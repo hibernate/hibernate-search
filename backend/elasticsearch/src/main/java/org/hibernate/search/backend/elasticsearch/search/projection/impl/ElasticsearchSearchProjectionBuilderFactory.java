@@ -18,7 +18,6 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
@@ -150,14 +149,14 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		}
 
 		@Override
-		public boolean areCompatible(ElasticsearchFieldProjectionBuilderFactory component1,
-				ElasticsearchFieldProjectionBuilderFactory component2, DslConverter dslConverter) {
-			// TODO HSEARCH-3257 handle dslConverter option
+		public boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2) {
+			// in case of projection all possible incompatibilities are evaluated earlier
 			return component1.isDslCompatibleWith( component2 );
 		}
 
 		@Override
 		public boolean hasCompatibleConverter(ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2) {
+			// no compatibility check is deferred in time
 			return true;
 		}
 

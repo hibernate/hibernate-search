@@ -18,7 +18,6 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
@@ -74,7 +73,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldSortBuilderFactory> fieldComponent = scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED );
+				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, fieldComponent.getConverterCompatibilityChecker() );
 	}
 
@@ -106,9 +105,8 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 		}
 
 		@Override
-		public boolean areCompatible(ElasticsearchFieldSortBuilderFactory component1,
-				ElasticsearchFieldSortBuilderFactory component2, DslConverter dslConverter) {
-			return component1.isDslCompatibleWith( component2, dslConverter );
+		public boolean hasCompatibleCodec(ElasticsearchFieldSortBuilderFactory component1, ElasticsearchFieldSortBuilderFactory component2) {
+			return component1.hasCompatibleCodec( component2 );
 		}
 
 		@Override

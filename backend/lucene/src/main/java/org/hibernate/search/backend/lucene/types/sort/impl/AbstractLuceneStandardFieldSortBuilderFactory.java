@@ -13,7 +13,6 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuil
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -50,23 +49,6 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 		throw log.distanceOperationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
-	}
-
-	@Override
-	public boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory obj, DslConverter dslConverter) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( obj.getClass() != this.getClass() ) {
-			return false;
-		}
-
-		AbstractLuceneStandardFieldSortBuilderFactory<?, ?> other = (AbstractLuceneStandardFieldSortBuilderFactory<?, ?>) obj;
-
-		if ( sortable != other.sortable || !codec.isCompatibleWith( other.codec ) ) {
-			return false;
-		}
-		return !dslConverter.isEnabled() || converter.isCompatibleWith( other.converter );
 	}
 
 	@Override

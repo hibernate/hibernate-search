@@ -19,7 +19,6 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -77,14 +76,6 @@ public class ElasticsearchSearchScopeModel {
 
 	public <T> ElasticsearchScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
-		// by default dsl converter check is enabled
-		return getSchemaNodeComponent( absoluteFieldPath, componentRetrievalStrategy, DslConverter.ENABLED );
-	}
-
-	// TODO remove dslConverter parameter in subsequent commit within the same current issue
-	// the option will be handled later on the stream using the power of the converterChecker
-	public <T> ElasticsearchScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
-			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy, DslConverter dslConverter) {
 		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
 		ElasticsearchIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		T selectedComponent = null;
@@ -101,7 +92,7 @@ public class ElasticsearchSearchScopeModel {
 					indexModelForSelectedSchemaNode = indexModel;
 					selectedComponent = component;
 				}
-				else if ( !componentRetrievalStrategy.areCompatible( selectedComponent, component, dslConverter ) ) {
+				else if ( !componentRetrievalStrategy.hasCompatibleCodec( selectedComponent, component ) ) {
 					throw componentRetrievalStrategy.createCompatibilityException(
 							absoluteFieldPath,
 							selectedComponent,
