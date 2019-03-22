@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
@@ -72,9 +73,10 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath, DslConverter dslConverter) {
-		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
-				.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, dslConverter );
+		// TODO remove dslConverter parameter
+		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldSortBuilderFactory> fieldComponent = scopeModel
+				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED );
+		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override
@@ -112,7 +114,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 		@Override
 		public boolean hasCompatibleConverter(ElasticsearchFieldSortBuilderFactory component1, ElasticsearchFieldSortBuilderFactory component2) {
-			return true;
+			return component1.hasCompatibleConverter( component2 );
 		}
 
 		@Override

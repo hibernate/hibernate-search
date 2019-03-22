@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
@@ -34,18 +35,24 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 	private final ElasticsearchSearchContext searchContext;
 
 	private final String absoluteFieldPath;
-	private final ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
+
+	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final ElasticsearchConverterCompatibilityChecker converterChecker;
+
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private JsonElement missing;
 
 	public ElasticsearchFieldSortBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter,
-			ElasticsearchFieldCodec<F> codec) {
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			ElasticsearchConverterCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.dslToIndexConverter = dslToIndexConverter;
+		this.converter = converter;
+		this.rawConverter = rawConverter;
+		this.converterChecker = converterChecker;
 		this.codec = codec;
 	}
 
@@ -61,7 +68,11 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 
 	@Override
 	public void missingAs(Object value, DslConverter dslConverter) {
-		// TODO handle dslConverter
+		if ( dslConverter.isEnabled() ) {
+			converterChecker.failIfNotCompatible();
+		}
+
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = ( dslConverter.isEnabled() ) ? converter : rawConverter;
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			this.missing = codec.encode( converted );
