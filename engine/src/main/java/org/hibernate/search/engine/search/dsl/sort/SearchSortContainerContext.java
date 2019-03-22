@@ -49,31 +49,6 @@ public interface SearchSortContainerContext {
 	FieldSortContext byField(String absoluteFieldPath);
 
 	/**
-	 * Order elements by the value of a specific <strong>raw</strong> field.
-	 * <p>
-	 * The default order is <strong>ascending</strong>.
-	 * <p>
-	 * Using this method instead of {@link #byField(String)} will disable some of the conversion applied to
-	 * arguments to {@link FieldSortMissingValueContext#use(Object)},
-	 * allowing to pass values directly to the backend.
-	 * <p>
-	 * This is useful when the type of the indexed property is not the same as the type of search parameters.
-	 * For example one may use a custom bridge implementing {@code ValueBridge<MyType, String>}
-	 * to translate a property from a custom type to a string when indexing.
-	 * When targeting that field with {@code byField},
-	 * Hibernate Search will expect arguments to {@link FieldSortMissingValueContext#use(Object)} to be instances of the custom type;
-	 * with {@code byRawField}, it will expect strings.
-	 *
-	 * @param absoluteFieldPath The absolute path of the index field to sort by
-	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
-	 * @throws SearchException If the sort field type could not be automatically determined.
-	 *
-	 * @see #byField(String)
-	 */
-	FieldSortContext byRawField(String absoluteFieldPath);
-
-	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
 	 * <p>
 	 * The default order is <strong>ascending</strong>.

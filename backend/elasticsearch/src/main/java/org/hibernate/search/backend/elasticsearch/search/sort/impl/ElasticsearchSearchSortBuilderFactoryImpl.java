@@ -72,8 +72,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 	}
 
 	@Override
-	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath, DslConverter dslConverter) {
-		// TODO remove dslConverter parameter
+	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldSortBuilderFactory> fieldComponent = scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED );
 		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, fieldComponent.getConverterCompatibilityChecker() );

@@ -30,8 +30,8 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 
 	private final boolean sortable;
 
-	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
-	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	protected final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
 
 	protected final C codec;
 
@@ -69,14 +69,36 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 		return !dslConverter.isEnabled() || converter.isCompatibleWith( other.converter );
 	}
 
+	@Override
+	public boolean hasCompatibleCodec(LuceneFieldSortBuilderFactory other) {
+		if ( this == other ) {
+			return true;
+		}
+		if ( other.getClass() != this.getClass() ) {
+			return false;
+		}
+
+		AbstractLuceneStandardFieldSortBuilderFactory<?, ?> otherFactory = (AbstractLuceneStandardFieldSortBuilderFactory<?, ?>) other;
+		return sortable == otherFactory.sortable && codec.isCompatibleWith( otherFactory.codec );
+	}
+
+	@Override
+	public boolean hasCompatibleConverter(LuceneFieldSortBuilderFactory other) {
+		if ( this == other ) {
+			return true;
+		}
+		if ( other.getClass() != this.getClass() ) {
+			return false;
+		}
+
+		AbstractLuceneStandardFieldSortBuilderFactory<?, ?> otherFactory = (AbstractLuceneStandardFieldSortBuilderFactory<?, ?>) other;
+		return converter.isCompatibleWith( otherFactory.converter );
+	}
+
 	protected void checkSortable(String absoluteFieldPath) {
 		if ( !sortable ) {
 			throw log.unsortableField( absoluteFieldPath,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
-	}
-
-	protected ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
-		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
 	}
 }

@@ -226,19 +226,19 @@ public class FieldSearchSortIT {
 					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
 							&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
-				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( fieldModel.before1Value, DslConverter.DISABLED ) );
 				assertThat( query )
 						.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( fieldModel.between1And2Value, DslConverter.DISABLED ) );
 				assertThat( query )
 						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( fieldModel.between2And3Value, DslConverter.DISABLED ) );
 				assertThat( query )
 						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( fieldModel.after3Value, DslConverter.DISABLED ) );
 				assertThat( query )
 						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
@@ -487,7 +487,7 @@ public class FieldSearchSortIT {
 					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
 							&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
-				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( fieldModel.before1Value, DslConverter.DISABLED ), scope );
 
 				/*
@@ -529,7 +529,7 @@ public class FieldSearchSortIT {
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndexManager__dslConverterDisabled() {
+	public void multiIndex_withNoCompatibleIndexManager_dslConverterDisabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -537,7 +537,7 @@ public class FieldSearchSortIT {
 
 			SubTest.expectException(
 					() -> {
-						simpleQuery( b -> b.byRawField( fieldPath ), scope );
+						simpleQuery( b -> b.byField( fieldPath ), scope );
 					}
 			)
 					.assertThrown()

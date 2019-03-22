@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import org.apache.lucene.search.SortField;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
@@ -19,11 +20,11 @@ public class LuceneNumericFieldSortBuilder<F, E>
 
 	LuceneNumericFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
-			LuceneNumericFieldCodec<F, E> codec) {
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			LuceneConverterCompatibilityChecker converterChecker, LuceneNumericFieldCodec<F, E> codec) {
 		super(
 				searchContext, absoluteFieldPath,
-				converter, codec,
+				converter, rawConverter, converterChecker, codec,
 				codec.getDomain().getMinValue(),
 				codec.getDomain().getMaxValue()
 		);

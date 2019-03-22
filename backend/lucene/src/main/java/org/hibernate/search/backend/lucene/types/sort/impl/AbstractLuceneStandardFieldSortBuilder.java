@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
@@ -38,6 +39,9 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	protected final String absoluteFieldPath;
 
 	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final LuceneConverterCompatibilityChecker converterChecker;
+
 	protected final C codec;
 	private final Object sortMissingValueFirstPlaceholder;
 	private final Object sortMissingValueLastPlaceholder;
@@ -47,12 +51,14 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	protected AbstractLuceneStandardFieldSortBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
-			C codec,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			LuceneConverterCompatibilityChecker converterChecker, C codec,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
+		this.rawConverter = rawConverter;
+		this.converterChecker = converterChecker;
 		this.codec = codec;
 		this.sortMissingValueFirstPlaceholder = sortMissingValueFirstPlaceholder;
 		this.sortMissingValueLastPlaceholder = sortMissingValueLastPlaceholder;
@@ -70,9 +76,13 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	@Override
 	public void missingAs(Object value, DslConverter dslConverter) {
-		// TODO handle dslConverter
+		if ( dslConverter.isEnabled() ) {
+			converterChecker.failIfNotCompatible();
+		}
+
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = ( dslConverter.isEnabled() ) ? converter : rawConverter;
 		try {
-			F converted = converter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			missingValue = encodeMissingAs( converted );
 		}
 		catch (RuntimeException e) {
