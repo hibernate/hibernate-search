@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -61,7 +62,6 @@ public class RangeSearchPredicateIT {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
-	private IndexMapping compatibleIndexMapping;
 	private StubMappingIndexManager compatibleIndexManager;
 
 	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
@@ -79,7 +79,7 @@ public class RangeSearchPredicateIT {
 				)
 				.withIndex(
 						COMPATIBLE_INDEX_NAME,
-						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.compatibleIndexManager = indexManager
 				)
 				.withIndex(
@@ -116,7 +116,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void above_withDslConverter() {
+	public void above_withDslConverter_dslConverterEnabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -134,7 +134,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void above_withDslConverter_usingRawValues() {
+	public void above_withDslConverter_dslConverterDisabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -142,7 +142,7 @@ public class RangeSearchPredicateIT {
 
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
-					.predicate( f -> f.range().onRawField( absoluteFieldPath ).above( fieldModel.predicateLowerBound ) )
+					.predicate( f -> f.range().onRawField( absoluteFieldPath ).above( fieldModel.predicateLowerBound, DslConverter.DISABLED ) )
 					.toQuery();
 
 			assertThat( query )
@@ -199,7 +199,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void below_withDslConverter() {
+	public void below_withDslConverter_dslConverterEnabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -217,7 +217,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void below_withDslConverter_usingRawValues() {
+	public void below_withDslConverter_dslConverterDisabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -225,7 +225,7 @@ public class RangeSearchPredicateIT {
 
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
-					.predicate( f -> f.range().onRawField( absoluteFieldPath ).below( fieldModel.predicateUpperBound ) )
+					.predicate( f -> f.range().onRawField( absoluteFieldPath ).below( fieldModel.predicateUpperBound, DslConverter.DISABLED ) )
 					.toQuery();
 
 			assertThat( query )
@@ -283,7 +283,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void fromTo_withDslConverter() {
+	public void fromTo_withDslConverter_dslConverterEnabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -302,7 +302,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void fromTo_withDslConverter_usingRawValues() {
+	public void fromTo_withDslConverter_dslConverterDisabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -311,7 +311,8 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onRawField( absoluteFieldPath )
-							.from( fieldModel.predicateLowerBound ).to( fieldModel.predicateUpperBound ) )
+							.from( fieldModel.predicateLowerBound, DslConverter.DISABLED )
+							.to( fieldModel.predicateUpperBound, DslConverter.DISABLED ) )
 					.toQuery();
 
 			assertThat( query )
@@ -653,7 +654,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void multiField_withDslConverter() {
+	public void multiField_withDslConverter_dslConverterEnabled() {
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.range().onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
@@ -666,12 +667,12 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void multiFields_withDslConverter_usingRawValues() {
+	public void multiFields_withDslConverter_dslConverterDisabled() {
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.range().onRawField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
 						.orRawField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
-						.below( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue )
+						.below( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue, DslConverter.DISABLED )
 				)
 				.toQuery();
 
@@ -850,12 +851,15 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_usingField() {
+	public void multiIndex_withRawFieldCompatibleIndexManager_dslConverterEnabled() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object upperValueToMatch = fieldModel.predicateUpperBound;
+
 			SubTest.expectException(
 					() -> {
 						indexManager.createSearchScope( rawFieldCompatibleIndexManager )
-								.predicate().range().onField( fieldModel.relativeFieldName );
+								.predicate().range().onField( absoluteFieldPath ).below( upperValueToMatch );
 					}
 			)
 					.assertThrown()
@@ -869,7 +873,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_usingRawField() {
+	public void multiIndex_withRawFieldCompatibleIndexManager_dslConverterDisabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -878,7 +882,7 @@ public class RangeSearchPredicateIT {
 
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
-					.predicate( f -> f.range().onRawField( absoluteFieldPath ).below( upperValueToMatch ) )
+					.predicate( f -> f.range().onRawField( absoluteFieldPath ).below( upperValueToMatch, DslConverter.DISABLED ) )
 					.toQuery();
 
 			assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -890,7 +894,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndexManager_usingField() {
+	public void multiIndex_withNoCompatibleIndexManager_dslConverterEnabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -910,7 +914,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndexManager_usingRawField() {
+	public void multiIndex_withNoCompatibleIndexManager_dslConverterDisabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
