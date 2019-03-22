@@ -142,7 +142,7 @@ public class RangeSearchPredicateIT {
 
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
-					.predicate( f -> f.range().onRawField( absoluteFieldPath ).above( fieldModel.predicateLowerBound, DslConverter.DISABLED ) )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).above( fieldModel.predicateLowerBound, DslConverter.DISABLED ) )
 					.toQuery();
 
 			assertThat( query )
@@ -225,7 +225,7 @@ public class RangeSearchPredicateIT {
 
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
-					.predicate( f -> f.range().onRawField( absoluteFieldPath ).below( fieldModel.predicateUpperBound, DslConverter.DISABLED ) )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).below( fieldModel.predicateUpperBound, DslConverter.DISABLED ) )
 					.toQuery();
 
 			assertThat( query )
@@ -310,7 +310,7 @@ public class RangeSearchPredicateIT {
 
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
-					.predicate( f -> f.range().onRawField( absoluteFieldPath )
+					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( fieldModel.predicateLowerBound, DslConverter.DISABLED )
 							.to( fieldModel.predicateUpperBound, DslConverter.DISABLED ) )
 					.toQuery();
@@ -670,8 +670,8 @@ public class RangeSearchPredicateIT {
 	public void multiFields_withDslConverter_dslConverterDisabled() {
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
-				.predicate( f -> f.range().onRawField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
-						.orRawField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
+				.predicate( f -> f.range().onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
+						.orField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
 						.below( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue, DslConverter.DISABLED )
 				)
 				.toQuery();
@@ -882,7 +882,7 @@ public class RangeSearchPredicateIT {
 
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
-					.predicate( f -> f.range().onRawField( absoluteFieldPath ).below( upperValueToMatch, DslConverter.DISABLED ) )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch, DslConverter.DISABLED ) )
 					.toQuery();
 
 			assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -921,7 +921,7 @@ public class RangeSearchPredicateIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			SubTest.expectException(
-					() -> scope.predicate().range().onRawField( fieldPath )
+					() -> scope.predicate().range().onField( fieldPath )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )

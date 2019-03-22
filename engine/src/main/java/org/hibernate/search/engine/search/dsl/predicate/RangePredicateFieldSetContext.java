@@ -42,34 +42,6 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	RangePredicateFieldSetContext orFields(String ... absoluteFieldPaths);
 
 	/**
-	 * Target the given <strong>raw</strong> fields in the range predicate,
-	 * as an alternative to the already-targeted fields.
-	 * <p>
-	 * See {@link RangePredicateContext#onFields(String...)} for more information about targeting raw fields.
-	 *
-	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
-	 * @return {@code this}, for method chaining.
-	 *
-	 * @see RangePredicateContext#onRawField(String)
-	 */
-	default RangePredicateFieldSetContext orRawField(String absoluteFieldPath) {
-		return orRawFields( absoluteFieldPath );
-	}
-
-	/**
-	 * Target the given <strong>raw</strong> fields in the match predicate,
-	 * as an alternative to the already-targeted fields.
-	 * <p>
-	 * See {@link RangePredicateContext#onRawFields(String...)} for more information about targeting raw fields.
-	 *
-	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
-	 * @return {@code this}, for method chaining.
-	 *
-	 * @see RangePredicateContext#onRawFields(String...)
-	 */
-	RangePredicateFieldSetContext orRawFields(String... absoluteFieldPaths);
-
-	/**
 	 * Require at least one of the targeted fields to be "higher than" the given value,
 	 * and "lower than" another value (to be provided in following calls).
 	 * <p>

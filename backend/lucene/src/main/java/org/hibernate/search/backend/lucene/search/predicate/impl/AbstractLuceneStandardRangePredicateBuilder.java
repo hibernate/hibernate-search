@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
@@ -33,7 +34,10 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 
 	protected final String absoluteFieldPath;
 
-	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final LuceneConverterCompatibilityChecker converterChecker;
+
 	protected final C codec;
 
 	protected E lowerLimit;
@@ -45,19 +49,21 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 	protected AbstractLuceneStandardRangePredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
-			C codec) {
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			LuceneConverterCompatibilityChecker converterChecker, C codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
+		this.rawConverter = rawConverter;
+		this.converterChecker = converterChecker;
 		this.codec = codec;
 	}
 
 	@Override
 	public void lowerLimit(Object value, DslConverter dslConverter) {
-		// TODO handle dslConverter
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( dslConverter );
 		try {
-			F converted = converter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			lowerLimit = codec.encode( converted );
 		}
 		catch (RuntimeException e) {
@@ -74,9 +80,9 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 
 	@Override
 	public void upperLimit(Object value, DslConverter dslConverter) {
-		// TODO handle dslConverter
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( dslConverter );
 		try {
-			F converted = converter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			upperLimit = codec.encode( converted );
 		}
 		catch (RuntimeException e) {
@@ -89,5 +95,13 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 	@Override
 	public void excludeUpperLimit() {
 		excludeUpperLimit = true;
+	}
+
+	public ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(DslConverter dslConverter) {
+		if ( dslConverter.isEnabled() ) {
+			converterChecker.failIfNotCompatible();
+		}
+
+		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
 	}
 }
