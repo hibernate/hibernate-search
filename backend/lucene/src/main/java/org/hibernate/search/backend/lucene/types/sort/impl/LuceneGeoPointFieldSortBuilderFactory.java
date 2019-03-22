@@ -9,10 +9,10 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -30,7 +30,7 @@ public class LuceneGeoPointFieldSortBuilderFactory implements LuceneFieldSortBui
 
 	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
+			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneConverterCompatibilityChecker converterChecker) {
 		throw log.traditionalSortNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
@@ -44,14 +44,18 @@ public class LuceneGeoPointFieldSortBuilderFactory implements LuceneFieldSortBui
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory obj, DslConverter dslConverter) {
-		if ( obj.getClass() != this.getClass() ) {
+	public boolean hasCompatibleCodec(LuceneFieldSortBuilderFactory other) {
+		if ( other.getClass() != this.getClass() ) {
 			return false;
 		}
 
-		LuceneGeoPointFieldSortBuilderFactory other = (LuceneGeoPointFieldSortBuilderFactory) obj;
+		LuceneGeoPointFieldSortBuilderFactory otherFactory = (LuceneGeoPointFieldSortBuilderFactory) other;
+		return otherFactory.sortable == this.sortable;
+	}
 
-		return other.sortable == this.sortable;
+	@Override
+	public boolean hasCompatibleConverter(LuceneFieldSortBuilderFactory other) {
+		return true;
 	}
 
 	protected void checkSortable(String absoluteFieldPath) {

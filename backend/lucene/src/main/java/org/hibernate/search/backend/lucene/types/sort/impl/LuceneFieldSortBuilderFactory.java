@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
@@ -22,7 +23,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * allowing fine-grained control over the type of sort created for each field.
  * <p>
  * For example, a sort on an {@link Integer} field
- * will not have its {@link FieldSortBuilder#missingAs(Object)} method
+ * will not have its {@link FieldSortBuilder#missingAs(Object, DslConverter)} method
  * accept the same arguments as a sort on a {@link java.time.LocalDate} field;
  * having a separate {@link LuceneFieldSortBuilderFactory} for those two fields
  * allows to implement the different behavior.
@@ -35,7 +36,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 public interface LuceneFieldSortBuilderFactory {
 
 	FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
+			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneConverterCompatibilityChecker converterChecker);
 
 	DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath, GeoPoint center);
 
@@ -47,9 +48,19 @@ public interface LuceneFieldSortBuilderFactory {
 	 * @see LuceneFieldCodec#isCompatibleWith(LuceneFieldCodec)
 	 *
 	 * @param other Another {@link LuceneFieldSortBuilderFactory}, never {@code null}.
-	 * @param converter whether {@code ENABLED}, converters will also be taken in account for the matching
+	 * @param dslConverter whether {@code ENABLED}, converters will also be taken in account for the matching
 	 * @return {@code true} if the given predicate builder factory is DSL-compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory other, DslConverter converter);
+	default boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory other, DslConverter dslConverter) {
+		if ( !hasCompatibleCodec( other ) ) {
+			return false;
+		}
+
+		return ( !dslConverter.isEnabled() || hasCompatibleConverter( other ) );
+	}
+
+	boolean hasCompatibleCodec(LuceneFieldSortBuilderFactory other);
+
+	boolean hasCompatibleConverter(LuceneFieldSortBuilderFactory other);
 }

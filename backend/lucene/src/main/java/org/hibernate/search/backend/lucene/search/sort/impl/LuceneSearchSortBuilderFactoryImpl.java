@@ -15,6 +15,7 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.lucene.search.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
@@ -73,10 +74,10 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 	}
 
 	@Override
-	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath, DslConverter dslConverter) {
-		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
-				.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, dslConverter );
+	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath) {
+		LuceneScopedIndexFieldComponent<LuceneFieldSortBuilderFactory> fieldComponent = scopeModel
+				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED );
+		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override
@@ -117,7 +118,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 		@Override
 		public boolean hasCompatibleConverter(LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2) {
-			return true;
+			return component1.hasCompatibleConverter( component2 );
 		}
 
 		@Override
