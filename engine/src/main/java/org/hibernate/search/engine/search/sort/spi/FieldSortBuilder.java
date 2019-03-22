@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.engine.search.sort.spi;
 
+import org.hibernate.search.engine.search.predicate.DslConverter;
+
 public interface FieldSortBuilder<B> extends SearchSortBuilder<B> {
 
 	void missingFirst();
 
 	void missingLast();
 
-	void missingAs(Object value);
+	void missingAs(Object value, DslConverter dslConverter);
 
 }
