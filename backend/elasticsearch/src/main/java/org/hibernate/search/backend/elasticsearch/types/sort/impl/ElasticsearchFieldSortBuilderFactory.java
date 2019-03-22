@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -21,7 +22,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * allowing fine-grained control over the type of sort created for each field.
  * <p>
  * For example, a sort on an {@link Integer} field
- * will not have its {@link FieldSortBuilder#missingAs(Object)} method
+ * will not have its {@link FieldSortBuilder#missingAs(Object, DslConverter)} method
  * accept the same arguments as a sort on a {@link java.time.LocalDate} field;
  * having a separate {@link ElasticsearchFieldSortBuilderFactory} for those two fields
  * allows to implement the different behavior.
@@ -34,7 +35,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 public interface ElasticsearchFieldSortBuilderFactory {
 
 	FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchConverterCompatibilityChecker converterChecker);
 
 	DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
 			GeoPoint center);
@@ -47,9 +48,19 @@ public interface ElasticsearchFieldSortBuilderFactory {
 	 * @see org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec#isCompatibleWith(ElasticsearchFieldCodec)
 	 * *
 	 * @param other Another {@link ElasticsearchFieldSortBuilderFactory}, never {@code null}.
-	 * @param converter whether {@code ENABLED}, converters will also be taken in account for the matching
+	 * @param dslConverter whether {@code ENABLED}, converters will also be taken in account for the matching
 	 * @return {@code true} if the given sort builder factory is DSL-compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isDslCompatibleWith(ElasticsearchFieldSortBuilderFactory other, DslConverter converter);
+	default boolean isDslCompatibleWith(ElasticsearchFieldSortBuilderFactory other, DslConverter dslConverter) {
+		if ( !hasCompatibleCodec( other ) ) {
+			return false;
+		}
+
+		return ( !dslConverter.isEnabled() || hasCompatibleConverter( other ) );
+	}
+
+	boolean hasCompatibleCodec(ElasticsearchFieldSortBuilderFactory other);
+
+	boolean hasCompatibleConverter(ElasticsearchFieldSortBuilderFactory other);
 }

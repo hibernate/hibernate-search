@@ -9,11 +9,11 @@ package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchDistanceSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -32,7 +32,7 @@ public class ElasticsearchGeoPointFieldSortBuilderFactory implements Elasticsear
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, DslConverter dslConverter) {
+			String absoluteFieldPath, ElasticsearchConverterCompatibilityChecker converterChecker) {
 		throw log.traditionalSortNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
@@ -47,14 +47,18 @@ public class ElasticsearchGeoPointFieldSortBuilderFactory implements Elasticsear
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(ElasticsearchFieldSortBuilderFactory obj, DslConverter converter) {
-		if ( obj.getClass() != this.getClass() ) {
+	public boolean hasCompatibleCodec(ElasticsearchFieldSortBuilderFactory other) {
+		if ( other.getClass() != this.getClass() ) {
 			return false;
 		}
 
-		ElasticsearchGeoPointFieldSortBuilderFactory other = (ElasticsearchGeoPointFieldSortBuilderFactory) obj;
+		ElasticsearchGeoPointFieldSortBuilderFactory otherFactory = (ElasticsearchGeoPointFieldSortBuilderFactory) other;
+		return otherFactory.sortable == this.sortable;
+	}
 
-		return other.sortable == this.sortable;
+	@Override
+	public boolean hasCompatibleConverter(ElasticsearchFieldSortBuilderFactory obj) {
+		return true;
 	}
 
 	private static void checkSortable(String absoluteFieldPath, boolean sortable) {
