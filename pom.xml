@@ -187,7 +187,7 @@
         <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
 
         <!-- >>> ORM -->
-        <version.org.hibernate>5.4.1.Final</version.org.hibernate>
+        <version.org.hibernate>5.4.2.Final</version.org.hibernate>
         <javadoc.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
         <version.org.hibernate.commons.annotations>5.1.0.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>

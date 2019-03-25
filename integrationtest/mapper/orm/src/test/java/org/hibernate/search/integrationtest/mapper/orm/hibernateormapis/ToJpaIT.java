@@ -14,6 +14,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Table;
 import javax.persistence.TypedQuery;
 
@@ -164,8 +165,7 @@ public class ToJpaIT {
 				query.getSingleResult();
 			} )
 					.assertThrown()
-					// HHH-13300: query.getSingleResult() throws org.hibernate.NonUniqueResultException instead of javax.persistence.NonUniqueResultException
-					.isInstanceOf( org.hibernate.NonUniqueResultException.class );
+					.isInstanceOf( NonUniqueResultException.class );
 			backendMock.verifyExpectationsMet();
 
 			backendMock.expectSearchObjects(
