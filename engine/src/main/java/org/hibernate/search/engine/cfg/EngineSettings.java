@@ -29,11 +29,6 @@ public final class EngineSettings {
 	public static final String BACKENDS = "backends";
 
 	/**
-	 * The root property whose children are index names, e.g. "indexes.myIndex.backend = myBackend".
-	 */
-	public static final String INDEXES = "indexes";
-
-	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {

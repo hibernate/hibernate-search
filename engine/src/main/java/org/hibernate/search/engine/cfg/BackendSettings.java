@@ -33,4 +33,9 @@ public final class BackendSettings {
 	 */
 	public static final String INDEX_DEFAULTS = "index_defaults";
 
+	/**
+	 * The root property whose children are index names, e.g. {@code indexes.myIndex.<some index-scoped property> = bar}.
+	 */
+	public static final String INDEXES = "indexes";
+
 }

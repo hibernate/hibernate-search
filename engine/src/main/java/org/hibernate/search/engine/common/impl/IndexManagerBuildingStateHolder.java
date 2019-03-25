@@ -131,6 +131,7 @@ class IndexManagerBuildingStateHolder {
 	class BackendInitialBuildState<D extends DocumentElement> {
 		private final String backendName;
 		private final BackendBuildContext backendBuildContext;
+		private final ConfigurationPropertySource backendPropertySource;
 		private final ConfigurationPropertySource defaultIndexPropertySource;
 		private final BackendImplementor<D> backend;
 
@@ -141,6 +142,7 @@ class IndexManagerBuildingStateHolder {
 				BackendImplementor<D> backend) {
 			this.backendName = backendName;
 			this.backendBuildContext = backendBuildContext;
+			this.backendPropertySource = backendPropertySource;
 			this.defaultIndexPropertySource =
 					EngineConfigurationUtils.getIndexDefaults( backendPropertySource );
 			this.backend = backend;
@@ -151,12 +153,10 @@ class IndexManagerBuildingStateHolder {
 			IndexManagerInitialBuildState<?> state = indexManagerBuildStateByName.get( indexName );
 			if ( state == null ) {
 				ConfigurationPropertySource indexPropertySource =
-						EngineConfigurationUtils.getIndexWithoutDefaults( propertySource, indexName );
-				ConfigurationPropertySource defaultedIndexPropertySource =
-						EngineConfigurationUtils.addIndexDefaults( indexPropertySource, defaultIndexPropertySource );
+						EngineConfigurationUtils.getIndex( backendPropertySource, defaultIndexPropertySource, indexName );
 
 				IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder(
-						indexName, multiTenancyEnabled, backendBuildContext, defaultedIndexPropertySource
+						indexName, multiTenancyEnabled, backendBuildContext, indexPropertySource
 				);
 				IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
 				IndexedEntityBindingContext bindingContext = new IndexedEntityBindingContextImpl( schemaRootNodeBuilder );

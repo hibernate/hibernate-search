@@ -19,17 +19,13 @@ public final class EngineConfigurationUtils {
 		return engineSource.withMask( EngineSettings.BACKENDS ).withMask( backendName );
 	}
 
-	public static ConfigurationPropertySource getIndexWithoutDefaults(ConfigurationPropertySource engineSource, String indexName) {
-		return engineSource.withMask( EngineSettings.INDEXES ).withMask( indexName );
+	public static ConfigurationPropertySource getIndex(ConfigurationPropertySource backendSource,
+			ConfigurationPropertySource indexDefaultsSource, String indexName) {
+		return backendSource.withMask( BackendSettings.INDEXES ).withMask( indexName ).withFallback( indexDefaultsSource );
 	}
 
 	public static ConfigurationPropertySource getIndexDefaults(ConfigurationPropertySource backendSource) {
 		return backendSource.withMask( BackendSettings.INDEX_DEFAULTS );
-	}
-
-	public static ConfigurationPropertySource addIndexDefaults(ConfigurationPropertySource indexSource,
-			ConfigurationPropertySource indexDefaultsSource) {
-		return indexSource.withFallback( indexDefaultsSource );
 	}
 
 }
