@@ -19,13 +19,4 @@ public final class IndexSettings {
 	private IndexSettings() {
 	}
 
-	/**
-	 * The name of the backend to create the index in.
-	 * <p>
-	 * Expects a String.
-	 * <p>
-	 * Defaults to the name of the {@link EngineSettings#DEFAULT_BACKEND default backend}.
-	 */
-	public static final String BACKEND = "backend";
-
 }

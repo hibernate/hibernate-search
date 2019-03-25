@@ -235,10 +235,11 @@ public interface Log extends BasicLogger {
 	SearchException backendTypeCannotBeNullOrEmpty(String backendName, String key);
 
 	@Message(id = ID_OFFSET_2 + 50,
-			value = "Missing backend reference for index '%1$s'."
-					+ " Set the property '%2$s' to a supported value or set '%3$s' to set a default value for all indexes."
+			value = "The name of the default backend is not set."
+					+ " Set it through the configuration property '%1$s',"
+					+ " or set the backend name explicitly for each indexed type in your mapping."
 	)
-	SearchException indexBackendCannotBeNullOrEmpty(String indexName, String key, String defaultKey);
+	SearchException defaultBackendNameNotSet(String defaultKey);
 
 	@Message(id = ID_OFFSET_2 + 51,
 			value = "It is not possible to use per-field boosts together with withConstantScore option"

@@ -265,10 +265,12 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
 				String indexName = contribution.getIndexName();
 				if ( indexName != null ) {
+					String backendName = contribution.getBackendName();
 					IndexManagerBuildingState<?> indexManagerBuildingState;
 					try {
 						indexManagerBuildingState = indexManagerBuildingStateHolder
-								.startBuilding( indexName, multiTenancyEnabled );
+								.getBackend( backendName )
+								.getIndexManagerBuildingState( indexName, multiTenancyEnabled );
 					}
 					catch (RuntimeException e) {
 						buildContext.getFailureCollector()
@@ -352,11 +354,11 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 		private class MappingConfigurationCollectorImpl implements MappingConfigurationCollector<C> {
 			@Override
-			public void mapToIndex(MappableTypeModel typeModel, String indexName) {
+			public void mapToIndex(MappableTypeModel typeModel, String backendName, String indexName) {
 				if ( typeModel.isAbstract() ) {
 					throw log.cannotMapAbstractTypeToIndex( typeModel, indexName );
 				}
-				getOrCreateContribution( typeModel ).mapToIndex( indexName );
+				getOrCreateContribution( typeModel ).mapToIndex( backendName, indexName );
 			}
 
 			@Override
@@ -396,6 +398,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	private static class TypeMappingContribution<C> {
 		private final MappableTypeModel typeModel;
 		private String indexName;
+		private String backendName;
 		private final List<C> contributors = new ArrayList<>();
 
 		TypeMappingContribution(MappableTypeModel typeModel) {
@@ -406,10 +409,15 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			return indexName;
 		}
 
-		public void mapToIndex(String indexName) {
+		public String getBackendName() {
+			return backendName;
+		}
+
+		public void mapToIndex(String backendName, String indexName) {
 			if ( this.indexName != null ) {
 				throw log.multipleIndexMapping( typeModel, this.indexName, indexName );
 			}
+			this.backendName = backendName;
 			this.indexName = indexName;
 		}
 

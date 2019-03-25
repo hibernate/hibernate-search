@@ -72,14 +72,6 @@ For ORM entities, the default index name is the name of the indexed class, witho
 Index names can be customized in the mapping.
 
 +
-Notable properties:
-
-* `hibernate.search.indexes.<index name>.backend`: the backend to use for this index.
-Set this to the name of your backend.
-Note that you do not need to set this explicitly for each index,
-you can simply set the global property `hibernate.search.default_backend` (see above).
-
-+
 Examples:
 
 * `hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy = validate`

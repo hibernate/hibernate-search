@@ -19,7 +19,7 @@ public final class EngineSettings {
 	 * <p>
 	 * Expects a String.
 	 * <p>
-	 * Defaults to no value, meaning a backend must be {@link IndexSettings#BACKEND set for every single index}.
+	 * Defaults to no value, meaning a backend must be set in the mapping for every single index.
 	 */
 	public static final String DEFAULT_BACKEND = "default_backend";
 

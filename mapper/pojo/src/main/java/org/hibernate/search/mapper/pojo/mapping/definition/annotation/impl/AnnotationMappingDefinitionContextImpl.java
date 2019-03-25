@@ -80,12 +80,13 @@ public class AnnotationMappingDefinitionContextImpl implements AnnotationMapping
 				.forEach( typeModel -> {
 					Optional<Indexed> indexedAnnotation = typeModel.getAnnotationByType( Indexed.class );
 					if ( indexedAnnotation.isPresent() ) {
+						String backendName = indexedAnnotation.get().backend();
 						String defaultedIndexName = indexedAnnotation.get().index();
 						if ( defaultedIndexName.isEmpty() ) {
 							defaultedIndexName = typeModel.getJavaClass().getName();
 						}
 						try {
-							collector.mapToIndex( typeModel, defaultedIndexName );
+							collector.mapToIndex( typeModel, backendName, defaultedIndexName );
 						}
 						catch (RuntimeException e) {
 							failureCollector.withContext( PojoEventContexts.fromType( typeModel ) )
