@@ -50,7 +50,7 @@ public interface MatchPredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * @param value The value to match.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * See {@link DslConverter#ENABLED} for more information.
 	 * @return A context allowing to set further options or get the resulting predicate.
 	 *
 	 * @see #matching(Object, DslConverter)
@@ -64,10 +64,10 @@ public interface MatchPredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * @param value The value to match.
 	 * The signature of this method defines this parameter as an {@link Object},
-	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * See {@link DslConverter} for more information.
 	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter}.
+	 * See {@link DslConverter} for more information.
 	 * @return A context allowing to set further options or get the resulting predicate.
 	 *
 	 * @see DslConverter

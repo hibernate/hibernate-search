@@ -27,7 +27,7 @@ public interface RangePredicateFromContext {
 	 * was not null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * See {@link DslConverter#ENABLED} for more information.
 	 *
 	 * Upper bound is included by default in the range.
 	 *
@@ -46,10 +46,10 @@ public interface RangePredicateFromContext {
 	 * but this is only possible if the lower bound ({@link RangePredicateFieldSetContext#from(Object)})
 	 * was not null.
 	 * The signature of this method defines this parameter as an {@link Object},
-	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * See {@link DslConverter} for more information.
 	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter}.
+	 * See {@link DslConverter} for more information.
 	 *
 	 * Upper bound is included by default in the range.
 	 *
