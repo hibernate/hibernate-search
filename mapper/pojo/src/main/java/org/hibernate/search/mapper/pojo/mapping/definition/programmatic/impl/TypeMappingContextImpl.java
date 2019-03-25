@@ -30,6 +30,7 @@ public class TypeMappingContextImpl
 
 	private final PojoRawTypeModel<?> typeModel;
 
+	private String backendName;
 	private String indexName;
 
 	private final ErrorCollectingPojoTypeMetadataContributor children = new ErrorCollectingPojoTypeMetadataContributor();
@@ -43,7 +44,7 @@ public class TypeMappingContextImpl
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		if ( indexName != null ) {
 			try {
-				configurationCollector.mapToIndex( typeModel, indexName );
+				configurationCollector.mapToIndex( typeModel, backendName, indexName );
 			}
 			catch (RuntimeException e) {
 				buildContext.getFailureCollector()
@@ -71,6 +72,13 @@ public class TypeMappingContextImpl
 
 	@Override
 	public TypeMappingContext indexed(String indexName) {
+		this.indexName = indexName;
+		return this;
+	}
+
+	@Override
+	public TypeMappingContext indexed(String backendName, String indexName) {
+		this.backendName = backendName;
 		this.indexName = indexName;
 		return this;
 	}

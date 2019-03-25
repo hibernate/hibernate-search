@@ -352,7 +352,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 						analysisConfigurer
 				)
 				.withIndex(
-						MAPPED_TYPE_NAME, INDEX_NAME,
+						INDEX_NAME,
+						c -> c.mappedType( MAPPED_TYPE_NAME ),
 						mappingContributor,
 						indexManager -> { }
 				)

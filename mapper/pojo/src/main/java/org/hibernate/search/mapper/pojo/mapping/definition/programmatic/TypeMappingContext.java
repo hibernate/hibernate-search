@@ -20,6 +20,8 @@ public interface TypeMappingContext {
 
 	TypeMappingContext indexed(String indexName);
 
+	TypeMappingContext indexed(String backendName, String indexName);
+
 	/**
 	 * @param bridgeClass The class of the bridge to use.
 	 * @return {@code this}, for method chaining.

@@ -120,12 +120,15 @@ public class SearchSetupHelper implements TestRule {
 
 		public SetupContext withIndex(String rawIndexName,
 				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {
-			return withIndex( rawIndexName + "_Type", rawIndexName, mappingContributor, listener );
+			return withIndex( rawIndexName, ignored -> { }, mappingContributor, listener );
 		}
 
-		public SetupContext withIndex(String typeName, String rawIndexName,
+		public SetupContext withIndex(String rawIndexName,
+				Consumer<? super StubIndexMappingContext> optionsContributor,
 				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {
-			indexDefinitions.add( new IndexDefinition( typeName, rawIndexName, mappingContributor, listener ) );
+			IndexDefinition indexDefinition = new IndexDefinition( rawIndexName, mappingContributor, listener );
+			optionsContributor.accept( new StubIndexMappingContext( indexDefinition ) );
+			indexDefinitions.add( indexDefinition );
 			return this;
 		}
 
@@ -166,6 +169,26 @@ public class SearchSetupHelper implements TestRule {
 
 	}
 
+	public static class StubIndexMappingContext {
+
+		private final IndexDefinition indexDefinition;
+
+		public StubIndexMappingContext(IndexDefinition indexDefinition) {
+			this.indexDefinition = indexDefinition;
+		}
+
+		public StubIndexMappingContext mappedType(String typeName) {
+			indexDefinition.typeName = typeName;
+			return this;
+		}
+
+		public StubIndexMappingContext backend(String backendName) {
+			indexDefinition.backendName = backendName;
+			return this;
+		}
+
+	}
+
 	public interface IndexSetupListener {
 
 		void onSetup(StubMappingIndexManager indexMapping);
@@ -179,21 +202,24 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	private static class IndexDefinition {
-		private final String typeName;
 		private final String rawIndexName;
 		private final Consumer<? super IndexedEntityBindingContext> mappingContributor;
 		private final IndexSetupListener listener;
 
-		private IndexDefinition(String typeName, String rawIndexName,
+		private String typeName;
+		private String backendName;
+
+		private IndexDefinition(String rawIndexName,
 				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {
-			this.typeName = typeName;
 			this.rawIndexName = rawIndexName;
 			this.mappingContributor = mappingContributor;
 			this.listener = listener;
+			this.typeName = rawIndexName + "_Type";
+			this.backendName = null;
 		}
 
 		void beforeBuild(StubMappingInitiator stubMetadataContributor) {
-			stubMetadataContributor.add( typeName, rawIndexName, mappingContributor );
+			stubMetadataContributor.add( typeName, backendName, rawIndexName, mappingContributor );
 		}
 
 		void afterBuild(StubMapping mapping) {

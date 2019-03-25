@@ -20,6 +20,16 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Indexed {
 
+	/**
+	 * @return The name of the backend.
+	 * Defaults to the {@link org.hibernate.search.engine.cfg.EngineSettings#DEFAULT_BACKEND default backend}.
+	 */
+	String backend() default "";
+
+	/**
+	 * @return The name of the index.
+	 * Defaults to the simple name of the entity class.
+	 */
 	String index() default "";
 
 }

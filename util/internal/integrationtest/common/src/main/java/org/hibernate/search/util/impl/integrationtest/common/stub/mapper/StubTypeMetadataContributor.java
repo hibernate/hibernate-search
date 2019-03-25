@@ -15,18 +15,21 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
 class StubTypeMetadataContributor {
 
 	private final StubTypeModel typeIdentifier;
+	private final String backendName;
 	private final String indexName;
 	private final Consumer<? super IndexedEntityBindingContext> delegate;
 
-	StubTypeMetadataContributor(StubTypeModel typeIdentifier, String indexName, Consumer<? super IndexedEntityBindingContext> delegate) {
+	StubTypeMetadataContributor(StubTypeModel typeIdentifier, String backendName, String indexName,
+			Consumer<? super IndexedEntityBindingContext> delegate) {
 		this.typeIdentifier = typeIdentifier;
+		this.backendName = backendName;
 		this.indexName = indexName;
 		this.delegate = delegate;
 	}
 
 	final void contribute(MappingConfigurationCollector<StubTypeMetadataContributor> collector) {
 		if ( indexName != null ) {
-			collector.mapToIndex( typeIdentifier, indexName );
+			collector.mapToIndex( typeIdentifier, backendName, indexName );
 		}
 		collector.collectContributor( typeIdentifier, this );
 	}

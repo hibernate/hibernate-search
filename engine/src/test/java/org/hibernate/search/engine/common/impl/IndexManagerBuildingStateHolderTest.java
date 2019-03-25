@@ -38,28 +38,24 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 			new IndexManagerBuildingStateHolder( beanProviderMock, configurationSourceMock, rootBuildContextMock );
 
 	@Test
-	public void error_missingIndexBackend_emptyOptional() {
+	public void error_missingBackend_nullName() {
 		String keyPrefix = "somePrefix.";
 		resetAll();
-		EasyMock.expect( configurationSourceMock.get( "indexes.indexName.backend" ) )
-				.andReturn( Optional.empty() );
-		EasyMock.expect( configurationSourceMock.resolve( "indexes.indexName.backend" ) )
-				.andReturn( Optional.of( keyPrefix + "indexes.indexName.backend" ) );
 		EasyMock.expect( configurationSourceMock.get( "default_backend" ) )
 				.andReturn( Optional.empty() );
 		EasyMock.expect( configurationSourceMock.resolve( "default_backend" ) )
 				.andReturn( Optional.of( keyPrefix + "default_backend" ) );
 		replayAll();
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Missing backend reference for index 'indexName'" );
-		thrown.expectMessage( "Set the property 'somePrefix.indexes.indexName.backend' to a supported value" );
-		thrown.expectMessage( "or set 'somePrefix.default_backend' to set a default value for all indexes" );
-		holder.startBuilding( "indexName", false );
+		thrown.expectMessage( "The name of the default backend is not set" );
+		thrown.expectMessage( "Set it through the configuration property 'somePrefix.default_backend'" );
+		thrown.expectMessage( "or set the backend name explicitly for each indexed type in your mapping" );
+		holder.getBackend( null );
 		verifyAll();
 	}
 
 	@Test
-	public void error_missingIndexBackend_emptyString() {
+	public void error_missingIndexBackend_emptyName() {
 		String keyPrefix = "somePrefix.";
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "indexes.indexName.backend" ) )
@@ -72,19 +68,17 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				.andReturn( Optional.of( keyPrefix + "default_backend" ) );
 		replayAll();
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Missing backend reference for index 'indexName'" );
-		thrown.expectMessage( "Set the property 'somePrefix.indexes.indexName.backend' to a supported value" );
-		thrown.expectMessage( "or set 'somePrefix.default_backend' to set a default value for all indexes" );
-		holder.startBuilding( "indexName", false );
+		thrown.expectMessage( "The name of the default backend is not set" );
+		thrown.expectMessage( "Set it through the configuration property 'somePrefix.default_backend'" );
+		thrown.expectMessage( "or set the backend name explicitly for each indexed type in your mapping" );
+		holder.getBackend( "" );
 		verifyAll();
 	}
 
 	@Test
-	public void error_missingBackendType_emptyOptional() {
+	public void error_missingBackendType_nullType() {
 		String keyPrefix = "somePrefix.";
 		resetAll();
-		EasyMock.expect( configurationSourceMock.get( "indexes.indexName.backend" ) )
-				.andReturn( (Optional) Optional.of( "backendName" ) );
 		EasyMock.expect( configurationSourceMock.get( "backends.backendName.type" ) )
 				.andReturn( Optional.empty() );
 		EasyMock.expect( configurationSourceMock.resolve( "backends.backendName.type" ) )
@@ -93,16 +87,14 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Missing backend type for backend 'backendName'" );
 		thrown.expectMessage( "Set the property 'somePrefix.backends.backendName.type' to a supported value" );
-		holder.startBuilding( "indexName", false );
+		holder.getBackend( "backendName" );
 		verifyAll();
 	}
 
 	@Test
-	public void error_missingBackendType_emptyString() {
+	public void error_missingBackendType_emptyType() {
 		String keyPrefix = "somePrefix.";
 		resetAll();
-		EasyMock.expect( configurationSourceMock.get( "indexes.indexName.backend" ) )
-				.andReturn( (Optional) Optional.of( "backendName" ) );
 		EasyMock.expect( configurationSourceMock.get( "backends.backendName.type" ) )
 				.andReturn( (Optional) Optional.of( "" ) );
 		EasyMock.expect( configurationSourceMock.resolve( "backends.backendName.type" ) )
@@ -111,7 +103,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Missing backend type for backend 'backendName'" );
 		thrown.expectMessage( "Set the property 'somePrefix.backends.backendName.type' to a supported value" );
-		holder.startBuilding( "indexName", false );
+		holder.getBackend( "backendName" );
 		verifyAll();
 	}
 

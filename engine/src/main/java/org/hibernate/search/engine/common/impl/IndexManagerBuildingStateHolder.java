@@ -15,7 +15,6 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
-import org.hibernate.search.engine.cfg.IndexSettings;
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -34,6 +33,7 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.IndexedEntityBindingContextImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
@@ -47,9 +47,6 @@ class IndexManagerBuildingStateHolder {
 
 	private static final OptionalConfigurationProperty<String> DEFAULT_INDEX_BACKEND_NAME =
 			ConfigurationProperty.forKey( EngineSettings.DEFAULT_BACKEND ).asString().build();
-
-	private static final OptionalConfigurationProperty<String> INDEX_BACKEND_NAME =
-			ConfigurationProperty.forKey( IndexSettings.BACKEND ).asString().build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends BackendFactory>> BACKEND_TYPE =
 			ConfigurationProperty.forKey( BackendSettings.TYPE ).asBeanReference( BackendFactory.class )
@@ -71,42 +68,23 @@ class IndexManagerBuildingStateHolder {
 		this.rootBuildContext = rootBuildContext;
 	}
 
-	public IndexManagerBuildingState<?> startBuilding(String indexName, boolean multiTenancyEnabled) {
-		ConfigurationPropertySource indexPropertySource =
-				EngineConfigurationUtils.getIndexWithoutDefaults( propertySource, indexName );
-		String backendName = getBackendName( indexName, indexPropertySource );
-
-		BackendInitialBuildState<?> backendBuildingstate =
-				backendBuildStateByName.computeIfAbsent( backendName, this::createBackend );
-
-		IndexManagerInitialBuildState<?> state = indexManagerBuildStateByName.get( indexName );
-		if ( state == null ) {
-			state = backendBuildingstate.createIndexManagerBuildingState(
-					indexName, multiTenancyEnabled, indexPropertySource
-			);
-			indexManagerBuildStateByName.put( indexName, state );
+	BackendInitialBuildState<?> getBackend(String backendName) {
+		if ( StringHelper.isEmpty( backendName ) ) {
+			backendName = getDefaultBackendName();
 		}
-		return state;
+		return backendBuildStateByName.computeIfAbsent( backendName, this::createBackend );
 	}
 
-	private String getBackendName(String indexName, ConfigurationPropertySource indexPropertySource) {
-		Optional<String> backendNameOptional = INDEX_BACKEND_NAME.get( indexPropertySource );
-		if ( backendNameOptional.isPresent() ) {
-			return backendNameOptional.get();
+	private String getDefaultBackendName() {
+		Optional<String> defaultBackendNameOptional = DEFAULT_INDEX_BACKEND_NAME.get( propertySource );
+		if ( defaultBackendNameOptional.isPresent() ) {
+			return defaultBackendNameOptional.get();
 		}
 		else {
-			Optional<String> defaultBackendNameOptional = DEFAULT_INDEX_BACKEND_NAME.get( propertySource );
-			if ( defaultBackendNameOptional.isPresent() ) {
-				return defaultBackendNameOptional.get();
-			}
-			else {
-				throw log.indexBackendCannotBeNullOrEmpty(
-						indexName,
-						INDEX_BACKEND_NAME.resolveOrRaw( indexPropertySource ),
-						// Retrieve the resolved *default* key (*.default_backend) from the global (non-index-scoped) source
-						DEFAULT_INDEX_BACKEND_NAME.resolveOrRaw( propertySource )
-				);
-			}
+			throw log.defaultBackendNameNotSet(
+					// Retrieve the resolved *default* key (*.default_backend) from the global (non-index-scoped) source
+					DEFAULT_INDEX_BACKEND_NAME.resolveOrRaw( propertySource )
+			);
 		}
 	}
 
@@ -150,7 +128,7 @@ class IndexManagerBuildingStateHolder {
 		}
 	}
 
-	private class BackendInitialBuildState<D extends DocumentElement> {
+	class BackendInitialBuildState<D extends DocumentElement> {
 		private final String backendName;
 		private final BackendBuildContext backendBuildContext;
 		private final ConfigurationPropertySource defaultIndexPropertySource;
@@ -168,17 +146,26 @@ class IndexManagerBuildingStateHolder {
 			this.backend = backend;
 		}
 
-		IndexManagerInitialBuildState<D> createIndexManagerBuildingState(
-				String indexName, boolean multiTenancyEnabled,
-				ConfigurationPropertySource indexPropertySource) {
-			ConfigurationPropertySource defaultedIndexPropertySource =
-					EngineConfigurationUtils.addIndexDefaults( indexPropertySource, defaultIndexPropertySource );
-			IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder(
-					indexName, multiTenancyEnabled, backendBuildContext, defaultedIndexPropertySource
-			);
-			IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
-			IndexedEntityBindingContext bindingContext = new IndexedEntityBindingContextImpl( schemaRootNodeBuilder );
-			return new IndexManagerInitialBuildState<>( backendName, indexName, builder, bindingContext );
+		IndexManagerInitialBuildState<?> getIndexManagerBuildingState(
+				String indexName, boolean multiTenancyEnabled) {
+			IndexManagerInitialBuildState<?> state = indexManagerBuildStateByName.get( indexName );
+			if ( state == null ) {
+				ConfigurationPropertySource indexPropertySource =
+						EngineConfigurationUtils.getIndexWithoutDefaults( propertySource, indexName );
+				ConfigurationPropertySource defaultedIndexPropertySource =
+						EngineConfigurationUtils.addIndexDefaults( indexPropertySource, defaultIndexPropertySource );
+
+				IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder(
+						indexName, multiTenancyEnabled, backendBuildContext, defaultedIndexPropertySource
+				);
+				IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
+				IndexedEntityBindingContext bindingContext = new IndexedEntityBindingContextImpl( schemaRootNodeBuilder );
+
+				state = new IndexManagerInitialBuildState<>( backendName, indexName, builder, bindingContext );
+				indexManagerBuildStateByName.put( indexName, state );
+			}
+			return state;
+
 		}
 
 		void closeOnFailure() {

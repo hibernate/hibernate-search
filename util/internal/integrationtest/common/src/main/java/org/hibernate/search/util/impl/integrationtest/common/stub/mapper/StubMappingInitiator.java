@@ -26,8 +26,10 @@ public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataCo
 		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
 
-	public void add(String typeIdentifier, String indexName, Consumer<? super IndexedEntityBindingContext> mappingContributor) {
-		mappingContributors.add( new StubTypeMetadataContributor( new StubTypeModel( typeIdentifier ), indexName, mappingContributor ) );
+	public void add(String typeIdentifier, String backendName, String indexName,
+			Consumer<? super IndexedEntityBindingContext> mappingContributor) {
+		mappingContributors.add( new StubTypeMetadataContributor( new StubTypeModel( typeIdentifier ), backendName,
+				indexName, mappingContributor ) );
 	}
 
 	@Override
