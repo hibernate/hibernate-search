@@ -24,7 +24,13 @@ import org.junit.Test;
 public class IndexedIT {
 
 	@Rule
-	public BackendMock backendMock = new BackendMock( "stubBackend" );
+	public BackendMock defaultBackendMock = new BackendMock( "defaultBackend" );
+
+	@Rule
+	public BackendMock backend2Mock = new BackendMock( "backend2" );
+
+	@Rule
+	public BackendMock backend3Mock = new BackendMock( "backend3" );
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
@@ -45,12 +51,12 @@ public class IndexedIT {
 			}
 		}
 
-		backendMock.expectSchema( IndexedEntity.class.getName(), b -> b
+		defaultBackendMock.expectSchema( IndexedEntity.class.getName(), b -> b
 				.field( "text", String.class )
 		);
-		setupHelper.withBackendMock( backendMock )
+		setupHelper.withBackendMock( defaultBackendMock )
 				.setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -69,12 +75,79 @@ public class IndexedIT {
 			}
 		}
 
-		backendMock.expectSchema( "explicitIndexName", b -> b
+		defaultBackendMock.expectSchema( "explicitIndexName", b -> b
 				.field( "text", String.class )
 		);
-		setupHelper.withBackendMock( backendMock )
+		setupHelper.withBackendMock( defaultBackendMock )
 				.setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void nonDefaultBackend() {
+		@Indexed(index = "index", backend = "backend2")
+		class IndexedEntity {
+			Integer id;
+			String text;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		backend2Mock.expectSchema( "index", b -> b
+				.field( "text", String.class )
+		);
+		setupHelper.withBackendMock( defaultBackendMock )
+				.withBackendMock( backend2Mock )
+				.setup( IndexedEntity.class );
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void multiBackend() {
+		@Indexed(index = "index1", backend = "backend2")
+		class IndexedEntity1 {
+			Integer id;
+			String text1;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public String getText1() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		@Indexed(index = "index2", backend = "backend3")
+		class IndexedEntity2 {
+			Integer id;
+			String text2;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public String getText2() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		backend2Mock.expectSchema( "index1", b -> b
+				.field( "text1", String.class )
+		);
+		backend3Mock.expectSchema( "index2", b -> b
+				.field( "text2", String.class )
+		);
+		setupHelper.withBackendMock( defaultBackendMock )
+				.withBackendMock( backend2Mock )
+				.withBackendMock( backend3Mock )
+				.setup( IndexedEntity1.class, IndexedEntity2.class );
+		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -93,7 +166,7 @@ public class IndexedIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock )
+				() -> setupHelper.withBackendMock( defaultBackendMock )
 						// Do not mention the type is an entity type here, on purpose, to trigger the failure
 						.withAnnotatedTypes( IndexedWithoutEntityMetadata.class )
 						.setup()
@@ -123,7 +196,7 @@ public class IndexedIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( AbstractIndexedEntity.class )
+				() -> setupHelper.withBackendMock( defaultBackendMock ).setup( AbstractIndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -148,7 +221,7 @@ public class IndexedIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock )
+				() -> setupHelper.withBackendMock( defaultBackendMock )
 						.withConfiguration( builder -> {
 							builder.setAnnotatedTypeDiscoveryEnabled( false );
 							builder.addEntityType( AbstractIndexedEntity.class );
