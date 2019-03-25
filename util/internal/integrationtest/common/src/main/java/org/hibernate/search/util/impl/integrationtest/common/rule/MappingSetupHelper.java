@@ -29,7 +29,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 	public C withBackendMock(BackendMock backendMock) {
 		String backendName = backendMock.getBackendName();
 		return createSetupContext()
-				.withBackendProperty( backendName, "type", StubBackendFactory.class.getName() )
+				.withBackendMock( backendMock )
 				.withPropertyRadical( EngineSettings.DEFAULT_BACKEND, backendName );
 	}
 
@@ -75,6 +75,11 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		private final List<Configuration<B, R>> configurations = new ArrayList<>();
 
 		protected AbstractSetupContext() {
+		}
+
+		public C withBackendMock(BackendMock backendMock) {
+			String backendName = backendMock.getBackendName();
+			return withBackendProperty( backendName, "type", StubBackendFactory.class.getName() );
 		}
 
 		protected abstract C withPropertyRadical(String keyRadical, Object value);
