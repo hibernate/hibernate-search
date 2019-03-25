@@ -20,7 +20,7 @@ public interface WildcardPredicateContext {
 	 * the predicate will match if <em>any</em> targeted field matches.
 	 * <p>
 	 * When targeting multiple fields, those fields must have compatible types.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * Please refer to the reference documentation for more information.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return A {@link WildcardPredicateFieldSetContext} allowing to define field-specific settings

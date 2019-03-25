@@ -6,16 +6,42 @@
  */
 package org.hibernate.search.engine.search.predicate;
 
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+
 /**
- * Allow to specify whether any values passed to the DSL should be converted, if {@code ENABLED}, or not, if {@code DISABLED}.
- * If no conversion is expected on the field, this option will have no effect.
- * <p>
- * Similarly to {@link org.hibernate.search.engine.search.projection.ProjectionConverter}, if {@code DISABLED},
- * values will be passed to the back-end exactly as the user has inserted them.
+ * Allows to specify whether values passed to the DSL should be converted using the
+ * {@link org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext#dslConverter(ToDocumentFieldValueConverter) DSL converter}
+ * defined in the mapping.
  */
 public enum DslConverter {
 
-	ENABLED, DISABLED;
+	/**
+	 * Enable the DSL converter.
+	 * <p>
+	 * This generally means the values passed to the DSL are expected to have the exact same type
+	 * as the entity property used to populate the index field.
+	 * <p>
+	 * To be more specific, it means the converter passed to
+	 * {@link org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext#dslConverter(ToDocumentFieldValueConverter)}
+	 * will be applied to values passed to the DSL in order to get a value that the backend can understand.
+	 * <p>
+	 * If no DSL converter was defined, this option won't have any effect.
+	 * <p>
+	 * Please refer to the reference documentation for more information.
+	 */
+	ENABLED,
+	/**
+	 * Disable the DSL converter.
+	 * <p>
+	 * This generally means the values passed to the DSL are expected to have the exact same type as the index field.
+	 * <p>
+	 * To be more specific, it means the converter passed to
+	 * {@link org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext#dslConverter(ToDocumentFieldValueConverter)}
+	 * will <strong>not</strong> be applied to values.
+	 * <p>
+	 * Please refer to the reference documentation for more information.
+	 */
+	DISABLED;
 
 	public boolean isEnabled() {
 		return this.equals( ENABLED );

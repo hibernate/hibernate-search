@@ -16,62 +16,6 @@ import org.hibernate.search.util.common.SearchException;
  * A context allowing to specify the type of a predicate.
  * <p>
  * This is the main entry point to the predicate DSL.
- *
- * <h3>Common concepts</h3>
- *
- * <h4 id="commonconcepts-parametertype">Type of predicate parameters</h4>
- *
- * Some predicates, such as the {@link #match()} predicate or the {@link #range()} predicate,
- * target an index field and define an {@link Object} parameter ({@link MatchPredicateFieldSetContext#matching(Object)},
- * {@link RangePredicateFieldSetContext#from(Object)}, ...).
- * The type of arguments passed to these methods is expected to be consistent with the targeted field:
- * if you want a field "myField" to be between values {@code X} and {@code Y},
- * Hibernate Search needs to be able to convert the values {@code X} and {@code Y}
- * to something comparable to the indexed value of "myField".
- * <p>
- * Generally the expected type of this argument should be rather obvious:
- * for example if you created a field by mapping an {@link Integer} property,
- * then an {@link Integer} value will be expected when building a predicate;
- * if you mapped a {@link java.time.LocalDate}, then a {@link java.time.LocalDate} will be expected.
- * Note that the type that is actually stored in the index does not matter:
- * if you mapped a custom enum type, then this same enum type will be expected throughout the predicate DSL,
- * even if it is stored as a {@link String} in the index.
- * <p>
- * Note it is possible to skip some of the conversion performed by Hibernate Search and by targeting "raw" fields,
- * and in that case the expected type of arguments will be different;
- * see <a href="#commonconcepts-rawfield">Raw fields</a> for details.
- * <p>
- * Sometimes a predicate targets <em>multiple</em> fields, either explicitly
- * (multiple field names passed to the {@code onFields} method when defining the predicate)
- * or implicitly (multiple targeted indexes).
- * In that case, the type of the targeted fields must be compatible.
- * For example targeting an {@link Integer} field and a {@link java.time.LocalDate} field
- * in the same {@link #match()} predicate won't work, because you won't be able to pass a non-null argument
- * that is both an {@link Integer} and a {@link java.time.LocalDate}
- * to the {@link MatchPredicateFieldSetContext#matching(Object)} method.
- * Thus you generally cannot target fields with different types in the same predicate.
- * When targeting different fields in the same index, you can, however,
- * define one predicate for each field and combine them using a {@link #bool() boolean predicate}.
- * <p>
- * Note that custom bridges have the ability to customize the expected type of arguments in the DSL:
- * for example they could accept {@link String} arguments when targeting {@link Integer} fields.
- * See the documentation of bridges for more information on custom bridges.
- *
- * <h4 id="commonconcepts-rawfield">Raw fields</h4>
- *
- * Some predicates allow to target "raw fields" using an {@code onRawField(String)} method instead of {@code onField(String)}.
- * Targeting a raw field means some of the usual conversion will be skipped when Hibernate Search processes
- * predicate arguments such as the value to match.
- * <p>
- * This is useful when the type of the indexed property is not the same as the type of search arguments.
- * For example one may use a custom bridge implementing {@code ValueBridge<MyType, String>}
- * to translate a property from a custom type to a string when indexing.
- * When targeting that field with {@code onField},
- * Hibernate Search will expect predicate arguments to be instances of the custom type;
- * with {@code onRawField}, it will expect strings.
- * <p>
- * For details about conversions applied by built-in bridges,
- * please refer to the reference documentation.
  */
 public interface SearchPredicateFactoryContext {
 

@@ -46,15 +46,12 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * and "lower than" another value (to be provided in following calls).
 	 * <p>
 	 * This syntax is essentially used like this: {@code .from( lowerBound ).to( upperBound )}.
-	 * <p>
-	 * This method will apply DSL converters to {@code value} before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter#ENABLED}.
 	 *
 	 * @param value The lower bound of the range. May be null, in which case the range has no lower bound
 	 * and the upper bound (passed to {@link RangePredicateFromContext#to(Object)}) must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * See {@link DslConverter#ENABLED} for more information.
 	 *
 	 * Lower bound is included by default in the range.
 	 *
@@ -73,10 +70,10 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * @param value The lower bound of the range. May be null, in which case the range has no lower bound
 	 * and the upper bound (passed to {@link RangePredicateFromContext#to(Object)}) must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
-	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * See {@link DslConverter} for more information.
 	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter}.
+	 * See {@link DslConverter} for more information.
 	 *
 	 * Lower bound is included by default in the range.
 	 *
@@ -87,14 +84,11 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	/**
 	 * Require at least one of the targeted fields to be "higher than" the given value,
 	 * with no limit as to how high it can be.
-	 * <p>
-	 * This method will apply DSL converters to {@code value} before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter#ENABLED}.
 	 *
 	 * @param value The lower bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * See {@link DslConverter#ENABLED} for more information.
 	 *
 	 * Lower bound is included by default in the range.
 	 *
@@ -110,10 +104,10 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * @param value The lower bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
-	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * See {@link DslConverter} for more information.
 	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter}.
+	 * See {@link DslConverter} for more information.
 	 *
 	 * Lower bound is included by default in the range.
 	 *
@@ -124,14 +118,11 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	/**
 	 * Require at least one of the targeted fields to be "lower than" the given value,
 	 * with no limit as to how low it can be.
-	 * <p>
-	 * This method will apply DSL converters to {@code value} before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter#ENABLED}.
 	 *
 	 * @param value The upper bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * See {@link DslConverter#ENABLED} for more information.
 	 *
 	 * Upper bound is included by default in the range.
 	 *
@@ -147,10 +138,10 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * @param value The upper bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
-	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * See {@link DslConverter} for more information.
 	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter}.
+	 * See {@link DslConverter} for more information.
 	 *
 	 * Upper bound is included by default in the range.
 	 *
