@@ -12,8 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.SearchScope;
@@ -29,8 +28,6 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class HibernateOrmSimpleMappingIT {
-	private static final String BACKEND_NAME = "backendName";
-
 	private static final String BOOK1_TITLE = "I, Robot";
 	private static final Integer BOOK1_PAGECOUNT = 224;
 
@@ -42,38 +39,7 @@ public class HibernateOrmSimpleMappingIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[] backendSetups() {
-		return new Object[] {
-				new BackendSetupStrategy() {
-					@Override
-					public String toString() {
-						return "lucene";
-					}
-					@Override
-					public OrmSetupHelper.SetupContext startSetup(OrmSetupHelper setupHelper) {
-						return setupHelper.withBackend( "lucene", BACKEND_NAME )
-								.withBackendProperty(
-										BACKEND_NAME,
-										LuceneBackendSettings.ANALYSIS_CONFIGURER,
-										new LuceneSimpleMappingAnalysisConfigurer()
-								);
-					}
-				},
-				new BackendSetupStrategy() {
-					@Override
-					public String toString() {
-						return "elasticsearch";
-					}
-					@Override
-					public OrmSetupHelper.SetupContext startSetup(OrmSetupHelper setupHelper) {
-						return setupHelper.withBackend( "elasticsearch", "backendName" )
-								.withBackendProperty(
-										BACKEND_NAME,
-										ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-										new ElasticsearchSimpleMappingAnalysisConfigurer()
-								);
-					}
-				}
-		};
+		return BackendSetupStrategy.simple().toArray();
 	}
 
 	@Rule
@@ -232,9 +198,5 @@ public class HibernateOrmSimpleMappingIT {
 		}
 	}
 	// end::projection-advanced-bean[]
-
-	private interface BackendSetupStrategy {
-		OrmSetupHelper.SetupContext startSetup(OrmSetupHelper setupHelper);
-	}
 
 }
