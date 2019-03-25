@@ -11,7 +11,7 @@ package org.hibernate.search.engine.cfg;
  * <p>
  * Constants in this class are to be appended to a prefix to form a property key.
  * The exact prefix will depend on the integration, but should generally look like
- * either "{@code hibernate.search.indexes.<index name>.}" (for per-index settings)
+ * either "{@code hibernate.search.backend.<backend name>.indexes.<index name>.}" (for per-index settings)
  * or "{@code hibernate.search.backends.<backend name>.index_defaults.}" (for default index settings).
  */
 public final class IndexSettings {

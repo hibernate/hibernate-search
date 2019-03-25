@@ -34,12 +34,13 @@ class IndexManagerPartialBuildState {
 			ConfigurationPropertySource rootPropertySource) {
 		ContextualFailureCollector indexFailureCollector =
 				rootFailureCollector.withContext( EventContexts.fromIndexName( indexName ) );
+		ConfigurationPropertySource backendPropertySource =
+				EngineConfigurationUtils.getBackend( rootPropertySource, backendName );
 		ConfigurationPropertySource indexPropertySource =
-				EngineConfigurationUtils.addIndexDefaults(
-						EngineConfigurationUtils.getIndexWithoutDefaults( rootPropertySource, indexName ),
-						EngineConfigurationUtils.getIndexDefaults(
-								EngineConfigurationUtils.getBackend( rootPropertySource, backendName )
-						)
+				EngineConfigurationUtils.getIndex(
+						backendPropertySource,
+						EngineConfigurationUtils.getIndexDefaults( backendPropertySource ),
+						indexName
 				);
 		IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl(
 				indexFailureCollector, indexPropertySource

@@ -63,10 +63,11 @@ These properties affect either one or multiple indexes, depending on the root.
 +
 With the root `hibernate.search.backends.<backend name>.index_defaults`,
 they set defaults for all indexes of the referenced backend.
+The backend name must match the name defined in the mapping.
 +
-With the root `hibernate.search.indexes.<index name>`,
+With the root `hibernate.search.backends.<backend name>.indexes.<index name>`,
 they set the value for a specific index, overriding the defaults (if any).
-The index name must match the name defined in the mapping.
+The backend and index names must match the names defined in the mapping.
 For ORM entities, the default index name is the name of the indexed class, without the package:
 `org.mycompany.Book` will have `Book` as its default index name.
 Index names can be customized in the mapping.
