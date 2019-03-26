@@ -230,10 +230,33 @@ public class SearchProjectionIT {
 		Float score1 = result.getHits().get( 0 );
 		Float score2 = result.getHits().get( 1 );
 
-		Assertions.assertThat( score1 ).isNotNull();
-		Assertions.assertThat( score2 ).isNotNull();
+		Assertions.assertThat( score1 ).isNotNull().isNotNaN();
+		Assertions.assertThat( score2 ).isNotNull().isNotNaN();
 
 		Assertions.assertThat( score1 ).isGreaterThan( score2 );
+	}
+
+	/**
+	 * Test projection on the score when we do not sort by score.
+	 */
+	@Test
+	public void score_noScoreSort() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		IndexSearchQuery<Float> query = scope.query()
+				.asProjection( f -> f.score() )
+				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
+				.sort( c -> c.byIndexOrder() )
+				.toQuery();
+
+		IndexSearchResult<Float> result = query.fetch();
+		assertThat( result ).hasTotalHitCount( 2 );
+
+		Float score1 = result.getHits().get( 0 );
+		Float score2 = result.getHits().get( 1 );
+
+		Assertions.assertThat( score1 ).isNotNull().isNotNaN();
+		Assertions.assertThat( score2 ).isNotNull().isNotNaN();
 	}
 
 	/**

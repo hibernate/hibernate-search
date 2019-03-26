@@ -25,7 +25,7 @@ class LuceneScoreProjection implements LuceneSearchProjection<Float, Float> {
 
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		luceneCollectorBuilder.requireTopDocsCollector();
+		luceneCollectorBuilder.requireScore();
 	}
 
 	@Override

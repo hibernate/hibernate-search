@@ -33,7 +33,7 @@ final class HibernateSearchNormalizerWrapper extends AnalyzerWrapper {
 	protected TokenStreamComponents wrapComponents(String fieldName, TokenStreamComponents components) {
 		HibernateSearchNormalizerCheckingFilter filter =
 				new HibernateSearchNormalizerCheckingFilter( components.getTokenStream(), normalizerName );
-		return new TokenStreamComponents( components.getTokenizer(), filter );
+		return new TokenStreamComponents( components.getSource(), filter );
 	}
 
 	@Override
