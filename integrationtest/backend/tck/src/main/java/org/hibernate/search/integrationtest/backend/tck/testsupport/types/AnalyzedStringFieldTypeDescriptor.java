@@ -24,7 +24,7 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 
 	@Override
 	public StandardIndexFieldTypeContext<?, String> configure(IndexFieldTypeFactoryContext fieldContext) {
-		return fieldContext.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name );
+		return fieldContext.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name );
 	}
 
 	@Override

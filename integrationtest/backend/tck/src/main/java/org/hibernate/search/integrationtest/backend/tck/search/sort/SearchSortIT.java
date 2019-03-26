@@ -489,7 +489,7 @@ public class SearchSortIT {
 			string_analyzed_forScore = root.field(
 					"string_analyzed_forScore" ,
 					f -> f.asString()
-							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
 					.toReference();
 			unsortable = root.field( "unsortable", f -> f.asString().sortable( Sortable.NO ) )

@@ -252,7 +252,7 @@ public class DocumentElementIT {
 				string = root.field( "string", f -> f.asString() ).toReference(),
 				string_analyzed = root.field(
 						"string_analyzed" ,
-						f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+						f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 				)
 						.toReference(),
 				integer = root.field( "integer", f -> f.asInteger() ).toReference(),

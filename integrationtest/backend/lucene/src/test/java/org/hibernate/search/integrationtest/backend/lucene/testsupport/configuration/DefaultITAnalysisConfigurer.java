@@ -11,12 +11,14 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefi
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 public class DefaultITAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
 	public void configure(LuceneAnalysisDefinitionContainerContext context) {
-		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).instance( new StandardAnalyzer() );
+		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+				.instance( new StandardAnalyzer( EnglishAnalyzer.ENGLISH_STOP_WORDS_SET ) );
 		context.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ).custom()
 				.tokenFilter( LowerCaseFilterFactory.class );
 	}

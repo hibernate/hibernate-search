@@ -357,7 +357,7 @@ public class ObjectFieldStorageIT {
 			string = objectField.field( "string", f -> f.asString() ).toReference();
 			string_analyzed = objectField.field(
 					"string_analyzed",
-					f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+					f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
 					.toReference();
 			integer = objectField.field( "integer", f -> f.asInteger() ).toReference();
