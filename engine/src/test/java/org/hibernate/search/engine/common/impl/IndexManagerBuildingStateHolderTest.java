@@ -6,9 +6,17 @@
  */
 package org.hibernate.search.engine.common.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Optional;
 
+import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.spi.BackendFactory;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.testsupport.util.AbstractBeanProviderPartialMock;
 import org.hibernate.search.engine.testsupport.util.AbstractConfigurationPropertySourcePartialMock;
@@ -18,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
@@ -36,6 +45,78 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 
 	private IndexManagerBuildingStateHolder holder =
 			new IndexManagerBuildingStateHolder( beanProviderMock, configurationSourceMock, rootBuildContextMock );
+
+	@Test
+	public void success() {
+		BackendFactory backendFactoryMock = createMock( BackendFactory.class );
+		BackendImplementor<DocumentElement> backendMock = createMock( BackendImplementor.class );
+		IndexManagerBuilder<DocumentElement> indexManagerBuilderMock = createMock( IndexManagerBuilder.class );
+		IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilderMock = createMock( IndexSchemaRootNodeBuilder.class );
+
+		Capture<ConfigurationPropertySource> backendPropertySourceCapture = Capture.newInstance();
+		Capture<ConfigurationPropertySource> indexPropertySourceCapture = Capture.newInstance();
+
+		resetAll();
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.type" ) )
+				.andReturn( (Optional) Optional.of( "someBackendType" ) );
+		EasyMock.expect( beanProviderMock.getBean( BackendFactory.class, "someBackendType" ) )
+				.andReturn( BeanHolder.of( backendFactoryMock ) );
+		EasyMock.expect( backendFactoryMock.create(
+				EasyMock.eq( "myBackend" ),
+				EasyMock.anyObject(),
+				EasyMock.capture( backendPropertySourceCapture )
+		) )
+				.andReturn( (BackendImplementor) backendMock );
+		replayAll();
+		IndexManagerBuildingStateHolder.BackendInitialBuildState<?> backend = holder.getBackend( "myBackend" );
+		verifyAll();
+
+		resetAll();
+		EasyMock.expect( backendMock.createIndexManagerBuilder(
+				EasyMock.eq( "myIndex" ),
+				EasyMock.eq( false ),
+				EasyMock.anyObject(),
+				EasyMock.capture( indexPropertySourceCapture )
+		) )
+				.andReturn( (IndexManagerBuilder) indexManagerBuilderMock );
+		EasyMock.expect( indexManagerBuilderMock.getSchemaRootNodeBuilder() )
+				.andStubReturn( indexSchemaRootNodeBuilderMock );
+		replayAll();
+		backend.getIndexManagerBuildingState( "myIndex", false );
+		verifyAll();
+
+		// Check that configuration property sources behave as expected
+		Optional result;
+
+		// Backend configuration
+		resetAll();
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.foo" ) )
+				.andReturn( (Optional) Optional.of( "bar" ) );
+		replayAll();
+		result = backendPropertySourceCapture.getValue().get( "foo" );
+		verifyAll();
+		assertThat( result ).contains( "bar" );
+
+		// Index configuration
+		resetAll();
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
+				.andReturn( (Optional) Optional.of( "bar" ) );
+		replayAll();
+		result = indexPropertySourceCapture.getValue().get( "foo" );
+		verifyAll();
+		assertThat( result ).contains( "bar" );
+
+		// Index configuration defaults
+		resetAll();
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
+				.andReturn( Optional.empty() );
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.index_defaults.foo" ) )
+				.andReturn( (Optional) Optional.of( "bar" ) );
+		replayAll();
+		result = indexPropertySourceCapture.getValue().get( "foo" );
+		verifyAll();
+		assertThat( result ).contains( "bar" );
+	}
 
 	@Test
 	public void error_missingBackend_nullName() {
