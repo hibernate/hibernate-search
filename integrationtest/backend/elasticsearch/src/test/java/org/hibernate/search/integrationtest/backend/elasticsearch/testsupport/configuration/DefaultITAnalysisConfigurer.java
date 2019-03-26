@@ -13,8 +13,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 public class DefaultITAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	@Override
 	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
-		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).type( "standard" )
-				// Try to behave like Lucene, which uses English stopwords by default
+		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).type( "standard" )
 				.param( "stopwords", "_english_" );
 		context.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ).custom()
 				.withTokenFilters( "lowercase" );

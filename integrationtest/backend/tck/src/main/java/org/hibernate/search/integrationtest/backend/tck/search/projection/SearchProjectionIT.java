@@ -407,7 +407,7 @@ public class SearchProjectionIT {
 					.map( root, "string2" );
 
 			scoreField = FieldModel.mapper(
-					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ),
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ),
 					"scorepattern scorepattern", "scorepattern", "xxx" )
 					.map( root, "score" );
 		}

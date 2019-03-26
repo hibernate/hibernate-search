@@ -1181,12 +1181,12 @@ public class MatchSearchPredicateIT {
 			)
 					.map( root, "string3" );
 			analyzedStringField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ),
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ),
 					"quick brown fox", "another word", "a"
 			)
 					.map( root, "analyzedString" );
 			analyzedStringField2 = MainFieldModel.mapper(
-					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ),
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ),
 					"another world", "blue whale", "the"
 			)
 					.map( root, "analyzedString2" );

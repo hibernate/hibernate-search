@@ -534,19 +534,19 @@ public class WildcardSearchPredicateIT {
 					}
 			);
 			analyzedStringField1 = MainFieldModel.mapper(
-					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
 					.map( root, "analyzedString1" );
 			analyzedStringField2 = MainFieldModel.mapper(
-					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
 					.map( root, "analyzedString2" );
 			analyzedStringField3 = MainFieldModel.mapper(
-					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
 					.map( root, "analyzedString3" );
 			analyzedStringFieldWithDslConverter = MainFieldModel.mapper(
-					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 							.dslConverter( ValueWrapper.toIndexFieldConverter() )
 			)
 					.map( root, "analyzedStringWithDslConverter" );
@@ -557,7 +557,7 @@ public class WildcardSearchPredicateIT {
 		static OtherIndexMapping createCompatible(IndexSchemaElement root) {
 			return new OtherIndexMapping(
 					MainFieldModel.mapper(
-							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					)
 							.map( root, "analyzedString1" )
 			);
@@ -566,7 +566,7 @@ public class WildcardSearchPredicateIT {
 		static OtherIndexMapping createRawFieldCompatible(IndexSchemaElement root) {
 			return new OtherIndexMapping(
 					MainFieldModel.mapper(
-							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 									// Using a different DSL converter
 									.dslConverter( ValueWrapper.toIndexFieldConverter() )
 					)

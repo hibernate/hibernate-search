@@ -425,7 +425,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 					"string_analyzed",
 					f -> f.asString()
 							.projectable( Projectable.YES )
-							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
 					.toReference();
 			integer = root.field(

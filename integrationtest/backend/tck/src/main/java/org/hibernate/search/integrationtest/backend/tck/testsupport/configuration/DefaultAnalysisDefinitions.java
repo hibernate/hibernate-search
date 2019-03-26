@@ -14,9 +14,9 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.configurati
  */
 public enum DefaultAnalysisDefinitions {
 	/**
-	 * The standard analyzer, as defined by Lucene.
+	 * The standard analyzer, as defined by Lucene, but with english stopwords.
 	 */
-	ANALYZER_STANDARD("standard"),
+	ANALYZER_STANDARD_ENGLISH("standard-english"),
 	/**
 	 * A normalizer that lowercases the input.
 	 */

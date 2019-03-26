@@ -374,7 +374,7 @@ public class DocumentModelDslIT {
 							"myField",
 							f -> f.asString()
 									.sortable( Sortable.YES )
-									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					)
 							.toReference();
 				} )
@@ -383,7 +383,7 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Cannot apply an analyzer on a sortable field" )
 				.hasMessageContaining( "Use a normalizer instead" )
-				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD.name + "'" )
+				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexName( INDEX_NAME )
 				) );
@@ -398,7 +398,7 @@ public class DocumentModelDslIT {
 					root.field(
 							"myField",
 							f -> f.asString()
-									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 									.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )
 					)
 							.toReference();
@@ -407,7 +407,7 @@ public class DocumentModelDslIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Cannot apply both an analyzer and a normalizer" )
-				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD.name + "'" )
+				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'" )
 				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexName( INDEX_NAME )

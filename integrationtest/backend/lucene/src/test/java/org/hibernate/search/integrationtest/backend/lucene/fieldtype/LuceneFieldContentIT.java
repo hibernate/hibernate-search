@@ -120,7 +120,7 @@ public class LuceneFieldContentIT {
 
 		IndexMapping(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) ).toReference();
-			text = root.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).projectable( Projectable.YES ) ).toReference();
+			text = root.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES ) ).toReference();
 			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) ).toReference();
 			longNumber = root.field( "longNumber", f -> f.asLong().projectable( Projectable.YES ) ).toReference();
 
