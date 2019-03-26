@@ -17,7 +17,8 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.LeafCollector;
-import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.Scorable;
+import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.util.SloppyMath;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -54,8 +55,8 @@ public class DistanceCollector implements Collector {
 	}
 
 	@Override
-	public boolean needsScores() {
-		return false;
+	public ScoreMode scoreMode() {
+		return ScoreMode.COMPLETE_NO_SCORES;
 	}
 
 	/**
@@ -168,7 +169,7 @@ public class DistanceCollector implements Collector {
 		}
 
 		@Override
-		public void setScorer(Scorer scorer) {
+		public void setScorer(Scorable scorer) {
 			// we don't need any scorer
 		}
 

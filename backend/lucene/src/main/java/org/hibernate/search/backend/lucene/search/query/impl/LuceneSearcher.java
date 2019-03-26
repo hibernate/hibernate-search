@@ -63,14 +63,14 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		luceneCollectorProvider.contributeCollectors( luceneCollectorsBuilder );
 		LuceneCollectors luceneCollectors = luceneCollectorsBuilder.build();
 
-		indexSearcher.search( luceneQuery, luceneCollectors.getCompositeCollector() );
+		luceneCollectors.collect( indexSearcher, luceneQuery, offset, limit );
 
 		SearchProjectionExtractContext projectionExecutionContext =
 				new SearchProjectionExtractContext( indexSearcher, luceneQuery );
 
 		return searchResultExtractor.extract(
 				indexSearcher, luceneCollectors.getTotalHits(),
-				luceneCollectors.getTopDocs( offset, limit ),
+				luceneCollectors.getTopDocs(),
 				projectionExecutionContext
 		);
 	}
