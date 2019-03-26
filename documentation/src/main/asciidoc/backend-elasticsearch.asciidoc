@@ -287,16 +287,34 @@ See <<mapper-orm-bridge-valuebridge-builtin>> for more information.
 |java.lang.Boolean|`boolean`
 |java.math.BigDecimal|Not supported yet; see https://hibernate.atlassian.net/browse/HSEARCH-3487[HSEARCH-3487]
 |java.math.BigInteger|Not supported yet; see https://hibernate.atlassian.net/browse/HSEARCH-3487[HSEARCH-3487]
-|java.time.Instant|`date` with default format (`"strict_date_optional_time\|\|epoch_millis"`)
-|java.time.LocalDate|`date` with `format: "strict_date\|\|yyyyyyyyy-MM-dd"`
-|java.time.LocalTime|`date` with `format: "strict_hour_minute_second_fraction\|\|HH:mm:ss.SSSSSSSSS"`
-|java.time.LocalDateTime|`date` with `format: "strict_date_hour_minute_second_fraction\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS"`
-|java.time.ZonedDateTime|`date` with `format: "yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']"`
-|java.time.OffsetDateTime|`date` with `format: "strict_date_time\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ"`
-|java.time.OffsetTime|`date` with `format: "strict_time"`
-|java.time.Year|`date` with `format: "strict_year\|\|yyyyyyyyy"`
-|java.time.YearMonth|`date` with `format: "strict_year_month\|\|yyyyyyyyy-MM"`
-|java.time.MonthDay|`date` with `format: "--MM-dd"`
+|java.time.Instant|`date` with format
+`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
+or `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'` (ES6 and below)
+|java.time.LocalDate|`date` with format
+`uuuu-MM-dd` (ES7 and above)
+or `yyyy-MM-dd\|\|yyyyyyyyy-MM-dd` (ES6 and below)
+|java.time.LocalTime|`date` with format
+`HH:mm:ss.SSSSSSSSS` (ES7 and above)
+or `HH:mm:ss.SSS\|\|HH:mm:ss.SSSSSSSSS` (ES6 and below)
+|java.time.LocalDateTime|`date` with format
+`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES7 and above)
+or `yyyy-MM-dd'T'HH:mm:ss.SSS\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES6 and below)
+|java.time.ZonedDateTime|`date` with format
+`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ'['VV']'` (ES7 and above)
+or `yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'` (ES6 and below)
+|java.time.OffsetDateTime|`date` with format
+`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
+or `yyyy-MM-dd'T'HH:mm:ss.SSSZZ\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ` (ES6 and below)
+|java.time.OffsetTime|`date` with format
+`HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
+or `HH:mm:ss.SSSZZ\|\|HH:mm:ss.SSSSSSSSSZZ` (ES6 and below)
+|java.time.Year|`date` with format
+`uuuu` (ES7 and above)
+or `yyyy\|\|yyyyyyyyy` (ES6 and below)
+|java.time.YearMonth|`date` with format
+`uuuu-MM` (ES7 and above)
+or `yyyy-MM\|\|yyyyyyyyy-MM` (ES6 and below)
+|java.time.MonthDay|`date` with format `--MM-dd`
 |org.hibernate.search.engine.spatial.GeoPoint|`geo_point`
 |====
 
