@@ -133,11 +133,14 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score: less than 2
 						.should( f.spatial().within().onField( "geoPoint" )
 								.boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX )
 						)
-						.should( f.match().onField( "string" ).boostedTo( 42 )
+						// Constant score: 2
+						.should( f.match().onField( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
 						)
 				)
 				.sort( c -> c.byScore() )
@@ -149,11 +152,14 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score boosted 42x: more than 2
 						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 42 )
 								.boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX )
 						)
+						// Constant score: 2
 						.should( f.match().onField( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
 						)
 				)
 				.sort( c -> c.byScore() )
@@ -170,12 +176,14 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score: less than 2
 						.should( f.spatial().within().onField( "geoPoint" )
 								.boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX )
 						)
+						// Constant score: 2
 						.should( f.match().onField( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
-								.boostedTo( 7 )
+								.withConstantScore().boostedTo( 2 )
 						)
 				)
 				.sort( c -> c.byScore() )
@@ -187,12 +195,15 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score boosted 39x: more than 2
 						.should( f.spatial().within().onField( "geoPoint" )
 								.boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX )
 								.boostedTo( 39 )
 						)
+						// Constant score: 2
 						.should( f.match().onField( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
 						)
 				)
 				.sort( c -> c.byScore() )
@@ -209,14 +220,15 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
-						// 2 * 4 => boost x8
-						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 4 )
+						// Base score boosted 2*3=6x: less than 8
+						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 3 )
 								.boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX )
 								.boostedTo( 2 )
 						)
-						// 3 * 3 => boost x9
-						.should( f.match().onField( "string" ).boostedTo( 3 )
-								.matching( OURSON_QUI_BOIT_STRING ).boostedTo( 3 )
+						// Constant score: 8
+						.should( f.match().onField( "string" )
+								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 8 )
 						)
 				)
 				.sort( c -> c.byScore() )
@@ -228,15 +240,15 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
-						// 3 * 3 => boost x9
-						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 3 )
+						// Base score boosted 3*4=12x: more than 8
+						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 4 )
 								.boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX )
 								.boostedTo( 3 )
 						)
-						// 2 * 4 => boost x8
-						.should( f.match().onField( "string" ).boostedTo( 4 )
+						// Constant score: 8
+						.should( f.match().onField( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
-								.boostedTo( 2 )
+								.withConstantScore().boostedTo( 8 )
 						)
 				)
 				.sort( c -> c.byScore() )
@@ -253,12 +265,17 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score boosted 0.001x: less than 2
 						.should( f.spatial().within().onField( "geoPoint" )
 								.orField( "geoPoint_1" )
 								.boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX )
 								.boostedTo( 0.001f )
 						)
-						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+						// Constant score: 2
+						.should( f.match().onField( "string" )
+								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
+						)
 				)
 				.sort( c -> c.byScore() )
 				.toQuery();
@@ -269,12 +286,17 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score boosted 39x: more than 2
 						.should( f.spatial().within().onField( "geoPoint" )
 								.orField( "geoPoint_1" )
 								.boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX )
 								.boostedTo( 39 )
 						)
-						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+						// Constant score: 2
+						.should( f.match().onField( "string" )
+								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
+						)
 				)
 				.sort( c -> c.byScore() )
 				.toQuery();

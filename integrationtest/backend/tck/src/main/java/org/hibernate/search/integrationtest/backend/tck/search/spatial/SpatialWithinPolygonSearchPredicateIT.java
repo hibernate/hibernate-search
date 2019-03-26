@@ -98,8 +98,13 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score: less than 2
 						.should( f.spatial().within().onField( "geoPoint" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
-						.should( f.match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING ) )
+						// Constant score: 2
+						.should( f.match().onField( "string" )
+								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
+						)
 				)
 				.sort( c -> c.byScore() )
 				.toQuery();
@@ -110,8 +115,13 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score boosted 42x: more than 2
 						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 42 ).polygon( CHEZ_MARGOTTE_POLYGON ) )
-						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+						// Constant score: 2
+						.should( f.match().onField( "string" )
+								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
+						)
 				)
 				.sort( c -> c.byScore() )
 				.toQuery();
@@ -127,11 +137,16 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score: less than 2
 						.should( f.spatial().within().onField( "geoPoint" )
 								.polygon( CHEZ_MARGOTTE_POLYGON )
 								.boostedTo( 0.1f )
 						)
-						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+						// Constant score: 2
+						.should( f.match().onField( "string" )
+								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
+						)
 				)
 				.sort( c -> c.byScore() )
 				.toQuery();
@@ -142,11 +157,16 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score boosted 39x: more than 2
 						.should( f.spatial().within().onField( "geoPoint" )
 								.polygon( CHEZ_MARGOTTE_POLYGON )
 								.boostedTo( 39 )
 						)
-						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+						// Constant score: 2
+						.should( f.match().onField( "string" )
+								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
+						)
 				)
 				.sort( c -> c.byScore() )
 				.toQuery();
@@ -162,15 +182,15 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
-						// 0.1 * 7 => boost x0.7
+						// Base score boosted 0.1*7=0.7x: less than 8
 						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 7 )
 								.polygon( CHEZ_MARGOTTE_POLYGON )
 								.boostedTo( 0.1f )
 						)
-						// 1 * 7 => boost x7
-						.should( f.match().onField( "string" ).boostedTo( 7 )
+						// Constant score: 8
+						.should( f.match().onField( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
-								.boostedTo( 1 )
+								.withConstantScore().boostedTo( 8 )
 						)
 				)
 				.sort( c -> c.byScore() )
@@ -182,15 +202,15 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
-						// 39 * 10 => boost x390
+						// Base score boosted 39*10=390x: more than 8
 						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 10 )
 								.polygon( CHEZ_MARGOTTE_POLYGON )
 								.boostedTo( 39 )
 						)
-						// 20 * 15 => boost x300
-						.should( f.match().onField( "string" ).boostedTo( 15 )
+						// Constant score: 8
+						.should( f.match().onField( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
-								.boostedTo( 20 )
+								.withConstantScore().boostedTo( 8 )
 						)
 				)
 				.sort( c -> c.byScore() )
@@ -207,12 +227,17 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score boosted 0.1x: less than 2
 						.should( f.spatial().within().onField( "geoPoint" )
 								.orField( "geoPoint_1" )
 								.polygon( CHEZ_MARGOTTE_POLYGON )
 								.boostedTo( 0.1f )
 						)
-						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+						// Constant score: 2
+						.should( f.match().onField( "string" )
+								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
+						)
 				)
 				.sort( c -> c.byScore() )
 				.toQuery();
@@ -223,12 +248,17 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
+						// Base score boosted 39x: more than 2
 						.should( f.spatial().within().onField( "geoPoint" )
 								.orField( "geoPoint_1" )
 								.polygon( CHEZ_MARGOTTE_POLYGON )
 								.boostedTo( 39 )
 						)
-						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+						// Constant score: 2
+						.should( f.match().onField( "string" )
+								.matching( OURSON_QUI_BOIT_STRING )
+								.withConstantScore().boostedTo( 2 )
+						)
 				)
 				.sort( c -> c.byScore() )
 				.toQuery();
