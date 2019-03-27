@@ -60,6 +60,7 @@ public class FieldSearchProjectionIT {
 	private static final String EMPTY = "empty";
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
+	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -73,6 +74,7 @@ public class FieldSearchProjectionIT {
 	private IndexMapping compatibleIndexMapping;
 	private StubMappingIndexManager compatibleIndexManager;
 
+	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
 	private StubMappingIndexManager rawFieldCompatibleIndexManager;
 
 	private StubMappingIndexManager incompatibleIndexManager;
@@ -92,12 +94,12 @@ public class FieldSearchProjectionIT {
 				)
 				.withIndex(
 						RAW_FIELD_COMPATIBLE_INDEX_NAME,
-						ctx -> new IncompatibleFieldProjectionConvertersIndexMapping( ctx.getSchemaElement() ),
+						ctx -> this.rawFieldCompatibleIndexMapping = new RawFieldCompatibleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
 				)
 				.withIndex(
 						INCOMPATIBLE_INDEX_NAME,
-						ctx -> new IncompatibleFieldTypesIndexMapping( ctx.getSchemaElement() ),
+						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleIndexManager = indexManager
 				)
 				.setup();
@@ -451,7 +453,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void multiIndex() {
+	public void multiIndex_withCompatibleIndexManager_noProjectionConverter() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( compatibleIndexManager );
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -475,7 +477,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void multiIndex_withProjectionConverters() {
+	public void multiIndex_withCompatibleIndexManager_projectionConverterEnabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( compatibleIndexManager );
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
@@ -499,7 +501,49 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void error_multiIndex_incompatibleType() {
+	public void multiIndex_withRawFieldCompatibleIndexManager_projectionConverterEnabled() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
+
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			SubTest.expectException(
+					"projection on multiple indexes with incompatible types for field " + fieldPath,
+					() -> scope.projection().field( fieldPath )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Multiple conflicting types to build a projection" )
+					.hasMessageContaining( "'" + fieldPath + "'" );
+		}
+	}
+
+	@Test
+	public void multiIndex_withRawFieldCompatibleIndexManager_projectionConverterDisabled() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
+
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+			SubTest.expectSuccess( fieldModel, model -> {
+				String fieldPath = model.relativeFieldName;
+
+				assertThat(
+						scope.query()
+								.asProjection( f -> f.field( fieldPath, model.type, ProjectionConverter.DISABLED ) )
+								.predicate( f -> f.matchAll() )
+								.toQuery()
+				).hasHitsAnyOrder(
+						model.document1Value.indexedValue,
+						model.document2Value.indexedValue,
+						model.document3Value.indexedValue,
+						null, // Empty document
+						model.document1Value.indexedValue // From the "compatible" index
+				);
+			} );
+		}
+	}
+
+	@Test
+	public void multiIndex_withIncompatibleIndexManager_projectionConverterEnabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -517,15 +561,15 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void error_multiIndex_incompatibleProjectionConverter() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
+	public void multiIndex_withIncompatibleIndexManager_projectionConverterDisabled() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			SubTest.expectException(
 					"projection on multiple indexes with incompatible types for field " + fieldPath,
-					() -> scope.projection().field( fieldPath, ValueWrapper.class )
+					() -> scope.projection().field( fieldPath, ProjectionConverter.DISABLED )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -585,6 +629,12 @@ public class FieldSearchProjectionIT {
 		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			compatibleIndexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
+		} );
+		workPlan.execute().join();
+
+		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
+		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+			rawFieldCompatibleIndexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		workPlan.execute().join();
 
@@ -675,8 +725,38 @@ public class FieldSearchProjectionIT {
 		}
 	}
 
-	private static class IncompatibleFieldTypesIndexMapping {
-		IncompatibleFieldTypesIndexMapping(IndexSchemaElement root) {
+	private static class RawFieldCompatibleIndexMapping {
+		final List<FieldModel<?>> supportedFieldWithProjectionConverterModels = new ArrayList<>();
+
+		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
+			/*
+			 * Add fields with the same name as the supportedFieldWithProjectionConverterModels from IndexMapping,
+			 * but with an incompatible projection converter.
+			 */
+			mapByTypeFields(
+					root, "byType_converted_", c -> c.projectionConverter( new IncompatibleProjectionConverter<>() ),
+					(typeDescriptor, expectations, model) -> {
+						supportedFieldWithProjectionConverterModels.add( model );
+					}
+			);
+		}
+
+		private static class IncompatibleProjectionConverter<F> implements
+				FromDocumentFieldValueConverter<F, ValueWrapper<F>> {
+			@Override
+			public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
+				return superTypeCandidate.isAssignableFrom( ValueWrapper.class );
+			}
+
+			@Override
+			public ValueWrapper<F> convert(F value, FromDocumentFieldValueConvertContext context) {
+				return null;
+			}
+		}
+	}
+
+	private static class IncompatibleIndexMapping {
+		IncompatibleIndexMapping(IndexSchemaElement root) {
 			/*
 			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
 			 * but with an incompatible type.
@@ -691,35 +771,6 @@ public class FieldSearchProjectionIT {
 				}
 				mapper.map( root, "byType_" + typeDescriptor.getUniqueName() );
 			} );
-		}
-	}
-
-	private static class IncompatibleFieldProjectionConvertersIndexMapping {
-		IncompatibleFieldProjectionConvertersIndexMapping(IndexSchemaElement root) {
-			/*
-			 * Add fields with the same name as the supportedFieldWithProjectionConverterModels from IndexMapping,
-			 * but with an incompatible projection converter.
-			 */
-			forEachTypeDescriptor( typeDescriptor -> {
-				IncompatibleFieldModel.mapper(
-						context -> typeDescriptor.configure( context )
-								.projectionConverter( new IncompatibleProjectionConverter<>() )
-				)
-						.map( root, "byType_converted_" + typeDescriptor.getUniqueName() );
-			} );
-		}
-
-		private static class IncompatibleProjectionConverter<F> implements
-				FromDocumentFieldValueConverter<F, ValueWrapper<F>> {
-			@Override
-			public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-				return superTypeCandidate.isAssignableFrom( ValueWrapper.class );
-			}
-
-			@Override
-			public ValueWrapper<F> convert(F value, FromDocumentFieldValueConvertContext context) {
-				return null;
-			}
 		}
 	}
 
