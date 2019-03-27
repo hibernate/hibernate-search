@@ -6,17 +6,28 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import org.hibernate.search.engine.environment.service.spi.ServiceManager;
+import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 
 class DelegatingBuildContext {
+
 	private final RootBuildContext delegate;
 
 	DelegatingBuildContext(RootBuildContext delegate) {
 		this.delegate = delegate;
 	}
 
-	public ServiceManager getServiceManager() {
-		return delegate.getServiceManager();
+	public ClassResolver getClassResolver() {
+		return delegate.getClassResolver();
+	}
+
+	public ResourceResolver getResourceResolver() {
+		return delegate.getResourceResolver();
+	}
+
+	public BeanProvider getBeanProvider() {
+		return delegate.getBeanProvider();
 	}
 
 }

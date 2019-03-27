@@ -125,7 +125,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		}
 
 		// Apply the user-provided mapping configurer if necessary
-		final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
+		final BeanProvider beanProvider = buildContext.getBeanProvider();
 		MAPPING_CONFIGURER.getAndMap( propertySource, beanProvider::getBean )
 				.ifPresent( holder -> {
 					try ( BeanHolder<? extends HibernateOrmSearchMappingConfigurer> configurerHolder = holder ) {

@@ -31,8 +31,6 @@ import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassAndResourceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
-import org.hibernate.search.engine.environment.service.impl.ServiceManagerImpl;
-import org.hibernate.search.engine.environment.service.spi.ServiceManager;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -145,8 +143,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			ConfigurationPropertySource propertySource = mainPropertySource;
 
 			BeanProvider beanProvider = new ConfiguredBeanProvider( classResolver, beanResolver, propertySource );
-			ServiceManager serviceManager = new ServiceManagerImpl( classResolver, resourceResolver, beanProvider );
-			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager, failureCollector );
+			RootBuildContext rootBuildContext = new RootBuildContext( classResolver, resourceResolver, beanProvider, failureCollector );
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanProvider, propertySource, rootBuildContext );
 

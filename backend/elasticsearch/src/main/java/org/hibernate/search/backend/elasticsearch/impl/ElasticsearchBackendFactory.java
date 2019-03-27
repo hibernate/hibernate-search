@@ -100,7 +100,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 		ElasticsearchDialectName dialectName = DIALECT.get( propertySource );
 
-		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
+		BeanProvider beanProvider = buildContext.getBeanProvider();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
 		ElasticsearchClientImplementor client = null;
 		try {
@@ -184,7 +184,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		try {
 			// Apply the user-provided analysis configurer if necessary
-			final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
+			final BeanProvider beanProvider = buildContext.getBeanProvider();
 			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanProvider::getBean )
 					.map( holder -> {
 						try ( BeanHolder<? extends ElasticsearchAnalysisConfigurer> configurerHolder = holder ) {
