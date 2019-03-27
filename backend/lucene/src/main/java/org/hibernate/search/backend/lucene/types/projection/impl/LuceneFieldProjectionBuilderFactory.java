@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.projection.impl;
 
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
@@ -31,16 +28,8 @@ public interface LuceneFieldProjectionBuilderFactory {
 
 	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath, GeoPoint center);
 
-	/**
-	 * Determine whether another projection builder factory is DSL-compatible with this one,
-	 * i.e. whether it creates builders that behave the same way.
-	 *
-	 * @see FromDocumentFieldValueConverter#isCompatibleWith(FromDocumentFieldValueConverter)
-	 * @see LuceneFieldCodec#isCompatibleWith(LuceneFieldCodec)
-	 *
-	 * @param other Another {@link LuceneFieldPredicateBuilderFactory}, never {@code null}.
-	 * @return {@code true} if the given predicate builder factory is DSL-compatible.
-	 * {@code false} otherwise, or when in doubt.
-	 */
-	boolean isDslCompatibleWith(LuceneFieldProjectionBuilderFactory other);
+	boolean hasCompatibleCodec(LuceneFieldProjectionBuilderFactory other);
+
+	boolean hasCompatibleConverter(LuceneFieldProjectionBuilderFactory other);
+
 }

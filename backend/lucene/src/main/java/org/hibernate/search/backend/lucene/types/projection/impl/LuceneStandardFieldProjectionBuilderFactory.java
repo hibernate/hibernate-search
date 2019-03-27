@@ -67,19 +67,23 @@ public class LuceneStandardFieldProjectionBuilderFactory<F> implements LuceneFie
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldProjectionBuilderFactory obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( obj.getClass() != LuceneStandardFieldProjectionBuilderFactory.class ) {
+	public boolean hasCompatibleCodec(LuceneFieldProjectionBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
+		LuceneStandardFieldProjectionBuilderFactory<?> castedOther =
+				(LuceneStandardFieldProjectionBuilderFactory<?>) other;
+		return projectable == castedOther.projectable && codec.isCompatibleWith( castedOther.codec );
+	}
 
-		LuceneStandardFieldProjectionBuilderFactory<?> other = (LuceneStandardFieldProjectionBuilderFactory<?>) obj;
-
-		return projectable == other.projectable &&
-				codec.isCompatibleWith( other.codec ) &&
-				converter.isCompatibleWith( other.converter );
+	@Override
+	public boolean hasCompatibleConverter(LuceneFieldProjectionBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		LuceneStandardFieldProjectionBuilderFactory<?> castedOther =
+				(LuceneStandardFieldProjectionBuilderFactory<?>) other;
+		return converter.isCompatibleWith( castedOther.converter );
 	}
 
 	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {

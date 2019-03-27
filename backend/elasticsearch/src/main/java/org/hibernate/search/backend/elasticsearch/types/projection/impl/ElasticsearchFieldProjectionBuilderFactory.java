@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
@@ -30,16 +28,8 @@ public interface ElasticsearchFieldProjectionBuilderFactory {
 
 	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath, GeoPoint center);
 
-	/**
-	 * Determine whether another projection builder factory is DSL-compatible with this one,
-	 * i.e. whether it creates builders that behave the same way.
-	 *
-	 * @see FromDocumentFieldValueConverter#isCompatibleWith(FromDocumentFieldValueConverter)
-	 * @see org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec#isCompatibleWith(ElasticsearchFieldCodec)
-	 *
-	 * @param other Another {@link ElasticsearchFieldProjectionBuilderFactory}, never {@code null}.
-	 * @return {@code true} if the given predicate builder factory is DSL-compatible.
-	 * {@code false} otherwise, or when in doubt.
-	 */
-	boolean isDslCompatibleWith(ElasticsearchFieldProjectionBuilderFactory other);
+	boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory other);
+
+	boolean hasCompatibleConverter(ElasticsearchFieldProjectionBuilderFactory other);
+
 }

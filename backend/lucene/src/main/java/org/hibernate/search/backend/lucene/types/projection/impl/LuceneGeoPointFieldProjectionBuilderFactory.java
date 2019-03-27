@@ -63,19 +63,23 @@ public class LuceneGeoPointFieldProjectionBuilderFactory implements LuceneFieldP
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldProjectionBuilderFactory obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( obj.getClass() != LuceneGeoPointFieldProjectionBuilderFactory.class ) {
+	public boolean hasCompatibleCodec(LuceneFieldProjectionBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
+		LuceneGeoPointFieldProjectionBuilderFactory castedOther =
+				(LuceneGeoPointFieldProjectionBuilderFactory) other;
+		return projectable == castedOther.projectable && codec.isCompatibleWith( castedOther.codec );
+	}
 
-		LuceneGeoPointFieldProjectionBuilderFactory other = (LuceneGeoPointFieldProjectionBuilderFactory) obj;
-
-		return projectable == other.projectable
-				&& converter.isCompatibleWith( other.converter )
-				&& codec.isCompatibleWith( other.codec );
+	@Override
+	public boolean hasCompatibleConverter(LuceneFieldProjectionBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		LuceneGeoPointFieldProjectionBuilderFactory castedOther =
+				(LuceneGeoPointFieldProjectionBuilderFactory) other;
+		return converter.isCompatibleWith( castedOther.converter );
 	}
 
 	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {

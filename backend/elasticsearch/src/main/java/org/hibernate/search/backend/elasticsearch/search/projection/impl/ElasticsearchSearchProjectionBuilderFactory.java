@@ -151,7 +151,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		@Override
 		public boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2) {
 			// in case of projection all possible incompatibilities are evaluated earlier
-			return component1.isDslCompatibleWith( component2 );
+			return component1.hasCompatibleCodec( component2 ) && component1.hasCompatibleConverter( component2 );
 		}
 
 		@Override

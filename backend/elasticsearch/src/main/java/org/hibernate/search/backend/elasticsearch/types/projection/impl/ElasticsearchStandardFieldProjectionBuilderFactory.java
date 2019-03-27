@@ -63,19 +63,23 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(ElasticsearchFieldProjectionBuilderFactory obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( obj.getClass() != ElasticsearchStandardFieldProjectionBuilderFactory.class ) {
+	public boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
+		ElasticsearchStandardFieldProjectionBuilderFactory<?> castedOther =
+				(ElasticsearchStandardFieldProjectionBuilderFactory<?>) other;
+		return projectable == castedOther.projectable && codec.isCompatibleWith( castedOther.codec );
+	}
 
-		ElasticsearchStandardFieldProjectionBuilderFactory<?> other = (ElasticsearchStandardFieldProjectionBuilderFactory<?>) obj;
-
-		return projectable == other.projectable
-				&& converter.isCompatibleWith( other.converter )
-				&& codec.isCompatibleWith( other.codec );
+	@Override
+	public boolean hasCompatibleConverter(ElasticsearchFieldProjectionBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		ElasticsearchStandardFieldProjectionBuilderFactory<?> castedOther =
+				(ElasticsearchStandardFieldProjectionBuilderFactory<?>) other;
+		return converter.isCompatibleWith( castedOther.converter );
 	}
 
 	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {

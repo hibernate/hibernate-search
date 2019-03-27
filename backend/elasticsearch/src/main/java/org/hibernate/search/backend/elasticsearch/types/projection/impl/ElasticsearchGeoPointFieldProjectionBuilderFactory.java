@@ -63,19 +63,23 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory implements Elast
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(ElasticsearchFieldProjectionBuilderFactory obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( obj.getClass() != ElasticsearchGeoPointFieldProjectionBuilderFactory.class ) {
+	public boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
+		ElasticsearchGeoPointFieldProjectionBuilderFactory castedOther =
+				(ElasticsearchGeoPointFieldProjectionBuilderFactory) other;
+		return projectable == castedOther.projectable && codec.isCompatibleWith( castedOther.codec );
+	}
 
-		ElasticsearchGeoPointFieldProjectionBuilderFactory other = (ElasticsearchGeoPointFieldProjectionBuilderFactory) obj;
-
-		return projectable == other.projectable
-				&& converter.isCompatibleWith( other.converter )
-				&& codec.isCompatibleWith( other.codec );
+	@Override
+	public boolean hasCompatibleConverter(ElasticsearchFieldProjectionBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		ElasticsearchGeoPointFieldProjectionBuilderFactory castedOther =
+				(ElasticsearchGeoPointFieldProjectionBuilderFactory) other;
+		return converter.isCompatibleWith( castedOther.converter );
 	}
 
 	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {

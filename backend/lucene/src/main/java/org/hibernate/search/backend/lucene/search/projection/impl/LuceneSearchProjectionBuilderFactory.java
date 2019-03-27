@@ -150,7 +150,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		@Override
 		public boolean hasCompatibleCodec(LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2) {
 			// in case of projection all possible incompatibilities are evaluated earlier
-			return component1.isDslCompatibleWith( component2 );
+			return component1.hasCompatibleCodec( component2 ) && component1.hasCompatibleConverter( component2 );
 		}
 
 		@Override
