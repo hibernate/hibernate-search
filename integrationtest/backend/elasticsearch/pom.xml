@@ -14,6 +14,10 @@
 
     <properties>
         <surefire.executing-module>it-elasticsearch</surefire.executing-module>
+        <!-- By default AWS is not enabled, which means we need to exclude these categories -->
+        <failsafe.excludedGroups.aws>
+            org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresRequestPostProcessing
+        </failsafe.excludedGroups.aws>
     </properties>
 
     <dependencies>
@@ -76,6 +80,9 @@
                             <dependenciesToScan>
                                 <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>
                             </dependenciesToScan>
+                            <excludedGroups>
+                                ${failsafe.excludedGroups.aws}
+                            </excludedGroups>
                         </configuration>
                     </execution>
                 </executions>
@@ -92,6 +99,32 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>aws</id>
+            <activation>
+                <property>
+                    <name>test.elasticsearch.host.aws.signing.enabled</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <failsafe.excludedGroups.aws>
+                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose,
+                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoRequestPostProcessing
+                </failsafe.excludedGroups.aws>
+                <test.elasticsearch.host.aws.signing.enabled>true</test.elasticsearch.host.aws.signing.enabled>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 </project>
 

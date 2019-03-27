@@ -419,6 +419,10 @@
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
+        <test.elasticsearch.host.aws.signing.enabled>false</test.elasticsearch.host.aws.signing.enabled>
+        <test.elasticsearch.host.aws.access_key></test.elasticsearch.host.aws.access_key>
+        <test.elasticsearch.host.aws.secret_key></test.elasticsearch.host.aws.secret_key>
+        <test.elasticsearch.host.aws.region></test.elasticsearch.host.aws.region>
         <!-- Control how integration tests format the requests sent to Elasticsearch -->
         <test.elasticsearch.testdialect></test.elasticsearch.testdialect>
 
