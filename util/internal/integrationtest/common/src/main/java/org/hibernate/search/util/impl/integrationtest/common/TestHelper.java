@@ -15,6 +15,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanProvider;
+import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultClassAndResourceResolver;
+
 import org.junit.runner.Description;
 
 public final class TestHelper {
@@ -30,6 +36,14 @@ public final class TestHelper {
 
 	private TestHelper(Description description) {
 		this.testId = description.getTestClass().getSimpleName() + "-" + description.getMethodName();
+	}
+
+	public BeanProvider createBeanProviderForTest() {
+		DefaultClassAndResourceResolver classAndResourceResolver = new DefaultClassAndResourceResolver();
+		ReflectionBeanResolver beanResolver = new ReflectionBeanResolver( classAndResourceResolver );
+		return new ConfiguredBeanProvider(
+				classAndResourceResolver, beanResolver, ConfigurationPropertySource.empty()
+		);
 	}
 
 	public Map<String, Object> getPropertiesFromFile(String propertyFilePath) {

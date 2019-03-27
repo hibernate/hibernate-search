@@ -19,6 +19,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -28,6 +29,8 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequ
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResponseFormatter;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -44,15 +47,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class TestElasticsearchClient implements TestRule {
-
-	/**
-	 * We use a {@link ElasticsearchClientFactoryImpl} to create our low-level client.
-	 *
-	 * The main advantage is that we ensure we connect to Elasticsearch exactly the same way
-	 * as any test-created SearchFactory, allowing to support things like testing on AWS
-	 * (using the hibernate-search-elasticsearch-aws module).
-	 */
-	private final ElasticsearchClientFactoryImpl clientFactory = new ElasticsearchClientFactoryImpl();
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
@@ -449,8 +443,23 @@ public class TestElasticsearchClient implements TestRule {
 
 	private void before(Description description) {
 		testHelper = TestHelper.create( description );
-		ConfigurationPropertySource backendProperties = TckConfiguration.get().getBackendProperties( testHelper, null );
-		client = clientFactory.create( backendProperties, DefaultGsonProvider.create( GsonBuilder::new, true ) );
+		ConfigurationPropertySource backendProperties =
+				TckConfiguration.get().getBackendProperties( testHelper, null );
+
+		BeanProvider beanProvider = testHelper.createBeanProviderForTest();
+		/*
+		 * We use a {@link ElasticsearchClientFactoryImpl} to create our low-level client.
+		 *
+		 * The main advantage is that we ensure we connect to Elasticsearch exactly the same way
+		 * as any test-created SearchFactory, allowing to support things like testing on AWS
+		 * (using the hibernate-search-elasticsearch-aws module).
+		 */
+		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
+				beanProvider.getBean( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
+			client = factoryHolder.get().create(
+					backendProperties, DefaultGsonProvider.create( GsonBuilder::new, true )
+			);
+		}
 	}
 
 	private void after(Closer<IOException> closer) {

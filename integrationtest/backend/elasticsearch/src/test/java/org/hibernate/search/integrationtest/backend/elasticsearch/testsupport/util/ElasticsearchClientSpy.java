@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.u
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
@@ -16,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.impl.integrationtest.common.rule.CallQueue;
 
@@ -24,6 +26,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public class ElasticsearchClientSpy implements TestRule {
+	private AtomicInteger createdClientCount = new AtomicInteger();
 	private final CallQueue<ElasticsearchClientSubmitCall> expectations = new CallQueue<>();
 
 	@Override
@@ -58,8 +61,19 @@ public class ElasticsearchClientSpy implements TestRule {
 	private void tearDown() {
 	}
 
+	public int getCreatedClientCount() {
+		return createdClientCount.get();
+	}
+
 	public BeanReference<ElasticsearchClientFactory> getFactory() {
-		return BeanReference.ofInstance( new SpyingElasticsearchClientFactory() );
+		return beanProvider -> {
+			BeanHolder<ElasticsearchClientFactory> delegateHolder =
+					beanProvider.getBean( ElasticsearchClientFactoryImpl.REFERENCE );
+			SpyingElasticsearchClientFactory spyingFactory =
+					new SpyingElasticsearchClientFactory( delegateHolder.get() );
+			return BeanHolder.<ElasticsearchClientFactory>of( spyingFactory )
+					.withDependencyAutoClosing( delegateHolder );
+		};
 	}
 
 	public void expectNext(ElasticsearchRequest request, ElasticsearchRequestAssertionMode assertionMode) {
@@ -70,11 +84,17 @@ public class ElasticsearchClientSpy implements TestRule {
 	}
 
 	private class SpyingElasticsearchClientFactory implements ElasticsearchClientFactory {
-		private final ElasticsearchClientFactory delegate = new ElasticsearchClientFactoryImpl();
+		private final ElasticsearchClientFactory delegate;
+
+		private SpyingElasticsearchClientFactory(
+				ElasticsearchClientFactory delegate) {
+			this.delegate = delegate;
+		}
 
 		@Override
 		public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
 				GsonProvider initialGsonProvider) {
+			createdClientCount.incrementAndGet();
 			return new SpyingElasticsearchClient( delegate.create( propertySource, initialGsonProvider ) );
 		}
 	}
