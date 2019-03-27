@@ -51,6 +51,10 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-pojo</artifactId>
         </dependency>
         <dependency>
