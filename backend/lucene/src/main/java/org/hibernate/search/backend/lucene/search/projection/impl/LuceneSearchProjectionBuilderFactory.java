@@ -15,6 +15,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.lucene.search.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -57,9 +58,13 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ProjectionConverter projectionConverter) {
-		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createFieldValueProjectionBuilder( absoluteFieldPath, expectedType, projectionConverter );
+		LuceneScopedIndexFieldComponent<LuceneFieldProjectionBuilderFactory> fieldComponent =
+				scopeModel.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+		if ( projectionConverter.isEnabled() ) {
+			fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
+		}
+		return fieldComponent.getComponent()
+				.createFieldValueProjectionBuilder( absoluteFieldPath, expectedType, projectionConverter );
 	}
 
 	@Override
@@ -149,14 +154,12 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 		@Override
 		public boolean hasCompatibleCodec(LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2) {
-			// in case of projection all possible incompatibilities are evaluated earlier
-			return component1.hasCompatibleCodec( component2 ) && component1.hasCompatibleConverter( component2 );
+			return component1.hasCompatibleCodec( component2 );
 		}
 
 		@Override
 		public boolean hasCompatibleConverter(LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2) {
-			// no compatibility check is deferred in time
-			return true;
+			return component1.hasCompatibleConverter( component2 );
 		}
 
 		@Override

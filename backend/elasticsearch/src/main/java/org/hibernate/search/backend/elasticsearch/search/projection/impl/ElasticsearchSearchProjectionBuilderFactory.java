@@ -14,6 +14,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
@@ -58,9 +59,13 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ProjectionConverter projectionConverter) {
-		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createFieldValueProjectionBuilder( absoluteFieldPath, expectedType, projectionConverter );
+		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldProjectionBuilderFactory> fieldComponent =
+				scopeModel.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+		if ( projectionConverter.isEnabled() ) {
+			fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
+		}
+		return fieldComponent.getComponent()
+				.createFieldValueProjectionBuilder( absoluteFieldPath, expectedType, projectionConverter );
 	}
 
 	@Override
@@ -150,14 +155,12 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 		@Override
 		public boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2) {
-			// in case of projection all possible incompatibilities are evaluated earlier
-			return component1.hasCompatibleCodec( component2 ) && component1.hasCompatibleConverter( component2 );
+			return component1.hasCompatibleCodec( component2 );
 		}
 
 		@Override
 		public boolean hasCompatibleConverter(ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2) {
-			// no compatibility check is deferred in time
-			return true;
+			return component1.hasCompatibleConverter( component2 );
 		}
 
 		@Override
