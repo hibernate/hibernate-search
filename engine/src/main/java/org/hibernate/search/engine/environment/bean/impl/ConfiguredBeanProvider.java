@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -35,6 +36,7 @@ public final class ConfiguredBeanProvider implements BeanProvider {
 
 	private final BeanResolver beanResolver;
 	private final Map<ConfiguredBeanKey<?>, BeanFactory<?>> explicitlyConfiguredBeans;
+	private final Map<Class<?>, List<? extends BeanReference<?>>> roleMap;
 
 	private final BeanCreationContext beanCreationContext;
 
@@ -54,6 +56,7 @@ public final class ConfiguredBeanProvider implements BeanProvider {
 			}
 		}
 		this.explicitlyConfiguredBeans = configurationContext.getConfiguredBeans();
+		this.roleMap = configurationContext.getRoleMap();
 
 		this.beanCreationContext = new BeanCreationContextImpl( this );
 	}
@@ -78,6 +81,19 @@ public final class ConfiguredBeanProvider implements BeanProvider {
 		}
 		catch (SearchException e) {
 			return fallbackToConfiguredBeans( e, typeReference, nameReference );
+		}
+	}
+
+	@Override
+	public <T> BeanHolder<List<T>> getBeansWithRole(Class<T> role) {
+		Contracts.assertNotNull( role, "role" );
+		@SuppressWarnings("unchecked") // We know the references have the correct type, see BeanConfigurationContextImpl
+		List<BeanReference<? extends T>> references = (List<BeanReference<? extends T>>) roleMap.get( role );
+		if ( references == null || references.isEmpty() ) {
+			return BeanHolder.of( Collections.emptyList() );
+		}
+		else {
+			return getBeans( references );
 		}
 	}
 
