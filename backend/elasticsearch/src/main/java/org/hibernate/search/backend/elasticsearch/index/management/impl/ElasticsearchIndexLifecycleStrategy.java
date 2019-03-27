@@ -39,6 +39,9 @@ public class ElasticsearchIndexLifecycleStrategy {
 			case VALIDATE:
 				client.validate( executionOptions, context.getFailureCollector() );
 				break;
+			case NONE:
+				// Nothing to do
+				break;
 			default:
 				throw new AssertionFailure( "Unexpected index management strategy: " + strategyName );
 		}
@@ -53,6 +56,7 @@ public class ElasticsearchIndexLifecycleStrategy {
 			case DROP_AND_CREATE:
 			case UPDATE:
 			case VALIDATE:
+			case NONE:
 				// Nothing to do
 				break;
 			default:
