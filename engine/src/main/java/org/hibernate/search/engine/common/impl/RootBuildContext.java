@@ -6,21 +6,37 @@
  */
 package org.hibernate.search.engine.common.impl;
 
+import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
-import org.hibernate.search.engine.environment.service.spi.ServiceManager;
 
 class RootBuildContext {
 
-	private final ServiceManager serviceManager;
+	private final ClassResolver classResolver;
+	private final ResourceResolver resourceResolver;
+	private final BeanProvider beanProvider;
+
 	private final FailureCollector failureCollector;
 
-	RootBuildContext(ServiceManager serviceManager, FailureCollector failureCollector) {
-		this.serviceManager = serviceManager;
+	RootBuildContext(ClassResolver classResolver, ResourceResolver resourceResolver,
+			BeanProvider beanProvider, FailureCollector failureCollector) {
+		this.classResolver = classResolver;
+		this.resourceResolver = resourceResolver;
+		this.beanProvider = beanProvider;
 		this.failureCollector = failureCollector;
 	}
 
-	ServiceManager getServiceManager() {
-		return serviceManager;
+	ClassResolver getClassResolver() {
+		return classResolver;
+	}
+
+	ResourceResolver getResourceResolver() {
+		return resourceResolver;
+	}
+
+	BeanProvider getBeanProvider() {
+		return beanProvider;
 	}
 
 	FailureCollector getFailureCollector() {

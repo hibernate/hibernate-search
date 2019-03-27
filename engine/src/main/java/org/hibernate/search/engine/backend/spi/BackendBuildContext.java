@@ -6,13 +6,19 @@
  */
 package org.hibernate.search.engine.backend.spi;
 
-import org.hibernate.search.engine.environment.service.spi.ServiceManager;
+import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 
 /**
  * A build context for backends.
  */
 public interface BackendBuildContext {
 
-	ServiceManager getServiceManager();
+	ClassResolver getClassResolver();
+
+	ResourceResolver getResourceResolver();
+
+	BeanProvider getBeanProvider();
 
 }

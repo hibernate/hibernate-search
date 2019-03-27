@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.engine.mapper.mapping.spi;
 
-import org.hibernate.search.engine.environment.service.spi.ServiceManager;
+import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.common.SearchException;
 
@@ -15,7 +17,11 @@ import org.hibernate.search.util.common.SearchException;
  */
 public interface MappingBuildContext {
 
-	ServiceManager getServiceManager();
+	ClassResolver getClassResolver();
+
+	ResourceResolver getResourceResolver();
+
+	BeanProvider getBeanProvider();
 
 	/**
 	 * A collector of (non-fatal) failures, allowing to notify Hibernate Search

@@ -20,6 +20,6 @@ final class MarkerBuildContextImpl implements MarkerBuildContext {
 
 	@Override
 	public BeanProvider getBeanProvider() {
-		return buildContext.getServiceManager().getBeanProvider();
+		return buildContext.getBeanProvider();
 	}
 }

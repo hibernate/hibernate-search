@@ -79,7 +79,7 @@ public class ContainerExtractorBinder {
 
 	public ContainerExtractorBinder(MappingBuildContext buildContext,
 			TypePatternMatcherFactory typePatternMatcherFactory) {
-		this.beanProvider = buildContext.getServiceManager().getBeanProvider();
+		this.beanProvider = buildContext.getBeanProvider();
 		this.typePatternMatcherFactory = typePatternMatcherFactory;
 		addDefaultExtractor( MapValueExtractor.class );
 		addDefaultExtractor( CollectionElementExtractor.class );
