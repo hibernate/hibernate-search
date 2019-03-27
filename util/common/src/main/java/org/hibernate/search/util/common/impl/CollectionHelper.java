@@ -61,6 +61,22 @@ public final class CollectionHelper {
 	}
 
 	@SafeVarargs
+	public static <T> Set<T> asImmutableSet(T ... items) {
+		//The intention here is to save some memory by picking the simplest safe representation,
+		// as we usually require immutable sets for long living metadata:
+		switch ( items.length ) {
+			case 0:
+				return Collections.emptySet();
+			case 1:
+				return Collections.singleton( items[0] );
+			default:
+				LinkedHashSet<T> set = new LinkedHashSet<>();
+				Collections.addAll( set, items );
+				return Collections.unmodifiableSet( set );
+		}
+	}
+
+	@SafeVarargs
 	public static <T> List<T> asList(T firstItem, T... otherItems) {
 		List<T> list = new ArrayList<>( otherItems.length + 1 );
 		list.add( firstItem );

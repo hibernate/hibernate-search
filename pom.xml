@@ -149,6 +149,7 @@
         <module>util/internal/test</module>
         <module>engine</module>
         <module>backend/elasticsearch</module>
+        <module>backend/elasticsearch-aws</module>
         <module>backend/lucene</module>
         <module>mapper/pojo</module>
         <module>mapper/javabean</module>
@@ -185,6 +186,7 @@
         <version.org.elasticsearch.client>${version.org.elasticsearch.main}</version.org.elasticsearch.client>
         <documentation.org.elasticsearch.url>https://www.elastic.co/guide/en/elasticsearch/reference/${parsed-version.org.elasticsearch.main.majorVersion}.${parsed-version.org.elasticsearch.main.minorVersion}</documentation.org.elasticsearch.url>
         <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
+        <version.uk.co.lucasweb.aws-v4-signer-java>1.3</version.uk.co.lucasweb.aws-v4-signer-java>
 
         <!-- >>> ORM -->
         <version.org.hibernate>5.4.2.Final</version.org.hibernate>
@@ -493,6 +495,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-backend-lucene</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -720,6 +727,11 @@
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>${version.com.google.code.gson}</version>
+            </dependency>
+            <dependency>
+                <groupId>uk.co.lucasweb</groupId>
+                <artifactId>aws-v4-signer-java</artifactId>
+                <version>${version.uk.co.lucasweb.aws-v4-signer-java}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
