@@ -25,10 +25,14 @@ import org.elasticsearch.client.sniff.SnifferBuilder;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.common.impl.SearchThreadFactory;
 
 /**
@@ -36,6 +40,17 @@ import org.hibernate.search.util.common.impl.SearchThreadFactory;
  * @author Yoann Rodiere
  */
 public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
+
+	public static final BeanReference<ElasticsearchClientFactory> REFERENCE = new BeanReference<ElasticsearchClientFactory>() {
+		@Override
+		public BeanHolder<ElasticsearchClientFactory> getBean(BeanProvider beanProvider) {
+			BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurerHolders =
+					beanProvider.getBeansWithRole( ElasticsearchHttpClientConfigurer.class );
+			ElasticsearchClientFactoryImpl factory = new ElasticsearchClientFactoryImpl( httpClientConfigurerHolders.get() );
+			return BeanHolder.<ElasticsearchClientFactory>of( factory )
+					.withDependencyAutoClosing( httpClientConfigurerHolders );
+		}
+	};
 
 	private static final ConfigurationProperty<List<String>> HOST =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOSTS )
@@ -101,23 +116,15 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 					.withDefault( ElasticsearchBackendSettings.Defaults.DISCOVERY_SCHEME )
 					.build();
 
-	/* TODO ElasticsearchHttpClientConfigurer
-	private ServiceManager serviceManager;
+	private final List<ElasticsearchHttpClientConfigurer> httpClientConfigurers;
 
-	@Override
-	public void start(ConfigurationPropertySource propertySource, BackendBuildContext context) {
-		this.serviceManager = context.getServiceManager();
+	public ElasticsearchClientFactoryImpl(
+			List<ElasticsearchHttpClientConfigurer> httpClientConfigurers) {
+		this.httpClientConfigurers = httpClientConfigurers;
 	}
 
 	@Override
-	public void stop() {
-		this.serviceManager = null;
-	}
-	*/
-
-	@Override
-	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
-			GsonProvider gsonProvider) {
+	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource, GsonProvider gsonProvider) {
 		int requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 
 		RestClient restClient = createClient( propertySource, requestTimeoutMs );
@@ -127,7 +134,8 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 				gsonProvider.getGson(), gsonProvider.getLogHelper() );
 	}
 
-	private RestClient createClient(ConfigurationPropertySource propertySource, int maxRetryTimeoutMillis) {
+	private RestClient createClient(ConfigurationPropertySource propertySource,
+			int maxRetryTimeoutMillis) {
 		ServerUris hosts = ServerUris.fromStrings( HOST.get( propertySource ) );
 
 		return RestClient.builder( hosts.asHostsArray() )
@@ -138,8 +146,10 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 				 * See https://github.com/elastic/elasticsearch/issues/21789#issuecomment-287399115
 				 */
 				.setMaxRetryTimeoutMillis( maxRetryTimeoutMillis )
-				.setRequestConfigCallback( b -> customizeRequestConfig( propertySource, b ) )
-				.setHttpClientConfigCallback( b -> customizeHttpClientConfig( propertySource, hosts, b ) )
+				.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
+				.setHttpClientConfigCallback(
+						b -> customizeHttpClientConfig( b, httpClientConfigurers, propertySource, hosts )
+				)
 				.build();
 	}
 
@@ -168,8 +178,9 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		}
 	}
 
-	private HttpAsyncClientBuilder customizeHttpClientConfig(ConfigurationPropertySource propertySource,
-			ServerUris hosts, HttpAsyncClientBuilder builder) {
+	private HttpAsyncClientBuilder customizeHttpClientConfig(HttpAsyncClientBuilder builder,
+			Iterable<ElasticsearchHttpClientConfigurer> configurers,
+			ConfigurationPropertySource propertySource, ServerUris hosts) {
 		builder.setMaxConnTotal( MAX_TOTAL_CONNECTION.get( propertySource ) )
 				.setMaxConnPerRoute( MAX_TOTAL_CONNECTION_PER_ROUTE.get( propertySource ) )
 				.setThreadFactory( new SearchThreadFactory( "Elasticsearch transport thread" ) );
@@ -195,19 +206,15 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			builder.setDefaultCredentialsProvider( credentialsProvider );
 		}
 
-		/* TODO ElasticsearchHttpClientConfigurer
-		Iterable<ElasticsearchHttpClientConfigurer> configurers =
-				serviceManager.getClassResolver().loadJavaServices( ElasticsearchHttpClientConfigurer.class );
 		for ( ElasticsearchHttpClientConfigurer configurer : configurers ) {
-			configurer.configure( builder, properties );
+			configurer.configure( builder, propertySource );
 		}
-		*/
 
 		return builder;
 	}
 
-	private RequestConfig.Builder customizeRequestConfig(ConfigurationPropertySource propertySource,
-			RequestConfig.Builder builder) {
+	private RequestConfig.Builder customizeRequestConfig(RequestConfig.Builder builder,
+			ConfigurationPropertySource propertySource) {
 		return builder
 				.setConnectionRequestTimeout( 0 ) //Disable lease handling for the connection pool! See also HSEARCH-2681
 				.setSocketTimeout( READ_TIMEOUT.get( propertySource ) )

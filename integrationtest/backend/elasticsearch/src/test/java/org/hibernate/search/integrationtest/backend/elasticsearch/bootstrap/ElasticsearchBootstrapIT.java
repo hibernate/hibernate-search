@@ -6,25 +6,30 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.EasyMock;
-import org.easymock.EasyMockSupport;
-
-public class ElasticsearchBootstrapIT extends EasyMockSupport {
+public class ElasticsearchBootstrapIT {
 
 	private static final String BACKEND_NAME = "BackendName";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	@Rule
+	public ElasticsearchClientSpy elasticsearchClientSpy = new ElasticsearchClientSpy();
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
@@ -34,17 +39,17 @@ public class ElasticsearchBootstrapIT extends EasyMockSupport {
 	 */
 	@Test
 	public void explicitDialect() {
-		ElasticsearchClientFactory clientFactoryMock = createMock( ElasticsearchClientFactory.class );
-
-		resetAll();
-		// Do not expect any call to the client factory
-		replayAll();
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withBackendProperty(
 						BACKEND_NAME, ElasticsearchBackendSettings.DIALECT, dialect.getName()
 				)
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientFactoryMock
+						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+						elasticsearchClientSpy.getFactory()
+				)
+				.withIndexDefaultsProperty(
+						BACKEND_NAME, ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
+						ElasticsearchIndexLifecycleStrategyName.NONE
 				)
 				.withIndex(
 						"EmptyIndexName",
@@ -52,15 +57,17 @@ public class ElasticsearchBootstrapIT extends EasyMockSupport {
 						indexManager -> { }
 				)
 				.setupFirstPhaseOnly();
-		verifyAll();
 
-		resetAll();
-		// NOW, we expect a call to the client factory
-		EasyMock.expect( clientFactoryMock.create( EasyMock.anyObject(), EasyMock.anyObject() ) )
-				.andDelegateTo( new ElasticsearchClientFactoryImpl() );
-		replayAll();
+		// We do not expect the client to be created in the first phase
+		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isEqualTo( 0 );
+		elasticsearchClientSpy.verifyExpectationsMet();
+
+		// In the *second* phase, however, we expect the client to be created and used to check the version
+		elasticsearchClientSpy.expectNext(
+				ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.EXTENSIBLE
+		);
 		partialSetup.doSecondPhase();
-		verifyAll();
+		elasticsearchClientSpy.verifyExpectationsMet();
 	}
 
 }

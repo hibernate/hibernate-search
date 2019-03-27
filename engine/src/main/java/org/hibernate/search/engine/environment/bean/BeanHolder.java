@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,6 +36,15 @@ public interface BeanHolder<T> extends AutoCloseable {
 	 */
 	@Override
 	void close();
+
+	/**
+	 * @param dependencies Dependencies that should be closed eventually.
+	 * @return A bean holder that wraps the current bean holder, and ensures the dependencies are also
+	 * closed when its {@link #close()} method is called.
+	 */
+	default BeanHolder<T> withDependencyAutoClosing(BeanHolder<?> ... dependencies) {
+		return new DependencyClosingBeanHolder<>( this, Arrays.asList( dependencies ) );
+	}
 
 	/**
 	 * @param instance The bean instance.

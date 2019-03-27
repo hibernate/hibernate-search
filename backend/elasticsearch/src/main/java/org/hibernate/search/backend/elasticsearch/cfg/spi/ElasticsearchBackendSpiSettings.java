@@ -29,6 +29,6 @@ public final class ElasticsearchBackendSpiSettings {
 		}
 
 		public static final BeanReference<ElasticsearchClientFactory> CLIENT_FACTORY =
-				BeanReference.ofInstance( new ElasticsearchClientFactoryImpl() );
+				ElasticsearchClientFactoryImpl.REFERENCE;
 	}
 }
