@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
+import java.util.List;
+
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
 
 /**
@@ -33,5 +36,10 @@ final class BeanResolverOnlyBeanProvider implements BeanProvider {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
 		return beanResolver.resolve( typeReference, nameReference );
+	}
+
+	@Override
+	public <T> BeanHolder<List<T>> getBeansWithRole(Class<T> role) {
+		throw new AssertionFailure( "Unexpected call to getBeansWithRole before roles are even defined." );
 	}
 }

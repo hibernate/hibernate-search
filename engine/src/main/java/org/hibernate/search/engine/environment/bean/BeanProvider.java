@@ -81,7 +81,7 @@ public interface BeanProvider {
 	 * and get a {@code Function<BeanReference<T>, T>} that can be used in {@link java.util.Optional#map(Function)}
 	 * for instance.
 	 *
-	 * @param <T> The expected return type.
+	 * @param <T> The expected bean type.
 	 * @param references The references to the beans to retrieve. Must be non-null.
 	 * @return A {@link BeanHolder} containing a {@link List} containing the resolved beans,
 	 * in the same order as the {@code references}.
@@ -100,5 +100,21 @@ public interface BeanProvider {
 			throw e;
 		}
 	}
+
+	/**
+	 * Retrieve a list of beans with the given role.
+	 * <p>
+	 * <strong>WARNING:</strong> this does not just return all the beans that implement {@code role}.
+	 * Beans are assigned a role explicitly during
+	 * {@link org.hibernate.search.engine.environment.bean.spi.BeanConfigurer bean configuration}
+	 * by calling
+	 * {@link org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext#assignRole(Class, BeanReference)}.
+	 *
+	 * @param <T> The expected bean type.
+	 * @param role The role that must have been assigned to the retrieved beans. Must be non-null and non-empty.
+	 * @return A {@link BeanHolder} containing a {@link List} containing the resolved beans.
+	 * @throws SearchException if one of the references assigned to the role cannot be resolved.
+	 */
+	<T> BeanHolder<List<T>> getBeansWithRole(Class<T> role);
 
 }
