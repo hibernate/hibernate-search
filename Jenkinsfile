@@ -524,10 +524,12 @@ stage('Non-default environment ITs') {
 										 passwordVariable: 'AWS_SECRET_ACCESS_KEY'
 						]]) {
 							mavenNonDefaultIT itEnv, """ \
-								clean install -pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \
+								clean install \
+								-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 								${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \
 								-Dtest.elasticsearch.host.provided=true \
 								-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \
+								-Dtest.elasticsearch.host.aws.signing.enabled=true \
 								-Dtest.elasticsearch.host.aws.access_key=$AWS_ACCESS_KEY_ID \
 								-Dtest.elasticsearch.host.aws.secret_key=$AWS_SECRET_ACCESS_KEY \
 								-Dtest.elasticsearch.host.aws.region=$itEnv.awsRegion \

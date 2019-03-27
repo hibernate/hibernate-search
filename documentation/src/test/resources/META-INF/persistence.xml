@@ -77,6 +77,14 @@
                       value="${test.elasticsearch.host.username}"/>
             <property name="hibernate.search.backends.myBackend.password"
                       value="${test.elasticsearch.host.password}"/>
+            <property name="hibernate.search.backends.myBackend.aws.signing.enabled"
+                      value="${test.elasticsearch.host.aws.signing.enabled}"/>
+            <property name="hibernate.search.backends.myBackend.aws.access_key"
+                      value="${test.elasticsearch.host.aws.access_key}"/>
+            <property name="hibernate.search.backends.myBackend.aws.secret_key"
+                      value="${test.elasticsearch.host.aws.secret_key}"/>
+            <property name="hibernate.search.backends.myBackend.aws.region"
+                      value="${test.elasticsearch.host.aws.region}"/>
             <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy"
                       value="drop-and-create-and-drop"/>
             <!-- Make this test work even if there is only a single node in the cluster -->
@@ -143,6 +151,14 @@
                       value="${test.elasticsearch.host.username}"/>
             <property name="hibernate.search.backends.myBackend.password"
                       value="${test.elasticsearch.host.password}"/>
+            <property name="hibernate.search.backends.myBackend.aws.signing.enabled"
+                      value="${test.elasticsearch.host.aws.signing.enabled}"/>
+            <property name="hibernate.search.backends.myBackend.aws.access_key"
+                      value="${test.elasticsearch.host.aws.access_key}"/>
+            <property name="hibernate.search.backends.myBackend.aws.secret_key"
+                      value="${test.elasticsearch.host.aws.secret_key}"/>
+            <property name="hibernate.search.backends.myBackend.aws.region"
+                      value="${test.elasticsearch.host.aws.region}"/>
             <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy"
                       value="drop-and-create-and-drop"/>
             <!-- Make this test work even if there is only a single node in the cluster -->
