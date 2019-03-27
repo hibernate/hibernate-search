@@ -188,11 +188,11 @@ stage('Configure') {
 					new EsLocalITEnvironment(versionRange: '[7.0,7.x)', mavenProfile: 'elasticsearch-7.0', status: ITEnvironmentStatus.SUPPORTED)
 			],
 			esAws: [
-					new EsAwsITEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6', status: ITEnvironmentStatus.EXPERIMENTAL),
-					new EsAwsITEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL),
-					new EsAwsITEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL),
-					new EsAwsITEnvironment(version: '6.3', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL),
-					new EsAwsITEnvironment(version: '6.4', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL)
+					new EsAwsITEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6', status: ITEnvironmentStatus.SUPPORTED),
+					new EsAwsITEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.SUPPORTED),
+					new EsAwsITEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.SUPPORTED),
+					new EsAwsITEnvironment(version: '6.3', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.SUPPORTED),
+					new EsAwsITEnvironment(version: '6.4', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.SUPPORTED)
 			]
 	])
 
