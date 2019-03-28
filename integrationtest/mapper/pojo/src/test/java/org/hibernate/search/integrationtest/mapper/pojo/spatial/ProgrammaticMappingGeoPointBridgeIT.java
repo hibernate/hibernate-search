@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.spatial;
 
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridgeBuilder;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
@@ -36,16 +37,16 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 	@Before
 	public void setup() {
 		backendMock.expectSchema( GeoPointOnTypeEntity.INDEX, b -> b
-				.field( "homeLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.YES ) )
-				.field( "workLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
+				.field( "homeLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.YES ).sortable( Sortable.YES ) )
+				.field( "workLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
 		);
 		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.INDEX, b -> b
-				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
-				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.NO ) )
+				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
+				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.NO ).sortable( Sortable.DEFAULT ) )
 		);
 		backendMock.expectSchema( GeoPointOnCustomCoordinatesPropertyEntity.INDEX, b -> b
-				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
-				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
+				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
+				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
 		);
 
 		mapping = setupHelper.withBackendMock( backendMock )
@@ -63,6 +64,7 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 									.fieldName( "homeLocation" )
 									.markerSet( "home" )
 									.projectable( Projectable.YES )
+									.sortable( Sortable.YES )
 							)
 							.bridge(
 							GeoPointBridgeBuilder.forType()

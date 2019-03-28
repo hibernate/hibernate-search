@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
@@ -46,6 +47,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 		private String fieldName;
 		private Projectable projectable = Projectable.DEFAULT;
+		private Sortable sortable = Sortable.DEFAULT;
 		private String markerSet;
 
 		@Override
@@ -54,6 +56,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 			fieldName( annotation.fieldName() );
 			markerSet( annotation.markerSet() );
 			projectable( annotation.projectable() );
+			sortable( annotation.sortable() );
 		}
 
 		@Override
@@ -69,6 +72,12 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 		}
 
 		@Override
+		public Builder sortable(Sortable sortable) {
+			this.sortable = sortable;
+			return this;
+		}
+
+		@Override
 		public Builder markerSet(String markerSet) {
 			this.markerSet = markerSet;
 			return this;
@@ -76,12 +85,13 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 		@Override
 		public BeanHolder<? extends GeoPointBridge> build(BridgeBuildContext buildContext) {
-			return BeanHolder.of( new GeoPointBridge( fieldName, projectable, markerSet ) );
+			return BeanHolder.of( new GeoPointBridge( fieldName, projectable, sortable, markerSet ) );
 		}
 	}
 
 	private final String fieldName;
 	private final Projectable projectable;
+	private final Sortable sortable;
 	private final String markerSet;
 
 	private IndexFieldReference<GeoPoint> indexFieldReference;
@@ -90,9 +100,10 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	/**
 	 * Private constructor, use {@link GeoPointBridgeBuilder#forType()} or {@link GeoPointBridgeBuilder#forProperty()} instead.
 	 */
-	private GeoPointBridge(String fieldName, Projectable projectable, String markerSet) {
+	private GeoPointBridge(String fieldName, Projectable projectable, Sortable sortable, String markerSet) {
 		this.fieldName = fieldName;
 		this.projectable = projectable;
+		this.sortable = sortable;
 		this.markerSet = markerSet;
 	}
 
@@ -123,7 +134,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 			PojoModelCompositeElement bridgedPojoModelElement) {
 		indexFieldReference = indexSchemaElement.field(
 				defaultedFieldName,
-				typeFactoryContext.asGeoPoint().projectable( projectable ).toIndexFieldType()
+				typeFactoryContext.asGeoPoint().projectable( projectable ).sortable( sortable ).toIndexFieldType()
 		)
 				.toReference();
 

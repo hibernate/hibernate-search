@@ -14,6 +14,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
@@ -89,6 +90,12 @@ public @interface GeoPointBridge {
 	 * field. Defaults to {@code Projectable.DEFAULT}.
 	 */
 	Projectable projectable() default Projectable.DEFAULT;
+
+	/**
+	 * @return Returns an instance of the {@link Sortable} enum, indicating whether sorts are enabled for this
+	 * field. Defaults to {@code Sortable.DEFAULT}.
+	 */
+	Sortable sortable() default Sortable.DEFAULT;
 
 	/**
 	 * @return The name of the marker set this spatial should look into
