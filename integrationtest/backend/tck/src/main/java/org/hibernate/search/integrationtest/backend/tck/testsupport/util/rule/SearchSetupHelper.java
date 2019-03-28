@@ -18,7 +18,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
+import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -37,7 +37,7 @@ public class SearchSetupHelper implements TestRule {
 	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
 	private final List<SearchIntegration> integrations = new ArrayList<>();
 
-	private TestHelper testHelper;
+	private final TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
 	public SetupContext withDefaultConfiguration() {
 		return withConfiguration( null );
@@ -53,7 +53,7 @@ public class SearchSetupHelper implements TestRule {
 
 	public SetupContext withConfiguration(String configurationId, String backendName) {
 		TckConfiguration tckConfiguration = TckConfiguration.get();
-		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( testHelper, configurationId )
+		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( configurationProvider, configurationId )
 				.withPrefix( "backends." + backendName );
 
 		// Hack to have the resolve() method ignore the various masks and prefixes that we added for TCK purposes only
@@ -69,17 +69,16 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	private Statement statement(final Statement base, final Description description) {
-		return new Statement() {
-
+		Statement wrapped = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				testHelper = TestHelper.create( description );
 				try ( Closer<RuntimeException> closer = new Closer<>() ) {
 					try {
 						base.evaluate();
 					}
 					finally {
-						closer.pushAll( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates );
+						closer.pushAll(
+								SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates );
 						integrationPartialBuildStates.clear();
 						closer.pushAll( SearchIntegration::close, integrations );
 						integrations.clear();
@@ -87,6 +86,7 @@ public class SearchSetupHelper implements TestRule {
 				}
 			}
 		};
+		return configurationProvider.apply( wrapped, description );
 	}
 
 	public class SetupContext {

@@ -11,7 +11,7 @@ import java.util.ServiceLoader;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
+import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 /**
  * Allows to run the tests with different backends depending on the content of the property file at
@@ -52,12 +52,12 @@ public final class TckConfiguration {
 		return backendFeatures;
 	}
 
-	public ConfigurationPropertySource getBackendProperties(TestHelper testHelper, String configurationId) {
+	public ConfigurationPropertySource getBackendProperties(TestConfigurationProvider configurationProvider, String configurationId) {
 		String propertiesPath =
 				configurationId == null
 						? DEFAULT_PROPERTIES_PATH
 						: SPECIFIC_PROPERTIES_PATH_FUNCTION.apply( configurationId );
-		return ConfigurationPropertySource.fromMap( testHelper.getPropertiesFromFile( propertiesPath ) )
+		return ConfigurationPropertySource.fromMap( configurationProvider.getPropertiesFromFile( propertiesPath ) )
 				.withMask( "backend" );
 	}
 }

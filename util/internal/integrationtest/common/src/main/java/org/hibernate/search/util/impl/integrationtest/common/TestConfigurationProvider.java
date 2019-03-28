@@ -21,21 +21,31 @@ import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanProvider;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassAndResourceResolver;
 
+import org.junit.rules.TestRule;
 import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
-public final class TestHelper {
+public final class TestConfigurationProvider implements TestRule {
 
 	private static final String STARTUP_TIMESTAMP = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS", Locale.ROOT )
 			.format( new Date() );
 
-	public static TestHelper create(Description description) {
-		return new TestHelper( description );
-	}
+	private String testId;
 
-	private final String testId;
-
-	private TestHelper(Description description) {
-		this.testId = description.getTestClass().getSimpleName() + "-" + description.getMethodName();
+	@Override
+	public Statement apply(Statement base, Description description) {
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				testId = description.getTestClass().getSimpleName() + "-" + description.getMethodName();
+				try {
+					base.evaluate();
+				}
+				finally {
+					testId = null;
+				}
+			}
+		};
 	}
 
 	public BeanProvider createBeanProviderForTest() {
