@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
+import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 
 import org.junit.rules.TestRule;
@@ -24,7 +24,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 
 	private final List<R> toClose = new ArrayList<>();
 
-	private TestHelper testHelper;
+	private final TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
 	public C withBackendMock(BackendMock backendMock) {
 		String backendName = backendMock.getBackendName();
@@ -37,7 +37,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		String propertiesPath = getPropertiesPath( configurationId );
 		return createSetupContext()
 				.withPropertyRadical( EngineSettings.DEFAULT_BACKEND, backendName )
-				.withProperties( testHelper.getPropertiesFromFile( propertiesPath ) );
+				.withProperties( configurationProvider.getPropertiesFromFile( propertiesPath ) );
 	}
 
 	@Override
@@ -52,12 +52,10 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 	protected abstract void close(R toClose) throws Exception;
 
 	private Statement statement(Statement base, Description description) {
-		return new Statement() {
-
+		Statement wrapped = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
 				try ( Closer<Exception> closer = new Closer<>() ) {
-					testHelper = TestHelper.create( description );
 					try {
 						base.evaluate();
 					}
@@ -68,6 +66,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 				}
 			}
 		};
+		return configurationProvider.apply( wrapped, description );
 	}
 
 	public abstract class AbstractSetupContext {

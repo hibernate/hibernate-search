@@ -35,7 +35,7 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.di
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
+import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -50,7 +50,7 @@ public class TestElasticsearchClient implements TestRule {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
-	private TestHelper testHelper;
+	private final TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
 	private ElasticsearchClientImplementor client;
 
@@ -425,12 +425,12 @@ public class TestElasticsearchClient implements TestRule {
 
 	@Override
 	public Statement apply(Statement base, Description description) {
-		return new Statement() {
+		Statement wrapped = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
 				try ( Closer<IOException> closer = new Closer<>() ) {
 					try {
-						before( description );
+						before();
 						base.evaluate();
 					}
 					finally {
@@ -439,14 +439,14 @@ public class TestElasticsearchClient implements TestRule {
 				}
 			}
 		};
+		return configurationProvider.apply( wrapped, description );
 	}
 
-	private void before(Description description) {
-		testHelper = TestHelper.create( description );
+	private void before() {
 		ConfigurationPropertySource backendProperties =
-				TckConfiguration.get().getBackendProperties( testHelper, null );
+				TckConfiguration.get().getBackendProperties( configurationProvider, null );
 
-		BeanProvider beanProvider = testHelper.createBeanProviderForTest();
+		BeanProvider beanProvider = configurationProvider.createBeanProviderForTest();
 		/*
 		 * We use a {@link ElasticsearchClientFactoryImpl} to create our low-level client.
 		 *
@@ -469,7 +469,6 @@ public class TestElasticsearchClient implements TestRule {
 		createdTemplatesNames.clear();
 		closer.push( this::tryCloseClient, client );
 		client = null;
-		testHelper = null;
 	}
 
 	private void tryDeleteESIndex(URLEncodedString indexName) {
