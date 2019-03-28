@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.builtin.spatial;
 
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge;
@@ -19,6 +20,8 @@ public interface GeoPointBridgeBuilder<B> extends BridgeBuilder<B> {
 	GeoPointBridgeBuilder<B> fieldName(String fieldName);
 
 	GeoPointBridgeBuilder<B> projectable(Projectable projectable);
+
+	GeoPointBridgeBuilder<B> sortable(Sortable sortable);
 
 	GeoPointBridgeBuilder<B> markerSet(String markerSet);
 
