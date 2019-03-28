@@ -220,7 +220,8 @@ public class OrmLibraryShowcaseIT {
 				0, 10
 		);
 		// Should only include content from university
-		assertThat( documents ).extracting( Document::getId ).containsExactly(
+		// TODO HSEARCH-2254 check results are sorted by distance once we do sort them (see the query implementation)
+		assertThat( documents ).extracting( Document::getId ).containsExactlyInAnyOrder(
 				INDONESIAN_ECONOMY_ID,
 				JAVA_FOR_DUMMIES_ID,
 				ART_OF_COMPUTER_PROG_ID,
@@ -234,7 +235,8 @@ public class OrmLibraryShowcaseIT {
 				0, 10
 		);
 		// Should only include content from suburb1 or university
-		assertThat( documents ).extracting( Document::getId ).containsExactly(
+		// TODO HSEARCH-2254 check results are sorted by distance once we do sort them (see the query implementation)
+		assertThat( documents ).extracting( Document::getId ).containsExactlyInAnyOrder(
 				CALLIGRAPHY_ID,
 				INDONESIAN_ECONOMY_ID,
 				JAVA_FOR_DUMMIES_ID,
@@ -249,7 +251,8 @@ public class OrmLibraryShowcaseIT {
 				0, 10
 		);
 		// Should only include content from suburb1 or university with "calligraphy" in it
-		assertThat( documents ).extracting( Document::getId ).containsExactly(
+		// TODO HSEARCH-2254 check results are sorted by distance once we do sort them (see the query implementation)
+		assertThat( documents ).extracting( Document::getId ).containsExactlyInAnyOrder(
 				CALLIGRAPHY_ID
 		);
 
@@ -261,7 +264,8 @@ public class OrmLibraryShowcaseIT {
 				0, 10
 		);
 		// Should only include content from university
-		assertThat( documents ).extracting( Document::getId ).containsExactly(
+		// TODO HSEARCH-2254 check results are sorted by distance once we do sort them (see the query implementation)
+		assertThat( documents ).extracting( Document::getId ).containsExactlyInAnyOrder(
 				INDONESIAN_ECONOMY_ID,
 				JAVA_FOR_DUMMIES_ID,
 				ART_OF_COMPUTER_PROG_ID,

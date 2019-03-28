@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
  */
 @Entity
 @Indexed(index = Library.INDEX)
-@GeoPointBridge(fieldName = "location")
+@GeoPointBridge(fieldName = "location", sortable = Sortable.YES)
 public class Library extends AbstractEntity<Integer> {
 
 	static final String INDEX = "Library";
