@@ -25,6 +25,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -45,6 +46,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class MatchSearchPredicateIT {
+
+	public static final String CONFIGURATION_ID = "analysis-override";
 
 	private static final String INDEX_NAME = "IndexName";
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
@@ -75,7 +78,7 @@ public class MatchSearchPredicateIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
@@ -748,6 +751,120 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
+	public void analyzerOverride() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
+		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+
+		IndexSearchQuery<DocumentReference> query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( whitespaceAnalyzedField ).matching( "NEW WORLD" ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( whitespaceLowercaseAnalyzedField ).matching( "NEW WORLD" ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( whitespaceAnalyzedField ).matching( "NEW WORLD" )
+						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void analyzerOverride_fuzzy() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
+		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+
+		IndexSearchQuery<DocumentReference> query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( whitespaceAnalyzedField ).matching( "WORD" ).fuzzy() )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( whitespaceLowercaseAnalyzedField ).matching( "WORD" ).fuzzy() )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( whitespaceAnalyzedField ).matching( "WORD" ).fuzzy()
+						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void analyzerOverride_withNormalizer() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
+
+		SubTest.expectException( () -> scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( whitespaceAnalyzedField ).matching( "WORLD" )
+						// we have a normalizer with that name, but not an analyzer
+						.analyzer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ) )
+				.toQuery().fetch()
+		)
+				.assertThrown()
+				.isInstanceOf( Exception.class )
+
+				// TODO on Elasticsearch backend a CompletionException is raised instead of a SearchException
+				// Error during generated code invocation com.intellij.debugger.engine.evaluation.EvaluateException: Method threw 'java.util.concurrent.CompletionException' exception.
+				//.isInstanceOf( SearchException.class )
+
+				// TODO on Elasticsearch backend the error is not handled by Search
+				//.hasMessageContaining( "HSEARCH000353: Unknown analyzer: 'DefaultAnalysisDefinitions_lowercase'. Make sure you defined this analyzer." )
+		;
+	}
+
+	@Test
+	public void analyzerOverride_notExistingName() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
+
+		SubTest.expectException( () -> scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( whitespaceAnalyzedField ).matching( "WORLD" )
+						// we don't have any analyzer with that name
+						.analyzer( "this_name_does_actually_not_exist" ) )
+				.toQuery().fetch()
+		)
+				.assertThrown()
+				.isInstanceOf( Exception.class )
+
+				// TODO on Elasticsearch backend a CompletionException is raised instead of a SearchException
+				// Error during generated code invocation com.intellij.debugger.engine.evaluation.EvaluateException: Method threw 'java.util.concurrent.CompletionException' exception.
+				//.isInstanceOf( SearchException.class )
+
+				// TODO on Elasticsearch backend the error is not handled by Search
+				//.hasMessageContaining( "HSEARCH000353: Unknown analyzer: 'this_name_does_actually_not_exist'. Make sure you defined this analyzer." )
+		;
+	}
+
+	@Test
 	public void multiFields() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
@@ -1048,6 +1165,8 @@ public class MatchSearchPredicateIT {
 			indexMapping.analyzedStringField.document1Value.write( document );
 			indexMapping.analyzedStringField2.document1Value.write( document );
 			indexMapping.normalizedStringField.document1Value.write( document );
+			indexMapping.whitespaceAnalyzedField.document1Value.write( document );
+			indexMapping.whitespaceLowercaseAnalyzedField.document1Value.write( document );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
@@ -1061,6 +1180,8 @@ public class MatchSearchPredicateIT {
 			indexMapping.analyzedStringField.document2Value.write( document );
 			indexMapping.analyzedStringField2.document2Value.write( document );
 			indexMapping.normalizedStringField.document2Value.write( document );
+			indexMapping.whitespaceAnalyzedField.document2Value.write( document );
+			indexMapping.whitespaceLowercaseAnalyzedField.document2Value.write( document );
 		} );
 		workPlan.add( referenceProvider( EMPTY ), document -> { } );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
@@ -1072,6 +1193,8 @@ public class MatchSearchPredicateIT {
 			indexMapping.analyzedStringField.document3Value.write( document );
 			indexMapping.analyzedStringField2.document3Value.write( document );
 			indexMapping.normalizedStringField.document3Value.write( document );
+			indexMapping.whitespaceAnalyzedField.document3Value.write( document );
+			indexMapping.whitespaceLowercaseAnalyzedField.document3Value.write( document );
 		} );
 		workPlan.execute().join();
 
@@ -1141,6 +1264,9 @@ public class MatchSearchPredicateIT {
 		final MainFieldModel string1FieldWithDslConverter;
 		final MainFieldModel string2FieldWithDslConverter;
 
+		final MainFieldModel whitespaceAnalyzedField;
+		final MainFieldModel whitespaceLowercaseAnalyzedField;
+
 		@SuppressWarnings("unchecked")
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
@@ -1205,6 +1331,16 @@ public class MatchSearchPredicateIT {
 					"Mapper", "ORM", "Pojo"
 			)
 					.map( root, "string2FieldWithDslConverter" );
+			whitespaceAnalyzedField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ),
+					"brave new world", "BRAVE NEW WORLD", "BRave NeW WoRlD"
+			)
+					.map( root, "whitespaceAnalyzed" );
+			whitespaceLowercaseAnalyzedField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ),
+					"brave new world", "BRAVE NEW WORLD", "BRave NeW WoRlD"
+			)
+					.map( root, "whitespaceLowercaseAnalyzed" );
 		}
 	}
 
