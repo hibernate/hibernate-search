@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.dsl.predicate.spi;
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.search.dsl.predicate.ExistsPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
@@ -84,6 +85,11 @@ public class DelegatingSearchPredicateFactoryContext implements SearchPredicateF
 	@Override
 	public SimpleQueryStringPredicateContext simpleQueryString() {
 		return delegate.simpleQueryString();
+	}
+
+	@Override
+	public ExistsPredicateContext exists() {
+		return delegate.exists();
 	}
 
 	@Override
