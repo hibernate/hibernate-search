@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -117,6 +118,11 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> simpleQueryString() {
 		return new LuceneSimpleQueryStringPredicateBuilder( searchContext, scopeModel );
+	}
+
+	@Override
+	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> exists(String absoluteFieldPath) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override

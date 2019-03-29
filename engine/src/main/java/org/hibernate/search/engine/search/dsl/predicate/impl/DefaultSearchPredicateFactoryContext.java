@@ -89,7 +89,7 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 
 	@Override
 	public ExistsPredicateContext exists() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return new ExistsPredicateContextImpl<>( factory );
 	}
 
 	@Override

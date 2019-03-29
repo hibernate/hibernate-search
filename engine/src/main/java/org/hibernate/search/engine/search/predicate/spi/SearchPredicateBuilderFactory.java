@@ -72,6 +72,8 @@ public interface SearchPredicateBuilderFactory<C, B> {
 
 	SimpleQueryStringPredicateBuilder<B> simpleQueryString();
 
+	ExistsPredicateBuilder<B> exists(String absoluteFieldPath);
+
 	SpatialWithinCirclePredicateBuilder<B> spatialWithinCircle(String absoluteFieldPath);
 
 	SpatialWithinPolygonPredicateBuilder<B> spatialWithinPolygon(String absoluteFieldPath);
