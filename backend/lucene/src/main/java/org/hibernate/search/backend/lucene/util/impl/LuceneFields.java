@@ -20,6 +20,8 @@ public class LuceneFields {
 
 	private static final String TYPE_FIELD_NAME = internalFieldName( "type" );
 
+	private static final String FIELD_NAMES_FIELD_NAME = internalFieldName( "field_names" );
+
 	public static final String TYPE_MAIN_DOCUMENT = "main";
 
 	public static final String TYPE_CHILD_DOCUMENT = "child";
@@ -63,6 +65,10 @@ public class LuceneFields {
 
 	public static String typeFieldName() {
 		return TYPE_FIELD_NAME;
+	}
+
+	public static String fieldNamesFieldName() {
+		return FIELD_NAMES_FIELD_NAME;
 	}
 
 	public static String rootIdFieldName() {
