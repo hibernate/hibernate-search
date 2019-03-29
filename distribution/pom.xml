@@ -115,7 +115,7 @@
                         <configuration>
                             <sourcepath>
                                 ${basedir}/../engine/src/main/java;
-                                ${basedir}/../util/internal/common/src/main/java;
+                                ${basedir}/../util/common/src/main/java;
                                 ${basedir}/../mapper/pojo/src/main/java;
                                 ${basedir}/../mapper/orm/src/main/java;
                                 ${basedir}/../backend/elasticsearch/src/main/java;
