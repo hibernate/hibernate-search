@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.time.Instant;
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -39,6 +40,13 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 				Instant.parse( "2018-02-15T10:15:30.00Z" ),
 				Instant.parse( "2018-03-15T10:15:30.00Z" )
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<Instant> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				Instant.EPOCH, Instant.parse( "2018-02-01T10:15:30.00Z" )
+		);
 	}
 
 	@Override

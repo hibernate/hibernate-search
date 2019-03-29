@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -32,6 +33,13 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 				(byte) 3, (byte) 13, (byte) 25,
 				(byte) 10, (byte) 19
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<Byte> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				(byte) 0, (byte) 42
+		);
 	}
 
 	@Override

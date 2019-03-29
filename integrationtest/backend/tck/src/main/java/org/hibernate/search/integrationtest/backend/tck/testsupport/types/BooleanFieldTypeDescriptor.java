@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -30,6 +31,13 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	public Optional<RangePredicateExpectations<Boolean>> getRangePredicateExpectations() {
 		// Tested separately in BooleanSortAndRangePredicateIT, because we can only use two values
 		return Optional.empty();
+	}
+
+	@Override
+	public ExistsPredicateExpectations<Boolean> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				true, false
+		);
 	}
 
 	@Override

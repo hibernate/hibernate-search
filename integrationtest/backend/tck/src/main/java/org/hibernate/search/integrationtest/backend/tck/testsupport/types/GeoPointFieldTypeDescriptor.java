@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.util.Optional;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -49,6 +50,13 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 				return false;
 			}
 		} );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<GeoPoint> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				GeoPoint.of( 0.0, 0.0 ), GeoPoint.of( 40, 70 )
+		);
 	}
 
 	@Override
