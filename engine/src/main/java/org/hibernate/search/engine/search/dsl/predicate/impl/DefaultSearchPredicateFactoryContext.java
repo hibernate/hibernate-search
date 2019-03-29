@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.ExistsPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
@@ -84,6 +85,11 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 	@Override
 	public SimpleQueryStringPredicateContext simpleQueryString() {
 		return new SimpleQueryStringPredicateContextImpl<>( factory );
+	}
+
+	@Override
+	public ExistsPredicateContext exists() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override

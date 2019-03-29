@@ -131,6 +131,17 @@ public interface SearchPredicateFactoryContext {
 	SimpleQueryStringPredicateContext simpleQueryString();
 
 	/**
+	 * Match documents where a given field exists.
+	 * <p>
+	 * Fields are considered to exist in a document when they have at least one non-null value in this document.
+	 *
+	 * @return A context allowing to define the predicate more precisely
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
+	 * @see ExistsPredicateContext
+	 */
+	ExistsPredicateContext exists();
+
+	/**
 	 * Access the different types of spatial predicates.
 	 *
 	 * @return A context allowing to define the type of spatial predicate.
