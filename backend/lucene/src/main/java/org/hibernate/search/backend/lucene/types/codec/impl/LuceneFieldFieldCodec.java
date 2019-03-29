@@ -38,6 +38,9 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 		}
 
 		fieldContributor.contribute( absoluteFieldPath, value, f -> contributeField( documentBuilder, absoluteFieldPath, f ) );
+
+		// For "exists" predicates
+		documentBuilder.addFieldName( absoluteFieldPath );
 	}
 
 	@Override

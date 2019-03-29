@@ -38,6 +38,9 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 		}
 
 		documentBuilder.addField( domain.createIndexField( absoluteFieldPath, encodedValue ) );
+
+		// For "exists" predicates
+		documentBuilder.addFieldName( absoluteFieldPath );
 	}
 
 	@Override

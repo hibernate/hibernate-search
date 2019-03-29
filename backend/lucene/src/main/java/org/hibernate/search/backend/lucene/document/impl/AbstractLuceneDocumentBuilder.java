@@ -69,7 +69,8 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 				addNestedObjectDocumentBuilder( nestedDocumentBuilder );
 				return nestedDocumentBuilder;
 			default:
-				LuceneFlattenedObjectDocumentBuilder flattenedDocumentBuilder = new LuceneFlattenedObjectDocumentBuilder( fieldSchemaNode );
+				LuceneFlattenedObjectDocumentBuilder flattenedDocumentBuilder =
+						new LuceneFlattenedObjectDocumentBuilder( fieldSchemaNode, this );
 				addFlattenedObjectDocumentBuilder( flattenedDocumentBuilder );
 				return flattenedDocumentBuilder;
 		}

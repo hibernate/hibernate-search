@@ -45,6 +45,9 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 		// doc values fields are required for predicates, distance projections and distance sorts
 		documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
 		documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
+
+		// For "exists" predicates
+		documentBuilder.addFieldName( absoluteFieldPath );
 	}
 
 	@Override

@@ -6,38 +6,29 @@
  */
 package org.hibernate.search.backend.lucene.document.impl;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
+
+import org.apache.lucene.index.IndexableField;
 
 /**
  * @author Guillaume Smet
  */
 class LuceneFlattenedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder {
 
-	private final Set<IndexableField> fields = new HashSet<>();
+	private final AbstractLuceneDocumentBuilder parent;
 
-	LuceneFlattenedObjectDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode) {
+	LuceneFlattenedObjectDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode, AbstractLuceneDocumentBuilder parent) {
 		super( schemaNode );
+		this.parent = parent;
 	}
 
 	@Override
 	public void addField(IndexableField field) {
-		fields.add( field );
+		parent.addField( field );
 	}
 
 	@Override
-	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String rootId, Document currentDocument,
-			List<Document> nestedDocuments) {
-		for ( IndexableField field : fields ) {
-			currentDocument.add( field );
-		}
-
-		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, currentDocument, nestedDocuments );
+	public void addFieldName(String absoluteFieldPath) {
+		parent.addFieldName( absoluteFieldPath );
 	}
 }

@@ -45,6 +45,9 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 					new BytesRef( normalize( absoluteFieldPath, value ) )
 			) );
 		}
+
+		// For "exists" predicates
+		documentBuilder.addFieldName( absoluteFieldPath );
 	}
 
 	@Override

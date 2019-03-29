@@ -122,7 +122,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> exists(String absoluteFieldPath) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return new LuceneExistsPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
