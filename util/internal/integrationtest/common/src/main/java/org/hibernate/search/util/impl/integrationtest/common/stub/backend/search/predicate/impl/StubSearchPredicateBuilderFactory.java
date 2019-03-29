@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
+import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
@@ -78,6 +79,11 @@ public class StubSearchPredicateBuilderFactory
 
 	@Override
 	public SimpleQueryStringPredicateBuilder<StubPredicateBuilder> simpleQueryString() {
+		return new StubPredicateBuilder();
+	}
+
+	@Override
+	public ExistsPredicateBuilder<StubPredicateBuilder> exists(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 
