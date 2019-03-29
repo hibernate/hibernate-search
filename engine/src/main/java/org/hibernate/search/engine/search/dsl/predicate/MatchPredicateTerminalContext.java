@@ -60,4 +60,20 @@ public interface MatchPredicateTerminalContext
 	 */
 	MatchPredicateTerminalContext fuzzy(int maxEditDistance, int exactPrefixLength);
 
+	/**
+	 * Define an analyzer to use at query time to interpret the value to match.
+	 * <p>
+	 * If this method is not called, the analyzer defined on the field will be used.
+	 *
+	 * @param analyzerName The name of the analyzer to use in the query for this predicate.
+	 * @return {@code this}, for method chaining.
+	 */
+	MatchPredicateTerminalContext analyzer(String analyzerName);
+
+	/**
+	 * Any analyzer defined on any field will be ignored to interpret the value to match.
+	 *
+	 * @return {@code this}, for method chaining.
+	 */
+	MatchPredicateTerminalContext ignoreAnalyzer();
 }

@@ -38,6 +38,11 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	}
 
 	@Override
+	public void analyzer(String analyzerName) {
+		// TODO must be implemented
+	}
+
+	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context, JsonObject outerObject,
 			JsonObject innerObject) {
 		if ( fuzziness != null ) {

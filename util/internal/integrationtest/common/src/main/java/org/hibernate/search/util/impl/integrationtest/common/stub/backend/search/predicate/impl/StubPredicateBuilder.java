@@ -89,6 +89,11 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
+	public void analyzer(String analyzerName) {
+		// No-op
+	}
+
+	@Override
 	public void lowerLimit(Object value, DslConverter dslConverter) {
 		// No-op
 	}

@@ -59,6 +59,11 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 	}
 
 	@Override
+	public void analyzer(String analyzerName) {
+		throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+	}
+
+	@Override
 	public void value(Object value, DslConverter dslConverter) {
 		if ( dslConverter.isEnabled() ) {
 			converterChecker.failIfNotCompatible();
