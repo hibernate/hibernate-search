@@ -121,7 +121,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public ExistsPredicateBuilder<ElasticsearchSearchPredicateBuilder> exists(String absoluteFieldPath) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return new ElasticsearchExistsPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
