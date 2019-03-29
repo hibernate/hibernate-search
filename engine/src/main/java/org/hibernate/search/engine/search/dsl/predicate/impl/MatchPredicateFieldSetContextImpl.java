@@ -112,6 +112,22 @@ class MatchPredicateFieldSetContextImpl<B>
 		}
 
 		@Override
+		public MatchPredicateTerminalContext analyzer(String analyzerName) {
+			for ( MatchPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
+				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
+					predicateBuilder.analyzer( analyzerName );
+				}
+			}
+			return this;
+		}
+
+		@Override
+		public MatchPredicateTerminalContext ignoreAnalyzer() {
+			// TODO implement ignore analyzer feature!
+			return this;
+		}
+
+		@Override
 		protected CommonState<B> thisAsS() {
 			return this;
 		}

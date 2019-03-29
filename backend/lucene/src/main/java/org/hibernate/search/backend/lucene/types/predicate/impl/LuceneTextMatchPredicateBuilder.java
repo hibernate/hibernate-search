@@ -46,6 +46,11 @@ class LuceneTextMatchPredicateBuilder<F>
 	}
 
 	@Override
+	public void analyzer(String analyzerName) {
+		// TODO must be implemented
+	}
+
+	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		if ( queryBuilder != null ) {
 			QueryBuilder effectiveQueryBuilder;
