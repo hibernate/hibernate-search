@@ -10,6 +10,7 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -36,6 +37,14 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 			// Values around what is indexed
 			YearMonth.of( 1980, Month.OCTOBER ), YearMonth.of( 1981, Month.JANUARY )
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<YearMonth> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				YearMonth.of( 0, Month.JANUARY ),
+				YearMonth.of( 2017, Month.NOVEMBER )
+		);
 	}
 
 	@Override

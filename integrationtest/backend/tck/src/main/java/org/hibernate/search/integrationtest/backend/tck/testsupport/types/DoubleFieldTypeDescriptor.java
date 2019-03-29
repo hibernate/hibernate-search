@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -32,6 +33,13 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 				3.0, 13.2, 25.79,
 				10.0, 19.101
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<Double> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				0.0, 42.1
+		);
 	}
 
 	@Override

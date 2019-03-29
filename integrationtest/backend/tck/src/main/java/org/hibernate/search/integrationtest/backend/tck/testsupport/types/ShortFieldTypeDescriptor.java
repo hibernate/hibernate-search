@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -32,6 +33,13 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 				(short) 3, (short) 13, (short) 25,
 				(short) 10, (short) 19
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<Short> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				(short) 0, (short) 67
+		);
 	}
 
 	@Override

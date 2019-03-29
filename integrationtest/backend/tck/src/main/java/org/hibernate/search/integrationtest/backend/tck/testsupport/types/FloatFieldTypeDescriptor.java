@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -32,6 +33,13 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 				3.0f, 13.2f, 25.79f,
 				10.0f, 19.101f
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<Float> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				0.0f, 67.0f
+		);
 	}
 
 	@Override

@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.time.Year;
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -35,6 +36,13 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 				// Values around what is indexed
 				Year.of( 1981 ), Year.of( 1983 )
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<Year> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				Year.of( 1980 ), Year.of( 4302 )
+		);
 	}
 
 	@Override

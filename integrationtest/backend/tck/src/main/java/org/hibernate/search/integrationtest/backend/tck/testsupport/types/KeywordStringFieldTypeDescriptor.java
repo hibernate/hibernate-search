@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -32,6 +33,14 @@ public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String
 				"aaron", "george", "zach",
 				"bastian", "marc"
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<String> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				"", // No token, but still non-null: should be considered as existing
+				"Aaron"
+		);
 	}
 
 	@Override

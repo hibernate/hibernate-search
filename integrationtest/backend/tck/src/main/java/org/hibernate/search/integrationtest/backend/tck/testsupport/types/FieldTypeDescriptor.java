@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -78,6 +79,8 @@ public abstract class FieldTypeDescriptor<F> {
 	public abstract Optional<MatchPredicateExpectations<F>> getMatchPredicateExpectations();
 
 	public abstract Optional<RangePredicateExpectations<F>> getRangePredicateExpectations();
+
+	public abstract ExistsPredicateExpectations<F> getExistsPredicateExpectations();
 
 	public abstract Optional<FieldSortExpectations<F>> getFieldSortExpectations();
 

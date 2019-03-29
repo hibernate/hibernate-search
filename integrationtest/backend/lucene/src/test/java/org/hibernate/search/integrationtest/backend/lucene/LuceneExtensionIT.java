@@ -286,6 +286,19 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
+	public void predicate_nativeField_exists() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		IndexSearchQuery<DocumentReference> query = scope.query()
+				.asReference()
+				.predicate( f -> f.exists().onField( "nativeField" ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID );
+	}
+
+	@Test
 	public void projection_nativeField() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
@@ -336,7 +349,7 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, FIRST_ID, FIFTH_ID, SECOND_ID, FOURTH_ID );
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIFTH_ID, THIRD_ID, FIRST_ID, SECOND_ID, FOURTH_ID );
 	}
 
 	@Test
@@ -386,8 +399,6 @@ public class LuceneExtensionIT {
 						FIFTH_ID,
 						doc -> doc.hasField( "string", "text 2" )
 								.hasField( "integer", 1 )
-								.hasField( "nativeField", "53" )
-								.hasField( "nativeField_unsupportedProjection", "53" )
 								// Geo points are stored as two internal fields
 								.hasInternalField( "geoPoint_latitude", 45.12 )
 								.hasInternalField( "geoPoint_longitude", -75.34 )
@@ -538,9 +549,6 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.string, "text 2" );
 			document.addValue( indexMapping.integer, 1 );
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.12, -75.34 ) );
-
-			document.addValue( indexMapping.nativeField, 53 );
-			document.addValue( indexMapping.nativeField_unsupportedProjection, 53 );
 
 			document.addValue( indexMapping.sort1, "zz" );
 			document.addValue( indexMapping.sort2, "zz" );

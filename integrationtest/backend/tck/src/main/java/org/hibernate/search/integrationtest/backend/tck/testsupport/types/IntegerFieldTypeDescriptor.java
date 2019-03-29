@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -15,7 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 
 public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 
-	IntegerFieldTypeDescriptor() {
+	public IntegerFieldTypeDescriptor() {
 		super( Integer.class );
 	}
 
@@ -32,6 +33,13 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 				3, 13, 25,
 				10, 19
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<Integer> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				0, 12
+		);
 	}
 
 	@Override

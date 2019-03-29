@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.time.LocalTime;
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -41,6 +42,14 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 				LocalTime.of( 10, 40, 10, 0 ),
 				LocalTime.of( 11, 40, 10, 0 )
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<LocalTime> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				LocalTime.of( 0, 0, 0 ),
+				LocalTime.of( 12, 14, 52 )
+		);
 	}
 
 	@Override

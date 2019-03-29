@@ -11,6 +11,7 @@ import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -41,6 +42,14 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 				LocalTime.of( 12, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
 				LocalTime.of( 18, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( -3 ) )
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<OffsetTime> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				LocalTime.of( 0, 0, 0 ).atOffset( ZoneOffset.UTC ),
+				LocalTime.of( 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
+		);
 	}
 
 	@Override

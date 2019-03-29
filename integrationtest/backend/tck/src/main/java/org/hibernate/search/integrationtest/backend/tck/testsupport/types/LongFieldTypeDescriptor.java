@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.util.Optional;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -15,7 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 
 public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 
-	LongFieldTypeDescriptor() {
+	public LongFieldTypeDescriptor() {
 		super( Long.class );
 	}
 
@@ -32,6 +33,13 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 				3L, 13L, 25L,
 				10L, 19L
 		) );
+	}
+
+	@Override
+	public ExistsPredicateExpectations<Long> getExistsPredicateExpectations() {
+		return new ExistsPredicateExpectations<>(
+				0L, 67L
+		);
 	}
 
 	@Override
