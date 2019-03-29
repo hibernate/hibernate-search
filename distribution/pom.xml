@@ -57,6 +57,11 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-documentation</artifactId>
             <scope>provided</scope>
             <type>pom</type>
@@ -119,6 +124,7 @@
                                 ${basedir}/../mapper/pojo/src/main/java;
                                 ${basedir}/../mapper/orm/src/main/java;
                                 ${basedir}/../backend/elasticsearch/src/main/java;
+                                ${basedir}/../backend/elasticsearch-aws/src/main/java;
                                 ${basedir}/../backend/lucene/src/main/java;
                             </sourcepath>
                             <docfilessubdirs>true</docfilessubdirs>
