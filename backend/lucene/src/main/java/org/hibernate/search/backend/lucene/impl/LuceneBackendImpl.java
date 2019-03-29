@@ -71,7 +71,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 				workFactory, multiTenancyStrategy
 		);
 		this.searchContext = new SearchBackendContext(
-				eventContext, workFactory, multiTenancyStrategy, queryOrchestrator
+				eventContext, workFactory, multiTenancyStrategy, queryOrchestrator, analysisDefinitionRegistry
 		);
 	}
 

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
@@ -23,15 +24,17 @@ public class SearchBackendContext {
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final LuceneQueryWorkOrchestrator orchestrator;
+	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	public SearchBackendContext(EventContext eventContext,
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
-			LuceneQueryWorkOrchestrator orchestrator) {
+			LuceneQueryWorkOrchestrator orchestrator, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		this.eventContext = eventContext;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.workFactory = workFactory;
 		this.orchestrator = orchestrator;
+		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 	}
 
 	@Override
@@ -41,6 +44,10 @@ public class SearchBackendContext {
 
 	public EventContext getEventContext() {
 		return eventContext;
+	}
+
+	public LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
+		return analysisDefinitionRegistry;
 	}
 
 	<T> LuceneSearchQueryBuilder<T> createSearchQueryBuilder(
