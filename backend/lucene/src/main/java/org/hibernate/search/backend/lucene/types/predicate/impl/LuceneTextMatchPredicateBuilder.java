@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.MatchNoDocsQuery;
@@ -13,6 +16,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicateBuilder;
@@ -20,14 +25,20 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.util.impl.FuzzyQueryBuilder;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class LuceneTextMatchPredicateBuilder<F>
 		extends AbstractLuceneStandardMatchPredicateBuilder<F, String, LuceneTextFieldCodec<F>> {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final QueryBuilder queryBuilder;
+	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private Integer maxEditDistance;
 	private Integer prefixLength;
+	private Analyzer overrideAnalyzer;
 
 	LuceneTextMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
@@ -37,6 +48,7 @@ class LuceneTextMatchPredicateBuilder<F>
 			QueryBuilder queryBuilder) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 		this.queryBuilder = queryBuilder;
+		analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
 
 	@Override
@@ -47,7 +59,10 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	@Override
 	public void analyzer(String analyzerName) {
-		// TODO must be implemented
+		this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
+		if ( overrideAnalyzer == null ) {
+			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
 	}
 
 	@Override
@@ -55,9 +70,10 @@ class LuceneTextMatchPredicateBuilder<F>
 		if ( queryBuilder != null ) {
 			QueryBuilder effectiveQueryBuilder;
 			if ( maxEditDistance != null ) {
-				effectiveQueryBuilder = new FuzzyQueryBuilder( queryBuilder.getAnalyzer(), maxEditDistance, prefixLength );
+				effectiveQueryBuilder = new FuzzyQueryBuilder( getAnalyzer(), maxEditDistance, prefixLength );
 			}
 			else {
+				queryBuilder.setAnalyzer( getAnalyzer() );
 				effectiveQueryBuilder = queryBuilder;
 			}
 
@@ -82,5 +98,12 @@ class LuceneTextMatchPredicateBuilder<F>
 				return new TermQuery( term );
 			}
 		}
+	}
+
+	private Analyzer getAnalyzer() {
+		if ( overrideAnalyzer != null ) {
+			return overrideAnalyzer;
+		}
+		return queryBuilder.getAnalyzer();
 	}
 }
