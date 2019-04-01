@@ -20,6 +20,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	private static final JsonAccessor<Integer> FUZZINESS_ACCESSOR = JsonAccessor.root().property( "fuzziness" ).asInteger();
 	private static final JsonAccessor<Integer> PREFIX_LENGTH_ACCESSOR = JsonAccessor.root().property( "prefix_length" ).asInteger();
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
+	private static final String ELASTICSEARCH_NOOP_ANALYZER_NAME = "keyword";
 
 	private Integer fuzziness;
 	private Integer prefixLength;
@@ -42,6 +43,11 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	@Override
 	public void analyzer(String analyzerName) {
 		this.analyzer = analyzerName;
+	}
+
+	@Override
+	public void ignoreAnalyzer() {
+		analyzer( ELASTICSEARCH_NOOP_ANALYZER_NAME );
 	}
 
 	@Override
