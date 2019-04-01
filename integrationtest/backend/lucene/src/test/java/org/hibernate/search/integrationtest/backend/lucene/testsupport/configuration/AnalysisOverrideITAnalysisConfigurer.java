@@ -11,6 +11,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
+import org.apache.lucene.analysis.ngram.NGramTokenizerFactory;
 
 public class AnalysisOverrideITAnalysisConfigurer extends DefaultITAnalysisConfigurer {
 
@@ -24,5 +25,10 @@ public class AnalysisOverrideITAnalysisConfigurer extends DefaultITAnalysisConfi
 		context.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ).custom()
 				.tokenizer( WhitespaceTokenizerFactory.class )
 				.tokenFilter( LowerCaseFilterFactory.class );
+
+		context.analyzer( OverrideAnalysisDefinitions.ANALYZER_NGRAM.name ).custom()
+				.tokenizer( NGramTokenizerFactory.class )
+					.param( "minGramSize", "5" )
+					.param( "maxGramSize", "6" );
 	}
 }

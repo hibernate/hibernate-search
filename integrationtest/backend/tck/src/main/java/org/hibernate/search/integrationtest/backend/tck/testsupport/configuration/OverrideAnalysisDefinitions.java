@@ -21,7 +21,12 @@ public enum OverrideAnalysisDefinitions {
 	/**
 	 * Analyzer with a tokenizer on whitespaces and a lowercase token filter.
 	 */
-	ANALYZER_WHITESPACE_LOWERCASE("analyzer_whitespace_lowercase");
+	ANALYZER_WHITESPACE_LOWERCASE("analyzer_whitespace_lowercase"),
+
+	/**
+	 * Ngram analyzer defined for query only.
+	 */
+	ANALYZER_NGRAM("analyzer_ngram");
 
 	public final String name;
 
