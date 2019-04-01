@@ -19,10 +19,20 @@ public class AuthorServiceIT {
 	 */
 	@Test
 	public void test() {
+		checkIsInModulePath( Object.class );
+		checkIsInModulePath( AuthorService.class );
+
 		AuthorService service = new AuthorService();
 		service.add( "foo" );
 		service.add( "bar" );
 		service.add( "foo bar" );
 		Assert.assertEquals( 2, service.search( "foo" ).size() );
+	}
+
+	private void checkIsInModulePath(Class<?> clazz) {
+		Assert.assertTrue(
+				clazz + " should be part of a named module - there is a problem in test setup",
+				clazz.getModule().isNamed()
+		);
 	}
 }
