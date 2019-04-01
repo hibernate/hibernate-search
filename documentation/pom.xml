@@ -96,11 +96,6 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <!-- Inherit execution unpack-shared-test-build-resources -->
-            </plugin>
-            <plugin>
                 <groupId>com.github.alexcojocaru</groupId>
                 <artifactId>elasticsearch-maven-plugin</artifactId>
             </plugin>
@@ -124,6 +119,7 @@
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
+                    <!-- Inherit execution unpack-shared-test-build-resources -->
                     <execution>
                         <id>unpack-asciidoctor-theme</id>
                         <phase>generate-resources</phase>
