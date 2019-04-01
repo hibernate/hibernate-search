@@ -20,12 +20,10 @@ import java.util.Locale;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.LongPoint;
-import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneYearMonthFieldCodec implements LuceneNumericFieldCodec<YearMonth, Long> {
+public final class LuceneYearMonthFieldCodec extends AbstractLuceneNumericFieldCodec<YearMonth, Long> {
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
@@ -34,32 +32,14 @@ public final class LuceneYearMonthFieldCodec implements LuceneNumericFieldCodec<
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	private final boolean projectable;
-
-	private final boolean sortable;
-
 	public LuceneYearMonthFieldCodec(boolean projectable, boolean sortable) {
-		this.projectable = projectable;
-		this.sortable = sortable;
+		super( projectable, sortable );
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, YearMonth value) {
-		if ( value == null ) {
-			return;
-		}
-
-		if ( projectable ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
-		}
-
-		long numericValue = encode( value );
-
-		if ( sortable ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, numericValue ) );
-		}
-
-		documentBuilder.addField( new LongPoint( absoluteFieldPath, numericValue ) );
+	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, YearMonth value,
+			Long encodedValue) {
+		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}
 
 	@Override
@@ -77,20 +57,6 @@ public final class LuceneYearMonthFieldCodec implements LuceneNumericFieldCodec<
 		}
 
 		return YearMonth.parse( value, FORMATTER );
-	}
-
-	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( LuceneYearMonthFieldCodec.class != obj.getClass() ) {
-			return false;
-		}
-
-		LuceneYearMonthFieldCodec other = (LuceneYearMonthFieldCodec) obj;
-
-		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 
 	@Override

@@ -20,12 +20,10 @@ import java.util.Locale;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.LongPoint;
-import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneLocalTimeFieldCodec implements LuceneNumericFieldCodec<LocalTime, Long> {
+public final class LuceneLocalTimeFieldCodec extends AbstractLuceneNumericFieldCodec<LocalTime, Long> {
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendValue( HOUR_OF_DAY, 2 )
@@ -39,32 +37,14 @@ public final class LuceneLocalTimeFieldCodec implements LuceneNumericFieldCodec<
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	private final boolean projectable;
-
-	private final boolean sortable;
-
 	public LuceneLocalTimeFieldCodec(boolean projectable, boolean sortable) {
-		this.projectable = projectable;
-		this.sortable = sortable;
+		super( projectable, sortable );
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalTime value) {
-		if ( value == null ) {
-			return;
-		}
-
-		if ( projectable ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
-		}
-
-		long numericValue = encode( value );
-
-		if ( sortable ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, numericValue ) );
-		}
-
-		documentBuilder.addField( new LongPoint( absoluteFieldPath, numericValue ) );
+	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalTime value,
+			Long encodedValue) {
+		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}
 
 	@Override
@@ -82,20 +62,6 @@ public final class LuceneLocalTimeFieldCodec implements LuceneNumericFieldCodec<
 		}
 
 		return LocalTime.parse( value, FORMATTER );
-	}
-
-	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( LuceneLocalTimeFieldCodec.class != obj.getClass() ) {
-			return false;
-		}
-
-		LuceneLocalTimeFieldCodec other = (LuceneLocalTimeFieldCodec) obj;
-
-		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 
 	@Override

@@ -11,17 +11,17 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-public class LuceneNumericFieldSortBuilder<F, E>
-		extends AbstractLuceneStandardFieldSortBuilder<F, E, LuceneNumericFieldCodec<F, E>> {
+public class LuceneNumericFieldSortBuilder<F, E extends Number>
+		extends AbstractLuceneStandardFieldSortBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
 
 	LuceneNumericFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
-			LuceneConverterCompatibilityChecker converterChecker, LuceneNumericFieldCodec<F, E> codec) {
+			LuceneConverterCompatibilityChecker converterChecker, AbstractLuceneNumericFieldCodec<F, E> codec) {
 		super(
 				searchContext, absoluteFieldPath,
 				converter, rawConverter, converterChecker, codec,

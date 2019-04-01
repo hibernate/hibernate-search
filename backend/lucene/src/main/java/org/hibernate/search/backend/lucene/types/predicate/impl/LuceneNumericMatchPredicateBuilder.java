@@ -10,19 +10,19 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibil
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 import org.apache.lucene.search.Query;
 
-class LuceneNumericMatchPredicateBuilder<F, E>
-		extends AbstractLuceneStandardMatchPredicateBuilder<F, E, LuceneNumericFieldCodec<F, E>> {
+class LuceneNumericMatchPredicateBuilder<F, E extends Number>
+		extends AbstractLuceneStandardMatchPredicateBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
 
 	LuceneNumericMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
-			LuceneConverterCompatibilityChecker converterChecker, LuceneNumericFieldCodec<F, E> codec) {
+			LuceneConverterCompatibilityChecker converterChecker, AbstractLuceneNumericFieldCodec<F, E> codec) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 	}
 
