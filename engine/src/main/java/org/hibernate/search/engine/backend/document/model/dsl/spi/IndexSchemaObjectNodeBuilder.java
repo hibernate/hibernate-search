@@ -17,7 +17,8 @@ public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
 	 * Create a new field and add it to the current builder.
 	 *
 	 * @param relativeFieldName The relative name of the new field
-	 * @param <F> The type of the index field.
+	 * @param indexFieldType The type of the new field
+	 * @param <F> The type of values for the new field
 	 * @return A context allowing to define the new field
 	 */
 	<F> IndexSchemaFieldTerminalContext<IndexFieldReference<F>> addField(String relativeFieldName, IndexFieldType<F> indexFieldType);
@@ -29,7 +30,8 @@ public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
 	 * and its accessor will not have any effect on documents.
 	 *
 	 * @param relativeFieldName The relative name of the new field
-	 * @param <F> The type of the index field.
+	 * @param indexFieldType The type of the new field
+	 * @param <F> The type of values for the new field
 	 * @return A context allowing to define the new field
 	 */
 	<F> IndexSchemaFieldTerminalContext<IndexFieldReference<F>> createExcludedField(String relativeFieldName, IndexFieldType<F> indexFieldType);

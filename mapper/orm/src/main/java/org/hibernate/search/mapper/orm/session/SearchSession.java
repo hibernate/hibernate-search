@@ -25,6 +25,7 @@ public interface SearchSession {
 	 * The query will target the indexes mapped to the given type, or to any of its sub-types.
 	 *
 	 * @param type An indexed type, or a supertype of all indexed types that will be targeted by the search query.
+	 * @param <T> An indexed type, or a supertype of all indexed types that will be targeted by the search query.
 	 * @return A context allowing to define the search query,
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see SearchQueryResultDefinitionContext
@@ -39,6 +40,7 @@ public interface SearchSession {
 	 * The query will target the indexes mapped to the given types, or to any of their sub-types.
 	 *
 	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the search query.
+	 * @param <T> A supertype of all indexed types that will be targeted by the search query.
 	 * @return A context allowing to define the search query,
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see SearchQueryResultDefinitionContext
@@ -50,7 +52,8 @@ public interface SearchSession {
 	/**
 	 * Create a {@link SearchScope} limited to the given type.
 	 *
-	 * @param type An type to include in the scope.
+	 * @param type A type to include in the scope.
+	 * @param <T> A type to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
@@ -62,6 +65,7 @@ public interface SearchSession {
 	 * Create a {@link SearchScope} limited to the given types.
 	 *
 	 * @param types A collection of types to include in the scope.
+	 * @param <T> A supertype of all types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */

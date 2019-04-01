@@ -24,6 +24,7 @@ public interface DocumentElement {
 	 *
 	 * @param fieldReference The field to add a value to.
 	 * @param value The value to add to the field.
+	 * @param <F> The type of values for the given field.
 	 */
 	<F> void addValue(IndexFieldReference<F> fieldReference, F value);
 

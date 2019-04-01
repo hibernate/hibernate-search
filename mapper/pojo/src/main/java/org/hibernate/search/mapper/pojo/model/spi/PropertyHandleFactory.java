@@ -25,6 +25,7 @@ public interface PropertyHandleFactory {
 	}
 
 	/**
+	 * @param lookup A lookup with sufficient access rights to access all members and methods that are relevant to the properties.
 	 * @return A factory producing property handles that rely on {@link java.lang.invoke.MethodHandle} to get the value of a property.
 	 */
 	static PropertyHandleFactory usingMethodHandle(MethodHandles.Lookup lookup) {

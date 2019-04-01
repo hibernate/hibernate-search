@@ -28,6 +28,7 @@ public interface ElasticsearchClient {
 	 * Unwrap the client to some implementation-specific type.
 	 *
 	 * @param clientClass The {@link Class} representing the expected client type
+	 * @param <T> The expected client type
 	 * @return The unwrapped client.
 	 * @throws SearchException if the client implementation does not support
 	 * unwrapping to the given class.
