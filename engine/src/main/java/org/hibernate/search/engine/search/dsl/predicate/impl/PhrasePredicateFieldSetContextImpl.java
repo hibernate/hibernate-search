@@ -108,6 +108,26 @@ class PhrasePredicateFieldSetContextImpl<B>
 		}
 
 		@Override
+		public PhrasePredicateTerminalContext analyzer(String analyzerName) {
+			for ( PhrasePredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
+				for ( PhrasePredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
+					predicateBuilder.analyzer( analyzerName );
+				}
+			}
+			return this;
+		}
+
+		@Override
+		public PhrasePredicateTerminalContext ignoreAnalyzer() {
+			for ( PhrasePredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
+				for ( PhrasePredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
+					predicateBuilder.ignoreAnalyzer();
+				}
+			}
+			return this;
+		}
+
+		@Override
 		protected CommonState<B> thisAsS() {
 			return this;
 		}

@@ -41,8 +41,9 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(String absoluteFieldPath) {
-		return new LuceneTextPhrasePredicateBuilder( absoluteFieldPath, codec, queryBuilder );
+	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(LuceneSearchContext searchContext,
+			String absoluteFieldPath) {
+		return new LuceneTextPhrasePredicateBuilder( searchContext, absoluteFieldPath, codec, queryBuilder );
 	}
 
 	@Override
