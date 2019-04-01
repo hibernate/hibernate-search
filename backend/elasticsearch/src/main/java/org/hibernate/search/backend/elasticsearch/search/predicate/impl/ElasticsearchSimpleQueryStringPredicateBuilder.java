@@ -27,7 +27,9 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private static final JsonAccessor<String> QUERY_ACCESSOR = JsonAccessor.root().property( "query" ).asString();
 	private static final JsonAccessor<JsonElement> DEFAULT_OPERATOR_ACCESSOR = JsonAccessor.root().property( "default_operator" );
 	private static final JsonAccessor<JsonArray> FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asArray();
+	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
 
+	private static final String ELASTICSEARCH_NOOP_ANALYZER_NAME = "keyword";
 
 	private static final JsonPrimitive AND_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "and" );
 	private static final JsonPrimitive OR_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "or" );
@@ -38,6 +40,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private final Map<String, ElasticsearchSimpleQueryStringPredicateBuilderFieldContext> fields = new LinkedHashMap<>();
 	private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 	private String simpleQueryString;
+	private String analyzer;
 
 	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchSearchScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
@@ -65,6 +68,16 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	}
 
 	@Override
+	public void analyzer(String analyzerName) {
+		this.analyzer = analyzerName;
+	}
+
+	@Override
+	public void ignoreAnalyzer() {
+		analyzer( ELASTICSEARCH_NOOP_ANALYZER_NAME );
+	}
+
+	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		QUERY_ACCESSOR.set( innerObject, simpleQueryString );
@@ -75,6 +88,10 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 			fieldArray.add( fieldContext.build() );
 		}
 		FIELDS_ACCESSOR.set( innerObject, fieldArray );
+
+		if ( analyzer != null ) {
+			ANALYZER_ACCESSOR.set( innerObject, analyzer );
+		}
 
 		SIMPLE_QUERY_STRING_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;

@@ -116,7 +116,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> simpleQueryString() {
-		return new LuceneSimpleQueryStringPredicateBuilder( scopeModel );
+		return new LuceneSimpleQueryStringPredicateBuilder( searchContext, scopeModel );
 	}
 
 	@Override
