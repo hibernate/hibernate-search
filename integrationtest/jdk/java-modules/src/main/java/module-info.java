@@ -1,4 +1,4 @@
-module hibernate.search.integrationtest.java.module {
+module org.hibernate.search.integrationtest.java.module {
 	exports org.hibernate.search.integrationtest.java.module.service;
 	requires java.naming;
 	requires org.hibernate.search.engine;
