@@ -40,6 +40,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -930,6 +931,29 @@ public class MatchSearchPredicateIT {
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HSEARCH-2534" )
+	public void analyzerOverride_queryOnlyAnalyzer() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+
+		IndexSearchQuery<DocumentReference> query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "worldofwordcraft" ) )
+				.toQuery();
+
+		assertThat( query ).hasNoHits();
+
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "worldofwordcraft" )
+						.analyzer( OverrideAnalysisDefinitions.ANALYZER_NGRAM.name ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
