@@ -16,7 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 
 public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 
-	public LongFieldTypeDescriptor() {
+	LongFieldTypeDescriptor() {
 		super( Long.class );
 	}
 

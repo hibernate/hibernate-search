@@ -16,7 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 
 public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 
-	public IntegerFieldTypeDescriptor() {
+	IntegerFieldTypeDescriptor() {
 		super( Integer.class );
 	}
 

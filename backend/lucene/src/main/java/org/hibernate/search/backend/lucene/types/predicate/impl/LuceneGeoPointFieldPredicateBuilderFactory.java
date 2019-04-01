@@ -12,12 +12,16 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class LuceneGeoPointFieldPredicateBuilderFactory
@@ -25,19 +29,13 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static final LuceneGeoPointFieldPredicateBuilderFactory INSTANCE = new LuceneGeoPointFieldPredicateBuilderFactory();
+	private final ToDocumentFieldValueConverter<?, ? extends GeoPoint> converter;
+	private final LuceneGeoPointFieldCodec codec;
 
-	private LuceneGeoPointFieldPredicateBuilderFactory() {
-	}
-
-	@Override
-	public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other) {
-		return INSTANCE == other;
-	}
-
-	@Override
-	public boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other) {
-		return INSTANCE == other;
+	public LuceneGeoPointFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends GeoPoint> converter,
+			LuceneGeoPointFieldCodec codec) {
+		this.converter = converter;
+		this.codec = codec;
 	}
 
 	@Override
@@ -72,5 +70,15 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath) {
 		return new LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
+	}
+
+	@Override
+	protected LuceneFieldCodec<?> getCodec() {
+		return codec;
+	}
+
+	@Override
+	protected ToDocumentFieldValueConverter<?, ?> getConverter() {
+		return converter;
 	}
 }

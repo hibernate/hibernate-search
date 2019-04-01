@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibil
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -53,6 +54,8 @@ public interface LuceneFieldPredicateBuilderFactory {
 			String absoluteFieldPath);
 
 	LuceneSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(String absoluteFieldPath);
+
+	ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(String absoluteFieldPath);
 
 	SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath);

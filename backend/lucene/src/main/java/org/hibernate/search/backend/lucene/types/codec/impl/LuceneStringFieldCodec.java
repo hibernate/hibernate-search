@@ -13,9 +13,15 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.SortedDocValuesField;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.DocValuesFieldExistsQuery;
+import org.apache.lucene.search.NormsFieldExistsQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
 public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String> {
 
@@ -46,8 +52,10 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 			) );
 		}
 
-		// For "exists" predicates
-		documentBuilder.addFieldName( absoluteFieldPath );
+		if ( !sortable && fieldType.omitNorms() ) {
+			// For createExistsQuery()
+			documentBuilder.addFieldName( absoluteFieldPath );
+		}
 	}
 
 	@Override
@@ -69,6 +77,19 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 		return ( sortable == other.sortable ) &&
 				Objects.equals( fieldType, other.fieldType ) &&
 				Objects.equals( analyzerOrNormalizer, other.analyzerOrNormalizer );
+	}
+
+	@Override
+	public Query createExistsQuery(String absoluteFieldPath) {
+		if ( !fieldType.omitNorms() ) {
+			return new NormsFieldExistsQuery( absoluteFieldPath );
+		}
+		else if ( sortable ) {
+			return new DocValuesFieldExistsQuery( absoluteFieldPath );
+		}
+		else {
+			return new TermQuery( new Term( LuceneFields.fieldNamesFieldName(), absoluteFieldPath ) );
+		}
 	}
 
 	@Override

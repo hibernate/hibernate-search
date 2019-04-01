@@ -11,11 +11,14 @@ import java.util.Objects;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.search.Query;
+
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
@@ -38,9 +41,6 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 		}
 
 		fieldContributor.contribute( absoluteFieldPath, value, f -> contributeField( documentBuilder, absoluteFieldPath, f ) );
-
-		// For "exists" predicates
-		documentBuilder.addFieldName( absoluteFieldPath );
 	}
 
 	@Override
@@ -58,6 +58,13 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 		}
 
 		return fieldValueExtractor.extract( field );
+	}
+
+	@Override
+	public Query createExistsQuery(String absoluteFieldPath) {
+		throw new AssertionFailure(
+				"This method should not be called, as native Lucene fields are not supported by the query DSL."
+		);
 	}
 
 	@Override

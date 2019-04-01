@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.types.projection.impl.LuceneGeoPointF
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneGeoPointFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -38,6 +39,8 @@ class LuceneGeoPointIndexFieldTypeContext
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
+		ToDocumentFieldValueConverter<?, ? extends GeoPoint> dslToIndexConverter =
+				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super GeoPoint, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
 		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
@@ -46,7 +49,7 @@ class LuceneGeoPointIndexFieldTypeContext
 
 		return new LuceneIndexFieldType<>(
 				codec,
-				LuceneGeoPointFieldPredicateBuilderFactory.INSTANCE,
+				new LuceneGeoPointFieldPredicateBuilderFactory( dslToIndexConverter, codec ),
 				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable ),
 				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec, indexToProjectionConverter, createFromDocumentRawConverter() )
 		);

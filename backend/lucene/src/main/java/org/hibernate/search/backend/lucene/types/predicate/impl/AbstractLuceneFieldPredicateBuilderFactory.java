@@ -11,7 +11,10 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
@@ -23,6 +26,26 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 		implements LuceneFieldPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	@Override
+	public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		AbstractLuceneFieldPredicateBuilderFactory castedOther =
+				(AbstractLuceneFieldPredicateBuilderFactory) other;
+		return getCodec().isCompatibleWith( castedOther.getCodec() );
+	}
+
+	@Override
+	public boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		AbstractLuceneFieldPredicateBuilderFactory castedOther =
+				(AbstractLuceneFieldPredicateBuilderFactory) other;
+		return getConverter().isCompatibleWith( castedOther.getConverter() );
+	}
 
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(LuceneSearchContext searchContext,
@@ -71,4 +94,13 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
 	}
+
+	@Override
+	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(String absoluteFieldPath) {
+		return new LuceneExistsPredicateBuilder( absoluteFieldPath, getCodec() );
+	}
+
+	protected abstract LuceneFieldCodec<?> getCodec();
+
+	protected abstract ToDocumentFieldValueConverter<?, ?> getConverter();
 }

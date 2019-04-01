@@ -34,22 +34,12 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 	}
 
 	@Override
-	public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?> castedOther =
-				(AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?>) other;
-		return codec.isCompatibleWith( castedOther.codec );
+	public C getCodec() {
+		return codec;
 	}
 
 	@Override
-	public boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?> castedOther =
-				(AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?>) other;
-		return converter.isCompatibleWith( castedOther.converter );
+	public ToDocumentFieldValueConverter<?, ? extends F> getConverter() {
+		return converter;
 	}
 }

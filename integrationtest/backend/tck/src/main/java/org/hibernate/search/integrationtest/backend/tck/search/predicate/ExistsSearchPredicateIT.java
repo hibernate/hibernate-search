@@ -28,8 +28,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.LongFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
@@ -59,7 +57,6 @@ public class ExistsSearchPredicateIT {
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
-	private static final String INCOMPATIBLE_INDEX_DOCUMENT_1 = "incompatible_1";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -73,7 +70,6 @@ public class ExistsSearchPredicateIT {
 	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
 	private StubMappingIndexManager rawFieldCompatibleIndexManager;
 
-	private IncompatibleIndexMapping incompatibleIndexMapping;
 	private StubMappingIndexManager incompatibleIndexManager;
 
 	@Before
@@ -96,7 +92,7 @@ public class ExistsSearchPredicateIT {
 				)
 				.withIndex(
 						INCOMPATIBLE_INDEX_NAME,
-						ctx -> this.incompatibleIndexMapping = new IncompatibleIndexMapping( ctx.getSchemaElement() ),
+						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleIndexManager = indexManager
 				)
 				.setup();
@@ -252,12 +248,14 @@ public class ExistsSearchPredicateIT {
 	public void unknownField() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
-				.asReference()
-				.predicate( f -> f.exists().onField( "unknown_field" ) )
-				.toQuery();
-
-		assertThat( query ).hasNoHits();
+		SubTest.expectException(
+				"exists() predicate with unknown field",
+				() -> scope.predicate().exists().onField( "unknown_field" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" )
+				.hasMessageContaining( "'unknown_field'" );
 	}
 
 	@Test
@@ -305,28 +303,29 @@ public class ExistsSearchPredicateIT {
 	}
 
 	/**
-	 * Because it's based on a special "field_name" field,
-	 * the exists predicate doesn't care about field types.
+	 * The "exists" predicate may take advantage of doc values or norms fields,
+	 * which may not be present in every index.
+	 * So for now we expect the codec to be identical across indexes.
+	 * Theoretically we could be more permissive, but that would require more work and more extensive testing,
+	 * and the usefulness of this work is dubious.
 	 */
 	@Test
 	public void multiIndex_withIncompatibleIndexManager() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			SubTest.expectSuccess( fieldModel, model -> {
-				String absoluteFieldPath = model.relativeFieldName;
+			String fieldPath = fieldModel.relativeFieldName;
 
-				IndexSearchQuery<DocumentReference> query = scope.query()
-						.asReference()
-						.predicate( f -> f.exists().onField( absoluteFieldPath ) )
-						.toQuery();
-
-				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-					b.doc( INDEX_NAME, DOCUMENT_1 );
-					b.doc( INDEX_NAME, DOCUMENT_2 );
-					b.doc( INCOMPATIBLE_INDEX_NAME, INCOMPATIBLE_INDEX_DOCUMENT_1 );
-				} );
-			} );
+			SubTest.expectException(
+					() -> scope.predicate().exists().onField( fieldPath )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "'" + fieldPath + "'" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
+					) );
 		}
 	}
 
@@ -385,12 +384,6 @@ public class ExistsSearchPredicateIT {
 		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
 		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			rawFieldCompatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-		} );
-		workPlan.execute().join();
-
-		workPlan = incompatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( INCOMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			incompatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		workPlan.execute().join();
 
@@ -498,24 +491,20 @@ public class ExistsSearchPredicateIT {
 	}
 
 	private static class IncompatibleIndexMapping {
-		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
-
 		IncompatibleIndexMapping(IndexSchemaElement root) {
 			/*
 			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
 			 * but with an incompatible type.
 			 */
 			forEachTypeDescriptor( typeDescriptor -> {
-				StandardFieldMapper<?, ? extends ByTypeFieldModel<?>> mapper;
+				StandardFieldMapper<?, IncompatibleFieldModel> mapper;
 				if ( Integer.class.equals( typeDescriptor.getJavaType() ) ) {
-					mapper = ByTypeFieldModel.mapper( new LongFieldTypeDescriptor() );
+					mapper = IncompatibleFieldModel.mapper( context -> context.asLong() );
 				}
 				else {
-					mapper = ByTypeFieldModel.mapper( new IntegerFieldTypeDescriptor() );
+					mapper = IncompatibleFieldModel.mapper( context -> context.asInteger() );
 				}
-				ByTypeFieldModel<?> model = mapper.map( root, "byType_" + typeDescriptor.getUniqueName() );
-				// All types are supported
-				supportedFieldModels.add( model );
+				mapper.map( root, "byType_" + typeDescriptor.getUniqueName() );
 			} );
 		}
 	}
