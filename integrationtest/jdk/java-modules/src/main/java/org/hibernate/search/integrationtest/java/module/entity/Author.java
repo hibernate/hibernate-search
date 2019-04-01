@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.search.integrationtest.java.module.config.MyLuceneAnalysisConfigurer;
+import org.hibernate.search.integrationtest.java.module.config.MyElasticsearchAnalysisConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
@@ -22,7 +22,7 @@ public class Author {
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField( analyzer = MyLuceneAnalysisConfigurer.MY_ANALYZER )
+	@FullTextField( analyzer = MyElasticsearchAnalysisConfigurer.MY_ANALYZER )
 	private String name;
 
 	public Author() {
