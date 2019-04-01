@@ -123,7 +123,11 @@ class MatchPredicateFieldSetContextImpl<B>
 
 		@Override
 		public MatchPredicateTerminalContext ignoreAnalyzer() {
-			// TODO implement ignore analyzer feature!
+			for ( MatchPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
+				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
+					predicateBuilder.ignoreAnalyzer();
+				}
+			}
 			return this;
 		}
 

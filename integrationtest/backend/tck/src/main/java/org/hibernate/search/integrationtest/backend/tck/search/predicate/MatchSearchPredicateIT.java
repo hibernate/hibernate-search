@@ -865,6 +865,72 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
+	public void analyzerIgnore() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+
+		IndexSearchQuery<DocumentReference> query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "world another world" ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+		// ignoring the analyzer means that the parameter of match predicate will not be tokenized
+		// so it will not match any token
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "world another world" ).ignoreAnalyzer() )
+				.toQuery();
+
+		assertThat( query )
+				.hasNoHits();
+
+		// to have a match with the ignoreAnalyzer option enabled, we have to pass the parameter as a token is
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "world" ).ignoreAnalyzer() )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+	}
+
+	@Test
+	public void analyzerIgnore_fuzzy() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+
+		IndexSearchQuery<DocumentReference> query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "word another word" ).fuzzy() )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+		// ignoring the analyzer means that the parameter of match predicate will not be tokenized
+		// so it will not match any token
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "word another word" ).fuzzy().ignoreAnalyzer() )
+				.toQuery();
+
+		assertThat( query )
+				.hasNoHits();
+
+		// to have a match with the ignoreAnalyzer option enabled, we have to pass the parameter as a token is
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "word" ).fuzzy().ignoreAnalyzer() )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+	}
+
+	@Test
 	public void multiFields() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 

@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.MatchNoDocsQuery;
@@ -39,6 +40,7 @@ class LuceneTextMatchPredicateBuilder<F>
 	private Integer maxEditDistance;
 	private Integer prefixLength;
 	private Analyzer overrideAnalyzer;
+	private boolean ignoreAnalyzer = false;
 
 	LuceneTextMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
@@ -48,7 +50,7 @@ class LuceneTextMatchPredicateBuilder<F>
 			QueryBuilder queryBuilder) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 		this.queryBuilder = queryBuilder;
-		analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
+		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
 
 	@Override
@@ -63,6 +65,11 @@ class LuceneTextMatchPredicateBuilder<F>
 		if ( overrideAnalyzer == null ) {
 			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
+	}
+
+	@Override
+	public void ignoreAnalyzer() {
+		this.ignoreAnalyzer = true;
 	}
 
 	@Override
@@ -101,6 +108,9 @@ class LuceneTextMatchPredicateBuilder<F>
 	}
 
 	private Analyzer getAnalyzer() {
+		if ( ignoreAnalyzer ) {
+			return new KeywordAnalyzer();
+		}
 		if ( overrideAnalyzer != null ) {
 			return overrideAnalyzer;
 		}
