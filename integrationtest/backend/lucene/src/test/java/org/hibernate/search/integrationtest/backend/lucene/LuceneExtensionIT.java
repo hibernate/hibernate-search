@@ -289,13 +289,16 @@ public class LuceneExtensionIT {
 	public void predicate_nativeField_exists() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
-				.asReference()
-				.predicate( f -> f.exists().onField( "nativeField" ) )
-				.toQuery();
-
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID );
+		SubTest.expectException(
+				"exists() predicate on unsupported native field",
+				() -> scope.predicate().exists().onField( "nativeField" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query." )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexFieldAbsolutePath( "nativeField" )
+				) );
 	}
 
 	@Test

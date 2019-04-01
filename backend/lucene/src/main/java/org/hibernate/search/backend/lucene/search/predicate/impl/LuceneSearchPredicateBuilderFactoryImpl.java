@@ -122,7 +122,9 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> exists(String absoluteFieldPath) {
-		return new LuceneExistsPredicateBuilder( absoluteFieldPath );
+		return scopeModel
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createExistsPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override

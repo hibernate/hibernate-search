@@ -15,6 +15,9 @@ import org.apache.lucene.document.LatLonDocValuesField;
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.search.DocValuesFieldExistsQuery;
+import org.apache.lucene.search.Query;
+
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -45,9 +48,6 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 		// doc values fields are required for predicates, distance projections and distance sorts
 		documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
 		documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
-
-		// For "exists" predicates
-		documentBuilder.addFieldName( absoluteFieldPath );
 	}
 
 	@Override
@@ -66,6 +66,11 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	public void contributeStoredFields(String absoluteFieldPath, Consumer<String> collector) {
 		collector.accept( getLatitudeAbsoluteFieldPath( absoluteFieldPath ) );
 		collector.accept( getLongitudeAbsoluteFieldPath( absoluteFieldPath ) );
+	}
+
+	@Override
+	public Query createExistsQuery(String absoluteFieldPath) {
+		return new DocValuesFieldExistsQuery( absoluteFieldPath );
 	}
 
 	@Override

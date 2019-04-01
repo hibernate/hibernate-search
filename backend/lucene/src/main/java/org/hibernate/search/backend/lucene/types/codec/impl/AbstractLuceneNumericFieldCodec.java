@@ -7,6 +7,12 @@
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.DocValuesFieldExistsQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> implements LuceneStandardFieldCodec<F, E> {
 
@@ -36,11 +42,22 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 		if ( sortable ) {
 			documentBuilder.addField( domain.createDocValuesField( absoluteFieldPath, encodedValue ) );
 		}
+		else {
+			// For createExistsQuery()
+			documentBuilder.addFieldName( absoluteFieldPath );
+		}
 
 		documentBuilder.addField( domain.createIndexField( absoluteFieldPath, encodedValue ) );
+	}
 
-		// For "exists" predicates
-		documentBuilder.addFieldName( absoluteFieldPath );
+	@Override
+	public Query createExistsQuery(String absoluteFieldPath) {
+		if ( sortable ) {
+			return new DocValuesFieldExistsQuery( absoluteFieldPath );
+		}
+		else {
+			return new TermQuery( new Term( LuceneFields.fieldNamesFieldName(), absoluteFieldPath ) );
+		}
 	}
 
 	@Override

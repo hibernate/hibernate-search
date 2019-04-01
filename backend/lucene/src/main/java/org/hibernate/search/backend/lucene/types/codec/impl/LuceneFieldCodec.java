@@ -9,6 +9,8 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import java.util.function.Consumer;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.search.Query;
+
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 /**
@@ -49,6 +51,14 @@ public interface LuceneFieldCodec<F> {
 	 * @return The decoded value.
 	 */
 	F decode(Document document, String absoluteFieldPath);
+
+	/**
+	 * Create a {@link Query} that will match every document in which the field with the given path appears.
+	 *
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @return A Lucene {@link Query}.
+	 */
+	Query createExistsQuery(String absoluteFieldPath);
 
 	/**
 	 * Determine whether another codec is compatible with this one, i.e. whether it will encode/decode the information
