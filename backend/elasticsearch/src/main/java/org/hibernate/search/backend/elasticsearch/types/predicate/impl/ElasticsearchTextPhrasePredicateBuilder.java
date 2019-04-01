@@ -24,11 +24,15 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearc
 
 	private static final JsonAccessor<Integer> SLOP_ACCESSOR = JsonAccessor.root().property( "slop" ).asInteger();
 	private static final JsonAccessor<JsonElement> QUERY_ACCESSOR = JsonAccessor.root().property( "query" );
+	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
+
+	private static final String ELASTICSEARCH_NOOP_ANALYZER_NAME = "keyword";
 
 	private final String absoluteFieldPath;
 
 	private Integer slop;
 	private JsonElement phrase;
+	private String analyzer;
 
 	ElasticsearchTextPhrasePredicateBuilder(String absoluteFieldPath) {
 		this.absoluteFieldPath = absoluteFieldPath;
@@ -45,11 +49,24 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearc
 	}
 
 	@Override
+	public void analyzer(String analyzerName) {
+		this.analyzer = analyzerName;
+	}
+
+	@Override
+	public void ignoreAnalyzer() {
+		analyzer( ELASTICSEARCH_NOOP_ANALYZER_NAME );
+	}
+
+	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		QUERY_ACCESSOR.set( innerObject, phrase );
 		if ( slop != null ) {
 			SLOP_ACCESSOR.set( innerObject, slop );
+		}
+		if ( analyzer != null ) {
+			ANALYZER_ACCESSOR.set( innerObject, analyzer );
 		}
 
 		JsonObject middleObject = new JsonObject();

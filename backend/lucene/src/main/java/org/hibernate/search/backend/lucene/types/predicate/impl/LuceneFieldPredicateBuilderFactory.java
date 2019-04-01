@@ -47,7 +47,7 @@ public interface LuceneFieldPredicateBuilderFactory {
 			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneConverterCompatibilityChecker converterChecker);
 
 	PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(
-			String absoluteFieldPath);
+			LuceneSearchContext searchContext, String absoluteFieldPath);
 
 	WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
 			String absoluteFieldPath);

@@ -12,4 +12,7 @@ public interface PhrasePredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
 	void phrase(String phrase);
 
+	void analyzer(String analyzerName);
+
+	void ignoreAnalyzer();
 }

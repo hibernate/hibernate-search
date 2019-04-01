@@ -6,12 +6,21 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.Query;
@@ -21,21 +30,27 @@ import org.apache.lucene.util.QueryBuilder;
 class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		implements PhrasePredicateBuilder<LuceneSearchPredicateBuilder> {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	protected final String absoluteFieldPath;
 	protected final LuceneTextFieldCodec<?> codec;
 
 	private final QueryBuilder queryBuilder;
+	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private int slop;
 	private String phrase;
+	private Analyzer overrideAnalyzer;
+	private boolean ignoreAnalyzer = false;
 
 	LuceneTextPhrasePredicateBuilder(
-			String absoluteFieldPath,
+			LuceneSearchContext searchContext, String absoluteFieldPath,
 			LuceneTextFieldCodec<?> codec,
 			QueryBuilder queryBuilder) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 		this.queryBuilder = queryBuilder;
+		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
 
 	@Override
@@ -49,8 +64,28 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 	}
 
 	@Override
+	public void analyzer(String analyzerName) {
+		this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
+		if ( overrideAnalyzer == null ) {
+			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
+	}
+
+	@Override
+	public void ignoreAnalyzer() {
+		this.ignoreAnalyzer = true;
+	}
+
+	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		if ( queryBuilder != null ) {
+			if ( ignoreAnalyzer ) {
+				queryBuilder.setAnalyzer( new KeywordAnalyzer() );
+			}
+			else if ( overrideAnalyzer != null ) {
+				queryBuilder.setAnalyzer( overrideAnalyzer );
+			}
+
 			Query analyzed = queryBuilder.createPhraseQuery( absoluteFieldPath, phrase, slop );
 			if ( analyzed == null ) {
 				// Either the value was an empty string
@@ -66,6 +101,5 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 
 			return new TermQuery( new Term( absoluteFieldPath, codec.normalize( absoluteFieldPath, phrase ) ) );
 		}
-
 	}
 }

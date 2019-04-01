@@ -14,8 +14,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
 public interface PhrasePredicateTerminalContext
 		extends SearchPredicateTerminalContext, SearchPredicateScoreContext<PhrasePredicateTerminalContext> {
 
-	// TODO HSEARCH-3312 allow analyzer/normalizer override
-
 	/**
 	 * Sets the slop, which defines how permissive the phrase predicate will be.
 	 * <p>
@@ -33,5 +31,22 @@ public interface PhrasePredicateTerminalContext
 	 * @return {@code this}, for method chaining.
 	 */
 	PhrasePredicateTerminalContext withSlop(int slop);
+
+	/**
+	 * Define an analyzer to use at query time to interpret the value to match.
+	 * <p>
+	 * If this method is not called, the analyzer defined on the field will be used.
+	 *
+	 * @param analyzerName The name of the analyzer to use in the query for this predicate.
+	 * @return {@code this}, for method chaining.
+	 */
+	PhrasePredicateTerminalContext analyzer(String analyzerName);
+
+	/**
+	 * Any analyzer defined on any field will be ignored to interpret the value to match.
+	 *
+	 * @return {@code this}, for method chaining.
+	 */
+	PhrasePredicateTerminalContext ignoreAnalyzer();
 
 }

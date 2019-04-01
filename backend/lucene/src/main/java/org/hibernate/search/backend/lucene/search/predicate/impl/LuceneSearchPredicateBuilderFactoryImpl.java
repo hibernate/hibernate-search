@@ -104,7 +104,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> phrase(String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createPhrasePredicateBuilder( absoluteFieldPath );
+				.getComponent().createPhrasePredicateBuilder( searchContext, absoluteFieldPath );
 	}
 
 	@Override
