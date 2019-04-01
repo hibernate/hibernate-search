@@ -13,7 +13,7 @@
     <description>Hibernate Search common utilities</description>
 
     <properties>
-        <java.module.name>org.hibernate.search.util.internal.common</java.module.name>
+        <java.module.name>org.hibernate.search.util.common</java.module.name>
     </properties>
 
     <dependencies>
