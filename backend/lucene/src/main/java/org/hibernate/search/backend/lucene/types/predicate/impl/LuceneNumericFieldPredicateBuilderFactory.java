@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 /**
@@ -17,12 +17,12 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
  * @param <F> The field type.
  * @param <E> The encoded number type.
  */
-public final class LuceneNumericFieldPredicateBuilderFactory<F, E>
-		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, LuceneNumericFieldCodec<F, E>> {
+public final class LuceneNumericFieldPredicateBuilderFactory<F, E extends Number>
+		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, AbstractLuceneNumericFieldCodec<F, E>> {
 
 	public LuceneNumericFieldPredicateBuilderFactory(
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
-			LuceneNumericFieldCodec<F, E> codec) {
+			AbstractLuceneNumericFieldCodec<F, E> codec) {
 		super( converter, rawConverter, codec );
 	}
 

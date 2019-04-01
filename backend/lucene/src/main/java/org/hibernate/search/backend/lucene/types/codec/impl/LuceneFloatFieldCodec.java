@@ -9,37 +9,19 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FloatDocValuesField;
-import org.apache.lucene.document.FloatPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneFloatFieldCodec implements LuceneNumericFieldCodec<Float, Float> {
-
-	private final boolean projectable;
-
-	private final boolean sortable;
+public final class LuceneFloatFieldCodec extends AbstractLuceneNumericFieldCodec<Float, Float> {
 
 	public LuceneFloatFieldCodec(boolean projectable, boolean sortable) {
-		this.projectable = projectable;
-		this.sortable = sortable;
+		super( projectable, sortable );
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Float value) {
-		if ( value == null ) {
-			return;
-		}
-
-		if ( projectable ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, value ) );
-		}
-
-		if ( sortable ) {
-			documentBuilder.addField( new FloatDocValuesField( absoluteFieldPath, value ) );
-		}
-
-		documentBuilder.addField( new FloatPoint( absoluteFieldPath, value ) );
+	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Float value,
+			Float encodedValue) {
+		documentBuilder.addField( new StoredField( absoluteFieldPath, encodedValue ) );
 	}
 
 	@Override
@@ -51,21 +33,6 @@ public final class LuceneFloatFieldCodec implements LuceneNumericFieldCodec<Floa
 		}
 
 		return (Float) field.numericValue();
-	}
-
-	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( LuceneFloatFieldCodec.class != obj.getClass() ) {
-			return false;
-		}
-
-		LuceneFloatFieldCodec other = (LuceneFloatFieldCodec) obj;
-
-		return ( projectable == other.projectable ) &&
-				( sortable == other.sortable );
 	}
 
 	@Override

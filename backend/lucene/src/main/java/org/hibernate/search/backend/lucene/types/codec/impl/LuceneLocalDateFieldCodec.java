@@ -15,13 +15,11 @@ import java.time.format.ResolverStyle;
 import java.util.Locale;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.LongPoint;
-import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
-public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<LocalDate, Long> {
+public final class LuceneLocalDateFieldCodec extends AbstractLuceneNumericFieldCodec<LocalDate, Long> {
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.append( LuceneYearMonthFieldCodec.FORMATTER )
@@ -30,32 +28,14 @@ public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	private final boolean projectable;
-
-	private final boolean sortable;
-
 	public LuceneLocalDateFieldCodec(boolean projectable, boolean sortable) {
-		this.projectable = projectable;
-		this.sortable = sortable;
+		super( projectable, sortable );
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalDate value) {
-		if ( value == null ) {
-			return;
-		}
-
-		if ( projectable ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
-		}
-
-		long valueToEpochDay = encode( value );
-
-		if ( sortable ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, valueToEpochDay ) );
-		}
-
-		documentBuilder.addField( new LongPoint( absoluteFieldPath, valueToEpochDay ) );
+	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalDate value,
+			Long encodedValue) {
+		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}
 
 	@Override
@@ -73,20 +53,6 @@ public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<
 		}
 
 		return LocalDate.parse( value, FORMATTER );
-	}
-
-	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( LuceneLocalDateFieldCodec.class != obj.getClass() ) {
-			return false;
-		}
-
-		LuceneLocalDateFieldCodec other = (LuceneLocalDateFieldCodec) obj;
-
-		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 
 	@Override

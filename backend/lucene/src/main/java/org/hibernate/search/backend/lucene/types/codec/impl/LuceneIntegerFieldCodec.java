@@ -7,38 +7,20 @@
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
-public final class LuceneIntegerFieldCodec implements LuceneNumericFieldCodec<Integer, Integer> {
-
-	private final boolean projectable;
-
-	private final boolean sortable;
+public final class LuceneIntegerFieldCodec extends AbstractLuceneNumericFieldCodec<Integer, Integer> {
 
 	public LuceneIntegerFieldCodec(boolean projectable, boolean sortable) {
-		this.projectable = projectable;
-		this.sortable = sortable;
+		super( projectable, sortable );
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Integer value) {
-		if ( value == null ) {
-			return;
-		}
-
-		if ( projectable ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, value ) );
-		}
-
-		if ( sortable ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, value.longValue() ) );
-		}
-
-		documentBuilder.addField( new IntPoint( absoluteFieldPath, value ) );
+	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Integer value,
+			Integer encodedValue) {
+		documentBuilder.addField( new StoredField( absoluteFieldPath, encodedValue ) );
 	}
 
 	@Override
@@ -50,21 +32,6 @@ public final class LuceneIntegerFieldCodec implements LuceneNumericFieldCodec<In
 		}
 
 		return (Integer) field.numericValue();
-	}
-
-	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( LuceneIntegerFieldCodec.class != obj.getClass() ) {
-			return false;
-		}
-
-		LuceneIntegerFieldCodec other = (LuceneIntegerFieldCodec) obj;
-
-		return ( projectable == other.projectable ) &&
-				( sortable == other.sortable );
 	}
 
 	@Override

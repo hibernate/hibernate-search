@@ -6,10 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.document.DoublePoint;
+import org.apache.lucene.document.FloatDocValuesField;
 import org.apache.lucene.document.FloatPoint;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.LongPoint;
+import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 
@@ -28,6 +32,10 @@ public abstract class LuceneNumericDomain<E> {
 	public abstract Query createRangeQuery(String absoluteFieldPath, E lowerLimit, E upperLimit);
 
 	public abstract SortField.Type getSortFieldType();
+
+	abstract IndexableField createIndexField(String absoluteFieldPath, E numericValue);
+
+	abstract IndexableField createDocValuesField(String absoluteFieldPath, E numericValue);
 
 	public static final LuceneNumericDomain<Integer> INTEGER = new LuceneNumericDomain<Integer>() {
 		@Override
@@ -65,6 +73,16 @@ public abstract class LuceneNumericDomain<E> {
 		@Override
 		public SortField.Type getSortFieldType() {
 			return SortField.Type.INT;
+		}
+
+		@Override
+		IndexableField createIndexField(String absoluteFieldPath, Integer numericValue) {
+			return new IntPoint( absoluteFieldPath, numericValue );
+		}
+
+		@Override
+		IndexableField createDocValuesField(String absoluteFieldPath, Integer numericValue) {
+			return new NumericDocValuesField( absoluteFieldPath, numericValue.longValue() );
 		}
 	};
 
@@ -105,6 +123,16 @@ public abstract class LuceneNumericDomain<E> {
 		public SortField.Type getSortFieldType() {
 			return SortField.Type.LONG;
 		}
+
+		@Override
+		IndexableField createIndexField(String absoluteFieldPath, Long numericValue) {
+			return new LongPoint( absoluteFieldPath, numericValue );
+		}
+
+		@Override
+		IndexableField createDocValuesField(String absoluteFieldPath, Long numericValue) {
+			return new NumericDocValuesField( absoluteFieldPath, numericValue );
+		}
 	};
 
 	public static final LuceneNumericDomain<Float> FLOAT = new LuceneNumericDomain<Float>() {
@@ -144,6 +172,16 @@ public abstract class LuceneNumericDomain<E> {
 		public SortField.Type getSortFieldType() {
 			return SortField.Type.FLOAT;
 		}
+
+		@Override
+		IndexableField createIndexField(String absoluteFieldPath, Float numericValue) {
+			return new FloatPoint( absoluteFieldPath, numericValue );
+		}
+
+		@Override
+		IndexableField createDocValuesField(String absoluteFieldPath, Float numericValue) {
+			return new FloatDocValuesField( absoluteFieldPath, numericValue );
+		}
 	};
 
 	public static final LuceneNumericDomain<Double> DOUBLE = new LuceneNumericDomain<Double>() {
@@ -182,6 +220,16 @@ public abstract class LuceneNumericDomain<E> {
 		@Override
 		public SortField.Type getSortFieldType() {
 			return SortField.Type.DOUBLE;
+		}
+
+		@Override
+		IndexableField createIndexField(String absoluteFieldPath, Double numericValue) {
+			return new DoublePoint( absoluteFieldPath, numericValue );
+		}
+
+		@Override
+		IndexableField createDocValuesField(String absoluteFieldPath, Double numericValue) {
+			return new DoubleDocValuesField( absoluteFieldPath, numericValue );
 		}
 	};
 }

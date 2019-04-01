@@ -18,12 +18,10 @@ import java.util.Locale;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneMonthDayFieldCodec implements LuceneNumericFieldCodec<MonthDay, Integer> {
+public final class LuceneMonthDayFieldCodec extends AbstractLuceneNumericFieldCodec<MonthDay, Integer> {
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendLiteral( "--" )
@@ -33,32 +31,14 @@ public final class LuceneMonthDayFieldCodec implements LuceneNumericFieldCodec<M
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	private final boolean projectable;
-
-	private final boolean sortable;
-
 	public LuceneMonthDayFieldCodec(boolean projectable, boolean sortable) {
-		this.projectable = projectable;
-		this.sortable = sortable;
+		super( projectable, sortable );
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, MonthDay value) {
-		if ( value == null ) {
-			return;
-		}
-
-		if ( projectable ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
-		}
-
-		Integer integerValue = encode( value );
-
-		if ( sortable ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, integerValue ) );
-		}
-
-		documentBuilder.addField( new IntPoint( absoluteFieldPath, integerValue ) );
+	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, MonthDay value,
+			Integer encodedValue) {
+		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}
 
 	@Override
@@ -76,20 +56,6 @@ public final class LuceneMonthDayFieldCodec implements LuceneNumericFieldCodec<M
 		}
 
 		return MonthDay.parse( value, FORMATTER );
-	}
-
-	@Override
-	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( LuceneMonthDayFieldCodec.class != obj.getClass() ) {
-			return false;
-		}
-
-		LuceneMonthDayFieldCodec other = (LuceneMonthDayFieldCodec) obj;
-
-		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 
 	@Override
