@@ -33,7 +33,7 @@ public interface SearchSession extends AutoCloseable {
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see SearchQueryResultDefinitionContext
 	 */
-	default <T> SearchQueryResultDefinitionContext search(Class<T> type) {
+	default SearchQueryResultDefinitionContext search(Class<?> type) {
 		return scope( type ).search();
 	}
 
@@ -47,18 +47,18 @@ public interface SearchSession extends AutoCloseable {
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see SearchQueryResultDefinitionContext
 	 */
-	default <T> SearchQueryResultDefinitionContext search(Collection<? extends Class<? extends T>> types) {
+	default SearchQueryResultDefinitionContext search(Collection<? extends Class<?>> types) {
 		return scope( types ).search();
 	}
 
 	/**
 	 * Create a {@link SearchScope} limited to the given type.
 	 *
-	 * @param type An type to include in the scope.
+	 * @param type A type to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default <T> SearchScope scope(Class<T> type) {
+	default SearchScope scope(Class<?> type) {
 		return scope( Collections.singleton( type ) );
 	}
 
@@ -69,7 +69,7 @@ public interface SearchSession extends AutoCloseable {
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	<T> SearchScope scope(Collection<? extends Class<? extends T>> types);
+	SearchScope scope(Collection<? extends Class<?>> types);
 
 	/**
 	 * @return The main work plan for this session. It will be executed upon closing this session.
