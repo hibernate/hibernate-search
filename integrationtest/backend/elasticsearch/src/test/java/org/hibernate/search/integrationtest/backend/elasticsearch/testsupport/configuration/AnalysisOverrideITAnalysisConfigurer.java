@@ -21,5 +21,14 @@ public class AnalysisOverrideITAnalysisConfigurer extends DefaultITAnalysisConfi
 		context.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ).custom()
 				.withTokenizer( "whitespace" )
 				.withTokenFilters( "lowercase" );
+
+		String tokenizerName = OverrideAnalysisDefinitions.ANALYZER_NGRAM.name + "_tokenizer";
+		context.analyzer( OverrideAnalysisDefinitions.ANALYZER_NGRAM.name ).custom()
+				.withTokenizer( tokenizerName );
+
+		context.tokenizer( tokenizerName )
+				.type( "ngram" )
+				.param( "min_gram", 5 )
+				.param( "max_gram", 6 );
 	}
 }
