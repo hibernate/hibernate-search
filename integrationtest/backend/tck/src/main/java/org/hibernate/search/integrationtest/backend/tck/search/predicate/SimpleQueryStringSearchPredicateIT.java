@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -24,6 +25,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
@@ -43,6 +45,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class SimpleQueryStringSearchPredicateIT {
+
+	private static final String CONFIGURATION_ID = "analysis-override";
 
 	private static final String INDEX_NAME = "IndexName";
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
@@ -87,7 +91,7 @@ public class SimpleQueryStringSearchPredicateIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
@@ -229,6 +233,89 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		assertThat( query )
 				.hasNoHits();
+	}
+
+	@Test
+	public void analyzerOverride() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
+		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+
+		IndexSearchQuery<DocumentReference> query = scope.query()
+				.asReference()
+				.predicate( f -> f.simpleQueryString().onField( whitespaceAnalyzedField ).matching( "HERE | PANDA" ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.simpleQueryString().onField( whitespaceLowercaseAnalyzedField ).matching( "HERE | PANDA" ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.simpleQueryString().onField( whitespaceAnalyzedField ).matching( "HERE | PANDA" )
+						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void analyzerOverride_notExistingName() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
+
+		SubTest.expectException( () -> scope.query()
+				.asReference()
+				.predicate( f -> f.simpleQueryString().onField( whitespaceAnalyzedField ).matching( "HERE | PANDA" )
+						// we don't have any analyzer with that name
+						.analyzer( "this_name_does_actually_not_exist" ) )
+				.toQuery().fetch()
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "this_name_does_actually_not_exist" );
+	}
+
+	@Test
+	public void analyzerIgnore() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+
+		IndexSearchQuery<DocumentReference> query = scope.query()
+				.asReference()
+				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "HERE | PANDA" ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+		// ignoring the analyzer means that the parameter of match predicate will not be tokenized
+		// so it will not match any token
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "HERE | PANDA" ).ignoreAnalyzer() )
+				.toQuery();
+
+		assertThat( query )
+				.hasNoHits();
+
+		// to have a match with the ignoreAnalyzer option enabled, we have to pass the parameter as a token is
+		query = scope.query()
+				.asReference()
+				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "here" ).ignoreAnalyzer() )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
@@ -623,12 +710,18 @@ public class SimpleQueryStringSearchPredicateIT {
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringField2.reference, TEXT_TERM_1_AND_TERM_3 );
 			document.addValue( indexMapping.analyzedStringField3.reference, TERM_4 );
+			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
+			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_3 );
+			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
+			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_2_IN_PHRASE );
+			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
+			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_4_IN_PHRASE_SLOP_2 );
@@ -697,6 +790,8 @@ public class SimpleQueryStringSearchPredicateIT {
 		final MainFieldModel analyzedStringField2;
 		final MainFieldModel analyzedStringField3;
 		final MainFieldModel analyzedStringFieldWithDslConverter;
+		final MainFieldModel whitespaceAnalyzedField;
+		final MainFieldModel whitespaceLowercaseAnalyzedField;
 
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
@@ -724,6 +819,14 @@ public class SimpleQueryStringSearchPredicateIT {
 							.dslConverter( ValueWrapper.toIndexFieldConverter() )
 			)
 					.map( root, "analyzedStringWithDslConverter" );
+			whitespaceAnalyzedField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+			)
+					.map( root, "whitespaceAnalyzed" );
+			whitespaceLowercaseAnalyzedField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+			)
+					.map( root, "whitespaceLowercaseAnalyzed" );
 		}
 	}
 
