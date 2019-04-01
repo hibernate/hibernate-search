@@ -44,10 +44,11 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	boolean isSearchable(Class<?> type);
 
 	/**
-	 * Given a set of target entity, return the set of configured subtypes that are indexed.
+	 * Given a target entity type, return the set of configured subtypes that are indexed.
 	 *
-	 * @param entityType the target set
-	 * @return the set of configured subtypes that are indexed
+	 * @param entityType A {@link Class} representing the target entity type.
+	 * @param <E> The target entity type.
+	 * @return The set of configured subtypes that are indexed.
 	 */
 	<E> Set<Class<? extends E>> getIndexedTypesPolymorphic(Class<E> entityType);
 

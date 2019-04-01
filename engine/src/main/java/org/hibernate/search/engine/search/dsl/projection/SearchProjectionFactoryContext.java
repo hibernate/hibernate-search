@@ -117,6 +117,8 @@ public interface SearchProjectionFactoryContext<R, O> {
 	/**
 	 * Project on the distance from the center to a {@link GeoPoint} field.
 	 *
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param center The center to compute the distance from.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	DistanceToFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center);
@@ -146,6 +148,7 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 *
 	 * @param transformer The function that will transform the list of projected elements into a custom object.
 	 * @param projections The projections used to populate the list, in order.
+	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	<T> CompositeProjectionContext<T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
@@ -155,6 +158,7 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 *
 	 * @param transformer The function that will transform the projected element into a custom object.
 	 * @param terminalContexts The terminal contexts allowing to retrieve {@link SearchProjection}s.
+	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	default <T> CompositeProjectionContext<T> composite(Function<List<?>, T> transformer,
@@ -171,6 +175,8 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 *
 	 * @param transformer The function that will transform the projected element into a custom object.
 	 * @param projection The original projection used to produce the element passed to the transformer.
+	 * @param <P> The type of the element passed to the transformer.
+	 * @param <T> The type of the custom object composing the projected element.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	<P, T> CompositeProjectionContext<T> composite(Function<P, T> transformer, SearchProjection<P> projection);
@@ -181,6 +187,8 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * @param transformer The function that will transform the projected element into a custom object.
 	 * @param terminalContext The terminal context allowing to retrieve the {@link SearchProjection}
 	 * that will be used to produce the element passed to the transformer.
+	 * @param <P> The type of the element passed to the transformer.
+	 * @param <T> The type of the custom object composing the projected element.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	default <P, T> CompositeProjectionContext<T> composite(Function<P, T> transformer, SearchProjectionTerminalContext<P> terminalContext) {
@@ -193,6 +201,9 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * @param transformer The function that will transform the projected elements into a custom object.
 	 * @param projection1 The projection used to produce the first element passed to the transformer.
 	 * @param projection2 The projection used to produce the second element passed to the transformer.
+	 * @param <P1> The type of the first element passed to the transformer.
+	 * @param <P2> The type of the second element passed to the transformer.
+	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	<P1, P2, T> CompositeProjectionContext<T> composite(BiFunction<P1, P2, T> transformer,
@@ -206,6 +217,9 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * that will be used to produce the first element passed to the transformer.
 	 * @param terminalContext2 The terminal context allowing to retrieve the {@link SearchProjection}
 	 * that will be used to produce the second element passed to the transformer.
+	 * @param <P1> The type of the first element passed to the transformer.
+	 * @param <P2> The type of the second element passed to the transformer.
+	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	default <P1, P2, T> CompositeProjectionContext<T> composite(BiFunction<P1, P2, T> transformer,
@@ -223,6 +237,10 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * @param projection1 The projection used to produce the first element passed to the transformer.
 	 * @param projection2 The projection used to produce the second element passed to the transformer.
 	 * @param projection3 The projection used to produce the third element passed to the transformer.
+	 * @param <P1> The type of the first element passed to the transformer.
+	 * @param <P2> The type of the second element passed to the transformer.
+	 * @param <P3> The type of the third element passed to the transformer.
+	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	<P1, P2, P3, T> CompositeProjectionContext<T> composite(TriFunction<P1, P2, P3, T> transformer,
@@ -238,6 +256,10 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * that will be used to produce the second element passed to the transformer.
 	 * @param terminalContext3 The terminal context allowing to retrieve the {@link SearchProjection}
 	 * that will be used to produce the third element passed to the transformer.
+	 * @param <P1> The type of the first element passed to the transformer.
+	 * @param <P2> The type of the second element passed to the transformer.
+	 * @param <P3> The type of the third element passed to the transformer.
+	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	default <P1, P2, P3, T> CompositeProjectionContext<T> composite(TriFunction<P1, P2, P3, T> transformer,

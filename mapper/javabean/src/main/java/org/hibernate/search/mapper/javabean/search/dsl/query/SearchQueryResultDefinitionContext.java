@@ -34,6 +34,7 @@ public interface SearchQueryResultDefinitionContext {
 	 * @param projectionContributor A function that will use the DSL context passed in parameter to create a projection,
 	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
+	 * @param <T> The resulting type of the projection.
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
@@ -44,6 +45,7 @@ public interface SearchQueryResultDefinitionContext {
 	 * Define the query results as one projection for each matching document.
 	 *
 	 * @param projection A {@link SearchProjection} object obtained from the {@link SearchScope}.
+	 * @param <T> The resulting type of the projection.
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */

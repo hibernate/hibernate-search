@@ -38,6 +38,7 @@ public interface BeanReference<T> {
 	 * Create a {@link BeanReference} referencing a bean by its type only.
 	 *
 	 * @param type The bean type. Must not be null.
+	 * @param <T> The bean type.
 	 * @return The corresponding {@link BeanReference}.
 	 */
 	static <T> BeanReference<T> of(Class<T> type) {
@@ -49,6 +50,7 @@ public interface BeanReference<T> {
 	 *
 	 * @param type The bean type. Must not be null.
 	 * @param name The bean name. May be null or empty.
+	 * @param <T> The bean type.
 	 * @return The corresponding {@link BeanReference}.
 	 */
 	static <T> BeanReference<T> of(Class<T> type, String name) {
@@ -64,6 +66,7 @@ public interface BeanReference<T> {
 	 * Create a {@link BeanReference} referencing a bean instance directly.
 	 *
 	 * @param instance The bean instance. Must not be null.
+	 * @param <T> The bean type.
 	 * @return The corresponding {@link BeanReference}.
 	 */
 	static <T> BeanReference<T> ofInstance(T instance) {
