@@ -107,6 +107,18 @@ class SimpleQueryStringPredicateFieldSetContextImpl<B>
 			return this;
 		}
 
+		@Override
+		public SimpleQueryStringPredicateTerminalContext analyzer(String analyzerName) {
+			builder.analyzer( analyzerName );
+			return this;
+		}
+
+		@Override
+		public SimpleQueryStringPredicateTerminalContext ignoreAnalyzer() {
+			builder.ignoreAnalyzer();
+			return this;
+		}
+
 		private List<String> collectAbsoluteFieldPaths() {
 			return fieldSetContexts.stream().flatMap( f -> f.absoluteFieldPaths.stream() )
 					.collect( Collectors.toList() );

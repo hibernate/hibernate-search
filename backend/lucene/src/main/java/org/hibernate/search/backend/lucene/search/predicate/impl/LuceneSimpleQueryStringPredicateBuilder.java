@@ -6,30 +6,43 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldContext;
 import org.hibernate.search.backend.lucene.util.impl.FieldContextSimpleQueryParser;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.Query;
 
 public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		implements SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final LuceneSearchScopeModel scopeModel;
+	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private final Map<String, LuceneSimpleQueryStringPredicateBuilderFieldContext> fields = new LinkedHashMap<>();
 	private Occur defaultOperator = Occur.SHOULD;
 	private String simpleQueryString;
+	private Analyzer overrideAnalyzer;
+	private boolean ignoreAnalyzer = false;
 
-	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchScopeModel scopeModel) {
+	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneSearchScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
+		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
 
 	@Override
@@ -54,6 +67,19 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	}
 
 	@Override
+	public void analyzer(String analyzerName) {
+		this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
+		if ( overrideAnalyzer == null ) {
+			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexNames( scopeModel.getIndexNames() ) );
+		}
+	}
+
+	@Override
+	public void ignoreAnalyzer() {
+		this.ignoreAnalyzer = true;
+	}
+
+	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		Analyzer analyzer = buildAnalyzer();
 		FieldContextSimpleQueryParser queryParser = new FieldContextSimpleQueryParser( analyzer, fields );
@@ -63,30 +89,34 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	}
 
 	private Analyzer buildAnalyzer() {
+		if ( ignoreAnalyzer ) {
+			return new KeywordAnalyzer();
+		}
+		if ( overrideAnalyzer != null ) {
+			return overrideAnalyzer;
+		}
 		if ( fields.size() == 1 ) {
 			return fields.values().iterator().next().getAnalyzer();
 		}
-		else {
-			/*
-			 * We need to build a new scoped analyzer to address the case of search queries targeting
-			 * multiple indexes, where index A defines "field1" but not "field2",
-			 * and index B defines "field2" but not "field1".
-			 * In that case, neither the scoped analyzer for index A nor the scoped analyzer for index B would work.
-			 *
-			 * An alternative exists, but I am not sure it would perform significantly better.
-			 * Let us consider that all targeted indexes are compatible for the targeted fields,
-			 * i.e. if an index defines a field, it always has the same analyzer as the same field in other indexes.
-			 * This compatibility would allow us to simply use a "chaining" analyzer,
-			 * which would hold a list of each scoped analyzer for each index,
-			 * and, when asked for the analyzer to delegate to,
-			 * would pick the first analyzer returned by any of the scoped analyzers in its list.
-			 */
-			ScopedAnalyzer.Builder builder = new ScopedAnalyzer.Builder();
-			for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldContext> entry : fields.entrySet() ) {
-				builder.setAnalyzer( entry.getKey(), entry.getValue().getAnalyzer() );
-			}
-			return builder.build();
-		}
-	}
 
+		/*
+		 * We need to build a new scoped analyzer to address the case of search queries targeting
+		 * multiple indexes, where index A defines "field1" but not "field2",
+		 * and index B defines "field2" but not "field1".
+		 * In that case, neither the scoped analyzer for index A nor the scoped analyzer for index B would work.
+		 *
+		 * An alternative exists, but I am not sure it would perform significantly better.
+		 * Let us consider that all targeted indexes are compatible for the targeted fields,
+		 * i.e. if an index defines a field, it always has the same analyzer as the same field in other indexes.
+		 * This compatibility would allow us to simply use a "chaining" analyzer,
+		 * which would hold a list of each scoped analyzer for each index,
+		 * and, when asked for the analyzer to delegate to,
+		 * would pick the first analyzer returned by any of the scoped analyzers in its list.
+		 */
+		ScopedAnalyzer.Builder builder = new ScopedAnalyzer.Builder();
+		for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldContext> entry : fields.entrySet() ) {
+			builder.setAnalyzer( entry.getKey(), entry.getValue().getAnalyzer() );
+		}
+		return builder.build();
+	}
 }

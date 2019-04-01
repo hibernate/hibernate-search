@@ -14,6 +14,10 @@ public interface SimpleQueryStringPredicateBuilder<B> extends SearchPredicateBui
 
 	void simpleQueryString(String simpleQueryString);
 
+	void analyzer(String analyzerName);
+
+	void ignoreAnalyzer();
+
 	interface FieldContext {
 
 		void boost(float boost);
