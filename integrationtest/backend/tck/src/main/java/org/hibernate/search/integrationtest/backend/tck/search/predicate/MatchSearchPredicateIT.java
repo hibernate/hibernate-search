@@ -829,15 +829,8 @@ public class MatchSearchPredicateIT {
 				.toQuery().fetch()
 		)
 				.assertThrown()
-				.isInstanceOf( Exception.class )
-
-				// TODO on Elasticsearch backend a CompletionException is raised instead of a SearchException
-				// Error during generated code invocation com.intellij.debugger.engine.evaluation.EvaluateException: Method threw 'java.util.concurrent.CompletionException' exception.
-				//.isInstanceOf( SearchException.class )
-
-				// TODO on Elasticsearch backend the error is not handled by Search
-				//.hasMessageContaining( "HSEARCH000353: Unknown analyzer: 'DefaultAnalysisDefinitions_lowercase'. Make sure you defined this analyzer." )
-		;
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "DefaultAnalysisDefinitions_lowercase" );
 	}
 
 	@Test
@@ -853,15 +846,8 @@ public class MatchSearchPredicateIT {
 				.toQuery().fetch()
 		)
 				.assertThrown()
-				.isInstanceOf( Exception.class )
-
-				// TODO on Elasticsearch backend a CompletionException is raised instead of a SearchException
-				// Error during generated code invocation com.intellij.debugger.engine.evaluation.EvaluateException: Method threw 'java.util.concurrent.CompletionException' exception.
-				//.isInstanceOf( SearchException.class )
-
-				// TODO on Elasticsearch backend the error is not handled by Search
-				//.hasMessageContaining( "HSEARCH000353: Unknown analyzer: 'this_name_does_actually_not_exist'. Make sure you defined this analyzer." )
-		;
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "this_name_does_actually_not_exist" );
 	}
 
 	@Test

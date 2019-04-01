@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchR
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
+import org.hibernate.search.util.common.impl.Futures;
 
 import com.google.gson.JsonObject;
 
@@ -68,7 +69,7 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 				.paging( limit, offset )
 				.routingKeys( routingKeys ).build();
 
-		return queryOrchestrator.submit( work ).join()
+		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) )
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async query execution, we will have to add a loadAsync method here,
