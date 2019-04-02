@@ -466,56 +466,56 @@ public class ElasticsearchExtensionIT {
 			integer = root.field(
 					"integer",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asJsonString( "{'type': 'integer'}" )
+							.asNative( "{'type': 'integer'}" )
 			)
 					.toReference();
 			string = root.field(
 					"string",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asJsonString( "{'type': 'keyword'}" )
+							.asNative( "{'type': 'keyword'}" )
 			)
 					.toReference();
 			geoPoint = root.field(
 					"geoPoint",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asJsonString( "{'type': 'geo_point'}" )
+							.asNative( "{'type': 'geo_point'}" )
 			)
 					.toReference();
 			dateWithColons = root.field(
 					"dateWithColons",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asJsonString( "{'type': 'date', 'format': 'yyyy:MM:dd'}" )
+							.asNative( "{'type': 'date', 'format': 'yyyy:MM:dd'}" )
 			)
 					.toReference();
 
 			sort1 = root.field(
 					"sort1",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 			sort2 = root.field(
 					"sort2",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 			sort3 = root.field(
 					"sort3",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 			sort4 = root.field(
 					"sort4",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 			sort5 = root.field(
 					"sort5",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 		}

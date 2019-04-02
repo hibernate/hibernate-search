@@ -212,7 +212,7 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	}
 
 	@Override
-	public ElasticsearchJsonStringIndexFieldTypeContext<?> asJsonString(String mappingJsonString) {
+	public ElasticsearchJsonStringIndexFieldTypeContext<?> asNative(String mappingJsonString) {
 		return new ElasticsearchJsonStringIndexFieldTypeContextImpl( this, mappingJsonString );
 	}
 
