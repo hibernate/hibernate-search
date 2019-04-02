@@ -11,16 +11,14 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
-import org.apache.lucene.analysis.core.KeywordAnalyzer;
 
+import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 /**
  * @author Guillaume Smet
  */
 public final class ScopedAnalyzer extends DelegatingAnalyzerWrapper {
-
-	private static final Analyzer DEFAULT_ANALYZER = new KeywordAnalyzer();
 
 	private final Map<String, Analyzer> scopedAnalyzers;
 
@@ -34,7 +32,7 @@ public final class ScopedAnalyzer extends DelegatingAnalyzerWrapper {
 		Analyzer analyzer = scopedAnalyzers.get( absoluteFieldPath );
 
 		if ( analyzer == null ) {
-			return DEFAULT_ANALYZER;
+			return AnalyzerUtils.DEFAULT_ANALYZER;
 		}
 
 		return analyzer;

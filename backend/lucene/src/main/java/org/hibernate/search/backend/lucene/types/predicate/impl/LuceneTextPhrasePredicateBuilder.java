@@ -15,12 +15,12 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneS
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
+import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.Query;
@@ -80,7 +80,7 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		if ( queryBuilder != null ) {
 			if ( ignoreAnalyzer ) {
-				queryBuilder.setAnalyzer( new KeywordAnalyzer() );
+				queryBuilder.setAnalyzer( AnalyzerUtils.DEFAULT_ANALYZER );
 			}
 			else if ( overrideAnalyzer != null ) {
 				queryBuilder.setAnalyzer( overrideAnalyzer );

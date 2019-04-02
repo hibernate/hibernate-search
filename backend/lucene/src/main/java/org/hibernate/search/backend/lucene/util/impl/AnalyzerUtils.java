@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.SearchException;
@@ -23,6 +24,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Yoann Rodiere
  */
 public final class AnalyzerUtils {
+
+	public static final Analyzer DEFAULT_ANALYZER = new KeywordAnalyzer();
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
