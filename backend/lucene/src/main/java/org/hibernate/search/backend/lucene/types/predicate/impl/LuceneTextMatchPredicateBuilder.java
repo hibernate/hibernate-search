@@ -34,13 +34,11 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final QueryBuilder queryBuilder;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private Integer maxEditDistance;
 	private Integer prefixLength;
-	private Analyzer overrideAnalyzer;
-	private boolean ignoreAnalyzer = false;
+	private Analyzer analyzer;
 
 	LuceneTextMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
@@ -49,7 +47,7 @@ class LuceneTextMatchPredicateBuilder<F>
 			LuceneConverterCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec,
 			QueryBuilder queryBuilder) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
-		this.queryBuilder = queryBuilder;
+		this.analyzer = ( queryBuilder == null ) ? null : queryBuilder.getAnalyzer();
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
 
@@ -61,27 +59,26 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	@Override
 	public void analyzer(String analyzerName) {
-		this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
-		if ( overrideAnalyzer == null ) {
+		this.analyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
+		if ( analyzer == null ) {
 			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 	}
 
 	@Override
 	public void ignoreAnalyzer() {
-		this.ignoreAnalyzer = true;
+		this.analyzer = AnalyzerUtils.KEYWORD_ANALYZER;
 	}
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		if ( queryBuilder != null ) {
+		if ( analyzer != null ) {
 			QueryBuilder effectiveQueryBuilder;
 			if ( maxEditDistance != null ) {
-				effectiveQueryBuilder = new FuzzyQueryBuilder( getAnalyzer(), maxEditDistance, prefixLength );
+				effectiveQueryBuilder = new FuzzyQueryBuilder( analyzer, maxEditDistance, prefixLength );
 			}
 			else {
-				queryBuilder.setAnalyzer( getAnalyzer() );
-				effectiveQueryBuilder = queryBuilder;
+				effectiveQueryBuilder = new QueryBuilder( analyzer );
 			}
 
 			Query analyzed = effectiveQueryBuilder.createBooleanQuery( absoluteFieldPath, value );
@@ -105,15 +102,5 @@ class LuceneTextMatchPredicateBuilder<F>
 				return new TermQuery( term );
 			}
 		}
-	}
-
-	private Analyzer getAnalyzer() {
-		if ( ignoreAnalyzer ) {
-			return AnalyzerUtils.KEYWORD_ANALYZER;
-		}
-		if ( overrideAnalyzer != null ) {
-			return overrideAnalyzer;
-		}
-		return queryBuilder.getAnalyzer();
 	}
 }

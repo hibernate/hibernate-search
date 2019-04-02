@@ -917,6 +917,22 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
+	public void analyzerOverride_normalizedStringField() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String absoluteFieldPath = indexMapping.normalizedStringField.relativeFieldName;
+
+		IndexSearchQuery<DocumentReference> query = scope.query()
+				.asReference()
+				// the matching parameter will be tokenized even if the field has a normalizer
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "Auster Coe" )
+					.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+	}
+
+	@Test
 	public void multiFields() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
