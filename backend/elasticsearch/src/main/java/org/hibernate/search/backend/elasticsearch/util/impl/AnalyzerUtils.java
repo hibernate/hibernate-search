@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.util.impl;
 
 public final class AnalyzerUtils {
 
-	public static final String DEFAULT_ANALYZER = "keyword";
+	public static final String KEYWORD_ANALYZER = "keyword";
 
 	private AnalyzerUtils() {
 		// Not used

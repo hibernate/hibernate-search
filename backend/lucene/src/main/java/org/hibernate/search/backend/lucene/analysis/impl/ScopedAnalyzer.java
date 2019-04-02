@@ -32,7 +32,7 @@ public final class ScopedAnalyzer extends DelegatingAnalyzerWrapper {
 		Analyzer analyzer = scopedAnalyzers.get( absoluteFieldPath );
 
 		if ( analyzer == null ) {
-			return AnalyzerUtils.DEFAULT_ANALYZER;
+			return AnalyzerUtils.KEYWORD_ANALYZER;
 		}
 
 		return analyzer;

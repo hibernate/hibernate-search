@@ -25,7 +25,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public final class AnalyzerUtils {
 
-	public static final Analyzer DEFAULT_ANALYZER = new KeywordAnalyzer();
+	public static final Analyzer KEYWORD_ANALYZER = new KeywordAnalyzer();
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

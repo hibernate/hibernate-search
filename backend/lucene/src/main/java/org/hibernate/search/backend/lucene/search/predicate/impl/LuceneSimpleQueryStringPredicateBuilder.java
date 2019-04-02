@@ -90,7 +90,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 
 	private Analyzer buildAnalyzer() {
 		if ( ignoreAnalyzer ) {
-			return AnalyzerUtils.DEFAULT_ANALYZER;
+			return AnalyzerUtils.KEYWORD_ANALYZER;
 		}
 		if ( overrideAnalyzer != null ) {
 			return overrideAnalyzer;
