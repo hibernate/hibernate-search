@@ -14,6 +14,6 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
  */
 public interface ElasticsearchSearchSortContainerContext extends SearchSortContainerContext {
 
-	NonEmptySortContext fromJsonString(String jsonString);
+	NonEmptySortContext fromJson(String jsonString);
 
 }

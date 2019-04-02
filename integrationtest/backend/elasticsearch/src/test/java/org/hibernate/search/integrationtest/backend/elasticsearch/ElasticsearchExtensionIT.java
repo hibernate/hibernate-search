@@ -81,20 +81,20 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_fromJsonString() {
+	public void predicate_fromJson() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
-								.fromJsonString( "{'match': {'string': 'text 1'}}" )
+								.fromJson( "{'match': {'string': 'text 1'}}" )
 						)
 						.should( f.extension( ElasticsearchExtension.get() )
-								.fromJsonString( "{'match': {'integer': 2}}" )
+								.fromJson( "{'match': {'integer': 2}}" )
 						)
 						.should( f.extension( ElasticsearchExtension.get() )
-								.fromJsonString(
+								.fromJson(
 										"{"
 											+ "'geo_distance': {"
 												+ "'distance': '200km',"
@@ -116,15 +116,15 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_fromJsonString_separatePredicate() {
+	public void predicate_fromJson_separatePredicate() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchPredicate predicate1 = scope.predicate().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'match': {'string': 'text 1'}}" ).toPredicate();
+				.fromJson( "{'match': {'string': 'text 1'}}" ).toPredicate();
 		SearchPredicate predicate2 = scope.predicate().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'match': {'integer': 2}}" ).toPredicate();
+				.fromJson( "{'match': {'integer': 2}}" ).toPredicate();
 		SearchPredicate predicate3 = scope.predicate().extension( ElasticsearchExtension.get() )
-				.fromJsonString(
+				.fromJson(
 						"{"
 							+ "'geo_distance': {"
 								+ "'distance': '200km',"
@@ -156,7 +156,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void sort_fromJsonString() {
+	public void sort_fromJson() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		IndexSearchQuery<DocumentReference> query = scope.query()
@@ -164,11 +164,11 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
-								.fromJsonString( "{'sort1': 'asc'}" )
+								.fromJson( "{'sort1': 'asc'}" )
 						.then().extension( ElasticsearchExtension.get() )
-								.fromJsonString( "{'sort2': 'asc'}" )
+								.fromJson( "{'sort2': 'asc'}" )
 						.then().extension( ElasticsearchExtension.get() )
-								.fromJsonString( "{'sort3': 'asc'}" )
+								.fromJson( "{'sort3': 'asc'}" )
 						// Also test using the standard DSL on a field defined with the extension
 						.then().byField( "sort4" ).asc().onMissingValue().sortLast()
 						.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
@@ -184,11 +184,11 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
-								.fromJsonString( "{'sort1': 'desc'}" )
+								.fromJson( "{'sort1': 'desc'}" )
 						.then().extension( ElasticsearchExtension.get() )
-								.fromJsonString( "{'sort2': 'desc'}" )
+								.fromJson( "{'sort2': 'desc'}" )
 						.then().extension( ElasticsearchExtension.get() )
-								.fromJsonString( "{'sort3': 'desc'}" )
+								.fromJson( "{'sort3': 'desc'}" )
 						.then().byField( "sort4" ).desc().onMissingValue().sortLast()
 						.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				)
@@ -200,17 +200,17 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void sort_fromJsonString_separateSort() {
+	public void sort_fromJson_separateSort() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchSort sort1Asc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'sort1': 'asc'}" )
+				.fromJson( "{'sort1': 'asc'}" )
 				.toSort();
 		SearchSort sort2Asc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'sort2': 'asc'}" )
+				.fromJson( "{'sort2': 'asc'}" )
 				.toSort();
 		SearchSort sort3Asc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'sort3': 'asc'}" )
+				.fromJson( "{'sort3': 'asc'}" )
 				.toSort();
 		// Also test using the standard DSL on a field defined with the extension
 		SearchSort sort4Asc = scope.sort()
@@ -227,13 +227,13 @@ public class ElasticsearchExtensionIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
 		SearchSort sort1Desc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'sort1': 'desc'}" )
+				.fromJson( "{'sort1': 'desc'}" )
 				.toSort();
 		SearchSort sort2Desc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'sort2': 'desc'}" )
+				.fromJson( "{'sort2': 'desc'}" )
 				.toSort();
 		SearchSort sort3Desc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'sort3': 'desc'}" )
+				.fromJson( "{'sort3': 'desc'}" )
 				.toSort();
 		SearchSort sort4Desc = scope.sort()
 				.byField( "sort4" ).desc().onMissingValue().sortLast()

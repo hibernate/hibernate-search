@@ -14,6 +14,6 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
  */
 public interface ElasticsearchSearchPredicateFactoryContext extends SearchPredicateFactoryContext {
 
-	SearchPredicateTerminalContext fromJsonString(String jsonString);
+	SearchPredicateTerminalContext fromJson(String jsonString);
 
 }

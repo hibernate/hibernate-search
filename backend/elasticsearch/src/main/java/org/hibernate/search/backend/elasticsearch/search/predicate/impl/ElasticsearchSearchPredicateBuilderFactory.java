@@ -12,6 +12,6 @@ public interface ElasticsearchSearchPredicateBuilderFactory
 		extends
 		SearchPredicateBuilderFactory<ElasticsearchSearchPredicateCollector, ElasticsearchSearchPredicateBuilder> {
 
-	ElasticsearchSearchPredicateBuilder fromJsonString(String jsonString);
+	ElasticsearchSearchPredicateBuilder fromJson(String jsonString);
 
 }

@@ -149,7 +149,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateBuilder fromJsonString(String jsonString) {
+	public ElasticsearchSearchPredicateBuilder fromJson(String jsonString) {
 		return new ElasticsearchUserProvidedJsonPredicateContributor(
 				searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class )
 		);

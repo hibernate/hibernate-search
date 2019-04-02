@@ -90,7 +90,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 	}
 
 	@Override
-	public ElasticsearchSearchSortBuilder fromJsonString(String jsonString) {
+	public ElasticsearchSearchSortBuilder fromJson(String jsonString) {
 		return new ElasticsearchUserProvidedJsonSortBuilder(
 				searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class )
 		);

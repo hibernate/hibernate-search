@@ -11,6 +11,6 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 public interface ElasticsearchSearchSortBuilderFactory
 		extends SearchSortBuilderFactory<ElasticsearchSearchSortCollector, ElasticsearchSearchSortBuilder> {
 
-	ElasticsearchSearchSortBuilder fromJsonString(String jsonString);
+	ElasticsearchSearchSortBuilder fromJson(String jsonString);
 
 }
