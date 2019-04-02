@@ -16,13 +16,13 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldContext;
+import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 import org.hibernate.search.backend.lucene.util.impl.FieldContextSimpleQueryParser;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.Query;
 
@@ -90,7 +90,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 
 	private Analyzer buildAnalyzer() {
 		if ( ignoreAnalyzer ) {
-			return new KeywordAnalyzer();
+			return AnalyzerUtils.DEFAULT_ANALYZER;
 		}
 		if ( overrideAnalyzer != null ) {
 			return overrideAnalyzer;

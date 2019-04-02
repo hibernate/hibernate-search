@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.MatchNoDocsQuery;
@@ -24,6 +23,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
+import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 import org.hibernate.search.backend.lucene.util.impl.FuzzyQueryBuilder;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -109,7 +109,7 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	private Analyzer getAnalyzer() {
 		if ( ignoreAnalyzer ) {
-			return new KeywordAnalyzer();
+			return AnalyzerUtils.DEFAULT_ANALYZER;
 		}
 		if ( overrideAnalyzer != null ) {
 			return overrideAnalyzer;
