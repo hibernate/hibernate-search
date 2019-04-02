@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerUtils;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 
 import com.google.gson.JsonElement;
@@ -25,8 +26,6 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearc
 	private static final JsonAccessor<Integer> SLOP_ACCESSOR = JsonAccessor.root().property( "slop" ).asInteger();
 	private static final JsonAccessor<JsonElement> QUERY_ACCESSOR = JsonAccessor.root().property( "query" );
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
-
-	private static final String ELASTICSEARCH_NOOP_ANALYZER_NAME = "keyword";
 
 	private final String absoluteFieldPath;
 
@@ -55,7 +54,7 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearc
 
 	@Override
 	public void ignoreAnalyzer() {
-		analyzer( ELASTICSEARCH_NOOP_ANALYZER_NAME );
+		analyzer( AnalyzerUtils.DEFAULT_ANALYZER );
 	}
 
 	@Override

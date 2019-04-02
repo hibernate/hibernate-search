@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldContext;
+import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerUtils;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import com.google.gson.JsonArray;
@@ -28,8 +29,6 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private static final JsonAccessor<JsonElement> DEFAULT_OPERATOR_ACCESSOR = JsonAccessor.root().property( "default_operator" );
 	private static final JsonAccessor<JsonArray> FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asArray();
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
-
-	private static final String ELASTICSEARCH_NOOP_ANALYZER_NAME = "keyword";
 
 	private static final JsonPrimitive AND_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "and" );
 	private static final JsonPrimitive OR_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "or" );
@@ -74,7 +73,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 
 	@Override
 	public void ignoreAnalyzer() {
-		analyzer( ELASTICSEARCH_NOOP_ANALYZER_NAME );
+		analyzer( AnalyzerUtils.DEFAULT_ANALYZER );
 	}
 
 	@Override

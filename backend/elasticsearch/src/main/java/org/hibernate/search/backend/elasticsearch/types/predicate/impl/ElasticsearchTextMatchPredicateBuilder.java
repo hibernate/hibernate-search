@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConve
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerUtils;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 import com.google.gson.JsonObject;
@@ -20,7 +21,6 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	private static final JsonAccessor<Integer> FUZZINESS_ACCESSOR = JsonAccessor.root().property( "fuzziness" ).asInteger();
 	private static final JsonAccessor<Integer> PREFIX_LENGTH_ACCESSOR = JsonAccessor.root().property( "prefix_length" ).asInteger();
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
-	private static final String ELASTICSEARCH_NOOP_ANALYZER_NAME = "keyword";
 
 	private Integer fuzziness;
 	private Integer prefixLength;
@@ -47,7 +47,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 
 	@Override
 	public void ignoreAnalyzer() {
-		analyzer( ELASTICSEARCH_NOOP_ANALYZER_NAME );
+		analyzer( AnalyzerUtils.DEFAULT_ANALYZER );
 	}
 
 	@Override
