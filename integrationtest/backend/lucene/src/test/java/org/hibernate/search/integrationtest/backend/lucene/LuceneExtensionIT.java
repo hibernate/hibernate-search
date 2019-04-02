@@ -592,19 +592,19 @@ public class LuceneExtensionIT {
 			nativeField = root.field(
 					"nativeField",
 					f -> f.extension( LuceneExtension.get() )
-							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
+							.asNative( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
 			)
 					.toReference();
 			nativeField_unsupportedProjection = root.field(
 					"nativeField_unsupportedProjection",
 					f -> f.extension( LuceneExtension.get() )
-							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField )
+							.asNative( Integer.class, LuceneExtensionIT::contributeNativeField )
 			)
 					.toReference();
 			nativeField_invalidFieldPath = root.field(
 					"nativeField_invalidFieldPath",
 					f -> f.extension( LuceneExtension.get() )
-							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeFieldInvalidFieldPath )
+							.asNative( Integer.class, LuceneExtensionIT::contributeNativeFieldInvalidFieldPath )
 			)
 					.toReference();
 

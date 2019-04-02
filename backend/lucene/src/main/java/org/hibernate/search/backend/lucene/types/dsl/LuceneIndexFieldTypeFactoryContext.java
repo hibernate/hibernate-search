@@ -26,7 +26,7 @@ public interface LuceneIndexFieldTypeFactoryContext extends IndexFieldTypeFactor
 	 * @param <F> The type of the value.
 	 * @return The DSL context.
 	 */
-	<F> IndexFieldTypeTerminalContext<F> asLuceneField(Class<F> valueType,
+	<F> IndexFieldTypeTerminalContext<F> asNative(Class<F> valueType,
 			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor);
 
@@ -38,9 +38,9 @@ public interface LuceneIndexFieldTypeFactoryContext extends IndexFieldTypeFactor
 	 * @param <F> The type of the value.
 	 * @return The DSL context.
 	 */
-	default <F> IndexFieldTypeTerminalContext<F> asLuceneField(Class<F> valueType,
+	default <F> IndexFieldTypeTerminalContext<F> asNative(Class<F> valueType,
 			LuceneFieldContributor<F> fieldContributor) {
-		return asLuceneField( valueType, fieldContributor, null );
+		return asNative( valueType, fieldContributor, null );
 	}
 
 }
