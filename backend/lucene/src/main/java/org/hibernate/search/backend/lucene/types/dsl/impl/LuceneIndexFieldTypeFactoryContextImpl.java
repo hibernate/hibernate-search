@@ -210,7 +210,7 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	}
 
 	@Override
-	public <F> IndexFieldTypeTerminalContext<F> asLuceneField(Class<F> indexFieldType,
+	public <F> IndexFieldTypeTerminalContext<F> asNative(Class<F> indexFieldType,
 			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		return new LuceneFieldIndexFieldTypeContext<>(
