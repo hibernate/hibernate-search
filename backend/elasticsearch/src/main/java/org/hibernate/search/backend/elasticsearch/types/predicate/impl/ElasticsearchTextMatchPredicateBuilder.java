@@ -47,7 +47,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 
 	@Override
 	public void ignoreAnalyzer() {
-		analyzer( AnalyzerUtils.DEFAULT_ANALYZER );
+		analyzer( AnalyzerUtils.KEYWORD_ANALYZER );
 	}
 
 	@Override

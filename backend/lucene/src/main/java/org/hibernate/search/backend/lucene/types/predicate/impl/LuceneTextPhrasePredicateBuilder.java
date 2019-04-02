@@ -80,7 +80,7 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		if ( queryBuilder != null ) {
 			if ( ignoreAnalyzer ) {
-				queryBuilder.setAnalyzer( AnalyzerUtils.DEFAULT_ANALYZER );
+				queryBuilder.setAnalyzer( AnalyzerUtils.KEYWORD_ANALYZER );
 			}
 			else if ( overrideAnalyzer != null ) {
 				queryBuilder.setAnalyzer( overrideAnalyzer );

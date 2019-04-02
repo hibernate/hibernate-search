@@ -109,7 +109,7 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	private Analyzer getAnalyzer() {
 		if ( ignoreAnalyzer ) {
-			return AnalyzerUtils.DEFAULT_ANALYZER;
+			return AnalyzerUtils.KEYWORD_ANALYZER;
 		}
 		if ( overrideAnalyzer != null ) {
 			return overrideAnalyzer;
