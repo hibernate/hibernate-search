@@ -73,7 +73,7 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 	}
 
 	@Override
-	public void ignoreAnalyzer() {
+	public void skipAnalysis() {
 		throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
 

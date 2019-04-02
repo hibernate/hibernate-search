@@ -66,7 +66,7 @@ class LuceneTextMatchPredicateBuilder<F>
 	}
 
 	@Override
-	public void ignoreAnalyzer() {
+	public void skipAnalysis() {
 		this.analyzer = AnalyzerUtils.KEYWORD_ANALYZER;
 	}
 

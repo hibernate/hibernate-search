@@ -37,10 +37,10 @@ public interface SimpleQueryStringPredicateTerminalContext
 	SimpleQueryStringPredicateTerminalContext analyzer(String analyzerName);
 
 	/**
-	 * Any analyzer defined on any field will be ignored to interpret the value to match.
+	 * Any analyzer or normalizer defined on any field will be ignored to interpret the value to match.
 	 *
 	 * @return {@code this}, for method chaining.
 	 */
-	SimpleQueryStringPredicateTerminalContext ignoreAnalyzer();
+	SimpleQueryStringPredicateTerminalContext skipAnalysis();
 
 }

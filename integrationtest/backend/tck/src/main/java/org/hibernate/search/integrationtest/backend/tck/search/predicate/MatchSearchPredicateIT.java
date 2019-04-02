@@ -851,7 +851,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void analyzerIgnore() {
+	public void skipAnalysis() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
@@ -867,16 +867,16 @@ public class MatchSearchPredicateIT {
 		// so it will not match any token
 		query = scope.query()
 				.asReference()
-				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "world another world" ).ignoreAnalyzer() )
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "world another world" ).skipAnalysis() )
 				.toQuery();
 
 		assertThat( query )
 				.hasNoHits();
 
-		// to have a match with the ignoreAnalyzer option enabled, we have to pass the parameter as a token is
+		// to have a match with the skipAnalysis option enabled, we have to pass the parameter as a token is
 		query = scope.query()
 				.asReference()
-				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "world" ).ignoreAnalyzer() )
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "world" ).skipAnalysis() )
 				.toQuery();
 
 		assertThat( query )
@@ -884,7 +884,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void analyzerIgnore_fuzzy() {
+	public void skipAnalysis_fuzzy() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
@@ -900,16 +900,16 @@ public class MatchSearchPredicateIT {
 		// so it will not match any token
 		query = scope.query()
 				.asReference()
-				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "word another word" ).fuzzy().ignoreAnalyzer() )
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "word another word" ).fuzzy().skipAnalysis() )
 				.toQuery();
 
 		assertThat( query )
 				.hasNoHits();
 
-		// to have a match with the ignoreAnalyzer option enabled, we have to pass the parameter as a token is
+		// to have a match with the skipAnalysis option enabled, we have to pass the parameter as a token is
 		query = scope.query()
 				.asReference()
-				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "word" ).fuzzy().ignoreAnalyzer() )
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "word" ).fuzzy().skipAnalysis() )
 				.toQuery();
 
 		assertThat( query )
