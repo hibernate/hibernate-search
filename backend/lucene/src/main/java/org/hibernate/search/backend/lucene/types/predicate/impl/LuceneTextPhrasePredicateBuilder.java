@@ -35,13 +35,11 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 	protected final String absoluteFieldPath;
 	protected final LuceneTextFieldCodec<?> codec;
 
-	private final QueryBuilder queryBuilder;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private int slop;
 	private String phrase;
-	private Analyzer overrideAnalyzer;
-	private boolean ignoreAnalyzer = false;
+	private Analyzer analyzer;
 
 	LuceneTextPhrasePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath,
@@ -49,7 +47,7 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 			QueryBuilder queryBuilder) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
-		this.queryBuilder = queryBuilder;
+		this.analyzer = ( queryBuilder == null ) ? null : queryBuilder.getAnalyzer();
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
 
@@ -65,28 +63,21 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 
 	@Override
 	public void analyzer(String analyzerName) {
-		this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
-		if ( overrideAnalyzer == null ) {
+		this.analyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
+		if ( analyzer == null ) {
 			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 	}
 
 	@Override
 	public void ignoreAnalyzer() {
-		this.ignoreAnalyzer = true;
+		this.analyzer = AnalyzerUtils.KEYWORD_ANALYZER;
 	}
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		if ( queryBuilder != null ) {
-			if ( ignoreAnalyzer ) {
-				queryBuilder.setAnalyzer( AnalyzerUtils.KEYWORD_ANALYZER );
-			}
-			else if ( overrideAnalyzer != null ) {
-				queryBuilder.setAnalyzer( overrideAnalyzer );
-			}
-
-			Query analyzed = queryBuilder.createPhraseQuery( absoluteFieldPath, phrase, slop );
+		if ( analyzer != null ) {
+			Query analyzed = new QueryBuilder( analyzer ).createPhraseQuery( absoluteFieldPath, phrase, slop );
 			if ( analyzed == null ) {
 				// Either the value was an empty string
 				// or the analysis removed all tokens (that can happen if the value contained only stopwords, for example)
