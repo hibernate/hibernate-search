@@ -249,7 +249,7 @@ public class PhraseSearchPredicateIT {
 	}
 
 	@Test
-	public void analyzerIgnore() {
+	public void skipAnalysis() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
@@ -265,16 +265,16 @@ public class PhraseSearchPredicateIT {
 		// so it will not match any token
 		query = scope.query()
 				.asReference()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( "quick fox" ).ignoreAnalyzer() )
+				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( "quick fox" ).skipAnalysis() )
 				.toQuery();
 
 		assertThat( query )
 				.hasNoHits();
 
-		// to have a match with the ignoreAnalyzer option enabled, we have to pass the parameter as a token is
+		// to have a match with the skipAnalysis option enabled, we have to pass the parameter as a token is
 		query = scope.query()
 				.asReference()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( "fox" ).ignoreAnalyzer() )
+				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( "fox" ).skipAnalysis() )
 				.toQuery();
 
 		assertThat( query )

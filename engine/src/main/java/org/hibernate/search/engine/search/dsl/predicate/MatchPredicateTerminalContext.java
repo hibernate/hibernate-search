@@ -71,9 +71,9 @@ public interface MatchPredicateTerminalContext
 	MatchPredicateTerminalContext analyzer(String analyzerName);
 
 	/**
-	 * Any analyzer defined on any field will be ignored to interpret the value to match.
+	 * Any analyzer and normalizer defined on any field will be ignored to interpret the value to match.
 	 *
 	 * @return {@code this}, for method chaining.
 	 */
-	MatchPredicateTerminalContext ignoreAnalyzer();
+	MatchPredicateTerminalContext skipAnalysis();
 }

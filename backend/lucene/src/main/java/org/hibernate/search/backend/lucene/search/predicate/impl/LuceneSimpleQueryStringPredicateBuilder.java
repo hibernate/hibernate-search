@@ -75,7 +75,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	}
 
 	@Override
-	public void ignoreAnalyzer() {
+	public void skipAnalysis() {
 		this.ignoreAnalyzer = true;
 	}
 

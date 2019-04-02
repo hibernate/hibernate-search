@@ -118,10 +118,10 @@ class PhrasePredicateFieldSetContextImpl<B>
 		}
 
 		@Override
-		public PhrasePredicateTerminalContext ignoreAnalyzer() {
+		public PhrasePredicateTerminalContext skipAnalysis() {
 			for ( PhrasePredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				for ( PhrasePredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
-					predicateBuilder.ignoreAnalyzer();
+					predicateBuilder.skipAnalysis();
 				}
 			}
 			return this;

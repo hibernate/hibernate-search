@@ -286,7 +286,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	@Test
-	public void analyzerIgnore() {
+	public void skipAnalysis() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
@@ -302,16 +302,16 @@ public class SimpleQueryStringSearchPredicateIT {
 		// so it will not match any token
 		query = scope.query()
 				.asReference()
-				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "HERE | PANDA" ).ignoreAnalyzer() )
+				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "HERE | PANDA" ).skipAnalysis() )
 				.toQuery();
 
 		assertThat( query )
 				.hasNoHits();
 
-		// to have a match with the ignoreAnalyzer option enabled, we have to pass the parameter as a token is
+		// to have a match with the skipAnalysis option enabled, we have to pass the parameter as a token is
 		query = scope.query()
 				.asReference()
-				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "here" ).ignoreAnalyzer() )
+				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "here" ).skipAnalysis() )
 				.toQuery();
 
 		assertThat( query )

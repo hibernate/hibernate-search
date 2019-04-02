@@ -16,5 +16,5 @@ public interface MatchPredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
 	void analyzer(String analyzerName);
 
-	void ignoreAnalyzer();
+	void skipAnalysis();
 }

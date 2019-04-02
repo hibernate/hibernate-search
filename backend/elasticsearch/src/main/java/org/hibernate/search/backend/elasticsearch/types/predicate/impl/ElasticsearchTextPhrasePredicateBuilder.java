@@ -53,7 +53,7 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearc
 	}
 
 	@Override
-	public void ignoreAnalyzer() {
+	public void skipAnalysis() {
 		analyzer( AnalyzerUtils.KEYWORD_ANALYZER );
 	}
 

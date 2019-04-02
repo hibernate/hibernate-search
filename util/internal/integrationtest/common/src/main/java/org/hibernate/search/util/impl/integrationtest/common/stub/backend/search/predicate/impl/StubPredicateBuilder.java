@@ -94,7 +94,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public void ignoreAnalyzer() {
+	public void skipAnalysis() {
 		// No-op
 	}
 

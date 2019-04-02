@@ -64,7 +64,7 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 	}
 
 	@Override
-	public void ignoreAnalyzer() {
+	public void skipAnalysis() {
 		throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
 

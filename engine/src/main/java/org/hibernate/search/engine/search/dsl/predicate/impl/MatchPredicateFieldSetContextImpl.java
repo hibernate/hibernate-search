@@ -122,10 +122,10 @@ class MatchPredicateFieldSetContextImpl<B>
 		}
 
 		@Override
-		public MatchPredicateTerminalContext ignoreAnalyzer() {
+		public MatchPredicateTerminalContext skipAnalysis() {
 			for ( MatchPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
-					predicateBuilder.ignoreAnalyzer();
+					predicateBuilder.skipAnalysis();
 				}
 			}
 			return this;

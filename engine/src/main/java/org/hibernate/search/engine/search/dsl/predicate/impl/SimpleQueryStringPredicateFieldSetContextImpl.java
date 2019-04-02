@@ -114,8 +114,8 @@ class SimpleQueryStringPredicateFieldSetContextImpl<B>
 		}
 
 		@Override
-		public SimpleQueryStringPredicateTerminalContext ignoreAnalyzer() {
-			builder.ignoreAnalyzer();
+		public SimpleQueryStringPredicateTerminalContext skipAnalysis() {
+			builder.skipAnalysis();
 			return this;
 		}
 
