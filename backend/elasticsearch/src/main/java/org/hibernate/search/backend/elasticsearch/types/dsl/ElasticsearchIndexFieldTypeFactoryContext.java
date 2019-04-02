@@ -14,6 +14,6 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
  */
 public interface ElasticsearchIndexFieldTypeFactoryContext extends IndexFieldTypeFactoryContext {
 
-	ElasticsearchJsonStringIndexFieldTypeContext<?> asJsonString(String mappingJsonString);
+	ElasticsearchJsonStringIndexFieldTypeContext<?> asNative(String mappingJsonString);
 
 }
