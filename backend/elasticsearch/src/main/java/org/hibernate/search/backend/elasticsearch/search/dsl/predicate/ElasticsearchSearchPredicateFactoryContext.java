@@ -14,6 +14,14 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
  */
 public interface ElasticsearchSearchPredicateFactoryContext extends SearchPredicateFactoryContext {
 
+	/**
+	 * Create a predicate from JSON.
+	 *
+	 * @param jsonString A string representing an Elasticsearch query as a JSON object.
+	 * The JSON object must be a syntactically correct Elasticsearch query.
+	 * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html">the Elasticsearch documentation</a>.
+	 * @return A context allowing to get the resulting predicate.
+	 */
 	SearchPredicateTerminalContext fromJson(String jsonString);
 
 }
