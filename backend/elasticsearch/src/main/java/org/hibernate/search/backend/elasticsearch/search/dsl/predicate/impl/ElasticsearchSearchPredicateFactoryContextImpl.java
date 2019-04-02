@@ -26,7 +26,7 @@ public class ElasticsearchSearchPredicateFactoryContextImpl
 	}
 
 	@Override
-	public SearchPredicateTerminalContext fromJsonString(String jsonString) {
+	public SearchPredicateTerminalContext fromJson(String jsonString) {
 		return new ElasticsearchJsonStringPredicateContext( factory, jsonString );
 	}
 }

@@ -33,8 +33,8 @@ public class ElasticsearchSearchSortContainerContextImpl
 	}
 
 	@Override
-	public NonEmptySortContext fromJsonString(String jsonString) {
-		dslContext.addChild( factory.fromJsonString( jsonString ) );
+	public NonEmptySortContext fromJson(String jsonString) {
+		dslContext.addChild( factory.fromJson( jsonString ) );
 		return nonEmptyContext();
 	}
 

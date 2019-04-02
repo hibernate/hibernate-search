@@ -18,7 +18,7 @@ final class ElasticsearchJsonStringPredicateContext
 
 	ElasticsearchJsonStringPredicateContext(ElasticsearchSearchPredicateBuilderFactory factory, String jsonString) {
 		super( factory );
-		this.builder = factory.fromJsonString( jsonString );
+		this.builder = factory.fromJson( jsonString );
 	}
 
 	@Override
