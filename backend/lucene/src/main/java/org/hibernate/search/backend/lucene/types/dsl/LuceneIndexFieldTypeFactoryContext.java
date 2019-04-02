@@ -11,6 +11,9 @@ import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributo
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+
 
 /**
  * @author Guillaume Smet
@@ -18,7 +21,23 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalConte
 public interface LuceneIndexFieldTypeFactoryContext extends IndexFieldTypeFactoryContext {
 
 	/**
-	 * Declares a native field, on which projection is allowed.
+	 * Define a native field type.
+	 * <p>
+	 * A native field type has the following characteristics:
+	 * <ul>
+	 *     <li>Hibernate Search doesn't know its exact type, so it cannot be configured precisely,
+	 *     except through the parameters passed to this method</li>
+	 *     <li>When indexing, fields values will be passed to the {@link LuceneFieldContributor field contributor}.
+	 *     This contributor will translate the value into {@link org.apache.lucene.index.IndexableField} instances
+	 *     which will be added to the document.</li>
+	 *     <li>The predicate/sort DSLs cannot be used on fields of this type.
+	 *     It is recommended to create the predicate/sort/projections targeting these fields from native Lucene objects
+	 *     using {@link org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext#fromLuceneQuery(Query)}
+	 *     or {@link org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext#fromLuceneSort(Sort)}</li>
+	 *     <li>The projection DSL can only be used on fields of this type of {@code fieldValueExtractor} is non-null.
+	 *     When projecting, the value extractor will be passed the {@link org.apache.lucene.index.IndexableField}
+	 *     and will return the corresponding projected value of type {@code F}.</li>
+	 * </ul>
 	 *
 	 * @param valueType The type of the value.
 	 * @param fieldContributor The field contributor.
@@ -31,7 +50,9 @@ public interface LuceneIndexFieldTypeFactoryContext extends IndexFieldTypeFactor
 			LuceneFieldValueExtractor<F> fieldValueExtractor);
 
 	/**
-	 * Declares a native field on which projection is not allowed.
+	 * Define a native field type on which projection is not allowed.
+	 * <p>
+	 * See {@link #asNative(Class, LuceneFieldContributor, LuceneFieldValueExtractor)}.
 	 *
 	 * @param valueType The type of the value.
 	 * @param fieldContributor The field contributor.

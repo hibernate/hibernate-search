@@ -15,5 +15,11 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
  */
 public interface LuceneSearchPredicateFactoryContext extends SearchPredicateFactoryContext {
 
+	/**
+	 * Create a predicate from a Lucene {@link Query}.
+	 *
+	 * @param query A Lucene query.
+	 * @return A context allowing to get the resulting predicate.
+	 */
 	SearchPredicateTerminalContext fromLuceneQuery(Query query);
 }
