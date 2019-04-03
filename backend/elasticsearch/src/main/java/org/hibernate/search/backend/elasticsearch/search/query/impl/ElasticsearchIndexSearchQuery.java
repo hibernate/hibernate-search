@@ -27,6 +27,11 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 
+	/**
+	 * ES default limit for (limit + offset); any search query beyond that limit will be rejected.
+	 */
+	private static final long MAX_RESULT_WINDOW_SIZE = 10000;
+
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final Set<URLEncodedString> indexNames;
@@ -65,7 +70,7 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 		// TODO restore scrolling support. See HSEARCH-3323
 		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( indexNames )
-				.paging( limit, offset )
+				.paging( defaultedLimit( limit, offset ), offset )
 				.routingKeys( routingKeys ).build();
 
 		return queryOrchestrator.submit( work ).join()
@@ -89,5 +94,23 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 
 		ElasticsearchWork<Long> work = workFactory.count( indexNames ).query( filteredPayload ).routingKeys( routingKeys ).build();
 		return queryOrchestrator.submit( work ).join();
+	}
+
+	private Long defaultedLimit(Long limit, Long offset) {
+		/*
+		 * If the user has given a 'size' value, take it as is, let ES itself complain if it's too high;
+		 * if no value is given, take as much as possible, as by default only 10 rows would be returned.
+		 */
+		if ( limit != null ) {
+			return limit;
+		}
+		else {
+			// Elasticsearch has a default limit of 10, which is not what we want.
+			long maxLimitThatElasticsearchWillAccept = MAX_RESULT_WINDOW_SIZE;
+			if ( offset != null ) {
+				maxLimitThatElasticsearchWillAccept -= offset;
+			}
+			return maxLimitThatElasticsearchWillAccept;
+		}
 	}
 }
