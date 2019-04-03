@@ -117,6 +117,14 @@ See <<mapper-orm-bridge-valuebridge-builtin>> for more information.
 |org.hibernate.search.engine.spatial.GeoPoint
 |====
 
+[NOTE]
+====
+Date/time types do not support the whole range of years that can be represented in `java.time` types:
+
+* `java.time` can represent years ranging from `-999.999.999` to `999.999.999`.
+* The Lucene backend supports dates ranging from year `-292.275.054` to year `292.278.993`.
+====
+
 // TODO also document "extension" types
 
 [[backend-lucene-analysis]]
