@@ -32,7 +32,14 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 				LocalDateTime.of( 1900, 1, 1, 0, 0, 0, 0 ),
 				LocalDateTime.of( 1600, 2, 28, 13, 0, 23, 0 ),
 				LocalDateTime.of( -52, 10, 11, 10, 15, 30, 0 ),
-				LocalDateTime.of( 22500, 10, 11, 17, 44, 0, 0 )
+				LocalDateTime.of( 22500, 10, 11, 17, 44, 0, 0 ),
+				/*
+				 * Minimum and maximum years that can be represented as number of millisecond since the epoch in a long.
+				 * The minimum and maximum dates that can be represented are slightly before/after,
+				 * but there's no point telling users these years are supported if not all months are supported.
+				 */
+				LocalDateTime.of( -292_275_054, 1, 1, 0, 0, 0, 0 ),
+				LocalDateTime.of( 292_278_993, 12, 31, 23, 59, 59, 999_000_000 )
 		);
 	}
 
