@@ -38,9 +38,9 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 	private static final JsonObjectAccessor MATCH_ACCESSOR = JsonAccessor.root().property( "match" ).asObject();
 
-	private final ElasticsearchSearchContext searchContext;
+	protected final String absoluteFieldPath;
 
-	private final String absoluteFieldPath;
+	private final ElasticsearchSearchContext searchContext;
 
 	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
 	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
