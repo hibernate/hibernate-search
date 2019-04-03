@@ -486,4 +486,7 @@ public interface Log extends BasicLogger {
 			+ " This version would require dialect '%2$s', but Hibernate Search was configured to use dialect '%3$s'.")
 	SearchException unexpectedElasticsearchVersion(ElasticsearchVersion actualVersion,
 			ElasticsearchDialectName appropriateDialectName, ElasticsearchDialectName configuredDialectName);
+
+	@Message(id = ID_OFFSET_3 + 60, value = "Elasticsearch backend does not support skip analysis on not analyzed field: '%1$s'.")
+	SearchException skipAnalysisOnKeywordField(String absoluteFieldPath, @Param EventContext context);
 }

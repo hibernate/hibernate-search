@@ -6,21 +6,31 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerUtils;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchPredicateBuilder<String> {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private static final JsonAccessor<Integer> FUZZINESS_ACCESSOR = JsonAccessor.root().property( "fuzziness" ).asInteger();
 	private static final JsonAccessor<Integer> PREFIX_LENGTH_ACCESSOR = JsonAccessor.root().property( "prefix_length" ).asInteger();
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
+
+	private final DataType type;
 
 	private Integer fuzziness;
 	private Integer prefixLength;
@@ -30,8 +40,10 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 			ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends String> converter, ToDocumentFieldValueConverter<String, ? extends String> rawConverter,
-			ElasticsearchConverterCompatibilityChecker converterChecker, ElasticsearchFieldCodec<String> codec) {
+			ElasticsearchConverterCompatibilityChecker converterChecker, ElasticsearchFieldCodec<String> codec,
+			DataType type) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		this.type = type;
 	}
 
 	@Override
@@ -47,6 +59,10 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 
 	@Override
 	public void skipAnalysis() {
+		if ( DataType.KEYWORD.equals( type ) ) {
+			throw log.skipAnalysisOnKeywordField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
+
 		analyzer( AnalyzerUtils.KEYWORD_ANALYZER );
 	}
 
