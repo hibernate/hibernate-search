@@ -45,9 +45,9 @@ class LuceneTextMatchPredicateBuilder<F>
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneConverterCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec,
-			QueryBuilder queryBuilder) {
+			Analyzer analyzerOrNormalizer) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
-		this.analyzer = ( queryBuilder == null ) ? null : queryBuilder.getAnalyzer();
+		this.analyzer = analyzerOrNormalizer;
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
 

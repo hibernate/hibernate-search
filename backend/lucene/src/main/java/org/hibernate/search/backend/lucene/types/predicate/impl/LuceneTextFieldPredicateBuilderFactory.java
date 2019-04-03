@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.apache.lucene.util.QueryBuilder;
+import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
@@ -19,19 +19,22 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
 public final class LuceneTextFieldPredicateBuilderFactory<F>
 		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, LuceneTextFieldCodec<F>> {
 
-	private final QueryBuilder queryBuilder;
+	private final Analyzer analyzerOrNormalizer;
 
-	public LuceneTextFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+	public LuceneTextFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter,
+			ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneTextFieldCodec<F> codec,
-			QueryBuilder queryBuilder) {
+			Analyzer analyzerOrNormalizer) {
 		super( converter, rawConverter, codec );
-		this.queryBuilder = queryBuilder;
+		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
 	@Override
 	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneConverterCompatibilityChecker converterChecker) {
-		return new LuceneTextMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, queryBuilder );
+		return new LuceneTextMatchPredicateBuilder<>(
+				searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, analyzerOrNormalizer
+		);
 	}
 
 	@Override
@@ -43,7 +46,7 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath) {
-		return new LuceneTextPhrasePredicateBuilder( searchContext, absoluteFieldPath, codec, queryBuilder );
+		return new LuceneTextPhrasePredicateBuilder( searchContext, absoluteFieldPath, codec, analyzerOrNormalizer );
 	}
 
 	@Override
@@ -56,7 +59,7 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	public LuceneSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
 			String absoluteFieldPath) {
 		return new LuceneSimpleQueryStringPredicateBuilderFieldContext(
-				queryBuilder == null ? null : queryBuilder.getAnalyzer()
+				analyzerOrNormalizer
 		);
 	}
 }
