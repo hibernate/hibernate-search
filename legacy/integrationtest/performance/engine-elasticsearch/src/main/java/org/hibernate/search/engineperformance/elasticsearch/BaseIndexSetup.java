@@ -20,7 +20,7 @@ class BaseIndexSetup {
 
 	private static final String AWS_SECRET_KEY_PROPERTY = "aws.secret-key";
 
-	private static final String AWS_REGION_PROPERTY = "aws.region";
+	private static final String AWS_REGION_PROPERTY = "aws.signing.region";
 
 	protected ConnectionInfo getConnectionInfo() {
 		String host = System.getProperty( HOST_PROPERTY );

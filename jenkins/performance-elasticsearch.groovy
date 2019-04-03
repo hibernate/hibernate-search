@@ -15,7 +15,7 @@ node ('Performance') {
 				usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY']]) {
 			sh "java " +
 					" -Dhost=${env.ES_ENDPOINT} -Daws.access-key=${AWS_ACCESS_KEY_ID}" +
-					" -Daws.secret-key=${AWS_SECRET_ACCESS_KEY} -Daws.region=${env.AWS_REGION}" +
+					" -Daws.secret-key=${AWS_SECRET_ACCESS_KEY} -Daws.signing.region=${env.AWS_REGION}" +
 					" -jar legacy/integrationtest/performance/engine-elasticsearch/target/benchmarks.jar " +
 					" -wi 1 -i 10" +
 					" -rff output/elasticsearch-benchmark-results.csv" +

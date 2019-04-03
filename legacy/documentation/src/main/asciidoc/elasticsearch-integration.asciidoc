@@ -343,15 +343,15 @@ Enable or disable AWS request signing:: `hibernate.search.default.elasticsearch.
 +
 The value must be either `true` or `false`.
 +
-AWS access key:: `hibernate.search.default.elasticsearch.aws.access_key AKIDEXAMPLE`
+AWS access key:: `hibernate.search.default.elasticsearch.aws.signing.access_key AKIDEXAMPLE`
 +
 This property has no default and must be provided for the AWS authentication to work.
 +
-AWS secret key:: `hibernate.search.default.elasticsearch.aws.secret_key wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY`
+AWS secret key:: `hibernate.search.default.elasticsearch.aws.signing.secret_key wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY`
 +
 This property has no default and must be provided for the AWS authentication to work.
 +
-AWS region:: `hibernate.search.default.elasticsearch.aws.region us-east-1`
+AWS region:: `hibernate.search.default.elasticsearch.aws.signing.region us-east-1`
 +
 This property has no default and must be provided for the AWS authentication to work.
 

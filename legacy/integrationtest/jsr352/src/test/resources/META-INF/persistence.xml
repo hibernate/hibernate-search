@@ -44,12 +44,12 @@
                       value="${test.elasticsearch.host.password}"/>
             <property name="hibernate.search.default.elasticsearch.aws.signing.enabled"
                       value="${test.elasticsearch.host.aws.signing.enabled}"/>
-            <property name="hibernate.search.default.elasticsearch.aws.access_key"
-                      value="${test.elasticsearch.host.aws.access_key}"/>
-            <property name="hibernate.search.default.elasticsearch.aws.secret_key"
-                      value="${test.elasticsearch.host.aws.secret_key}"/>
-            <property name="hibernate.search.default.elasticsearch.aws.region"
-                      value="${test.elasticsearch.host.aws.region}"/>
+            <property name="hibernate.search.default.elasticsearch.aws.signing.access_key"
+                      value="${test.elasticsearch.host.aws.signing.access_key}"/>
+            <property name="hibernate.search.default.elasticsearch.aws.signing.secret_key"
+                      value="${test.elasticsearch.host.aws.signing.secret_key}"/>
+            <property name="hibernate.search.default.elasticsearch.aws.signing.region"
+                      value="${test.elasticsearch.host.aws.signing.region}"/>
             <property name="hibernate.search.default.elasticsearch.required_index_status" value="yellow"/>
             <property name="hibernate.search.default.elasticsearch.index_schema_management_strategy"
                       value="drop-and-create-and-drop"/>

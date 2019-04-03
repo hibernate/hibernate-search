@@ -143,9 +143,9 @@
                         <ELASTICSEARCH_USERNAME>${test.elasticsearch.host.username}</ELASTICSEARCH_USERNAME>
                         <ELASTICSEARCH_PASSWORD>${test.elasticsearch.host.password}</ELASTICSEARCH_PASSWORD>
                         <ELASTICSEARCH_AWS_SIGNING_ENABLED>${test.elasticsearch.host.aws.signing.enabled}</ELASTICSEARCH_AWS_SIGNING_ENABLED>
-                        <ELASTICSEARCH_AWS_ACCESS_KEY>${test.elasticsearch.host.aws.access_key}</ELASTICSEARCH_AWS_ACCESS_KEY>
-                        <ELASTICSEARCH_AWS_SECRET_LEY>${test.elasticsearch.host.aws.secret_key}</ELASTICSEARCH_AWS_SECRET_LEY>
-                        <ELASTICSEARCH_AWS_REGION>${test.elasticsearch.host.aws.region}</ELASTICSEARCH_AWS_REGION>
+                        <ELASTICSEARCH_AWS_ACCESS_KEY>${test.elasticsearch.host.aws.signing.access_key}</ELASTICSEARCH_AWS_ACCESS_KEY>
+                        <ELASTICSEARCH_AWS_SECRET_LEY>${test.elasticsearch.host.aws.signing.secret_key}</ELASTICSEARCH_AWS_SECRET_LEY>
+                        <ELASTICSEARCH_AWS_REGION>${test.elasticsearch.host.aws.signing.region}</ELASTICSEARCH_AWS_REGION>
                         <!--
                              The test settings add a different suffix to this value for each test execution.
                              We can't add this suffix (${random.uuid}) here due to IDEA limitations:

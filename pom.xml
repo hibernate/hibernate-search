@@ -424,9 +424,9 @@
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
         <test.elasticsearch.host.aws.signing.enabled>false</test.elasticsearch.host.aws.signing.enabled>
-        <test.elasticsearch.host.aws.access_key></test.elasticsearch.host.aws.access_key>
-        <test.elasticsearch.host.aws.secret_key></test.elasticsearch.host.aws.secret_key>
-        <test.elasticsearch.host.aws.region></test.elasticsearch.host.aws.region>
+        <test.elasticsearch.host.aws.signing.access_key></test.elasticsearch.host.aws.signing.access_key>
+        <test.elasticsearch.host.aws.signing.secret_key></test.elasticsearch.host.aws.signing.secret_key>
+        <test.elasticsearch.host.aws.signing.region></test.elasticsearch.host.aws.signing.region>
         <!-- Control how integration tests format the requests sent to Elasticsearch -->
         <test.elasticsearch.testdialect></test.elasticsearch.testdialect>
 

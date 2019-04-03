@@ -532,9 +532,9 @@ stage('Non-default environment ITs') {
 								-Dtest.elasticsearch.host.provided=true \
 								-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \
 								-Dtest.elasticsearch.host.aws.signing.enabled=true \
-								-Dtest.elasticsearch.host.aws.access_key=$AWS_ACCESS_KEY_ID \
-								-Dtest.elasticsearch.host.aws.secret_key=$AWS_SECRET_ACCESS_KEY \
-								-Dtest.elasticsearch.host.aws.region=$itEnv.awsRegion \
+								-Dtest.elasticsearch.host.aws.signing.access_key=$AWS_ACCESS_KEY_ID \
+								-Dtest.elasticsearch.host.aws.signing.secret_key=$AWS_SECRET_ACCESS_KEY \
+								-Dtest.elasticsearch.host.aws.signing.region=$itEnv.awsRegion \
 							"""
 						}
 					}
