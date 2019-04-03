@@ -7,11 +7,15 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -19,6 +23,16 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 
 	InstantFieldTypeDescriptor() {
 		super( Instant.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<Instant>> getIndexingExpectations() {
+		List<Instant> values = new ArrayList<>();
+		LocalDateTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localDateTime -> {
+			values.add( localDateTime.atOffset( ZoneOffset.UTC ).toInstant() );
+		} );
+		values.add( Instant.EPOCH );
+		return Optional.of( new IndexingExpectations<>( values ) );
 	}
 
 	@Override

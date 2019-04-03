@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -18,6 +19,16 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 
 	ByteFieldTypeDescriptor() {
 		super( Byte.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<Byte>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>(
+				Byte.MIN_VALUE, Byte.MAX_VALUE,
+				(byte) -42, (byte) -1, (byte) 0, (byte) 1, (byte) 3, (byte) 42,
+				// This is ugly, but we test it on purpose
+				new Byte( (byte) 44 )
+		) );
 	}
 
 	@Override

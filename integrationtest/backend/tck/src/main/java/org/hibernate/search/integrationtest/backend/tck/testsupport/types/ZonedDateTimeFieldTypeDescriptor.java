@@ -8,19 +8,44 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
 public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedDateTime> {
 
+	private static List<ZoneId> getZoneIdsForIndexingExpectations() {
+		return Arrays.asList(
+				ZoneId.of( "UTC" ),
+				ZoneId.of( "Europe/Paris" ),
+				ZoneId.of( "Europe/Amsterdam" ),
+				ZoneId.of( "America/Los_Angeles" )
+		);
+	}
+
 	ZonedDateTimeFieldTypeDescriptor() {
 		super( ZonedDateTime.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<ZonedDateTime>> getIndexingExpectations() {
+		List<ZonedDateTime> values = new ArrayList<>();
+		LocalDateTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localDateTime -> {
+			getZoneIdsForIndexingExpectations().forEach( zoneId -> {
+				values.add( localDateTime.atZone( zoneId ) );
+			} );
+		} );
+		return Optional.of( new IndexingExpectations<>( values ) );
 	}
 
 	@Override

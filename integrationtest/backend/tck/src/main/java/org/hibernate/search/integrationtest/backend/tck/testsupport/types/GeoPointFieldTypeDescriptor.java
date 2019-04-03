@@ -12,6 +12,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -19,6 +20,24 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 
 	GeoPointFieldTypeDescriptor() {
 		super( GeoPoint.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<GeoPoint>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>(
+				GeoPoint.of( 0.0, 0.0 ),
+				// Negative 0 is a thing with doubles.
+				GeoPoint.of( 0.0, -0.0 ),
+				GeoPoint.of( -0.0, 0.0 ),
+				GeoPoint.of( -0.0, -0.0 ),
+				GeoPoint.of( 90.0, 0.0 ),
+				GeoPoint.of( 90.0, 180.0 ),
+				GeoPoint.of( 90.0, -180.0 ),
+				GeoPoint.of( -90.0, 0.0 ),
+				GeoPoint.of( -90.0, 180.0 ),
+				GeoPoint.of( -90.0, -180.0 ),
+				GeoPoint.of( 42.0, -42.0 )
+		) );
 	}
 
 	@Override

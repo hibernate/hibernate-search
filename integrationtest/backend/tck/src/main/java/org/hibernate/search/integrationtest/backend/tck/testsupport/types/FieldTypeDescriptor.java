@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeConte
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -64,6 +65,11 @@ public abstract class FieldTypeDescriptor<F> {
 		this.uniqueName = uniqueName;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[javaType=" + javaType + "]";
+	}
+
 	public final Class<F> getJavaType() {
 		return javaType;
 	}
@@ -75,6 +81,8 @@ public abstract class FieldTypeDescriptor<F> {
 	public StandardIndexFieldTypeContext<?, F> configure(IndexFieldTypeFactoryContext fieldContext) {
 		return fieldContext.as( javaType );
 	}
+
+	public abstract Optional<IndexingExpectations<F>> getIndexingExpectations();
 
 	public abstract Optional<MatchPredicateExpectations<F>> getMatchPredicateExpectations();
 

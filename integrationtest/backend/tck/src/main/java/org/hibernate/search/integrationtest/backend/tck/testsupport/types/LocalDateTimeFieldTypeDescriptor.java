@@ -7,18 +7,42 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
 public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalDateTime> {
 
+	static List<LocalDateTime> getValuesForIndexingExpectations() {
+		return Arrays.asList(
+				LocalDateTime.of( 1970, 1, 1, 0, 0, 0, 0 ),
+				LocalDateTime.of( 1980, 1, 1, 0, 0, 0, 0 ),
+				LocalDateTime.of( 1985, 5, 13, 10, 15, 30, 0 ),
+				LocalDateTime.of( 2017, 7, 7, 11, 15, 30, 555_000_000 ),
+				LocalDateTime.of( 1980, 10, 5, 12, 0, 0, 0 ),
+				LocalDateTime.of( 1980, 12, 31, 23, 59, 59, 999_000_000 ),
+				LocalDateTime.of( 2004, 2, 29, 1, 0, 0, 0 ),
+				LocalDateTime.of( 1900, 1, 1, 0, 0, 0, 0 ),
+				LocalDateTime.of( 1600, 2, 28, 13, 0, 23, 0 ),
+				LocalDateTime.of( -52, 10, 11, 10, 15, 30, 0 ),
+				LocalDateTime.of( 22500, 10, 11, 17, 44, 0, 0 )
+		);
+	}
+
 	LocalDateTimeFieldTypeDescriptor() {
 		super( LocalDateTime.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<LocalDateTime>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>( getValuesForIndexingExpectations() ) );
 	}
 
 	@Override

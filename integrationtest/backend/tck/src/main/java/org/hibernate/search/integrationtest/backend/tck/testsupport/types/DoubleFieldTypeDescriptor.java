@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -18,6 +19,24 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 
 	DoubleFieldTypeDescriptor() {
 		super( Double.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<Double>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>(
+				Double.MIN_VALUE, Double.MAX_VALUE,
+				- Double.MIN_VALUE, - Double.MAX_VALUE,
+				// Elasticsearch doesn't support these: it fails when parsing them
+				//Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.NaN,
+				0.0,
+				-0.0, // Negative 0 is a different double
+				Math.nextDown( 0.0 ),
+				Math.nextUp( 0.0 ),
+				42.42,
+				1584514514.000000184,
+				// This is ugly, but we test it on purpose
+				new Double( 44.0 )
+		) );
 	}
 
 	@Override

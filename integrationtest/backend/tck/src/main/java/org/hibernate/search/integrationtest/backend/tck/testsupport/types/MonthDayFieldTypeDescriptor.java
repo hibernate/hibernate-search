@@ -8,11 +8,16 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.Month;
 import java.time.MonthDay;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -20,6 +25,24 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 
 	MonthDayFieldTypeDescriptor() {
 		super( MonthDay.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<MonthDay>> getIndexingExpectations() {
+		List<MonthDay> values = new ArrayList<>();
+		Arrays.stream( Month.values() ).forEach( month -> {
+			values.add( MonthDay.of( month, 1 ) );
+			values.add( MonthDay.of( month, 3 ) );
+			values.add( MonthDay.of( month, 14 ) );
+			values.add( MonthDay.of( month, 28 ) );
+		} );
+		Collections.addAll(
+				values,
+				MonthDay.of( Month.FEBRUARY, 28 ),
+				MonthDay.of( Month.JUNE, 30 ),
+				MonthDay.of( Month.DECEMBER, 31 )
+		);
+		return Optional.of( new IndexingExpectations<>( values ) );
 	}
 
 	@Override

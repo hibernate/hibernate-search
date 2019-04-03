@@ -7,18 +7,39 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.Year;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
 public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 
+	static List<Year> getValuesForIndexingExpectations() {
+		return Arrays.asList(
+				Year.of( -25435 ), Year.of( -42 ), Year.of( -1 ),
+				Year.of( 0 ),
+				Year.of( 1 ), Year.of( 3 ), Year.of( 42 ), Year.of( 18353 ),
+				Year.of( 1989 ),
+				Year.of( 1999 ),
+				Year.of( 2000 ),
+				Year.of( 2019 ),
+				Year.of( 2050 )
+		);
+	}
+
 	YearFieldTypeDescriptor() {
 		super( Year.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<Year>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>( getValuesForIndexingExpectations() ) );
 	}
 
 	@Override

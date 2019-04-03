@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -18,6 +19,17 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 
 	LongFieldTypeDescriptor() {
 		super( Long.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<Long>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>(
+				Long.MIN_VALUE, Long.MAX_VALUE,
+				(long) Integer.MIN_VALUE, (long) Integer.MAX_VALUE,
+				-251_484_254L, -42L, -1L, 0L, 1L, 3L, 42L, 151_484_254L,
+				// This is ugly, but we test it on purpose
+				new Long( 44L )
+		) );
 	}
 
 	@Override
