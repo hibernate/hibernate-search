@@ -28,7 +28,14 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 				Year.of( 1999 ),
 				Year.of( 2000 ),
 				Year.of( 2019 ),
-				Year.of( 2050 )
+				Year.of( 2050 ),
+				/*
+				 * Minimum and maximum years that can be represented as number of millisecond since the epoch in a long.
+				 * The minimum and maximum dates that can be represented are slightly before/after,
+				 * but there's no point telling users these years are supported if not all months are supported.
+				 */
+				Year.of( -292_275_054 ),
+				Year.of( 292_278_993 )
 		);
 	}
 
