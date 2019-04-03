@@ -33,7 +33,7 @@ import org.junit.Test;
 public class IndexSearchQueryFetchIT {
 
 	private static final String INDEX_NAME = "IndexName";
-	private static final int DOCUMENT_COUNT = 3;
+	private static final int DOCUMENT_COUNT = 200;
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
