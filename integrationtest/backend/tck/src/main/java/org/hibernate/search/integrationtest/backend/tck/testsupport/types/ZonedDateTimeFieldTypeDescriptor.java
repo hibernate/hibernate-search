@@ -12,6 +12,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +50,14 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 				values.add( localDateTime.atZone( zoneId ) );
 			} );
 		} );
+		// HSEARCH-3557: Two date/times that could be ambiguous due to a daylight saving time switch
+		Collections.addAll(
+				values,
+				LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
+						.withEarlierOffsetAtOverlap(),
+				LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
+						.withLaterOffsetAtOverlap()
+		);
 		return Optional.of( new IndexingExpectations<>( values ) );
 	}
 
