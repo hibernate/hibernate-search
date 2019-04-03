@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.tck.search;
+package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.projectionMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.referenceMatcher;
@@ -31,6 +31,12 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceTransformer;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubHitTransformer;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubObjectLoader;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedHit;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingSearchScope;
@@ -42,7 +48,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class IndexSearchResultLoadingOrTransformingIT {
+public class IndexSearchQueryResultLoadingOrTransformingIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
