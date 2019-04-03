@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.util.QueryBuilder;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
@@ -88,7 +87,6 @@ class LuceneStringIndexFieldTypeContext
 
 		// TODO GSM: the idea would be to create only one global QueryBuilder object per analyzer/normalizer
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
-		QueryBuilder queryBuilder = analyzerOrNormalizer != null ? new QueryBuilder( analyzerOrNormalizer ) : null;
 
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
 				createDslToIndexConverter();
@@ -102,7 +100,7 @@ class LuceneStringIndexFieldTypeContext
 
 		return new LuceneIndexFieldType<>(
 				codec,
-				new LuceneTextFieldPredicateBuilderFactory<>( dslToIndexConverter, createToDocumentRawConverter(), codec, queryBuilder ),
+				new LuceneTextFieldPredicateBuilderFactory<>( dslToIndexConverter, createToDocumentRawConverter(), codec, analyzerOrNormalizer ),
 				new LuceneTextFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
 				analyzerOrNormalizer

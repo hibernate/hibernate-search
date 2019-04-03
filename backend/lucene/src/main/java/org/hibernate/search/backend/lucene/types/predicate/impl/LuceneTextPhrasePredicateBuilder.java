@@ -44,10 +44,10 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 	LuceneTextPhrasePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath,
 			LuceneTextFieldCodec<?> codec,
-			QueryBuilder queryBuilder) {
+			Analyzer analyzerOrNormalizer) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
-		this.analyzer = ( queryBuilder == null ) ? null : queryBuilder.getAnalyzer();
+		this.analyzer = analyzerOrNormalizer;
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
 
