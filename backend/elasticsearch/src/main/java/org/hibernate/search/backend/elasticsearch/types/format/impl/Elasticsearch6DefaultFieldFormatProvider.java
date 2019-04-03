@@ -58,8 +58,17 @@ public class Elasticsearch6DefaultFieldFormatProvider implements ElasticsearchDe
 		map.put( LocalDateTime.class, asImmutableList( "yyyy-MM-dd'T'HH:mm:ss.SSS", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS" ) );
 		map.put( OffsetTime.class, asImmutableList( "HH:mm:ss.SSSZZ", "HH:mm:ss.SSSSSSSSSZZ" ) );
 		map.put( OffsetDateTime.class, asImmutableList( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ" ) );
-		// ZoneRegionId is optional for ZonedDateTime, but we need the offset to handle ambiguous date/times at DST overlap
-		map.put( ZonedDateTime.class, asImmutableList( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'" ) );
+		/*
+		 * ZoneRegionId is optional for ZonedDateTime, but we need the offset to handle ambiguous date/times at DST overlap.
+		 *
+		 * Also, in some cases the ZoneId might actually be a ZoneOffset (since ZoneOffset extends ZoneId),
+		 * so we need an alternative format to support this.
+		 */
+		map.put( ZonedDateTime.class, asImmutableList(
+				"yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'",
+				"yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'",
+				"yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZ']'"
+		) );
 		map.put( Year.class, asImmutableList( "yyyy", "yyyyyyyyy" ) );
 		map.put( YearMonth.class, asImmutableList( "yyyy-MM", "yyyyyyyyy-MM" ) );
 		// MonthDays are formatted as a LocalDate, with a forced year, to support February 29th. See ElasticsearchMonthDayFieldCodec.
