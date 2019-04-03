@@ -9,6 +9,8 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.hibernate.search.util.common.impl.TimeHelper;
+
 public class ElasticsearchZonedDateTimeFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<ZonedDateTime> {
 
 	public ElasticsearchZonedDateTimeFieldCodec(DateTimeFormatter delegate) {
@@ -17,6 +19,6 @@ public class ElasticsearchZonedDateTimeFieldCodec extends AbstractElasticsearchJ
 
 	@Override
 	protected ZonedDateTime nullUnsafeParse(String stringValue) {
-		return ZonedDateTime.parse( stringValue, formatter );
+		return TimeHelper.parseZoneDateTime( stringValue, formatter );
 	}
 }

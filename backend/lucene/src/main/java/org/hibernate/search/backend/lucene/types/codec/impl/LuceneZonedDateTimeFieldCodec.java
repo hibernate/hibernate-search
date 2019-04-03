@@ -13,6 +13,7 @@ import java.time.format.ResolverStyle;
 import java.util.Locale;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.util.common.impl.TimeHelper;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
@@ -56,7 +57,7 @@ public final class LuceneZonedDateTimeFieldCodec extends AbstractLuceneNumericFi
 			return null;
 		}
 
-		return ZonedDateTime.parse( value, FORMATTER );
+		return TimeHelper.parseZoneDateTime( value, FORMATTER );
 	}
 
 	@Override
