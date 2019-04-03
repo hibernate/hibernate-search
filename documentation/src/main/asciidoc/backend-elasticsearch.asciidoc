@@ -374,6 +374,14 @@ or `yyyy-MM-dd` (ES6 and below).
 |org.hibernate.search.engine.spatial.GeoPoint|`geo_point`
 |====
 
+[NOTE]
+====
+The Elasticsearch `date` type does not support the whole range of years that can be modeled in `java.time` types:
+
+* `java.time` supports years ranging from `-999.999.999` to `999.999.999`.
+* Elasticsearch supports years ranging from `-292.275.054` to `292.278.993`.
+====
+
 // TODO also document "extension" types
 
 [[backend-elasticsearch-analysis]]
