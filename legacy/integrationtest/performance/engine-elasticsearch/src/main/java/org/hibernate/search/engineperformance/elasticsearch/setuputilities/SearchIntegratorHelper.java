@@ -58,9 +58,9 @@ public class SearchIntegratorHelper {
 			cfg.addProperty( "hibernate.search.default.elasticsearch.host", connectionInfo.getHost() );
 			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.username", connectionInfo.getUsername() );
 			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.password", connectionInfo.getPassword() );
-			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.access_key", connectionInfo.getAwsAccessKey() );
-			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.secret_key", connectionInfo.getAwsSecretKey() );
-			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.region", connectionInfo.getAwsRegion() );
+			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.signing.access_key", connectionInfo.getAwsAccessKey() );
+			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.signing.secret_key", connectionInfo.getAwsSecretKey() );
+			addIfNonNull( cfg, "hibernate.search.default.elasticsearch.aws.signing.region", connectionInfo.getAwsRegion() );
 		}
 		else if ( client.startsWith( "blackhole-" ) ) {
 			String elasticsearchVersion = client.replaceFirst( "^blackhole-", "" );

@@ -20,9 +20,9 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 public class AWSElasticsearchHttpClientConfigurer implements ElasticsearchHttpClientConfigurer {
 
 	private static final String SIGNING_ENABLED_PROPERTY = "elasticsearch.aws.signing.enabled";
-	private static final String ACCESS_KEY_PROPERTY = "elasticsearch.aws.access_key";
-	private static final String SECRET_KEY_PROPERTY = "elasticsearch.aws.secret_key";
-	private static final String REGION_PROPERTY = "elasticsearch.aws.region";
+	private static final String ACCESS_KEY_PROPERTY = "elasticsearch.aws.signing.access_key";
+	private static final String SECRET_KEY_PROPERTY = "elasticsearch.aws.signing.secret_key";
+	private static final String REGION_PROPERTY = "elasticsearch.aws.signing.region";
 	private static final String ELASTICSEARCH_SERVICE_NAME = "es";
 
 	@Override

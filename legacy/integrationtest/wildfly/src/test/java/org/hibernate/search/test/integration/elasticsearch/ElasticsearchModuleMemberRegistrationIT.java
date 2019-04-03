@@ -55,9 +55,9 @@ public class ElasticsearchModuleMemberRegistrationIT {
 	private static final String ES_USERNAME_PROPERTY = ES_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_USERNAME;
 	private static final String ES_PASSWORD_PROPERTY = ES_PROPERTY_PREFIX + ElasticsearchEnvironment.SERVER_PASSWORD;
 	private static final String ES_AWS_SIGNING_ENABLED_PROPERTY = ES_PROPERTY_PREFIX + "elasticsearch.aws.signing.enabled";
-	private static final String ES_AWS_ACCESS_KEY_PROPERTY = ES_PROPERTY_PREFIX + "elasticsearch.aws.access_key";
-	private static final String ES_AWS_SECRET_KEY_PROPERTY = ES_PROPERTY_PREFIX + "elasticsearch.aws.secret_key";
-	private static final String ES_AWS_REGION_PROPERTY = ES_PROPERTY_PREFIX + "elasticsearch.aws.region";
+	private static final String ES_AWS_ACCESS_KEY_PROPERTY = ES_PROPERTY_PREFIX + "elasticsearch.aws.signing.access_key";
+	private static final String ES_AWS_SECRET_KEY_PROPERTY = ES_PROPERTY_PREFIX + "elasticsearch.aws.signing.secret_key";
+	private static final String ES_AWS_REGION_PROPERTY = ES_PROPERTY_PREFIX + "elasticsearch.aws.signing.region";
 
 	@Deployment
 	public static Archive<?> createTestArchive() {

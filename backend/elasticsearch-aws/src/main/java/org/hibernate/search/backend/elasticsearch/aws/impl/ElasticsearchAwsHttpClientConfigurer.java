@@ -23,17 +23,17 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 					.build();
 
 	private static final OptionalConfigurationProperty<String> ACCESS_KEY =
-			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.ACCESS_KEY )
+			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_ACCESS_KEY )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> SECRET_KEY =
-			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SECRET_KEY )
+			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_SECRET_KEY )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> REGION =
-			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.REGION )
+			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_REGION )
 					.asString()
 					.build();
 

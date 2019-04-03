@@ -190,20 +190,20 @@ Hibernate Search will be able to understand the following configuration properti
 [source]
 ----
 hibernate.search.backends.<backend name>.aws.signing.enabled = false (default)
-hibernate.search.backends.<backend name>.aws.access_key = AKIDEXAMPLE (no default)
-hibernate.search.backends.<backend name>.aws.secret_key = wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY (no default)
-hibernate.search.backends.<backend name>.aws.region = us-east-1 (no default)
+hibernate.search.backends.<backend name>.aws.signing.access_key = AKIDEXAMPLE (no default)
+hibernate.search.backends.<backend name>.aws.signing.secret_key = wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY (no default)
+hibernate.search.backends.<backend name>.aws.signing.region = us-east-1 (no default)
 ----
 
 * `aws.signing.enabled` defines whether request signing is enabled.
 Expects a boolean value.
-* `aws.access_key` defines the access key.
+* `aws.signing.access_key` defines the access key.
 Expects a string value.
 This property has no default and must be provided for the AWS authentication to work.
-* `aws.secret_key` defines the secret key.
+* `aws.signing.secret_key` defines the secret key.
 Expects a string value.
 This property has no default and must be provided for the AWS authentication to work.
-* `aws.region` defines the AWS region.
+* `aws.signing.region` defines the AWS region.
 Expects a string value.
 This property has no default and must be provided for the AWS authentication to work.
 

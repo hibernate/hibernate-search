@@ -34,7 +34,7 @@ public final class ElasticsearchAwsBackendSettings {
 	 * <p>
 	 * No default: must be provided when signing is enabled.
 	 */
-	public static final String ACCESS_KEY = "aws.access_key";
+	public static final String SIGNING_ACCESS_KEY = "aws.signing.access_key";
 
 	/**
 	 * The AWS secret key.
@@ -43,7 +43,7 @@ public final class ElasticsearchAwsBackendSettings {
 	 * <p>
 	 * No default: must be provided when signing is enabled.
 	 */
-	public static final String SECRET_KEY = "aws.secret_key";
+	public static final String SIGNING_SECRET_KEY = "aws.signing.secret_key";
 
 	/**
 	 * The AWS region.
@@ -52,7 +52,7 @@ public final class ElasticsearchAwsBackendSettings {
 	 * <p>
 	 * No default: must be provided when signing is enabled.
 	 */
-	public static final String REGION = "aws.region";
+	public static final String SIGNING_REGION = "aws.signing.region";
 
 	/**
 	 * Default values for the different settings if no values are given.

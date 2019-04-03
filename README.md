@@ -126,7 +126,7 @@ Also, the elasticsearch integration tests can be executed
 against an Elasticsearch service on AWS.
 You will need to execute something along the lines of:
 
-    > mvn clean install -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.host.aws.access_key=<Your access key> -Dtest.elasticsearch.host.aws.secret_key=<Your secret key> -Dtest.elasticsearch.host.aws.region=<Your AWS region ID>
+    > mvn clean install -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.host.aws.signing.access_key=<Your access key> -Dtest.elasticsearch.host.aws.signing.secret_key=<Your secret key> -Dtest.elasticsearch.host.aws.signing.region=<Your AWS region ID>
 
 When building Hibernate Search with new JDKs, you may want to run Elasticsearch with a different JDK than the one used by Maven.
 This can be done by setting a property
