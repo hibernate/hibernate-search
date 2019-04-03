@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;

@@ -62,11 +62,8 @@ public class Elasticsearch6DefaultFieldFormatProvider implements ElasticsearchDe
 		map.put( ZonedDateTime.class, asImmutableList( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'" ) );
 		map.put( Year.class, asImmutableList( "yyyy", "yyyyyyyyy" ) );
 		map.put( YearMonth.class, asImmutableList( "yyyy-MM", "yyyyyyyyy-MM" ) );
-		/*
-		 * This seems to be the ISO-8601 format for dates without year.
-		 * It's also the default format for Java's MonthDay, see MonthDay.PARSER.
-		 */
-		map.put( MonthDay.class, asImmutableList( "--MM-dd" ) );
+		// MonthDays are formatted as a LocalDate, with a forced year, to support February 29th. See ElasticsearchMonthDayFieldCodec.
+		map.put( MonthDay.class, asImmutableList( "yyyy-MM-dd" ) );
 		ELASTICSEARCH_6_FORMAT_PATTERNS_BY_TYPE = Collections.unmodifiableMap( map );
 	}
 

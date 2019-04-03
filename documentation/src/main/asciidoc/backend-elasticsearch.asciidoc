@@ -368,7 +368,9 @@ or `yyyy\|\|yyyyyyyyy` (ES6 and below)
 |java.time.YearMonth|`date` with format
 `uuuu-MM` (ES7 and above)
 or `yyyy-MM\|\|yyyyyyyyy-MM` (ES6 and below)
-|java.time.MonthDay|`date` with format `--MM-dd`
+|java.time.MonthDay|`date` with format `uuuu-MM-dd` (ES7 and above)
+or `yyyy-MM-dd` (ES6 and below).
+**The year is always set to 0**.
 |org.hibernate.search.engine.spatial.GeoPoint|`geo_point`
 |====
 

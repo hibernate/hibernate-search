@@ -52,11 +52,8 @@ public class Elasticsearch7DefaultFieldFormatProvider implements ElasticsearchDe
 		map.put( ZonedDateTime.class, "uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ'['VV']'" );
 		map.put( Year.class, "uuuu" );
 		map.put( YearMonth.class, "uuuu-MM" );
-		/*
-		 * This seems to be the ISO-8601 format for dates without year.
-		 * It's also the default format for Java's MonthDay, see MonthDay.PARSER.
-		 */
-		map.put( MonthDay.class, "--MM-dd" );
+		// MonthDays are formatted as a LocalDate, with a forced year, to support February 29th. See ElasticsearchMonthDayFieldCodec.
+		map.put( MonthDay.class, "uuuu-MM-dd" );
 		JAVA_TIME_FORMAT_PATTERN_BY_TYPE = Collections.unmodifiableMap( map );
 	}
 
