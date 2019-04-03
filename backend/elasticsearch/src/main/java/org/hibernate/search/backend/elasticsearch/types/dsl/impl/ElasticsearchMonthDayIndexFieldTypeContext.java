@@ -26,7 +26,8 @@ class ElasticsearchMonthDayIndexFieldTypeContext
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<MonthDay> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
+	protected ElasticsearchIndexFieldType<MonthDay> toIndexFieldType(PropertyMapping mapping,
+			DateTimeFormatter formatter) {
 		ElasticsearchMonthDayFieldCodec codec = new ElasticsearchMonthDayFieldCodec( formatter );
 
 		ToDocumentFieldValueConverter<?, ? extends MonthDay> dslToIndexConverter =
