@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -17,6 +18,18 @@ public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String
 
 	KeywordStringFieldTypeDescriptor() {
 		super( String.class, "keywordString" );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<String>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>(
+				"several tokens",
+				"onetoken",
+				"to the", // Only stopwords
+				"    trailingspaces   ",
+				"      ",
+				""
+		) );
 	}
 
 	@Override

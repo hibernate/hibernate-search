@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -17,6 +18,24 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 
 	FloatFieldTypeDescriptor() {
 		super( Float.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<Float>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>(
+				Float.MIN_VALUE, Float.MAX_VALUE,
+				- Float.MIN_VALUE, - Float.MAX_VALUE,
+				// Elasticsearch doesn't support these: it fails when parsing them
+				//Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NaN,
+				0.0f,
+				-0.0f, // Negative 0 is a different float
+				Math.nextDown( 0.0f ),
+				Math.nextUp( 0.0f ),
+				42.42f,
+				1584514514.000000184f,
+				// This is ugly, but we test it on purpose
+				new Float( 44.0f )
+		) );
 	}
 
 	@Override

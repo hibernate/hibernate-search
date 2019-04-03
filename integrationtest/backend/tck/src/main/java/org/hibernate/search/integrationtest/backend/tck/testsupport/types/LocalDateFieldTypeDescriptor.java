@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -18,6 +19,21 @@ public class LocalDateFieldTypeDescriptor extends FieldTypeDescriptor<LocalDate>
 
 	LocalDateFieldTypeDescriptor() {
 		super( LocalDate.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<LocalDate>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>(
+				LocalDate.of( 1970, 1, 1 ),
+				LocalDate.of( 1980, 1, 1 ),
+				LocalDate.of( 2017, 7, 7 ),
+				LocalDate.of( 1980, 12, 31 ),
+				LocalDate.of( 2004, 2, 29 ),
+				LocalDate.of( 1900, 1, 1 ),
+				LocalDate.of( 1600, 2, 28 ),
+				LocalDate.of( -52, 10, 11 ),
+				LocalDate.of( 22500, 10, 11 )
+		) );
 	}
 
 	@Override

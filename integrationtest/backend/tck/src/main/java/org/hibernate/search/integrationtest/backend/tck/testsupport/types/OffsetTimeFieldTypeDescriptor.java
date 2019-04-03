@@ -9,10 +9,13 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.time.LocalTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -20,6 +23,17 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 
 	OffsetTimeFieldTypeDescriptor() {
 		super( OffsetTime.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<OffsetTime>> getIndexingExpectations() {
+		List<OffsetTime> values = new ArrayList<>();
+		LocalTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localTime -> {
+			OffsetDateTimeFieldTypeDescriptor.getOffsetsForIndexingExpectations().forEach( offset -> {
+				values.add( localTime.atOffset( offset ) );
+			} );
+		} );
+		return Optional.of( new IndexingExpectations<>( values ) );
 	}
 
 	@Override

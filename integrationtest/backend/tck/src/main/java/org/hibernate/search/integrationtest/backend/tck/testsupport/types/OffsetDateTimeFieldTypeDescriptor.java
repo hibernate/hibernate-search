@@ -9,17 +9,45 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
 public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetDateTime> {
 
+	static List<ZoneOffset> getOffsetsForIndexingExpectations() {
+		return Arrays.asList(
+				ZoneOffset.UTC,
+				ZoneOffset.ofHoursMinutes( -8, 0 ),
+				ZoneOffset.ofHoursMinutes( -2, -30 ),
+				ZoneOffset.ofHoursMinutes( -2, 0 ),
+				ZoneOffset.ofHoursMinutes( 2, 0 ),
+				ZoneOffset.ofHoursMinutes( 2, 30 ),
+				ZoneOffset.ofHoursMinutes( 10, 0 ),
+				ZoneOffset.ofHoursMinutesSeconds( 10, 0, 24 )
+		);
+	}
+
 	OffsetDateTimeFieldTypeDescriptor() {
 		super( OffsetDateTime.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<OffsetDateTime>> getIndexingExpectations() {
+		List<OffsetDateTime> values = new ArrayList<>();
+		LocalDateTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localDateTime -> {
+			getOffsetsForIndexingExpectations().forEach( offset -> {
+				values.add( localDateTime.atOffset( offset ) );
+			} );
+		} );
+		return Optional.of( new IndexingExpectations<>( values ) );
 	}
 
 	@Override

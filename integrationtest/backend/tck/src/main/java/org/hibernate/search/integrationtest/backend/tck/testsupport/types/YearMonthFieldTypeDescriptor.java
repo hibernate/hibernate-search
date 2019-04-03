@@ -8,10 +8,14 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.Month;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -19,6 +23,17 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 
 	YearMonthFieldTypeDescriptor() {
 		super( YearMonth.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<YearMonth>> getIndexingExpectations() {
+		List<YearMonth> values = new ArrayList<>();
+		YearFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( year -> {
+			Arrays.stream( Month.values() ).forEach( month -> {
+				values.add( year.atMonth( month ) );
+			} );
+		} );
+		return Optional.of( new IndexingExpectations<>( values ) );
 	}
 
 	@Override

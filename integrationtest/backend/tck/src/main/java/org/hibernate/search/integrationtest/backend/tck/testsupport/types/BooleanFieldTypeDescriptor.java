@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -17,6 +18,17 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 
 	BooleanFieldTypeDescriptor() {
 		super( Boolean.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<Boolean>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>(
+				true,
+				false,
+				// This is ugly, but we test it on purpose
+				new Boolean( true ),
+				new Boolean( false )
+		) );
 	}
 
 	@Override

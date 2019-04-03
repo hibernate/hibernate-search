@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -17,6 +18,16 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 
 	IntegerFieldTypeDescriptor() {
 		super( Integer.class );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<Integer>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>(
+				Integer.MIN_VALUE, Integer.MAX_VALUE,
+				-251_484_254, -42, -1, 0, 1, 3, 42, 151_484_254,
+				// This is ugly, but we test it on purpose
+				new Integer( 44 )
+		) );
 	}
 
 	@Override

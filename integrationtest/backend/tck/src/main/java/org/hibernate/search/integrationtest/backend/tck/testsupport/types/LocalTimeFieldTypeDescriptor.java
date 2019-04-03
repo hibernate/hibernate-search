@@ -7,26 +7,41 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
 public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime> {
 
-	public static final int ONE_MILLION = 1000000;
+	static List<LocalTime> getValuesForIndexingExpectations() {
+		return Arrays.asList(
+				LocalTime.of( 0, 0, 0, 0 ),
+				LocalTime.of( 10, 15, 30, 0 ),
+				LocalTime.of( 11, 15, 30, 555_000_000 ),
+				LocalTime.of( 23, 59, 59, 999_000_000 )
+		);
+	}
 
 	LocalTimeFieldTypeDescriptor() {
 		super( LocalTime.class );
 	}
 
 	@Override
+	public Optional<IndexingExpectations<LocalTime>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>( getValuesForIndexingExpectations() ) );
+	}
+
+	@Override
 	public Optional<MatchPredicateExpectations<LocalTime>> getMatchPredicateExpectations() {
 		return Optional.of( new MatchPredicateExpectations<>(
-				LocalTime.of( 10, 10, 10, 123 * ONE_MILLION ),
-				LocalTime.of( 10, 10, 10, 122 * ONE_MILLION )
+				LocalTime.of( 10, 10, 10, 123_000_000 ),
+				LocalTime.of( 10, 10, 10, 122_000_000 )
 		) );
 	}
 
@@ -61,9 +76,9 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 	@Override
 	public Optional<FieldProjectionExpectations<LocalTime>> getFieldProjectionExpectations() {
 		return Optional.of( new FieldProjectionExpectations<>(
-				LocalTime.of( 10, 10, 10, 123000000 ),
-				LocalTime.of( 11, 10, 10, 123450000 ),
-				LocalTime.of( 12, 10, 10, 123456789 )
+				LocalTime.of( 10, 10, 10, 123_000_000 ),
+				LocalTime.of( 11, 10, 10, 123_450_000 ),
+				LocalTime.of( 12, 10, 10, 123_456_789 )
 		) );
 	}
 }

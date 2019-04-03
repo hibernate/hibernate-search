@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeConte
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 
@@ -25,6 +26,18 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 	@Override
 	public StandardIndexFieldTypeContext<?, String> configure(IndexFieldTypeFactoryContext fieldContext) {
 		return fieldContext.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name );
+	}
+
+	@Override
+	public Optional<IndexingExpectations<String>> getIndexingExpectations() {
+		return Optional.of( new IndexingExpectations<>(
+				"several tokens",
+				"onetoken",
+				"to the", // Only stopwords
+				"    trailingspaces   ",
+				"      ",
+				""
+		) );
 	}
 
 	@Override
