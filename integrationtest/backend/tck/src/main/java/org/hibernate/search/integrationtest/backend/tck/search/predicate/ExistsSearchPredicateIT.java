@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -118,6 +119,27 @@ public class ExistsSearchPredicateIT {
 	}
 
 	/**
+	 * Fields with docvalues may be optimized and use a different Lucene query.
+	 * Make sure to test the optimization as well.
+	 */
+	@Test
+	public void exists_withDocValues() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDocValuesModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+
+			IndexSearchQuery<DocumentReference> query = scope.query()
+					.asReference()
+					.predicate( f -> f.exists().onField( absoluteFieldPath ) )
+					.toQuery();
+
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		}
+	}
+
+	/**
 	 * There's no such thing as a "missing" predicate,
 	 * but let's check that negating the "exists" predicate works as intended.
 	 */
@@ -185,6 +207,27 @@ public class ExistsSearchPredicateIT {
 	}
 
 	/**
+	 * Fields with docvalues may be optimized and use a different Lucene query.
+	 * Make sure to test the optimization as well.
+	 */
+	@Test
+	public void inFlattenedObject_withDocValues() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldWithDocValuesModels ) {
+			String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+
+			IndexSearchQuery<DocumentReference> query = scope.query()
+					.asReference()
+					.predicate( f -> f.exists().onField( absoluteFieldPath ) )
+					.toQuery();
+
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		}
+	}
+
+	/**
 	 * Querying fields of a nested object without a nested predicate should result in no result at all.
 	 */
 	@Test
@@ -208,6 +251,28 @@ public class ExistsSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
+			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+
+			IndexSearchQuery<DocumentReference> query = scope.query()
+					.asReference()
+					.predicate( f -> f.nested().onObjectField( indexMapping.nestedObject.relativeFieldName )
+							.nest( f.exists().onField( absoluteFieldPath ) ) )
+					.toQuery();
+
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		}
+	}
+
+	/**
+	 * Fields with docvalues may be optimized and use a different Lucene query.
+	 * Make sure to test the optimization as well.
+	 */
+	@Test
+	public void inNestedPredicate_withDocValues() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldWithDocValuesModels ) {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			IndexSearchQuery<DocumentReference> query = scope.query()
@@ -333,33 +398,42 @@ public class ExistsSearchPredicateIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			indexMapping.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.string1Field.document1Value.write( document );
 
 			// Add one object with the values of document 1, and another with the values of document 2
 			DocumentElement flattenedObject1 = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
+			indexMapping.flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
 			DocumentElement flattenedObject2 = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
+			// Can't add two values to a sortable field
+			//indexMapping.flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
 
 			// Same for the nested object
 			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
+			indexMapping.nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
 			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
+			indexMapping.nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			indexMapping.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.string2Field.document2Value.write( document );
 
 			// Add one empty object, and and another with the values of document 2
 			document.addObject( indexMapping.flattenedObject.self );
 			DocumentElement flattenedObject2 = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
+			indexMapping.flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
 
 			// Same for the nested object
 			document.addObject( indexMapping.nestedObject.self );
 			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
+			indexMapping.nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.string1Field.document3Value.write( document );
@@ -423,8 +497,24 @@ public class ExistsSearchPredicateIT {
 		} );
 	}
 
+	private static void mapByTypeFieldsIfSortSupported(IndexSchemaElement parent, String prefix,
+			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
+			FieldModelConsumer<MatchPredicateExpectations<?>, ByTypeFieldModel<?>> consumer) {
+		forEachTypeDescriptor( typeDescriptor -> {
+			// Safe, see forEachTypeDescriptor
+			MatchPredicateExpectations<?> expectations = typeDescriptor.getMatchPredicateExpectations().get();
+			// Ignore non-sortable fields
+			if ( typeDescriptor.getFieldSortExpectations().isPresent() ) {
+				ByTypeFieldModel<?> fieldModel = ByTypeFieldModel.mapper( typeDescriptor )
+						.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
+				consumer.accept( typeDescriptor, expectations, fieldModel );
+			}
+		} );
+	}
+
 	private static class IndexMapping {
 		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
+		final List<ByTypeFieldModel<?>> supportedFieldWithDocValuesModels = new ArrayList<>();
 
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
@@ -438,6 +528,13 @@ public class ExistsSearchPredicateIT {
 					(typeDescriptor, expectations, model) -> {
 						// All types are supported
 						supportedFieldModels.add( model );
+					}
+			);
+			mapByTypeFieldsIfSortSupported(
+					root, "byType_withDocValues_", c -> c.sortable( Sortable.YES ),
+					(typeDescriptor, expectations, model) -> {
+						// All types are supported
+						supportedFieldWithDocValuesModels.add( model );
 					}
 			);
 			string1Field = MainFieldModel.mapper(
@@ -457,6 +554,7 @@ public class ExistsSearchPredicateIT {
 		final String relativeFieldName;
 		final IndexObjectFieldReference self;
 		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
+		final List<ByTypeFieldModel<?>> supportedFieldWithDocValuesModels = new ArrayList<>();
 
 		ObjectMapping(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
 			this.relativeFieldName = relativeFieldName;
@@ -467,6 +565,13 @@ public class ExistsSearchPredicateIT {
 					(typeDescriptor, expectations, model) -> {
 						// All types are supported
 						supportedFieldModels.add( model );
+					}
+			);
+			mapByTypeFieldsIfSortSupported(
+					objectField, "byType_withDocValues_", c -> c.sortable( Sortable.YES ),
+					(typeDescriptor, expectations, model) -> {
+						// All types are supported
+						supportedFieldWithDocValuesModels.add( model );
 					}
 			);
 		}
