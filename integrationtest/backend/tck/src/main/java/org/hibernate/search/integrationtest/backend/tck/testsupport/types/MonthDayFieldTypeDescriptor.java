@@ -39,6 +39,7 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 		Collections.addAll(
 				values,
 				MonthDay.of( Month.FEBRUARY, 28 ),
+				MonthDay.of( Month.FEBRUARY, 29 ), // HSEARCH-3549
 				MonthDay.of( Month.JUNE, 30 ),
 				MonthDay.of( Month.DECEMBER, 31 )
 		);
