@@ -28,7 +28,12 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 				ZoneId.of( "UTC" ),
 				ZoneId.of( "Europe/Paris" ),
 				ZoneId.of( "Europe/Amsterdam" ),
-				ZoneId.of( "America/Los_Angeles" )
+				ZoneId.of( "America/Los_Angeles" ),
+				// HSEARCH-3548: also test ZoneOffsets used as ZoneIds
+				ZoneOffset.UTC, // Strangely, this is not the same as ZoneId.of( "UTC" )
+				ZoneOffset.ofHoursMinutes( -2, 0 ),
+				ZoneOffset.ofHoursMinutes( 2, 30 ),
+				ZoneOffset.ofHoursMinutesSeconds( 10, 0, 24 )
 		);
 	}
 
