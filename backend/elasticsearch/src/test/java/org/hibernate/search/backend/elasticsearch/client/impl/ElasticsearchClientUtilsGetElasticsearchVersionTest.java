@@ -44,6 +44,7 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 				{ "5.0.0", 5, 0, 0, null },
 				{ "5.6.6", 5, 6, 6, null },
 				{ "6.0.0", 6, 0, 0, null },
+				{ "6.7.0", 6, 7, 0, null },
 				{ "7.0.0-beta1", 7, 0, 0, "beta1" },
 				{ "7.0.0", 7, 0, 0, null }
 		};
