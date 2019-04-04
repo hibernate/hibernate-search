@@ -2372,7 +2372,7 @@
         <profile>
             <id>elasticsearch-7.0</id>
             <properties>
-                <test.elasticsearch.host.version>7.0.0-beta1</test.elasticsearch.host.version>
+                <test.elasticsearch.host.version>7.0.0</test.elasticsearch.host.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.Elasticsearch7TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
