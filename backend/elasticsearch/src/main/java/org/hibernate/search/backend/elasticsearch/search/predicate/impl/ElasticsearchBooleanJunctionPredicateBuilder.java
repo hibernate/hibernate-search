@@ -112,6 +112,11 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 		contributeClauses( context, innerObject, SHOULD_ACCESSOR, shouldClauseBuilders );
 		contributeClauses( context, innerObject, FILTER_ACCESSOR, filterClauseBuilders );
 
+		// Forcing to the Lucene's defaults. See HSEARCH-3534
+		if ( minimumShouldMatchConstraints == null && hasAtLeastOneMustOrFilterPredicate() ) {
+			minimumShouldMatchNumber( 0, 0 );
+		}
+
 		if ( minimumShouldMatchConstraints != null ) {
 			MINIMUM_SHOULD_MATCH_ACCESSOR.set(
 					innerObject,
@@ -122,6 +127,10 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 		outerObject.add( "bool", innerObject );
 
 		return outerObject;
+	}
+
+	private boolean hasAtLeastOneMustOrFilterPredicate() {
+		return mustClauseBuilders != null || filterClauseBuilders != null;
 	}
 
 	private void contributeClauses(ElasticsearchSearchPredicateContext context, JsonObject innerObject,
