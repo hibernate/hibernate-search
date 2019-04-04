@@ -1,6 +1,45 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Alpha4 (04-04-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3557 ZonedDateTime at later offset during DST change gets parsed incorrectly
+    * HSEARCH-3554 The Elasticsearch backend defaults to a 10 element hit limit
+    * HSEARCH-3549 Indexing MonthDay.of( 2, 29 ) fails on Elasticsearch
+    * HSEARCH-3548 ZonedDateTime with zone = ZoneOffset.UTC fails when indexing in Elasticsearch 5.6
+    * HSEARCH-3546 SearchException is missing from the javadoc
+    * HSEARCH-3540 The NONE Elasticsearch index lifecycle strategy throws an AssertionFailure
+    * HSEARCH-3538 Disabling projection converters in projections is ignored when checking compatibility
+    * HSEARCH-2423 Projecting an unstored field should raise an exception with Elasticsearch
+    * HSEARCH-2185 Phrase query with the DSL does not consider the `ignoreAnalyzer()` options
+
+** Improvement
+    * HSEARCH-3555 Document the range of years supported by each backend for date/time types
+    * HSEARCH-3543 Allow to set GeoPointBridges as sortable to enable distance sorts
+    * HSEARCH-3521 Move index-specific configuration properties below the hibernate.search.backends.<backend name>.indexes property
+    * HSEARCH-3510 Change the syntax of predicates/sorts on raw fields from onRawField(...).matching() to onField(...).matchingRaw()?
+    * HSEARCH-3507 Improve consistency of naming for methods related to native Elasticsearch/Lucene features (fromJsonString, etc.)
+    * HSEARCH-2757 Allow usage of FieldSelectors when using Spatial indexing
+
+** New Feature
+    * HSEARCH-3312 Allow analyzer/normalizer overrides on a per-predicate basis
+    * HSEARCH-2534 Allow using query-only analyzer definitions with Elasticsearch
+    * HSEARCH-2518 Allow to assign a name to an analyzer class/instance
+    * HSEARCH-2464 Add support for "missing"/"exists" predicates
+
+** Task
+    * HSEARCH-3550 Fix the many problems of java module integration tests
+    * HSEARCH-3542 Fix transient failures in OrmLibraryShowcaseIT#searchAroundMe_spatial
+    * HSEARCH-3533 Upgrade to Hibernate ORM 5.4.2
+    * HSEARCH-3532 Fix the java module name for hibernate-search-util-common
+    * HSEARCH-3531 Upgrade to Lucene 8.0.0
+    * HSEARCH-3530 Update the date formats in the reference documentation
+    * HSEARCH-3375 Fail the build on javadoc warnings
+    * HSEARCH-3070 Remove the concept of ServiceManager
+    * HSEARCH-3051 Search 6 groundwork - Restore the Elasticsearch AWS integration
+
 6.0.0.Alpha3 (21-03-2019)
 -------------------------
 
