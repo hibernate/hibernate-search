@@ -93,6 +93,11 @@ public class ElasticsearchDialectFactoryTest {
 	}
 
 	@Test
+	public void es67() {
+		testSuccess( "6.7.0", ElasticsearchDialectName.ES_6, Elasticsearch6Dialect.class );
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3490")
 	public void es700beta1() throws Exception {
 		testSuccess( "7.0.0-beta1", ElasticsearchDialectName.ES_7, Elasticsearch7Dialect.class );
