@@ -36,24 +36,32 @@ public class PutIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Voi
 			implements PutIndexMappingWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
+		private final Boolean includeTypeName;
 		private final JsonObject payload;
 
-		public static Builder forElasticsearch6AndBelow(GsonProvider gsonProvider,
+		public static Builder forElasticsearch66AndBelow(GsonProvider gsonProvider,
 				URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping typeMapping) {
-			return new Builder( gsonProvider, indexName, typeName, typeMapping );
+			return new Builder( gsonProvider, indexName, typeName, null, typeMapping );
+		}
+
+		public static Builder forElasticsearch67(GsonProvider gsonProvider,
+				URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping typeMapping) {
+			return new Builder( gsonProvider, indexName, typeName, true, typeMapping );
 		}
 
 		public static Builder forElasticsearch7AndAbove(GsonProvider gsonProvider,
 				URLEncodedString indexName, RootTypeMapping typeMapping) {
-			return new Builder( gsonProvider, indexName, null, typeMapping );
+			return new Builder( gsonProvider, indexName, null, null, typeMapping );
 		}
 
 		private Builder(
 				GsonProvider gsonProvider,
-				URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping typeMapping) {
+				URLEncodedString indexName, URLEncodedString typeName, Boolean includeTypeName,
+				RootTypeMapping typeMapping) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.typeName = typeName;
+			this.includeTypeName = includeTypeName;
 			/*
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
 			 * We better not include the null fields.
@@ -67,9 +75,13 @@ public class PutIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Voi
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.put()
 					.pathComponent( indexName );
-			// ES6 and below only
+			// ES6.6 and below only
 			if ( typeName != null ) {
 				builder.pathComponent( typeName );
+			}
+			// ES6.7 only
+			if ( includeTypeName != null ) {
+				builder.param( "include_type_name", includeTypeName );
 			}
 			builder.pathComponent( Paths._MAPPING )
 					.body( payload );

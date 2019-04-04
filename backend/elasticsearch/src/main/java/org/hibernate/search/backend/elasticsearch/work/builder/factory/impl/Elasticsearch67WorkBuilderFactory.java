@@ -29,12 +29,13 @@ import com.google.gson.JsonObject;
  * <ul>
  *     <li>Mappings are assigned a "type name"; we use the hardcoded "doc" type name</li>
  *     <li>Some URLs require to include this type name instead of the "_doc" keyword used in ES7.</li>
+ *     <li>We set an "include_type_name=true" parameter in index creation and mapping APIs</li>
  * </ul>
  */
 @SuppressWarnings("deprecation") // We use Paths.DOC on purpose
-public class Elasticsearch6WorkBuilderFactory extends Elasticsearch7WorkBuilderFactory {
+public class Elasticsearch67WorkBuilderFactory extends Elasticsearch7WorkBuilderFactory {
 
-	public Elasticsearch6WorkBuilderFactory(GsonProvider gsonProvider) {
+	public Elasticsearch67WorkBuilderFactory(GsonProvider gsonProvider) {
 		super( gsonProvider );
 	}
 
@@ -46,17 +47,17 @@ public class Elasticsearch6WorkBuilderFactory extends Elasticsearch7WorkBuilderF
 
 	@Override
 	public CreateIndexWorkBuilder createIndex(URLEncodedString indexName) {
-		return CreateIndexWork.Builder.forElasticsearch6AndBelow( gsonProvider, indexName, Paths.DOC );
+		return CreateIndexWork.Builder.forElasticsearch67( gsonProvider, indexName, Paths.DOC );
 	}
 
 	@Override
 	public GetIndexTypeMappingWorkBuilder getIndexTypeMapping(URLEncodedString indexName) {
-		return GetIndexTypeMappingWork.Builder.forElasticsearch6AndBelow( indexName, Paths.DOC );
+		return GetIndexTypeMappingWork.Builder.forElasticsearch67( indexName, Paths.DOC );
 	}
 
 	@Override
 	public PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, RootTypeMapping mapping) {
-		return PutIndexTypeMappingWork.Builder.forElasticsearch6AndBelow( gsonProvider, indexName, Paths.DOC, mapping );
+		return PutIndexTypeMappingWork.Builder.forElasticsearch67( gsonProvider, indexName, Paths.DOC, mapping );
 	}
 
 	@Override

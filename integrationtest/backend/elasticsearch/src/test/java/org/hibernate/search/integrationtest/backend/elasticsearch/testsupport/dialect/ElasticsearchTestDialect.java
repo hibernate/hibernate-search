@@ -24,6 +24,8 @@ public interface ElasticsearchTestDialect {
 
 	Optional<URLEncodedString> getTypeNameForMappingApi();
 
+	Boolean getIncludeTypeNameParameterForMappingApi();
+
 	List<String> getAllLocalDateDefaultMappingFormats();
 
 	default String getFirstLocalDateDefaultMappingFormat() {

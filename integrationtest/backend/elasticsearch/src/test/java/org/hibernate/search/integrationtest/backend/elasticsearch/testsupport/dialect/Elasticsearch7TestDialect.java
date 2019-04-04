@@ -40,6 +40,11 @@ public class Elasticsearch7TestDialect implements ElasticsearchTestDialect {
 	}
 
 	@Override
+	public Boolean getIncludeTypeNameParameterForMappingApi() {
+		return null;
+	}
+
+	@Override
 	public List<String> getAllLocalDateDefaultMappingFormats() {
 		return Collections.singletonList( "uuuu-MM-dd" );
 	}

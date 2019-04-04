@@ -84,17 +84,24 @@ public class ElasticsearchDialectFactoryTest {
 
 	@Test
 	public void es60() {
-		testSuccess( "6.0.0", ElasticsearchDialectName.ES_6, Elasticsearch6Dialect.class );
+		testSuccess( "6.0.0", ElasticsearchDialectName.ES_6, Elasticsearch60Dialect.class );
 	}
 
 	@Test
 	public void es66() {
-		testSuccess( "6.6.0", ElasticsearchDialectName.ES_6, Elasticsearch6Dialect.class );
+		testSuccess( "6.6.0", ElasticsearchDialectName.ES_6, Elasticsearch60Dialect.class );
 	}
 
 	@Test
 	public void es67() {
-		testSuccess( "6.7.0", ElasticsearchDialectName.ES_6, Elasticsearch6Dialect.class );
+		testSuccess( "6.7.0", ElasticsearchDialectName.ES_6_7, Elasticsearch67Dialect.class );
+	}
+
+	@Test
+	public void es68() {
+		logged.expectMessage( "HSEARCH400085", "'6.8.0'" );
+		ElasticsearchDialectName dialectName = dialectFactory.getAppropriateDialectName( ElasticsearchVersion.of( "6.8.0" ) );
+		assertThat( dialectName ).isEqualTo( ElasticsearchDialectName.ES_6_7 );
 	}
 
 	@Test

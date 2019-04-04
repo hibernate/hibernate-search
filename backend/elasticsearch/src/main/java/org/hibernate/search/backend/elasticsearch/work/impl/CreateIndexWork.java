@@ -48,23 +48,31 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 		private final GsonProvider gsonProvider;
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
+		private final Boolean includeTypeName;
 		private final JsonObject payload = new JsonObject();
 
-		public static Builder forElasticsearch6AndBelow(GsonProvider gsonProvider,
+		public static Builder forElasticsearch66AndBelow(GsonProvider gsonProvider,
 				URLEncodedString indexName, URLEncodedString typeName) {
-			return new Builder( gsonProvider, indexName, typeName );
+			return new Builder( gsonProvider, indexName, typeName, null );
+		}
+
+		public static Builder forElasticsearch67(GsonProvider gsonProvider,
+				URLEncodedString indexName, URLEncodedString typeName) {
+			return new Builder( gsonProvider, indexName, typeName, true );
 		}
 
 		public static Builder forElasticsearch7AndAbove(GsonProvider gsonProvider,
 				URLEncodedString indexName) {
-			return new Builder( gsonProvider, indexName, null );
+			return new Builder( gsonProvider, indexName, null, null );
 		}
 
-		private Builder(GsonProvider gsonProvider, URLEncodedString indexName, URLEncodedString typeName) {
+		private Builder(GsonProvider gsonProvider, URLEncodedString indexName, URLEncodedString typeName,
+				Boolean includeTypeName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.gsonProvider = gsonProvider;
 			this.indexName = indexName;
 			this.typeName = typeName;
+			this.includeTypeName = includeTypeName;
 		}
 
 		@Override
@@ -112,7 +120,10 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.put()
 					.pathComponent( indexName );
-
+			// ES6.7 only
+			if ( includeTypeName != null ) {
+				builder.param( "include_type_name", includeTypeName );
+			}
 			if ( payload.size() > 0 ) {
 				builder.body( payload );
 			}

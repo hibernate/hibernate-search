@@ -97,12 +97,14 @@ launching an Elasticsearch server automatically on port 9200.
 You may redefine the version to use by specifying the right profile and using the
 `test.elasticsearch.host.version` property, while disabling the default profile:
 
-    > mvn clean install -P!elasticsearch-5.6,elasticsearch-6.0 -Dtest.elasticsearch.host.version=6.0.0
+    > mvn clean install -P!elasticsearch-6.7,elasticsearch-6.0 -Dtest.elasticsearch.host.version=6.0.0
 
 The following profiles are available:
 
  * `elasticsearch-5.6` for 5.6.x and later 5.x
- * `elasticsearch-6.0` for 6.x (the default)
+ * `elasticsearch-6.0` for 6.0.x to 6.6.x
+ * `elasticsearch-6.7` for 6.7 (the default)
+ * `elasticsearch-7.0` for 7.x (the default)
 
 A list of available versions for `test.elasticsearch.host.version` can be found on
 [Maven Central](https://search.maven.org/search?q=g:org.elasticsearch%20AND%20a:elasticsearch&core=gav).
@@ -116,7 +118,7 @@ and run Elasticsearch-related tests against your own server using the
 If you want to run tests against a different Elasticsearch version  (6.x for instance),
 you will still have to select a profile among those listed above, and disable the default profile:
 
-    > mvn clean install -P!elasticsearch-5.6,elasticsearch-6.0 -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=http://localhost:9200
+    > mvn clean install -P!elasticsearch-6.7,elasticsearch-6.0 -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=http://localhost:9200
 
 You may also use authentication:
 

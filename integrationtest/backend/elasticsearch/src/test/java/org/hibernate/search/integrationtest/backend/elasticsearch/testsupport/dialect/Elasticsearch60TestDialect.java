@@ -18,7 +18,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @SuppressWarnings("deprecation") // We use Paths.DOC on purpose
-public class Elasticsearch6TestDialect implements ElasticsearchTestDialect {
+public class Elasticsearch60TestDialect implements ElasticsearchTestDialect {
 
 	@Override
 	public ElasticsearchDialectName getName() {
@@ -38,6 +38,11 @@ public class Elasticsearch6TestDialect implements ElasticsearchTestDialect {
 	@Override
 	public Optional<URLEncodedString> getTypeNameForMappingApi() {
 		return Optional.of( Paths.DOC );
+	}
+
+	@Override
+	public Boolean getIncludeTypeNameParameterForMappingApi() {
+		return null;
 	}
 
 	@Override

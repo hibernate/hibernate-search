@@ -229,19 +229,28 @@ public class TestElasticsearchClient implements TestRule {
 	}
 
 	private void deleteAndCreateIndex(URLEncodedString indexName) {
-		doDeleteAndCreateIndex(
-				indexName,
-				ElasticsearchRequest.put().pathComponent( indexName ).build()
-				);
+		deleteAndCreateIndex( indexName, null );
 	}
 
 	private void deleteAndCreateIndex(URLEncodedString indexName, JsonObject settingsAsJsonObject) {
-		JsonObject payload = new JsonObject();
-		payload.add( "settings", settingsAsJsonObject );
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
+				.pathComponent( indexName );
+
+		if ( settingsAsJsonObject != null ) {
+			JsonObject payload = new JsonObject();
+			payload.add( "settings", settingsAsJsonObject );
+			builder.body( payload );
+		}
+
+		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
+		if ( includeTypeName != null ) {
+			builder.param( "include_type_name", includeTypeName );
+		}
+
 		doDeleteAndCreateIndex(
 				indexName,
-				ElasticsearchRequest.put().pathComponent( indexName ).body( payload ).build()
-				);
+				builder.build()
+		);
 	}
 
 	private void doDeleteAndCreateIndex(URLEncodedString indexName, ElasticsearchRequest createRequest) {
@@ -260,10 +269,17 @@ public class TestElasticsearchClient implements TestRule {
 		source.add( "settings", settings );
 
 		registerTemplateForCleanup( templateName );
-		performRequest( ElasticsearchRequest.put()
+
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
 				.pathComponent( Paths._TEMPLATE ).pathComponent( URLEncodedString.fromString( templateName ) )
-				.body( source )
-				.build() );
+				.body( source );
+
+		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
+		if ( includeTypeName != null ) {
+			builder.param( "include_type_name", includeTypeName );
+		}
+
+		performRequest( builder.build() );
 	}
 
 	private void ensureIndexDoesNotExist(URLEncodedString indexName) {
@@ -300,6 +316,11 @@ public class TestElasticsearchClient implements TestRule {
 		dialect.getTypeNameForMappingApi().ifPresent( builder::pathComponent );
 		builder.body( mappingJsonObject );
 
+		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
+		if ( includeTypeName != null ) {
+			builder.param( "include_type_name", includeTypeName );
+		}
+
 		performRequest( builder.build() );
 	}
 
@@ -308,6 +329,11 @@ public class TestElasticsearchClient implements TestRule {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( Paths._MAPPING );
 		dialect.getTypeNameForMappingApi().ifPresent( builder::pathComponent );
+
+		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
+		if ( includeTypeName != null ) {
+			builder.param( "include_type_name", includeTypeName );
+		}
 
 		/*
 		 * Elasticsearch 5.5+ triggers a 404 error when mappings are missing,

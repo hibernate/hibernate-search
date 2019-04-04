@@ -14,14 +14,15 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @SuppressWarnings("deprecation") // We use Paths.DOC on purpose
-public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
+public class Elasticsearch67TestDialect implements ElasticsearchTestDialect {
 
 	@Override
 	public ElasticsearchDialectName getName() {
-		return ElasticsearchDialectName.ES_5_6;
+		return ElasticsearchDialectName.ES_6_7;
 	}
 
 	@Override
@@ -41,7 +42,7 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 
 	@Override
 	public Boolean getIncludeTypeNameParameterForMappingApi() {
-		return null;
+		return true;
 	}
 
 	@Override
@@ -51,6 +52,8 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 
 	@Override
 	public void setTemplatePattern(JsonObject object, String pattern) {
-		object.addProperty( "template", pattern );
+		JsonArray array = new JsonArray();
+		array.add( pattern );
+		object.add( "index_patterns", array );
 	}
 }
