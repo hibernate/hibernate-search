@@ -57,7 +57,7 @@ public class LuceneBoolSearchPredicateIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Computed minimum for minimumShouldMatch constraint is out of bounds" )
-				.hasMessageContaining( "expected a number between 1 and '3', got '1'" );
+				.hasMessageContaining( "expected a number between '1' and '1', got '3'" );
 	}
 
 	private static class IndexMapping {

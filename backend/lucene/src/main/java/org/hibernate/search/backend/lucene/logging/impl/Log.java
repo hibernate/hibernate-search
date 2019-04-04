@@ -309,8 +309,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 44,
 			value = "Computed minimum for minimumShouldMatch constraint is out of bounds:"
-					+ " expected a number between 1 and '%1$s', got '%2$s'.")
-	SearchException minimumShouldMatchMinimumOutOfBounds(int minimum, int totalShouldClauseNumber);
+					+ " expected a number between '1' and '%1$s', got '%2$s'.")
+	SearchException minimumShouldMatchMinimumOutOfBounds(int totalShouldClauseNumber, int minimum);
 
 	@Message(id = ID_OFFSET_2 + 45,
 			value = "Multiple conflicting minimumShouldMatch constraints for ceiling '%1$s'")
