@@ -176,7 +176,7 @@ class LuceneBooleanJunctionPredicateBuilder extends AbstractLuceneSearchPredicat
 			}
 
 			if ( minimum < 1 || minimum > totalShouldClauseNumber ) {
-				throw log.minimumShouldMatchMinimumOutOfBounds( minimum, totalShouldClauseNumber );
+				throw log.minimumShouldMatchMinimumOutOfBounds( totalShouldClauseNumber, minimum );
 			}
 
 			return minimum;
