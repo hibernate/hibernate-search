@@ -19,9 +19,13 @@ public enum ElasticsearchDialectName {
 	 */
 	ES_5_6("5.6"),
 	/**
-	 * Use the dialect targeting Elasticsearch 6.
+	 * Use the dialect targeting Elasticsearch 6.0 to 6.6.
 	 */
 	ES_6("6"),
+	/**
+	 * Use the dialect targeting Elasticsearch 6.7.
+	 */
+	ES_6_7("6.7"),
 	/**
 	 * Use the dialect targeting Elasticsearch 7.
 	 */

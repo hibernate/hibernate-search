@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.dialect.impl;
 /**
  * The dialect for Elasticsearch 5.6.
  */
-public class Elasticsearch56Dialect extends Elasticsearch6Dialect implements ElasticsearchDialect {
+public class Elasticsearch56Dialect extends Elasticsearch60Dialect implements ElasticsearchDialect {
 
 	// Nothing specific so far. This may change if we add new features that work better in later versions.
 

@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasticsearch6IndexFieldTypeFactoryContextProvider;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch6WorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch67WorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
 import com.google.gson.Gson;
@@ -19,12 +19,12 @@ import com.google.gson.Gson;
 /**
  * The dialect for Elasticsearch 6.
  */
-public class Elasticsearch6Dialect extends Elasticsearch7Dialect implements ElasticsearchDialect {
+public class Elasticsearch67Dialect extends Elasticsearch7Dialect implements ElasticsearchDialect {
 
 	@Override
 	public ElasticsearchWorkBuilderFactory createWorkBuilderFactory(GsonProvider gsonProvider) {
 		// Necessary because of the breaking changes related to type names in ES7
-		return new Elasticsearch6WorkBuilderFactory( gsonProvider );
+		return new Elasticsearch67WorkBuilderFactory( gsonProvider );
 	}
 
 	@Override

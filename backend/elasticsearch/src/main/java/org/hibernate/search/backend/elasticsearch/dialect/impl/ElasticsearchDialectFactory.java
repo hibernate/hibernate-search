@@ -26,7 +26,9 @@ public class ElasticsearchDialectFactory {
 			case ES_5_6:
 				return new Elasticsearch56Dialect();
 			case ES_6:
-				return new Elasticsearch6Dialect();
+				return new Elasticsearch60Dialect();
+			case ES_6_7:
+				return new Elasticsearch67Dialect();
 			case ES_7:
 				return new Elasticsearch7Dialect();
 			case AUTO:
@@ -50,7 +52,14 @@ public class ElasticsearchDialectFactory {
 			return ElasticsearchDialectName.ES_5_6;
 		}
 		else if ( version.getMajor() == 6 ) {
-			return ElasticsearchDialectName.ES_6;
+			if ( version.getMinor() < 7 ) {
+				return ElasticsearchDialectName.ES_6;
+			}
+			// Either the latest supported version, or a newer/unknown one
+			if ( version.getMinor() != 7 ) {
+				log.unknownElasticsearchVersion( version );
+			}
+			return ElasticsearchDialectName.ES_6_7;
 		}
 		else {
 			// Either the latest supported version, or a newer/unknown one

@@ -70,19 +70,25 @@ public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Roo
 			implements GetIndexTypeMappingWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
+		private final Boolean includeTypeName;
 
-		public static Builder forElasticsearch6AndBelow(URLEncodedString indexName, URLEncodedString typeName) {
-			return new Builder( indexName, typeName );
+		public static Builder forElasticsearch66AndBelow(URLEncodedString indexName, URLEncodedString typeName) {
+			return new Builder( indexName, typeName, null );
+		}
+
+		public static Builder forElasticsearch67(URLEncodedString indexName, URLEncodedString typeName) {
+			return new Builder( indexName, typeName, true );
 		}
 
 		public static Builder forElasticsearch7AndAbove(URLEncodedString indexName) {
-			return new Builder( indexName, null );
+			return new Builder( indexName, null, null );
 		}
 
-		public Builder(URLEncodedString indexName, URLEncodedString typeName) {
+		private Builder(URLEncodedString indexName, URLEncodedString typeName, Boolean includeTypeName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.typeName = typeName;
+			this.includeTypeName = includeTypeName;
 		}
 
 		@Override
@@ -91,6 +97,10 @@ public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Roo
 					ElasticsearchRequest.get()
 					.pathComponent( indexName )
 					.pathComponent( Paths._MAPPING );
+			// ES6.7 only
+			if ( includeTypeName != null ) {
+				builder.param( "include_type_name", includeTypeName );
+			}
 			return builder.build();
 		}
 
