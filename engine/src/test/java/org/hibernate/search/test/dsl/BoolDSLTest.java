@@ -12,6 +12,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 
@@ -490,6 +491,21 @@ public class BoolDSLTest {
 		thrown.expectMessage( "Multiple conflicting minimumShouldMatch constraints" );
 
 		queryBuilder.bool().minimumShouldMatchNumber( -1 ).minimumShouldMatchPercent( 100 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3535")
+	public void minimumShouldMatch_error_outOfBounds() {
+		QueryBuilder queryBuilder = helper.queryBuilder( IndexedEntity.class );
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "Computed minimum for minimumShouldMatch constraint is out of bounds" );
+		thrown.expectMessage( "expected a number between '1' and '1', got '3'" );
+
+		queryBuilder.bool()
+				.should( queryBuilder.all().createQuery() )
+				.minimumShouldMatchNumber( 3 )
+				.createQuery();
 	}
 
 	private void initData() {
