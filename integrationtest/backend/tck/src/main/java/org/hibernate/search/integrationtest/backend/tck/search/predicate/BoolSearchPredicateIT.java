@@ -24,6 +24,7 @@ import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -984,6 +985,110 @@ public class BoolSearchPredicateIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting minimumShouldMatch constraints for ceiling" )
 				.hasMessageContaining( "'4'" );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HSEARCH-3534" )
+	public void minimumShouldMatch_default() {
+		StubMappingSearchScope searchScope = indexManager.createSearchScope();
+
+		// If the should is alone ( not having any sibling must ),
+		// the default minimum should match will be 1.
+		IndexSearchQuery<DocumentReference> query = searchScope.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.should( f.match().onField( "field1" ).matching( "no-match" ) )
+				)
+				.toQuery();
+
+		assertThat( query ).hasNoHits();
+
+		// If the should has a sibling must,
+		// the default minimum should match will be 0.
+		query = searchScope.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.should( f.match().onField( "field1" ).matching( "no-match" ) )
+						.must( f.match().onField( "field5" ).matching( FIELD5_VALUE1AND2 ) ) // match 1 and 2
+				)
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+
+		// If there exists a must or a filter, but they are not a sibling of the should,
+		// the default minimum should match will be 1.
+		query = searchScope.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.filter( f.bool()
+								.should( f.match().onField( "field1" ).matching( "no-match" ) )
+						)
+						.must( f.match().onField( "field3" ).matching( FIELD3_VALUE1 ) ) // match 1
+				)
+				.toQuery();
+
+		assertThat( query ).hasNoHits();
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HSEARCH-3534" )
+	public void minimumShouldMatch_default_withinFilter_mustSibling() {
+		StubMappingSearchScope searchScope = indexManager.createSearchScope();
+
+		// We're following here the Lucene's conventions.
+		// If the should has a sibling must, even if the should is inside a filter,
+		// the default minimum should match will be 0.
+		IndexSearchQuery<DocumentReference> query = searchScope.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.filter( f.bool()
+								.should( f.match().onField( "field1" ).matching( "no-match" ) )
+								.must( f.match().onField( "field5" ).matching( FIELD5_VALUE1AND2 ) ) // match 1 and 2
+						)
+				)
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
+	public void minimumShouldMatch_default_withinFilter_mustNotSibling() {
+		StubMappingSearchScope searchScope = indexManager.createSearchScope();
+
+		// Differently from must predicate,
+		// if the should has a sibling must-not inside a filter,
+		// the default minimum should match will be still 1.
+		IndexSearchQuery<DocumentReference> query = searchScope.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.filter( f.bool()
+								.should( f.match().onField( "field1" ).matching( "no-match" ) )
+								.mustNot( f.match().onField( "field5" ).matching( FIELD5_VALUE1AND2 ) ) // match 3
+						)
+				)
+				.toQuery();
+
+		assertThat( query ).hasNoHits();
+	}
+
+	@Test
+	public void minimumShouldMatch_default_withinFilter_filterSibling() {
+		StubMappingSearchScope searchScope = indexManager.createSearchScope();
+
+		// We're following here the Lucene's conventions.
+		// If the should has a sibling filter, even if the should is inside a filter,
+		// the default minimum should match will be 0.
+		IndexSearchQuery<DocumentReference> query = searchScope.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.filter( f.bool()
+								.should( f.match().onField( "field1" ).matching( "no-match" ) )
+								.filter( p -> f.match().onField( "field5" ).matching( FIELD5_VALUE1AND2 ) ) // match 1 and 2
+						)
+				)
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	private void initData() {
