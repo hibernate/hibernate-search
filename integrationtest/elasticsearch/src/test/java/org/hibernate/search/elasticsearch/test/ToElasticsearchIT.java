@@ -18,13 +18,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.*;
 import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.BoostQuery;
-import org.apache.lucene.search.CachingWrapperQuery;
-import org.apache.lucene.search.MatchNoDocsQuery;
-import org.apache.lucene.search.PrefixQuery;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -170,6 +165,54 @@ public class ToElasticsearchIT extends SearchTestBase {
 			List<Letter> letters = fullTextQuery.list();
 
 			assertThat( letters ).isEmpty();
+		}
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testFuzzyQueryWithTranspositionsEnabled() {
+		boolean transpositions = true;
+		int	editDistance = 1;
+		int prefixLength = 1;
+
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+
+			FuzzyQuery fuzzyQuery = new FuzzyQuery( new Term( "signature", "gunnra" ), editDistance, prefixLength, FuzzyQuery.defaultMaxExpansions, transpositions );
+			BooleanQuery testedQuery = new BooleanQuery.Builder().add( fuzzyQuery, Occur.SHOULD ).build();
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( testedQuery, Letter.class );
+
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'bool':{'should':{'fuzzy':{'signature':{'value':'gunnra','fuzziness':1,'prefix_length':1,'transpositions':true}}}}}}", queryString );
+
+			List<Letter> letters = fullTextQuery.list();
+
+			assertThat( letters ).hasSize( 2 );
+			assertThat( letters.get(0) ).extracting( "signature" ).containsExactly( "Gunnar Morling" );
+			assertThat( letters.get(1) ).extracting( "signature" ).containsExactly( "Gunnar Morling" );
+		}
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testFuzzyQueryWithTranspositionsDisabled() {
+		boolean transpositions = false;
+		int	editDistance = 1;
+		int prefixLength = 1;
+
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+
+			FuzzyQuery fuzzyQuery = new FuzzyQuery( new Term( "signature", "gunnra" ), editDistance, prefixLength, FuzzyQuery.defaultMaxExpansions, transpositions );
+			BooleanQuery testedQuery = new BooleanQuery.Builder().add( fuzzyQuery, Occur.SHOULD ).build();
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( testedQuery, Letter.class );
+
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'bool':{'should':{'fuzzy':{'signature':{'value':'gunnra','fuzziness':1,'prefix_length':1,'transpositions':false}}}}}}", queryString );
+
+			List<Letter> letters = fullTextQuery.list();
+
+			assertThat( letters ).hasSize( 0 );
 		}
 	}
 
