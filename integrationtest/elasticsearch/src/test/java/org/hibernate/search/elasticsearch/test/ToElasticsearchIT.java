@@ -172,7 +172,7 @@ public class ToElasticsearchIT extends SearchTestBase {
 	@SuppressWarnings("unchecked")
 	public void testFuzzyQueryWithTranspositionsEnabled() {
 		boolean transpositions = true;
-		int	editDistance = 1;
+		int editDistance = 1;
 		int prefixLength = 1;
 
 		try ( Session session = openSession() ) {
@@ -197,7 +197,7 @@ public class ToElasticsearchIT extends SearchTestBase {
 	@SuppressWarnings("unchecked")
 	public void testFuzzyQueryWithTranspositionsDisabled() {
 		boolean transpositions = false;
-		int	editDistance = 1;
+		int editDistance = 1;
 		int prefixLength = 1;
 
 		try ( Session session = openSession() ) {
