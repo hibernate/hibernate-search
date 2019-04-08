@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 /**
  * @author Yoann Rodiere
@@ -26,6 +26,8 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 
 	private Projectable projectable = Projectable.DEFAULT;
 	protected boolean resolvedProjectable;
+
+	protected F indexNullAs;
 
 	AbstractElasticsearchScalarFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			Class<F> fieldType, DataType dataType) {
@@ -46,6 +48,12 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 	}
 
 	@Override
+	public S indexNullAs(F indexNullAs) {
+		this.indexNullAs = indexNullAs;
+		return thisAsS();
+	}
+
+	@Override
 	public final IndexFieldType<F> toIndexFieldType() {
 		PropertyMapping mapping = new PropertyMapping();
 
@@ -59,7 +67,11 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 		mapping.setStore( resolvedProjectable );
 		mapping.setDocValues( resolvedSortable );
 
-		return toIndexFieldType( mapping );
+		ElasticsearchIndexFieldType<F> indexFieldType = toIndexFieldType( mapping );
+		if ( indexNullAs != null ) {
+			indexFieldType.indexNullAs( indexNullAs );
+		}
+		return indexFieldType;
 	}
 
 	protected abstract ElasticsearchIndexFieldType<F> toIndexFieldType(PropertyMapping mapping);

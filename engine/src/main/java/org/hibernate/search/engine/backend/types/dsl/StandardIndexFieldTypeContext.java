@@ -16,4 +16,5 @@ public interface StandardIndexFieldTypeContext<S extends StandardIndexFieldTypeC
 
 	S sortable(Sortable sortable);
 
+	S indexNullAs(F indexNullAs);
 }

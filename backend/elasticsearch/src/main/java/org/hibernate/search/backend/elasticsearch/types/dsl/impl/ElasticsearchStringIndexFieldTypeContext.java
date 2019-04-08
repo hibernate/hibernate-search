@@ -24,6 +24,8 @@ import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonPrimitive;
+
 /**
  * @author Yoann Rodiere
  * @author Guillaume Smet
@@ -38,6 +40,7 @@ class ElasticsearchStringIndexFieldTypeContext
 	private String normalizerName;
 	private Projectable projectable = Projectable.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
+	private String indexNullAs;
 
 	ElasticsearchStringIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, String.class );
@@ -64,6 +67,12 @@ class ElasticsearchStringIndexFieldTypeContext
 	@Override
 	public ElasticsearchStringIndexFieldTypeContext sortable(Sortable sortable) {
 		this.sortable = sortable;
+		return this;
+	}
+
+	@Override
+	public ElasticsearchStringIndexFieldTypeContext indexNullAs(String indexNullAs) {
+		this.indexNullAs = indexNullAs;
 		return this;
 	}
 
@@ -97,6 +106,10 @@ class ElasticsearchStringIndexFieldTypeContext
 		}
 
 		mapping.setStore( resolvedProjectable );
+
+		if ( indexNullAs != null ) {
+			mapping.setNullValue( new JsonPrimitive( indexNullAs ) );
+		}
 
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
 				createDslToIndexConverter();

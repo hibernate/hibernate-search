@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
@@ -76,6 +77,14 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 	public Optional<FieldProjectionExpectations<YearMonth>> getFieldProjectionExpectations() {
 		return Optional.of( new FieldProjectionExpectations<>(
 			YearMonth.of( -320, Month.NOVEMBER ), YearMonth.of( 1984, Month.JANUARY ), YearMonth.of( 6001, Month.NOVEMBER )
+		) );
+	}
+
+	@Override
+	public Optional<IndexNullAsExpectactions<YearMonth>> getIndexNullAsExpectations() {
+		return Optional.of( new IndexNullAsExpectactions<>(
+				YearMonth.of( 0, Month.JANUARY ),
+				YearMonth.of( 2017, Month.NOVEMBER )
 		) );
 	}
 }

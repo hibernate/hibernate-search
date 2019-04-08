@@ -14,6 +14,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
@@ -79,5 +80,10 @@ public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<Str
 		return Optional.of( new FieldProjectionExpectations<>(
 				"Aaron", "george", "Zach"
 		) );
+	}
+
+	@Override
+	public Optional<IndexNullAsExpectactions<String>> getIndexNullAsExpectations() {
+		return Optional.empty();
 	}
 }

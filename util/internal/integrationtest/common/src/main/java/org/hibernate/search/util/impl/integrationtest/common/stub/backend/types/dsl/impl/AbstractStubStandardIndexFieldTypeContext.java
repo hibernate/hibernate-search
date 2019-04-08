@@ -74,6 +74,12 @@ abstract class AbstractStubStandardIndexFieldTypeContext<S extends AbstractStubS
 	}
 
 	@Override
+	public S indexNullAs(F indexNullAs) {
+		// TODO implement indexNullAs in the backends
+		return null;
+	}
+
+	@Override
 	public IndexFieldType<F> toIndexFieldType() {
 		return new StubIndexFieldType<>( inputType, modifiers );
 	}

@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
@@ -88,6 +89,14 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 				LocalTime.of( 10, 10, 10, 123_000_000 ),
 				LocalTime.of( 11, 10, 10, 123_450_000 ),
 				LocalTime.of( 12, 10, 10, 123_456_789 )
+		) );
+	}
+
+	@Override
+	public Optional<IndexNullAsExpectactions<LocalTime>> getIndexNullAsExpectations() {
+		return Optional.of( new IndexNullAsExpectactions<>(
+				LocalTime.of( 0, 0, 0 ),
+				LocalTime.of( 12, 14, 52 )
 		) );
 	}
 }

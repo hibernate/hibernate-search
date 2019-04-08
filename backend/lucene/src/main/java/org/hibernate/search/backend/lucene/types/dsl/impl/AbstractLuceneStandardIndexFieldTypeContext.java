@@ -59,6 +59,12 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 	}
 
 	@Override
+	public S indexNullAs(F indexNullAs) {
+		// TODO implement indexNullAs in the backends
+		return thisAsS();
+	}
+
+	@Override
 	public abstract LuceneIndexFieldType<F> toIndexFieldType();
 
 	protected abstract S thisAsS();

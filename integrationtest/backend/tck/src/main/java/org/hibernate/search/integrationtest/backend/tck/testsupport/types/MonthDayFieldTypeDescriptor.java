@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
@@ -85,6 +86,14 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 	public Optional<FieldProjectionExpectations<MonthDay>> getFieldProjectionExpectations() {
 		return Optional.of( new FieldProjectionExpectations<>(
 			MonthDay.of( Month.JANUARY, 7 ), MonthDay.of( Month.NOVEMBER, 7 ), MonthDay.of( Month.NOVEMBER, 21 )
+		) );
+	}
+
+	@Override
+	public Optional<IndexNullAsExpectactions<MonthDay>> getIndexNullAsExpectations() {
+		return Optional.of( new IndexNullAsExpectactions<>(
+				MonthDay.of( Month.JANUARY, 1 ),
+				MonthDay.of( Month.FEBRUARY, 28 )
 		) );
 	}
 }
