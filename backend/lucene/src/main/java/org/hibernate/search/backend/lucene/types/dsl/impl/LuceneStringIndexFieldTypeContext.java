@@ -94,7 +94,7 @@ class LuceneStringIndexFieldTypeContext
 				createIndexToProjectionConverter();
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
 				resolvedSortable,
-				getFieldType( resolvedProjectable, analyzer != null ),
+				getFieldType( resolvedProjectable, analyzer != null ), indexNullAsValue,
 				analyzerOrNormalizer
 		);
 

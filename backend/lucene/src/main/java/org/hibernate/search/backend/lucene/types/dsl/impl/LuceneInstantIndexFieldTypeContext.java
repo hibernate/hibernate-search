@@ -41,7 +41,7 @@ class LuceneInstantIndexFieldTypeContext
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Instant, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneInstantFieldCodec codec = new LuceneInstantFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneInstantFieldCodec codec = new LuceneInstantFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

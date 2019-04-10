@@ -32,8 +32,8 @@ public final class LuceneYearMonthFieldCodec extends AbstractLuceneNumericFieldC
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneYearMonthFieldCodec(boolean projectable, boolean sortable) {
-		super( projectable, sortable );
+	public LuceneYearMonthFieldCodec(boolean projectable, boolean sortable, YearMonth indexNullAsValue) {
+		super( projectable, sortable, indexNullAsValue );
 	}
 
 	@Override

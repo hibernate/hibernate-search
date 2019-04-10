@@ -41,7 +41,7 @@ class LuceneLocalTimeIndexFieldTypeContext
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super LocalTime, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneLocalTimeFieldCodec codec = new LuceneLocalTimeFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneLocalTimeFieldCodec codec = new LuceneLocalTimeFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

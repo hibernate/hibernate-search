@@ -29,13 +29,20 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	private final boolean projectable;
 	private final boolean sortable;
 
-	public LuceneGeoPointFieldCodec(boolean projectable, boolean sortable) {
+	private final GeoPoint indexNullAsValue;
+
+	public LuceneGeoPointFieldCodec(boolean projectable, boolean sortable, GeoPoint indexNullAsValue) {
 		this.projectable = projectable;
 		this.sortable = sortable;
+		this.indexNullAsValue = indexNullAsValue;
 	}
 
 	@Override
 	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, GeoPoint value) {
+		if ( value == null && indexNullAsValue != null ) {
+			value = indexNullAsValue;
+		}
+
 		if ( value == null ) {
 			return;
 		}

@@ -41,7 +41,7 @@ class LuceneMonthDayIndexFieldTypeContext
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super MonthDay, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneMonthDayFieldCodec codec = new LuceneMonthDayFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneMonthDayFieldCodec codec = new LuceneMonthDayFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

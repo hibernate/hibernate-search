@@ -20,13 +20,20 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 
 	private final boolean sortable;
 
-	public AbstractLuceneNumericFieldCodec(boolean projectable, boolean sortable) {
+	private final F indexNullAsValue;
+
+	public AbstractLuceneNumericFieldCodec(boolean projectable, boolean sortable, F indexNullAsValue) {
 		this.projectable = projectable;
 		this.sortable = sortable;
+		this.indexNullAsValue = indexNullAsValue;
 	}
 
 	@Override
 	public final void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value) {
+		if ( value == null && indexNullAsValue != null ) {
+			value = indexNullAsValue;
+		}
+
 		if ( value == null ) {
 			return;
 		}

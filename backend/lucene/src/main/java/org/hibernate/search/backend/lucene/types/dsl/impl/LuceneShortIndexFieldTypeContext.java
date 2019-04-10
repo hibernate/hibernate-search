@@ -39,7 +39,7 @@ class LuceneShortIndexFieldTypeContext
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Short, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneShortFieldCodec codec = new LuceneShortFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneShortFieldCodec codec = new LuceneShortFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

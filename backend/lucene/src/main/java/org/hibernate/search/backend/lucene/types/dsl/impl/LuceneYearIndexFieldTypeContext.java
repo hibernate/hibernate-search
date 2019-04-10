@@ -41,7 +41,7 @@ class LuceneYearIndexFieldTypeContext
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Year, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneYearFieldCodec codec = new LuceneYearFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneYearFieldCodec codec = new LuceneYearFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

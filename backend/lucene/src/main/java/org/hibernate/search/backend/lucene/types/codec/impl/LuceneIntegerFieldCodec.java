@@ -13,8 +13,8 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 public final class LuceneIntegerFieldCodec extends AbstractLuceneNumericFieldCodec<Integer, Integer> {
 
-	public LuceneIntegerFieldCodec(boolean projectable, boolean sortable) {
-		super( projectable, sortable );
+	public LuceneIntegerFieldCodec(boolean projectable, boolean sortable, Integer indexNullAsValue) {
+		super( projectable, sortable, indexNullAsValue );
 	}
 
 	@Override

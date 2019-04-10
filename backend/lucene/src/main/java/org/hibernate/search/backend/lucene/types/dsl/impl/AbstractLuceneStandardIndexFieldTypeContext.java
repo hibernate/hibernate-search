@@ -32,6 +32,7 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 	private ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
 	private FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
 	protected Projectable projectable = Projectable.DEFAULT;
+	protected F indexNullAsValue = null;
 
 	AbstractLuceneStandardIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType) {
 		this.buildContext = buildContext;
@@ -60,7 +61,7 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 
 	@Override
 	public S indexNullAs(F indexNullAs) {
-		// TODO implement indexNullAs in the backends
+		indexNullAsValue = indexNullAs;
 		return thisAsS();
 	}
 

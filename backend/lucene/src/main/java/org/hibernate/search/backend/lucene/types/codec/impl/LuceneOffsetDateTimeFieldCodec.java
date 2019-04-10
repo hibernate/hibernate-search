@@ -27,8 +27,8 @@ public final class LuceneOffsetDateTimeFieldCodec extends AbstractLuceneNumericF
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneOffsetDateTimeFieldCodec(boolean projectable, boolean sortable) {
-		super( projectable, sortable );
+	public LuceneOffsetDateTimeFieldCodec(boolean projectable, boolean sortable, OffsetDateTime indexNullAsValue) {
+		super( projectable, sortable, indexNullAsValue );
 	}
 
 	@Override

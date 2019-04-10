@@ -39,7 +39,7 @@ class LuceneFloatIndexFieldTypeContext
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Float, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneFloatFieldCodec codec = new LuceneFloatFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneFloatFieldCodec codec = new LuceneFloatFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

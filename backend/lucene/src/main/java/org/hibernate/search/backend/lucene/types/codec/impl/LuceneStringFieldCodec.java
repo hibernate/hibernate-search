@@ -29,16 +29,23 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 
 	private final FieldType fieldType;
 
+	private String indexNullAsValue;
+
 	private final Analyzer analyzerOrNormalizer;
 
-	public LuceneStringFieldCodec(boolean sortable, FieldType fieldType, Analyzer analyzerOrNormalizer) {
+	public LuceneStringFieldCodec(boolean sortable, FieldType fieldType, String indexNullAsValue, Analyzer analyzerOrNormalizer) {
 		this.sortable = sortable;
 		this.fieldType = fieldType;
+		this.indexNullAsValue = indexNullAsValue;
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
 	@Override
 	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, String value) {
+		if ( value == null && indexNullAsValue != null ) {
+			value = indexNullAsValue;
+		}
+
 		if ( value == null ) {
 			return;
 		}

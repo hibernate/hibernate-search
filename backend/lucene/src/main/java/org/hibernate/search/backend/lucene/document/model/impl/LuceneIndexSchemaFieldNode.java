@@ -60,10 +60,6 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return absoluteFieldPath;
 	}
 
-	public LuceneFieldCodec<F> getCodec() {
-		return codec;
-	}
-
 	public LuceneFieldPredicateBuilderFactory getPredicateBuilderFactory() {
 		if ( predicateBuilderFactory == null ) {
 			throw log.unsupportedDSLPredicates( getEventContext() );
@@ -100,5 +96,9 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private EventContext getEventContext() {
 		return EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath );
+	}
+
+	public LuceneFieldCodec<F> getCodec() {
+		return codec;
 	}
 }

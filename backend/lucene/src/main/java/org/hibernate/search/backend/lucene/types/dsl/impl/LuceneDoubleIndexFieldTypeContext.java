@@ -39,7 +39,7 @@ class LuceneDoubleIndexFieldTypeContext
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Double, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneDoubleFieldCodec codec = new LuceneDoubleFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneDoubleFieldCodec codec = new LuceneDoubleFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

@@ -44,7 +44,7 @@ class LuceneGeoPointIndexFieldTypeContext
 		FromDocumentFieldValueConverter<? super GeoPoint, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
 		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
-				resolvedProjectable, resolvedSortable
+				resolvedProjectable, resolvedSortable, indexNullAsValue
 		);
 
 		return new LuceneIndexFieldType<>(

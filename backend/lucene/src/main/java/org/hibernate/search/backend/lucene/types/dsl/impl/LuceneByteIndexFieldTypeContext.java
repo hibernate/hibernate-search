@@ -39,7 +39,7 @@ class LuceneByteIndexFieldTypeContext
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Byte, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneByteFieldCodec codec = new LuceneByteFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneByteFieldCodec codec = new LuceneByteFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

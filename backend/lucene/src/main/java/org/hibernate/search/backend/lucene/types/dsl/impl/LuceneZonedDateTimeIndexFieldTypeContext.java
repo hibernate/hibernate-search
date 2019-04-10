@@ -41,7 +41,7 @@ class LuceneZonedDateTimeIndexFieldTypeContext
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super ZonedDateTime, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneZonedDateTimeFieldCodec codec = new LuceneZonedDateTimeFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneZonedDateTimeFieldCodec codec = new LuceneZonedDateTimeFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,
