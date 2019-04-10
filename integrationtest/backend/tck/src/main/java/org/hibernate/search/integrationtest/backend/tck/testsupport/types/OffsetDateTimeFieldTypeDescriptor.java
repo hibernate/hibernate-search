@@ -54,8 +54,8 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 	@Override
 	public Optional<MatchPredicateExpectations<OffsetDateTime>> getMatchPredicateExpectations() {
 		return Optional.of( new MatchPredicateExpectations<>(
-				LocalDateTime.of( 1980, 10, 11, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 1984, 10, 7, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) )
+				LocalDateTime.of( 1980, 10, 11, 0, 15 ).atOffset( ZoneOffset.ofHours( 1 ) ),
+				LocalDateTime.of( 1984, 10, 7, 15, 37, 37 ).atOffset( ZoneOffset.ofHours( -6 ) )
 		) );
 	}
 
@@ -63,12 +63,12 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 	public Optional<RangePredicateExpectations<OffsetDateTime>> getRangePredicateExpectations() {
 		return Optional.of( new RangePredicateExpectations<>(
 				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 2018, 4, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
+				LocalDateTime.of( 2018, 2, 1, 0, 30 ).atOffset( ZoneOffset.ofHours( 1 ) ),
+				LocalDateTime.of( 2018, 3, 18, 22, 57, 59 ).atOffset( ZoneOffset.ofHours( 1 ) ),
+				LocalDateTime.of( 2018, 4, 1, 14, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
 				// Values around what is indexed
-				LocalDateTime.of( 2018, 2, 15, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) )
+				LocalDateTime.of( 2018, 2, 15, 21, 10, 10 ).atOffset( ZoneOffset.ofHours( 1 ) ),
+				LocalDateTime.of( 2018, 3, 18, 22, 57, 59 ).atOffset( ZoneOffset.ofHours( -6 ) )
 		) );
 	}
 
@@ -84,22 +84,22 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 	public Optional<FieldSortExpectations<OffsetDateTime>> getFieldSortExpectations() {
 		return Optional.of( new FieldSortExpectations<>(
 				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
-				LocalDateTime.of( 2018, 4, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
+				LocalDateTime.of( 2018, 2, 1, 13, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
+				LocalDateTime.of( 2018, 3, 21, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
+				LocalDateTime.of( 2018, 4, 10, 23, 30 ).atOffset( ZoneOffset.ofHours( -6 ) ),
 				// Values around what is indexed
-				LocalDateTime.of( 2018, 1, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
+				LocalDateTime.of( 2018, 2, 1, 12, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
 				LocalDateTime.of( 2018, 2, 15, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( -9 ) ),
-				LocalDateTime.of( 2018, 5, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) )
+				LocalDateTime.of( 2018, 3, 21, 0, 0 ).atOffset( ZoneOffset.ofHours( -9 ) ),
+				LocalDateTime.of( 2018, 5, 3, 0, 3 ).atOffset( ZoneOffset.ofHours( -6 ) )
 		) );
 	}
 
 	@Override
 	public Optional<FieldProjectionExpectations<OffsetDateTime>> getFieldProjectionExpectations() {
 		return Optional.of( new FieldProjectionExpectations<>(
-				LocalDateTime.of( 2018, 2, 1, 0, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
+				LocalDateTime.of( 2018, 2, 1, 16, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
+				LocalDateTime.of( 2018, 3, 1, 23, 59, 59 ).atOffset( ZoneOffset.ofHours( 1 ) ),
 				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atOffset( ZoneOffset.UTC )
 		) );
 	}
