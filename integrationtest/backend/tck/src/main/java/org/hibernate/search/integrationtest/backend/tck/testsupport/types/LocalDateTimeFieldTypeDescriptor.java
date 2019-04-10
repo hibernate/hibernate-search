@@ -55,8 +55,8 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 	@Override
 	public Optional<MatchPredicateExpectations<LocalDateTime>> getMatchPredicateExpectations() {
 		return Optional.of( new MatchPredicateExpectations<>(
-				LocalDateTime.of( 1980, 10, 11, 0, 0 ),
-				LocalDateTime.of( 1984, 10, 7, 0, 0 )
+				LocalDateTime.of( 1980, 10, 11, 0, 15 ),
+				LocalDateTime.of( 1984, 10, 7, 15, 37, 37 )
 		) );
 	}
 
@@ -64,12 +64,12 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 	public Optional<RangePredicateExpectations<LocalDateTime>> getRangePredicateExpectations() {
 		return Optional.of( new RangePredicateExpectations<>(
 				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 0, 0 ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ),
-				LocalDateTime.of( 2018, 4, 1, 0, 0 ),
+				LocalDateTime.of( 2018, 2, 1, 10, 0 ),
+				LocalDateTime.of( 2018, 3, 1, 15, 15, 15 ),
+				LocalDateTime.of( 2018, 4, 1, 0, 59 ),
 				// Values around what is indexed
-				LocalDateTime.of( 2018, 2, 15, 0, 0 ),
-				LocalDateTime.of( 2018, 3, 15, 0, 0 )
+				LocalDateTime.of( 2018, 2, 1, 10, 0, 1 ),
+				LocalDateTime.of( 2018, 3, 15, 10, 10 )
 		) );
 	}
 
@@ -85,23 +85,23 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 	public Optional<FieldSortExpectations<LocalDateTime>> getFieldSortExpectations() {
 		return Optional.of( new FieldSortExpectations<>(
 				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 0, 0 ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ),
+				LocalDateTime.of( 2018, 2, 1, 14, 0 ),
+				LocalDateTime.of( 2018, 3, 1, 3, 0, 3 ),
 				LocalDateTime.of( 2018, 4, 1, 0, 0 ),
 				// Values around what is indexed
-				LocalDateTime.of( 2018, 1, 1, 0, 0 ),
-				LocalDateTime.of( 2018, 2, 15, 0, 0 ),
-				LocalDateTime.of( 2018, 3, 15, 0, 0 ),
-				LocalDateTime.of( 2018, 5, 1, 0, 0 )
+				LocalDateTime.of( 2018, 1, 1, 16, 2, 2 ),
+				LocalDateTime.of( 2018, 2, 1, 14, 0, 1 ),
+				LocalDateTime.of( 2018, 3, 15, 14, 10, 10 ),
+				LocalDateTime.of( 2018, 5, 1, 9, 18 )
 		) );
 	}
 
 	@Override
 	public Optional<FieldProjectionExpectations<LocalDateTime>> getFieldProjectionExpectations() {
 		return Optional.of( new FieldProjectionExpectations<>(
-				LocalDateTime.of( 2018, 2, 1, 0, 0, 0, 1 ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ),
-				LocalDateTime.of( 2018, 4, 1, 0, 0 )
+				LocalDateTime.of( 2018, 2, 1, 14, 0, 15, 1 ),
+				LocalDateTime.of( 2018, 3, 1, 0, 59 ),
+				LocalDateTime.of( 2018, 4, 1, 23, 0 )
 		) );
 	}
 }

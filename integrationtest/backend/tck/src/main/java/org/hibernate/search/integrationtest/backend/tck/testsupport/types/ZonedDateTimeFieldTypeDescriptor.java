@@ -65,8 +65,8 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 	@Override
 	public Optional<MatchPredicateExpectations<ZonedDateTime>> getMatchPredicateExpectations() {
 		return Optional.of( new MatchPredicateExpectations<>(
-				LocalDateTime.of( 1980, 10, 11, 0, 0 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 1984, 10, 7, 0, 0 ).atZone( ZoneId.of( "America/Chicago" ) )
+				LocalDateTime.of( 1980, 10, 11, 0, 15 ).atZone( ZoneId.of( "Europe/Paris" ) ),
+				LocalDateTime.of( 1984, 10, 7, 15, 37, 37 ).atZone( ZoneId.of( "America/Chicago" ) )
 		) );
 	}
 
@@ -74,12 +74,12 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 	public Optional<RangePredicateExpectations<ZonedDateTime>> getRangePredicateExpectations() {
 		return Optional.of( new RangePredicateExpectations<>(
 				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 0, 0 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 2018, 4, 1, 0, 0 ).atZone( ZoneId.of( "Europe/Paris" ) ),
+				LocalDateTime.of( 2018, 2, 1, 10, 0, 36 ).atZone( ZoneId.of( "Europe/Paris" ) ),
+				LocalDateTime.of( 2018, 3, 1, 23, 0, 1 ).atZone( ZoneId.of( "Europe/Paris" ) ),
+				LocalDateTime.of( 2018, 4, 1, 0, 30 ).atZone( ZoneId.of( "Europe/Paris" ) ),
 				// Values around what is indexed
 				LocalDateTime.of( 2018, 2, 15, 0, 0 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atZone( ZoneId.of( "America/Chicago" ) )
+				LocalDateTime.of( 2018, 3, 1, 23, 0, 1 ).atZone( ZoneId.of( "America/Chicago" ) )
 		) );
 	}
 
@@ -95,22 +95,22 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 	public Optional<FieldSortExpectations<ZonedDateTime>> getFieldSortExpectations() {
 		return Optional.of( new FieldSortExpectations<>(
 				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 0, 0 ).atZone( ZoneId.of( "America/Chicago" ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atZone( ZoneId.of( "America/Chicago" ) ),
-				LocalDateTime.of( 2018, 4, 1, 0, 0 ).atZone( ZoneId.of( "America/Chicago" ) ),
+				LocalDateTime.of( 2018, 2, 1, 18, 12, 12 ).atZone( ZoneId.of( "America/Chicago" ) ),
+				LocalDateTime.of( 2018, 3, 1, 10, 0 ).atZone( ZoneId.of( "America/Chicago" ) ),
+				LocalDateTime.of( 2018, 4, 1, 7, 0 ).atZone( ZoneId.of( "America/Chicago" ) ),
 				// Values around what is indexed
-				LocalDateTime.of( 2018, 1, 1, 0, 0 ).atZone( ZoneId.of( "America/Chicago" ) ),
-				LocalDateTime.of( 2018, 2, 15, 0, 0 ).atZone( ZoneId.of( "America/Chicago" ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atZone( ZoneId.of( "US/Alaska" ) ),
-				LocalDateTime.of( 2018, 5, 1, 0, 0 ).atZone( ZoneId.of( "America/Chicago" ) )
+				LocalDateTime.of( 2018, 1, 1, 23, 59, 59 ).atZone( ZoneId.of( "America/Chicago" ) ),
+				LocalDateTime.of( 2018, 2, 1, 18, 12, 13 ).atZone( ZoneId.of( "America/Chicago" ) ),
+				LocalDateTime.of( 2018, 3, 1, 10, 0 ).atZone( ZoneId.of( "US/Alaska" ) ),
+				LocalDateTime.of( 2018, 5, 1, 3, 10 ).atZone( ZoneId.of( "America/Chicago" ) )
 		) );
 	}
 
 	@Override
 	public Optional<FieldProjectionExpectations<ZonedDateTime>> getFieldProjectionExpectations() {
 		return Optional.of( new FieldProjectionExpectations<>(
-				LocalDateTime.of( 2018, 2, 1, 0, 0, 0, 1 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atZone( ZoneId.of( "Europe/Paris" ) ),
+				LocalDateTime.of( 2018, 2, 1, 23, 0, 0, 1 ).atZone( ZoneId.of( "Europe/Paris" ) ),
+				LocalDateTime.of( 2018, 3, 1, 23, 59, 1 ).atZone( ZoneId.of( "Europe/Paris" ) ),
 				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atZone( ZoneId.of( "UTC" ) )
 		) );
 	}
