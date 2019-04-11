@@ -120,6 +120,12 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 		}
 
 		@Override
+		public boolean hasCompatibleAnalyzer(LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2) {
+			// analyzers are not involved in a sort clause
+			return true;
+		}
+
+		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2,
 				EventContext context) {

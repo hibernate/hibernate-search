@@ -41,6 +41,8 @@ public interface LuceneFieldPredicateBuilderFactory {
 
 	boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other);
 
+	boolean hasCompatibleAnalyzer(LuceneFieldPredicateBuilderFactory other);
+
 	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker);
 

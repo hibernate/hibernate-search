@@ -16,11 +16,11 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 public class LuceneSearchScopeModel {
 
@@ -76,49 +76,50 @@ public class LuceneSearchScopeModel {
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
 		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
-		T selectedComponent = null;
-		LuceneCompatibilityChecker converterChecker = null;
+		LuceneScopedIndexFieldComponent<T> scopedIndexFieldComponent = new LuceneScopedIndexFieldComponent<>();
 
 		for ( LuceneIndexModel indexModel : indexModels ) {
 			LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
+			if ( schemaNode == null ) {
+				continue;
+			}
 
-			if ( schemaNode != null ) {
-				T component = componentRetrievalStrategy.extractComponent( schemaNode );
+			T component = componentRetrievalStrategy.extractComponent( schemaNode );
+			if ( selectedSchemaNode == null ) {
+				selectedSchemaNode = schemaNode;
+				indexModelForSelectedSchemaNode = indexModel;
+				scopedIndexFieldComponent.setComponent( component );
+				continue;
+			}
 
-				if ( selectedSchemaNode == null ) {
-					selectedSchemaNode = schemaNode;
-					indexModelForSelectedSchemaNode = indexModel;
-					selectedComponent = component;
-				}
-				else if ( !componentRetrievalStrategy.hasCompatibleCodec( selectedComponent, component ) ) {
-					throw componentRetrievalStrategy.createCompatibilityException(
-							absoluteFieldPath,
-							selectedComponent,
-							component,
-							EventContexts.fromIndexNames(
-									indexModelForSelectedSchemaNode.getIndexName(),
-									indexModel.getIndexName()
-							)
-					);
-				}
-				else if ( !componentRetrievalStrategy.hasCompatibleConverter( selectedComponent, component ) ) {
-					converterChecker = new LuceneFailingCompatibilityChecker(
-							absoluteFieldPath, selectedComponent, component, EventContexts.fromIndexNames(
-							indexModelForSelectedSchemaNode.getIndexName(),
-							indexModel.getIndexName()
-					), componentRetrievalStrategy );
-				}
+			if ( !componentRetrievalStrategy.hasCompatibleCodec( scopedIndexFieldComponent.getComponent(), component ) ) {
+				throw componentRetrievalStrategy.createCompatibilityException(
+						absoluteFieldPath,
+						scopedIndexFieldComponent.getComponent(),
+						component,
+						EventContexts.fromIndexNames(
+								indexModelForSelectedSchemaNode.getIndexName(),
+								indexModel.getIndexName()
+						)
+				);
+			}
+
+			LuceneFailingCompatibilityChecker<T> failingCompatibilityChecker = new LuceneFailingCompatibilityChecker<>(
+					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
+					indexModelForSelectedSchemaNode.getIndexName(), indexModel.getIndexName()
+			), componentRetrievalStrategy );
+
+			if ( !componentRetrievalStrategy.hasCompatibleConverter( scopedIndexFieldComponent.getComponent(), component ) ) {
+				scopedIndexFieldComponent.setConverterCompatibilityChecker( failingCompatibilityChecker );
+			}
+			if ( !componentRetrievalStrategy.hasCompatibleAnalyzer( scopedIndexFieldComponent.getComponent(), component ) ) {
+				scopedIndexFieldComponent.setAnalyzerCompatibilityChecker( failingCompatibilityChecker );
 			}
 		}
 		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
-		if ( converterChecker == null ) {
-			// no converter incompatibility detected
-			converterChecker = new LuceneSucceedingCompatibilityChecker();
-		}
-
-		return new LuceneScopedIndexFieldComponent<>( selectedComponent, converterChecker );
+		return scopedIndexFieldComponent;
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {

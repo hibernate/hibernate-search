@@ -48,6 +48,12 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 	}
 
 	@Override
+	public boolean hasCompatibleAnalyzer(LuceneFieldPredicateBuilderFactory other) {
+		// analyzers are not involved in a non-text field predicate clause
+		return true;
+	}
+
+	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath) {
 		throw log.textPredicatesNotSupportedByFieldType(
