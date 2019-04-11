@@ -33,9 +33,9 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 
 	@Override
 	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker) {
+			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
 		return new LuceneTextMatchPredicateBuilder<>(
-				searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, analyzerOrNormalizer
+				searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, analyzerOrNormalizer, analyzerChecker
 		);
 	}
 

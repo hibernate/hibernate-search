@@ -38,16 +38,20 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	private Integer maxEditDistance;
 	private Integer prefixLength;
+
 	private Analyzer analyzer;
+	private LuceneCompatibilityChecker analyzerChecker;
+	private boolean analyzerOverridden = false;
 
 	LuceneTextMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec,
-			Analyzer analyzerOrNormalizer) {
+			Analyzer analyzerOrNormalizer, LuceneCompatibilityChecker analyzerChecker) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 		this.analyzer = analyzerOrNormalizer;
+		this.analyzerChecker = analyzerChecker;
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
 
@@ -63,15 +67,23 @@ class LuceneTextMatchPredicateBuilder<F>
 		if ( analyzer == null ) {
 			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
+		this.analyzerOverridden = true;
 	}
 
 	@Override
 	public void skipAnalysis() {
 		this.analyzer = AnalyzerUtils.KEYWORD_ANALYZER;
+		this.analyzerOverridden = true;
 	}
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
+		// in case of an overridden analyzer,
+		// any analyzer incompatibility is overridden too
+		if ( !this.analyzerOverridden ) {
+			analyzerChecker.failIfNotCompatible();
+		}
+
 		if ( analyzer != null ) {
 			QueryBuilder effectiveQueryBuilder;
 			if ( maxEditDistance != null ) {
