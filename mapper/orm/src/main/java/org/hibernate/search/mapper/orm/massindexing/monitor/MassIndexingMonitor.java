@@ -55,7 +55,7 @@ public interface MassIndexingMonitor {
 	 *
 	 * @param increment additional number of documents built
 	 */
-	void documentsBuilt(int increment);
+	void documentsBuilt(long increment);
 
 	/**
 	 * Notify the monitor that {@code increment} more entities have been loaded from the database.
@@ -72,7 +72,7 @@ public interface MassIndexingMonitor {
 	 *
 	 * @param increment additional number of entities loaded from database
 	 */
-	void entitiesLoaded(int increment);
+	void entitiesLoaded(long increment);
 
 	/**
 	 * Notify the monitor that {@code increment} more entities have been

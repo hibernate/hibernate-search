@@ -47,11 +47,6 @@ public class SimpleIndexingProgressMonitor implements MassIndexingMonitor {
 	}
 
 	@Override
-	public void entitiesLoaded(int size) {
-		//not used
-	}
-
-	@Override
 	public void documentsAdded(long increment) {
 		long previous = documentsDoneCounter.getAndAdd( increment );
 		if ( startTime == 0 ) {
@@ -73,7 +68,12 @@ public class SimpleIndexingProgressMonitor implements MassIndexingMonitor {
 	}
 
 	@Override
-	public void documentsBuilt(int number) {
+	public void documentsBuilt(long number) {
+		//not used
+	}
+
+	@Override
+	public void entitiesLoaded(long size) {
 		//not used
 	}
 
