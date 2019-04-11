@@ -18,7 +18,7 @@ import org.apache.lucene.util.QueryBuilder;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
+import org.hibernate.search.backend.lucene.search.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
@@ -44,7 +44,7 @@ class LuceneTextMatchPredicateBuilder<F>
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
-			LuceneConverterCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec,
+			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec,
 			Analyzer analyzerOrNormalizer) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 		this.analyzer = analyzerOrNormalizer;

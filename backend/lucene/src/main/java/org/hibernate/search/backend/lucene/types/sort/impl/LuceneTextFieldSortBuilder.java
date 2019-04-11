@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import org.apache.lucene.search.SortField;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
+import org.hibernate.search.backend.lucene.search.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
@@ -21,7 +21,7 @@ public class LuceneTextFieldSortBuilder<F>
 	LuceneTextFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
-			LuceneConverterCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec) {
+			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
 	}
 

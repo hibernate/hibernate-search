@@ -77,7 +77,7 @@ public class LuceneSearchScopeModel {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
 		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		T selectedComponent = null;
-		LuceneConverterCompatibilityChecker converterChecker = null;
+		LuceneCompatibilityChecker converterChecker = null;
 
 		for ( LuceneIndexModel indexModel : indexModels ) {
 			LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
@@ -102,7 +102,7 @@ public class LuceneSearchScopeModel {
 					);
 				}
 				else if ( !componentRetrievalStrategy.hasCompatibleConverter( selectedComponent, component ) ) {
-					converterChecker = new LuceneFailingConverterCompatibilityChecker(
+					converterChecker = new LuceneFailingCompatibilityChecker(
 							absoluteFieldPath, selectedComponent, component, EventContexts.fromIndexNames(
 							indexModelForSelectedSchemaNode.getIndexName(),
 							indexModel.getIndexName()
@@ -115,7 +115,7 @@ public class LuceneSearchScopeModel {
 		}
 		if ( converterChecker == null ) {
 			// no converter incompatibility detected
-			converterChecker = new LuceneSucceedingConverterCompatibilityChecker();
+			converterChecker = new LuceneSucceedingCompatibilityChecker();
 		}
 
 		return new LuceneScopedIndexFieldComponent<>( selectedComponent, converterChecker );

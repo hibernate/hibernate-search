@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.impl;
 
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class LuceneFailingConverterCompatibilityChecker<T> implements LuceneConverterCompatibilityChecker {
+public class LuceneFailingCompatibilityChecker<T> implements LuceneCompatibilityChecker {
 
 	private final String absoluteFieldPath;
 	private final IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy;
@@ -16,7 +16,7 @@ public class LuceneFailingConverterCompatibilityChecker<T> implements LuceneConv
 	private final T component2;
 	private final EventContext eventContext;
 
-	public LuceneFailingConverterCompatibilityChecker(String absoluteFieldPath, T component1, T component2, EventContext eventContext,
+	public LuceneFailingCompatibilityChecker(String absoluteFieldPath, T component1, T component2, EventContext eventContext,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.component1 = component1;

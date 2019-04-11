@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
+import org.hibernate.search.backend.lucene.search.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
@@ -40,7 +40,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
 	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
-	private final LuceneConverterCompatibilityChecker converterChecker;
+	private final LuceneCompatibilityChecker converterChecker;
 
 	protected final C codec;
 	private final Object sortMissingValueFirstPlaceholder;
@@ -52,7 +52,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
-			LuceneConverterCompatibilityChecker converterChecker, C codec,
+			LuceneCompatibilityChecker converterChecker, C codec,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;

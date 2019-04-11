@@ -9,9 +9,9 @@ package org.hibernate.search.backend.lucene.search.impl;
 public class LuceneScopedIndexFieldComponent<T> {
 
 	private final T component;
-	private final LuceneConverterCompatibilityChecker converterChecker;
+	private final LuceneCompatibilityChecker converterChecker;
 
-	public LuceneScopedIndexFieldComponent(T component, LuceneConverterCompatibilityChecker converterChecker) {
+	public LuceneScopedIndexFieldComponent(T component, LuceneCompatibilityChecker converterChecker) {
 		this.component = component;
 		this.converterChecker = converterChecker;
 	}
@@ -20,7 +20,7 @@ public class LuceneScopedIndexFieldComponent<T> {
 		return component;
 	}
 
-	public LuceneConverterCompatibilityChecker getConverterCompatibilityChecker() {
+	public LuceneCompatibilityChecker getConverterCompatibilityChecker() {
 		return converterChecker;
 	}
 }
