@@ -82,8 +82,7 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 		LuceneStringFieldCodec other = (LuceneStringFieldCodec) obj;
 
 		return ( sortable == other.sortable ) &&
-				Objects.equals( fieldType, other.fieldType ) &&
-				Objects.equals( analyzerOrNormalizer, other.analyzerOrNormalizer );
+				Objects.equals( fieldType, other.fieldType );
 	}
 
 	@Override
