@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
-public class LuceneSucceedingConverterCompatibilityChecker implements LuceneConverterCompatibilityChecker {
+public interface LuceneCompatibilityChecker {
 
-	@Override
-	public void failIfNotCompatible() {
-		// this sub class never fails
-	}
+	void failIfNotCompatible();
+
 }
