@@ -163,6 +163,12 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		}
 
 		@Override
+		public boolean hasCompatibleAnalyzer(LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2) {
+			// analyzers are not involved in a projection clause
+			return true;
+		}
+
+		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2,
 				EventContext context) {

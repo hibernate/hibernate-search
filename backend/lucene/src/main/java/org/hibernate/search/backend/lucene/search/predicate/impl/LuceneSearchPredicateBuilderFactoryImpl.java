@@ -179,6 +179,11 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 		}
 
 		@Override
+		public boolean hasCompatibleAnalyzer(LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2) {
+			return component1.hasCompatibleAnalyzer( component2 );
+		}
+
+		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2,
 				EventContext context) {

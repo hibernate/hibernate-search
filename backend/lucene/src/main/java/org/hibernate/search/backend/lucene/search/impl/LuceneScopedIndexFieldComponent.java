@@ -8,19 +8,31 @@ package org.hibernate.search.backend.lucene.search.impl;
 
 public class LuceneScopedIndexFieldComponent<T> {
 
-	private final T component;
-	private final LuceneCompatibilityChecker converterChecker;
-
-	public LuceneScopedIndexFieldComponent(T component, LuceneCompatibilityChecker converterChecker) {
-		this.component = component;
-		this.converterChecker = converterChecker;
-	}
+	private T component;
+	private LuceneCompatibilityChecker converterCompatibilityChecker = new LuceneSucceedingCompatibilityChecker();
+	private LuceneCompatibilityChecker analyzerCompatibilityChecker = new LuceneSucceedingCompatibilityChecker();
 
 	public T getComponent() {
 		return component;
 	}
 
 	public LuceneCompatibilityChecker getConverterCompatibilityChecker() {
-		return converterChecker;
+		return converterCompatibilityChecker;
+	}
+
+	public LuceneCompatibilityChecker getAnalyzerCompatibilityChecker() {
+		return analyzerCompatibilityChecker;
+	}
+
+	void setComponent(T component) {
+		this.component = component;
+	}
+
+	void setConverterCompatibilityChecker(LuceneCompatibilityChecker converterCompatibilityChecker) {
+		this.converterCompatibilityChecker = converterCompatibilityChecker;
+	}
+
+	void setAnalyzerCompatibilityChecker(LuceneCompatibilityChecker analyzerCompatibilityChecker) {
+		this.analyzerCompatibilityChecker = analyzerCompatibilityChecker;
 	}
 }
