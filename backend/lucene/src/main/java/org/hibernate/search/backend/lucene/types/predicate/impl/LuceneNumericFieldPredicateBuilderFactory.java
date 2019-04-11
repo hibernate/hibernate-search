@@ -8,8 +8,10 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
 /**
  * A predicate factory for fields encoded as a number.
@@ -27,8 +29,8 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E extends Number
 	}
 
 	@Override
-	public LuceneNumericMatchPredicateBuilder<F, E> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker) {
+	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
+			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
 		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 	}
 
