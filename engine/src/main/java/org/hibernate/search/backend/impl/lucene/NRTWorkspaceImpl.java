@@ -73,7 +73,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final ReentrantLock writeLock = new ReentrantLock();
-	private final AtomicReference<DirectoryReader> currentReader = new AtomicReference<DirectoryReader>();
+	private final AtomicReference<DirectoryReader> currentReader = new AtomicReference<>();
 	private final CommitPolicy commitPolicy = new NRTCommitPolicy( writerHolder );
 
 	/**

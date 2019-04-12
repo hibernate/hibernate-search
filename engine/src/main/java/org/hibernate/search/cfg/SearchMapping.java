@@ -27,10 +27,10 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
  * @author Emmanuel Bernard
  */
 public class SearchMapping {
-	private final Set<Map<String, Object>> analyzerDefs = new HashSet<Map<String, Object>>();
-	private final Set<Map<String, Object>> normalizerDefs = new HashSet<Map<String, Object>>();
-	private final Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
-	private final Map<Class<?>, EntityDescriptor> entities = new HashMap<Class<?>, EntityDescriptor>();
+	private final Set<Map<String, Object>> analyzerDefs = new HashSet<>();
+	private final Set<Map<String, Object>> normalizerDefs = new HashSet<>();
+	private final Set<Map<String, Object>> fullTextFilterDefs = new HashSet<>();
+	private final Map<Class<?>, EntityDescriptor> entities = new HashMap<>();
 
 	public Set<Map<String, Object>> getAnalyzerDefs() {
 		return analyzerDefs;
@@ -81,10 +81,10 @@ public class SearchMapping {
 													String attributeName) {
 		@SuppressWarnings("unchecked") List<Map<String, Object>> array = (List<Map<String, Object>>) containingAnnotation.get( attributeName );
 		if ( array == null ) {
-			array = new ArrayList<Map<String, Object>>();
+			array = new ArrayList<>();
 			containingAnnotation.put( attributeName, array );
 		}
-		Map<String, Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<>();
 		array.add( param );
 		return param;
 	}

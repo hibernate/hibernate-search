@@ -21,7 +21,7 @@ public class PropertyLatitudeMapping {
 	private final SearchMapping mapping;
 	private final EntityDescriptor entity;
 	private final PropertyDescriptor property;
-	private final Map<String, Object> latitude = new HashMap<String, Object>();
+	private final Map<String, Object> latitude = new HashMap<>();
 
 	public PropertyLatitudeMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
 		this.mapping = mapping;

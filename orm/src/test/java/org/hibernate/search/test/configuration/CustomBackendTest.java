@@ -36,7 +36,7 @@ public class CustomBackendTest {
 	}
 
 	private void verifyBackendUsage(String name, Class<? extends BackendQueueProcessor> backendType) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+	    try (FullTextSessionBuilder builder = new FullTextSessionBuilder()) {
 		FullTextSession ftSession = builder
 			.setProperty( "hibernate.search.default.worker.backend", name )
 			.addAnnotatedClass( BlogEntry.class )
@@ -47,7 +47,7 @@ public class CustomBackendTest {
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager( "org.hibernate.search.test.configuration.BlogEntry" );
 		BackendQueueProcessor backendQueueProcessor = allIndexesManager.getBackendQueueProcessor( indexManager.getIndexName() );
 		assertEquals( backendType, backendQueueProcessor.getClass() );
-		builder.close();
+	    }
 	}
 
 	public void verifyBackendUsage(Class<? extends BackendQueueProcessor> backendType) {

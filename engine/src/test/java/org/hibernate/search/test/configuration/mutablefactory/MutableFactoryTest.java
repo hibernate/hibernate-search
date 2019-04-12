@@ -137,14 +137,7 @@ public class MutableFactoryTest {
 		searchIntegrator = integratorResource.create( new SearchConfigurationForTest() );
 		int numberOfClasses = 100;
 		int numberOfThreads = 10;
-		new ConcurrentRunner( numberOfClasses, numberOfThreads,
-				new TaskFactory() {
-					@Override
-					public Runnable createRunnable(int i) throws Exception {
-						return new DoAddClass( i );
-					}
-				}
-			)
+		new ConcurrentRunner( numberOfClasses, numberOfThreads, DoAddClass::new)
 			.setTimeout( 1, TimeUnit.MINUTES )
 			.execute();
 

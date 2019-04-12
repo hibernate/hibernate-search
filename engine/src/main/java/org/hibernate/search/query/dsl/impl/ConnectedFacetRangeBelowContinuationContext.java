@@ -34,7 +34,7 @@ public class ConnectedFacetRangeBelowContinuationContext<T> extends ConnectedFac
 		context.makeRange();
 		context.setRangeStart( max );
 		context.setRangeEnd( null );
-		return new ConnectedFacetRangeAboveContext<T>( context );
+		return new ConnectedFacetRangeAboveContext<>( context );
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class ConnectedFacetRangeBelowContinuationContext<T> extends ConnectedFac
 	public FacetRangeLimitContext<T> from(T rangeStart) {
 		context.makeRange();
 		context.setRangeStart( rangeStart );
-		return new ConnectedFacetRangeLimitContext<T>( context );
+		return new ConnectedFacetRangeLimitContext<>( context );
 	}
 }
 

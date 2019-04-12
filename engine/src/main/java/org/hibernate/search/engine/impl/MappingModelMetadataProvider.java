@@ -89,7 +89,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 
 	private final MetadataProvider delegate;
 	private final SearchMapping mapping;
-	private final Map<AnnotatedElement, AnnotationReader> cache = new HashMap<AnnotatedElement, AnnotationReader>( 100 );
+	private final Map<AnnotatedElement, AnnotationReader> cache = new HashMap<>( 100 );
 	private Map<Object, Object> defaults;
 
 	public MappingModelMetadataProvider(MetadataProvider delegate, SearchMapping mapping) {
@@ -102,8 +102,8 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		if ( defaults == null ) {
 			final Map<Object, Object> delegateDefaults = delegate.getDefaults();
 			defaults = delegateDefaults == null ?
-					new HashMap<Object, Object>() :
-					new HashMap<Object, Object>( delegateDefaults );
+					new HashMap<>() :
+					new HashMap<>( delegateDefaults );
 			defaults.put( AnalyzerDefs.class, createAnalyzerDefArray() );
 			defaults.put( NormalizerDefs.class, createNormalizerDefArray() );
 			if ( !mapping.getFullTextFilterDefs().isEmpty() ) {
@@ -124,7 +124,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	}
 
 	private AnalyzerDef[] createAnalyzerDefArray() {
-		List<String> globalAnalyzerDefNames = new ArrayList<String>();
+		List<String> globalAnalyzerDefNames = new ArrayList<>();
 		AnalyzerDef[] defs = new AnalyzerDef[mapping.getAnalyzerDefs().size()];
 		int index = 0;
 		for ( Map<String, Object> analyzerDef : mapping.getAnalyzerDefs() ) {
@@ -140,7 +140,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	}
 
 	private NormalizerDef[] createNormalizerDefArray() {
-		List<String> globalNormalizerDefNames = new ArrayList<String>();
+		List<String> globalNormalizerDefNames = new ArrayList<>();
 		NormalizerDef[] defs = new NormalizerDef[mapping.getNormalizerDefs().size()];
 		int index = 0;
 		for ( Map<String, Object> normalizerDef : mapping.getNormalizerDefs() ) {
@@ -188,35 +188,40 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	private AnalyzerDef createAnalyzerDef(Map<String, Object> analyzerDef) {
 		AnnotationDescriptor analyzerDefAnnotation = new AnnotationDescriptor( AnalyzerDef.class );
 		for ( Map.Entry<String, Object> entry : analyzerDef.entrySet() ) {
-			if ( "tokenizer".equals( entry.getKey() ) ) {
-				AnnotationDescriptor tokenizerAnnotation = new AnnotationDescriptor( TokenizerDef.class );
-				@SuppressWarnings("unchecked")
-				Map<String, Object> tokenizer = (Map<String, Object>) entry.getValue();
-				for ( Map.Entry<String, Object> tokenizerEntry : tokenizer.entrySet() ) {
-					if ( "params".equals( tokenizerEntry.getKey() ) ) {
-						addParamsToAnnotation( tokenizerAnnotation, tokenizerEntry );
-					}
-					else {
-						tokenizerAnnotation.setValue( tokenizerEntry.getKey(), tokenizerEntry.getValue() );
-					}
+			if ( null == entry.getKey() ) {
+			    analyzerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
+			}
+			else switch (entry.getKey()) {
+		    	case "tokenizer":
+			    AnnotationDescriptor tokenizerAnnotation = new AnnotationDescriptor( TokenizerDef.class );
+			    @SuppressWarnings("unchecked")
+				    Map<String, Object> tokenizer = (Map<String, Object>) entry.getValue();
+			    for ( Map.Entry<String, Object> tokenizerEntry : tokenizer.entrySet() ) {
+				if ( "params".equals( tokenizerEntry.getKey() ) ) {
+				    addParamsToAnnotation( tokenizerAnnotation, tokenizerEntry );
 				}
-				analyzerDefAnnotation.setValue( "tokenizer", createAnnotation( tokenizerAnnotation ) );
-			}
-			else if ( "filters".equals( entry.getKey() ) ) {
-				@SuppressWarnings("unchecked") TokenFilterDef[] filtersArray = createFilters(
-						(List<Map<String, Object>>) entry.getValue()
-				);
-				analyzerDefAnnotation.setValue( "filters", filtersArray );
-			}
-			else if ( "charFilters".equals( entry.getKey() ) ) {
-				@SuppressWarnings("unchecked") CharFilterDef[] charFiltersArray = createCharFilters(
-						(List<Map<String, Object>>) entry.getValue()
-				);
-				analyzerDefAnnotation.setValue( "charFilters", charFiltersArray );
-			}
-			else {
-				analyzerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
-			}
+				else {
+				    tokenizerAnnotation.setValue( tokenizerEntry.getKey(), tokenizerEntry.getValue() );
+				}
+			    }
+			    analyzerDefAnnotation.setValue( "tokenizer", createAnnotation( tokenizerAnnotation ) );
+			    break;
+		    	case "filters":
+			    @SuppressWarnings("unchecked") TokenFilterDef[] filtersArray = createFilters(
+				    (List<Map<String, Object>>) entry.getValue()
+			    );
+			    analyzerDefAnnotation.setValue( "filters", filtersArray );
+			    break;
+		    	case "charFilters":
+			    @SuppressWarnings("unchecked") CharFilterDef[] charFiltersArray = createCharFilters(
+				    (List<Map<String, Object>>) entry.getValue()
+			    );
+			    analyzerDefAnnotation.setValue( "charFilters", charFiltersArray );
+			    break;
+		    	default:
+			    analyzerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
+			    break;
+		    }
 		}
 		return (AnalyzerDef) createAnnotation( analyzerDefAnnotation );
 	}
@@ -224,21 +229,26 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	private NormalizerDef createNormalizerDef(Map<String, Object> analyzerDef) {
 		AnnotationDescriptor normalizerDefAnnotation = new AnnotationDescriptor( NormalizerDef.class );
 		for ( Map.Entry<String, Object> entry : analyzerDef.entrySet() ) {
-			if ( "filters".equals( entry.getKey() ) ) {
-				@SuppressWarnings("unchecked") TokenFilterDef[] filtersArray = createFilters(
-						(List<Map<String, Object>>) entry.getValue()
-				);
-				normalizerDefAnnotation.setValue( "filters", filtersArray );
+			if ( null == entry.getKey() ) {
+			    normalizerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
 			}
-			else if ( "charFilters".equals( entry.getKey() ) ) {
-				@SuppressWarnings("unchecked") CharFilterDef[] charFiltersArray = createCharFilters(
-						(List<Map<String, Object>>) entry.getValue()
-				);
-				normalizerDefAnnotation.setValue( "charFilters", charFiltersArray );
-			}
-			else {
-				normalizerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
-			}
+			else switch (entry.getKey()) {
+		    	case "filters":
+			    @SuppressWarnings("unchecked") TokenFilterDef[] filtersArray = createFilters(
+				    (List<Map<String, Object>>) entry.getValue()
+			    );
+			    normalizerDefAnnotation.setValue( "filters", filtersArray );
+			    break;
+		    	case "charFilters":
+			    @SuppressWarnings("unchecked") CharFilterDef[] charFiltersArray = createCharFilters(
+				    (List<Map<String, Object>>) entry.getValue()
+			    );
+			    normalizerDefAnnotation.setValue( "charFilters", charFiltersArray );
+			    break;
+		    	default:
+			    normalizerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
+			    break;
+		    }
 		}
 		return (NormalizerDef) createAnnotation( normalizerDefAnnotation );
 	}
@@ -374,7 +384,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		 */
 		private void initAnnotations() {
 			if ( annotationsArray == null ) {
-				annotations = new HashMap<Class<? extends Annotation>, Annotation>();
+				annotations = new HashMap<>();
 				delegatesAnnotationReading();
 				if ( entityType != null ) {
 					final EntityDescriptor entity = mapping.getEntityDescriptor( entityType );
@@ -459,9 +469,9 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final Collection<Map<String, Object>> facets = property.getFacets();
 
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
-					new ArrayList<org.hibernate.search.annotations.Field>( fields.size() );
+					new ArrayList<>( fields.size() );
 
-			List<NumericField> numericFieldAnnotations = new ArrayList<NumericField>( numericFields.size() );
+			List<NumericField> numericFieldAnnotations = new ArrayList<>( numericFields.size() );
 			for ( Map<String, Object> numericField : numericFields ) {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( NumericField.class );
 				for ( Map.Entry<String, Object> entry : numericField.entrySet() ) {
@@ -470,7 +480,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				numericFieldAnnotations.add( (NumericField) createAnnotation( fieldAnnotation ) );
 			}
 
-			List<SortableField> sortableFieldAnnotations = new ArrayList<SortableField>( sortableFields.size() );
+			List<SortableField> sortableFieldAnnotations = new ArrayList<>( sortableFields.size() );
 			for ( Map<String, Object> sortableField : sortableFields ) {
 				AnnotationDescriptor sortableFieldAnnotation = new AnnotationDescriptor( SortableField.class );
 				for ( Map.Entry<String, Object> entry : sortableField.entrySet() ) {
@@ -479,7 +489,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				sortableFieldAnnotations.add( (SortableField) createAnnotation( sortableFieldAnnotation ) );
 			}
 
-			List<Facet> facetAnnotations = new ArrayList<Facet>( facets.size() );
+			List<Facet> facetAnnotations = new ArrayList<>( facets.size() );
 			for ( Map<String, Object> facet : facets ) {
 				AnnotationDescriptor sortableFieldAnnotation = new AnnotationDescriptor( Facet.class );
 				for ( Map.Entry<String, Object> entry : facet.entrySet() ) {
@@ -491,38 +501,43 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			for ( Map<String, Object> field : fields ) {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Field.class );
 				for ( Map.Entry<String, Object> entry : field.entrySet() ) {
-					if ( "analyzer".equals( entry.getKey() ) ) {
-						addAnalyzerAnnotationTo( fieldAnnotation, entry );
+					if ( null == entry.getKey() ) {
+					    fieldAnnotation.setValue( entry.getKey(), entry.getValue() );
 					}
-					else if ( "normalizer".equals( entry.getKey() ) ) {
-						addNormalizerAnnotationTo( fieldAnnotation, entry );
-					}
-					else if ( "boost".equals( entry.getKey() ) ) {
-						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
-						@SuppressWarnings("unchecked")
-						Map<String, Object> boost = (Map<String, Object>) entry.getValue();
-						for ( Map.Entry<String, Object> boostEntry : boost.entrySet() ) {
-							boostAnnotation.setValue( boostEntry.getKey(), boostEntry.getValue() );
+					else switch (entry.getKey()) {
+				    	case "analyzer":
+					    addAnalyzerAnnotationTo( fieldAnnotation, entry );
+					    break;
+				    	case "normalizer":
+					    addNormalizerAnnotationTo( fieldAnnotation, entry );
+					    break;
+				    	case "boost":
+					    AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
+					    @SuppressWarnings("unchecked")
+						    Map<String, Object> boost = (Map<String, Object>) entry.getValue();
+					    for ( Map.Entry<String, Object> boostEntry : boost.entrySet() ) {
+						boostAnnotation.setValue( boostEntry.getKey(), boostEntry.getValue() );
+					    }
+					    fieldAnnotation.setValue( "boost", createAnnotation( boostAnnotation ) );
+					    break;
+				    	case "bridge":
+					    AnnotationDescriptor bridgeAnnotation = new AnnotationDescriptor( FieldBridge.class );
+					    @SuppressWarnings("unchecked")
+						    Map<String, Object> bridge = (Map<String, Object>) entry.getValue();
+					    for ( Map.Entry<String, Object> bridgeEntry : bridge.entrySet() ) {
+						if ( "params".equals( bridgeEntry.getKey() ) ) {
+						    addParamsToAnnotation( bridgeAnnotation, bridgeEntry );
 						}
-						fieldAnnotation.setValue( "boost", createAnnotation( boostAnnotation ) );
-					}
-					else if ( "bridge".equals( entry.getKey() ) ) {
-						AnnotationDescriptor bridgeAnnotation = new AnnotationDescriptor( FieldBridge.class );
-						@SuppressWarnings("unchecked")
-						Map<String, Object> bridge = (Map<String, Object>) entry.getValue();
-						for ( Map.Entry<String, Object> bridgeEntry : bridge.entrySet() ) {
-							if ( "params".equals( bridgeEntry.getKey() ) ) {
-								addParamsToAnnotation( bridgeAnnotation, bridgeEntry );
-							}
-							else {
-								bridgeAnnotation.setValue( bridgeEntry.getKey(), bridgeEntry.getValue() );
-							}
+						else {
+						    bridgeAnnotation.setValue( bridgeEntry.getKey(), bridgeEntry.getValue() );
 						}
-						fieldAnnotation.setValue( "bridge", createAnnotation( bridgeAnnotation ) );
-					}
-					else {
-						fieldAnnotation.setValue( entry.getKey(), entry.getValue() );
-					}
+					    }
+					    fieldAnnotation.setValue( "bridge", createAnnotation( bridgeAnnotation ) );
+					    break;
+				    	default:
+					    fieldAnnotation.setValue( entry.getKey(), entry.getValue() );
+					    break;
+				    }
 				}
 				fieldAnnotations.add( (org.hibernate.search.annotations.Field) createAnnotation( fieldAnnotation ) );
 			}
@@ -772,15 +787,20 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			AnnotationDescriptor annotation = new AnnotationDescriptor( ClassBridge.class );
 			Set<Entry<String, Object>> entrySet = classBridgeDef.entrySet();
 			for ( Entry<String, Object> entry : entrySet ) {
-				if ( "analyzer".equals( entry.getKey() ) ) {
-					addAnalyzerAnnotationTo( annotation, entry );
+				if ( null == entry.getKey() ) {
+				    annotation.setValue( entry.getKey(), entry.getValue() );
 				}
-				else if ( "params".equals( entry.getKey() ) ) {
-					addParamsToAnnotation( annotation, entry );
-				}
-				else {
-					annotation.setValue( entry.getKey(), entry.getValue() );
-				}
+				else switch (entry.getKey()) {
+			    	case "analyzer":
+				    addAnalyzerAnnotationTo( annotation, entry );
+				    break;
+			    	case "params":
+				    addParamsToAnnotation( annotation, entry );
+				    break;
+			    	default:
+				    annotation.setValue( entry.getKey(), entry.getValue() );
+				    break;
+			    }
 			}
 
 			return (ClassBridge) createAnnotation( annotation );

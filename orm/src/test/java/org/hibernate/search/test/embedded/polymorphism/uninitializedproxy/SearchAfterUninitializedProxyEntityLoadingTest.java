@@ -64,9 +64,7 @@ public class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBa
 	}
 
 	private void executeTest(Class<? extends AbstractEntity> clazz, boolean loadAbstractProxyBeforeSearch) {
-		Session session = openSession();
-
-		try {
+		try (Session session = openSession()) {
 			if ( loadAbstractProxyBeforeSearch ) {
 				// Load a proxified version of the entity into the session
 				LazyAbstractEntityReference reference = (LazyAbstractEntityReference) session.get(
@@ -77,15 +75,10 @@ public class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBa
 			// Search for the created entity
 			assertEquals( 1, doSearch( session, clazz, entityId ).size() );
 		}
-		finally {
-			session.close();
-		}
 	}
 
 	private void populateDatabase() {
-		Session session = openSession();
-
-		try {
+		try (Session session = openSession()) {
 			Transaction t = session.beginTransaction();
 
 			ConcreteEntity entity = new ConcreteEntity();
@@ -98,9 +91,6 @@ public class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBa
 
 			session.flush();
 			t.commit();
-		}
-		finally {
-			session.close();
 		}
 	}
 

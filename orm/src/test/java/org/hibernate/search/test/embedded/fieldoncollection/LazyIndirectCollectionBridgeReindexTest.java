@@ -62,8 +62,7 @@ public class LazyIndirectCollectionBridgeReindexTest extends SearchTestBase {
 	}
 
 	private void prepareEntities() {
-		Session session = openSession();
-		try {
+		try (Session session = openSession()) {
 			Transaction transaction = session.beginTransaction();
 
 			CollectionItem bridgedEntity = new CollectionItem();
@@ -79,9 +78,6 @@ public class LazyIndirectCollectionBridgeReindexTest extends SearchTestBase {
 			session.save( root );
 
 			transaction.commit();
-		}
-		finally {
-			session.close();
 		}
 	}
 

@@ -30,7 +30,7 @@ public class FieldAccessTest extends SearchTestBase {
 	public void testFields() throws Exception {
 		Document doc = new Document( "Hibernate in Action", "Object/relational mapping with Hibernate",
 				"blah blah blah" );
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( doc );
 		tx.commit();
@@ -44,17 +44,17 @@ public class FieldAccessTest extends SearchTestBase {
 		assertEquals( "Query by field", 1, result.size() );
 		s.delete( result.get( 0 ) );
 		tx.commit();
-		s.close();
+	    }
 
 	}
 
 	@Test
 	public void testFieldBoost() throws Exception {
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( new Document( "Hibernate in Action", "Object and Relational", "blah blah blah" )		);
 		s.persist(
-				new Document( "Object and Relational", "Hibernate in Action", "blah blah blah" )
+			new Document( "Object and Relational", "Hibernate in Action", "blah blah blah" )
 		);
 		tx.commit();
 
@@ -68,7 +68,7 @@ public class FieldAccessTest extends SearchTestBase {
 		assertEquals( "@Boost fails", "Hibernate in Action", ( (Document) result.get( 0 ) ).getTitle() );
 		s.delete( result.get( 0 ) );
 		tx.commit();
-		s.close();
+	    }
 
 	}
 

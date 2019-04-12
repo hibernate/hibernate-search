@@ -67,29 +67,29 @@ public class ScrollableResultsTest {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number" ) );
 		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
-		ScrollableResults scrollableResults = sess
-			.createFullTextQuery( tq, AlternateBook.class )
-			.setSort( sort )
-			.setFetchSize( 10 )
-			.setFirstResult( 20 )
-			.setMaxResults( 111 )
-			.scroll();
+	    try (ScrollableResults scrollableResults = sess
+		    .createFullTextQuery( tq, AlternateBook.class )
+		    .setSort( sort )
+		    .setFetchSize( 10 )
+		    .setFirstResult( 20 )
+		    .setMaxResults( 111 )
+		    .scroll()) {
 		assertEquals( -1, scrollableResults.getRowNumber() );
 		assertTrue( scrollableResults.last() );
 		assertEquals( 110, scrollableResults.getRowNumber() );
 		scrollableResults.beforeFirst();
 		int position = scrollableResults.getRowNumber();
 		while ( scrollableResults.next() ) {
-			position++;
-			int bookId = position + 20;
-			assertEquals( position, scrollableResults.getRowNumber() );
-			AlternateBook book = (AlternateBook) scrollableResults.get()[0];
-			assertEquals( bookId, book.getId().intValue() );
-			assertEquals( "book about the number " + bookId, book.getSummary() );
-			assertTrue( sess.contains( book ) );
+		    position++;
+		    int bookId = position + 20;
+		    assertEquals( position, scrollableResults.getRowNumber() );
+		    AlternateBook book = (AlternateBook) scrollableResults.get()[0];
+		    assertEquals( bookId, book.getId().intValue() );
+		    assertEquals( "book about the number " + bookId, book.getSummary() );
+		    assertTrue( sess.contains( book ) );
 		}
 		assertEquals( 110, position );
-		scrollableResults.close();
+	    }
 		tx.commit();
 	}
 
@@ -103,11 +103,11 @@ public class ScrollableResultsTest {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number" ) );
 		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
-		ScrollableResults scrollableResults = sess
-			.createFullTextQuery( tq, AlternateBook.class )
-			.setSort( sort )
-			.setFetchSize( 10 )
-			.scroll();
+	    try (ScrollableResults scrollableResults = sess
+		    .createFullTextQuery( tq, AlternateBook.class )
+		    .setSort( sort )
+		    .setFetchSize( 10 )
+		    .scroll()) {
 		scrollableResults.beforeFirst();
 		// initial position should be -1 as in Hibernate Core
 		assertEquals( -1, scrollableResults.getRowNumber() );
@@ -115,13 +115,13 @@ public class ScrollableResultsTest {
 		int position = scrollableResults.getRowNumber();
 		assertEquals( 323, position );
 		while ( scrollableResults.previous() ) {
-			AlternateBook book = (AlternateBook) scrollableResults.get()[0];
-			assertEquals( --position, book.getId().intValue() );
-			assertEquals( "book about the number " + position, book.getSummary() );
+		    AlternateBook book = (AlternateBook) scrollableResults.get()[0];
+		    assertEquals( --position, book.getId().intValue() );
+		    assertEquals( "book about the number " + position, book.getSummary() );
 		}
 		assertEquals( 0, position );
 		assertEquals( -1, scrollableResults.getRowNumber() );
-		scrollableResults.close();
+	    }
 		tx.commit();
 	}
 
@@ -181,53 +181,53 @@ public class ScrollableResultsTest {
 		TermQuery tq = new TermQuery( new Term( "dept", "num" ) );
 		//the tests relies on the results being returned sorted by id:
 		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
-		ScrollableResults scrollableResults = sess
-			.createFullTextQuery( tq, Employee.class )
-			.setProjection(
-					FullTextQuery.OBJECT_CLASS,
-					FullTextQuery.ID,
-					FullTextQuery.THIS,
-					"lastname",
-					FullTextQuery.THIS
-					)
-			.setFetchSize( 10 )
-			.setSort( sort )
-			.scroll();
+	    try (ScrollableResults scrollableResults = sess
+		    .createFullTextQuery( tq, Employee.class )
+		    .setProjection(
+			    FullTextQuery.OBJECT_CLASS,
+			    FullTextQuery.ID,
+			    FullTextQuery.THIS,
+			    "lastname",
+			    FullTextQuery.THIS
+		    )
+		    .setFetchSize( 10 )
+		    .setSort( sort )
+		    .scroll()) {
 		scrollableResults.last();
 		assertEquals( 132, scrollableResults.getRowNumber() );
 		scrollableResults.beforeFirst();
 		assertEquals( -1, scrollableResults.getRowNumber() );
 		int position = scrollableResults.getRowNumber();
 		while ( scrollableResults.next() ) {
-			position++;
-			Object[] objs = scrollableResults.get();
-			assertEquals( Employee.class, objs[0] );
-			assertEquals( position, objs[1] );
-			assertTrue( objs[2] instanceof Employee );
-			sess.contains( objs[2] );
-			assertEquals( "Rossi", objs[3] );
-			assertTrue( objs[4] instanceof Employee );
-			sess.contains( objs[4] );
-			assertTrue( objs[2] == objs[4] ); // projected twice the same entity
-			// detach some objects:
-			if ( position % 3 == 0 ) {
-				sess.evict( objs[2] );
-			}
+		    position++;
+		    Object[] objs = scrollableResults.get();
+		    assertEquals( Employee.class, objs[0] );
+		    assertEquals( position, objs[1] );
+		    assertTrue( objs[2] instanceof Employee );
+		    sess.contains( objs[2] );
+		    assertEquals( "Rossi", objs[3] );
+		    assertTrue( objs[4] instanceof Employee );
+		    sess.contains( objs[4] );
+		    assertTrue( objs[2] == objs[4] ); // projected twice the same entity
+		    // detach some objects:
+		    if ( position % 3 == 0 ) {
+			sess.evict( objs[2] );
+		    }
 		}
 		//verify we scrolled to the end:
 		assertEquals( 132, position );
 		// and now the other way around, checking entities are attached again:
 		while ( scrollableResults.previous() ) {
-			position--;
-			Object[] objs = scrollableResults.get();
-			assertTrue( objs[2] instanceof Employee );
-			sess.contains( objs[2] );
-			assertTrue( objs[4] instanceof Employee );
-			sess.contains( objs[4] );
-			assertTrue( objs[2] == objs[4] );
+		    position--;
+		    Object[] objs = scrollableResults.get();
+		    assertTrue( objs[2] instanceof Employee );
+		    sess.contains( objs[2] );
+		    assertTrue( objs[4] instanceof Employee );
+		    sess.contains( objs[4] );
+		    assertTrue( objs[2] == objs[4] );
 		}
 		assertEquals( -1, position );
-		scrollableResults.close();
+	    }
 		tx.commit();
 	}
 

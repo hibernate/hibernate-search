@@ -61,7 +61,7 @@ public final class IndexedTypeSets {
 		Objects.requireNonNull( entityTypes );
 		if ( entityTypes instanceof Set<?> ) {
 			Set<IndexedTypeIdentifier> set = (Set<IndexedTypeIdentifier>) entityTypes;
-			fromSafeHashSet( new HashSet<IndexedTypeIdentifier>( set ) );
+			fromSafeHashSet( new HashSet<>( set ) );
 		}
 		HashSet<IndexedTypeIdentifier> set = new HashSet<>();
 		for ( IndexedTypeIdentifier iti : entityTypes ) {

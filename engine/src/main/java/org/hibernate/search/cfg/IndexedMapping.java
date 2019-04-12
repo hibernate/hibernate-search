@@ -26,7 +26,7 @@ public class IndexedMapping {
 	public IndexedMapping(SearchMapping mapping, EntityDescriptor entity) {
 		this.mapping = mapping;
 		this.entity = entity;
-		indexed = new HashMap<String, Object>();
+		indexed = new HashMap<>();
 		entity.setIndexed( indexed );
 	}
 
@@ -53,7 +53,7 @@ public class IndexedMapping {
 	}
 
 	public IndexedMapping boost(float boost) {
-		final Map<String, Object> boostAnn = new HashMap<String, Object>();
+		final Map<String, Object> boostAnn = new HashMap<>();
 		boostAnn.put( "value", boost );
 		entity.setBoost( boostAnn );
 		return this;
@@ -70,14 +70,14 @@ public class IndexedMapping {
 	 */
 	@Deprecated
 	public IndexedMapping dynamicBoost(Class<? extends BoostStrategy> impl) {
-		final Map<String, Object> dynamicBoost = new HashMap<String, Object>();
+		final Map<String, Object> dynamicBoost = new HashMap<>();
 		dynamicBoost.put( "impl", impl );
 		entity.setDynamicBoost( dynamicBoost );
 		return this;
 	}
 
 	public IndexedMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
-		final Map<String, Object> discriminatorAnn = new HashMap<String, Object>();
+		final Map<String, Object> discriminatorAnn = new HashMap<>();
 		discriminatorAnn.put( "impl", discriminator );
 		entity.setAnalyzerDiscriminator( discriminatorAnn );
 		return this;

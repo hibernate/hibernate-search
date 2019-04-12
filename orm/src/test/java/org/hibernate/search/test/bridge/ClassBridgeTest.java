@@ -39,7 +39,7 @@ public class ClassBridgeTest extends SearchTestBase {
 	 */
 	@Test
 	public void testClassBridges() throws Exception {
-		org.hibernate.Session s = openSession();
+	    try (org.hibernate.Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( getDepts1() );
 		s.persist( getDepts2() );
@@ -64,7 +64,7 @@ public class ClassBridgeTest extends SearchTestBase {
 		assertNotNull( result );
 		assertEquals( "incorrect number of results returned", 2, result.size() );
 		for ( Departments d : result ) {
-			assertEquals( "incorrect manufacturer", "C", d.getManufacturer() );
+		    assertEquals( "incorrect manufacturer", "C", d.getManufacturer() );
 		}
 
 		// No data cross-ups.
@@ -93,10 +93,10 @@ public class ClassBridgeTest extends SearchTestBase {
 
 		// cleanup
 		for ( Object element : s.createQuery( "from " + Departments.class.getName() ).list() ) {
-			s.delete( element );
+		    s.delete( element );
 		}
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class ClassBridgeTest extends SearchTestBase {
 	 */
 	@Test
 	public void testClassBridgesWithProjection() throws Exception {
-		org.hibernate.Session s = openSession();
+	    try (org.hibernate.Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( getDepts1() );
 		s.persist( getDepts2() );
@@ -157,10 +157,10 @@ public class ClassBridgeTest extends SearchTestBase {
 		assertTrue( "incorrect result count returned", projections.isLast() );
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Departments.class.getName() ).list() ) {
-			s.delete( element );
+		    s.delete( element );
 		}
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	private Query createQuery(QueryBuilder queryBuilder, String fieldName, String term) {
@@ -181,7 +181,7 @@ public class ClassBridgeTest extends SearchTestBase {
 	 */
 	@Test
 	public void testClassBridge() throws Exception {
-		org.hibernate.Session s = openSession();
+	    try (org.hibernate.Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( getDept1() );
 		s.persist( getDept2() );
@@ -232,10 +232,10 @@ public class ClassBridgeTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Department.class.getName() ).list() ) {
-			s.delete( element );
+		    s.delete( element );
 		}
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	private Department getDept1() {

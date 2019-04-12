@@ -70,7 +70,7 @@ public class IndexManagerHolder {
 	private static final String DEFAULT_INDEX_MANAGER_KEY = "__DEFAULT__";
 
 	private final ConcurrentMap<String, IndexManagerType> indexManagerImplementationsRegistry = new ConcurrentHashMap<>();
-	private final ConcurrentMap<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
+	private final ConcurrentMap<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, BackendQueueProcessor> backendQueueProcessorRegistry = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, IndexManagerGroupHolder> groupHolderRegistry = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, IndexManagerGroupHolder> groupHolderByIndexManagerNameRegistry = new ConcurrentHashMap<>();

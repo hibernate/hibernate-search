@@ -155,7 +155,7 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 
 		List resultList = new ArrayList();
 
-		Session sessionHbn = openSession();
+	    try (Session sessionHbn = openSession()) {
 		sessionHbn.beginTransaction();
 
 		FullTextSession fTxtSess = Search.getFullTextSession( sessionHbn );
@@ -163,24 +163,24 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 		QueryBuilder builder = fTxtSess.getSearchFactory().buildQueryBuilder().forEntity( GeoEntity.class ).get();
 
 		org.apache.lucene.search.Query luceneQuery = builder.spatial()
-				.within( distance, Unit.KM )
-				.ofLatitude( startLat )
-				.andLongitude( startLon )
-				.createQuery();
-
+			.within( distance, Unit.KM )
+			.ofLatitude( startLat )
+			.andLongitude( startLon )
+			.createQuery();
+		
 		FullTextQuery hibQuery = fTxtSess.createFullTextQuery( luceneQuery, GeoEntity.class );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( startLat, startLon, Spatial.COORDINATES_DEFAULT_FIELD );
 
 		if ( sortByDistance ) {
-			Sort distanceSort = new Sort(
-					new DistanceSortField(
-							startLat,
-							startLon,
-							Spatial.COORDINATES_DEFAULT_FIELD
-					)
-			);
-			hibQuery.setSort( distanceSort );
+		    Sort distanceSort = new Sort(
+			    new DistanceSortField(
+				    startLat,
+				    startLon,
+				    Spatial.COORDINATES_DEFAULT_FIELD
+			    )
+		    );
+		    hibQuery.setSort( distanceSort );
 		}
 
 		hibQuery.setFirstResult( firstResult ).setMaxResults( maxResult );
@@ -189,13 +189,13 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 
 		// copy distance from projection to entities
 		for ( Object obj[] : (List<Object[]>) tmpList ) {
-			GeoEntity entity = (GeoEntity) obj[0];
-			entity.setDistance( (Double) obj[1] );
-			resultList.add( entity );
+		    GeoEntity entity = (GeoEntity) obj[0];
+		    entity.setDistance( (Double) obj[1] );
+		    resultList.add( entity );
 		}
 
 		sessionHbn.getTransaction().commit();
-		sessionHbn.close();
+	    }
 		return resultList;
 	}
 
@@ -275,7 +275,7 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 	}
 
 	private void prepareTestData() {
-		Session sessionHbn = openSession();
+	    try (Session sessionHbn = openSession()) {
 		sessionHbn.beginTransaction();
 
 		sessionHbn.saveOrUpdate( new GeoEntity( 54.021861, 18.048349, "v00" ) );
@@ -330,7 +330,7 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 		sessionHbn.saveOrUpdate( new GeoEntity( 54.095646, 18.033243, "v49" ) );
 
 		sessionHbn.getTransaction().commit();
-		sessionHbn.close();
+	    }
 		log.debug( "test data saved" );
 	}
 }

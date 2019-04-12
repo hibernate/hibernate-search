@@ -43,19 +43,19 @@ public class SessionTest extends SearchTestBase {
 	public void testSessionWrapper() throws Exception {
 		Session s = openSession();
 		DelegationWrapper wrapper = new DelegationWrapper( s );
-		Session wrapped = (Session) Proxy.newProxyInstance(
-				org.hibernate.Session.class.getClassLoader(),
-				SESS_PROXY_INTERFACES,
-				wrapper
-		);
-		try {
+		try (Session wrapped = (Session) Proxy.newProxyInstance(
+			org.hibernate.Session.class.getClassLoader(),
+			SESS_PROXY_INTERFACES,
+			wrapper
+		)) {
+		    try {
 			Search.getFullTextSession( wrapped );
-		}
-		catch (ClassCastException e) {
+		    }
+		    catch (ClassCastException e) {
 			e.printStackTrace();
 			fail( e.toString() );
+		    }
 		}
-		wrapped.close();
 	}
 
 	@Test

@@ -19,13 +19,7 @@ public class TheaterBridgeProvider1 implements BridgeProvider {
 	@Override
 	public FieldBridge provideFieldBridge(BridgeProviderContext bridgeProviderContext) {
 		if ( bridgeProviderContext.getReturnType().equals( Theater.class ) ) {
-			return new String2FieldBridgeAdaptor( new StringBridge() {
-
-				@Override
-				public String objectToString(Object object) {
-					return ( (Theater) object ).toString();
-				}
-			} );
+			return new String2FieldBridgeAdaptor( (Object object) -> ( (Theater) object ).toString());
 		}
 		return null;
 	}

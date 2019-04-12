@@ -22,7 +22,7 @@ public class NormalizerDefMapping {
 
 	NormalizerDefMapping(String name, SearchMapping mapping) {
 		this.mapping = mapping;
-		this.definition = new HashMap<String, Object>();
+		this.definition = new HashMap<>();
 		mapping.addNormalizerDef( definition );
 		definition.put( "name", name );
 	}

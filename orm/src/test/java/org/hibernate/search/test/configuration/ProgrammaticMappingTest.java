@@ -699,7 +699,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testClassBridgeMapping() throws Exception {
-		org.hibernate.Session s = openSession();
+	    try (org.hibernate.Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( getDepts1() );
 		s.persist( getDepts2() );
@@ -724,7 +724,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		assertNotNull( result );
 		assertEquals( "incorrect number of results returned", 2, result.size() );
 		for ( Departments d : result ) {
-			assertEquals( "incorrect manufacturer", "C", d.getManufacturer() );
+		    assertEquals( "incorrect manufacturer", "C", d.getManufacturer() );
 		}
 
 		// No data cross-ups.
@@ -755,10 +755,10 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Departments.class.getName() ).list() ) {
-			s.delete( element );
+		    s.delete( element );
 		}
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Test

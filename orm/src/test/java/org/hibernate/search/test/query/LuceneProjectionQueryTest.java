@@ -84,16 +84,13 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 	@After
 	@Override
 	public void tearDown() throws Exception {
-		Session s = getSession(); // Opened during setup
-		try {
+		try (Session s = getSession() // Opened during setup
+	    ) {
 			Transaction tx = s.beginTransaction();
 			for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
 				s.delete( element );
 			}
 			tx.commit();
-		}
-		finally {
-			s.close();
 		}
 		super.tearDown();
 	}

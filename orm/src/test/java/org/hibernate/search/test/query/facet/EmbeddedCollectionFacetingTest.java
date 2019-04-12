@@ -67,7 +67,7 @@ public class EmbeddedCollectionFacetingTest extends SearchTestBase {
 		book3.getAuthors().add( hugo );
 		book3.getAuthors().add( moliere );
 
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		Transaction tx = session.beginTransaction();
 		session.persist( voltaire );
 		session.persist( hugo );
@@ -78,7 +78,7 @@ public class EmbeddedCollectionFacetingTest extends SearchTestBase {
 		session.persist( book3 );
 
 		tx.commit();
-		session.close();
+	    }
 	}
 
 	@Test

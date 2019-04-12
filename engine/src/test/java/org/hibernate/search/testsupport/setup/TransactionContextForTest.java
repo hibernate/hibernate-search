@@ -18,7 +18,7 @@ import org.hibernate.search.backend.TransactionContext;
  */
 public class TransactionContextForTest implements TransactionContext {
 	private boolean progress = true;
-	private List<Synchronization> syncs = new ArrayList<Synchronization>();
+	private List<Synchronization> syncs = new ArrayList<>();
 
 	@Override
 	public boolean isTransactionInProgress() {

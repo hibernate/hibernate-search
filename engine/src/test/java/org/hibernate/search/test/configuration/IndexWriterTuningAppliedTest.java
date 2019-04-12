@@ -53,13 +53,11 @@ public class IndexWriterTuningAppliedTest {
 		AbstractWorkspaceImpl dvdsWorkspace = sfHolder.extractWorkspace( dvdTestType );
 		AbstractWorkspaceImpl booksWorkspace = sfHolder.extractWorkspace( bookTestType );
 		IndexWriter dvdsIndexWriter = dvdsWorkspace.getIndexWriter();
-		IndexWriter booksIndexWriter = booksWorkspace.getIndexWriter();
-		try {
+		try (IndexWriter booksIndexWriter = booksWorkspace.getIndexWriter()) {
 			Assert.assertFalse( dvdsIndexWriter.getConfig().getInfoStream().isEnabled( "IW" ) );
 			Assert.assertTrue( booksIndexWriter.getConfig().getInfoStream().isEnabled( "IW" ) );
 		}
 		finally {
-			booksIndexWriter.close();
 			dvdsIndexWriter.close();
 		}
 	}

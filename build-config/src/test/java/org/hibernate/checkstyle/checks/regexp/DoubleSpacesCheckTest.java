@@ -59,7 +59,7 @@ public class DoubleSpacesCheckTest {
 	}
 
 	private static class DoubleSpacesCheckMock extends DoubleSpacesCheck {
-		List<Integer> violations = new ArrayList<Integer>();
+		List<Integer> violations = new ArrayList<>();
 
 		@Override
 		public void processLines(List<String> aLines) {

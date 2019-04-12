@@ -62,32 +62,26 @@ public class TikaBridgeTest extends SearchTestBase {
 
 	@Test
 	public void testIndexMp3MetaTags() throws Exception {
-		Session session = openSession();
-
+	    try (Session session = openSession()) {
 		persistSong( session );
 		searchSong( session );
-
-		session.close();
+	    }
 	}
 
 	@Test
 	public void testIndexMp3MetaTagsDSL() throws Exception {
-		Session session = openSession();
-
+	    try (Session session = openSession()) {
 		persistSong( session );
 		searchSongDsl( session );
-
-		session.close();
+	    }
 	}
 
 	@Test
 	public void testIndexMp3MetaTagsDSLErrorMessage() throws Exception {
-		Session session = openSession();
-
+	    try (Session session = openSession()) {
 		persistSong( session );
 		searchSongDsl( session );
-
-		session.close();
+	    }
 	}
 
 	@Test

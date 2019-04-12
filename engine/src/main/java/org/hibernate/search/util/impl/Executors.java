@@ -62,7 +62,7 @@ public final class Executors {
 				threads,
 				0L,
 				TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<Runnable>( queueSize ),
+				new LinkedBlockingQueue<>( queueSize ),
 				new SearchThreadFactory( groupname ),
 				new BlockPolicy()
 		);
@@ -93,7 +93,7 @@ public final class Executors {
 				threadsMax,
 				30,
 				TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>( queueSize ),
+				new LinkedBlockingQueue<>( queueSize ),
 				new SearchThreadFactory( groupname ),
 				new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy()
 				);

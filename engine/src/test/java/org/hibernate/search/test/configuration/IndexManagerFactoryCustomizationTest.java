@@ -132,7 +132,7 @@ public class IndexManagerFactoryCustomizationTest {
 		@Override
 		public <T> Iterable<T> loadJavaServices(Class<T> serviceContract) {
 			if ( fakedDiscoveredServices.containsKey( serviceContract ) ) {
-				LinkedHashSet<T> services = new LinkedHashSet<T>( 1 );
+				LinkedHashSet<T> services = new LinkedHashSet<>( 1 );
 				Class<T> clazz = classForName( fakedDiscoveredServices.get( serviceContract ) );
 				services.add( ClassLoaderHelper.instanceFromClass( serviceContract, clazz, "fake service" ) );
 				return services;

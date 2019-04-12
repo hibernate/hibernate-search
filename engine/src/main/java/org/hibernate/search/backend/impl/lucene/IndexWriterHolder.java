@@ -50,7 +50,7 @@ class IndexWriterHolder {
 	/**
 	 * Current open IndexWriter, or null when closed.
 	 */
-	private final AtomicReference<IndexWriter> writer = new AtomicReference<IndexWriter>();
+	private final AtomicReference<IndexWriter> writer = new AtomicReference<>();
 
 	/**
 	 * Protects from multiple initialization attempts of IndexWriter

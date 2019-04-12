@@ -62,7 +62,7 @@ final class Helper {
 	}
 
 	static List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) throws IOException {
-		List<String> terms = new ArrayList<String>();
+		List<String> terms = new ArrayList<>();
 
 		// Can't deal with null at this point. Likely returned by some FieldBridge not recognizing the type.
 		if ( localText == null ) {
@@ -72,8 +72,7 @@ final class Helper {
 					"pass String parameters" );
 		}
 		final Reader reader = new StringReader( localText );
-		final TokenStream stream = analyzer.tokenStream( fieldName, reader );
-		try {
+		try (TokenStream stream = analyzer.tokenStream( fieldName, reader )) {
 			CharTermAttribute attribute = stream.addAttribute( CharTermAttribute.class );
 			stream.reset();
 			while ( stream.incrementToken() ) {
@@ -83,9 +82,6 @@ final class Helper {
 				}
 			}
 			stream.end();
-		}
-		finally {
-			stream.close();
 		}
 		return terms;
 	}

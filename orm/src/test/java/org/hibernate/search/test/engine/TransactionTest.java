@@ -56,12 +56,9 @@ public class TransactionTest extends SearchTestBase {
 		assertEquals( "rollback() should not index", 3, getDocumentNumber() );
 
 		s = getSessionFactory().openSession();
-		s.doWork( new Work() {
-			@Override
-			public void execute(Connection connection) throws SQLException {
-				connection.setAutoCommit( true ); // www.hibernate.org/403.html
-			}
-		} );
+		s.doWork((Connection connection) -> {
+		    connection.setAutoCommit( true ); // www.hibernate.org/403.html
+		});
 		s.persist(
 				new Document(
 						"Java Persistence with Hibernate", "Object/relational mapping with Hibernate", "blah blah blah"

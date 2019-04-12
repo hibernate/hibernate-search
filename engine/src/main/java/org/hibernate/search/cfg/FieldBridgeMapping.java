@@ -24,7 +24,7 @@ public class FieldBridgeMapping {
 	private final EntityDescriptor entity;
 	private final PropertyDescriptor property;
 	private final FieldMapping fieldMapping;
-	private final Map<String, Object> bridge = new HashMap<String, Object>();
+	private final Map<String, Object> bridge = new HashMap<>();
 
 	public FieldBridgeMapping(Class<?> impl, Map<String, Object> field,
 							FieldMapping fieldMapping,

@@ -82,12 +82,12 @@ public class ExceptionMatcherBuilder {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Same hack as in JUnit's internal ExpectedExceptionMatcherBuilder
 	private List<Matcher<? super Throwable>> castedMatchers() {
-		return new ArrayList<Matcher<? super Throwable>>( (List) matchers );
+		return new ArrayList<>( (List) matchers );
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Same hack as in JUnit's internal ExpectedExceptionMatcherBuilder
 	private List<Matcher<? super Throwable>> castedSuppressedMatchers() {
-		return new ArrayList<Matcher<? super Throwable>>( (List) suppressedMatchers );
+		return new ArrayList<>( (List) suppressedMatchers );
 	}
 
 	public ExceptionMatcherBuilder matching(final Matcher<?> throwableMatcher) {

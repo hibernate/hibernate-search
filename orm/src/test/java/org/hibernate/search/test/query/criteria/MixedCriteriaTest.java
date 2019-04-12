@@ -37,13 +37,13 @@ public class MixedCriteriaTest extends SearchTestBase {
 	public void testCriteriaWithFilteredEntity() throws Exception {
 		indexTestData();
 
-		// Search
-		Session session = openSession();
+	    try ( // Search
+		    Session session = openSession()) {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
 		MultiFieldQueryParser parser = new MultiFieldQueryParser(
-				new String[] { "kurztext" }, TestConstants.standardAnalyzer
+			new String[] { "kurztext" }, TestConstants.standardAnalyzer
 		);
 		Query query = parser.parse( "combi OR sport" );
 
@@ -51,19 +51,19 @@ public class MixedCriteriaTest extends SearchTestBase {
 		criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, AbstractCar.class )
-				.setCriteriaQuery( criteria );
+			.setCriteriaQuery( criteria );
 		List result = hibQuery.list();
 		assertEquals( 2, result.size() );
 		tx.commit();
-		session.close();
+	    }
 	}
 
 	@Test
 	public void testCriteriaWithoutFilteredEntity() throws Exception {
 		indexTestData();
 
-		// Search
-		Session session = openSession();
+	    try ( // Search
+		    Session session = openSession()) {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
@@ -74,45 +74,42 @@ public class MixedCriteriaTest extends SearchTestBase {
 		criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query )
-				.setCriteriaQuery( criteria );
+			.setCriteriaQuery( criteria );
 		List result = hibQuery.list();
 		assertEquals( 2, result.size() );
 		tx.commit();
-		session.close();
+	    }
 	}
 
 	@Test
 	public void testCriteriaWithMultipleEntities() throws Exception {
 		indexTestData();
 
-		// Search
-		Session session = openSession();
-		Transaction tx = session.beginTransaction();
-		FullTextSession fullTextSession = Search.getFullTextSession( session );
-
-		MultiFieldQueryParser parser = new MultiFieldQueryParser(
-				new String[] { "kurztext" }, TestConstants.standardAnalyzer
-		);
-		Query query = parser.parse( "combi OR sport" );
-
-		Criteria criteria = session.createCriteria( AbstractCar.class );
-		criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
-
-		try {
+		try ( // Search
+			Session session = openSession()) {
+		    Transaction tx = session.beginTransaction();
+		    FullTextSession fullTextSession = Search.getFullTextSession( session );
+		    MultiFieldQueryParser parser = new MultiFieldQueryParser(
+			    new String[] { "kurztext" }, TestConstants.standardAnalyzer
+		    );
+		    Query query = parser.parse( "combi OR sport" );
+		    Criteria criteria = session.createCriteria( AbstractCar.class );
+		    criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
+		    try {
 			org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, AbstractCar.class, Bike.class )
-					.setCriteriaQuery( criteria );
+				.setCriteriaQuery( criteria );
 			hibQuery.list();
 			fail();
-		}
-		catch (SearchException se) {
+		    }
+		    catch (SearchException se) {
 			assertEquals( "Cannot mix criteria and multiple entity types", se.getMessage() );
+		    }
+		    tx.commit();
 		}
-		tx.commit();
-		session.close();
 	}
 
 	private void indexTestData() {
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 
 		CombiCar combi = new CombiCar();
@@ -127,7 +124,7 @@ public class MixedCriteriaTest extends SearchTestBase {
 		bike.setKurztext( "bike" );
 		s.persist( bike );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 

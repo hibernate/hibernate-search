@@ -26,7 +26,7 @@ public class CalendarBridgeMapping {
 			throw new SearchException( "Resolution required in order to index calendar property" );
 		}
 		this.mapping = mapping;
-		this.resolution = new HashMap<String, Object>();
+		this.resolution = new HashMap<>();
 		this.entity = entity;
 		this.property = property;
 		this.resolution.put( "resolution", resolution );

@@ -194,20 +194,21 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 				queryContext.getQueryAnalyzerReference().unwrap( LuceneAnalyzerReference.class ).getAnalyzer()
 		);
 
-		if ( terms.size() == 0 ) {
-			throw log.queryWithNoTermsAfterAnalysis( fieldContext.getField(), searchTerm );
-		}
-		else if ( terms.size() == 1 ) {
-			query = createTermQuery( fieldContext, terms.get( 0 ) );
-		}
-		else {
-			BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
-			for ( String localTerm : terms ) {
-				Query termQuery = createTermQuery( fieldContext, localTerm );
-				booleanQueryBuilder.add( termQuery, BooleanClause.Occur.SHOULD );
-			}
-			query = booleanQueryBuilder.build();
-		}
+	    switch (terms.size()) {
+	    	case 0:
+		    throw log.queryWithNoTermsAfterAnalysis( fieldContext.getField(), searchTerm );
+	    	case 1:
+		    query = createTermQuery( fieldContext, terms.get( 0 ) );
+		    break;
+	    	default:
+		    BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
+		    for ( String localTerm : terms ) {
+			Query termQuery = createTermQuery( fieldContext, localTerm );
+			booleanQueryBuilder.add( termQuery, BooleanClause.Occur.SHOULD );
+		    }
+		    query = booleanQueryBuilder.build();
+		    break;
+	    }
 		return query;
 	}
 
@@ -238,7 +239,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 
 	private List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) {
 		//it's better not to apply the analyzer with wildcard as * and ? can be mistakenly removed
-		List<String> terms = new ArrayList<String>();
+		List<String> terms = new ArrayList<>();
 		if ( termContext.getApproximation() == TermQueryContext.Approximation.WILDCARD ) {
 			terms.add( localText );
 		}

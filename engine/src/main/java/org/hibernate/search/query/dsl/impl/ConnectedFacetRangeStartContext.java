@@ -23,7 +23,7 @@ public class ConnectedFacetRangeStartContext<T> implements FacetRangeStartContex
 	@Override
 	public FacetRangeLimitContext<T> from(T rangeStart) {
 		context.setRangeStart( rangeStart );
-		return new ConnectedFacetRangeLimitContext<T>( context );
+		return new ConnectedFacetRangeLimitContext<>( context );
 	}
 }
 

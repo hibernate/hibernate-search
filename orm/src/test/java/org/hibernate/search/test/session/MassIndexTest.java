@@ -46,12 +46,12 @@ public class MassIndexTest extends SearchTestBase {
 			@Override
 			public void execute(Connection connection) throws SQLException {
 				for ( int i = 0; i < loop; i++ ) {
-					Statement statmt = connection.createStatement();
-						statmt.executeUpdate( "insert into Domain(id, name) values( + "
-								+ ( i + 1 ) + ", 'sponge" + i + "')" );
-						statmt.executeUpdate( "insert into Email(id, title, body, header, domain_id) values( + "
-								+ ( i + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope', " + ( i + 1 ) + ")" );
-						statmt.close();
+				    try (Statement statmt = connection.createStatement()) {
+					statmt.executeUpdate( "insert into Domain(id, name) values( + "
+						+ ( i + 1 ) + ", 'sponge" + i + "')" );
+					statmt.executeUpdate( "insert into Email(id, title, body, header, domain_id) values( + "
+						+ ( i + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope', " + ( i + 1 ) + ")" );
+				    }
 					}
 				}
 		} );
@@ -113,19 +113,19 @@ public class MassIndexTest extends SearchTestBase {
 		s.doWork( new Work() {
 			@Override
 			public void execute(Connection connection) throws SQLException {
-				Statement stmt = connection.createStatement();
+			    try (Statement stmt = connection.createStatement()) {
 				stmt.executeUpdate( "update Email set body='Meet the guys who write the software'" );
-				stmt.close();
+			    }
 			}
 		} );
 		s.doWork( new Work() {
 			@Override
 			public void execute(Connection connection) throws SQLException {
-				//insert an object never indexed
-				Statement stmt = connection.createStatement();
+			    try ( //insert an object never indexed
+				    Statement stmt = connection.createStatement()) {
 				stmt.executeUpdate( "insert into Email(id, title, body, header) values( + "
-						+ ( loop + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope')" );
-				stmt.close();
+					+ ( loop + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope')" );
+			    }
 			}
 		} );
 
@@ -218,12 +218,9 @@ public class MassIndexTest extends SearchTestBase {
 	private Session getSessionWithAutoCommit() {
 		Session s;
 		s = openSession();
-		s.doWork( new Work() {
-			@Override
-			public void execute(Connection connection) throws SQLException {
-				connection.setAutoCommit( true );
-			}
-		} );
+		s.doWork((Connection connection) -> {
+		    connection.setAutoCommit( true );
+		});
 		return s;
 	}
 

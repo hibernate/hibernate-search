@@ -157,7 +157,7 @@ public class MaskedProperty extends Properties implements Serializable {
 		if ( propertyNames != null ) {
 			return;
 		}
-		Set<Object> maskedProperties = new TreeSet<Object>();
+		Set<Object> maskedProperties = new TreeSet<>();
 		//we use keys to be safe and avoid CCE for non String key entries
 		Enumeration<?> maskedNames = masked.propertyNames();
 		while ( maskedNames.hasMoreElements() ) {

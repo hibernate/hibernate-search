@@ -33,7 +33,7 @@ public class SimilarityTest extends SearchTestBase {
 
 	@Test
 	public void testConfiguredDefaultSimilarityGetsApplied() throws Exception {
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 
 		Can can = new Can();
@@ -51,21 +51,21 @@ public class SimilarityTest extends SearchTestBase {
 		TermQuery termQuery = new TermQuery( new Term( "name", "green" ) );
 		FullTextSession fullTextSession = Search.getFullTextSession( s );
 		List results = fullTextSession.createFullTextQuery( termQuery, Can.class )
-				.setProjection( FullTextQuery.SCORE, FullTextQuery.THIS )
-				.list();
+			.setProjection( FullTextQuery.SCORE, FullTextQuery.THIS )
+			.list();
 		assertEquals( 2, results.size() );
 		assertEquals(
-				"Similarity not overridden by the global setting",
-				( (Object[]) results.get( 0 ) )[0],
-				( (Object[]) results.get( 1 ) )[0]
+			"Similarity not overridden by the global setting",
+			( (Object[]) results.get( 0 ) )[0],
+			( (Object[]) results.get( 1 ) )[0]
 		);
 		assertFalse(
-				"Similarity not overridden by the global setting",
-				new Float( 1.0f ).equals( ( (Object[]) results.get( 0 ) )[0] )
+			"Similarity not overridden by the global setting",
+			new Float( 1.0f ).equals( ( (Object[]) results.get( 0 ) )[0] )
 		);
 
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

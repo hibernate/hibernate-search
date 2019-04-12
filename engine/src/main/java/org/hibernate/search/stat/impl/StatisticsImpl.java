@@ -214,7 +214,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 
 	@Override
 	public Set<String> getIndexedClassNames() {
-		Set<String> indexedClasses = new HashSet<String>();
+		Set<String> indexedClasses = new HashSet<>();
 		for ( IndexedTypeIdentifier clazz : extendedIntegrator.getIndexBindings().keySet() ) {
 			indexedClasses.add( clazz.getName() );
 		}
@@ -247,7 +247,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 
 	@Override
 	public Map<String, Integer> indexedEntitiesCount() {
-		Map<String, Integer> countPerEntity = new HashMap<String, Integer>();
+		Map<String, Integer> countPerEntity = new HashMap<>();
 		for ( String className : getIndexedClassNames() ) {
 			countPerEntity.put( className, getNumberOfIndexedEntities( className ) );
 		}

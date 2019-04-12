@@ -23,12 +23,12 @@ public class ProxyTest extends SearchTestBase {
 
 	@Test
 	public void testProxy() throws Exception {
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		Transaction tx = session.beginTransaction();
 		Book book = new Book(
-				1,
-				"La chute de la petite reine a travers les yeux de Festina",
-				"La chute de la petite reine a travers les yeux de Festina, blahblah"
+			1,
+			"La chute de la petite reine a travers les yeux de Festina",
+			"La chute de la petite reine a travers les yeux de Festina, blahblah"
 		);
 		Author author = new Author();
 		author.setBook( book );
@@ -46,23 +46,23 @@ public class ProxyTest extends SearchTestBase {
 		session.delete( loadedAuthor );
 
 		tx.commit();
-		session.close();
+	    }
 	}
 
 	@Test
 	public void testDeleteProxy() throws Exception {
 		createTestData();
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		IComment c = (IComment) s.get( Comment.class, 2 );
 		s.delete( c );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	public void createTestData() {
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		IProfile p = new Profile();
 		p.setId( 1 );
@@ -90,7 +90,7 @@ public class ProxyTest extends SearchTestBase {
 		s.save( c3 );
 
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

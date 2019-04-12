@@ -102,7 +102,7 @@ public class DynamicShardingTest extends SearchTestBase {
 	public void testDynamicShardsAreTargetingInQuery() throws Exception {
 		insert( elephant, spider, bear );
 
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( session );
 		QueryParser parser = new QueryParser( "id", TestConstants.stopAnalyzer );
@@ -110,7 +110,7 @@ public class DynamicShardingTest extends SearchTestBase {
 		List results = fts.createFullTextQuery( parser.parse( "name:bear OR name:elephant OR name:spider" ) ).list();
 		assertEquals( "Either double insert, single update, or query fails with shards", 3, results.size() );
 		tx.commit();
-		session.close();
+	    }
 	}
 
 	@Test
@@ -239,17 +239,13 @@ public class DynamicShardingTest extends SearchTestBase {
 		protected Set<String> loadInitialShardNames(Properties properties, BuildContext buildContext) {
 			ServiceManager serviceManager = buildContext.getServiceManager();
 			SessionFactory sessionFactory = serviceManager.requestService( HibernateSessionFactoryService.class ).getSessionFactory();
-			Session session = sessionFactory.openSession();
-			try {
+			try (Session session = sessionFactory.openSession()) {
 				Criteria initialShardsCriteria = session.createCriteria( Animal.class );
 				initialShardsCriteria.setProjection( Projections.distinct( Property.forName( "type" ) ) );
 
 				@SuppressWarnings("unchecked")
 				List<String> initialTypes = initialShardsCriteria.list();
 				return new HashSet<String>( initialTypes );
-			}
-			finally {
-				session.close();
 			}
 		}
 	}

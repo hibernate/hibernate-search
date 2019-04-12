@@ -42,8 +42,7 @@ public class UpdateOperationsTest {
 	}
 
 	private void invokeTest(boolean indexMetadataIsComplete, int expectedBackendOperations) {
-		FullTextSessionBuilder fullTextSessionBuilder = createSearchFactory( indexMetadataIsComplete );
-		try {
+		try (FullTextSessionBuilder fullTextSessionBuilder = createSearchFactory( indexMetadataIsComplete )) {
 			LeakingOptimizer.reset();
 			LeakingLocalBackend.reset();
 			FullTextSession session = fullTextSessionBuilder.openFullTextSession();
@@ -64,9 +63,6 @@ public class UpdateOperationsTest {
 
 			Assert.assertEquals( 1, LeakingLocalBackend.getLastProcessedQueue().size() );
 			Assert.assertEquals( expectedBackendOperations, LeakingOptimizer.getTotalOperations() );
-		}
-		finally {
-			fullTextSessionBuilder.close();
 		}
 	}
 

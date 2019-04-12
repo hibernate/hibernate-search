@@ -73,7 +73,7 @@ public class BridgeTest extends SearchTestBase {
 		cloud.setUri( new URI( "http://www.hibernate.org" ) );
 		cloud.setUrl( new URL( "http://www.hibernate.org" ) );
 		cloud.setUuid( UUID.fromString( "f49c6ba8-8d7f-417a-a255-d594dddf729f" ) );
-		org.hibernate.Session s = openSession();
+	    try (org.hibernate.Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
 		s.flush();
@@ -86,24 +86,24 @@ public class BridgeTest extends SearchTestBase {
 		List result;
 
 		BooleanQuery booleanQuery = new BooleanQuery.Builder()
-				.add( NumericRangeQuery.newDoubleRange( "double2", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newFloatRange( "float2", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newIntRange( "integerv2", 2, 3, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newLongRange( "long2", 2l, 3l, true, true ), BooleanClause.Occur.MUST )
-				.add( new TermQuery( new Term( "type", "dog" ) ), BooleanClause.Occur.MUST )
-				.add( new TermQuery( new Term( "storm", "false" ) ), BooleanClause.Occur.MUST )
-				.build();
-
+			.add( NumericRangeQuery.newDoubleRange( "double2", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST )
+			.add( NumericRangeQuery.newFloatRange( "float2", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST )
+			.add( NumericRangeQuery.newIntRange( "integerv2", 2, 3, true, true ), BooleanClause.Occur.MUST )
+			.add( NumericRangeQuery.newLongRange( "long2", 2l, 3l, true, true ), BooleanClause.Occur.MUST )
+			.add( new TermQuery( new Term( "type", "dog" ) ), BooleanClause.Occur.MUST )
+			.add( new TermQuery( new Term( "storm", "false" ) ), BooleanClause.Occur.MUST )
+			.build();
+		
 		result = session.createFullTextQuery( booleanQuery ).list();
 		assertEquals( "find primitives and do not fail on null", 1, result.size() );
 
 		booleanQuery = new BooleanQuery.Builder()
-				.add( NumericRangeQuery.newDoubleRange( "double1", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newFloatRange( "float1", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newIntRange( "integerv1", 2, 3, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newLongRange( "long1", 2l, 3l, true, true ), BooleanClause.Occur.MUST )
-				.build();
-
+			.add( NumericRangeQuery.newDoubleRange( "double1", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST )
+			.add( NumericRangeQuery.newFloatRange( "float1", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST )
+			.add( NumericRangeQuery.newIntRange( "integerv1", 2, 3, true, true ), BooleanClause.Occur.MUST )
+			.add( NumericRangeQuery.newLongRange( "long1", 2l, 3l, true, true ), BooleanClause.Occur.MUST )
+			.build();
+		
 		result = session.createFullTextQuery( booleanQuery ).list();
 		assertEquals( "null elements should not be stored", 0, result.size() ); //the query is dumb because restrictive
 
@@ -115,23 +115,23 @@ public class BridgeTest extends SearchTestBase {
 		result = session.createFullTextQuery( query ).setProjection( "clazz" ).list();
 		assertEquals( "Clazz projection works", 1, result.size() );
 		assertEquals(
-				"Clazz projection works",
-				Cloud.class.getName(),
-				( (Class) ( (Object[]) result.get( 0 ) )[0] ).getName()
+			"Clazz projection works",
+			Cloud.class.getName(),
+			( (Class) ( (Object[]) result.get( 0 ) )[0] ).getName()
 		);
 
 		BooleanQuery bQuery = new BooleanQuery.Builder()
-				.add( new TermQuery( new Term( "uri", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST )
-				.add( new TermQuery( new Term( "url", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST )
-				.build();
-
+			.add( new TermQuery( new Term( "uri", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST )
+			.add( new TermQuery( new Term( "url", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST )
+			.build();
+		
 		result = session.createFullTextQuery( bQuery ).setProjection( "clazz" ).list();
 		assertEquals( "Clazz projection works", 1, result.size() );
 
 		bQuery = new BooleanQuery.Builder()
-				.add( new TermQuery( new Term( "uuid", "f49c6ba8-8d7f-417a-a255-d594dddf729f" ) ), BooleanClause.Occur.MUST )
-				.build();
-
+			.add( new TermQuery( new Term( "uuid", "f49c6ba8-8d7f-417a-a255-d594dddf729f" ) ), BooleanClause.Occur.MUST )
+			.build();
+		
 		result = session.createFullTextQuery( bQuery ).setProjection( "clazz" ).list();
 		assertEquals( "Clazz projection works", 1, result.size() );
 
@@ -145,7 +145,7 @@ public class BridgeTest extends SearchTestBase {
 		assertEquals( "Wrong result, CharacterBridge is not working", 'P', ( (Object[]) result.get( 0 ) )[0] );
 
 		tx.commit();
-		s.close();
+	    }
 
 	}
 
@@ -155,7 +155,7 @@ public class BridgeTest extends SearchTestBase {
 		cloud.setCustomFieldBridge( "This is divided by 2" );
 		cloud.setCustomStringBridge( "This is div by 4" );
 		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
-		org.hibernate.Session s = openSession();
+	    try (org.hibernate.Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
 		s.flush();
@@ -176,7 +176,7 @@ public class BridgeTest extends SearchTestBase {
 		assertEquals( "Custom types not taken into account", 0, result.size() );
 
 		tx.commit();
-		s.close();
+	    }
 
 	}
 
@@ -197,8 +197,7 @@ public class BridgeTest extends SearchTestBase {
 		cloud.setDateSecond( date );
 		cloud.setDateYear( date );
 		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
-
-		org.hibernate.Session s = openSession();
+	    try (org.hibernate.Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
 		s.flush();
@@ -211,49 +210,49 @@ public class BridgeTest extends SearchTestBase {
 
 		Date myDate = DateTools.round( date, DateTools.Resolution.MILLISECOND );
 		NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange(
-				"myDate", myDate.getTime(), myDate.getTime(), true, true
+			"myDate", myDate.getTime(), myDate.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateDay = DateTools.round( date, DateTools.Resolution.DAY );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateDay", dateDay.getTime(), dateDay.getTime(), true, true
+			"dateDay", dateDay.getTime(), dateDay.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMonth = DateTools.round( date, DateTools.Resolution.MONTH );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateMonth", dateMonth.getTime(), dateMonth.getTime(), true, true
+			"dateMonth", dateMonth.getTime(), dateMonth.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateYear = DateTools.round( date, DateTools.Resolution.YEAR );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateYear", dateYear.getTime(), dateYear.getTime(), true, true
+			"dateYear", dateYear.getTime(), dateYear.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateHour = DateTools.round( date, DateTools.Resolution.HOUR );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateHour", dateHour.getTime(), dateHour.getTime(), true, true
+			"dateHour", dateHour.getTime(), dateHour.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMinute = DateTools.round( date, DateTools.Resolution.MINUTE );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateMinute", dateMinute.getTime(), dateMinute.getTime(), true, true
+			"dateMinute", dateMinute.getTime(), dateMinute.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateSecond = DateTools.round( date, DateTools.Resolution.SECOND );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateSecond", dateSecond.getTime(), dateSecond.getTime(), true, true
+			"dateSecond", dateSecond.getTime(), dateSecond.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMillisecond = DateTools.round( date, DateTools.Resolution.MILLISECOND );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateMillisecond", dateMillisecond.getTime(), dateMillisecond.getTime(), true, true
+			"dateMillisecond", dateMillisecond.getTime(), dateMillisecond.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
@@ -262,7 +261,7 @@ public class BridgeTest extends SearchTestBase {
 		assertEquals( "Date not found or not properly truncated", 1, result.size() );
 
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Test
@@ -281,7 +280,7 @@ public class BridgeTest extends SearchTestBase {
 		cloud.setCalendarSecond( calendar );
 		cloud.setCalendarYear( calendar );
 		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
-		org.hibernate.Session s = openSession();
+	    try (org.hibernate.Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
 		s.flush();
@@ -294,49 +293,49 @@ public class BridgeTest extends SearchTestBase {
 		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 		Date myDate = DateTools.round( date, DateTools.Resolution.MILLISECOND );
 		NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange(
-				"myCalendar", myDate.getTime(), myDate.getTime(), true, true
+			"myCalendar", myDate.getTime(), myDate.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateDay = DateTools.round( date, DateTools.Resolution.DAY );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarDay", dateDay.getTime(), dateDay.getTime(), true, true
+			"calendarDay", dateDay.getTime(), dateDay.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMonth = DateTools.round( date, DateTools.Resolution.MONTH );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarMonth", dateMonth.getTime(), dateMonth.getTime(), true, true
+			"calendarMonth", dateMonth.getTime(), dateMonth.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateYear = DateTools.round( date, DateTools.Resolution.YEAR );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarYear", dateYear.getTime(), dateYear.getTime(), true, true
+			"calendarYear", dateYear.getTime(), dateYear.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateHour = DateTools.round( date, DateTools.Resolution.HOUR );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarHour", dateHour.getTime(), dateHour.getTime(), true, true
+			"calendarHour", dateHour.getTime(), dateHour.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMinute = DateTools.round( date, DateTools.Resolution.MINUTE );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarMinute", dateMinute.getTime(), dateMinute.getTime(), true, true
+			"calendarMinute", dateMinute.getTime(), dateMinute.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateSecond = DateTools.round( date, DateTools.Resolution.SECOND );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarSecond", dateSecond.getTime(), dateSecond.getTime(), true, true
+			"calendarSecond", dateSecond.getTime(), dateSecond.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMillisecond = DateTools.round( date, DateTools.Resolution.MILLISECOND );
 		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarMillisecond", dateMillisecond.getTime(), dateMillisecond.getTime(), true, true
+			"calendarMillisecond", dateMillisecond.getTime(), dateMillisecond.getTime(), true, true
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
@@ -345,7 +344,7 @@ public class BridgeTest extends SearchTestBase {
 		assertEquals( "Calendar not found or not properly truncated", 1, result.size() );
 
 		tx.commit();
-		s.close();
+	    }
 
 		//now unit-test the bridge directly:
 
@@ -370,8 +369,7 @@ public class BridgeTest extends SearchTestBase {
 		Cloud cloud = new Cloud();
 		cloud.setDateDay( date );
 		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
-
-		org.hibernate.Session s = openSession();
+	    try (org.hibernate.Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
 		s.flush();
@@ -381,13 +379,13 @@ public class BridgeTest extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 
 		TermQuery termQuery = new TermQuery( new Term( "dateDayStringEncoding",
-				DateTools.dateToString( date, DateTools.Resolution.DAY ) ) );
-
+			DateTools.dateToString( date, DateTools.Resolution.DAY ) ) );
+		
 		List result = session.createFullTextQuery( termQuery ).list();
 		assertEquals( "Date not found or not properly truncated", 1, result.size() );
 
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Test
@@ -400,8 +398,7 @@ public class BridgeTest extends SearchTestBase {
 		Cloud cloud = new Cloud();
 		cloud.setCalendarDay( c );
 		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
-
-		org.hibernate.Session s = openSession();
+	    try (org.hibernate.Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
 		s.flush();
@@ -411,13 +408,13 @@ public class BridgeTest extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( s );
 
 		TermQuery termQuery = new TermQuery( new Term( "calendarDayStringEncoding",
-				DateTools.dateToString( c.getTime(), DateTools.Resolution.DAY ) ) );
-
+			DateTools.dateToString( c.getTime(), DateTools.Resolution.DAY ) ) );
+		
 		List result = session.createFullTextQuery( termQuery ).list();
 		assertEquals( "Calendar not found or not properly truncated", 1, result.size() );
 
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Test

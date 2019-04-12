@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class NumericFieldMapping extends FieldMapping {
 
-	private final Map<String, Object> numericField = new HashMap<String, Object>( 2 );
+	private final Map<String, Object> numericField = new HashMap<>( 2 );
 
 	/**
 	 * @deprecated Do not use constructors, use {@code numericField} methods in other classes from the same package.

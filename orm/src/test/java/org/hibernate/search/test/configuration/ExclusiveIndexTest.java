@@ -36,11 +36,11 @@ public class ExclusiveIndexTest {
 
 	@Test
 	public void verifyIndexExclusivity() {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+	    try (FullTextSessionBuilder builder = new FullTextSessionBuilder()) {
 		FullTextSession ftSession = builder
 			.setProperty(
-					"hibernate.search.org.hibernate.search.test.configuration.BlogEntry.exclusive_index_use",
-					"true"
+				"hibernate.search.org.hibernate.search.test.configuration.BlogEntry.exclusive_index_use",
+				"true"
 			)
 			.setProperty( "hibernate.search.Book.exclusive_index_use", "false" )
 			.addAnnotatedClass( BlogEntry.class )
@@ -57,7 +57,7 @@ public class ExclusiveIndexTest {
 		assertExclusiveIsEnabled( allIndexesManager, "Book", false );
 		//using default:
 		assertExclusiveIsEnabled( allIndexesManager, Foo.class.getName(), true );
-		builder.close();
+	    }
 	}
 
 	private void assertExclusiveIsEnabled(IndexManagerHolder allIndexesManager, String indexName, boolean expectExclusive) {

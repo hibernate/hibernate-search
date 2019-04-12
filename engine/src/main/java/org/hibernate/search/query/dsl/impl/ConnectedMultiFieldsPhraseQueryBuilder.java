@@ -83,7 +83,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			 */
 			TokenStream stream = null;
 			boolean isMultiPhrase = false;
-			Map<Integer, List<Term>> termsPerPosition = new TreeMap<Integer, List<Term>>();
+			Map<Integer, List<Term>> termsPerPosition = new TreeMap<>();
 			try {
 				Reader reader = new StringReader( sentence );
 				stream = analyzer.tokenStream( fieldName, reader );
@@ -106,7 +106,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 					}
 
 					if ( termsAtSamePosition == null ) {
-						termsAtSamePosition = new ArrayList<Term>();
+						termsAtSamePosition = new ArrayList<>();
 						termsPerPosition.put( position, termsAtSamePosition );
 					}
 

@@ -55,7 +55,7 @@ public class FilterOnDirectoryTest extends SearchTestBase {
 	}
 
 	private void createDoeFamily() {
-		Session s = openSession( );
+	    try (Session s = openSession( )) {
 		Transaction tx = s.beginTransaction();
 		Detective detective = new Detective();
 		detective.setName( "John Doe" );
@@ -64,7 +64,7 @@ public class FilterOnDirectoryTest extends SearchTestBase {
 		suspect.setName( "Jane Doe" );
 		s.persist( suspect );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

@@ -22,15 +22,11 @@ public class DocumentIdContainedInTest extends RecursiveGraphTest {
 
 	@Override
 	public void testCorrectDepthIndexed() {
-		Session session = openSession();
-		try {
+		try (Session session = openSession()) {
 			Transaction transaction = session.beginTransaction();
 			session.persist( new PersonWithBrokenSocialSecurityNumber( 1L, "Mario Rossi" ) );
 			session.persist( new PersonWithBrokenSocialSecurityNumber( 2L, "Bruno Rossi" ) );
 			transaction.commit();
-		}
-		finally {
-			session.close();
 		}
 		List<LuceneWork> processedQueue = LeakingLocalBackend.getLastProcessedQueue();
 		// as they resolve to the same Lucene id only one instance will make it to the backend.

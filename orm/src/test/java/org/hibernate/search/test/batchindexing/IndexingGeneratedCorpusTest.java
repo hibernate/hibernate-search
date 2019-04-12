@@ -245,8 +245,7 @@ public class IndexingGeneratedCorpusTest {
 	}
 
 	private long countByDatabaseCriteria(Class<? extends TitleAble> type) {
-		Session session = builder.openFullTextSession();
-		try {
+		try (Session session = builder.openFullTextSession()) {
 			Transaction tx = session.beginTransaction();
 			try {
 				Number countAsNumber = (Number) session
@@ -258,9 +257,6 @@ public class IndexingGeneratedCorpusTest {
 			finally {
 				tx.commit();
 			}
-		}
-		finally {
-			session.close();
 		}
 	}
 

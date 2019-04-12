@@ -115,7 +115,7 @@ public class MoreLikeThisTest {
 		IndexReader reader = null;
 
 		try {
-			Set<Term> terms = new HashSet<Term>( 100 );
+			Set<Term> terms = new HashSet<>( 100 );
 			reader = sfHolder.getSearchFactory().getIndexReaderAccessor().open( indexedType );
 			query.createWeight( new IndexSearcher( reader ), false ).extractTerms( terms );
 			return terms;

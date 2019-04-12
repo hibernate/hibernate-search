@@ -131,7 +131,7 @@ public class FreshReadersProvidedTest {
 
 	public static List<IndexReader> getSubIndexReaders(MultiReader compositeReader) {
 		CompositeReaderContext compositeReaderContext = compositeReader.getContext();
-		ArrayList<IndexReader> segmentReaders = new ArrayList<IndexReader>( 20 );
+		ArrayList<IndexReader> segmentReaders = new ArrayList<>( 20 );
 
 		for ( LeafReaderContext readerContext : compositeReaderContext.leaves() ) {
 			segmentReaders.add( readerContext.reader() );
@@ -148,8 +148,8 @@ public class FreshReadersProvidedTest {
 	private static class RecordingQueryWrapper extends Query {
 
 		final Query delegate;
-		final List<IndexReader> visitedReaders = new ArrayList<IndexReader>();
-		final List<String> seenTerms = new ArrayList<String>();
+		final List<IndexReader> visitedReaders = new ArrayList<>();
+		final List<String> seenTerms = new ArrayList<>();
 		final String fieldName;
 
 		public RecordingQueryWrapper(Query delegate, String fieldName) {

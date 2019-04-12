@@ -49,33 +49,40 @@ public class DefaultLockFactoryCreator implements LockFactoryCreator, Startable 
 		//For FS-based indexes default to "native", default to "single" otherwise.
 		String defaultStrategy = indexDir == null ? "single" : "native";
 		String lockFactoryName = dirConfiguration.getProperty( Environment.LOCKING_STRATEGY, defaultStrategy );
-		if ( "simple".equals( lockFactoryName ) ) {
-			if ( indexDir == null ) {
-				throw LOG.indexBasePathRequiredForLockingStrategy( "simple" );
-			}
-			return SimpleFSLockFactory.INSTANCE;
+		if ( null == lockFactoryName ) {
+		    LockFactoryProvider lockFactoryFactory = ClassLoaderHelper.instanceFromName(
+			    LockFactoryProvider.class,
+			    lockFactoryName,
+			    Environment.LOCKING_STRATEGY,
+			    serviceManager
+		    );
+		    File legacy = indexDir == null ? null : indexDir.toFile();
+		    return lockFactoryFactory.createLockFactory( legacy, dirConfiguration );
 		}
-		else if ( "native".equals( lockFactoryName ) ) {
-			if ( indexDir == null ) {
-				throw LOG.indexBasePathRequiredForLockingStrategy( "native" );
-			}
-			return NativeFSLockFactory.INSTANCE;
-		}
-		else if ( "single".equals( lockFactoryName ) ) {
-			return new SingleInstanceLockFactory();
-		}
-		else if ( "none".equals( lockFactoryName ) ) {
-			return NoLockFactory.INSTANCE;
-		}
-		else {
-			LockFactoryProvider lockFactoryFactory = ClassLoaderHelper.instanceFromName(
-					LockFactoryProvider.class,
-					lockFactoryName,
-					Environment.LOCKING_STRATEGY,
-					serviceManager
-			);
-			File legacy = indexDir == null ? null : indexDir.toFile();
-			return lockFactoryFactory.createLockFactory( legacy, dirConfiguration );
-		}
+		else switch (lockFactoryName) {
+	    	case "simple":
+		    if ( indexDir == null ) {
+			throw LOG.indexBasePathRequiredForLockingStrategy( "simple" );
+		    }
+		    return SimpleFSLockFactory.INSTANCE;
+	    	case "native":
+		    if ( indexDir == null ) {
+			throw LOG.indexBasePathRequiredForLockingStrategy( "native" );
+		    }
+		    return NativeFSLockFactory.INSTANCE;
+	    	case "single":
+		    return new SingleInstanceLockFactory();
+	    	case "none":
+		    return NoLockFactory.INSTANCE;
+	    	default:
+		    LockFactoryProvider lockFactoryFactory = ClassLoaderHelper.instanceFromName(
+			    LockFactoryProvider.class,
+			    lockFactoryName,
+			    Environment.LOCKING_STRATEGY,
+			    serviceManager
+		    );
+		    File legacy = indexDir == null ? null : indexDir.toFile();
+		    return lockFactoryFactory.createLockFactory( legacy, dirConfiguration );
+	    }
 	}
 }

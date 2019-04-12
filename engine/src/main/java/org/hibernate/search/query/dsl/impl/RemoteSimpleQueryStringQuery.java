@@ -47,7 +47,7 @@ public class RemoteSimpleQueryStringQuery extends Query {
 	public static class Builder {
 		private String query;
 
-		private List<Field> fields = new ArrayList<Field>();
+		private List<Field> fields = new ArrayList<>();
 
 		private boolean withAndAsDefaultOperator;
 

@@ -32,7 +32,7 @@ public class FieldMapping {
 		this.mapping = mapping;
 		this.entity = entity;
 		this.property = property;
-		this.field = new HashMap<String, Object>();
+		this.field = new HashMap<>();
 		property.addField( field );
 	}
 
@@ -50,7 +50,7 @@ public class FieldMapping {
 			this.field = existingField;
 		}
 		else {
-			this.field = new HashMap<String, Object>();
+			this.field = new HashMap<>();
 			property.addField( field );
 		}
 	}
@@ -102,7 +102,7 @@ public class FieldMapping {
 	}
 
 	public FieldMapping boost(float boost) {
-		final Map<String, Object> boostAnn = new HashMap<String, Object>();
+		final Map<String, Object> boostAnn = new HashMap<>();
 		boostAnn.put( "value", boost );
 		field.put( "boost", boostAnn );
 		return this;
@@ -113,28 +113,28 @@ public class FieldMapping {
 	}
 
 	public FieldMapping analyzer(Class<?> analyzerClass) {
-		final Map<String, Object> analyzer = new HashMap<String, Object>();
+		final Map<String, Object> analyzer = new HashMap<>();
 		analyzer.put( "impl", analyzerClass );
 		field.put( "analyzer", analyzer );
 		return this;
 	}
 
 	public FieldMapping analyzer(String analyzerDef) {
-		final Map<String, Object> analyzer = new HashMap<String, Object>();
+		final Map<String, Object> analyzer = new HashMap<>();
 		analyzer.put( "definition", analyzerDef );
 		field.put( "analyzer", analyzer );
 		return this;
 	}
 
 	public FieldMapping normalizer(Class<?> analyzerClass) {
-		final Map<String, Object> normalizer = new HashMap<String, Object>();
+		final Map<String, Object> normalizer = new HashMap<>();
 		normalizer.put( "impl", analyzerClass );
 		field.put( "normalizer", normalizer );
 		return this;
 	}
 
 	public FieldMapping normalizer(String analyzerDef) {
-		final Map<String, Object> normalizer = new HashMap<String, Object>();
+		final Map<String, Object> normalizer = new HashMap<>();
 		normalizer.put( "definition", analyzerDef );
 		field.put( "normalizer", normalizer );
 		return this;

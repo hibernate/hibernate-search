@@ -43,11 +43,11 @@ public class RecursiveGraphTest extends SearchTestBase {
 			if ( person == null ) {
 				continue;
 			}
-			Session s = getSessionFactory().openSession();
+		    try (Session s = getSessionFactory().openSession()) {
 			s.getTransaction().begin();
 			s.save( person );
 			s.getTransaction().commit();
-			s.close();
+		    }
 		}
 	}
 

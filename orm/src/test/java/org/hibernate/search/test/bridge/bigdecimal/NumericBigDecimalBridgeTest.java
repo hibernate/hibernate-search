@@ -51,7 +51,7 @@ public class NumericBigDecimalBridgeTest extends SearchTestBase {
 
 	@Test
 	public void testNumericFieldWithBigDecimals() throws Exception {
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		Transaction tx = session.beginTransaction();
 
 		// create entities
@@ -65,22 +65,22 @@ public class NumericBigDecimalBridgeTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder()
-				.forEntity( Item.class )
-				.get();
-
+			.buildQueryBuilder()
+			.forEntity( Item.class )
+			.get();
+		
 		Query rootQuery = queryBuilder.bool()
-				.must( queryBuilder.range().onField( "price" ).above( 10000l ).createQuery() )
-				.must( queryBuilder.range().onField( "price" ).below( 20000l ).createQuery() )
-				.createQuery();
-
+			.must( queryBuilder.range().onField( "price" ).above( 10000l ).createQuery() )
+			.must( queryBuilder.range().onField( "price" ).below( 20000l ).createQuery() )
+			.createQuery();
+		
 		@SuppressWarnings( "unchecked" )
-		List<Item> resultList = fullTextSession.createFullTextQuery( rootQuery, Item.class ).list();
+			List<Item> resultList = fullTextSession.createFullTextQuery( rootQuery, Item.class ).list();
 		assertNotNull( resultList );
 		assertEquals( 1, resultList.size() );
 
 		tx.commit();
-		session.close();
+	    }
 	}
 
 	@Override

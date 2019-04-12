@@ -35,7 +35,7 @@ public class AndDocIdSet extends DocIdSet {
 		if ( andedDocIdSets == null || andedDocIdSets.size() < 2 ) {
 			throw new IllegalArgumentException( "To \"and\" some DocIdSet(s) they should be at least 2" );
 		}
-		this.andedDocIdSets = new ArrayList<DocIdSet>( andedDocIdSets ); // make a defensive mutable copy
+		this.andedDocIdSets = new ArrayList<>( andedDocIdSets ); // make a defensive mutable copy
 		this.maxDocNumber = maxDocs;
 	}
 

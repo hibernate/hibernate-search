@@ -36,7 +36,7 @@ public final class MultiWriteDrainableLinkedList<T> {
 	 * @param element The element to add.
 	 */
 	public void add(T element) {
-		final Node<T> newnode = new Node<T>( element );
+		final Node<T> newnode = new Node<>( element );
 		addNode( newnode );
 	}
 
@@ -61,7 +61,7 @@ public final class MultiWriteDrainableLinkedList<T> {
 	public Iterable<T> drainToDetachedIterable() {
 		final Node<T> head = drainHead();
 		if ( head != null ) {
-			return new DetachedNodeIterable<T>( head );
+			return new DetachedNodeIterable<>( head );
 		}
 		else {
 			//The choice to return null rather than an empty iterator
@@ -96,7 +96,7 @@ public final class MultiWriteDrainableLinkedList<T> {
 
 		@Override
 		public Iterator<T> iterator() {
-			return new DetachedNodeIterator<T>( head );
+			return new DetachedNodeIterator<>( head );
 		}
 	}
 

@@ -21,7 +21,7 @@ import org.hibernate.search.bridge.FieldBridge;
  */
 public class FieldBridgeDirectMapping extends PropertyMapping {
 
-	private final Map<String, Object> fieldBridgeAnn = new HashMap<String, Object>();
+	private final Map<String, Object> fieldBridgeAnn = new HashMap<>();
 
 	public FieldBridgeDirectMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping, Class<? extends FieldBridge> fieldBridge) {
 		super( property, entity, mapping );

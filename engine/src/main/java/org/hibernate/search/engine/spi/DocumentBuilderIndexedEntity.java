@@ -295,7 +295,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	public AddLuceneWork createAddWork(String tenantId, IndexedTypeIdentifier entityType, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext conversionContext) {
-		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
+		Map<String, String> fieldToAnalyzerMap = new HashMap<>();
 		Document doc = getDocument( tenantId, entity, id, fieldToAnalyzerMap, sessionInitializer, conversionContext, null );
 		final AddLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
@@ -308,7 +308,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	public UpdateLuceneWork createUpdateWork(String tenantId, IndexedTypeIdentifier entityType, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
-		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
+		Map<String, String> fieldToAnalyzerMap = new HashMap<>();
 		Document doc = getDocument( tenantId, entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge, null );
 		final UpdateLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {

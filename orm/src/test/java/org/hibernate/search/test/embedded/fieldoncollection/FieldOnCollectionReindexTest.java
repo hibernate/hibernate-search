@@ -28,8 +28,7 @@ public class FieldOnCollectionReindexTest extends SearchTestBase {
 	@TestForIssue(jiraKey = "HSEARCH-1020")
 	@Test
 	public void testUpdatingCollectionWithFieldAnnotationReindexesEntity() {
-		Session hibernateSession = openSession();
-
+	    try (Session hibernateSession = openSession()) {
 		IndexedEntity indexedEntity = new IndexedEntity( "child" );
 
 		CollectionItem item1 = new CollectionItem();
@@ -105,15 +104,14 @@ public class FieldOnCollectionReindexTest extends SearchTestBase {
 		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
 
 		tx.commit();
-		hibernateSession.close();
+	    }
 	}
 
 	// Same test with @Fields annotation
 	@TestForIssue(jiraKey = "HSEARCH-1020")
 	@Test
 	public void testUpdatingCollectionWithFieldsAnnotationReindexesEntity() {
-		Session hibernateSession = openSession();
-
+	    try (Session hibernateSession = openSession()) {
 		IndexedEntity indexedEntity = new IndexedEntity( "child" );
 
 		CollectionItem item1 = new CollectionItem();
@@ -187,14 +185,13 @@ public class FieldOnCollectionReindexTest extends SearchTestBase {
 		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
 
 		tx.commit();
-		hibernateSession.close();
+	    }
 	}
 
 	@TestForIssue(jiraKey = "HSEARCH-1004")
 	@Test
 	public void testUpdatingElementCollectionWithFieldAnnotationReindexesEntity() {
-		Session hibernateSession = openSession();
-
+	    try (Session hibernateSession = openSession()) {
 		IndexedEntity indexedEntity = new IndexedEntity( "child" );
 		indexedEntity.addKeyword( "test1" );
 		indexedEntity.addKeyword( "test3" );
@@ -249,8 +246,7 @@ public class FieldOnCollectionReindexTest extends SearchTestBase {
 		assertEquals( 1, searchResult.size() );
 		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
 		tx.commit();
-
-		hibernateSession.close();
+	    }
 	}
 
 	@SuppressWarnings("unchecked")

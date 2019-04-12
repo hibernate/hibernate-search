@@ -103,7 +103,7 @@ public class PropertyDescriptorTest {
 
 		Set<PropertyDescriptor> propertyDescriptors = typeDescriptor.getIndexedProperties();
 		assertEquals( "There should be 7 properties defined in Snafu", 7, propertyDescriptors.size() );
-		Set<String> expectedPropertyNames = new HashSet<String>();
+		Set<String> expectedPropertyNames = new HashSet<>();
 		expectedPropertyNames.add( "id" );
 		expectedPropertyNames.add( "snafu" );
 		expectedPropertyNames.add( "numericField" );

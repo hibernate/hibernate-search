@@ -73,16 +73,11 @@ public class MultiClassesQueryLoaderTest extends SearchTestBase {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 
-		session.doWork(
-				new Work() {
-					@Override
-					public void execute(Connection connection) throws SQLException {
-						Statement statement = connection.createStatement();
-						statement.executeUpdate( "DELETE FROM Author where name = 'Charles Dickens'" );
-						statement.close();
-					}
-				}
-		);
+		session.doWork((Connection connection) -> {
+		    try (Statement statement = connection.createStatement()) {
+			statement.executeUpdate( "DELETE FROM Author where name = 'Charles Dickens'" );
+		    }
+		});
 
 		FullTextSession s = Search.getFullTextSession( session );
 		QueryParser parser = new QueryParser( "title", TestConstants.keywordAnalyzer );

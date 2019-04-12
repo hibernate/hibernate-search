@@ -51,7 +51,7 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 		this.sharded = indexManagers.size() > 1;
 
 		// create the class bridge fields
-		Set<FieldDescriptor> fieldDescriptorTmp = new HashSet<FieldDescriptor>();
+		Set<FieldDescriptor> fieldDescriptorTmp = new HashSet<>();
 		for ( DocumentFieldMetadata documentFieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
 			FieldDescriptor fieldDescriptor;
 			if ( documentFieldMetadata.isNumeric() ) {
@@ -67,14 +67,14 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 		// handle the property descriptor and their fields
 		this.keyedPropertyDescriptors = Collections.unmodifiableMap( createPropertyDescriptors( typeMetadata ) );
 		this.propertyDescriptors = Collections.unmodifiableSet(
-				new HashSet<PropertyDescriptor>(
+				new HashSet<>(
 						createPropertyDescriptors( typeMetadata ).values()
 				)
 		);
 		this.allFieldDescriptors = Collections.unmodifiableMap( createAllFieldDescriptors() );
 
 		// create the index descriptors
-		Set<IndexDescriptor> indexDescriptorTmp = new HashSet<IndexDescriptor>();
+		Set<IndexDescriptor> indexDescriptorTmp = new HashSet<>();
 		for ( IndexManager indexManager : indexManagers ) {
 			indexDescriptorTmp.add( new IndexDescriptorImpl( indexManager ) );
 		}
@@ -175,7 +175,7 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 	}
 
 	private Map<String, PropertyDescriptor> createPropertyDescriptors(TypeMetadata typeMetadata) {
-		Map<String, PropertyDescriptor> propertyDescriptorsTmp = new HashMap<String, PropertyDescriptor>();
+		Map<String, PropertyDescriptor> propertyDescriptorsTmp = new HashMap<>();
 		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
 			createOrMergePropertyDescriptor( propertyDescriptorsTmp, propertyMetadata );
 		}
@@ -186,7 +186,7 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 	private void createOrMergePropertyDescriptor(Map<String, PropertyDescriptor> propertyDescriptorsTmp,
 			PropertyMetadata propertyMetadata) {
 		String propertyName = propertyMetadata.getPropertyAccessorName();
-		Set<FieldDescriptor> tmpSet = new HashSet<FieldDescriptor>();
+		Set<FieldDescriptor> tmpSet = new HashSet<>();
 		if ( propertyDescriptorsTmp.containsKey( propertyName ) ) {
 			tmpSet.addAll( propertyDescriptorsTmp.get( propertyName ).getIndexedFields() );
 		}
@@ -215,7 +215,7 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 	}
 
 	private Map<String, FieldDescriptor> createAllFieldDescriptors() {
-		Map<String, FieldDescriptor> fieldDescriptorMap = new HashMap<String, FieldDescriptor>();
+		Map<String, FieldDescriptor> fieldDescriptorMap = new HashMap<>();
 		for ( FieldDescriptor fieldDescriptor : classBridgeFieldDescriptors ) {
 			fieldDescriptorMap.put( fieldDescriptor.getName(), fieldDescriptor );
 		}

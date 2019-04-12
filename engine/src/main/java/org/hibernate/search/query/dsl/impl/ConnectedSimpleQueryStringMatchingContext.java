@@ -22,7 +22,7 @@ public class ConnectedSimpleQueryStringMatchingContext implements SimpleQueryStr
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 
-	private final List<FieldsContext> fieldsContexts = new ArrayList<FieldsContext>();
+	private final List<FieldsContext> fieldsContexts = new ArrayList<>();
 	private FieldsContext currentFieldsContext;
 
 	private boolean withAndAsDefaultOperator = false;

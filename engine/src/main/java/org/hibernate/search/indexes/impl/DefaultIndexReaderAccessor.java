@@ -76,7 +76,7 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 
 	@Override
 	public IndexReader open(String... indexNames) {
-		TreeSet<String> names = new TreeSet<String>();
+		TreeSet<String> names = new TreeSet<>();
 		for ( String name : indexNames ) {
 			if ( name != null ) {
 				names.add( name );

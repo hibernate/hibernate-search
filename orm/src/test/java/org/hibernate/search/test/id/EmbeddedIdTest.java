@@ -34,7 +34,7 @@ public class EmbeddedIdTest extends SearchTestBase {
 		emmanuel.setFavoriteColor( "Blue" );
 		emmanuel.setId( emmanuelPk );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.save( emmanuel );
 		tx.commit();
@@ -42,7 +42,7 @@ public class EmbeddedIdTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "id_content.lastName", "Bernard" ) )
+			new TermQuery( new Term( "id_content.lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
 		emmanuel = (Person) results.get( 0 );
@@ -52,14 +52,14 @@ public class EmbeddedIdTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "id_content.lastName", "Bernard" ) )
+			new TermQuery( new Term( "id_content.lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
 		emmanuel = (Person) results.get( 0 );
 		assertEquals( "Red", emmanuel.getFavoriteColor() );
 		s.delete( results.get( 0 ) );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class EmbeddedIdTest extends SearchTestBase {
 		john.setFavoriteColor( "Blue" );
 		john.setId( johnPk );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.save( emmanuel );
 		s.save( john );
@@ -94,11 +94,11 @@ public class EmbeddedIdTest extends SearchTestBase {
 
 		// we need a query which has at least the size of two.
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "favoriteColor", "blue" ) )
+			new TermQuery( new Term( "favoriteColor", "blue" ) )
 		).list();
 		assertEquals( 2, results.size() );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

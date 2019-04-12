@@ -26,7 +26,7 @@ public class AvoidDuplicatesTest extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		Transaction transaction = session.beginTransaction();
 
 		Nation italy = new Nation( "Italy", "IT" );
@@ -47,17 +47,17 @@ public class AvoidDuplicatesTest extends SearchTestBase {
 		session.persist( commedia );
 
 		transaction.commit();
-		session.close();
+	    }
 	}
 
 	@Test
 	public void testReindexedOnce() throws InterruptedException {
 		Assert.assertEquals( 2, countBooksInIndex() );
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		MassIndexer massIndexer = fullTextSession.createIndexer();
 		massIndexer.startAndWait();
-		session.close();
+	    }
 		Assert.assertEquals( 2, countBooksInIndex() );
 	}
 

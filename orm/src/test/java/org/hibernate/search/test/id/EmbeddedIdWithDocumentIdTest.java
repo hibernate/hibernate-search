@@ -41,7 +41,7 @@ public class EmbeddedIdWithDocumentIdTest extends SearchTestBase {
 		johnDoe.setPersonNames( johnDoePk );
 		johnDoe.setSecurityNumber( "AB123" );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.save( johnDoe );
 		tx.commit();
@@ -71,7 +71,7 @@ public class EmbeddedIdWithDocumentIdTest extends SearchTestBase {
 		assertEquals( "Red", johnDoe.getFavoriteColor() );
 		s.delete( results.get( 0 ) );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

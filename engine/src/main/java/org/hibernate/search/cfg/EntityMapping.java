@@ -37,7 +37,7 @@ public class EntityMapping {
 	}
 
 	public EntityMapping boost(float boost) {
-		final Map<String, Object> boostAnn = new HashMap<String, Object>();
+		final Map<String, Object> boostAnn = new HashMap<>();
 		boostAnn.put( "value", boost );
 		entity.setBoost( boostAnn );
 		return this;
@@ -54,14 +54,14 @@ public class EntityMapping {
 	 */
 	@Deprecated
 	public EntityMapping dynamicBoost(Class<? extends BoostStrategy> impl) {
-		final Map<String, Object> dynamicBoost = new HashMap<String, Object>();
+		final Map<String, Object> dynamicBoost = new HashMap<>();
 		dynamicBoost.put( "impl", impl );
 		entity.setDynamicBoost( dynamicBoost );
 		return this;
 	}
 
 	public EntityMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
-		final Map<String, Object> discriminatorAnn = new HashMap<String, Object>();
+		final Map<String, Object> discriminatorAnn = new HashMap<>();
 		discriminatorAnn.put( "impl", discriminator );
 		entity.setAnalyzerDiscriminator( discriminatorAnn );
 		return this;

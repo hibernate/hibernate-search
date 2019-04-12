@@ -20,7 +20,7 @@ public class DocumentIdMapping {
 	private final SearchMapping mapping;
 	private final EntityDescriptor entity;
 	private final PropertyDescriptor property;
-	private final Map<String, Object> documentId = new HashMap<String, Object>();
+	private final Map<String, Object> documentId = new HashMap<>();
 
 	public DocumentIdMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
 		this.mapping = mapping;

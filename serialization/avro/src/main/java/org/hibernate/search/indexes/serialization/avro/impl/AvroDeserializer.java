@@ -68,54 +68,62 @@ public class AvroDeserializer implements Deserializer {
 		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 		for ( GenericRecord operation : operations ) {
 			String schema = operation.getSchema().getName();
-			if ( "OptimizeAll".equals( schema ) ) {
-				hydrator.addOptimizeAll();
+			if ( null == schema ) {
+			    throw log.cannotDeserializeOperation( schema );
 			}
-			else if ( "PurgeAll".equals( schema ) ) {
-				hydrator.addPurgeAllLuceneWork( asClass( operation, "class" ) );
-			}
-			else if ( "Flush".equals( schema ) ) {
-				hydrator.addFlush();
-			}
-			else if ( "Delete".equals( schema ) ) {
-				processId( operation, hydrator );
-				hydrator.addDeleteLuceneWork(
-						asClass( operation, "class" ), conversionContext
-				);
-			}
-			else if ( "DeleteByQuery".equals( schema ) ) {
-				String entityClassName = asClass( operation, "class" );
-				int queryKey = asInt( operation, "key" );
-				List<Utf8> stringList = asListOfString( operation, "query" );
-				String[] query = new String[stringList.size()];
-				for ( int i = 0; i < stringList.size(); ++i ) {
-					query[i] = stringList.get( i ).toString();
-				}
-				hydrator.addDeleteByQueryLuceneWork( entityClassName, DeleteByQuerySupport.fromString( queryKey, query ) );
-			}
-			else if ( "Add".equals( schema ) ) {
+			else switch (schema) {
+		    	case "OptimizeAll":
+			    hydrator.addOptimizeAll();
+			    break;
+		    	case "PurgeAll":
+			    hydrator.addPurgeAllLuceneWork( asClass( operation, "class" ) );
+			    break;
+		    	case "Flush":
+			    hydrator.addFlush();
+			    break;
+		    	case "Delete":
+			    processId( operation, hydrator );
+			    hydrator.addDeleteLuceneWork(
+				    asClass( operation, "class" ), conversionContext
+			    );
+			    break;
+		    	case "DeleteByQuery":
+			    String entityClassName = asClass( operation, "class" );
+			    int queryKey = asInt( operation, "key" );
+			    List<Utf8> stringList = asListOfString( operation, "query" );
+			    String[] query = new String[stringList.size()];
+			    for ( int i = 0; i < stringList.size(); ++i ) {
+				query[i] = stringList.get( i ).toString();
+			    }
+			    hydrator.addDeleteByQueryLuceneWork( entityClassName, DeleteByQuerySupport.fromString( queryKey, query ) );
+			    break;
+		    	case "Add":
+			    {
 				buildLuceneDocument( asGenericRecord( operation, "document" ), hydrator );
 				Map<String, String> analyzers = getAnalyzers( operation );
 				processId( operation, hydrator );
 				hydrator.addAddLuceneWork(
-						asClass( operation, "class" ),
-						analyzers,
-						conversionContext
+					asClass( operation, "class" ),
+					analyzers,
+					conversionContext
 				);
-			}
-			else if ( "Update".equals( schema ) ) {
+				break;
+			    }
+		    	case "Update":
+			    {
 				buildLuceneDocument( asGenericRecord( operation, "document" ), hydrator );
 				Map<String, String> analyzers = getAnalyzers( operation );
 				processId( operation, hydrator );
 				hydrator.addUpdateLuceneWork(
-						asClass( operation, "class" ),
-						analyzers,
-						conversionContext
+					asClass( operation, "class" ),
+					analyzers,
+					conversionContext
 				);
-			}
-			else {
-				throw log.cannotDeserializeOperation( schema );
-			}
+				break;
+			    }
+		    	default:
+			    throw log.cannotDeserializeOperation( schema );
+		    }
 		}
 	}
 
@@ -161,116 +169,120 @@ public class AvroDeserializer implements Deserializer {
 		List<GenericRecord> fieldables = asListOfGenericRecords( document, "fieldables" );
 		for ( GenericRecord field : fieldables ) {
 			String schema = field.getSchema().getName();
-			if ( "CustomFieldable".equals( schema ) ) {
-				hydrator.addFieldable( asByteArray( field, "instance" ) );
+			if ( null == schema ) {
+			    throw log.cannotDeserializeField( schema );
 			}
-			else if ( "NumericIntField".equals( schema ) ) {
-				hydrator.addIntNumericField(
-							asInt( field, "value" ),
-							asString( field, "name" ),
-							asInt( field, "precisionStep" ),
-							asStore( field ),
-							asBoolean( field, "indexed" ),
-							asFloat( field, "boost" ),
-							asBoolean( field, "omitNorms" ),
-							asBoolean( field, "omitTermFreqAndPositions" )
-				);
-			}
-			else if ( "NumericFloatField".equals( schema ) ) {
-				hydrator.addFloatNumericField(
-							asFloat( field, "value" ),
-							asString( field, "name" ),
-							asInt( field, "precisionStep" ),
-							asStore( field ),
-							asBoolean( field, "indexed" ),
-							asFloat( field, "boost" ),
-							asBoolean( field, "omitNorms" ),
-							asBoolean( field, "omitTermFreqAndPositions" )
-				);
-			}
-			else if ( "NumericLongField".equals( schema ) ) {
-				hydrator.addLongNumericField(
-							asLong( field, "value" ),
-							asString( field, "name" ),
-							asInt( field, "precisionStep" ),
-							asStore( field ),
-							asBoolean( field, "indexed" ),
-							asFloat( field, "boost" ),
-							asBoolean( field, "omitNorms" ),
-							asBoolean( field, "omitTermFreqAndPositions" )
-				);
-			}
-			else if ( "NumericDoubleField".equals( schema ) ) {
-				hydrator.addDoubleNumericField(
-							asDouble( field, "value" ),
-							asString( field, "name" ),
-							asInt( field, "precisionStep" ),
-							asStore( field ),
-							asBoolean( field, "indexed" ),
-							asFloat( field, "boost" ),
-							asBoolean( field, "omitNorms" ),
-							asBoolean( field, "omitTermFreqAndPositions" )
-				);
-			}
-			else if ( "BinaryField".equals( schema ) ) {
-				hydrator.addFieldWithBinaryData(
-							asString( field, "name" ),
-							asByteArray( field, "value" ),
-							asInt( field, "offset" ),
-							asInt( field, "length" )
-				);
-			}
-			else if ( "StringField".equals( schema ) ) {
-				hydrator.addFieldWithStringData(
-						asString( field, "name" ),
-						asString( field, "value" ),
-						asStore( field ),
-						asIndex( field ),
-						asTermVector( field ),
-						asFloat( field, "boost" ),
-						asBoolean( field, "omitNorms" ),
-						asBoolean( field, "omitTermFreqAndPositions" )
-				);
-			}
-			else if ( "TokenStreamField".equals( schema ) ) {
-				buildAttributes( field, "value", hydrator );
-				hydrator.addFieldWithTokenStreamData(
-						asString( field, "name" ),
-						asTermVector( field ),
-						asFloat( field, "boost" ),
-						asBoolean( field, "omitNorms" ),
-						asBoolean( field, "omitTermFreqAndPositions" )
-				);
-			}
-			else if ( "ReaderField".equals( schema ) ) {
-				hydrator.addFieldWithSerializableReaderData(
-						asString( field, "name" ),
-						asByteArray( field, "value" ),
-						asTermVector( field ),
-						asFloat( field, "boost" ),
-						asBoolean( field, "omitNorms" ),
-						asBoolean( field, "omitTermFreqAndPositions" )
-				);
-			}
-			else if ( "BinaryDocValuesField".equals( schema ) ) {
-				hydrator.addDocValuesFieldWithBinaryData(
-						asString( field, "name" ),
-						asString( field, "type" ),
-						asByteArray( field, "value" ),
-						asInt( field, "offset" ),
-						asInt( field, "length" )
-				);
-			}
-			else if ( "NumericDocValuesField".equals( schema ) ) {
-				hydrator.addDocValuesFieldWithNumericData(
-						asString( field, "name" ),
-						asString( field, "type" ),
-						asLong( field, "value" )
-				);
-			}
-			else {
-				throw log.cannotDeserializeField( schema );
-			}
+			else switch (schema) {
+		    	case "CustomFieldable":
+			    hydrator.addFieldable( asByteArray( field, "instance" ) );
+			    break;
+		    	case "NumericIntField":
+			    hydrator.addIntNumericField(
+				    asInt( field, "value" ),
+				    asString( field, "name" ),
+				    asInt( field, "precisionStep" ),
+				    asStore( field ),
+				    asBoolean( field, "indexed" ),
+				    asFloat( field, "boost" ),
+				    asBoolean( field, "omitNorms" ),
+				    asBoolean( field, "omitTermFreqAndPositions" )
+			    );
+			    break;
+		    	case "NumericFloatField":
+			    hydrator.addFloatNumericField(
+				    asFloat( field, "value" ),
+				    asString( field, "name" ),
+				    asInt( field, "precisionStep" ),
+				    asStore( field ),
+				    asBoolean( field, "indexed" ),
+				    asFloat( field, "boost" ),
+				    asBoolean( field, "omitNorms" ),
+				    asBoolean( field, "omitTermFreqAndPositions" )
+			    );
+			    break;
+		    	case "NumericLongField":
+			    hydrator.addLongNumericField(
+				    asLong( field, "value" ),
+				    asString( field, "name" ),
+				    asInt( field, "precisionStep" ),
+				    asStore( field ),
+				    asBoolean( field, "indexed" ),
+				    asFloat( field, "boost" ),
+				    asBoolean( field, "omitNorms" ),
+				    asBoolean( field, "omitTermFreqAndPositions" )
+			    );
+			    break;
+		    	case "NumericDoubleField":
+			    hydrator.addDoubleNumericField(
+				    asDouble( field, "value" ),
+				    asString( field, "name" ),
+				    asInt( field, "precisionStep" ),
+				    asStore( field ),
+				    asBoolean( field, "indexed" ),
+				    asFloat( field, "boost" ),
+				    asBoolean( field, "omitNorms" ),
+				    asBoolean( field, "omitTermFreqAndPositions" )
+			    );
+			    break;
+		    	case "BinaryField":
+			    hydrator.addFieldWithBinaryData(
+				    asString( field, "name" ),
+				    asByteArray( field, "value" ),
+				    asInt( field, "offset" ),
+				    asInt( field, "length" )
+			    );
+			    break;
+		    	case "StringField":
+			    hydrator.addFieldWithStringData(
+				    asString( field, "name" ),
+				    asString( field, "value" ),
+				    asStore( field ),
+				    asIndex( field ),
+				    asTermVector( field ),
+				    asFloat( field, "boost" ),
+				    asBoolean( field, "omitNorms" ),
+				    asBoolean( field, "omitTermFreqAndPositions" )
+			    );
+			    break;
+		    	case "TokenStreamField":
+			    buildAttributes( field, "value", hydrator );
+			    hydrator.addFieldWithTokenStreamData(
+				    asString( field, "name" ),
+				    asTermVector( field ),
+				    asFloat( field, "boost" ),
+				    asBoolean( field, "omitNorms" ),
+				    asBoolean( field, "omitTermFreqAndPositions" )
+			    );
+			    break;
+		    	case "ReaderField":
+			    hydrator.addFieldWithSerializableReaderData(
+				    asString( field, "name" ),
+				    asByteArray( field, "value" ),
+				    asTermVector( field ),
+				    asFloat( field, "boost" ),
+				    asBoolean( field, "omitNorms" ),
+				    asBoolean( field, "omitTermFreqAndPositions" )
+			    );
+			    break;
+		    	case "BinaryDocValuesField":
+			    hydrator.addDocValuesFieldWithBinaryData(
+				    asString( field, "name" ),
+				    asString( field, "type" ),
+				    asByteArray( field, "value" ),
+				    asInt( field, "offset" ),
+				    asInt( field, "length" )
+			    );
+			    break;
+		    	case "NumericDocValuesField":
+			    hydrator.addDocValuesFieldWithNumericData(
+				    asString( field, "name" ),
+				    asString( field, "type" ),
+				    asLong( field, "value" )
+			    );
+			    break;
+		    	default:
+			    throw log.cannotDeserializeField( schema );
+		    }
 		}
 	}
 
@@ -289,35 +301,39 @@ public class AvroDeserializer implements Deserializer {
 		if ( element instanceof GenericRecord ) {
 			GenericRecord record = (GenericRecord) element;
 			String name = record.getSchema().getName();
-			if ( "TokenTrackingAttribute".equals( name ) ) {
-				@SuppressWarnings( "unchecked" )
-				List<Integer> positionList = (List<Integer>) record.get( "positions" );
-				hydrator.addTokenTrackingAttribute( positionList );
+			if ( null == name ) {
+			    throw log.unknownAttributeSerializedRepresentation( name );
 			}
-			else if ( "CharTermAttribute".equals( name ) ) {
-				hydrator.addCharTermAttribute( (CharSequence) record.get( "sequence" ) );
-			}
-			else if ( "PayloadAttribute".equals( name ) ) {
-				hydrator.addPayloadAttribute( asByteArray( record, "payload" ) );
-			}
-			else if ( "KeywordAttribute".equals( name ) ) {
-				hydrator.addKeywordAttribute( asBoolean( record, "isKeyword" ) );
-			}
-			else if ( "PositionIncrementAttribute".equals( name ) ) {
-				hydrator.addPositionIncrementAttribute( asInt( record, "positionIncrement" ) );
-			}
-			else if ( "FlagsAttribute".equals( name ) ) {
-				hydrator.addFlagsAttribute( asInt( record, "flags" ) );
-			}
-			else if ( "TypeAttribute".equals( name ) ) {
-				hydrator.addTypeAttribute( asString( record, "type" ) );
-			}
-			else if ( "OffsetAttribute".equals( name ) ) {
-				hydrator.addOffsetAttribute( asInt( record, "startOffset" ), asInt( record, "endOffset" ) );
-			}
-			else {
-				throw log.unknownAttributeSerializedRepresentation( name );
-			}
+			else switch (name) {
+		    	case "TokenTrackingAttribute":
+			    @SuppressWarnings( "unchecked" )
+				    List<Integer> positionList = (List<Integer>) record.get( "positions" );
+			    hydrator.addTokenTrackingAttribute( positionList );
+			    break;
+		    	case "CharTermAttribute":
+			    hydrator.addCharTermAttribute( (CharSequence) record.get( "sequence" ) );
+			    break;
+		    	case "PayloadAttribute":
+			    hydrator.addPayloadAttribute( asByteArray( record, "payload" ) );
+			    break;
+		    	case "KeywordAttribute":
+			    hydrator.addKeywordAttribute( asBoolean( record, "isKeyword" ) );
+			    break;
+		    	case "PositionIncrementAttribute":
+			    hydrator.addPositionIncrementAttribute( asInt( record, "positionIncrement" ) );
+			    break;
+		    	case "FlagsAttribute":
+			    hydrator.addFlagsAttribute( asInt( record, "flags" ) );
+			    break;
+		    	case "TypeAttribute":
+			    hydrator.addTypeAttribute( asString( record, "type" ) );
+			    break;
+		    	case "OffsetAttribute":
+			    hydrator.addOffsetAttribute( asInt( record, "startOffset" ), asInt( record, "endOffset" ) );
+			    break;
+		    	default:
+			    throw log.unknownAttributeSerializedRepresentation( name );
+		    }
 		}
 		else if ( element instanceof ByteBuffer ) {
 			hydrator.addSerializedAttribute( asByteArray( (ByteBuffer) element ) );

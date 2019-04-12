@@ -26,7 +26,7 @@ public class LeakingLocalBackend extends LocalBackendQueueProcessor {
 
 	@Override
 	public void close() {
-		lastProcessedQueue = new ArrayList<LuceneWork>();
+		lastProcessedQueue = new ArrayList<>();
 		super.close();
 	}
 
@@ -35,7 +35,7 @@ public class LeakingLocalBackend extends LocalBackendQueueProcessor {
 	}
 
 	public static void reset() {
-		lastProcessedQueue = new ArrayList<LuceneWork>();
+		lastProcessedQueue = new ArrayList<>();
 	}
 
 	@Override

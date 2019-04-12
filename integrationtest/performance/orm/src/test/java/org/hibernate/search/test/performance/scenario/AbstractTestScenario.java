@@ -14,6 +14,7 @@ import java.util.Properties;
  */
 public abstract class AbstractTestScenario implements TestScenario {
 
+	@Override
 	public Properties getHibernateProperties() {
 		Properties properties = new Properties();
 		properties.setProperty( "hibernate.hbm2ddl.auto", "create" );

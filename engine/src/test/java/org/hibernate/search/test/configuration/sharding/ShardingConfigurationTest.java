@@ -86,7 +86,7 @@ public class ShardingConfigurationTest {
 
 	@Test
 	public void testSettingNumberOfShardsOnlySelectsIdHashSharding() {
-		Map<String, String> shardingProperties = new HashMap<String, String>();
+		Map<String, String> shardingProperties = new HashMap<>();
 		shardingProperties.put( "hibernate.search.default.sharding_strategy.nbr_of_shards", "2" );
 
 		MutableSearchFactory searchFactory = getSearchFactory( shardingProperties );
@@ -109,7 +109,7 @@ public class ShardingConfigurationTest {
 
 	@Test
 	public void testSettingNegativeNumberOfShardsThrowsException() {
-		Map<String, String> shardingProperties = new HashMap<String, String>();
+		Map<String, String> shardingProperties = new HashMap<>();
 		shardingProperties.put( "hibernate.search.default.sharding_strategy.nbr_of_shards", "-1" );
 
 		try {
@@ -123,7 +123,7 @@ public class ShardingConfigurationTest {
 
 	@Test
 	public void testSettingZeroNumberOfShardsThrowsException() {
-		Map<String, String> shardingProperties = new HashMap<String, String>();
+		Map<String, String> shardingProperties = new HashMap<>();
 		shardingProperties.put( "hibernate.search.default.sharding_strategy.nbr_of_shards", "0" );
 
 		try {
@@ -137,7 +137,7 @@ public class ShardingConfigurationTest {
 
 	@Test
 	public void testSettingStringValueAsNumberOfShardsThrowsException() {
-		Map<String, String> shardingProperties = new HashMap<String, String>();
+		Map<String, String> shardingProperties = new HashMap<>();
 		shardingProperties.put( "hibernate.search.default.sharding_strategy.nbr_of_shards", "snafu" );
 
 		try {
@@ -151,7 +151,7 @@ public class ShardingConfigurationTest {
 
 	@Test
 	public void testSettingIdHashShardingStrategyWithoutNumberOfShards() {
-		Map<String, String> shardingProperties = new HashMap<String, String>();
+		Map<String, String> shardingProperties = new HashMap<>();
 		shardingProperties.put( "hibernate.search.default.sharding_strategy", IdHashShardingStrategy.class.getName() );
 
 		logged.expectMessage( "HSEARCH000193", "IdHashShardingStrategy" );
@@ -167,7 +167,7 @@ public class ShardingConfigurationTest {
 
 	@Test
 	public void testSettingCustomIndexShardingStrategy() {
-		Map<String, String> shardingProperties = new HashMap<String, String>();
+		Map<String, String> shardingProperties = new HashMap<>();
 		shardingProperties.put(
 				"hibernate.search.default.sharding_strategy",
 				DummyIndexShardingStrategy.class.getName()
@@ -201,7 +201,7 @@ public class ShardingConfigurationTest {
 
 	@Test
 	public void testSettingCustomShardIdentifierProvider() {
-		Map<String, String> shardingProperties = new HashMap<String, String>();
+		Map<String, String> shardingProperties = new HashMap<>();
 		shardingProperties.put(
 				"hibernate.search.default.sharding_strategy",
 				DummyShardIdentifierProvider.class.getName()
@@ -220,7 +220,7 @@ public class ShardingConfigurationTest {
 
 	@Test
 	public void testSettingUnknownStrategyClassThrowsException() {
-		Map<String, String> shardingProperties = new HashMap<String, String>();
+		Map<String, String> shardingProperties = new HashMap<>();
 		shardingProperties.put( "hibernate.search.default.sharding_strategy", "snafu" );
 
 		try {
@@ -234,7 +234,7 @@ public class ShardingConfigurationTest {
 
 	@Test
 	public void testSettingCustomShardIdentifierProviderWithExplicitIndexName() {
-		Map<String, String> shardingProperties = new HashMap<String, String>();
+		Map<String, String> shardingProperties = new HashMap<>();
 		shardingProperties.put(
 				"hibernate.search.foo.sharding_strategy",
 				DummyShardIdentifierProvider.class.getName()
@@ -254,7 +254,7 @@ public class ShardingConfigurationTest {
 	@Test
 	@Category(SkipOnElasticsearch.class) // This test is specific to Lucene
 	public void testConfiguringDynamicallyCreatedShardViaConfiguration() {
-		Map<String, String> shardingProperties = new HashMap<String, String>();
+		Map<String, String> shardingProperties = new HashMap<>();
 		shardingProperties.put(
 				"hibernate.search.foo.sharding_strategy",
 				DummyShardIdentifierProvider.class.getName()
@@ -341,7 +341,7 @@ public class ShardingConfigurationTest {
 	}
 
 	public static class DummyShardIdentifierProvider implements ShardIdentifierProvider {
-		private final Set<String> shards = new HashSet<String>();
+		private final Set<String> shards = new HashSet<>();
 
 		@Override
 		public void initialize(Properties properties, BuildContext buildContext) {

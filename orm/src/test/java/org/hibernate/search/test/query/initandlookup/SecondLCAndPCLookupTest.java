@@ -38,7 +38,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 
 	@Test
 	public void testQueryWoLookup() throws Exception {
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();
 		statistics.setStatisticsEnabled( true );
@@ -49,9 +49,9 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		Transaction transaction = session.beginTransaction();
 		final FullTextSession fullTextSession = Search.getFullTextSession( session );
 		final QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder()
-				.forEntity( Kernel.class )
-				.get();
+			.buildQueryBuilder()
+			.forEntity( Kernel.class )
+			.get();
 		final Query luceneQuery = queryBuilder.keyword().onField( "product" ).matching( "Polgeiser" ).createQuery();
 		final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Kernel.class );
 		List list = fullTextQuery.list();
@@ -63,12 +63,12 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 
 		transaction.commit();
 		clearData( session );
-		session.close();
+	    }
 	}
 
 	@Test
 	public void testQueryWith2LCLookup() throws Exception {
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();
 		statistics.setStatisticsEnabled( true );
@@ -79,9 +79,9 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		Transaction transaction = session.beginTransaction();
 		final FullTextSession fullTextSession = Search.getFullTextSession( session );
 		final QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder()
-				.forEntity( Kernel.class )
-				.get();
+			.buildQueryBuilder()
+			.forEntity( Kernel.class )
+			.get();
 		final Query luceneQuery = queryBuilder.keyword().onField( "product" ).matching( "Polgeiser" ).createQuery();
 		final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Kernel.class );
 		fullTextQuery.initializeObjectsWith( ObjectLookupMethod.SECOND_LEVEL_CACHE, DatabaseRetrievalMethod.QUERY );
@@ -94,12 +94,12 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 
 		transaction.commit();
 		clearData( session );
-		session.close();
+	    }
 	}
 
 	@Test
 	public void testQueryWithPCLookup() throws Exception {
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();
 		statistics.setStatisticsEnabled( true );
@@ -112,9 +112,9 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		session.createQuery( "from " + Kernel.class.getName() ).list();
 		statistics.clear();
 		final QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder()
-				.forEntity( Kernel.class )
-				.get();
+			.buildQueryBuilder()
+			.forEntity( Kernel.class )
+			.get();
 		final Query luceneQuery = queryBuilder.keyword().onField( "product" ).matching( "Polgeiser" ).createQuery();
 		final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Kernel.class );
 		fullTextQuery.initializeObjectsWith( ObjectLookupMethod.PERSISTENCE_CONTEXT, DatabaseRetrievalMethod.QUERY );
@@ -123,20 +123,20 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		assertThat( statistics.getSecondLevelCacheHitCount() )
 			.isEqualTo( 0 );
 		assertThat( statistics.getQueryExecutionCount() )
-				.describedAs( "entities should be looked up and are already loaded" )
-				.isEqualTo( 0 );
+			.describedAs( "entities should be looked up and are already loaded" )
+			.isEqualTo( 0 );
 		assertThat( statistics.getEntityLoadCount() )
-				.describedAs( "entities should be looked up and are already loaded" )
-				.isEqualTo( 0 );
-
+			.describedAs( "entities should be looked up and are already loaded" )
+			.isEqualTo( 0 );
+		
 		transaction.commit();
 		clearData( session );
-		session.close();
+	    }
 	}
 
 	@Test
 	public void testQueryWithPCAndCacheLookup() throws Exception {
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();
 		statistics.setStatisticsEnabled( true );
@@ -151,9 +151,9 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		assertThat( firstLoad.size() ).isEqualTo( 1 );
 		statistics.clear();
 		final QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder()
-				.forEntity( Kernel.class )
-				.get();
+			.buildQueryBuilder()
+			.forEntity( Kernel.class )
+			.get();
 		final Query luceneQuery = queryBuilder.keyword().onField( "product" ).matching( "Polgeiser" ).createQuery();
 		final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Kernel.class );
 		fullTextQuery.initializeObjectsWith( ObjectLookupMethod.SECOND_LEVEL_CACHE, DatabaseRetrievalMethod.QUERY );
@@ -162,15 +162,15 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		assertThat( statistics.getSecondLevelCacheHitCount() )
 			.isEqualTo( 1 );
 		assertThat( statistics.getQueryExecutionCount() )
-				.describedAs( "entities should be looked up and are already loaded" )
-				.isEqualTo( 0 );
+			.describedAs( "entities should be looked up and are already loaded" )
+			.isEqualTo( 0 );
 		assertThat( statistics.getEntityLoadCount() )
-				.describedAs( "entities should be looked up and are already loaded" )
-				.isEqualTo( 0 );
-
+			.describedAs( "entities should be looked up and are already loaded" )
+			.isEqualTo( 0 );
+		
 		transaction.commit();
 		clearData( session );
-		session.close();
+	    }
 	}
 
 	@Test
@@ -201,7 +201,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 
 	@Test
 	public void testQueryUsingFindByIdInitialization() throws Exception {
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		final Statistics statistics = session.getSessionFactory().getStatistics();
 		statistics.clear();
 		statistics.setStatisticsEnabled( true );
@@ -225,9 +225,9 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		Transaction transaction = session.beginTransaction();
 		final FullTextSession fullTextSession = Search.getFullTextSession( session );
 		final QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder()
-				.forEntity( Kernel.class )
-				.get();
+			.buildQueryBuilder()
+			.forEntity( Kernel.class )
+			.get();
 		final Query luceneQuery = queryBuilder.keyword().onField( "product" ).matching( "Polgeiser" ).createQuery();
 		final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Kernel.class );
 		fullTextQuery.initializeObjectsWith( ObjectLookupMethod.SKIP, DatabaseRetrievalMethod.FIND_BY_ID );
@@ -236,7 +236,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		assertThat( list ).allSatisfy( o -> assertThat( Hibernate.isInitialized( o ) ).isTrue() );
 
 		for ( Object o : list ) {
-			o.toString(); //check true initialization
+		    o.toString(); //check true initialization
 		}
 
 		assertThat( statistics.getSecondLevelCacheHitCount() )
@@ -248,7 +248,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 
 		transaction.commit();
 		clearData( session );
-		session.close();
+	    }
 	}
 
 	private void clearData(Session session) {

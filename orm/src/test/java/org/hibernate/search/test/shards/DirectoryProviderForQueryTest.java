@@ -39,7 +39,7 @@ public class DirectoryProviderForQueryTest extends SearchTestBase {
 	@Test
 	public void testDirectoryProviderForQuery() throws Exception {
 
-		Session s = openSession( );
+	    try (Session s = openSession( )) {
 		Transaction tx = s.beginTransaction();
 
 		Email a = new Email();
@@ -69,10 +69,10 @@ public class DirectoryProviderForQueryTest extends SearchTestBase {
 		assertEquals( "Query with filter should bring back results from only one shard.", 1, fullTextQuery.list().size() );
 
 		for ( Object o : results ) {
-			s.delete( o );
+		    s.delete( o );
 		}
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

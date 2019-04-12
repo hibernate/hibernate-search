@@ -47,7 +47,7 @@ public class EmbeddedTest extends SearchTestBase {
 		c.setName( "France" );
 		a.setCountry( c );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( tower );
 		tx.commit();
@@ -93,8 +93,7 @@ public class EmbeddedTest extends SearchTestBase {
 		tx = s.beginTransaction();
 		s.delete( s.get( Tower.class, tower.getId() ) );
 		tx.commit();
-
-		s.close();
+	    }
 
 	}
 
@@ -114,7 +113,7 @@ public class EmbeddedTest extends SearchTestBase {
 		states.add( sachsen );
 		country.setStates( states );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( country );
 		tx.commit();
@@ -127,7 +126,7 @@ public class EmbeddedTest extends SearchTestBase {
 		query = parser.parse( "states.name:Hessen" );
 		result = session.createFullTextQuery( query ).list();
 		assertEquals( "unable to find property in embedded", 1, result.size() );
-		s.close();
+	    }
 	}
 
 	@Test
@@ -151,7 +150,7 @@ public class EmbeddedTest extends SearchTestBase {
 		r2.setName( "Jane Smith" );
 		a.getResidents().add( r2 );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( tower );
 		tx.commit();
@@ -164,7 +163,7 @@ public class EmbeddedTest extends SearchTestBase {
 		query = parser.parse( "address.inhabitants.name:Smith" );
 		result = session.createFullTextQuery( query ).list();
 		assertEquals( "unable to find property in embedded @ElementCollection", 1, result.size() );
-		s.close();
+	    }
 	}
 
 	@Test
@@ -180,7 +179,7 @@ public class EmbeddedTest extends SearchTestBase {
 		a.setOwnedBy( o );
 		o.setAddress( a );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( tower );
 		tx.commit();
@@ -223,8 +222,7 @@ public class EmbeddedTest extends SearchTestBase {
 		tx = s.beginTransaction();
 		s.delete( s.get( Tower.class, tower.getId() ) );
 		tx.commit();
-
-		s.close();
+	    }
 
 	}
 
@@ -256,7 +254,7 @@ public class EmbeddedTest extends SearchTestBase {
 		p2.getOrders().put( "Emmanuel", o );
 		p2.getOrders().put( "Gavin", o2 );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( a );
 		s.persist( a2 );
@@ -274,8 +272,8 @@ public class EmbeddedTest extends SearchTestBase {
 		tx = session.beginTransaction();
 
 		QueryParser parser = new MultiFieldQueryParser(
-				new String[] { "name", "authors.name" },
-				TestConstants.standardAnalyzer
+			new String[] { "name", "authors.name" },
+			TestConstants.standardAnalyzer
 		);
 		Query query;
 		List<?> result;
@@ -310,7 +308,7 @@ public class EmbeddedTest extends SearchTestBase {
 		s.delete( s.get( Product.class, p1.getId() ) );
 		s.delete( s.get( Product.class, p2.getId() ) );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	/**
@@ -328,7 +326,7 @@ public class EmbeddedTest extends SearchTestBase {
 		candiate.setState( state );
 		state.setCandidate( candiate );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( candiate );
 		tx.commit();
@@ -338,8 +336,8 @@ public class EmbeddedTest extends SearchTestBase {
 		tx = session.beginTransaction();
 
 		QueryParser parser = new MultiFieldQueryParser(
-				new String[] { "name", "state.name" },
-				TestConstants.standardAnalyzer
+			new String[] { "name", "state.name" },
+			TestConstants.standardAnalyzer
 		);
 		Query query;
 		List<?> result;
@@ -363,7 +361,7 @@ public class EmbeddedTest extends SearchTestBase {
 		assertEquals( "IndexEmbedded ignored.", 1, result.size() );
 		tx.commit();
 		s.clear();
-		s.close();
+	    }
 	}
 
 	@Test
@@ -378,7 +376,7 @@ public class EmbeddedTest extends SearchTestBase {
 		featureA.setProduct( book );
 		book.getFeatures().add( featureA );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( book );
 		tx.commit();
@@ -412,8 +410,7 @@ public class EmbeddedTest extends SearchTestBase {
 		result = session.createFullTextQuery( query, AbstractProduct.class ).list();
 		assertEquals( "Feature B should be indexed now as well", 1, result.size() );
 		tx.commit();
-
-		s.close();
+	    }
 	}
 
 	@Override

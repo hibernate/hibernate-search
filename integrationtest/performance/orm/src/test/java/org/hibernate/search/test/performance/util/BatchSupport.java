@@ -47,13 +47,13 @@ public class BatchSupport {
 					new WorkExecutorVisitable() {
 					@Override
 					public Object accept(WorkExecutor executor, Connection connection) throws SQLException {
-						PreparedStatement ps = connection.prepareStatement( sql );
+					    try (PreparedStatement ps = connection.prepareStatement( sql )) {
 						for ( long id = idOffset; id < idCount; id++ ) {
-							batchCallback.initStatement( ps, id );
-							ps.addBatch();
+						    batchCallback.initStatement( ps, id );
+						    ps.addBatch();
 						}
 						ps.executeBatch();
-						ps.close();
+					    }
 						return null;
 					}
 				}, true );

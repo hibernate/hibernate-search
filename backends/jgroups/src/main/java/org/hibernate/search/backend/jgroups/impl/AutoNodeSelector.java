@@ -54,19 +54,21 @@ public final class AutoNodeSelector implements NodeSelectorStrategy {
 	@Override
 	public void viewAccepted(View view) {
 		List<Address> members = view.getMembers();
-		if ( members.size() == 1 ) {
-			masterAddress = members.get( 0 );
-		}
-		else if ( members.size() == 2 ) {
-			// pick the non-coordinator
-			masterAddress = members.get( 1 );
-		}
-		else {
-			// exclude cluster coordinator (the first)
-			int selectionRange = members.size() - 1;
-			int selected = Math.abs( indexName.hashCode() % selectionRange ) + 1;
-			masterAddress = members.get( selected );
-		}
+	    switch (members.size()) {
+	    	case 1:
+		    masterAddress = members.get( 0 );
+		    break;
+	    	case 2:
+		    // pick the non-coordinator
+		    masterAddress = members.get( 1 );
+		    break;
+	    	default:
+		    // exclude cluster coordinator (the first)
+		    int selectionRange = members.size() - 1;
+		    int selected = Math.abs( indexName.hashCode() % selectionRange ) + 1;
+		    masterAddress = members.get( selected );
+		    break;
+	    }
 		log.acceptingNewClusterView( view, masterAddress, indexName );
 	}
 

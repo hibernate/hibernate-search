@@ -28,7 +28,7 @@ import org.hibernate.search.spi.impl.SearchFactoryState;
  */
 public class IncrementalSearchConfiguration extends SearchConfigurationBase {
 	private final List<Class<?>> classes;
-	private final Map<String, Class<?>> classesByName = new HashMap<String, Class<?>>();
+	private final Map<String, Class<?>> classesByName = new HashMap<>();
 	private final SearchFactoryState searchFactoryState;
 	private final Properties properties;
 	private final ReflectionManager reflectionManager = new JavaReflectionManager();

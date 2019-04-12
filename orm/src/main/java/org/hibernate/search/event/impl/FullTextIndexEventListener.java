@@ -301,15 +301,17 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	}
 
 	public static boolean eventsDisabled(ExtendedSearchIntegrator extendedIntegrator) {
-		if ( extendedIntegrator.getIndexingMode() == IndexingMode.EVENT ) {
-			return extendedIntegrator.getIndexBindings().size() == 0;
+		if ( null == extendedIntegrator.getIndexingMode() ) {
+		    return false;
 		}
-		else if ( extendedIntegrator.getIndexingMode() == IndexingMode.MANUAL ) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		else switch (extendedIntegrator.getIndexingMode()) {
+	    	case EVENT:
+		    return extendedIntegrator.getIndexBindings().size() == 0;
+	    	case MANUAL:
+		    return true;
+	    	default:
+		    return false;
+	    }
 	}
 
 }

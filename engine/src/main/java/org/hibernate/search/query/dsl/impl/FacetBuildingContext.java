@@ -105,7 +105,7 @@ class FacetBuildingContext<T> {
 	public void makeRange() {
 		Class<?> type = getRangeType();
 		assertValidRangeType( type );
-		FacetRange<T> facetRange = new FacetRange<T>(
+		FacetRange<T> facetRange = new FacetRange<>(
 				type,
 				rangeStart,
 				rangeEnd,

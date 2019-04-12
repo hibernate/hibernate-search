@@ -145,29 +145,33 @@ public class ObjectLoaderBuilder {
 			throw new SearchException( "Cannot mix custom criteria query and " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
 		}
 		final ObjectInitializer initializer;
-		if ( retrievalMethod == DatabaseRetrievalMethod.FIND_BY_ID ) {
-			//return early as this method does naturally 2lc + session lookup
-			return LookupObjectInitializer.INSTANCE;
+		if ( null == retrievalMethod ) {
+		    throw new AssertionFailure( "Unknown " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
 		}
-		else if ( retrievalMethod == DatabaseRetrievalMethod.QUERY ) {
-			initializer = CriteriaObjectInitializer.INSTANCE;
+		else switch (retrievalMethod) {
+	    	case FIND_BY_ID:
+		    //return early as this method does naturally 2lc + session lookup
+		    return LookupObjectInitializer.INSTANCE;
+	    	case QUERY:
+		    initializer = CriteriaObjectInitializer.INSTANCE;
+		    break;
+	    	default:
+		    throw new AssertionFailure( "Unknown " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
+	    }
+		if ( null == lookupMethod ) {
+		    throw new AssertionFailure( "Unknown " + ObjectLookupMethod.class.getSimpleName() + "." + lookupMethod );
 		}
-		else {
-			throw new AssertionFailure( "Unknown " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
-		}
-		if ( lookupMethod == ObjectLookupMethod.SKIP ) {
-			return initializer;
-		}
-		else if ( lookupMethod == ObjectLookupMethod.PERSISTENCE_CONTEXT ) {
-			return new PersistenceContextObjectInitializer( initializer );
-		}
-		else if ( lookupMethod == ObjectLookupMethod.SECOND_LEVEL_CACHE ) {
-			//we want to check the PC first, that's cheaper
-			return new PersistenceContextObjectInitializer( new SecondLevelCacheObjectInitializer( initializer ) );
-		}
-		else {
-			throw new AssertionFailure( "Unknown " + ObjectLookupMethod.class.getSimpleName() + "." + lookupMethod );
-		}
-		//unreachable statement
+		else switch (lookupMethod) {
+	    	case SKIP:
+		    return initializer;
+	    //unreachable statement
+	    	case PERSISTENCE_CONTEXT:
+		    return new PersistenceContextObjectInitializer( initializer );
+	    	case SECOND_LEVEL_CACHE:
+		    //we want to check the PC first, that's cheaper
+		    return new PersistenceContextObjectInitializer( new SecondLevelCacheObjectInitializer( initializer ) );
+	    	default:
+		    throw new AssertionFailure( "Unknown " + ObjectLookupMethod.class.getSimpleName() + "." + lookupMethod );
+	    }
 	}
 }

@@ -60,11 +60,11 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestBase {
 	}
 
 	private void indexSingleFooInstance() {
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		Transaction transaction = session.beginTransaction();
 		session.persist( new Foo() );
 		transaction.commit();
-		session.close();
+	    }
 	}
 
 	private MockErrorHandler getErrorHandlerAndAssertCorrectTypeIsUsed() {

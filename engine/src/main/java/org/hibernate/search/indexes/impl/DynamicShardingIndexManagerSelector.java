@@ -62,7 +62,7 @@ class DynamicShardingIndexManagerSelector implements IndexManagerSelector {
 	}
 
 	private Set<IndexManager> getIndexManagersFromShards(Set<String> shardIdentifiers) {
-		Set<IndexManager> managers = new HashSet<IndexManager>( shardIdentifiers.size() );
+		Set<IndexManager> managers = new HashSet<>( shardIdentifiers.size() );
 		for ( String shardIdentifier : shardIdentifiers ) {
 			managers.add(
 					indexManagerGroupHolder.getOrCreateIndexManager(

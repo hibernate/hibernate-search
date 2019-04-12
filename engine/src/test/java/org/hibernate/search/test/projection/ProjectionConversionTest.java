@@ -191,28 +191,18 @@ public class ProjectionConversionTest {
 	@Test
 	public void concurrentMixedProjections() throws Exception {
 		//The point of this test is to "simultaneously" project multiple different types
-		new ConcurrentRunner( 1000, 20,
-			new TaskFactory() {
-				@Override
-				public Runnable createRunnable(int i) throws Exception {
-					return new Runnable() {
-						@Override
-						public void run() {
-							projectingExplicitId();
-							projectingIdOnOverloadedMapping();
-							projectingIntegerField();
-							projectingUnknownField();
-							projectionWithCustomBridge();
-							projectingEmbeddedIdByPropertyName();
-							projectingEmbeddedIdOnOverloadedMapping();
-							projectingEmbeddedWithCustomBridge();
-							projectingOnConflictingMappingEmbeddedField();
-							projectingOnConflictingMappedIdField();
-						}
-					};
-				}
-			}
-		).execute();
+		new ConcurrentRunner( 1000, 20, (int i) -> () -> {
+		    projectingExplicitId();
+		    projectingIdOnOverloadedMapping();
+		    projectingIntegerField();
+		    projectingUnknownField();
+		    projectionWithCustomBridge();
+		    projectingEmbeddedIdByPropertyName();
+		    projectingEmbeddedIdOnOverloadedMapping();
+		    projectingEmbeddedWithCustomBridge();
+		    projectingOnConflictingMappingEmbeddedField();
+		    projectingOnConflictingMappedIdField();
+		}).execute();
 	}
 
 	void projectionTestHelper(String projectionField, Object expectedValue) {

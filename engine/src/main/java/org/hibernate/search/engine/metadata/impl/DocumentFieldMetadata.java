@@ -141,6 +141,7 @@ public class DocumentFieldMetadata implements PartialDocumentFieldMetadata {
 		return boost;
 	}
 
+	@Override
 	public AnalyzerReference getAnalyzerReference() {
 		return analyzerReference;
 	}

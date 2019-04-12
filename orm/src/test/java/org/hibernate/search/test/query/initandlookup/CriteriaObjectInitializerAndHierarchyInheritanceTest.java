@@ -76,8 +76,7 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 	@TestForIssue(jiraKey = "HSEARCH-2301")
 	@SuppressWarnings("unchecked")
 	public void testJoinsAreOnlyOnUsefulEntityTypes() throws Exception {
-		Session s = openSession();
-
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		int i = 1;
 		createInstance( s, A.class, i++, "A" );
@@ -138,8 +137,7 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 		bqb.add( termQueryAAB, Occur.SHOULD );
 		results = getResultsFiltered( session, bqb.build(), A.class );
 		assertThat( byteman.consumeNextRecordedEvent() ).isEqualTo( AA.class.getName() );
-
-		s.close();
+	    }
 	}
 
 	private void createInstance(Session s, Class<? extends BaseEntity> clazz, Integer id, String name) throws Exception {

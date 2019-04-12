@@ -23,7 +23,7 @@ public class FullTextFilterDefMapping {
 
 	public FullTextFilterDefMapping(SearchMapping mapping, String name, Class<?> impl) {
 		this.mapping = mapping;
-		this.fullTextFilterDef = new HashMap<String, Object>();
+		this.fullTextFilterDef = new HashMap<>();
 		this.fullTextFilterDef.put( "name", name );
 		this.fullTextFilterDef.put( "impl", impl );
 		mapping.addFulltextFilterDef( fullTextFilterDef );

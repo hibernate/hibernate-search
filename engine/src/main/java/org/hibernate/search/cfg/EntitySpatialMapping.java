@@ -22,7 +22,7 @@ public class EntitySpatialMapping {
 
 	private final SearchMapping mapping;
 	private final EntityDescriptor entity;
-	private final Map<String, Object> spatial = new HashMap<String, Object>();
+	private final Map<String, Object> spatial = new HashMap<>();
 
 	public EntitySpatialMapping(SearchMapping mapping, EntityDescriptor entity) {
 		this.mapping = mapping;
@@ -45,7 +45,7 @@ public class EntitySpatialMapping {
 	}
 
 	public EntitySpatialMapping boost(float boost) {
-		final Map<String, Object> boostAnn = new HashMap<String, Object>();
+		final Map<String, Object> boostAnn = new HashMap<>();
 		boostAnn.put( "value", boost );
 		spatial.put( "boost", boostAnn );
 		return this;

@@ -61,9 +61,9 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 	private SearchConfigurationForTest(InstanceInitializer init, boolean expectsJPAAnnotations, Properties properties) {
 		this.initializer = init;
 		this.enableJPAAnnotationsProcessing = expectsJPAAnnotations;
-		this.classes = new HashMap<String, Class<?>>();
+		this.classes = new HashMap<>();
 		this.properties = properties;
-		this.providedServices = new HashMap<Class<? extends Service>, Object>();
+		this.providedServices = new HashMap<>();
 		this.classLoaderService = new DefaultClassLoaderService();
 		addProperty( "hibernate.search.default.directory_provider", "local-heap" );
 		addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );

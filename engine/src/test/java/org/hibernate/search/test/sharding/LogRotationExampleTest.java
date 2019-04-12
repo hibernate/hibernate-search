@@ -140,7 +140,7 @@ public class LogRotationExampleTest {
 
 		@Override
 		public void initialize(Properties properties, BuildContext buildContext) {
-			Set<String> hours = new HashSet<String>( 24 );
+			Set<String> hours = new HashSet<>( 24 );
 			for ( int hour = 0; hour < 24; hour++ ) {
 				hours.add( String.valueOf( hour ) );
 			}
@@ -158,7 +158,7 @@ public class LogRotationExampleTest {
 				if ( "timeRange".equals( ftf.getName() ) ) {
 					Integer from = (Integer) ftf.getParameter( "from" );
 					Integer to = (Integer) ftf.getParameter( "to" );
-					Set<String> hours = new HashSet<String>();
+					Set<String> hours = new HashSet<>();
 					for ( int hour = from; hour < to; hour++ ) {
 						hours.add( String.valueOf( hour ) );
 					}

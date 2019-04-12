@@ -42,7 +42,7 @@ public class NestedEmbeddedTest extends SearchTestBase {
 		AttributeValue value = new AttributeValue( attribute, "foo" );
 		attribute.setValue( value );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( product );
 		tx.commit();
@@ -51,13 +51,13 @@ public class NestedEmbeddedTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "attributes.values.value", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
-
-
+		
+		
 		query = parser.parse( "foo" );
 		result = session.createFullTextQuery( query ).list();
 		assertEquals( "unable to find property in attribute value", 1, result.size() );
-
-
+		
+		
 		s.clear();
 		tx = s.beginTransaction();
 
@@ -79,7 +79,7 @@ public class NestedEmbeddedTest extends SearchTestBase {
 		assertEquals( "change in embedded not reflected in root index", 1, result.size() );
 
 		tx.commit();
-		s.close();
+	    }
 	}
 
 

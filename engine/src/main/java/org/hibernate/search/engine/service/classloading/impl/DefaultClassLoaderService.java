@@ -29,7 +29,7 @@ public class DefaultClassLoaderService implements ClassLoaderService {
 	 * Constructs a ClassLoaderServiceImpl with standard set-up
 	 */
 	public DefaultClassLoaderService() {
-		final LinkedHashSet<ClassLoader> orderedClassLoaderSet = new LinkedHashSet<ClassLoader>();
+		final LinkedHashSet<ClassLoader> orderedClassLoaderSet = new LinkedHashSet<>();
 
 		//  adding known class-loaders...
 		orderedClassLoaderSet.add( DefaultClassLoaderService.class.getClassLoader() );
@@ -113,7 +113,7 @@ public class DefaultClassLoaderService implements ClassLoaderService {
 	@Override
 	public <S> LinkedHashSet<S> loadJavaServices(Class<S> serviceContract) {
 		ServiceLoader<S> serviceLoader = ServiceLoader.load( serviceContract, aggregatedClassLoader );
-		final LinkedHashSet<S> services = new LinkedHashSet<S>();
+		final LinkedHashSet<S> services = new LinkedHashSet<>();
 		for ( S service : serviceLoader ) {
 			services.add( service );
 		}

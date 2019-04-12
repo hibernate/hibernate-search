@@ -21,7 +21,7 @@ public class ProvidedIdMapping {
 	public ProvidedIdMapping(SearchMapping searchMapping, EntityDescriptor entity) {
 		this.searchMapping = searchMapping;
 		this.entity = entity;
-		providedIdMapping = new HashMap<String,Object>();
+		providedIdMapping = new HashMap<>();
 		entity.setProvidedId( providedIdMapping );
 	}
 

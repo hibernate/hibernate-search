@@ -39,7 +39,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 	private TwoWayFieldBridge twoWayBridge;
 
 	//Reused helpers:
-	private final ArrayList<String> propertyPath = new ArrayList<String>( 5 ); //half of usual increment size as I don't expect much
+	private final ArrayList<String> propertyPath = new ArrayList<>( 5 ); //half of usual increment size as I don't expect much
 	private final OneWayConversionContextImpl oneWayAdapter = new OneWayConversionContextImpl();
 	private final TwoWayConversionContextImpl twoWayAdapter = new TwoWayConversionContextImpl();
 	private final StringConversionContextImpl stringAdapter = new StringConversionContextImpl();

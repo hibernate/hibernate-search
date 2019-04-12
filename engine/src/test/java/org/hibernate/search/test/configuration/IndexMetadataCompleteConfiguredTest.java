@@ -45,8 +45,7 @@ public class IndexMetadataCompleteConfiguredTest extends BaseConfigurationTest {
 	}
 
 	private void verifyIndexCompleteMetadataOption(boolean expectation, SearchConfigurationForTest cfg) {
-		MutableSearchFactory sf = getMutableSearchFactoryWithSingleEntity( cfg );
-		try {
+		try (MutableSearchFactory sf = getMutableSearchFactoryWithSingleEntity( cfg )) {
 			assertEquals( expectation, extractWorkspace( sf, Document.class ).areSingleTermDeletesSafe() );
 
 			// trigger a SearchFactory rebuild:
@@ -57,9 +56,6 @@ public class IndexMetadataCompleteConfiguredTest extends BaseConfigurationTest {
 
 			// but still as expected for Book :
 			assertEquals( expectation, extractWorkspace( sf, Book.class ).areSingleTermDeletesSafe() );
-		}
-		finally {
-			sf.close();
 		}
 	}
 

@@ -40,7 +40,7 @@ public class MappingDefinitionRegistry<I, O> {
 	 * Map of collected definitions.
 	 * The key of the map is the definition name and the value is the definition itself.
 	 */
-	private final Map<String, O> definitions = new HashMap<String, O>();
+	private final Map<String, O> definitions = new HashMap<>();
 
 	/**
 	 * Used to keep track of conflicting definitions.
@@ -49,7 +49,7 @@ public class MappingDefinitionRegistry<I, O> {
 	 * In most cases the fully specified class name together with the annotated element name is used.
 	 * See also {@link #GLOBAL_DEFINITION}.
 	 */
-	private final Map<String, String> definitionPoints = new HashMap<String, String>();
+	private final Map<String, String> definitionPoints = new HashMap<>();
 
 	private final Function<I, O> definitionInterpreter;
 

@@ -28,7 +28,7 @@ public class IndexEmbeddedMapping {
 
 	public IndexEmbeddedMapping(SearchMapping mapping, PropertyDescriptor property, EntityDescriptor entity) {
 		this.mapping = mapping;
-		this.indexEmbedded = new HashMap<String, Object>();
+		this.indexEmbedded = new HashMap<>();
 		this.property = property;
 		this.entity = entity;
 		this.property.setIndexEmbedded( indexEmbedded );

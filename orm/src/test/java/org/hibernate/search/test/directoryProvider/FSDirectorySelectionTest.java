@@ -69,8 +69,7 @@ public class FSDirectorySelectionTest extends SearchTestBase {
 	}
 
 	private void assertCorrectDirectoryType(SessionFactory factory, String className) {
-		Session session = factory.openSession();
-
+	    try (Session session = factory.openSession()) {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		SearchIntegrator integrator = fullTextSession.getSearchFactory().unwrap( SearchIntegrator.class );
 		EntityIndexBinding snowIndexBinder = integrator.getIndexBindings().get( SnowStorm.class );
@@ -80,7 +79,7 @@ public class FSDirectorySelectionTest extends SearchTestBase {
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers.iterator().next();
 		Directory directory = indexManager.getDirectoryProvider().getDirectory();
 		assertEquals( "Wrong directory provider type", className, directory.getClass().getName() );
-		session.close();
+	    }
 	}
 
 	private SessionFactory createSessionFactoryUsingDirectoryType(String directoryType) {

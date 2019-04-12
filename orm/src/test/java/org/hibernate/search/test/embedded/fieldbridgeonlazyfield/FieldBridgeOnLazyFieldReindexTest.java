@@ -61,8 +61,7 @@ public class FieldBridgeOnLazyFieldReindexTest extends SearchTestBase {
 	}
 
 	private void prepareEntities() {
-		Session session = openSession();
-		try {
+		try (Session session = openSession()) {
 			Transaction transaction = session.beginTransaction();
 
 			LazyItem bridgedEntity = new LazyItem();
@@ -78,9 +77,6 @@ public class FieldBridgeOnLazyFieldReindexTest extends SearchTestBase {
 			session.save( root );
 
 			transaction.commit();
-		}
-		finally {
-			session.close();
 		}
 	}
 

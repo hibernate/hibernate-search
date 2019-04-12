@@ -24,7 +24,7 @@ public class ConnectedFacetRangeAboveBelowContext<T> implements FacetRangeAboveB
 	@Override
 	public FacetRangeLimitContext<T> from(T rangeStart) {
 		context.setRangeStart( rangeStart );
-		return new ConnectedFacetRangeLimitContext<T>( context );
+		return new ConnectedFacetRangeLimitContext<>( context );
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class ConnectedFacetRangeAboveBelowContext<T> implements FacetRangeAboveB
 	public FacetRangeAboveContext<T> above(T max) {
 		context.setRangeStart( max );
 		context.setRangeEnd( null );
-		return new ConnectedFacetRangeAboveContext<T>( context );
+		return new ConnectedFacetRangeAboveContext<>( context );
 	}
 }
 

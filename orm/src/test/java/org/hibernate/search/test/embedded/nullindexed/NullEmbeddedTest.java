@@ -45,37 +45,32 @@ public class NullEmbeddedTest extends SearchTestBase {
 		Puppy KittenTwo = new Puppy( "kitten two" );
 		cat.addPuppy( kittenOne ).addPuppy( KittenTwo );
 
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		s.persist( withoutPuppies );
-		s.persist( wihKittens );
-		s.persist( dog );
-		s.persist( cat );
-		s.persist( kittenOne );
-		s.persist( KittenTwo );
-		tx.commit();
-
-		try {
+		try (Session s = openSession()) {
+		    Transaction tx = s.beginTransaction();
+		    s.persist( withoutPuppies );
+		    s.persist( wihKittens );
+		    s.persist( dog );
+		    s.persist( cat );
+		    s.persist( kittenOne );
+		    s.persist( KittenTwo );
+		    tx.commit();
+		    try {
 			findNullsFor( s, "partner", "indexAsNull not set" );
 			fail( "Embedded null field should not exists for field without indexAsNull property" );
-		}
-		catch (SearchException e) {
+		    }
+		    catch (SearchException e) {
 			// Succeded: indexAsNull not specified so the field is not created
-		}
-
-		s.clear();
-
-		tx = s.beginTransaction();
-		s.delete( s.get( Man.class, withoutPuppies.getId() ) );
-		s.delete( s.get( Man.class, wihKittens.getId() ) );
-		s.delete( s.get( Pet.class, dog.getId() ) );
-		s.delete( s.get( Pet.class, cat.getId() ) );
-		s.delete( s.get( Puppy.class, kittenOne.getId() ) );
-		s.delete( s.get( Puppy.class, KittenTwo.getId() ) );
-		tx.commit();
-
-		s.close();
-	}
+		    }
+		    s.clear();
+		    tx = s.beginTransaction();
+		    s.delete( s.get( Man.class, withoutPuppies.getId() ) );
+		    s.delete( s.get( Man.class, wihKittens.getId() ) );
+		    s.delete( s.get( Pet.class, dog.getId() ) );
+		    s.delete( s.get( Pet.class, cat.getId() ) );
+		    s.delete( s.get( Puppy.class, kittenOne.getId() ) );
+		    s.delete( s.get( Puppy.class, KittenTwo.getId() ) );
+		    tx.commit();
+		}	}
 
 	@Test
 	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2389 Support indexNullAs for @IndexedEmbedded applied on objects with Elasticsearch
@@ -94,7 +89,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 		Puppy puppy2 = new Puppy( "puppy two" );
 		cat.addPuppy( puppy1 ).addPuppy( puppy2 );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( withPet );
 		s.persist( withPuppies );
@@ -119,8 +114,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 		s.delete( s.get( Puppy.class, puppy1.getId() ) );
 		s.delete( s.get( Puppy.class, puppy2.getId() ) );
 		tx.commit();
-
-		s.close();
+	    }
 	}
 
 	@Test
@@ -138,7 +132,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 		Puppy puppy2 = new Puppy( "puppy two" );
 		cat.addPuppy( puppy1 ).addPuppy( puppy2 );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( me );
 		s.persist( someoneElse );
@@ -162,8 +156,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 		s.delete( s.get( Puppy.class, puppy1.getId() ) );
 		s.delete( s.get( Puppy.class, puppy2.getId() ) );
 		tx.commit();
-
-		s.close();
+	    }
 	}
 
 	@Test
@@ -183,7 +176,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 		Trick trick2 = new Trick( "high five", "steak" );
 		dog.addTrick( trick1 ).addTrick( trick2 );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.persist( withPetWithoutTricks );
 		s.persist( withPetWithTricks );
@@ -204,8 +197,7 @@ public class NullEmbeddedTest extends SearchTestBase {
 		s.delete( s.get( Pet.class, cat.getId() ) );
 		s.delete( s.get( Pet.class, dog.getId() ) );
 		tx.commit();
-
-		s.close();
+	    }
 	}
 
 

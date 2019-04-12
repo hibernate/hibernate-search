@@ -48,8 +48,7 @@ public class DirectoryHelper {
 	 * @throws SearchException in case of lock acquisition timeouts, IOException, or if a corrupt index is found
 	 */
 	public static void initializeIndexIfNeeded(Directory directory) {
-		SimpleAnalyzer analyzer = new SimpleAnalyzer();
-		try {
+		try (SimpleAnalyzer analyzer = new SimpleAnalyzer()) {
 			if ( ! DirectoryReader.indexExists( directory ) ) {
 				try {
 					IndexWriterConfig iwriterConfig = new IndexWriterConfig( analyzer ).setOpenMode( OpenMode.CREATE_OR_APPEND );
@@ -66,9 +65,6 @@ public class DirectoryHelper {
 		}
 		catch (IOException e) {
 			throw new SearchException( "Could not initialize index", e );
-		}
-		finally {
-			analyzer.close();
 		}
 	}
 

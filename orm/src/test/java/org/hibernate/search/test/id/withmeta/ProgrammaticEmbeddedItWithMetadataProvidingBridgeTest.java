@@ -37,7 +37,7 @@ public class ProgrammaticEmbeddedItWithMetadataProvidingBridgeTest extends Searc
 		emmanuel.setFavoriteColor( "Blue" );
 		emmanuel.setId( emmanuelPk );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.save( emmanuel );
 		tx.commit();
@@ -45,7 +45,7 @@ public class ProgrammaticEmbeddedItWithMetadataProvidingBridgeTest extends Searc
 
 		tx = s.beginTransaction();
 		List<PlainPerson> results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "id_lastName", "Bernard" ) )
+			new TermQuery( new Term( "id_lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
 		emmanuel = (PlainPerson) results.get( 0 );
@@ -55,14 +55,14 @@ public class ProgrammaticEmbeddedItWithMetadataProvidingBridgeTest extends Searc
 
 		tx = s.beginTransaction();
 		results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "id_lastName", "Bernard" ) )
+			new TermQuery( new Term( "id_lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
 		emmanuel = (PlainPerson) results.get( 0 );
 		assertEquals( "Red", emmanuel.getFavoriteColor() );
 		s.delete( results.get( 0 ) );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

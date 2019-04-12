@@ -118,10 +118,10 @@ class Location {
 	}
 
 	public void addPinPoints(PinPoint... pinPoints) {
-		for ( int i = 0; i < pinPoints.length; i++ ) {
-			pinPoints[i].setLocation( this );
-			this.pinPoints.add( pinPoints[i] );
-		}
+            for (PinPoint pinPoint : pinPoints) {
+                pinPoint.setLocation(this);
+                this.pinPoints.add(pinPoint);
+            }
 	}
 
 	public String getDescription() {

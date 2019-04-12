@@ -180,17 +180,22 @@ public class NumericFieldTest {
 				.containsOnly( "rating", "ratingNumericPrecision1", "ratingNumericPrecision2" );
 
 		for ( FieldDescriptor field : fields ) {
-			if ( "ratingNumericPrecision1".equals( field.getName() ) ) {
-				assertThat( field.getType() ).isEqualTo( Type.NUMERIC );
-				assertThat( field.as( NumericFieldSettingsDescriptor.class ).precisionStep() ).isEqualTo( 1 );
+			if ( null == field.getName() ) {
+			    assertThat( field.getType() ).isEqualTo( Type.BASIC );
 			}
-			else if ( "ratingNumericPrecision2".equals( field.getName() ) ) {
-				assertThat( field.getType() ).isEqualTo( Type.NUMERIC );
-				assertThat( field.as( NumericFieldSettingsDescriptor.class ).precisionStep() ).isEqualTo( 2 );
-			}
-			else {
-				assertThat( field.getType() ).isEqualTo( Type.BASIC );
-			}
+			else switch (field.getName()) {
+		    	case "ratingNumericPrecision1":
+			    assertThat( field.getType() ).isEqualTo( Type.NUMERIC );
+			    assertThat( field.as( NumericFieldSettingsDescriptor.class ).precisionStep() ).isEqualTo( 1 );
+			    break;
+		    	case "ratingNumericPrecision2":
+			    assertThat( field.getType() ).isEqualTo( Type.NUMERIC );
+			    assertThat( field.as( NumericFieldSettingsDescriptor.class ).precisionStep() ).isEqualTo( 2 );
+			    break;
+		    	default:
+			    assertThat( field.getType() ).isEqualTo( Type.BASIC );
+			    break;
+		    }
 		}
 	}
 

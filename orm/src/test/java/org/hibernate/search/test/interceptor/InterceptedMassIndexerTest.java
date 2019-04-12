@@ -40,13 +40,9 @@ public class InterceptedMassIndexerTest extends SearchTestBase {
 	 * @throws InterruptedException
 	 */
 	private void rebuildIndexes() throws InterruptedException {
-		Session session = openSession();
-		try {
+		try (Session session = openSession()) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
 			fullTextSession.createIndexer( Blog.class ).startAndWait();
-		}
-		finally {
-			session.close();
 		}
 
 	}
@@ -57,8 +53,7 @@ public class InterceptedMassIndexerTest extends SearchTestBase {
 	 * @param expectedBooks
 	 */
 	private void assertIndexedBooks(int expectedBooks) {
-		Session session = openSession();
-		try {
+		try (Session session = openSession()) {
 			Transaction transaction = session.beginTransaction();
 			try {
 				FullTextSession fullTextSession = Search.getFullTextSession( session );
@@ -71,17 +66,13 @@ public class InterceptedMassIndexerTest extends SearchTestBase {
 				transaction.commit();
 			}
 		}
-		finally {
-			session.close();
-		}
 	}
 
 	/**
 	 * Stores some test blogs: 2 published and a draft
 	 */
 	private void storeSomeBlogs() {
-		Session session = openSession();
-		try {
+		try (Session session = openSession()) {
 			Transaction transaction = session.beginTransaction();
 			try {
 
@@ -104,9 +95,6 @@ public class InterceptedMassIndexerTest extends SearchTestBase {
 			finally {
 				transaction.commit();
 			}
-		}
-		finally {
-			session.close();
 		}
 	}
 

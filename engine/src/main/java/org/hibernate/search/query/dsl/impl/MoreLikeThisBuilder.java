@@ -144,22 +144,26 @@ public class MoreLikeThisBuilder<T> {
 	 */
 	private Integer getLuceneDocumentIdFromIdAsTermOrNull(DocumentBuilderIndexedEntity documentBuilder) {
 		String id;
-		if ( inputType == ID ) {
-			id = documentBuilder.getIdBridge().objectToString( input );
+		if ( null == inputType ) {
+		    throw new AssertionFailure( "We don't support string and reader for MoreLikeThis" );
 		}
-		else if ( inputType == ENTITY ) {
-			// Try and extract the id, if failing the id will be null
-			try {
-				// I expect a two way bridge to return null from a null input, correct?
-				id = documentBuilder.getIdBridge().objectToString( documentBuilder.getId( input ) );
-			}
-			catch (IllegalStateException e) {
-				id = null;
-			}
-		}
-		else {
-			throw new AssertionFailure( "We don't support string and reader for MoreLikeThis" );
-		}
+		else switch (inputType) {
+	    	case ID:
+		    id = documentBuilder.getIdBridge().objectToString( input );
+		    break;
+	    	case ENTITY:
+		    // Try and extract the id, if failing the id will be null
+		    try {
+			// I expect a two way bridge to return null from a null input, correct?
+			id = documentBuilder.getIdBridge().objectToString( documentBuilder.getId( input ) );
+		    }
+		    catch (IllegalStateException e) {
+			id = null;
+		    }
+		    break;
+	    	default:
+		    throw new AssertionFailure( "We don't support string and reader for MoreLikeThis" );
+	    }
 		if ( id == null ) {
 			return null;
 		}
@@ -203,26 +207,25 @@ public class MoreLikeThisBuilder<T> {
 		//In the original algorithm, the number of terms is limited to maxQueryTerms
 		//In the current implementation, we do nbrOfFields * maxQueryTerms
 		int length = fieldsContext.size();
-		if ( length == 0 ) {
-			throw new AssertionFailure( "Querying MoreLikeThis on 0 field." );
-		}
-		else if ( length == 1 ) {
-			return createQuery( q.get( 0 ), fieldsContext.getFirst() );
-		}
-		else {
-			BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
-			//the fieldsContext indexes are aligned with the priority queue's
-			Iterator<FieldContext> fieldsContextIterator = fieldsContext.iterator();
-			for ( PriorityQueue<Object[]> queue : q ) {
-				try {
-					queryBuilder.add( createQuery( queue, fieldsContextIterator.next() ), BooleanClause.Occur.SHOULD );
-				}
-				catch (BooleanQuery.TooManyClauses ignore) {
-					break;
-				}
+	    switch (length) {
+	    	case 0:
+		    throw new AssertionFailure( "Querying MoreLikeThis on 0 field." );
+	    	case 1:
+		    return createQuery( q.get( 0 ), fieldsContext.getFirst() );
+	    	default:
+		    BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
+		    //the fieldsContext indexes are aligned with the priority queue's
+		    Iterator<FieldContext> fieldsContextIterator = fieldsContext.iterator();
+		    for ( PriorityQueue<Object[]> queue : q ) {
+			try {
+			    queryBuilder.add( createQuery( queue, fieldsContextIterator.next() ), BooleanClause.Occur.SHOULD );
 			}
-			return queryBuilder.build();
-		}
+			catch (BooleanQuery.TooManyClauses ignore) {
+			    break;
+			}
+		    }
+		    return queryBuilder.build();
+	    }
 	}
 
 	private Query createQuery(PriorityQueue<Object[]> q, FieldContext fieldContext) {
@@ -293,7 +296,7 @@ public class MoreLikeThisBuilder<T> {
 	 */
 	private List<PriorityQueue<Object[]>> retrieveTerms() throws IOException {
 		int size = fieldsContext.size();
-		Map<String,Map<String, Int>> termFreqMapPerFieldname = new HashMap<String,Map<String, Int>>( size );
+		Map<String,Map<String, Int>> termFreqMapPerFieldname = new HashMap<>( size );
 		final Fields vectors;
 		Document maybeDocument = null;
 		if ( documentNumber == null && size > 0 ) {
@@ -306,7 +309,7 @@ public class MoreLikeThisBuilder<T> {
 				fieldNames[index] = fieldsContextIterator.next().getField();
 			}
 			//TODO should we keep the fieldToAnalyzerMap around to pass to the analyzer?
-			Map<String,String> fieldToAnalyzerMap = new HashMap<String, String>( );
+			Map<String,String> fieldToAnalyzerMap = new HashMap<>( );
 			//FIXME by calling documentBuilder we don't honor .comparingField("foo").ignoreFieldBridge(): probably not a problem in practice though
 			maybeDocument = documentBuilder.getDocument( null, input, null, fieldToAnalyzerMap, null, new ContextualExceptionBridgeHelper(), fieldNames );
 			vectors = null;
@@ -317,7 +320,7 @@ public class MoreLikeThisBuilder<T> {
 		for ( FieldContext fieldContext : fieldsContext ) {
 			String fieldName = fieldContext.getField();
 			if ( isCompatibleField( fieldName ) ) {
-				Map<String,Int> termFreqMap = new HashMap<String, Int>();
+				Map<String,Int> termFreqMap = new HashMap<>();
 				termFreqMapPerFieldname.put( fieldName, termFreqMap );
 				final Terms vector;
 				if ( vectors != null ) {
@@ -350,7 +353,7 @@ public class MoreLikeThisBuilder<T> {
 				termFreqMapPerFieldname.put( fieldName, null );
 			}
 		}
-		List<PriorityQueue<Object[]>> results = new ArrayList<PriorityQueue<Object[]>>( size );
+		List<PriorityQueue<Object[]>> results = new ArrayList<>( size );
 		for ( Map.Entry<String,Map<String,Int>> entry : termFreqMapPerFieldname.entrySet() ) {
 			results.add( createQueue( entry.getKey(), entry.getValue() ) );
 		}

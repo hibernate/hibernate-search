@@ -36,106 +36,98 @@ public class DeleteByTermTest {
 
 	@Test
 	public void testRelatedHierarchiesWithRootNonIndexed() throws Exception {
-		// Create two entities whose root entity is common but not indexed
-		// delete by term should be used
-		// create a unrelated Lucene Document with the same id
-		// it should be deleted when the entity sharing the id is deleted
-		FullTextSessionBuilder sessionBuilder = new FullTextSessionBuilder();
-		sessionBuilder
-				.addAnnotatedClass( ASubOfRoot.class )
-				.addAnnotatedClass( BSubOfRoot.class )
-				.build();
-		FullTextSession fts = sessionBuilder.openFullTextSession();
-		fts.beginTransaction();
-		ASubOfRoot a = new ASubOfRoot();
-		a.id = "1";
-		a.name = "Foo";
-		fts.persist( a );
-		BSubOfRoot b = new BSubOfRoot();
-		b.id = "2";
-		b.otherName = "Bar";
-		fts.persist( b );
-		fts.getTransaction().commit();
-
-		fts.clear();
-
-		// add a document that matches the entity a identifier to see if it is removed when the entity is removed
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) fts.getSearchFactory().unwrap( SearchIntegrator.class ).getIndexManager( "index1" );
-		WorkspaceHolder backendProcessor = (WorkspaceHolder) indexManager.getWorkspaceHolder();
-		IndexWriter writer = backendProcessor.getIndexResources().getWorkspace().getIndexWriter();
-		Document document = new Document();
-		document.add( new StringField( "id", "1", org.apache.lucene.document.Field.Store.NO ) );
-		document.add( new TextField( "name", "Baz", org.apache.lucene.document.Field.Store.NO ) );
-		writer.addDocument( document );
-		writer.commit();
-
-		fts.getTransaction().begin();
-		fts.delete( fts.get( ASubOfRoot.class, a.id ) );
-		fts.delete( fts.get( BSubOfRoot.class, b.id ) );
-		fts.getTransaction().commit();
-		fts.close();
-
-		// Verify that the index is empty
-		IndexReader indexReader = fts.getSearchFactory().getIndexReaderAccessor().open( "index1" );
-		try {
+		try ( // Create two entities whose root entity is common but not indexed
+	    // delete by term should be used
+	    // create a unrelated Lucene Document with the same id
+	    // it should be deleted when the entity sharing the id is deleted
+			FullTextSessionBuilder sessionBuilder = new FullTextSessionBuilder()) {
+		    sessionBuilder
+			    .addAnnotatedClass( ASubOfRoot.class )
+			    .addAnnotatedClass( BSubOfRoot.class )
+			    .build();
+		    FullTextSession fts = sessionBuilder.openFullTextSession();
+		    fts.beginTransaction();
+		    ASubOfRoot a = new ASubOfRoot();
+		    a.id = "1";
+		    a.name = "Foo";
+		    fts.persist( a );
+		    BSubOfRoot b = new BSubOfRoot();
+		    b.id = "2";
+		    b.otherName = "Bar";
+		    fts.persist( b );
+		    fts.getTransaction().commit();
+		    fts.clear();
+		    // add a document that matches the entity a identifier to see if it is removed when the entity is removed
+		    DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) fts.getSearchFactory().unwrap( SearchIntegrator.class ).getIndexManager( "index1" );
+		    WorkspaceHolder backendProcessor = (WorkspaceHolder) indexManager.getWorkspaceHolder();
+		    IndexWriter writer = backendProcessor.getIndexResources().getWorkspace().getIndexWriter();
+		    Document document = new Document();
+		    document.add( new StringField( "id", "1", org.apache.lucene.document.Field.Store.NO ) );
+		    document.add( new TextField( "name", "Baz", org.apache.lucene.document.Field.Store.NO ) );
+		    writer.addDocument( document );
+		    writer.commit();
+		    fts.getTransaction().begin();
+		    fts.delete( fts.get( ASubOfRoot.class, a.id ) );
+		    fts.delete( fts.get( BSubOfRoot.class, b.id ) );
+		    fts.getTransaction().commit();
+		    fts.close();
+		    // Verify that the index is empty
+		    IndexReader indexReader = fts.getSearchFactory().getIndexReaderAccessor().open( "index1" );
+		    try {
 			assertThat( indexReader.numDocs() ).isEqualTo( 0 );
-		}
-		finally {
+		    }
+		    finally {
 			indexReader.close();
+		    }
 		}
-		sessionBuilder.close();
 	}
 
 	@Test
 	public void testUnrelatedHierarchies() throws Exception {
-		// Create two entities whose root entities are unrelated
-		// delete by term should not be used
-		// create a unrelated Lucene Document with the same id
-		// it should not be deleted when the entity sharing the id is deleted
-		FullTextSessionBuilder sessionBuilder = new FullTextSessionBuilder();
-		sessionBuilder
-				.addAnnotatedClass( ASubOfRoot.class )
-				.addAnnotatedClass( Unrelated.class )
-				.build();
-		FullTextSession fts = sessionBuilder.openFullTextSession();
-		fts.beginTransaction();
-		ASubOfRoot a = new ASubOfRoot();
-		a.id = "1";
-		a.name = "Foo";
-		fts.persist( a );
-		Unrelated b = new Unrelated();
-		b.id = "2";
-		b.name = "Bar";
-		fts.persist( b );
-		fts.getTransaction().commit();
-
-		fts.clear();
-
-		// add a document that matches the entity a identifier to see if it is removed when the entity is removed
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) fts.getSearchFactory().unwrap( SearchIntegrator.class ).getIndexManager( "index1" );
-		WorkspaceHolder backendProcessor = (WorkspaceHolder) indexManager.getWorkspaceHolder();
-		IndexWriter writer = backendProcessor.getIndexResources().getWorkspace().getIndexWriter();
-		Document document = new Document();
-		document.add( new StringField( "id", "1", org.apache.lucene.document.Field.Store.NO ) );
-		document.add( new TextField( "name", "Baz", org.apache.lucene.document.Field.Store.NO ) );
-		writer.addDocument( document );
-		writer.commit();
-
-		fts.getTransaction().begin();
-		fts.delete( fts.get( ASubOfRoot.class, a.id ) );
-		fts.delete( fts.get( Unrelated.class, b.id ) );
-		fts.getTransaction().commit();
-		fts.close();
-
-		// Verify that the index is empty
-		IndexReader indexReader = fts.getSearchFactory().getIndexReaderAccessor().open( "index1" );
-		try {
+		try ( // Create two entities whose root entities are unrelated
+	    // delete by term should not be used
+	    // create a unrelated Lucene Document with the same id
+	    // it should not be deleted when the entity sharing the id is deleted
+			FullTextSessionBuilder sessionBuilder = new FullTextSessionBuilder()) {
+		    sessionBuilder
+			    .addAnnotatedClass( ASubOfRoot.class )
+			    .addAnnotatedClass( Unrelated.class )
+			    .build();
+		    FullTextSession fts = sessionBuilder.openFullTextSession();
+		    fts.beginTransaction();
+		    ASubOfRoot a = new ASubOfRoot();
+		    a.id = "1";
+		    a.name = "Foo";
+		    fts.persist( a );
+		    Unrelated b = new Unrelated();
+		    b.id = "2";
+		    b.name = "Bar";
+		    fts.persist( b );
+		    fts.getTransaction().commit();
+		    fts.clear();
+		    // add a document that matches the entity a identifier to see if it is removed when the entity is removed
+		    DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) fts.getSearchFactory().unwrap( SearchIntegrator.class ).getIndexManager( "index1" );
+		    WorkspaceHolder backendProcessor = (WorkspaceHolder) indexManager.getWorkspaceHolder();
+		    IndexWriter writer = backendProcessor.getIndexResources().getWorkspace().getIndexWriter();
+		    Document document = new Document();
+		    document.add( new StringField( "id", "1", org.apache.lucene.document.Field.Store.NO ) );
+		    document.add( new TextField( "name", "Baz", org.apache.lucene.document.Field.Store.NO ) );
+		    writer.addDocument( document );
+		    writer.commit();
+		    fts.getTransaction().begin();
+		    fts.delete( fts.get( ASubOfRoot.class, a.id ) );
+		    fts.delete( fts.get( Unrelated.class, b.id ) );
+		    fts.getTransaction().commit();
+		    fts.close();
+		    // Verify that the index is empty
+		    IndexReader indexReader = fts.getSearchFactory().getIndexReaderAccessor().open( "index1" );
+		    try {
 			assertThat( indexReader.numDocs() ).isEqualTo( 1 );
-		}
-		finally {
+		    }
+		    finally {
 			indexReader.close();
+		    }
 		}
-		sessionBuilder.close();
 	}
 
 	@Entity(name = "RootNonIndexed")

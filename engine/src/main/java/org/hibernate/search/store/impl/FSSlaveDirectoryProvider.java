@@ -194,15 +194,14 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		}
 
 		int readState = current;// to have the read consistent in the next two "if"s.
-		if ( readState == 1 ) {
-			return directory1;
-		}
-		else if ( readState == 2 ) {
-			return directory2;
-		}
-		else {
-			throw new AssertionFailure( "Illegal current directory: " + readState );
-		}
+	    switch (readState) {
+	    	case 1:
+		    return directory1;
+	    	case 2:
+		    return directory2;
+	    	default:
+		    throw new AssertionFailure( "Illegal current directory: " + readState );
+	    }
 	}
 
 	@Override

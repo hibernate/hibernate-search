@@ -28,7 +28,7 @@ public class TypeHierarchy {
 	private Map<Class<?>, Set<IndexedTypeIdentifier>> classToConfiguredClass;
 
 	public TypeHierarchy() {
-		classToConfiguredClass = new HashMap<Class<?>, Set<IndexedTypeIdentifier>>();
+		classToConfiguredClass = new HashMap<>();
 	}
 
 	public void addConfiguredClass(Class<?> configuredClass) {
@@ -46,7 +46,7 @@ public class TypeHierarchy {
 	private void addClass(Class<?> superclass, Class<?> indexedClass) {
 		Set<IndexedTypeIdentifier> classesSet = classToConfiguredClass.get( superclass );
 		if ( classesSet == null ) {
-			classesSet = new HashSet<IndexedTypeIdentifier>();
+			classesSet = new HashSet<>();
 			classToConfiguredClass.put( superclass, classesSet );
 		}
 		classesSet.add( new PojoIndexedTypeIdentifier( indexedClass ) );
@@ -56,7 +56,7 @@ public class TypeHierarchy {
 		if ( types == null ) {
 			return IndexedTypeSets.empty();
 		}
-		Set<IndexedTypeIdentifier> indexedClasses = new HashSet<IndexedTypeIdentifier>();
+		Set<IndexedTypeIdentifier> indexedClasses = new HashSet<>();
 		for ( IndexedTypeIdentifier type : types ) {
 			Class<?> clazz = type.getPojoType();
 			Set<IndexedTypeIdentifier> set = classToConfiguredClass.get( clazz );

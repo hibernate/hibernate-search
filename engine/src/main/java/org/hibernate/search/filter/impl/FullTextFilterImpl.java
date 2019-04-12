@@ -16,7 +16,7 @@ import org.hibernate.search.filter.FullTextFilterImplementor;
  * @author Emmanuel Bernard
  */
 public class FullTextFilterImpl implements FullTextFilterImplementor {
-	private final Map<String, Object> parameters = new HashMap<String, Object>();
+	private final Map<String, Object> parameters = new HashMap<>();
 	private String name;
 
 	public void setName(String name) {

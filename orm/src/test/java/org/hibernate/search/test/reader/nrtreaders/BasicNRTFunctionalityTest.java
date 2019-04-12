@@ -51,7 +51,7 @@ public class BasicNRTFunctionalityTest extends SearchTestBase {
 	@Test
 	public void testEntityResurrection() {
 		final Long id = 5l;
-		Session session = getSessionFactory().openSession();
+	    try (Session session = getSessionFactory().openSession()) {
 		session.getTransaction().begin();
 
 		AlternateDocument docOnInfinispan = new AlternateDocument( id, "On Infinispan", "a book about Infinispan", "content" );
@@ -85,8 +85,7 @@ public class BasicNRTFunctionalityTest extends SearchTestBase {
 		session.getTransaction().begin();
 		list = fullTextSession.createFullTextQuery( luceneQuery ).list();
 		Assert.assertEquals( 0, list.size() );
-
-		session.close();
+	    }
 	}
 
 	@Test
@@ -178,12 +177,8 @@ public class BasicNRTFunctionalityTest extends SearchTestBase {
 	}
 
 	private int getDocumentNbrFromFilesystem(NRTIndexManager documentsIndexManager) throws Exception {
-		IndexReader reader = DirectoryReader.open( documentsIndexManager.getDirectoryProvider().getDirectory() );
-		try {
+		try (IndexReader reader = DirectoryReader.open( documentsIndexManager.getDirectoryProvider().getDirectory() )) {
 			return reader.numDocs();
-		}
-		finally {
-			reader.close();
 		}
 	}
 

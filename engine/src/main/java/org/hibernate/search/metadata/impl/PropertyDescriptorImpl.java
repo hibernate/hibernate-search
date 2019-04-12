@@ -23,7 +23,7 @@ public class PropertyDescriptorImpl implements PropertyDescriptor {
 
 	public PropertyDescriptorImpl(String name, boolean id, Set<FieldDescriptor> fieldDescriptors) {
 		this.name = name;
-		this.fieldDescriptors = Collections.unmodifiableSet( new HashSet<FieldDescriptor>( fieldDescriptors ) );
+		this.fieldDescriptors = Collections.unmodifiableSet( new HashSet<>( fieldDescriptors ) );
 		this.id = id;
 	}
 

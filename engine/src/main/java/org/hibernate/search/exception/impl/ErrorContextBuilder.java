@@ -73,7 +73,7 @@ public class ErrorContextBuilder {
 			context.setOperationAtFault( operationAtFault );
 		}
 		else if ( workToBeDone != null ) {
-			List<LuceneWork> workLeft = new ArrayList<LuceneWork>();
+			List<LuceneWork> workLeft = new ArrayList<>();
 			for ( LuceneWork work : workToBeDone ) {
 				workLeft.add( work );
 			}
@@ -93,14 +93,14 @@ public class ErrorContextBuilder {
 
 	private List<LuceneWork> getFailingOperations() {
 		if ( failingOperations == null ) {
-			failingOperations = new ArrayList<LuceneWork>();
+			failingOperations = new ArrayList<>();
 		}
 		return failingOperations;
 	}
 
 	private List<LuceneWork> getOperationsThatWorked() {
 		if ( operationsThatWorked == null ) {
-			operationsThatWorked = new LinkedList<LuceneWork>();
+			operationsThatWorked = new LinkedList<>();
 		}
 		return operationsThatWorked;
 	}

@@ -38,7 +38,7 @@ class BooleanQueryBuilder implements MustJunction {
 	private int shouldClauseCount = 0;
 
 	BooleanQueryBuilder() {
-		clauses = new ArrayList<BooleanClause>( 5 );
+		clauses = new ArrayList<>( 5 );
 		queryCustomizer = new QueryCustomizer();
 	}
 

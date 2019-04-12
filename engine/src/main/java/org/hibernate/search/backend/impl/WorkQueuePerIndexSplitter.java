@@ -27,7 +27,7 @@ public class WorkQueuePerIndexSplitter {
 
 	private final IndexManagerHolder indexManagerHolder;
 	private final Predicate<IndexManager> indexManagerFilter;
-	private final HashMap<String,WorkPlan> queues = new HashMap<String,WorkPlan>();
+	private final HashMap<String,WorkPlan> queues = new HashMap<>();
 
 	public WorkQueuePerIndexSplitter(IndexManagerHolder indexManagerHolder,
 			Predicate<IndexManager> indexManagerFilter) {
@@ -74,7 +74,7 @@ public class WorkQueuePerIndexSplitter {
 
 	private static class WorkPlan {
 		private final BackendQueueProcessor backendQueueProcessor;
-		private final LinkedList<LuceneWork> queue = new LinkedList<LuceneWork>();
+		private final LinkedList<LuceneWork> queue = new LinkedList<>();
 		WorkPlan(BackendQueueProcessor backendQueueProcessor) {
 			this.backendQueueProcessor = backendQueueProcessor;
 		}

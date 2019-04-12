@@ -18,12 +18,12 @@ import java.util.Map;
 public class PropertyDescriptor {
 
 	private final String name;
-	private final Collection<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
-	private final Collection<Map<String, Object>> numericFields = new ArrayList<Map<String, Object>>();
-	private final Collection<Map<String, Object>> sortableFields = new ArrayList<Map<String, Object>>();
-	private final Collection<Map<String, Object>> facets = new ArrayList<Map<String, Object>>();
-	private Map<String, Object> dateBridge = new HashMap<String, Object>();
-	private Map<String, Object> calendarBridge = new HashMap<String, Object>();
+	private final Collection<Map<String, Object>> fields = new ArrayList<>();
+	private final Collection<Map<String, Object>> numericFields = new ArrayList<>();
+	private final Collection<Map<String, Object>> sortableFields = new ArrayList<>();
+	private final Collection<Map<String, Object>> facets = new ArrayList<>();
+	private Map<String, Object> dateBridge = new HashMap<>();
+	private Map<String, Object> calendarBridge = new HashMap<>();
 	private Map<String,Object> indexEmbedded;
 	private Map<String,Object> containedIn;
 

@@ -49,8 +49,7 @@ public class PolymorphicAssociationPropertyAccessTest extends SearchTestBase {
 	}
 
 	private void prepareEntities(String level3Name) {
-		Session session = openSession();
-		try {
+		try (Session session = openSession()) {
 			Transaction transaction = session.beginTransaction();
 
 			Level1 level1 = new Level1();
@@ -69,9 +68,6 @@ public class PolymorphicAssociationPropertyAccessTest extends SearchTestBase {
 			session.save( level3 );
 
 			transaction.commit();
-		}
-		finally {
-			session.close();
 		}
 	}
 

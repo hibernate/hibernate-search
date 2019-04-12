@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Deprecated
 public class StandardFilterKey extends FilterKey {
-	private final List<Object> parameters = new ArrayList<Object>();
+	private final List<Object> parameters = new ArrayList<>();
 	private boolean implSet;
 
 	@Override

@@ -105,7 +105,7 @@ public class ProvidedIdTest {
 				null,
 				null
 		);
-		Set<String> identifiers = new HashSet<String>();
+		Set<String> identifiers = new HashSet<>();
 		identifiers.add( "providedId" );
 		Map<String, EntityIndexBinding> targetedEntityBindings = new HashMap<>();
 		targetedEntityBindings.put( ProvidedIdPerson.class.getName(), extendedIntegrator.getIndexBindings().get( ProvidedIdPerson.class ) );
@@ -117,7 +117,7 @@ public class ProvidedIdTest {
 				0, 0, //not used in this case
 				targetedEntityBindings
 		);
-		HashSet<String> titles = new HashSet<String>( 3 );
+		HashSet<String> titles = new HashSet<>( 3 );
 		for ( int id = 0; id < hits.totalHits; id++ ) {
 			String projectedTitle = (String) extractor.extract( id ).getProjection()[0];
 			assertNotNull( projectedTitle );

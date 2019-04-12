@@ -405,7 +405,7 @@ public class SortingTest {
 			this.age = age;
 			this.name = name;
 			this.favoriteCuddlyToy = favoriteCuddlyToy;
-			this.friends = new ArrayList<Friend>();
+			this.friends = new ArrayList<>();
 		}
 
 		Person(int id, Integer age, String name, List<Friend> friends) {
@@ -422,7 +422,7 @@ public class SortingTest {
 			this.name = name;
 			this.array = arrayItems;
 			this.favoriteCuddlyToy = null;
-			this.friends = new ArrayList<Friend>();
+			this.friends = new ArrayList<>();
 		}
 	}
 

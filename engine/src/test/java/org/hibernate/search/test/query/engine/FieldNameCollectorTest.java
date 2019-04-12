@@ -193,13 +193,13 @@ public class FieldNameCollectorTest {
 	private void indexTestDocuments(Directory directory) throws IOException {
 		IndexWriterConfig indexWriterConfig = new IndexWriterConfig( new StandardAnalyzer() );
 		indexWriterConfig.setOpenMode( IndexWriterConfig.OpenMode.CREATE );
-		IndexWriter indexWriter = new IndexWriter( directory, indexWriterConfig );
+	    try (IndexWriter indexWriter = new IndexWriter( directory, indexWriterConfig )) {
 		Document document = new Document();
 		document.add( new StringField( "stringField", "test", Field.Store.NO ) );
 		document.add( new IntField( "intField", 0, Field.Store.NO ) );
 		indexWriter.addDocument( document );
 		indexWriter.commit();
-		indexWriter.close();
+	    }
 	}
 
 	enum FieldType {

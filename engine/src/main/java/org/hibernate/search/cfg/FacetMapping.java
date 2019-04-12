@@ -23,7 +23,7 @@ public class FacetMapping {
 	private final PropertyDescriptor property;
 	private final EntityDescriptor entity;
 	private final SearchMapping mapping;
-	private final Map<String, Object> facet = new HashMap<String, Object>();
+	private final Map<String, Object> facet = new HashMap<>();
 
 	public FacetMapping(String fieldName, PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
 		this.fieldName = fieldName;

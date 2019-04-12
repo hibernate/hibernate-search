@@ -37,9 +37,8 @@ public final class AnalyzerUtils {
 	public static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public static List<String> tokenizedTermValues(Analyzer analyzer, String field, String text) throws IOException {
-		final List<String> tokenList = new ArrayList<String>();
-		final TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
-		try {
+		final List<String> tokenList = new ArrayList<>();
+		try (TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) )) {
 			CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
 			stream.reset();
 			while ( stream.incrementToken() ) {
@@ -48,16 +47,12 @@ public final class AnalyzerUtils {
 			}
 			stream.end();
 		}
-		finally {
-			stream.close();
-		}
 		return tokenList;
 	}
 
 	public static Token[] tokensFromAnalysis(Analyzer analyzer, String field, String text) throws IOException {
-		final List<Token> tokenList = new ArrayList<Token>();
-		final TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
-		try {
+		final List<Token> tokenList = new ArrayList<>();
+		try (TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) )) {
 			CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
 			stream.reset();
 			while ( stream.incrementToken() ) {
@@ -66,9 +61,6 @@ public final class AnalyzerUtils {
 				tokenList.add( token );
 			}
 			stream.end();
-		}
-		finally {
-			stream.close();
 		}
 		return tokenList.toArray( new Token[tokenList.size()] );
 	}

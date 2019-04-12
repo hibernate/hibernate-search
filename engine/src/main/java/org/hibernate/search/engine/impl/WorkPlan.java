@@ -58,7 +58,7 @@ public class WorkPlan {
 	 * Using a LinkedHashMap to ensure the order will be stable from one run to another.
 	 * This changes everything when debugging...
 	 */
-	private final Map<IndexedTypeIdentifier, PerClassWork> byClass = new LinkedHashMap<IndexedTypeIdentifier, PerClassWork>();
+	private final Map<IndexedTypeIdentifier, PerClassWork> byClass = new LinkedHashMap<>();
 
 	private final ExtendedSearchIntegrator extendedIntegrator;
 
@@ -183,7 +183,7 @@ public class WorkPlan {
 	 * @return returns the current plan converted as a list of {@code LuceneWork}
 	 */
 	public List<LuceneWork> getPlannedLuceneWork() {
-		List<LuceneWork> luceneQueue = new ArrayList<LuceneWork>();
+		List<LuceneWork> luceneQueue = new ArrayList<>();
 		for ( PerClassWork perClassWork : byClass.values() ) {
 			perClassWork.enqueueLuceneWork( luceneQueue );
 		}
@@ -206,7 +206,7 @@ public class WorkPlan {
 		 * We use a LinkedHashMap to ensure the order will be stable from one run to another.
 		 * This changes everything when debugging...
 		 */
-		private final Map<Serializable, PerEntityWork> entityById = new LinkedHashMap<Serializable, PerEntityWork>();
+		private final Map<Serializable, PerEntityWork> entityById = new LinkedHashMap<>();
 
 		/**
 		 * When a PurgeAll operation is send on the type, we can remove all previously scheduled work
@@ -252,24 +252,35 @@ public class WorkPlan {
 		 * @param work the {@code Work} instance to add to the plan
 		 */
 		public void addWork(Work work) {
-			if ( work.getType() == WorkType.PURGE_ALL ) {
-				entityById.clear();
-				this.deletionQueries.clear();
-				purgeAll = true;
+			if ( null == work.getType() ) {
+			    Serializable id = extractProperId( work );
+			    PerEntityWork entityWork = entityById.get( id );
+			    if ( entityWork == null ) {
+				entityWork = new PerEntityWork( work );
+				entityById.put( id, entityWork );
+			    }
+			    entityWork.addWork( work );
 			}
-			else if ( work.getType() == WorkType.DELETE_BY_QUERY ) {
-				DeleteByQueryWork delWork = (DeleteByQueryWork) work;
-				this.deletionQueries.add( delWork.getDeleteByQuery() );
-			}
-			else {
-				Serializable id = extractProperId( work );
-				PerEntityWork entityWork = entityById.get( id );
-				if ( entityWork == null ) {
-					entityWork = new PerEntityWork( work );
-					entityById.put( id, entityWork );
-				}
-				entityWork.addWork( work );
-			}
+			else switch (work.getType()) {
+		    	case PURGE_ALL:
+			    entityById.clear();
+			    this.deletionQueries.clear();
+			    purgeAll = true;
+			    break;
+		    	case DELETE_BY_QUERY:
+			    DeleteByQueryWork delWork = (DeleteByQueryWork) work;
+			    this.deletionQueries.add( delWork.getDeleteByQuery() );
+			    break;
+		    	default:
+			    Serializable id = extractProperId( work );
+			    PerEntityWork entityWork = entityById.get( id );
+			    if ( entityWork == null ) {
+				entityWork = new PerEntityWork( work );
+				entityById.put( id, entityWork );
+			    }
+			    entityWork.addWork( work );
+			    break;
+		    }
 		}
 
 		/**

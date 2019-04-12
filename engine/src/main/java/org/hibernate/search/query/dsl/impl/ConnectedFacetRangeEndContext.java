@@ -35,14 +35,14 @@ public class ConnectedFacetRangeEndContext<T> extends ConnectedFacetParameterCon
 		context.makeRange();
 		context.setRangeStart( max );
 		context.setRangeEnd( null );
-		return new ConnectedFacetRangeAboveContext<T>( context );
+		return new ConnectedFacetRangeAboveContext<>( context );
 	}
 
 	@Override
 	public FacetRangeLimitContext<T> from(T rangeStart) {
 		context.makeRange();
 		context.setRangeStart( rangeStart );
-		return new ConnectedFacetRangeLimitContext<T>( context );
+		return new ConnectedFacetRangeLimitContext<>( context );
 	}
 
 	@Override

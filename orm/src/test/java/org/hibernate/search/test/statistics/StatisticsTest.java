@@ -115,16 +115,12 @@ public class StatisticsTest extends SearchTestBase {
 		assertEquals( 0, getStatistics().getNumberOfIndexedEntities( A.class.getName() ) );
 		assertEquals( 0, getStatistics().getNumberOfIndexedEntities( B.class.getName() ) );
 
-		Session s = openSession();
-		try {
+		try (Session s = openSession()) {
 			A entity = new A();
 			entity.id = 1L;
 			Transaction tx = s.beginTransaction();
 			s.persist( entity );
 			tx.commit();
-		}
-		finally {
-			s.close();
 		}
 
 		indexedEntitiesCount = getStatistics().indexedEntitiesCount();
@@ -137,8 +133,7 @@ public class StatisticsTest extends SearchTestBase {
 
 	@Test
 	public void queryExecution() {
-		Session s = openSession();
-		try {
+		try (Session s = openSession()) {
 			FullTextSession session = Search.getFullTextSession( s );
 			FullTextQuery query = session.createFullTextQuery( matchAll(), A.class );
 
@@ -162,15 +157,11 @@ public class StatisticsTest extends SearchTestBase {
 			assertNotEquals( 0, getStatistics().getSearchQueryExecutionMaxTime() );
 			assertNotNull( getStatistics().getSearchQueryExecutionMaxTimeQueryString() );
 		}
-		finally {
-			s.close();
-		}
 	}
 
 	@Test
 	public void objectLoading() {
-		Session s = openSession();
-		try {
+		try (Session s = openSession()) {
 			Transaction tx = s.beginTransaction();
 			A entity = new A();
 			entity.id = 1L;
@@ -200,16 +191,12 @@ public class StatisticsTest extends SearchTestBase {
 			assertNotEquals( 0, getStatistics().getObjectLoadingExecutionMaxTime() );
 			assertNotEquals( 0, getStatistics().getObjectLoadingTotalTime() );
 		}
-		finally {
-			s.close();
-		}
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2630")
 	public void objectLoading_multiClassesQueryLoader_singleResult() {
-		Session s = openSession();
-		try {
+		try (Session s = openSession()) {
 			Transaction tx = s.beginTransaction();
 			A entity = new A();
 			entity.id = 1L;
@@ -230,17 +217,13 @@ public class StatisticsTest extends SearchTestBase {
 
 			assertEquals( 2, getStatistics().getObjectsLoadedCount() );
 		}
-		finally {
-			s.close();
-		}
 	}
 
 	@Test
 	@SuppressWarnings("deprecation")
 	@TestForIssue(jiraKey = "HSEARCH-2631")
 	public void objectLoading_singleClassQueryLoader_criteria_iterate() {
-		Session s = openSession();
-		try {
+		try (Session s = openSession()) {
 			Transaction tx = s.beginTransaction();
 			A entity = new A();
 			entity.id = 1L;
@@ -263,9 +246,6 @@ public class StatisticsTest extends SearchTestBase {
 			iterator.next();
 
 			assertEquals( 2, getStatistics().getObjectsLoadedCount() );
-		}
-		finally {
-			s.close();
 		}
 	}
 

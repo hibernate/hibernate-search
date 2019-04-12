@@ -46,22 +46,20 @@ public final class KnownProtocols {
 					LATEST_MINOR_VERSION
 			);
 		}
-		if ( minorVersion == 2 ) {
-			return getV1_2();
-		}
-		else if ( minorVersion == 1 ) {
-			return getV1_1();
-		}
-		else if ( minorVersion == 0 ) {
-			return getV1_0();
-		}
-		else {
-			if ( ! warned ) {
-				warned = true;
-				log.unexpectedMinorProtocolVersion( majorVersion, minorVersion, LATEST_MINOR_VERSION );
-			}
-			return getV1_2();
-		}
+	    switch (minorVersion) {
+	    	case 2:
+		    return getV1_2();
+	    	case 1:
+		    return getV1_1();
+	    	case 0:
+		    return getV1_0();
+	    	default:
+		    if ( ! warned ) {
+			warned = true;
+			log.unexpectedMinorProtocolVersion( majorVersion, minorVersion, LATEST_MINOR_VERSION );
+		    }
+		    return getV1_2();
+	    }
 	}
 
 	public Protocol getLatestProtocol() {

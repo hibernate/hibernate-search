@@ -19,13 +19,7 @@ public class MovieBridgeProvider implements BridgeProvider {
 	@Override
 	public FieldBridge provideFieldBridge(BridgeProviderContext bridgeProviderContext) {
 		if ( bridgeProviderContext.getReturnType().equals( Movie.class ) ) {
-			return new String2FieldBridgeAdaptor( new StringBridge() {
-
-				@Override
-				public String objectToString(Object object) {
-					return ( (Movie) object ).toString();
-				}
-			} );
+			return new String2FieldBridgeAdaptor( (Object object) -> ( (Movie) object ).toString());
 		}
 		return null;
 	}

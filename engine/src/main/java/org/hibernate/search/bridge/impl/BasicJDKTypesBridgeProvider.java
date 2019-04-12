@@ -65,7 +65,7 @@ class BasicJDKTypesBridgeProvider implements BridgeProvider {
 
 	BasicJDKTypesBridgeProvider(ServiceManager serviceManager) {
 		this.clazz = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge( serviceManager ) );
-		Map<String, FieldBridge> bridges = new HashMap<String, FieldBridge>();
+		Map<String, FieldBridge> bridges = new HashMap<>();
 		bridges.put( Character.class.getName(), CHARACTER );
 		bridges.put( char.class.getName(), CHARACTER );
 		bridges.put( Double.class.getName(), DOUBLE );

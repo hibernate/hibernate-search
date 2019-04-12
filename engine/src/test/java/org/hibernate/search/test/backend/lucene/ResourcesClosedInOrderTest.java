@@ -112,11 +112,11 @@ public class ResourcesClosedInOrderTest {
 		assertEquals( 0, errorHandler.getTotalCount() );
 		searchIntegrator.close();
 
-		//Now the SearchIntegrator was closed, let's unwind the recorder events and compare them with expectations:
-		for ( int i = 0; i < expectedStack.length; i++ ) {
-			//Check the events have been fired in the expected order
-			assertEquals( expectedStack[i], byteman.consumeNextRecordedEvent() );
-		}
+            //Now the SearchIntegrator was closed, let's unwind the recorder events and compare them with expectations:
+            for (String expectedStack1 : expectedStack) {
+                //Check the events have been fired in the expected order
+                assertEquals(expectedStack1, byteman.consumeNextRecordedEvent());
+            }
 		//And no more events than those expected exist
 		assertTrue( byteman.isEventStackEmpty() );
 	}

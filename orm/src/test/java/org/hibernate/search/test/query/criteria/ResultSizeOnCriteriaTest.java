@@ -36,55 +36,48 @@ public class ResultSizeOnCriteriaTest extends SearchTestBase {
 	public void testResultSize() {
 		indexTestData();
 
-		// Search
-		Session session = openSession();
-		Transaction tx = session.beginTransaction();
-		FullTextSession fullTextSession = Search.getFullTextSession( session );
-
-		//Write query
-		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Tractor.class ).get();
-		Query query = qb.keyword().wildcard().onField( "owner" ).matching( "p*" ).createQuery();
-
-
-		//set criteria
-		Criteria criteria = session.createCriteria( Tractor.class );
-		criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
-
-		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Tractor.class )
-				.setCriteriaQuery( criteria );
-		List<Tractor> result = hibQuery.list();
-		//Result size is ok
-		assertEquals( 1, result.size() );
-
-		for ( Tractor tractor : result ) {
+		try ( // Search
+			Session session = openSession()) {
+		    Transaction tx = session.beginTransaction();
+		    FullTextSession fullTextSession = Search.getFullTextSession( session );
+		    //Write query
+		    QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Tractor.class ).get();
+		    Query query = qb.keyword().wildcard().onField( "owner" ).matching( "p*" ).createQuery();
+		    //set criteria
+		    Criteria criteria = session.createCriteria( Tractor.class );
+		    criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
+		    FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Tractor.class )
+			    .setCriteriaQuery( criteria );
+		    List<Tractor> result = hibQuery.list();
+		    //Result size is ok
+		    assertEquals( 1, result.size() );
+		    for ( Tractor tractor : result ) {
 			assertThat( tractor.isHasColor() ).isFalse();
 			assertThat( tractor.getOwner() ).startsWith( "P" );
-		}
-
-		//Compare with resultSize
-		try {
+		    }
+		    //Compare with resultSize
+		    try {
 			hibQuery.getResultSize();
 			assertThat( true ).as( "HSEARCH000105 should have been raised" ).isFalse();
-		}
-		catch (SearchException e) {
+		    }
+		    catch (SearchException e) {
 			assertThat( e.getMessage() ).startsWith( "HSEARCH000105" );
-		}
-		assertThat( result ).hasSize( 1 );
-		//getResultSize get only count of tractors matching keyword on field "owner" beginning with "p*"
-		tx.commit();
-
-		tx = session.beginTransaction();
-		for ( Object element : session.createQuery( "select t from Tractor t" ).list() ) {
+		    }
+		    assertThat( result ).hasSize( 1 );
+		    //getResultSize get only count of tractors matching keyword on field "owner" beginning with "p*"
+		    tx.commit();
+		    tx = session.beginTransaction();
+		    for ( Object element : session.createQuery( "select t from Tractor t" ).list() ) {
 			session.delete( element );
+		    }
+		    tx.commit();
 		}
-		tx.commit();
-		session.close();
 
 	}
 
 
 	private void indexTestData() {
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 
 		Tractor tractor = new Tractor();
@@ -104,7 +97,7 @@ public class ResultSizeOnCriteriaTest extends SearchTestBase {
 		s.persist( tractor3 );
 
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

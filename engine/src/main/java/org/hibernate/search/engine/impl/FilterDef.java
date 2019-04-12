@@ -31,7 +31,7 @@ public class FilterDef {
 
 	private Method factoryMethod;
 	private Method keyMethod;
-	private final Map<String, Method> setters = new HashMap<String, Method>();
+	private final Map<String, Method> setters = new HashMap<>();
 	private final FilterCacheModeType cacheMode;
 	private final Class<?> impl;
 	private final String name;

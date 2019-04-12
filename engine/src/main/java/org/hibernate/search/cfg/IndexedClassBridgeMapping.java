@@ -48,7 +48,7 @@ public class IndexedClassBridgeMapping {
 		this.mapping = mapping;
 		this.entity = entity;
 		this.indexedMapping = indexedMapping;
-		this.classBridge = new HashMap<String, Object>();
+		this.classBridge = new HashMap<>();
 	}
 
 	public IndexedClassBridgeMapping name(String name) {
@@ -82,21 +82,21 @@ public class IndexedClassBridgeMapping {
 	}
 
 	public IndexedClassBridgeMapping boost(float boost) {
-		final Map<String, Object> boostAnn = new HashMap<String, Object>();
+		final Map<String, Object> boostAnn = new HashMap<>();
 		boostAnn.put( "value", boost );
 		classBridge.put( "boost", boostAnn );
 		return this;
 	}
 
 	public IndexedClassBridgeMapping analyzer(Class<?> analyzerClass) {
-		final Map<String, Object> analyzer = new HashMap<String, Object>();
+		final Map<String, Object> analyzer = new HashMap<>();
 		analyzer.put( "impl", analyzerClass );
 		classBridge.put( "analyzer", analyzer );
 		return this;
 	}
 
 	public IndexedClassBridgeMapping analyzer(String analyzerDef) {
-		final Map<String, Object> analyzer = new HashMap<String, Object>();
+		final Map<String, Object> analyzer = new HashMap<>();
 		analyzer.put( "definition", analyzerDef );
 		classBridge.put( "analyzer", analyzer );
 		return this;

@@ -155,7 +155,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			if ( size <= 0 ) {
 				return Collections.emptyList();
 			}
-			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
+			List<EntityInfo> infos = new ArrayList<>( size );
 			DocumentExtractor extractor = buildDocumentExtractor( searcher, queryHits, first, max );
 			for ( int index = first; index <= max; index++ ) {
 				infos.add( extractor.extract( index ) );
@@ -330,7 +330,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		Map<FacetingRequest, FacetMetadata> facetingRequestsAndMetadata =
 				buildFacetingRequestsAndMetadata( facetingRequests, targetedEntityBindingsByName.values() );
 
-		if ( n == null ) { // try to make sure that we get the right amount of top docs
+		if ( null == n ) { // try to make sure that we get the right amount of top docs
 			queryHits = new QueryHits(
 					searcher,
 					filters,
@@ -342,32 +342,34 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 					spatialFieldName
 			);
 		}
-		else if ( 0 == n ) {
-			queryHits = new QueryHits(
-					searcher,
-					filters,
-					null,
-					0,
-					collectHits,
-					getTimeoutManager(),
-					null,
-					spatialSearchCenter,
-					spatialFieldName
-			);
-		}
-		else {
-			queryHits = new QueryHits(
-					searcher,
-					filters,
-					sort,
-					n,
-					collectHits,
-					getTimeoutManager(),
-					facetingRequestsAndMetadata,
-					spatialSearchCenter,
-					spatialFieldName
-			);
-		}
+		else switch (n) {
+	    	case 0:
+		    queryHits = new QueryHits(
+			    searcher,
+			    filters,
+			    null,
+			    0,
+			    collectHits,
+			    getTimeoutManager(),
+			    null,
+			    spatialSearchCenter,
+			    spatialFieldName
+		    );
+		    break;
+	    	default:
+		    queryHits = new QueryHits(
+			    searcher,
+			    filters,
+			    sort,
+			    n,
+			    collectHits,
+			    getTimeoutManager(),
+			    facetingRequestsAndMetadata,
+			    spatialSearchCenter,
+			    spatialFieldName
+		    );
+		    break;
+	    }
 		resultSize = queryHits.getTotalHits();
 
 		if ( stats ) {
@@ -417,7 +419,7 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 	 */
 	private LazyQueryState buildSearcher(ExtendedSearchIntegrator extendedIntegrator, Boolean forceScoring) {
 		Set<IndexManager> targetedIndexes = new HashSet<>();
-		Set<String> idFieldNames = new HashSet<String>();
+		Set<String> idFieldNames = new HashSet<>();
 		Similarity searcherSimilarity = null;
 
 		SortConfigurations.Builder sortConfigurations = new SortConfigurations.Builder();

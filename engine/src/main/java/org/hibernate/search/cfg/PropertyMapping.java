@@ -67,7 +67,7 @@ public class PropertyMapping {
 	}
 
 	public PropertyMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
-		Map<String, Object> analyzerDiscriminatorAnn = new HashMap<String, Object>();
+		Map<String, Object> analyzerDiscriminatorAnn = new HashMap<>();
 		analyzerDiscriminatorAnn.put( "impl", discriminator );
 		property.setAnalyzerDiscriminator( analyzerDiscriminatorAnn );
 		return this;
@@ -84,7 +84,7 @@ public class PropertyMapping {
 	 */
 	@Deprecated
 	public PropertyMapping dynamicBoost(Class<? extends BoostStrategy> impl) {
-		final Map<String, Object> dynamicBoostAnn = new HashMap<String, Object>();
+		final Map<String, Object> dynamicBoostAnn = new HashMap<>();
 		dynamicBoostAnn.put( "impl", impl );
 		property.setDynamicBoost( dynamicBoostAnn );
 		return this;

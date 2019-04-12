@@ -63,7 +63,7 @@ public class ShardsTest extends SearchTestBase {
 	// there is a mismatch of the index name as handled by IndexManagerHolder and the ES-IM: Animal.0 vs. Animal00
 	@Category(ElasticsearchSupportInProgress.class)
 	public void testBehavior() throws Exception {
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		Animal a = new Animal();
 		a.setId( 1 );
@@ -99,17 +99,17 @@ public class ShardsTest extends SearchTestBase {
 		results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear OR color:blue" ) ).list();
 		assertEquals( "Mixing shared and non sharded properties fails with indexreader reuse", 3, results.size() );
 		for ( Object o : results ) {
-			s.delete( o );
+		    s.delete( o );
 		}
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Test
 	// there is a mismatch of the index name as handled by IndexManagerHolder and the ES-IM: Animal.0 vs. Animal00
 	@Category(ElasticsearchSupportInProgress.class)
 	public void testInternalSharding() throws Exception {
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		Animal a = new Animal();
 		a.setId( 1 );
@@ -143,10 +143,10 @@ public class ShardsTest extends SearchTestBase {
 		List<?> results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear" ) ).list();
 		assertEquals( "Either double insert, single update, or query fails with shards", 2, results.size() );
 		for ( Object o : results ) {
-			s.delete( o );
+		    s.delete( o );
 		}
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

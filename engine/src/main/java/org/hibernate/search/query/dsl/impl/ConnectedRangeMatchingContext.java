@@ -32,7 +32,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext, Fiel
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.rangeContext = new RangeQueryContext();
-		this.fieldContexts = new ArrayList<FieldContext>( 4 );
+		this.fieldContexts = new ArrayList<>( 4 );
 		this.fieldContexts.add( new FieldContext( fieldName, queryContext ) );
 	}
 
@@ -46,7 +46,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext, Fiel
 	@Override
 	public <T> FromRangeContext<T> from(T from) {
 		rangeContext.setFrom( from );
-		return new ConnectedFromRangeContext<T>( this );
+		return new ConnectedFromRangeContext<>( this );
 	}
 
 	static class ConnectedFromRangeContext<T> implements FromRangeContext<T> {

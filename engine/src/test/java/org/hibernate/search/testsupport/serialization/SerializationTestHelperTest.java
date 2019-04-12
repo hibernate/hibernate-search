@@ -35,7 +35,7 @@ public class SerializationTestHelperTest {
 
 	static class Foo implements Serializable {
 
-		List<TestInnerClass> list = new ArrayList<TestInnerClass>();
+		List<TestInnerClass> list = new ArrayList<>();
 		transient Integer integer = Integer.valueOf( 6 );
 
 		static class TestInnerClass implements Serializable {

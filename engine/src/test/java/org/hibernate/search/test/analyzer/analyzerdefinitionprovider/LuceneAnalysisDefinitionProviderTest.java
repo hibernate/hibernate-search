@@ -212,14 +212,7 @@ public class LuceneAnalysisDefinitionProviderTest {
 		for ( Class<?> entityClass : entityClasses ) {
 			cfg.addClass( entityClass );
 		}
-		cfg.getProvidedServices().put( LuceneAnalysisDefinitionSourceService.class, new LuceneAnalysisDefinitionSourceService() {
-
-					@Override
-					public LuceneAnalysisDefinitionProvider getLuceneAnalyzerDefinitionProvider() {
-						return analyzerProvider;
-					}
-
-				} );
+		cfg.getProvidedServices().put(LuceneAnalysisDefinitionSourceService.class, (LuceneAnalysisDefinitionSourceService) () -> analyzerProvider);
 		return integratorResource.create( cfg );
 	}
 

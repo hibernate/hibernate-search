@@ -143,7 +143,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 	}
 
 	void prepareGenealogyTree() {
-		Session session = openSession();
+	    try (Session session = openSession()) {
 		Transaction transaction = session.beginTransaction();
 		Person[] ps = new Person[18];
 		// array index starting from 1 to match ids of picture at http://en.wikipedia.org/wiki/John,_King_of_England
@@ -174,10 +174,10 @@ public class RecursiveGraphTest extends SearchTestBase {
 		ps[7].addParents( ps[14], ps[15] );
 		ps[8].addParents( ps[16], ps[17] );
 		for ( int i = 1; i < 18; i++ ) {
-			session.save( ps[i] );
+		    session.save( ps[i] );
 		}
 		transaction.commit();
-		session.close();
+	    }
 		for ( int i = 1; i < 18; i++ ) {
 			assertEquals( 1, countWorksDoneOnPerson( Long.valueOf( i ) ) );
 		}

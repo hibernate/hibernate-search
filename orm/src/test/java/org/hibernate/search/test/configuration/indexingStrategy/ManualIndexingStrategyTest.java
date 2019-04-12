@@ -48,13 +48,13 @@ public class ManualIndexingStrategyTest extends SearchTestBase {
 	}
 
 	private void indexTestEntity() {
-		Session session = getSessionFactory().openSession();
+	    try (Session session = getSessionFactory().openSession()) {
 		session.getTransaction().begin();
 
 		session.persist( new TestEntity() );
 
 		session.getTransaction().commit();
-		session.close();
+	    }
 	}
 
 	@Indexed

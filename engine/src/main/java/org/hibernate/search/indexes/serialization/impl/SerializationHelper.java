@@ -34,9 +34,9 @@ public final class SerializationHelper {
 		//no need to close ByteArrayOutputStream
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			ObjectOutputStream stream = new ObjectOutputStream( out );
+		    try (ObjectOutputStream stream = new ObjectOutputStream( out )) {
 			stream.writeObject( instance );
-			stream.close();
+		    }
 		}
 		catch (IOException e) {
 			throw log.failToSerializeObject( instance.getClass(), e );
@@ -47,12 +47,8 @@ public final class SerializationHelper {
 	public static <T> T toInstance(byte[] data, Class<T> clazz) {
 		try {
 			ByteArrayInputStream byteIn = new ByteArrayInputStream( data );
-			final ObjectInputStream in = new ClassLoaderAwareObjectInputStream( byteIn, clazz.getClassLoader() );
-			try {
+			try (ObjectInputStream in = new ClassLoaderAwareObjectInputStream( byteIn, clazz.getClassLoader() )) {
 				return (T) in.readObject();
-			}
-			finally {
-				in.close();
 			}
 		}
 		catch (IOException e) {
@@ -66,12 +62,8 @@ public final class SerializationHelper {
 	public static Serializable toSerializable(byte[] data, ClassLoader loader) {
 		try {
 			ByteArrayInputStream byteIn = new ByteArrayInputStream( data );
-			final ObjectInputStream in = new ClassLoaderAwareObjectInputStream( byteIn, loader );
-			try {
+			try (ObjectInputStream in = new ClassLoaderAwareObjectInputStream( byteIn, loader )) {
 				return (Serializable) in.readObject();
-			}
-			finally {
-				in.close();
 			}
 		}
 		catch (IOException e) {

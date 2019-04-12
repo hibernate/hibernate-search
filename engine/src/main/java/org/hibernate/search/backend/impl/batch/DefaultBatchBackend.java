@@ -85,7 +85,7 @@ public class DefaultBatchBackend implements BatchBackend {
 	}
 
 	private Collection<IndexManager> uniqueIndexManagerForTypes(IndexedTypeSet entityTypes) {
-		HashMap<String,IndexManager> uniqueBackends = new HashMap<String, IndexManager>( entityTypes.size() );
+		HashMap<String,IndexManager> uniqueBackends = new HashMap<>( entityTypes.size() );
 		for ( IndexedTypeIdentifier type : entityTypes ) {
 			EntityIndexBinding indexBindingForEntity = integrator.getIndexBinding( type );
 			if ( indexBindingForEntity != null ) {

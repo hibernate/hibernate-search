@@ -50,10 +50,10 @@ public class TestReporter {
 
 	public static void printReport(TestContext testCtx, TestScenarioContext warmupCtx, TestScenarioContext measureCtx)
 			throws UnsupportedEncodingException, IOException {
-		PrintStream outStream = createOutputStream( measureCtx.scenario.getClass().getSimpleName() );
+	    try (PrintStream outStream = createOutputStream( measureCtx.scenario.getClass().getSimpleName() )) {
 		PrintWriter outWriter = new PrintWriter(
-				new BufferedWriter( new OutputStreamWriter( outStream, "UTF-8" ) ), false );
-
+			new BufferedWriter( new OutputStreamWriter( outStream, "UTF-8" ) ), false );
+		
 		outWriter.println( "==================================================================" );
 		outWriter.println( "HIBERNATE SEARCH PERFORMANCE TEST REPORT" );
 		printSummary( testCtx, warmupCtx, measureCtx, outWriter );
@@ -67,21 +67,21 @@ public class TestReporter {
 		Collection<Throwable> warmupFailures = warmupCtx.getFailures();
 		Collection<Throwable> measureFailures = measureCtx.getFailures();
 		if ( !warmupFailures.isEmpty() || !measureFailures.isEmpty() ) {
-			outWriter.println( "===========================================================================" );
-			outWriter.println( "EXCEPTIONS" );
-			outWriter.println( "" );
-			for ( Throwable e : warmupFailures ) {
-				e.printStackTrace( outWriter );
-				outWriter.println( "---------------------------------------------------------------" );
-			}
-			for ( Throwable e : measureFailures ) {
-				e.printStackTrace( outWriter );
-				outWriter.println( "---------------------------------------------------------------" );
-			}
+		    outWriter.println( "===========================================================================" );
+		    outWriter.println( "EXCEPTIONS" );
+		    outWriter.println( "" );
+		    for ( Throwable e : warmupFailures ) {
+			e.printStackTrace( outWriter );
+			outWriter.println( "---------------------------------------------------------------" );
+		    }
+		    for ( Throwable e : measureFailures ) {
+			e.printStackTrace( outWriter );
+			outWriter.println( "---------------------------------------------------------------" );
+		    }
 		}
 
 		outWriter.close();
-		outStream.close();
+	    }
 	}
 
 	private static void printSummary(

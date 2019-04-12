@@ -130,7 +130,7 @@ public abstract class SpatialHelper {
 		final int startY = Math.min( Math.min( Math.min( lowerLeftYIndex, upperLeftYIndex ), upperRightYIndex ), lowerRightYIndex );
 		final int endY = Math.max( Math.max( Math.max( lowerLeftYIndex, upperLeftYIndex ), upperRightYIndex ), lowerRightYIndex );
 
-		List<String> spatialHashCellsIds = new ArrayList<String>( ( endX + 1 - startX ) * ( endY + 1 - startY ) );
+		List<String> spatialHashCellsIds = new ArrayList<>( ( endX + 1 - startX ) * ( endY + 1 - startY ) );
 		for ( int xIndex = startX; xIndex <= endX; xIndex++ ) {
 			for ( int yIndex = startY; yIndex <= endY; yIndex++ ) {
 				spatialHashCellsIds.add( formatSpatialHashCellId( xIndex, yIndex ) );

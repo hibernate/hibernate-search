@@ -22,7 +22,7 @@ public class AggregatedClassLoaderTest {
 
 	@Before
 	public void setUp() {
-		LinkedHashSet<ClassLoader> orderedClassLoaderSet = new LinkedHashSet<ClassLoader>();
+		LinkedHashSet<ClassLoader> orderedClassLoaderSet = new LinkedHashSet<>();
 		orderedClassLoaderSet.add( AggregatedClassLoaderTest.class.getClassLoader() );
 		orderedClassLoaderSet.add( Thread.currentThread().getContextClassLoader() );
 		aggregatedClassLoader = new AggregatedClassLoader(

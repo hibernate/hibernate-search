@@ -30,7 +30,7 @@ public abstract class ShardIdentifierProviderTemplate implements ShardIdentifier
 	@Override
 	public final void initialize(Properties properties, BuildContext buildContext) {
 		Set<String> initialShardNames = loadInitialShardNames( properties, buildContext );
-		knownShards = Collections.unmodifiableSet( new HashSet<String>( initialShardNames ) );
+		knownShards = Collections.unmodifiableSet( new HashSet<>( initialShardNames ) );
 	}
 
 	protected abstract Set<String> loadInitialShardNames(Properties properties, BuildContext buildContext);
@@ -42,7 +42,7 @@ public abstract class ShardIdentifierProviderTemplate implements ShardIdentifier
 	}
 
 	private synchronized void addShardSynchronized(final String shardName) {
-		HashSet<String> newCopy = new HashSet<String>( knownShards );
+		HashSet<String> newCopy = new HashSet<>( knownShards );
 		newCopy.add( shardName );
 		knownShards = Collections.unmodifiableSet( newCopy );
 	}

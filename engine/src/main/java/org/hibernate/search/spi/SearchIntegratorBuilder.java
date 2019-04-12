@@ -100,7 +100,7 @@ public class SearchIntegratorBuilder {
 
 	private SearchConfiguration cfg;
 	private MutableSearchFactory rootFactory;
-	private final List<Class<?>> classes = new ArrayList<Class<?>>();
+	private final List<Class<?>> classes = new ArrayList<>();
 
 	public SearchIntegratorBuilder configuration(SearchConfiguration configuration) {
 		this.cfg = configuration;
@@ -179,7 +179,7 @@ public class SearchIntegratorBuilder {
 	}
 
 	private void removeClassesAlreadyManaged() {
-		Set<Class<?>> remove = new HashSet<Class<?>>();
+		Set<Class<?>> remove = new HashSet<>();
 		final IndexedTypeMap<DocumentBuilderContainedEntity> containedEntities = rootFactory.getDocumentBuildersContainedEntities();
 		final IndexedTypeMap<EntityIndexBinding> indexedEntities = rootFactory.getIndexBindings();
 		for ( Class<?> entity : classes ) {
@@ -368,14 +368,14 @@ public class SearchIntegratorBuilder {
 		final TypeHierarchy indexedTypeHierarchy = factoryState.getIndexedTypeHierarchy();
 		final IndexedTypeMap<EntityIndexBinding> documentBuildersIndexedEntities = factoryState.getIndexBindings();
 		final IndexedTypeMap<DocumentBuilderContainedEntity> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
-		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
+		final Set<XClass> optimizationBlackListedTypes = new HashSet<>();
 		final Map<XClass, Class<?>> classMappings = initializeClassMappings(
 				searchConfiguration,
 				searchConfiguration.getReflectionManager()
 		);
 
 		//we process the @Indexed classes last, so we first start all IndexManager(s).
-		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
+		final List<XClass> rootIndexedEntities = new LinkedList<>();
 		final org.hibernate.search.engine.metadata.impl.MetadataProvider metadataProvider =
 				new AnnotationMetadataProvider( searchConfiguration.getReflectionManager(), configContext );
 
@@ -484,7 +484,7 @@ public class SearchIntegratorBuilder {
 			if ( indexManager instanceof IndexNameNormalizer ) {
 				IndexNameNormalizer normalizer = (IndexNameNormalizer) indexManager;
 				if ( !indexNames.containsKey( normalizer.getActualIndexName() ) ) {
-					indexNames.put( normalizer.getActualIndexName(), new HashSet<String>( 2 ) );
+					indexNames.put( normalizer.getActualIndexName(), new HashSet<>( 2 ) );
 				}
 				indexNames.get( normalizer.getActualIndexName() ).add( indexManager.getIndexName() );
 			}
@@ -548,7 +548,7 @@ public class SearchIntegratorBuilder {
 	 */
 	private static Map<XClass, Class<?>> initializeClassMappings(SearchConfiguration cfg, ReflectionManager reflectionManager) {
 		Iterator<Class<?>> iter = cfg.getClassMappings();
-		Map<XClass, Class<?>> map = new HashMap<XClass, Class<?>>();
+		Map<XClass, Class<?>> map = new HashMap<>();
 		while ( iter.hasNext() ) {
 			Class<?> mappedClass = iter.next();
 			if ( mappedClass == null ) {

@@ -55,13 +55,13 @@ public class LoggerInfoStreamTest {
 		IndexWriterConfig indexWriterConfig = new IndexWriterConfig( new StandardAnalyzer() );
 		indexWriterConfig.setInfoStream( infoStream );
 
-		IndexWriter indexWriter = new IndexWriter( directory, indexWriterConfig );
+	    try (IndexWriter indexWriter = new IndexWriter( directory, indexWriterConfig )) {
 		Document doc = new Document();
 		doc.add( new StringField( "f1", "value1", Field.Store.YES ) );
 
 		indexWriter.addDocument( doc );
 		indexWriter.commit();
-		indexWriter.close();
+	    }
 
 		List<LoggingEvent> loggingEvents = testAppender.searchByLoggerAndMessage( LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY.getName(), "IW:" );
 

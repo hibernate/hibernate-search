@@ -32,10 +32,10 @@ public final class SerializationTestHelper {
 	public static <T> T duplicateBySerialization(T o) throws IOException, ClassNotFoundException {
 		// Serialize to buffer:
 		java.io.ByteArrayOutputStream outStream = new java.io.ByteArrayOutputStream();
-		ObjectOutputStream objectOutStream = new ObjectOutputStream( outStream );
+	    try (ObjectOutputStream objectOutStream = new ObjectOutputStream( outStream )) {
 		objectOutStream.writeObject( o );
 		objectOutStream.flush();
-		objectOutStream.close();
+	    }
 		// buffer version of Object:
 		byte[] objectBuffer = outStream.toByteArray();
 		// deserialize to new instance:

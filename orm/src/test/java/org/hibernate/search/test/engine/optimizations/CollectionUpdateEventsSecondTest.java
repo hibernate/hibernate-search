@@ -36,8 +36,7 @@ public class CollectionUpdateEventsSecondTest {
 	@Test
 	public void testScenario() {
 
-		FullTextSessionBuilder fullTextSessionBuilder = createSearchFactory();
-		try {
+		try (FullTextSessionBuilder fullTextSessionBuilder = createSearchFactory()) {
 			//check no operations are done:
 			assertOperationsPerformed( 0 );
 			assertLocationsLoaded( 0 );
@@ -76,9 +75,6 @@ public class CollectionUpdateEventsSecondTest {
 			finally {
 				fullTextSession.close();
 			}
-		}
-		finally {
-			fullTextSessionBuilder.close();
 		}
 	}
 

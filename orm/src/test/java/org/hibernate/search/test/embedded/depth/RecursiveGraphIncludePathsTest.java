@@ -135,36 +135,31 @@ public class RecursiveGraphIncludePathsTest extends SearchTestBase {
 	}
 
 	private void prepareSocialGraph() {
-		Session session = openSession();
+	    SocialPerson[] ps;
+	    try (Session session = openSession()) {
 		Transaction transaction = session.beginTransaction();
-		SocialPerson[] ps = new SocialPerson[7];
+		ps = new SocialPerson[7];
 		ps[0] = new SocialPerson( 0L, "Ross" );
 		ps[1] = new SocialPerson( 1L, "Chandler" );
 		ps[2] = new SocialPerson( 2L, "Joey" );
 		ps[3] = new SocialPerson( 3L, "Phoebe" );
 		ps[4] = new SocialPerson( 4L, "Monica" );
 		ps[5] = new SocialPerson( 5L, "Rachel" );
-
 		ps[6] = new SocialPerson( 6L, "Gunter" );
-
 		// Friends
 		for ( int i = 0; i < 6; i++ ) {
-			for ( int j = 0; j < 6; j++ ) {
-				if ( i != j ) {
-					ps[i].addFriends( ps[j] );
-				}
+		    for ( int j = 0; j < 6; j++ ) {
+			if ( i != j ) {
+			    ps[i].addFriends( ps[j] );
 			}
+		    }
 		}
-
 		// Lonely person
 		ps[6].addFriends( ps[5] );
-
-		for ( int i = 0; i < ps.length; i++ ) {
-			session.save( ps[i] );
-		}
-
-		transaction.commit();
-		session.close();
+		for (SocialPerson p : ps) {
+		    session.save(p);
+		}	transaction.commit();
+	    }
 		for ( int i = 1; i < ps.length; i++ ) {
 			assertEquals( 1, countWorksDoneOnPerson( Long.valueOf( i ) ) );
 		}

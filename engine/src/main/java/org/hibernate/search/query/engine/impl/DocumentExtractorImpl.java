@@ -96,47 +96,48 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		if ( projection == null ) {
 			// we're going to load hibernate entities
 			needId = true;
-			fields = new HashSet<String>( 2 ); // id + class
+			fields = new HashSet<>( 2 ); // id + class
 		}
 		else {
-			fields = new HashSet<String>( projection.length + 2 ); // we actually have no clue
+			fields = new HashSet<>( projection.length + 2 ); // we actually have no clue
 			for ( String projectionName : projection ) {
-				if ( projectionName == null ) {
+				if ( null == projectionName ) {
 					continue;
 				}
-				else if ( ProjectionConstants.THIS.equals( projectionName ) ) {
-					needId = true;
-					hasProjectionConstants = true;
-				}
-				else if ( ProjectionConstants.DOCUMENT.equals( projectionName ) ) {
-					// if we need to project DOCUMENT do not use fieldSelector as the user might want anything
-					allowFieldSelection = false;
-					needId = true;
-					hasProjectionConstants = true;
-					return;
-				}
-				else if ( ProjectionConstants.SCORE.equals( projectionName ) ) {
-					hasProjectionConstants = true;
-				}
-				else if ( ProjectionConstants.ID.equals( projectionName ) ) {
-					needId = true;
-					hasProjectionConstants = true;
-				}
-				else if ( ProjectionConstants.DOCUMENT_ID.equals( projectionName ) ) {
-					hasProjectionConstants = true;
-				}
-				else if ( ProjectionConstants.EXPLANATION.equals( projectionName ) ) {
-					hasProjectionConstants = true;
-				}
-				else if ( ProjectionConstants.OBJECT_CLASS.equals( projectionName ) ) {
-					hasProjectionConstants = true;
-				}
-				else if ( ProjectionConstants.SPATIAL_DISTANCE.equals( projectionName ) ) {
-					hasProjectionConstants = true;
-				}
-				else {
-					fields.add( projectionName );
-				}
+				else switch (projectionName) {
+			    	case ProjectionConstants.THIS:
+				    needId = true;
+				    hasProjectionConstants = true;
+				    break;
+			    	case ProjectionConstants.DOCUMENT:
+				    // if we need to project DOCUMENT do not use fieldSelector as the user might want anything
+				    allowFieldSelection = false;
+				    needId = true;
+				    hasProjectionConstants = true;
+				    return;
+			    	case ProjectionConstants.SCORE:
+				    hasProjectionConstants = true;
+				    break;
+			    	case ProjectionConstants.ID:
+				    needId = true;
+				    hasProjectionConstants = true;
+				    break;
+			    	case ProjectionConstants.DOCUMENT_ID:
+				    hasProjectionConstants = true;
+				    break;
+			    	case ProjectionConstants.EXPLANATION:
+				    hasProjectionConstants = true;
+				    break;
+			    	case ProjectionConstants.OBJECT_CLASS:
+				    hasProjectionConstants = true;
+				    break;
+			    	case ProjectionConstants.SPATIAL_DISTANCE:
+				    hasProjectionConstants = true;
+				    break;
+			    	default:
+				    fields.add( projectionName );
+				    break;
+			    }
 			}
 		}
 		if ( singleEntityBindingIfPossible == null ) {
@@ -194,35 +195,39 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			);
 			if ( hasProjectionConstants ) {
 				for ( int x = 0; x < projection.length; x++ ) {
-					if ( ProjectionConstants.SCORE.equals( projection[x] ) ) {
-						projected[x] = queryHits.score( scoreDocIndex );
-					}
-					else if ( ProjectionConstants.ID.equals( projection[x] ) ) {
-						projected[x] = id;
-					}
-					else if ( ProjectionConstants.DOCUMENT.equals( projection[x] ) ) {
-						projected[x] = document;
-					}
-					else if ( ProjectionConstants.DOCUMENT_ID.equals( projection[x] ) ) {
-						projected[x] = docId;
-					}
-					else if ( ProjectionConstants.EXPLANATION.equals( projection[x] ) ) {
-						projected[x] = queryHits.explain( scoreDocIndex );
-					}
-					else if ( ProjectionConstants.OBJECT_CLASS.equals( projection[x] ) ) {
-						projected[x] = type.getPojoType();
-					}
-					else if ( ProjectionConstants.SPATIAL_DISTANCE.equals( projection[x] ) ) {
-						projected[x] = queryHits.spatialDistance( scoreDocIndex );
-					}
-					else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
-						//THIS could be projected more than once
-						//THIS loading delayed to the Loader phase
-						// Use EntityInfo.ENTITY_PLACEHOLDER as placeholder.
-						// It will be replaced when we populate
-						// the EntityInfo with the real entity.
-						projected[x] = EntityInfo.ENTITY_PLACEHOLDER;
-					}
+					if ( null != projection[x] ) switch (projection[x]) {
+				    	case ProjectionConstants.SCORE:
+					    projected[x] = queryHits.score( scoreDocIndex );
+					    break;
+				    	case ProjectionConstants.ID:
+					    projected[x] = id;
+					    break;
+				    	case ProjectionConstants.DOCUMENT:
+					    projected[x] = document;
+					    break;
+				    	case ProjectionConstants.DOCUMENT_ID:
+					    projected[x] = docId;
+					    break;
+				    	case ProjectionConstants.EXPLANATION:
+					    projected[x] = queryHits.explain( scoreDocIndex );
+					    break;
+				    	case ProjectionConstants.OBJECT_CLASS:
+					    projected[x] = type.getPojoType();
+					    break;
+				    	case ProjectionConstants.SPATIAL_DISTANCE:
+					    projected[x] = queryHits.spatialDistance( scoreDocIndex );
+					    break;
+				    	case ProjectionConstants.THIS:
+					    //THIS could be projected more than once
+					    //THIS loading delayed to the Loader phase
+					    // Use EntityInfo.ENTITY_PLACEHOLDER as placeholder.
+					    // It will be replaced when we populate
+					    // the EntityInfo with the real entity.
+					    projected[x] = EntityInfo.ENTITY_PLACEHOLDER;
+					    break;
+				    	default:
+					    break;
+				    }
 				}
 			}
 		}

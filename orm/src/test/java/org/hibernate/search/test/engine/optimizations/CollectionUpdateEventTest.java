@@ -78,12 +78,11 @@ public class CollectionUpdateEventTest {
 	}
 
 	private void testScenario(boolean withClassBridgeOnItem, int depth, boolean withClassBridgeOnCatalog) {
-		FullTextSessionBuilder fulltextSessionBuilder = configure(
-				withClassBridgeOnItem,
-				depth,
-				withClassBridgeOnCatalog
-		);
-		try {
+		try (FullTextSessionBuilder fulltextSessionBuilder = configure(
+			withClassBridgeOnItem,
+			depth,
+			withClassBridgeOnCatalog
+		)) {
 			initializeData( fulltextSessionBuilder );
 			FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
 			try {
@@ -106,9 +105,6 @@ public class CollectionUpdateEventTest {
 			finally {
 				fullTextSession.close();
 			}
-		}
-		finally {
-			fulltextSessionBuilder.close();
 		}
 	}
 

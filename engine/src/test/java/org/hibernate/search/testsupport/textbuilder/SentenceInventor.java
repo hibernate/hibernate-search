@@ -114,7 +114,7 @@ public class SentenceInventor {
 	}
 
 	private WordDictionary randomDictionary(int size) {
-		Set<String> tree = new TreeSet<String>();
+		Set<String> tree = new TreeSet<>();
 		while ( tree.size() != size ) {
 			tree.add( randomTerm() );
 		}

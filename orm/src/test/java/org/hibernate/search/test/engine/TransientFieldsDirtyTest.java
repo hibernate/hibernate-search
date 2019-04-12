@@ -40,8 +40,7 @@ public class TransientFieldsDirtyTest extends SearchTestBase {
 	@TestForIssue(jiraKey = "HSEARCH-1096")
 	@Test
 	public void testTransientFieldsAreAlwaysDirty() {
-		Session session = openSession();
-		try {
+		try (Session session = openSession()) {
 			FormulaAdd f = new FormulaAdd();
 			f.id = 1L;
 			f.a = 1;
@@ -61,9 +60,6 @@ public class TransientFieldsDirtyTest extends SearchTestBase {
 			session.clear();
 
 			assertFormulaMatches( "5", session );
-		}
-		finally {
-			session.close();
 		}
 	}
 

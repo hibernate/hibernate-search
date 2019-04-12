@@ -24,7 +24,7 @@ public class ConnectedFacetContinuationContext implements FacetContinuationConte
 	@Override
 	public <T> FacetRangeAboveBelowContext<T> range() {
 		context.setRangeQuery( true );
-		return new ConnectedFacetRangeAboveBelowContext<T>( context );
+		return new ConnectedFacetRangeAboveBelowContext<>( context );
 	}
 
 	@Override

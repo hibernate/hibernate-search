@@ -115,7 +115,7 @@ public class DistanceCollector implements Collector {
 		int currentIterator = 0;
 
 		private SpatialResultsCollector(int size) {
-			orderedEntries = new ArrayList<HitEntry>( size );
+			orderedEntries = new ArrayList<>( size );
 		}
 
 		public Double get(int index, Point center) {

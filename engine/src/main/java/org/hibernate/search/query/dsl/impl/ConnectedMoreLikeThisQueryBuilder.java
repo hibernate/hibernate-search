@@ -97,7 +97,7 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 
 	private String[] getAllCompatibleFieldNames(DocumentBuilderIndexedEntity documentBuilder) {
 		Collection<DocumentFieldMetadata> allFieldMetadata = documentBuilder.getTypeMetadata().getAllDocumentFieldMetadata();
-		List<String> fieldNames = new ArrayList<String>( allFieldMetadata.size() );
+		List<String> fieldNames = new ArrayList<>( allFieldMetadata.size() );
 		for ( DocumentFieldMetadata fieldMetadata : allFieldMetadata ) {
 			boolean hasTermVector = fieldMetadata.getTermVector() != Field.TermVector.NO;
 			boolean isStored = fieldMetadata.getStore() != Store.NO;

@@ -86,7 +86,7 @@ public class PropertyMetadata implements PartialPropertyMetadata {
 	 */
 	@Deprecated
 	public List<DocumentFieldMetadata> getFieldMetadata() {
-		return new ArrayList<DocumentFieldMetadata>( documentFieldMetadataList );
+		return new ArrayList<>( documentFieldMetadataList );
 	}
 
 	public Set<DocumentFieldMetadata> getFieldMetadataSet() {

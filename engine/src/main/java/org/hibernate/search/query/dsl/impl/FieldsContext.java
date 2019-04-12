@@ -34,7 +34,7 @@ public class FieldsContext implements Iterable<FieldContext> {
 		if ( fieldNames == null ) {
 			fieldNames = NO_FIELD;
 		}
-		fieldContexts = new ArrayList<FieldContext>( fieldNames.length < 4 ? 4 : fieldNames.length );
+		fieldContexts = new ArrayList<>( fieldNames.length < 4 ? 4 : fieldNames.length );
 		for ( String fieldName : fieldNames ) {
 			doAdd( fieldName );
 		}

@@ -52,7 +52,7 @@ public abstract class AbstractDocumentBuilder {
 	private final InstanceInitializer instanceInitializer;
 
 	private boolean isRoot;
-	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
+	private Set<Class<?>> mappedSubclasses = new HashSet<>();
 
 	protected EntityState entityState;
 
@@ -132,7 +132,7 @@ public abstract class AbstractDocumentBuilder {
 		if ( entityState == EntityState.NON_INDEXABLE ) {
 			throw new AssertionFailure( "A non indexed entity is post processed" );
 		}
-		Set<Class<?>> tempMappedSubclasses = new HashSet<Class<?>>();
+		Set<Class<?>> tempMappedSubclasses = new HashSet<>();
 		//together with the caller this creates a o(2), but I think it's still faster than create the up hierarchy for each class
 		for ( Class<?> currentClass : indexedClasses ) {
 			if ( plainClass != currentClass && plainClass.isAssignableFrom( currentClass ) ) {

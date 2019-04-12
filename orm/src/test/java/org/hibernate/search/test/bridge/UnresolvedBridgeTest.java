@@ -22,9 +22,9 @@ public class UnresolvedBridgeTest {
 	public void testSerializableType() throws Exception {
 		Configuration cfg = new Configuration();
 
-		for ( int i = 0; i < getAnnotatedClasses().length; i++ ) {
-			cfg.addAnnotatedClass( getAnnotatedClasses()[i] );
-		}
+            for (Class<?> annotatedClasse : getAnnotatedClasses()) {
+                cfg.addAnnotatedClass(annotatedClasse);
+            }
 		cfg.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
 		try {
 			cfg.buildSessionFactory();

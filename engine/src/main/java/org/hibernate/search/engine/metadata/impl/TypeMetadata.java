@@ -266,7 +266,7 @@ public class TypeMetadata {
 			return documentFieldMetadata;
 		}
 		else {
-			Collection<DocumentFieldMetadata> allMetadata = new ArrayList<DocumentFieldMetadata>(
+			Collection<DocumentFieldMetadata> allMetadata = new ArrayList<>(
 					documentFieldMetadata.size()
 			);
 			for ( EmbeddedTypeMetadata element : embeddedTypeMetadata ) {
@@ -283,7 +283,7 @@ public class TypeMetadata {
 
 	// TODO HSEARCH-1867 change return type to set
 	public List<EmbeddedTypeMetadata> getEmbeddedTypeMetadata() {
-		return Collections.unmodifiableList( new ArrayList<EmbeddedTypeMetadata>( embeddedTypeMetadata ) );
+		return Collections.unmodifiableList( new ArrayList<>( embeddedTypeMetadata ) );
 	}
 
 	public Set<ContainedInMetadata> getContainedInMetadata() {
@@ -401,7 +401,7 @@ public class TypeMetadata {
 	}
 
 	private Map<String, PropertyMetadata> buildPropertyMetadataMap(Set<PropertyMetadata> propertyMetadataSet) {
-		Map<String, PropertyMetadata> tmpMap = new LinkedHashMap<String, PropertyMetadata>();
+		Map<String, PropertyMetadata> tmpMap = new LinkedHashMap<>();
 		for ( PropertyMetadata propertyMetadata : propertyMetadataSet ) {
 			tmpMap.put( propertyMetadata.getPropertyAccessorName(), propertyMetadata );
 		}
@@ -410,7 +410,7 @@ public class TypeMetadata {
 
 	private Set<DocumentFieldMetadata> collectFieldMetadata(Set<PropertyMetadata> propertyMetadataSet,
 			Set<DocumentFieldMetadata> classBridgeFields, PropertyMetadata idPropertyMetadata) {
-		Set<DocumentFieldMetadata> tmpSet = new LinkedHashSet<DocumentFieldMetadata>(); // Preserve order to make buildFieldMetadataMap deterministic
+		Set<DocumentFieldMetadata> tmpSet = new LinkedHashSet<>(); // Preserve order to make buildFieldMetadataMap deterministic
 		for ( PropertyMetadata propertyMetadata : propertyMetadataSet ) {
 			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadataSet() ) {
 				tmpSet.add( documentFieldMetadata );
@@ -431,7 +431,7 @@ public class TypeMetadata {
 	}
 
 	private Map<String, DocumentFieldMetadata> buildFieldMetadataMap(Set<DocumentFieldMetadata> documentFieldMetadataSet) {
-		Map<String, DocumentFieldMetadata> tmpMap = new LinkedHashMap<String, DocumentFieldMetadata>();
+		Map<String, DocumentFieldMetadata> tmpMap = new LinkedHashMap<>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataSet ) {
 			String name = documentFieldMetadata.getAbsoluteName();
 			if ( StringHelper.isEmpty( name ) ) {
@@ -453,7 +453,7 @@ public class TypeMetadata {
 	}
 
 	private Map<String, FacetMetadata> buildFacetMetadataMap(Collection<DocumentFieldMetadata> documentFieldMetadataCollection) {
-		Map<String, FacetMetadata> tmpMap = new LinkedHashMap<String, FacetMetadata>();
+		Map<String, FacetMetadata> tmpMap = new LinkedHashMap<>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataCollection ) {
 			for ( FacetMetadata facetMetadata : documentFieldMetadata.getFacetMetadata() ) {
 				tmpMap.put( facetMetadata.getAbsoluteName(), facetMetadata );
@@ -464,7 +464,7 @@ public class TypeMetadata {
 	}
 
 	private Map<String, BridgeDefinedField> buildBridgeDefinedFieldMetadataMap(Collection<DocumentFieldMetadata> documentFieldMetadataCollection) {
-		Map<String, BridgeDefinedField> tmpMap = new LinkedHashMap<String, BridgeDefinedField>();
+		Map<String, BridgeDefinedField> tmpMap = new LinkedHashMap<>();
 		for ( DocumentFieldMetadata documentFieldMetadata : documentFieldMetadataCollection ) {
 			for ( BridgeDefinedField bridgeDefinedField : documentFieldMetadata.getBridgeDefinedFields().values() ) {
 				tmpMap.put( bridgeDefinedField.getAbsoluteName(), bridgeDefinedField );
@@ -475,7 +475,7 @@ public class TypeMetadata {
 	}
 
 	private Map<String, DocumentFieldMetadata> copyClassBridgeMetadata(Set<DocumentFieldMetadata> classBridgeFields) {
-		Map<String, DocumentFieldMetadata> tmpMap = new LinkedHashMap<String, DocumentFieldMetadata>();
+		Map<String, DocumentFieldMetadata> tmpMap = new LinkedHashMap<>();
 		for ( DocumentFieldMetadata fieldMetadata : classBridgeFields ) {
 			tmpMap.put( fieldMetadata.getAbsoluteName(), fieldMetadata );
 		}
@@ -498,11 +498,11 @@ public class TypeMetadata {
 		private XMember discriminatorGetter;
 		private boolean stateInspectionOptimizationsEnabled = true;
 		private final Set<PropertyMetadata> propertyMetadataSet = new LinkedHashSet<>();
-		private final Set<DocumentFieldMetadata> classBridgeFields = new LinkedHashSet<DocumentFieldMetadata>();
-		private final Set<EmbeddedTypeMetadata> embeddedTypeMetadata = new LinkedHashSet<EmbeddedTypeMetadata>();
-		private final Set<ContainedInMetadata> containedInMetadata = new LinkedHashSet<ContainedInMetadata>();
-		private final Set<XClass> optimizationClassList = new LinkedHashSet<XClass>();
-		private final Set<String> collectionRoles = new TreeSet<String>();
+		private final Set<DocumentFieldMetadata> classBridgeFields = new LinkedHashSet<>();
+		private final Set<EmbeddedTypeMetadata> embeddedTypeMetadata = new LinkedHashSet<>();
+		private final Set<ContainedInMetadata> containedInMetadata = new LinkedHashSet<>();
+		private final Set<XClass> optimizationClassList = new LinkedHashSet<>();
+		private final Set<String> collectionRoles = new TreeSet<>();
 		private PropertyMetadata idPropertyMetadata;
 		private XProperty jpaProperty;
 		private final Set<SortableFieldMetadata> classBridgeSortableFieldMetadata = new LinkedHashSet<>();

@@ -32,7 +32,7 @@ public class ClassBridgeAndProjectionTest extends SearchTestBase {
 
 	@Test
 	public void testClassBridgeProjection() throws Exception {
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 
 		// create entities
@@ -74,7 +74,7 @@ public class ClassBridgeAndProjectionTest extends SearchTestBase {
 		Integer amountStudents = (Integer) firstResult[0];
 		assertEquals( Integer.valueOf( 2 ), amountStudents );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

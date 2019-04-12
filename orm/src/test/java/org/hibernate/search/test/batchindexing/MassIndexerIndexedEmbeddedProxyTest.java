@@ -91,8 +91,7 @@ public class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 	}
 
 	private void prepareEntities() {
-		Session session = openSession();
-		try {
+		try (Session session = openSession()) {
 			Transaction transaction = session.beginTransaction();
 
 			IndexedEmbeddedProxyLazyEntity lazyEntity = new IndexedEmbeddedProxyLazyEntity();
@@ -105,9 +104,6 @@ public class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 			session.save( rootEntity );
 
 			transaction.commit();
-		}
-		finally {
-			session.close();
 		}
 	}
 

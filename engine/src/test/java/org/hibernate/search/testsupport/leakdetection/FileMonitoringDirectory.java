@@ -26,8 +26,8 @@ import org.apache.lucene.store.RAMDirectory;
  */
 public class FileMonitoringDirectory extends RAMDirectory {
 
-	private final ConcurrentMap<IndexOutput,IndexOutput> openOutputs = new ConcurrentHashMap<IndexOutput, IndexOutput>( 10 );
-	private final ConcurrentMap<IndexInput,IndexInput> openInputs = new ConcurrentHashMap<IndexInput, IndexInput>( 40 );
+	private final ConcurrentMap<IndexOutput,IndexOutput> openOutputs = new ConcurrentHashMap<>( 10 );
+	private final ConcurrentMap<IndexInput,IndexInput> openInputs = new ConcurrentHashMap<>( 40 );
 
 	@Override
 	public IndexOutput createOutput(String name, IOContext context) throws IOException {

@@ -46,7 +46,7 @@ public class StandardServiceManager implements ServiceManager {
 
 	private final Properties properties;
 	private final BuildContext buildContext;
-	private final ConcurrentHashMap<Class<?>, ServiceWrapper<?>> cachedServices = new ConcurrentHashMap<Class<?>, ServiceWrapper<?>>();
+	private final ConcurrentHashMap<Class<?>, ServiceWrapper<?>> cachedServices = new ConcurrentHashMap<>();
 	private final Map<Class<? extends Service>, Object> providedServices;
 	private final Map<Class<? extends Service>, String> defaultServices;
 	private final ClassLoaderService classloaderService;
@@ -145,7 +145,7 @@ public class StandardServiceManager implements ServiceManager {
 		/*
 		 * Second pass to check for still-running services and forcefully stop them.
 		 */
-		List<String> unreleasedServicesToReport = failOnUnreleasedService ? new ArrayList<String>() : null;
+		List<String> unreleasedServicesToReport = failOnUnreleasedService ? new ArrayList<>() : null;
 		for ( ServiceWrapper<?> wrapper : cachedServices.values() ) {
 			synchronized ( wrapper ) {
 				if ( wrapper.status != ServiceStatus.STOPPED ) {
@@ -170,7 +170,7 @@ public class StandardServiceManager implements ServiceManager {
 	}
 
 	private Map<Class<? extends Service>, Object> createProvidedServices(SearchConfiguration searchConfiguration) {
-		Map<Class<? extends Service>, Object> tmpServices = new HashMap<Class<? extends Service>, Object>(
+		Map<Class<? extends Service>, Object> tmpServices = new HashMap<>(
 				searchConfiguration.getProvidedServices()
 				);
 
@@ -216,7 +216,7 @@ public class StandardServiceManager implements ServiceManager {
 			);
 		}
 		S service = services.iterator().next();
-		ServiceWrapper<S> wrapper = new ServiceWrapper<S>( service, serviceRole, buildContext );
+		ServiceWrapper<S> wrapper = new ServiceWrapper<>( service, serviceRole, buildContext );
 		@SuppressWarnings("unchecked")
 		ServiceWrapper<S> previousWrapper = (ServiceWrapper<S>) cachedServices.putIfAbsent( serviceRole, wrapper );
 		if ( previousWrapper != null ) {

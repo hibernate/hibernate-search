@@ -46,7 +46,7 @@ public class ClassBridgeMapping {
 	private ClassBridgeMapping(SearchMapping mapping, EntityDescriptor entity) {
 		this.mapping = mapping;
 		this.entity = entity;
-		this.classBridge = new HashMap<String, Object>();
+		this.classBridge = new HashMap<>();
 	}
 
 	public ClassBridgeMapping name(String name) {
@@ -80,21 +80,21 @@ public class ClassBridgeMapping {
 	}
 
 	public ClassBridgeMapping boost(float boost) {
-		final Map<String, Object> boostAnn = new HashMap<String, Object>();
+		final Map<String, Object> boostAnn = new HashMap<>();
 		boostAnn.put( "value", boost );
 		classBridge.put( "boost", boostAnn );
 		return this;
 	}
 
 	public ClassBridgeMapping analyzer(Class<?> analyzerClass) {
-		final Map<String, Object> analyzer = new HashMap<String, Object>();
+		final Map<String, Object> analyzer = new HashMap<>();
 		analyzer.put( "impl", analyzerClass );
 		classBridge.put( "analyzer", analyzer );
 		return this;
 	}
 
 	public ClassBridgeMapping analyzer(String analyzerDef) {
-		final Map<String, Object> analyzer = new HashMap<String, Object>();
+		final Map<String, Object> analyzer = new HashMap<>();
 		analyzer.put( "definition", analyzerDef );
 		classBridge.put( "analyzer", analyzer );
 		return this;

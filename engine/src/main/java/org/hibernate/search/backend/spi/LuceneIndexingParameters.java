@@ -65,7 +65,7 @@ public class LuceneIndexingParameters implements Serializable {
 
 		private static final long serialVersionUID = -6121723702279869524L;
 
-		final Map<IndexWriterSetting, Integer> parameters = new EnumMap<IndexWriterSetting, Integer>( IndexWriterSetting.class );
+		final Map<IndexWriterSetting, Integer> parameters = new EnumMap<>( IndexWriterSetting.class );
 
 		public ParameterSet(Properties prop) {
 			//don't iterate on property entries as we know all the keys:

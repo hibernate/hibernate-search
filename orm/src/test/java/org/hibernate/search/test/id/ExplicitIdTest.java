@@ -39,7 +39,7 @@ public class ExplicitIdTest extends SearchTestBase {
 		hello.setDocumentId( 1 );
 		hello.setText( "Hello World" );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.save( hello );
 		tx.commit();
@@ -47,11 +47,11 @@ public class ExplicitIdTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "text", "world" ) )
+			new TermQuery( new Term( "text", "world" ) )
 		).list();
 		assertEquals( 1, results.size() );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class ExplicitIdTest extends SearchTestBase {
 		goodbye.setDocumentId( 2 );
 		goodbye.setText( "Goodbye World" );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.save( hello );
 		s.save( goodbye );
@@ -78,11 +78,11 @@ public class ExplicitIdTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "text", "world" ) )
+			new TermQuery( new Term( "text", "world" ) )
 		).list();
 		assertEquals( 2, results.size() );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	/**
@@ -100,28 +100,27 @@ public class ExplicitIdTest extends SearchTestBase {
 		goodbye.setDocumentId( 1 );
 		goodbye.setText( "Goodbye World" );
 
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		s.save( hello );
-		s.save( goodbye );
-		tx.commit();
-		s.clear();
-
-		tx = s.beginTransaction();
-		try {
+		try (Session s = openSession()) {
+		    Transaction tx = s.beginTransaction();
+		    s.save( hello );
+		    s.save( goodbye );
+		    tx.commit();
+		    s.clear();
+		    tx = s.beginTransaction();
+		    try {
 			Search.getFullTextSession( s ).createFullTextQuery(
-					new TermQuery( new Term( "text", "world" ) )
+				new TermQuery( new Term( "text", "world" ) )
 			).list();
 			fail( "Test should fail, because document id is not unique." );
-		}
-		catch (SearchException e) {
+		    }
+		    catch (SearchException e) {
 			assertEquals(
-					"Loading entity of type org.hibernate.search.test.id.Article using 'documentId' as document id and '1' as value was not unique",
-					e.getMessage()
+				"Loading entity of type org.hibernate.search.test.id.Article using 'documentId' as document id and '1' as value was not unique",
+				e.getMessage()
 			);
+		    }
+		    tx.commit();
 		}
-		tx.commit();
-		s.close();
 	}
 
 	/**
@@ -135,7 +134,7 @@ public class ExplicitIdTest extends SearchTestBase {
 		hello.setDocumentId( 1 );
 		hello.setText( "Hello World" );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.save( hello );
 		tx.commit();
@@ -143,11 +142,11 @@ public class ExplicitIdTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
-				NumericRangeQuery.newLongRange( "articleId", hello.getArticleId(), hello.getArticleId(), true, true )
+			NumericRangeQuery.newLongRange( "articleId", hello.getArticleId(), hello.getArticleId(), true, true )
 		).list();
 		assertEquals( 1, results.size() );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

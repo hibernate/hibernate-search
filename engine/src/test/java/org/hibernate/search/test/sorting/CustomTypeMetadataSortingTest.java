@@ -110,12 +110,7 @@ public class CustomTypeMetadataSortingTest {
 
 		Query luceneQuery = factoryHolder.getSearchFactory().buildQueryBuilder().forEntity( PropertySet.class ).get().all().createQuery();
 
-		CustomTypeMetadata incorrectCustomMetadata = new CustomTypeMetadata() {
-			@Override
-			public Set<String> getSortableFields() {
-				return Collections.singleton( "properties.nonSortableField" );
-			}
-		};
+		CustomTypeMetadata incorrectCustomMetadata = () -> Collections.singleton( "properties.nonSortableField" );
 		IndexedTypeMap<CustomTypeMetadata> metadata = IndexedTypeMaps.hashMap();
 		metadata.put( PROPERTY_SET_TYPE_ID, incorrectCustomMetadata );
 		metadata.put( PERSON_TYPE_ID, new EmptyMetadata() );

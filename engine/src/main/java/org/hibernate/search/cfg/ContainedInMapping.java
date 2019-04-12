@@ -23,7 +23,7 @@ public class ContainedInMapping {
 		this.mapping = mapping;
 		this.property = property;
 		this.entity = entity;
-		Map<String, Object> containedIn = new HashMap<String, Object>();
+		Map<String, Object> containedIn = new HashMap<>();
 		property.setContainedIn( containedIn );
 	}
 

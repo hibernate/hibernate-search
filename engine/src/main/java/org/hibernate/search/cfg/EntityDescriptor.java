@@ -23,28 +23,28 @@ import org.hibernate.search.bridge.FieldBridge;
  */
 public class EntityDescriptor {
 	private Map<String, Object> indexed;
-	private final Map<PropertyKey, PropertyDescriptor> properties = new HashMap<PropertyKey, PropertyDescriptor>();
+	private final Map<PropertyKey, PropertyDescriptor> properties = new HashMap<>();
 	private Map<String, Object> boost;
 	private Map<String, Object> analyzerDiscriminator;
-	private final Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
+	private final Set<Map<String, Object>> fullTextFilterDefs = new HashSet<>();
 	private Map<String, Object> providedId;
 
 	/**
 	 * Configured class bridges. Each bridge is represented by a map with {@code @ClassBridge} annotation member values
 	 * keyed by annotation member name.
 	 */
-	private final Set<Map<String, Object>> classBridges = new HashSet<Map<String, Object>>();
+	private final Set<Map<String, Object>> classBridges = new HashSet<>();
 
 	/**
 	 * Class bridge instances and their configuration
 	 */
-	private final Map<FieldBridge, Map<String, Object>> classBridgeInstanceDefs = new IdentityHashMap<FieldBridge, Map<String,Object>>();
+	private final Map<FieldBridge, Map<String, Object>> classBridgeInstanceDefs = new IdentityHashMap<>();
 
 	/**
 	 * Class bridge instances and their configuration in form of a {@code ClassBridge} annotation
 	 */
-	private final Map<FieldBridge, ClassBridge> classBridgeConfigurations = new IdentityHashMap<FieldBridge, ClassBridge>();
-	private final Set<Map<String, Object>> spatials = new HashSet<Map<String, Object>>();
+	private final Map<FieldBridge, ClassBridge> classBridgeConfigurations = new IdentityHashMap<>();
+	private final Set<Map<String, Object>> spatials = new HashSet<>();
 	private Map<String, Object> dynamicBoost;
 
 	public Map<String, Object> getIndexed() {

@@ -51,9 +51,9 @@ public final class Generator {
 		generated.append( "}\n" );
 		File f = new File( "./Generated.java" );
 		try {
-			OutputStreamWriter fw = new OutputStreamWriter( new FileOutputStream( f ), "UTF-8" );
+		    try (OutputStreamWriter fw = new OutputStreamWriter( new FileOutputStream( f ), "UTF-8" )) {
 			fw.write( generated.toString() );
-			fw.close();
+		    }
 		}
 		catch (IOException e) {
 			System.out.println( "Error while generating classes" );

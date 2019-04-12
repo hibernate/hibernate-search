@@ -35,7 +35,7 @@ public class ImplicitIdTest extends SearchTestBase {
 		Animal dog = new Animal();
 		dog.setName( "Dog" );
 
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		Transaction tx = s.beginTransaction();
 		s.save( dog );
 		tx.commit();
@@ -43,11 +43,11 @@ public class ImplicitIdTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "name", "dog" ) )
+			new TermQuery( new Term( "name", "dog" ) )
 		).list();
 		assertEquals( 1, results.size() );
 		tx.commit();
-		s.close();
+	    }
 	}
 
 	@Override

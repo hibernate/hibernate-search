@@ -42,41 +42,41 @@ public class SearchIndexerTest {
 	 */
 	@Test
 	public void testEntityHierarchy() {
-		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
-				.addAnnotatedClass( ModernBook.class )
-				.addAnnotatedClass( AncientBook.class )
-				.addAnnotatedClass( Dvd.class )
-				.addAnnotatedClass( Book.class )
-				.addAnnotatedClass( Nation.class )
-				.build();
+	    try (FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
+		    .addAnnotatedClass( ModernBook.class )
+		    .addAnnotatedClass( AncientBook.class )
+		    .addAnnotatedClass( Dvd.class )
+		    .addAnnotatedClass( Book.class )
+		    .addAnnotatedClass( Nation.class )
+		    .build()) {
 		FullTextSession fullTextSession = ftsb.openFullTextSession();
 		SearchIntegrator integrator = fullTextSession.getSearchFactory().unwrap( SearchIntegrator.class );
 		{
-			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( integrator, Book.class );
-			assertTrue( tsii.getRootEntities().contains( Book.class ) );
-			assertFalse( tsii.getRootEntities().contains( ModernBook.class ) );
-			assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
+		    TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( integrator, Book.class );
+		    assertTrue( tsii.getRootEntities().contains( Book.class ) );
+		    assertFalse( tsii.getRootEntities().contains( ModernBook.class ) );
+		    assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
 		}
 		{
-			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl(
-					integrator,
-					ModernBook.class,
-					AncientBook.class,
-					Book.class
-			);
-			assertTrue( tsii.getRootEntities().contains( Book.class ) );
-			assertFalse( tsii.getRootEntities().contains( ModernBook.class ) );
-			assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
+		    TestableMassIndexerImpl tsii = new TestableMassIndexerImpl(
+			    integrator,
+			    ModernBook.class,
+			    AncientBook.class,
+			    Book.class
+		    );
+		    assertTrue( tsii.getRootEntities().contains( Book.class ) );
+		    assertFalse( tsii.getRootEntities().contains( ModernBook.class ) );
+		    assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
 		}
 		{
-			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl(
-					integrator,
-					ModernBook.class,
-					AncientBook.class
-			);
-			assertFalse( tsii.getRootEntities().contains( Book.class ) );
-			assertTrue( tsii.getRootEntities().contains( ModernBook.class ) );
-			assertTrue( tsii.getRootEntities().contains( AncientBook.class ) );
+		    TestableMassIndexerImpl tsii = new TestableMassIndexerImpl(
+			    integrator,
+			    ModernBook.class,
+			    AncientBook.class
+		    );
+		    assertFalse( tsii.getRootEntities().contains( Book.class ) );
+		    assertTrue( tsii.getRootEntities().contains( ModernBook.class ) );
+		    assertTrue( tsii.getRootEntities().contains( AncientBook.class ) );
 		}
 		//verify that indexing Object will result in one separate indexer working per root indexed entity
 		{
@@ -86,9 +86,9 @@ public class SearchIndexerTest {
 			assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
 			assertFalse( tsii.getRootEntities().contains( Object.class ) );
 			assertEquals( 2, tsii.getRootEntities().size() );
-		}
+		    }
 		fullTextSession.close();
-		ftsb.close();
+	    }
 	}
 
 	private static class TestableMassIndexerImpl extends MassIndexerImpl {
@@ -109,124 +109,124 @@ public class SearchIndexerTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-901")
 	public void testIdentifierNaming() throws InterruptedException {
-		//disable automatic indexing, to test manual index creation.
-		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
-				.setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
-				.addAnnotatedClass( Dvd.class )
-				.addAnnotatedClass( Nation.class )
-				.addAnnotatedClass( Book.class )
-				.addAnnotatedClass( WeirdlyIdentifiedEntity.class )
-				.setProperty( Environment.INDEXING_STRATEGY, "manual" )
-				.build();
+	    try ( //disable automatic indexing, to test manual index creation.
+		    FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
+			    .setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
+			    .addAnnotatedClass( Dvd.class )
+			    .addAnnotatedClass( Nation.class )
+			    .addAnnotatedClass( Book.class )
+			    .addAnnotatedClass( WeirdlyIdentifiedEntity.class )
+			    .setProperty( Environment.INDEXING_STRATEGY, "manual" )
+			    .build()) {
 		{
-			//creating the test data in database only:
-			FullTextSession fullTextSession = ftsb.openFullTextSession();
-			Transaction transaction = fullTextSession.beginTransaction();
-			Nation us = new Nation( "United States of America", "US" );
-			fullTextSession.persist( us );
-			Dvd dvda = new Dvd();
-			dvda.setTitle( "Star Trek (episode 96367)" );
-			dvda.setFirstPublishedIn( us );
-			fullTextSession.save( dvda );
-			Dvd dvdb = new Dvd();
-			dvdb.setTitle( "The Trek" );
-			dvdb.setFirstPublishedIn( us );
-			fullTextSession.save( dvdb );
-			WeirdlyIdentifiedEntity entity = new WeirdlyIdentifiedEntity();
-			entity.setId( "not an identifier" );
-			fullTextSession.save( entity );
-			transaction.commit();
-			fullTextSession.close();
+		    //creating the test data in database only:
+		    FullTextSession fullTextSession = ftsb.openFullTextSession();
+		    Transaction transaction = fullTextSession.beginTransaction();
+		    Nation us = new Nation( "United States of America", "US" );
+		    fullTextSession.persist( us );
+		    Dvd dvda = new Dvd();
+		    dvda.setTitle( "Star Trek (episode 96367)" );
+		    dvda.setFirstPublishedIn( us );
+		    fullTextSession.save( dvda );
+		    Dvd dvdb = new Dvd();
+		    dvdb.setTitle( "The Trek" );
+		    dvdb.setFirstPublishedIn( us );
+		    fullTextSession.save( dvdb );
+		    WeirdlyIdentifiedEntity entity = new WeirdlyIdentifiedEntity();
+		    entity.setId( "not an identifier" );
+		    fullTextSession.save( entity );
+		    transaction.commit();
+		    fullTextSession.close();
 		}
 		{
-			//verify index is still empty:
-			assertEquals( 0, countResults( new TermQuery( new Term( "title", "trek" ) ), ftsb, Dvd.class ) );
-			assertEquals(
-					0, countResults( new TermQuery( new Term( "id", "not" ) ), ftsb, WeirdlyIdentifiedEntity.class )
-			);
+		    //verify index is still empty:
+		    assertEquals( 0, countResults( new TermQuery( new Term( "title", "trek" ) ), ftsb, Dvd.class ) );
+		    assertEquals(
+			    0, countResults( new TermQuery( new Term( "id", "not" ) ), ftsb, WeirdlyIdentifiedEntity.class )
+		    );
 		}
 		{
-			FullTextSession fullTextSession = ftsb.openFullTextSession();
-			fullTextSession.createIndexer( Dvd.class )
-					.startAndWait();
-			fullTextSession.close();
+		    FullTextSession fullTextSession = ftsb.openFullTextSession();
+		    fullTextSession.createIndexer( Dvd.class )
+			    .startAndWait();
+		    fullTextSession.close();
 		}
 		{
-			//verify index is now containing both DVDs:
-			assertEquals( 2, countResults( new TermQuery( new Term( "title", "trek" ) ), ftsb, Dvd.class ) );
+		    //verify index is now containing both DVDs:
+		    assertEquals( 2, countResults( new TermQuery( new Term( "title", "trek" ) ), ftsb, Dvd.class ) );
 		}
 		{
-			FullTextSession fullTextSession = ftsb.openFullTextSession();
-			fullTextSession.createIndexer( WeirdlyIdentifiedEntity.class )
-					.startAndWait();
-			fullTextSession.close();
+		    FullTextSession fullTextSession = ftsb.openFullTextSession();
+		    fullTextSession.createIndexer( WeirdlyIdentifiedEntity.class )
+			    .startAndWait();
+		    fullTextSession.close();
 		}
 		{
-			//verify index is now containing the weirdly identified entity:
-			assertEquals(
-					1,
-					countResults( new TermQuery( new Term( "id", "identifier" ) ), ftsb, WeirdlyIdentifiedEntity.class )
-			);
+		    //verify index is now containing the weirdly identified entity:
+		    assertEquals(
+			    1,
+			    countResults( new TermQuery( new Term( "id", "identifier" ) ), ftsb, WeirdlyIdentifiedEntity.class )
+		    );
 		}
-		ftsb.close();
+	    }
 	}
 
 	@Test
 	public void testExtendedIdentifierNaming() throws InterruptedException {
-		//disable automatic indexing, to test manual index creation.
-		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
-				.setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
-				.addAnnotatedClass( ExtendedIssueEntity.class )
-				.addAnnotatedClass( IssueEntity.class )
-				.setProperty( Environment.INDEXING_STRATEGY, "manual" )
-				.build();
+	    try ( //disable automatic indexing, to test manual index creation.
+		    FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
+			    .setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
+			    .addAnnotatedClass( ExtendedIssueEntity.class )
+			    .addAnnotatedClass( IssueEntity.class )
+			    .setProperty( Environment.INDEXING_STRATEGY, "manual" )
+			    .build()) {
 		{
-			//creating the test data in database only:
-			FullTextSession fullTextSession = ftsb.openFullTextSession();
-			Transaction transaction = fullTextSession.beginTransaction();
-			ExtendedIssueEntity issue = new ExtendedIssueEntity();
-			issue.jiraCode = "HSEARCH-977";
-			issue.jiraDescription = "MassIndexer freezes when there is an indexed 'id' filed, which is not document's id";
-			issue.id = 1l;
-			fullTextSession.persist( issue );
-			transaction.commit();
-			fullTextSession.close();
+		    //creating the test data in database only:
+		    FullTextSession fullTextSession = ftsb.openFullTextSession();
+		    Transaction transaction = fullTextSession.beginTransaction();
+		    ExtendedIssueEntity issue = new ExtendedIssueEntity();
+		    issue.jiraCode = "HSEARCH-977";
+		    issue.jiraDescription = "MassIndexer freezes when there is an indexed 'id' filed, which is not document's id";
+		    issue.id = 1l;
+		    fullTextSession.persist( issue );
+		    transaction.commit();
+		    fullTextSession.close();
 		}
 		{
-			//verify index is still empty:
-			assertEquals(
-					0, countResults(
-							new TermQuery( new Term( "jiraDescription", "freezes" ) ), ftsb, ExtendedIssueEntity.class
-					)
-			);
-			assertEquals(
-					0,
-					countResults( new TermQuery( new Term( "jiraCode", "HSEARCH" ) ), ftsb, ExtendedIssueEntity.class )
-			);
+		    //verify index is still empty:
+		    assertEquals(
+			    0, countResults(
+				    new TermQuery( new Term( "jiraDescription", "freezes" ) ), ftsb, ExtendedIssueEntity.class
+			    )
+		    );
+		    assertEquals(
+			    0,
+			    countResults( new TermQuery( new Term( "jiraCode", "HSEARCH" ) ), ftsb, ExtendedIssueEntity.class )
+		    );
 		}
 		{
-			FullTextSession fullTextSession = ftsb.openFullTextSession();
-			fullTextSession.createIndexer( ExtendedIssueEntity.class )
-					.startAndWait();
-			fullTextSession.close();
+		    FullTextSession fullTextSession = ftsb.openFullTextSession();
+		    fullTextSession.createIndexer( ExtendedIssueEntity.class )
+			    .startAndWait();
+		    fullTextSession.close();
 		}
 		{
-			//verify index via term readers:
-			assertEquals(
-					1,
-					countResults(
-							new TermQuery( new Term( "jiraDescription", "freezes" ) ), ftsb, ExtendedIssueEntity.class
-					)
-			);
-
-			assertEquals(
-					1,
-					countResults(
-							NumericRangeQuery.newLongRange( "id", 1l, 1l, true, true ), ftsb, ExtendedIssueEntity.class
-					)
-			);
+		    //verify index via term readers:
+		    assertEquals(
+			    1,
+			    countResults(
+				    new TermQuery( new Term( "jiraDescription", "freezes" ) ), ftsb, ExtendedIssueEntity.class
+			    )
+		    );
+		    
+		    assertEquals(
+			    1,
+			    countResults(
+				    NumericRangeQuery.newLongRange( "id", 1l, 1l, true, true ), ftsb, ExtendedIssueEntity.class
+			    )
+		    );
 		}
-		ftsb.close();
+	    }
 	}
 
 	@Test

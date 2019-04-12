@@ -40,15 +40,17 @@ public class FacetComparators {
 
 		@Override
 		public int compare(Facet facet1, Facet facet2) {
-			if ( FacetSortOrder.COUNT_ASC.equals( sortOder ) ) {
-				return facet1.getCount() - facet2.getCount();
+			if ( null == sortOder ) {
+			    return facet1.getValue().compareTo( facet2.getValue() );
 			}
-			else if ( FacetSortOrder.COUNT_DESC.equals( sortOder ) ) {
-				return facet2.getCount() - facet1.getCount();
-			}
-			else {
-				return facet1.getValue().compareTo( facet2.getValue() );
-			}
+			else switch (sortOder) {
+		    	case COUNT_ASC:
+			    return facet1.getCount() - facet2.getCount();
+		    	case COUNT_DESC:
+			    return facet2.getCount() - facet1.getCount();
+		    	default:
+			    return facet1.getValue().compareTo( facet2.getValue() );
+		    }
 		}
 	}
 

@@ -48,8 +48,7 @@ public class ConcurrentFlushTest extends SearchTestBase {
 
 		@Override
 		public void run() {
-			Session session = sessionFactory.openSession();
-			try {
+			try (Session session = sessionFactory.openSession()) {
 				Transaction transaction = session.beginTransaction();
 				try {
 					FlushedStuff stuff = new FlushedStuff();
@@ -64,9 +63,6 @@ public class ConcurrentFlushTest extends SearchTestBase {
 			}
 			catch (HibernateException e) {
 				e.printStackTrace();
-			}
-			finally {
-				session.close();
 			}
 		}
 	}

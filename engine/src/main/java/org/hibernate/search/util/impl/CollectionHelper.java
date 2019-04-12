@@ -33,31 +33,31 @@ public final class CollectionHelper {
 	}
 
 	public static <K, V> HashMap<K, V> newHashMap() {
-		return new HashMap<K, V>();
+		return new HashMap<>();
 	}
 
 	public static <K, V> HashMap<K, V> newHashMap(int size) {
-		return new HashMap<K, V>( size );
+		return new HashMap<>( size );
 	}
 
 	public static <K, V> SortedMap<K, V> newSortedMap() {
-		return new TreeMap<K, V>();
+		return new TreeMap<>();
 	}
 
 	public static <T> HashSet<T> newHashSet() {
-		return new HashSet<T>();
+		return new HashSet<>();
 	}
 
 	public static <T> ArrayList<T> newArrayList() {
-		return new ArrayList<T>();
+		return new ArrayList<>();
 	}
 
 	public static <T> ArrayList<T> newArrayList(final int size) {
-		return new ArrayList<T>( size );
+		return new ArrayList<>( size );
 	}
 
 	public static <T> Set<T> asSet(T... ts) {
-		HashSet<T> set = new HashSet<T>( ts.length );
+		HashSet<T> set = new HashSet<>( ts.length );
 		Collections.addAll( set, ts );
 		return set;
 	}
@@ -109,12 +109,7 @@ public final class CollectionHelper {
 	}
 
 	public static <T> Iterable<T> flatten(Iterable<? extends Iterable<T>> nonFlat) {
-		return new Iterable<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return flatten( nonFlat.iterator() );
-			}
-		};
+		return () -> flatten( nonFlat.iterator() );
 	}
 
 	public static <T> Iterator<T> flatten(Iterator<? extends Iterable<T>> nonFlat) {

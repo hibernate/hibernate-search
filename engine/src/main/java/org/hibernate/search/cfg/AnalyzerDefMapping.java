@@ -23,10 +23,10 @@ public class AnalyzerDefMapping {
 
 	AnalyzerDefMapping(String name, String tokenizerName, Class<? extends TokenizerFactory> tokenizerFactory, SearchMapping mapping) {
 		this.mapping = mapping;
-		this.analyzerDef = new HashMap<String, Object>();
+		this.analyzerDef = new HashMap<>();
 		mapping.addAnalyzerDef( analyzerDef );
 		analyzerDef.put( "name", name );
-		tokenizer = new HashMap<String, Object>();
+		tokenizer = new HashMap<>();
 		tokenizer.put( "name", tokenizerName );
 		tokenizer.put( "factory", tokenizerFactory );
 		analyzerDef.put( "tokenizer", tokenizer );

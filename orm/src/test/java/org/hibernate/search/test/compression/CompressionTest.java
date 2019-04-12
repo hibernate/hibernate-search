@@ -191,16 +191,16 @@ public class CompressionTest extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		Session s = openSession();
+	    try (Session s = openSession()) {
 		s.getTransaction().begin();
 		s.persist(
-				new LargeDocument(
-						"Hibernate in Action, third edition",
-						"JPA2 with Hibernate",
-						"This is a placeholder for the new text that you should write"
-				)
+			new LargeDocument(
+				"Hibernate in Action, third edition",
+				"JPA2 with Hibernate",
+				"This is a placeholder for the new text that you should write"
+			)
 		);
 		s.getTransaction().commit();
-		s.close();
+	    }
 	}
 }

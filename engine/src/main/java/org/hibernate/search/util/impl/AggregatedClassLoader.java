@@ -29,7 +29,7 @@ public class AggregatedClassLoader extends ClassLoader {
 
 	@Override
 	public Enumeration<URL> getResources(String name) throws IOException {
-		final HashSet<URL> resourceUrls = new HashSet<URL>();
+		final HashSet<URL> resourceUrls = new HashSet<>();
 
 		for ( ClassLoader classLoader : individualClassLoaders ) {
 			final Enumeration<URL> urls = classLoader.getResources( name );

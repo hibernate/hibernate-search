@@ -52,7 +52,7 @@ public class AnalyzerTest {
 		germanArticle.setId( 1 );
 		germanArticle.setLanguage( "de" );
 		germanArticle.setText( "aufeinanderschl\u00FCgen" );
-		Set<Article> references = new HashSet<Article>();
+		Set<Article> references = new HashSet<>();
 		references.add( germanArticle );
 
 		Article englishArticle = new Article();

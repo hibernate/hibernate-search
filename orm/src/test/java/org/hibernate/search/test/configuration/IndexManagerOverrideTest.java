@@ -36,12 +36,12 @@ public class IndexManagerOverrideTest {
 
 	@Test
 	public void verifyIndexExclusivity() {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+	    try (FullTextSessionBuilder builder = new FullTextSessionBuilder()) {
 		FullTextSession ftSession = builder
 			.setProperty( "hibernate.search.Book.indexmanager", "near-real-time" )
 			.setProperty(
-					"hibernate.search." + Foo.class.getName() + ".indexmanager",
-					FooIndexManager.class.getName()
+				"hibernate.search." + Foo.class.getName() + ".indexmanager",
+				FooIndexManager.class.getName()
 			)
 			.addAnnotatedClass( BlogEntry.class )
 			.addAnnotatedClass( Foo.class )
@@ -54,17 +54,16 @@ public class IndexManagerOverrideTest {
 
 		//checks for the default implementation
 		checkIndexManagerType( allIndexesManager, "org.hibernate.search.test.configuration.BlogEntry",
-				org.hibernate.search.indexes.spi.DirectoryBasedIndexManager.class );
-
+			org.hibernate.search.indexes.spi.DirectoryBasedIndexManager.class );
+		
 		//Uses "NRT" taken from shortcut names
 		checkIndexManagerType( allIndexesManager, "Book",
-				org.hibernate.search.indexes.impl.NRTIndexManager.class );
-
+			org.hibernate.search.indexes.impl.NRTIndexManager.class );
+		
 		//Uses a fully qualified name to load an implementation
 		checkIndexManagerType( allIndexesManager, Foo.class.getName(),
-				FooIndexManager.class );
-
-		builder.close();
+			FooIndexManager.class );
+	    }
 	}
 
 	private void checkIndexManagerType(IndexManagerHolder allIndexesManager, String name, Class expectedType) {

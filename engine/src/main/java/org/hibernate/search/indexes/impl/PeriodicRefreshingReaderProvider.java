@@ -54,12 +54,12 @@ public class PeriodicRefreshingReaderProvider implements DirectoryBasedReaderPro
 	/**
 	 * contains all Readers (most current per Directory and all unclosed old readers)
 	 */
-	protected final Map<IndexReader, ReaderUsagePair> allReaders = new ConcurrentHashMap<IndexReader, ReaderUsagePair>();
+	protected final Map<IndexReader, ReaderUsagePair> allReaders = new ConcurrentHashMap<>();
 
 	/**
 	 * contains last updated Reader; protected by lockOnOpenLatest (in the values)
 	 */
-	protected final Map<Directory, PerDirectoryLatestReader> currentReaders = new ConcurrentHashMap<Directory, PerDirectoryLatestReader>();
+	protected final Map<Directory, PerDirectoryLatestReader> currentReaders = new ConcurrentHashMap<>();
 
 	private volatile ScheduledExecutorService scheduledExecutorService;
 	private int delay;
