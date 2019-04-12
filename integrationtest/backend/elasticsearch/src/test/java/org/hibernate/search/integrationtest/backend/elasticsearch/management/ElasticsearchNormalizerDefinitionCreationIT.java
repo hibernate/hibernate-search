@@ -92,8 +92,7 @@ public class ElasticsearchNormalizerDefinitionCreationIT {
 		withManagementStrategyConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> { },
-						indexMapping -> { }
+						ctx -> { }
 				)
 				.setup();
 	}

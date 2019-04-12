@@ -123,6 +123,10 @@ public class SearchSetupHelper implements TestRule {
 			return withIndex( rawIndexName, ignored -> { }, mappingContributor, listener );
 		}
 
+		public SetupContext withIndex(String rawIndexName, Consumer<? super IndexedEntityBindingContext> mappingContributor) {
+			return withIndex( rawIndexName, mappingContributor, ignored -> { } );
+		}
+
 		public SetupContext withIndex(String rawIndexName,
 				Consumer<? super StubIndexMappingContext> optionsContributor,
 				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {

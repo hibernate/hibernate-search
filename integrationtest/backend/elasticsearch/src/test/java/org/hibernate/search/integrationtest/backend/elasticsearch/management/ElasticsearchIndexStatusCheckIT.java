@@ -139,8 +139,7 @@ public class ElasticsearchIndexStatusCheckIT {
 		withManagementStrategyConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> { },
-						indexMapping -> { }
+						ctx -> { }
 				)
 				.setup();
 	}

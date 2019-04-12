@@ -135,8 +135,7 @@ public class ElasticsearchSchemaValidationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
 									.toReference();
-						},
-						indexManager -> { }
+						}
 				)
 				.withIndex(
 						INDEX2_NAME,
@@ -144,8 +143,7 @@ public class ElasticsearchSchemaValidationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
 									.toReference();
-						},
-						indexManager -> { }
+						}
 				)
 				.withIndex(
 						INDEX3_NAME,
@@ -156,8 +154,7 @@ public class ElasticsearchSchemaValidationIT {
 									f -> f.asString().analyzer( "default" )
 							)
 									.toReference();
-						},
-						indexManager -> { }
+						}
 				)
 				.setup();
 		// TODO add an index with a faceted field once we restore support for faceting; see HSEARCH-3271
@@ -359,8 +356,7 @@ public class ElasticsearchSchemaValidationIT {
 											f -> f.asString().analyzer( "default" )
 									)
 											.toReference();
-								},
-								indexManager -> { }
+								}
 						)
 						.setup(),
 				FailureReportUtils.buildFailureReportPattern()
@@ -401,8 +397,7 @@ public class ElasticsearchSchemaValidationIT {
 											// TODO disable norms once the APIs allow it; see HSEARCH-3048
 									)
 											.toReference();
-								},
-								indexManager -> { }
+								}
 						)
 						.setup(),
 				FailureReportUtils.buildFailureReportPattern()
@@ -437,8 +432,6 @@ public class ElasticsearchSchemaValidationIT {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() )
 											.toReference();
-								},
-								indexManager -> {
 								}
 						)
 						.setup(),
@@ -491,8 +484,6 @@ public class ElasticsearchSchemaValidationIT {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() )
 											.toReference();
-								},
-								indexManager -> {
 								}
 						)
 						.setup(),
@@ -570,8 +561,6 @@ public class ElasticsearchSchemaValidationIT {
 									.toReference();
 							root.field( "myTextField", f -> f.asString().analyzer( "default" ) )
 									.toReference();
-						},
-						indexManager -> {
 						}
 				)
 				.setup();
@@ -613,8 +602,6 @@ public class ElasticsearchSchemaValidationIT {
 									objectField.field( "myField", f -> f.asLocalDate() )
 											.toReference();
 									objectField.toReference();
-								},
-								indexManager -> {
 								}
 						)
 						.setup(),
@@ -690,8 +677,7 @@ public class ElasticsearchSchemaValidationIT {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString() )
 											.toReference();
-								},
-								indexManager -> { }
+								}
 						)
 						.withIndex(
 								INDEX2_NAME,
@@ -699,8 +685,7 @@ public class ElasticsearchSchemaValidationIT {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString() )
 											.toReference();
-								},
-								indexManager -> { }
+								}
 						)
 						.setup(),
 				FailureReportUtils.buildFailureReportPattern()
@@ -855,8 +840,6 @@ public class ElasticsearchSchemaValidationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString() )
 									.toReference();
-						},
-						indexManager -> {
 						}
 				)
 				.setup();
@@ -870,8 +853,6 @@ public class ElasticsearchSchemaValidationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
 									.toReference();
-						},
-						indexManager -> {
 						}
 				)
 				.setup();

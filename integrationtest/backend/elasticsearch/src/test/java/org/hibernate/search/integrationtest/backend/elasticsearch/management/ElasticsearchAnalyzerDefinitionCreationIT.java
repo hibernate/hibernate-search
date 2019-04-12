@@ -116,8 +116,7 @@ public class ElasticsearchAnalyzerDefinitionCreationIT {
 		withManagementStrategyConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> { },
-						indexMapping -> { }
+						ctx -> { }
 				)
 				.setup();
 	}

@@ -203,8 +203,7 @@ public class ElasticsearchSchemaCreationIT {
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,
-						mappingContributor,
-						indexManager -> { }
+						mappingContributor
 				)
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,

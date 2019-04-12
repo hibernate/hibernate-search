@@ -82,8 +82,7 @@ public class ElasticsearchSchemaCreateStrategyIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "field", f -> f.asString() )
 									.toReference();
-						},
-						indexManager -> { }
+						}
 				)
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,

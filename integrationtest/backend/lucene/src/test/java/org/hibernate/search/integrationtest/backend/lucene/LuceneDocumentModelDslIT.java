@@ -63,8 +63,7 @@ public class LuceneDocumentModelDslIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						mappingContributor,
-						indexManager -> { }
+						mappingContributor
 				)
 				.setup();
 	}

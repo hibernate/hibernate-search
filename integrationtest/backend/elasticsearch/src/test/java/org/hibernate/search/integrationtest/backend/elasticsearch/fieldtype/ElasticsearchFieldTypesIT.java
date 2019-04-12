@@ -64,9 +64,7 @@ public class ElasticsearchFieldTypesIT {
 				)
 				.withIndex(
 						INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> {
-						}
+						ctx -> new IndexMapping( ctx.getSchemaElement() )
 				)
 				.setup();
 
