@@ -115,8 +115,7 @@ public class ElasticsearchSchemaMigrationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
 									.toReference();
-						},
-						indexManager -> { }
+						}
 				)
 				.withIndex(
 						INDEX2_NAME,
@@ -124,8 +123,7 @@ public class ElasticsearchSchemaMigrationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
 									.toReference();
-						},
-						indexManager -> { }
+						}
 				)
 				.withIndex(
 						INDEX3_NAME,
@@ -146,8 +144,7 @@ public class ElasticsearchSchemaMigrationIT {
 									f -> f.asString().normalizer( "customNormalizer" )
 							)
 									.toReference();
-						},
-						indexManager -> { }
+						}
 				)
 				.setup();
 
@@ -216,8 +213,7 @@ public class ElasticsearchSchemaMigrationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
 									.toReference();
-						},
-						indexManager -> { }
+						}
 				)
 				.setup();
 
@@ -262,8 +258,7 @@ public class ElasticsearchSchemaMigrationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
 									.toReference();
-						},
-						indexManager -> { }
+						}
 				)
 				.setup();
 
@@ -307,8 +302,7 @@ public class ElasticsearchSchemaMigrationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
 									.toReference();
-						},
-						indexManager -> { }
+						}
 				)
 				.setup();
 
@@ -355,8 +349,7 @@ public class ElasticsearchSchemaMigrationIT {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() )
 											.toReference();
-								},
-								indexManager -> { }
+								}
 						)
 						.setup(),
 				FailureReportUtils.buildFailureReportPattern()
@@ -400,8 +393,7 @@ public class ElasticsearchSchemaMigrationIT {
 											f -> f.asString().analyzer( "customAnalyzer" )
 									)
 											.toReference();
-								},
-								indexManager -> { }
+								}
 						)
 						.setup(),
 				FailureReportUtils.buildFailureReportPattern()
@@ -445,8 +437,7 @@ public class ElasticsearchSchemaMigrationIT {
 											f -> f.asString().normalizer( "customNormalizer" )
 									)
 											.toReference();
-								},
-								indexManager -> { }
+								}
 						)
 						.setup(),
 				FailureReportUtils.buildFailureReportPattern()

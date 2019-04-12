@@ -52,8 +52,7 @@ public class ElasticsearchBootstrapIT {
 				)
 				.withIndex(
 						"EmptyIndexName",
-						ctx -> { },
-						indexManager -> { }
+						ctx -> { }
 				)
 				.setupFirstPhaseOnly();
 

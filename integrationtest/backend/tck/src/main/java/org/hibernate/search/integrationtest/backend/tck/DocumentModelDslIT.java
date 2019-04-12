@@ -497,8 +497,7 @@ public class DocumentModelDslIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						mappingContributor,
-						indexManager -> { }
+						mappingContributor
 				)
 				.setup();
 	}

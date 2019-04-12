@@ -650,8 +650,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		withManagementStrategyConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> { },
-						indexMapping -> { }
+						ctx -> { }
 				)
 				.setup();
 	}
