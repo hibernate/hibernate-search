@@ -22,10 +22,10 @@ import org.hibernate.search.util.common.impl.Closer;
 public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> {
 
 	private final PojoCaster<? super I> caster;
-	private final PropertyHandle<? super I> property;
+	private final PropertyHandle<I> property;
 	private final BeanHolder<? extends IdentifierBridge<I>> bridgeHolder;
 
-	public PropertyIdentifierMapping(PojoCaster<? super I> caster, PropertyHandle<? super I> property,
+	public PropertyIdentifierMapping(PojoCaster<? super I> caster, PropertyHandle<I> property,
 			BeanHolder<? extends IdentifierBridge<I>> bridgeHolder) {
 		this.caster = caster;
 		this.property = property;
@@ -46,10 +46,7 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 		if ( providedId != null ) {
 			return (I) caster.cast( providedId );
 		}
-
-		Object id = property.get( entitySupplier.get() );
-		// TODO avoid this cast? By construction, the property handle should always return type I
-		return (I) caster.cast( id );
+		return property.get( entitySupplier.get() );
 	}
 
 	@Override
