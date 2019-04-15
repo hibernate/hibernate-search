@@ -189,7 +189,7 @@ public final class PojoAssociationPathInverter {
 				inverseSideTypeAdditionalMetadata.getPropertiesAdditionalMetadata().entrySet() ) {
 			String inverseSidePropertyName = propertyEntry.getKey();
 			PojoPropertyModel<?> inverseSidePropertyModel = inverseSideTypeModel.getProperty( inverseSidePropertyName );
-			PropertyHandle propertyHandle = inverseSidePropertyModel.getHandle();
+			PropertyHandle<?> propertyHandle = inverseSidePropertyModel.getHandle();
 			BoundPojoModelPathPropertyNode<?, ?> inverseSidePathPropertyNode =
 					inverseSidePathTypeNode.property( propertyHandle );
 			PojoPropertyAdditionalMetadata inverseSidePropertyAdditionalMetadata = propertyEntry.getValue();

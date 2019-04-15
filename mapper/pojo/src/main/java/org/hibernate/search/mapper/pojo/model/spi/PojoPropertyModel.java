@@ -23,6 +23,6 @@ public interface PojoPropertyModel<T> {
 	 */
 	PojoGenericTypeModel<T> getTypeModel();
 
-	PropertyHandle getHandle();
+	PropertyHandle<T> getHandle();
 
 }

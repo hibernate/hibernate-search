@@ -21,10 +21,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 
 	private final BoundPojoModelPathTypeNode<T> parent;
-	private final PropertyHandle propertyHandle;
+	private final PropertyHandle<P> propertyHandle;
 	private final PojoPropertyModel<P> propertyModel;
 
-	BoundPojoModelPathPropertyNode(BoundPojoModelPathTypeNode<T> parent, PropertyHandle propertyHandle,
+	BoundPojoModelPathPropertyNode(BoundPojoModelPathTypeNode<T> parent, PropertyHandle<P> propertyHandle,
 			PojoPropertyModel<P> propertyModel) {
 		this.parent = parent;
 		this.propertyHandle = propertyHandle;
@@ -61,7 +61,7 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 		return new BoundPojoModelPathValueNode<>( this, extractorPath );
 	}
 
-	public PropertyHandle getPropertyHandle() {
+	public PropertyHandle<P> getPropertyHandle() {
 		return propertyHandle;
 	}
 

@@ -51,7 +51,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	private BoundRoutingKeyBridge<T> boundRoutingKeyBridge;
 	private final Collection<BoundTypeBridge<T>> boundBridges = new ArrayList<>();
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<PropertyHandle, PojoIndexingProcessorPropertyNodeBuilder<T, ?>> propertyNodeBuilders =
+	private final Map<PropertyHandle<?>, PojoIndexingProcessorPropertyNodeBuilder<T, ?>> propertyNodeBuilders =
 			new LinkedHashMap<>();
 
 	public PojoIndexingProcessorTypeNodeBuilder(
@@ -84,11 +84,11 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	public PojoMappingCollectorPropertyNode property(String propertyName) {
 		// TODO HSEARCH-3318 also pass an access type ("default" if not mentioned by the user, method/field otherwise) and take it into account to retrieve the right property model/handle
 		PojoPropertyModel<?> propertyModel = getModelPath().getTypeModel().getProperty( propertyName );
-		PropertyHandle propertyHandle = propertyModel.getHandle();
+		PropertyHandle<?> propertyHandle = propertyModel.getHandle();
 		return propertyNodeBuilders.computeIfAbsent( propertyHandle, this::createPropertyNodeBuilder );
 	}
 
-	private PojoIndexingProcessorPropertyNodeBuilder<T, ?> createPropertyNodeBuilder(PropertyHandle propertyHandle) {
+	private PojoIndexingProcessorPropertyNodeBuilder<T, ?> createPropertyNodeBuilder(PropertyHandle<?> propertyHandle) {
 		return new PojoIndexingProcessorPropertyNodeBuilder<>(
 				modelPath.property( propertyHandle ),
 				mappingHelper, bindingContext, identityMappingCollector

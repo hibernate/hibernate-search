@@ -8,12 +8,14 @@ package org.hibernate.search.mapper.pojo.model.spi;
 
 /**
  * A handle to a property of a POJO, allowing to get the value of that property from a POJO instance.
+ *
+ * @param <T> The property type.
  */
-public interface PropertyHandle {
+public interface PropertyHandle<T> {
 
 	String getName();
 
-	Object get(Object thiz);
+	T get(Object thiz);
 
 	/**
 	 * @return {@code true} if {@code obj} is a {@link PropertyHandle} referencing the exact same property

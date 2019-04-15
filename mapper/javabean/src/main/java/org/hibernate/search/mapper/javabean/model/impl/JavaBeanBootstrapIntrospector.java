@@ -87,7 +87,7 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 		return annotationHelper.getAnnotationsByMetaAnnotationType( annotatedElement, metaAnnotationType );
 	}
 
-	PropertyHandle createPropertyHandle(String name, Method method) throws IllegalAccessException {
+	PropertyHandle<?> createPropertyHandle(String name, Method method) throws IllegalAccessException {
 		return propertyHandleFactory.createForMethod( name, method );
 	}
 

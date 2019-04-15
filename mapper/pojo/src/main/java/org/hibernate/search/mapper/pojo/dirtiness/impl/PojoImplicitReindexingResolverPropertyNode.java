@@ -28,10 +28,10 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImplicitReindexingResolverNode<T, S> {
 
-	private final PropertyHandle handle;
+	private final PropertyHandle<P> handle;
 	private final Collection<PojoImplicitReindexingResolverNode<? super P, S>> nestedNodes;
 
-	public PojoImplicitReindexingResolverPropertyNode(PropertyHandle handle,
+	public PojoImplicitReindexingResolverPropertyNode(PropertyHandle<P> handle,
 			Collection<PojoImplicitReindexingResolverNode<? super P, S>> nestedNodes) {
 		this.handle = handle;
 		this.nestedNodes = nestedNodes;
@@ -58,9 +58,7 @@ public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImp
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
-		// TODO HSEARCH-3058 add generic type parameters to property handles
-		@SuppressWarnings("unchecked")
-		P propertyValue = (P) handle.get( dirty );
+		P propertyValue = handle.get( dirty );
 		if ( propertyValue != null ) {
 			for ( PojoImplicitReindexingResolverNode<? super P, S> node : nestedNodes ) {
 				node.resolveEntitiesToReindex( collector, runtimeIntrospector, propertyValue, dirtinessState );

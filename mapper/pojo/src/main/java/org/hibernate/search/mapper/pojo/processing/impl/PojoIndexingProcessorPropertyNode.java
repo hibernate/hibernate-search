@@ -27,11 +27,11 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcessor<T> {
 
-	private final PropertyHandle handle;
+	private final PropertyHandle<P> handle;
 	private final Collection<BeanHolder<? extends PropertyBridge>> propertyBridgeHolders;
 	private final Collection<PojoIndexingProcessor<? super P>> nestedNodes;
 
-	public PojoIndexingProcessorPropertyNode(PropertyHandle handle,
+	public PojoIndexingProcessorPropertyNode(PropertyHandle<P> handle,
 			Collection<BeanHolder<? extends PropertyBridge>> propertyBridgeHolders,
 			Collection<PojoIndexingProcessor<? super P>> nestedNodes) {
 		this.handle = handle;
@@ -66,9 +66,7 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 
 	@Override
 	public final void process(DocumentElement target, T source, AbstractPojoSessionContextImplementor sessionContext) {
-		// TODO HSEARCH-3058 add generic type parameters to property handles
-		@SuppressWarnings("unchecked")
-		P propertyValue = (P) handle.get( source );
+		P propertyValue = handle.get( source );
 		if ( !propertyBridgeHolders.isEmpty() ) {
 			PojoElement bridgedElement = new PojoElementImpl( propertyValue );
 			for ( BeanHolder<? extends PropertyBridge> bridgeHolder : propertyBridgeHolders ) {

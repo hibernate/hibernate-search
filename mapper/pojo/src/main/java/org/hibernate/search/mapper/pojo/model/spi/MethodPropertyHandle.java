@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-final class MethodPropertyHandle implements PropertyHandle {
+final class MethodPropertyHandle<T> implements PropertyHandle<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -35,9 +35,9 @@ final class MethodPropertyHandle implements PropertyHandle {
 	}
 
 	@Override
-	public Object get(Object thiz) {
+	public T get(Object thiz) {
 		try {
-			return method.invoke( thiz );
+			return (T) method.invoke( thiz );
 		}
 		catch (Error e) {
 			throw e;
@@ -60,7 +60,7 @@ final class MethodPropertyHandle implements PropertyHandle {
 		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
 			return false;
 		}
-		MethodPropertyHandle other = (MethodPropertyHandle) obj;
+		MethodPropertyHandle<?> other = (MethodPropertyHandle) obj;
 		return name.equals( other.name ) && method.equals( other.method );
 	}
 

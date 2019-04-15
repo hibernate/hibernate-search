@@ -43,7 +43,8 @@ final class GenericContextAwarePojoPropertyMode<T> implements PojoPropertyModel<
 	}
 
 	@Override
-	public PropertyHandle getHandle() {
-		return rawPropertyModel.getHandle();
+	@SuppressWarnings("unchecked") // We know that, in the current generic context, this cast is legal
+	public PropertyHandle<T> getHandle() {
+		return (PropertyHandle<T>) rawPropertyModel.getHandle();
 	}
 }

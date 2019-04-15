@@ -11,12 +11,12 @@ import java.lang.reflect.Method;
 
 final class MemberPropertyHandleFactory implements PropertyHandleFactory {
 	@Override
-	public PropertyHandle createForField(String propertyName, Field field) {
+	public PropertyHandle<?> createForField(String propertyName, Field field) {
 		return new FieldPropertyHandle( propertyName, field );
 	}
 
 	@Override
-	public PropertyHandle createForMethod(String propertyName, Method method) {
+	public PropertyHandle<?> createForMethod(String propertyName, Method method) {
 		return new MethodPropertyHandle( propertyName, method );
 	}
 }

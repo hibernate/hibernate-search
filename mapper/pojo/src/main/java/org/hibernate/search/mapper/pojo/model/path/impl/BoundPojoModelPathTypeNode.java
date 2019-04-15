@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
@@ -29,9 +30,11 @@ public abstract class BoundPojoModelPathTypeNode<T> extends BoundPojoModelPath {
 		}
 	}
 
-	public BoundPojoModelPathPropertyNode<T, ?> property(PropertyHandle propertyHandle) {
+	@SuppressWarnings("unchecked") // TODO HSEARCH-3318 This is an approximation, ideally we should not pass a propertyHandle but a name and access type
+	public <P> BoundPojoModelPathPropertyNode<T, P> property(PropertyHandle<P> propertyHandle) {
 		return new BoundPojoModelPathPropertyNode<>(
-				this, propertyHandle, getTypeModel().getProperty( propertyHandle.getName() )
+				this, propertyHandle,
+				(PojoPropertyModel<P>) getTypeModel().getProperty( propertyHandle.getName() )
 		);
 	}
 

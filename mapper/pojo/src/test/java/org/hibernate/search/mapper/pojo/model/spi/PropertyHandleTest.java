@@ -107,7 +107,7 @@ public class PropertyHandleTest {
 		Field otherField = EntityType.class.getDeclaredField( "otherField" );
 		setAccessible( otherField );
 
-		PropertyHandle propertyHandle = factory.createForField( propertyName, field );
+		PropertyHandle<?> propertyHandle = factory.createForField( propertyName, field );
 
 		assertThat( propertyHandle.getName() ).isEqualTo( propertyName );
 		assertThat( propertyHandle.get( new EntityType() ) ).isEqualTo( expectedValue );
@@ -116,9 +116,9 @@ public class PropertyHandleTest {
 				.contains( propertyHandle.getClass().getSimpleName() )
 				.contains( field.toString() );
 
-		PropertyHandle equalPropertyHandle = factory.createForField( propertyName, field );
-		PropertyHandle differentNamePropertyHandle = factory.createForField( propertyName + "foo", field );
-		PropertyHandle differentFieldPropertyHandle = factory.createForField( propertyName, otherField );
+		PropertyHandle<?> equalPropertyHandle = factory.createForField( propertyName, field );
+		PropertyHandle<?> differentNamePropertyHandle = factory.createForField( propertyName + "foo", field );
+		PropertyHandle<?> differentFieldPropertyHandle = factory.createForField( propertyName, otherField );
 		assertThat( propertyHandle ).isEqualTo( equalPropertyHandle );
 		assertThat( propertyHandle.hashCode() ).isEqualTo( equalPropertyHandle.hashCode() );
 		assertThat( propertyHandle ).isNotEqualTo( differentNamePropertyHandle );
@@ -133,7 +133,7 @@ public class PropertyHandleTest {
 		Method otherMethod = EntityType.class.getDeclaredMethod( "otherMethod" );
 		setAccessible( otherMethod );
 
-		PropertyHandle propertyHandle = factory.createForMethod( propertyName, method );
+		PropertyHandle<?> propertyHandle = factory.createForMethod( propertyName, method );
 		assertThat( propertyHandle.getName() ).isEqualTo( propertyName );
 		assertThat( propertyHandle.get( new EntityType() ) ).isEqualTo( expectedValue );
 
@@ -141,9 +141,9 @@ public class PropertyHandleTest {
 				.contains( propertyHandle.getClass().getSimpleName() )
 				.contains( method.toString() );
 
-		PropertyHandle equalPropertyHandle = factory.createForMethod( propertyName, method );
-		PropertyHandle differentNamePropertyHandle = factory.createForMethod( propertyName + "foo", method );
-		PropertyHandle differentMethodPropertyHandle = factory.createForMethod( propertyName + "foo", otherMethod );
+		PropertyHandle<?> equalPropertyHandle = factory.createForMethod( propertyName, method );
+		PropertyHandle<?> differentNamePropertyHandle = factory.createForMethod( propertyName + "foo", method );
+		PropertyHandle<?> differentMethodPropertyHandle = factory.createForMethod( propertyName + "foo", otherMethod );
 		assertThat( propertyHandle ).isEqualTo( equalPropertyHandle );
 		assertThat( propertyHandle.hashCode() ).isEqualTo( equalPropertyHandle.hashCode() );
 		assertThat( propertyHandle ).isNotEqualTo( differentNamePropertyHandle );

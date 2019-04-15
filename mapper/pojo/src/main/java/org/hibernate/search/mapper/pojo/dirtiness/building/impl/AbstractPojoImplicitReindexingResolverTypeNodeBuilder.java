@@ -118,7 +118,7 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> createPropertyBuilder(String propertyName) {
 		checkNotFrozen();
-		PropertyHandle handle = modelPath.getTypeModel().getProperty( propertyName ).getHandle();
+		PropertyHandle<?> handle = modelPath.getTypeModel().getProperty( propertyName ).getHandle();
 		return new PojoImplicitReindexingResolverPropertyNodeBuilder<>(
 				modelPath.property( handle ), buildingHelper
 		);

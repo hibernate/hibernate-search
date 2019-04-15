@@ -79,7 +79,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoInde
 	 * Thus applying the same property handle results in the same property type.
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public PojoIndexingDependencyCollectorPropertyNode<T, ?> property(PropertyHandle propertyHandle) {
+	public PojoIndexingDependencyCollectorPropertyNode<T, ?> property(PropertyHandle<?> propertyHandle) {
 		return new PojoIndexingDependencyCollectorPropertyNode<>(
 				this,
 				modelPathFromCurrentNode.property( propertyHandle ),
