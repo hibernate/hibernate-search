@@ -409,6 +409,7 @@ public class ToElasticsearch {
 										.addProperty( "value", query.getTerm().text() )
 										.addProperty( "fuzziness", query.getMaxEdits() )
 										.addProperty( "prefix_length", query.getPrefixLength() )
+										.addProperty( "transpositions", query.getTranspositions() )
 										.append( boostAppender( query ) )
 						)
 				).build();
