@@ -33,12 +33,12 @@ public class InitialPropertyMappingContext
 		implements PropertyMappingContext, PojoTypeMetadataContributor {
 
 	private final TypeMappingContext parent;
-	private final PropertyHandle propertyHandle;
+	private final PropertyHandle<?> propertyHandle;
 
 	private final ErrorCollectingPojoPropertyMetadataContributor children =
 			new ErrorCollectingPojoPropertyMetadataContributor();
 
-	InitialPropertyMappingContext(TypeMappingContext parent, PropertyHandle propertyHandle) {
+	InitialPropertyMappingContext(TypeMappingContext parent, PropertyHandle<?> propertyHandle) {
 		this.parent = parent;
 		this.propertyHandle = propertyHandle;
 	}

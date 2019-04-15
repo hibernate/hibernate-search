@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * @author Yoann Rodiere
  */
-public final class MethodHandlePropertyHandle implements PropertyHandle {
+public final class MethodHandlePropertyHandle<T> implements PropertyHandle<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -41,9 +41,9 @@ public final class MethodHandlePropertyHandle implements PropertyHandle {
 	}
 
 	@Override
-	public Object get(Object thiz) {
+	public T get(Object thiz) {
 		try {
-			return getter.invoke( thiz );
+			return (T) getter.invoke( thiz );
 		}
 		catch (Error e) {
 			throw e;
@@ -66,7 +66,7 @@ public final class MethodHandlePropertyHandle implements PropertyHandle {
 		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
 			return false;
 		}
-		MethodHandlePropertyHandle other = (MethodHandlePropertyHandle) obj;
+		MethodHandlePropertyHandle<?> other = (MethodHandlePropertyHandle) obj;
 		return name.equals( other.name ) && member.equals( other.member );
 	}
 

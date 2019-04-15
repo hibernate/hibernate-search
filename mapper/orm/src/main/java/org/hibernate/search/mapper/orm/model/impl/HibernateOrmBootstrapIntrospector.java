@@ -232,7 +232,7 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 				.filter( annotation -> annotationHelper.isMetaAnnotated( annotation, metaAnnotationType ) );
 	}
 
-	PropertyHandle createPropertyHandle(String name, Member member) throws IllegalAccessException {
+	PropertyHandle<?> createPropertyHandle(String name, Member member) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			setAccessible( method );

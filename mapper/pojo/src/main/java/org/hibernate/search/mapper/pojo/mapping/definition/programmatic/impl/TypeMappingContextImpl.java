@@ -118,7 +118,7 @@ public class TypeMappingContextImpl
 	@Override
 	public PropertyMappingContext property(String propertyName) {
 		PojoPropertyModel<?> propertyModel = typeModel.getProperty( propertyName );
-		PropertyHandle propertyHandle = propertyModel.getHandle();
+		PropertyHandle<?> propertyHandle = propertyModel.getHandle();
 		InitialPropertyMappingContext child = new InitialPropertyMappingContext( this, propertyHandle );
 		children.add( child );
 		return child;

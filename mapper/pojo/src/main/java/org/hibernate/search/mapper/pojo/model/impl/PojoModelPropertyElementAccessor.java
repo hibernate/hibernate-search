@@ -16,20 +16,18 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 class PojoModelPropertyElementAccessor<P> implements PojoModelElementAccessor<P> {
 
 	private final PojoModelElementAccessor<?> parent;
-	private final PropertyHandle handle;
+	private final PropertyHandle<P> handle;
 
-	PojoModelPropertyElementAccessor(PojoModelElementAccessor<?> parent, PropertyHandle handle) {
+	PojoModelPropertyElementAccessor(PojoModelElementAccessor<?> parent, PropertyHandle<P> handle) {
 		this.parent = parent;
 		this.handle = handle;
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public P read(PojoElement bridgedElement) {
 		Object parentValue = parent.read( bridgedElement );
 		if ( parentValue != null ) {
-			// TODO HSEARCH-3058 add generic type parameters to property handles
-			return (P) handle.get( parentValue );
+			return handle.get( parentValue );
 		}
 		else {
 			return null;

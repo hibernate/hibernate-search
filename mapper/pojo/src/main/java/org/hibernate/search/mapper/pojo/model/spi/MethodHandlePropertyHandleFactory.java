@@ -19,12 +19,12 @@ final class MethodHandlePropertyHandleFactory implements PropertyHandleFactory {
 	}
 
 	@Override
-	public PropertyHandle createForField(String propertyName, Field field) throws IllegalAccessException {
+	public PropertyHandle<?> createForField(String propertyName, Field field) throws IllegalAccessException {
 		return new MethodHandlePropertyHandle( propertyName, field, lookup.unreflectGetter( field ) );
 	}
 
 	@Override
-	public PropertyHandle createForMethod(String propertyName, Method method) throws IllegalAccessException {
+	public PropertyHandle<?> createForMethod(String propertyName, Method method) throws IllegalAccessException {
 		return new MethodHandlePropertyHandle( propertyName, method, lookup.unreflect( method ) );
 	}
 }

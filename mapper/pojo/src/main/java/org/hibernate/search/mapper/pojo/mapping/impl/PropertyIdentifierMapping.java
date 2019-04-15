@@ -22,10 +22,10 @@ import org.hibernate.search.util.common.impl.Closer;
 public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> {
 
 	private final PojoCaster<? super I> caster;
-	private final PropertyHandle property;
+	private final PropertyHandle<? super I> property;
 	private final BeanHolder<? extends IdentifierBridge<I>> bridgeHolder;
 
-	public PropertyIdentifierMapping(PojoCaster<? super I> caster, PropertyHandle property,
+	public PropertyIdentifierMapping(PojoCaster<? super I> caster, PropertyHandle<? super I> property,
 			BeanHolder<? extends IdentifierBridge<I>> bridgeHolder) {
 		this.caster = caster;
 		this.property = property;

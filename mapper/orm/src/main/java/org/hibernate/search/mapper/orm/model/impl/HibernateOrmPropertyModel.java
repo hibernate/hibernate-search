@@ -39,7 +39,7 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
  	 */
 	private final List<XProperty> declaredXProperties;
 
-	private PropertyHandle handle;
+	private PropertyHandle<T> handle;
 	private PojoGenericTypeModel<T> typeModel;
 
 	HibernateOrmPropertyModel(HibernateOrmBootstrapIntrospector introspector, HibernateOrmRawTypeModel<?> holderTypeModel,
@@ -90,10 +90,11 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	@Override
-	public PropertyHandle getHandle() {
+	@SuppressWarnings("unchecked") // By construction, we know the member returns values of type T
+	public PropertyHandle<T> getHandle() {
 		if ( handle == null ) {
 			try {
-				handle = introspector.createPropertyHandle( name, member );
+				handle = (PropertyHandle<T>) introspector.createPropertyHandle( name, member );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );

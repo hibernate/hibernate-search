@@ -29,7 +29,7 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	private final PropertyDescriptor descriptor;
 
 	private PojoGenericTypeModel<T> typeModel;
-	private PropertyHandle handle;
+	private PropertyHandle<T> handle;
 
 	JavaBeanPropertyModel(JavaBeanBootstrapIntrospector introspector, JavaBeanTypeModel<?> parentTypeModel,
 			PropertyDescriptor descriptor) {
@@ -102,10 +102,11 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	@Override
-	public PropertyHandle getHandle() {
+	@SuppressWarnings("unchecked") // By construction, we know the member returns values of type T
+	public PropertyHandle<T> getHandle() {
 		if ( handle == null ) {
 			try {
-				handle = introspector.createPropertyHandle( getName(), descriptor.getReadMethod() );
+				handle = (PropertyHandle<T>) introspector.createPropertyHandle( getName(), descriptor.getReadMethod() );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( getName(), parentTypeModel, e );

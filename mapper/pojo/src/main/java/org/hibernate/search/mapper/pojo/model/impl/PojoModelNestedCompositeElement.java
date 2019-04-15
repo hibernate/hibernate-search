@@ -71,7 +71,7 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 		return modelPath.type();
 	}
 
-	PropertyHandle getHandle() {
+	PropertyHandle<P> getHandle() {
 		return modelPath.getParent().getPropertyHandle();
 	}
 }
