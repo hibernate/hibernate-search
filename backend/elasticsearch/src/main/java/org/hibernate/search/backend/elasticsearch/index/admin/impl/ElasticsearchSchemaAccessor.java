@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.R
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
@@ -31,19 +32,19 @@ public class ElasticsearchSchemaAccessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchWorkBuilderFactory workFactory;
+	private final ElasticsearchLink link;
 
 	private final ElasticsearchWorkOrchestrator orchestrator;
 
-	public ElasticsearchSchemaAccessor(ElasticsearchWorkBuilderFactory workFactory,
+	public ElasticsearchSchemaAccessor(ElasticsearchLink link,
 			ElasticsearchWorkOrchestrator orchestrator) {
-		this.workFactory = workFactory;
+		this.link = link;
 		this.orchestrator = orchestrator;
 	}
 
 	public void createIndex(URLEncodedString indexName, IndexSettings settings,
 			RootTypeMapping mapping) {
-		ElasticsearchWork<?> work = workFactory.createIndex( indexName )
+		ElasticsearchWork<?> work = getWorkFactory().createIndex( indexName )
 				.settings( settings )
 				.mapping( mapping )
 				.build();
@@ -57,7 +58,7 @@ public class ElasticsearchSchemaAccessor {
 	 */
 	public boolean createIndexIfAbsent(URLEncodedString indexName, IndexSettings settings,
 			RootTypeMapping mapping) {
-		ElasticsearchWork<CreateIndexResult> work = workFactory.createIndex( indexName )
+		ElasticsearchWork<CreateIndexResult> work = getWorkFactory().createIndex( indexName )
 				.settings( settings )
 				.mapping( mapping )
 				.ignoreExisting()
@@ -67,7 +68,7 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public boolean indexExists(URLEncodedString indexName) {
-		ElasticsearchWork<Boolean> work = workFactory.indexExists( indexName ).build();
+		ElasticsearchWork<Boolean> work = getWorkFactory().indexExists( indexName ).build();
 		return execute( work );
 	}
 
@@ -75,7 +76,7 @@ public class ElasticsearchSchemaAccessor {
 		IndexMetadata indexMetadata = new IndexMetadata();
 		indexMetadata.setName( indexName );
 
-		ElasticsearchWork<RootTypeMapping> getMappingWork = workFactory.getIndexTypeMapping( indexName ).build();
+		ElasticsearchWork<RootTypeMapping> getMappingWork = getWorkFactory().getIndexTypeMapping( indexName ).build();
 		try {
 			RootTypeMapping mapping = execute( getMappingWork );
 			indexMetadata.setMapping( mapping );
@@ -84,7 +85,7 @@ public class ElasticsearchSchemaAccessor {
 			throw log.elasticsearchMappingRetrievalForValidationFailed( e );
 		}
 
-		ElasticsearchWork<IndexSettings> getSettingsWork = workFactory.getIndexSettings( indexName ).build();
+		ElasticsearchWork<IndexSettings> getSettingsWork = getWorkFactory().getIndexSettings( indexName ).build();
 		try {
 			IndexSettings indexSettings = execute( getSettingsWork );
 			indexMetadata.setSettings( indexSettings );
@@ -97,7 +98,7 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public void updateSettings(URLEncodedString indexName, IndexSettings settings) {
-		ElasticsearchWork<?> work = workFactory.putIndexSettings( indexName, settings ).build();
+		ElasticsearchWork<?> work = getWorkFactory().putIndexSettings( indexName, settings ).build();
 
 		try {
 			execute( work );
@@ -108,7 +109,7 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public void putMapping(URLEncodedString indexName, RootTypeMapping mapping) {
-		ElasticsearchWork<?> work = workFactory.putIndexTypeMapping( indexName, mapping ).build();
+		ElasticsearchWork<?> work = getWorkFactory().putIndexTypeMapping( indexName, mapping ).build();
 
 		try {
 			execute( work );
@@ -123,7 +124,7 @@ public class ElasticsearchSchemaAccessor {
 		String timeoutAndUnit = executionOptions.getRequiredStatusTimeoutInMs() + "ms";
 
 		ElasticsearchWork<?> work =
-				workFactory.waitForIndexStatusWork( indexName, requiredIndexStatus, timeoutAndUnit )
+				getWorkFactory().waitForIndexStatusWork( indexName, requiredIndexStatus, timeoutAndUnit )
 				.build();
 
 		try {
@@ -137,19 +138,19 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public void dropIndexIfExisting(URLEncodedString indexName) {
-		ElasticsearchWork<?> work = workFactory.dropIndex( indexName ).ignoreIndexNotFound().build();
+		ElasticsearchWork<?> work = getWorkFactory().dropIndex( indexName ).ignoreIndexNotFound().build();
 		execute( work );
 	}
 
 	public void closeIndex(URLEncodedString indexName) {
-		ElasticsearchWork<?> work = workFactory.closeIndex( indexName ).build();
+		ElasticsearchWork<?> work = getWorkFactory().closeIndex( indexName ).build();
 		execute( work );
 		log.closedIndex( indexName );
 	}
 
 	public void openIndex(URLEncodedString indexName) {
 		try {
-			ElasticsearchWork<?> work = workFactory.openIndex( indexName ).build();
+			ElasticsearchWork<?> work = getWorkFactory().openIndex( indexName ).build();
 			execute( work );
 		}
 		catch (RuntimeException e) {
@@ -157,6 +158,10 @@ public class ElasticsearchSchemaAccessor {
 			throw e;
 		}
 		log.openedIndex( indexName );
+	}
+
+	private ElasticsearchWorkBuilderFactory getWorkFactory() {
+		return link.getWorkBuilderFactory();
 	}
 
 	private <T> T execute(ElasticsearchWork<T> work) {

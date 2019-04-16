@@ -9,10 +9,8 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -101,20 +99,15 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Supplier<ElasticsearchClient> clientSupplier;
-	private final GsonProvider gsonProvider;
-	private final ElasticsearchWorkBuilderFactory workFactory;
+	private final ElasticsearchLink link;
 	private final ErrorHandler errorHandler;
 
 	private final ElasticsearchBatchingSharedWorkOrchestrator rootParallelOrchestrator;
 
 	public ElasticsearchWorkOrchestratorProvider(String rootParallelOrchestratorName,
-			Supplier<ElasticsearchClient> clientSupplier,
-			GsonProvider gsonProvider, ElasticsearchWorkBuilderFactory workFactory,
+			ElasticsearchLink link,
 			ErrorHandler errorHandler) {
-		this.clientSupplier = clientSupplier;
-		this.gsonProvider = gsonProvider;
-		this.workFactory = workFactory;
+		this.link = link;
 		this.errorHandler = errorHandler;
 
 		/*
@@ -234,18 +227,18 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	private ElasticsearchWorkBulker createBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder, int minBulkSize, boolean refreshInBulkAPICall) {
 		return new ElasticsearchDefaultWorkBulker(
 				sequenceBuilder,
-				worksToBulk -> workFactory.bulk( worksToBulk ).refresh( refreshInBulkAPICall ).build(),
+				worksToBulk -> link.getWorkBuilderFactory().bulk( worksToBulk ).refresh( refreshInBulkAPICall ).build(),
 				minBulkSize, MAX_BULK_SIZE
 				);
 	}
 
 	private ElasticsearchRefreshableWorkExecutionContext createIgnoreDirtyWorkExecutionContext() {
-		return new ElasticsearchIgnoreRefreshWorkExecutionContext( clientSupplier.get(), gsonProvider );
+		return new ElasticsearchIgnoreRefreshWorkExecutionContext( link.getClient(), link.getGsonProvider() );
 	}
 
 	private ElasticsearchRefreshableWorkExecutionContext createRefreshingWorkExecutionContext() {
 		return new ElasticsearchDefaultWorkExecutionContext(
-				clientSupplier.get(), gsonProvider, workFactory, errorHandler
+				link.getClient(), link.getGsonProvider(), link.getWorkBuilderFactory(), errorHandler
 		);
 	}
 

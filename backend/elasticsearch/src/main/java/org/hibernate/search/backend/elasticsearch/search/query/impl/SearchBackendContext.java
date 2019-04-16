@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
@@ -16,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Documen
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -27,8 +27,7 @@ import com.google.gson.Gson;
 public class SearchBackendContext {
 	private final EventContext eventContext;
 
-	private final ElasticsearchWorkBuilderFactory workFactory;
-	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
+	private final ElasticsearchLink link;
 	private final Gson userFacingGson;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
@@ -39,15 +38,13 @@ public class SearchBackendContext {
 	private final DocumentReferenceExtractorHelper documentReferenceExtractorHelper;
 
 	public SearchBackendContext(EventContext eventContext,
-			ElasticsearchWorkBuilderFactory workFactory,
-			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
+			ElasticsearchLink link,
 			Gson userFacingGson,
 			Function<String, String> indexNameConverter,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator) {
 		this.eventContext = eventContext;
-		this.workFactory = workFactory;
-		this.searchResultExtractorFactory = searchResultExtractorFactory;
+		this.link = link;
 		this.userFacingGson = userFacingGson;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
@@ -89,7 +86,7 @@ public class SearchBackendContext {
 			ElasticsearchSearchProjection<?, T> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 		return new ElasticsearchSearchQueryBuilder<>(
-				workFactory, searchResultExtractorFactory, orchestrator, multiTenancyStrategy,
+				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(), orchestrator, multiTenancyStrategy,
 				indexNames, sessionContext, projectionHitMapper, rootProjection
 		);
 	}
