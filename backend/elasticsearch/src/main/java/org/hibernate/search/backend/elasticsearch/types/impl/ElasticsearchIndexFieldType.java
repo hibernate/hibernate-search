@@ -17,9 +17,6 @@ import org.hibernate.search.backend.elasticsearch.types.projection.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-
 public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 	private final ElasticsearchFieldCodec<F> codec;
 	private final ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory;
@@ -59,9 +56,6 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 	}
 
 	public void indexNullAs(F value) {
-		JsonElement encoded = codec.encode( value );
-		if ( encoded instanceof JsonPrimitive ) {
-			mapping.setNullValue( (JsonPrimitive) encoded );
-		}
+		mapping.setNullValue( codec.encode( value ) );
 	}
 }

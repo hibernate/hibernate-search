@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
@@ -57,7 +57,7 @@ public class PropertyMapping extends AbstractTypeMapping {
 	 * </ul>
 	 */
 	@SerializedName("null_value")
-	private JsonPrimitive nullValue;
+	private JsonElement nullValue;
 
 	/**
 	 * Must be null when we don't want to include it in JSON serialization.
@@ -143,11 +143,11 @@ public class PropertyMapping extends AbstractTypeMapping {
 		this.store = store;
 	}
 
-	public JsonPrimitive getNullValue() {
+	public JsonElement getNullValue() {
 		return nullValue;
 	}
 
-	public void setNullValue(JsonPrimitive nullValue) {
+	public void setNullValue(JsonElement nullValue) {
 		this.nullValue = nullValue;
 	}
 

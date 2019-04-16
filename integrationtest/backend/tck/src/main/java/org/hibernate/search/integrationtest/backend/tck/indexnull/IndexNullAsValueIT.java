@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
@@ -57,7 +58,7 @@ public class IndexNullAsValueIT {
 	}
 
 	@Test
-	public void indexNullAsValue() {
+	public void indexNullAsValue_match() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -74,31 +75,54 @@ public class IndexNullAsValueIT {
 		}
 	}
 
+	@Test
+	public void indexNullAsValue_spatial() {
+		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
+				.asReference()
+				.predicate( f -> f.spatial().within().onField( "geoPointField" ).circle( GeoPoint.of( 0.0, 0.0 ), 1 ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_WITH_INDEX_NULL_AS_VALUES, DOCUMENT_WITH_NULL_VALUES );
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add(
 				referenceProvider( DOCUMENT_WITH_INDEX_NULL_AS_VALUES ),
-				document -> indexMapping.supportedFieldModels.forEach( f -> f.indexNullAsValue.write( document ) )
+				document -> {
+					indexMapping.supportedFieldModels.forEach( f -> f.indexNullAsValue.write( document ) );
+					document.addValue( indexMapping.geoPointField, GeoPoint.of( 0.0, 0.0 ) );
+				}
 		);
 		workPlan.add(
 				referenceProvider( DOCUMENT_WITH_DIFFERENT_VALUES ),
-				document -> indexMapping.supportedFieldModels.forEach( f -> f.differentValue.write( document ) )
+				document -> {
+					indexMapping.supportedFieldModels.forEach( f -> f.differentValue.write( document ) );
+					document.addValue( indexMapping.geoPointField, GeoPoint.of( 40, 70 ) );
+				}
 		);
 		workPlan.add(
 				referenceProvider( DOCUMENT_WITH_NULL_VALUES ),
-				document -> indexMapping.supportedFieldModels.forEach( f -> f.nullValue.write( document ) )
+				document -> {
+					indexMapping.supportedFieldModels.forEach( f -> f.nullValue.write( document ) );
+					document.addValue( indexMapping.geoPointField, null );
+				}
 		);
 		workPlan.execute().join();
 	}
 
 	private static class IndexMapping {
 		final List<ByTypeFieldModel<?>> supportedFieldModels;
+		final IndexFieldReference<GeoPoint> geoPointField;
 
 		IndexMapping(IndexSchemaElement root) {
 			supportedFieldModels = FieldTypeDescriptor.getAll().stream()
 					.filter( typeDescriptor -> typeDescriptor.getIndexNullAsExpectations().isPresent() )
 					.map( typeDescriptor -> ByTypeFieldModel.mapper( root, typeDescriptor ) )
 					.collect( Collectors.toList() );
+
+			geoPointField = root.field( "geoPointField", c -> c.asGeoPoint().indexNullAs( GeoPoint.of( 0.0, 0.0 ) ) ).toReference();
 		}
 	}
 

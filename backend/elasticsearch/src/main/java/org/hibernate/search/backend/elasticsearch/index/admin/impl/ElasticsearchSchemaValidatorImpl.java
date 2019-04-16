@@ -317,13 +317,13 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	}
 
 	private void validateJsonPrimitive(ValidationErrorCollector errorCollector,
-			DataType type, String attributeName, JsonPrimitive expectedValue, JsonPrimitive actualValue) {
+			DataType type, String attributeName, JsonElement expectedValue, JsonElement actualValue) {
 		DataType defaultedType = type == null ? DataType.OBJECT : type;
 		doValidateJsonPrimitive( errorCollector, defaultedType, attributeName, expectedValue, actualValue );
 	}
 
 	private void doValidateJsonPrimitive(ValidationErrorCollector errorCollector,
-			DataType type, String attributeName, JsonPrimitive expectedValue, JsonPrimitive actualValue) {
+			DataType type, String attributeName, JsonElement expectedValue, JsonElement actualValue) {
 		// We can't just use equal, mainly because of floating-point numbers
 
 		switch ( type ) {
@@ -332,7 +332,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 				validateEqualWithDefault( errorCollector, attributeName, expectedValue, actualValue, null );
 				break;
 			case DOUBLE:
-				if ( expectedValue.isNumber() && actualValue.isNumber() ) {
+				if ( areNumbers( expectedValue, actualValue ) ) {
 					validateEqualWithDefault( errorCollector, attributeName, expectedValue.getAsDouble(), actualValue.getAsDouble(),
 							DEFAULT_DOUBLE_DELTA, null );
 				}
@@ -343,7 +343,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 				}
 				break;
 			case FLOAT:
-				if ( expectedValue.isNumber() && actualValue.isNumber() ) {
+				if ( areNumbers( expectedValue, actualValue ) ) {
 					validateEqualWithDefault( errorCollector, attributeName, expectedValue.getAsFloat(), actualValue.getAsFloat(),
 							DEFAULT_FLOAT_DELTA, null );
 				}
@@ -363,6 +363,14 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 				validateEqualWithDefault( errorCollector, attributeName, expectedValue, actualValue, null );
 				break;
 		}
+	}
+
+	private boolean areNumbers(JsonElement expectedValue, JsonElement actualValue) {
+		if ( !( expectedValue instanceof JsonPrimitive && actualValue instanceof JsonPrimitive ) ) {
+			return false;
+		}
+
+		return ( (JsonPrimitive) expectedValue ).isNumber() && ( (JsonPrimitive) actualValue ).isNumber();
 	}
 
 	interface Validator<T> {
