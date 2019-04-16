@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.cfg;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,9 +21,15 @@ public class ElasticsearchVersion {
 
 	private static final Pattern pattern = Pattern.compile( "(\\d+)\\.(\\d+)\\.(\\d+)(?:-(\\w+))?" );
 
+	/**
+	 * @param versionString A version string following the format {@code x.y.z-qualifier},
+	 * where {@code x}, {@code y} and {@code z} are integers and {@code qualifier} is an optional string of word characters (alphanumeric or '_')
+	 * @return An {@link ElasticsearchVersion} object representing the given version.
+	 * @throws org.hibernate.search.util.common.SearchException If the input string doesn't follow the required format.
+	 */
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
-	public static ElasticsearchVersion of(String propertyValue) {
-		final String normalizedVersion = propertyValue.trim().toLowerCase( Locale.ROOT );
+	public static ElasticsearchVersion of(String versionString) {
+		final String normalizedVersion = versionString.trim().toLowerCase( Locale.ROOT );
 		Matcher matcher = pattern.matcher( normalizedVersion );
 		if ( !matcher.matches() ) {
 			throw log.invalidElasticsearchVersion( normalizedVersion );
@@ -67,5 +74,12 @@ public class ElasticsearchVersion {
 
 	public String getQualifier() {
 		return qualifier;
+	}
+
+	public boolean matches(ElasticsearchVersion other) {
+		return major == other.major
+				&& minor == other.minor
+				&& micro == other.micro
+				&& Objects.equals( qualifier, other.qualifier );
 	}
 }

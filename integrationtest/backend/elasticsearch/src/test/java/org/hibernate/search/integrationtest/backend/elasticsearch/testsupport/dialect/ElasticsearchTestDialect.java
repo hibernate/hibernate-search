@@ -9,14 +9,11 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.d
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 import com.google.gson.JsonObject;
 
 public interface ElasticsearchTestDialect {
-
-	ElasticsearchDialectName getName();
 
 	boolean isEmptyMappingPossible();
 
@@ -53,5 +50,9 @@ public interface ElasticsearchTestDialect {
 					e
 			);
 		}
+	}
+
+	static String getClusterVersion() {
+		return System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" );
 	}
 }

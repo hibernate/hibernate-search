@@ -45,13 +45,15 @@ public final class ElasticsearchBackendSettings {
 	public static final String HOSTS = "hosts";
 
 	/**
-	 * The dialect to use when interacting with the remote Elasticseearch cluster.
+	 * The version of Elasticsearch running on the Elasticsearch cluster.
 	 * <p>
-	 * See {@link ElasticsearchDialectName} for accepted values.
+	 * Expects either an {@link ElasticsearchVersion} object,
+	 * or a String that can be {{@link ElasticsearchVersion#of(String) parsed} in such an object.
 	 * <p>
-	 * Defaults to {@link ElasticsearchDialectName#AUTO}.
+	 * No default: if not provided, the version will be resolved automatically
+	 * by sending a request to the Elasticsearch cluster on startup.
 	 */
-	public static final String DIALECT = "dialect";
+	public static final String VERSION = "version";
 
 	/**
 	 * The username to send when connecting to the Elasticsearch servers (HTTP authentication).
@@ -193,7 +195,6 @@ public final class ElasticsearchBackendSettings {
 		}
 
 		public static final List<String> HOSTS = Collections.singletonList( "http://localhost:9200" );
-		public static final ElasticsearchDialectName DIALECT = ElasticsearchDialectName.AUTO;
 		public static final int REQUEST_TIMEOUT = 60000;
 		public static final int READ_TIMEOUT = 60000;
 		public static final int CONNECTION_TIMEOUT = 3000;

@@ -7,9 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
@@ -17,29 +18,29 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class ElasticsearchClientProvider implements Supplier<ElasticsearchClient> {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder;
 	private final GsonProvider defaultGsonProvider;
-	private final ElasticsearchDialectFactory dialectFactory;
-	private final ElasticsearchDialectName configuredDialectName;
+	private final Optional<ElasticsearchVersion> configuredVersionOptional;
 
 	private ElasticsearchClientImplementor clientImplementor;
 	private ElasticsearchVersion elasticsearchVersion;
 
 	ElasticsearchClientProvider(BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder,
 			GsonProvider defaultGsonProvider,
-			ElasticsearchDialectFactory dialectFactory,
-			ElasticsearchDialectName configuredDialectName) {
+			Optional<ElasticsearchVersion> configuredVersionOptional) {
 		this.clientFactoryHolder = clientFactoryHolder;
 		this.defaultGsonProvider = defaultGsonProvider;
-		this.dialectFactory = dialectFactory;
-		this.configuredDialectName = configuredDialectName;
+		this.configuredVersionOptional = configuredVersionOptional;
 	}
 
 	@Override
@@ -59,8 +60,11 @@ class ElasticsearchClientProvider implements Supplier<ElasticsearchClient> {
 			clientFactoryHolder.close(); // We won't need it anymore
 			elasticsearchVersion = ElasticsearchClientUtils.getElasticsearchVersion( clientImplementor );
 
-			if ( !ElasticsearchDialectName.AUTO.equals( configuredDialectName ) ) {
-				dialectFactory.checkAppropriate( configuredDialectName, elasticsearchVersion );
+			if ( configuredVersionOptional.isPresent() ) {
+				ElasticsearchVersion configuredVersion = configuredVersionOptional.get();
+				if ( !configuredVersion.matches( elasticsearchVersion ) ) {
+					throw log.unexpectedElasticsearchVersion( configuredVersion, elasticsearchVersion );
+				}
 			}
 		}
 	}

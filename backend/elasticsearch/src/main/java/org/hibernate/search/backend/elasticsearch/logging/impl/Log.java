@@ -12,7 +12,6 @@ import static org.jboss.logging.Logger.Level.WARN;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -478,14 +477,10 @@ public interface Log extends BasicLogger {
 			+ " and '-qualifier' is an optional string of word characters (alphanumeric or '_').")
 	SearchException invalidElasticsearchVersion(String versionString);
 
-	@Message(id = ID_OFFSET_3 + 58, value = "Invalid Elasticsearch dialect name: '%1$s'."
-			+ " Valid names are: %2$s.")
-	SearchException invalidDialectName(String normalizedValue, List<String> validValues);
-
-	@Message(id = ID_OFFSET_3 + 59, value = "Unexpected Elasticsearch version: '%1$s'."
-			+ " This version would require dialect '%2$s', but Hibernate Search was configured to use dialect '%3$s'.")
-	SearchException unexpectedElasticsearchVersion(ElasticsearchVersion actualVersion,
-			ElasticsearchDialectName appropriateDialectName, ElasticsearchDialectName configuredDialectName);
+	@Message(id = ID_OFFSET_3 + 59, value = "Unexpected Elasticsearch version running on the cluster: '%2$s'."
+			+ " Hibernate Search was configured for Elasticsearch '%1$s'.")
+	SearchException unexpectedElasticsearchVersion(ElasticsearchVersion configuredVersion,
+			ElasticsearchVersion actualVersion);
 
 	@Message(id = ID_OFFSET_3 + 60, value = "Elasticsearch backend does not support skip analysis on not analyzed field: '%1$s'.")
 	SearchException skipAnalysisOnKeywordField(String absoluteFieldPath, @Param EventContext context);
