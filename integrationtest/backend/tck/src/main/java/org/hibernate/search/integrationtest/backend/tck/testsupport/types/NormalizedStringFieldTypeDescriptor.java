@@ -84,6 +84,8 @@ public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<Str
 
 	@Override
 	public Optional<IndexNullAsExpectactions<String>> getIndexNullAsExpectations() {
-		return Optional.empty();
+		return Optional.of( new IndexNullAsExpectactions<>(
+				"", "Aaron"
+		) );
 	}
 }
