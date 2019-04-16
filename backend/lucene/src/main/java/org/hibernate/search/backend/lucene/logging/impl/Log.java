@@ -428,4 +428,7 @@ public interface Log extends BasicLogger {
 			value = "Multiple calls to toReference() for the same field definition."
 					+ " You must call toReference() exactly once.")
 	SearchException cannotCreateReferenceMultipleTimes(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 73, value = "Index-null-as option is not supported on analyzed field. Trying to define the analyzer: '%1$s' together with index null as: '%2$s'.")
+	SearchException cannotUseIndexNullAsAndAnalyzer(String analyzerName, String indexNullAs, @Param EventContext context);
 }

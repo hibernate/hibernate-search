@@ -98,6 +98,10 @@ class ElasticsearchStringIndexFieldTypeContext
 			if ( resolvedSortable ) {
 				throw log.cannotUseAnalyzerOnSortableField( analyzerName, getBuildContext().getEventContext() );
 			}
+
+			if ( indexNullAs != null ) {
+				throw log.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAs, getBuildContext().getEventContext() );
+			}
 		}
 		else {
 			mapping.setType( DataType.KEYWORD );

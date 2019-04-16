@@ -19,20 +19,23 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.test.SubTest;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class IndexNullAsValueIT {
 
 	private static final String INDEX_NAME = "IndexName";
+	private static final String ANOTHER_INDEX_NAME = "AnotherIndexName";
 
 	private static final String DOCUMENT_WITH_INDEX_NULL_AS_VALUES = "documentWithIndexNullAsValues";
 	private static final String DOCUMENT_WITH_DIFFERENT_VALUES = "documentWithDifferentValues";
@@ -44,21 +47,9 @@ public class IndexNullAsValueIT {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
-	@Before
-	public void before() {
-		setupHelper.withDefaultConfiguration()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
-
-		initData();
-	}
-
 	@Test
 	public void indexNullAsValue_match() {
+		setUp();
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -77,6 +68,7 @@ public class IndexNullAsValueIT {
 
 	@Test
 	public void indexNullAsValue_spatial() {
+		setUp();
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPointField" ).circle( GeoPoint.of( 0.0, 0.0 ), 1 ) )
@@ -84,6 +76,35 @@ public class IndexNullAsValueIT {
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_WITH_INDEX_NULL_AS_VALUES, DOCUMENT_WITH_NULL_VALUES );
+	}
+
+	@Test
+	public void indexNullAsValue_fullText() {
+		SubTest.expectException( () -> setupHelper.withDefaultConfiguration()
+				.withIndex( ANOTHER_INDEX_NAME, ctx -> ctx.getSchemaElement()
+								.field( "fullTextField", c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).indexNullAs( "bla bla bla" ) )
+								.toReference()
+						, ignored -> {
+						} )
+				.setup()
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Index-null-as option is not supported on analyzed field." )
+				.hasMessageContaining( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+				.hasMessageContaining( "bla bla bla" );
+	}
+
+	private void setUp() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex(
+						INDEX_NAME,
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.indexManager = indexManager
+				)
+				.setup();
+
+		initData();
 	}
 
 	private void initData() {

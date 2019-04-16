@@ -491,4 +491,7 @@ public interface Log extends BasicLogger {
 					+ " This version matches multiple dialects."
 					+ " Please use a more precise version to remove the ambiguity." )
 	SearchException ambiguousElasticsearchVersion(ElasticsearchVersion version);
+
+	@Message(id = ID_OFFSET_3 + 62, value = "Index-null-as option is not supported on analyzed field. Trying to define the analyzer: '%1$s' together with index null as: '%2$s'.")
+	SearchException cannotUseIndexNullAsAndAnalyzer(String analyzerName, String indexNullAs, @Param EventContext context);
 }

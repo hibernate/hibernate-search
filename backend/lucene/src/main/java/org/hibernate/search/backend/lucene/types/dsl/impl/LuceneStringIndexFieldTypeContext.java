@@ -83,6 +83,10 @@ class LuceneStringIndexFieldTypeContext
 			if ( normalizer != null ) {
 				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getBuildContext().getEventContext() );
 			}
+
+			if ( indexNullAsValue != null ) {
+				throw log.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAsValue, getBuildContext().getEventContext() );
+			}
 		}
 
 		// TODO GSM: the idea would be to create only one global QueryBuilder object per analyzer/normalizer
