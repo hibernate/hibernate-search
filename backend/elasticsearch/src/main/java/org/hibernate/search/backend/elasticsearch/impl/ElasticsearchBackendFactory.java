@@ -17,9 +17,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.gson.impl.DefaultGsonProvider;
@@ -102,31 +100,25 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 		BeanProvider beanProvider = buildContext.getBeanProvider();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
-		ElasticsearchClientImplementor client = null;
+		ElasticsearchClientProvider clientProvider = null;
 		try {
 			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanProvider::getBean );
 
-			ElasticsearchClientProvider clientProvider;
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
+			clientProvider = new ElasticsearchClientProvider(
+					clientFactoryHolder, defaultGsonProvider, dialectFactory, dialectName
+			);
+
 			ElasticsearchDialect dialect;
 			if ( ElasticsearchDialectName.AUTO.equals( dialectName ) ) {
 				// We must determine the appropriate dialect, and thus instantiate the client, right now.
-				client = clientFactoryHolder.get().create( propertySource, defaultGsonProvider );
-				clientFactoryHolder.close(); // We won't need this anymore
-				clientProvider = new ElasticsearchClientProvider( client );
+				clientProvider.onStart( propertySource );
 
-				ElasticsearchVersion version = ElasticsearchClientUtils.getElasticsearchVersion( client );
+				ElasticsearchVersion version = clientProvider.getElasticsearchVersion();
 				dialectName = dialectFactory.getAppropriateDialectName( version );
-				dialect = dialectFactory.create( dialectName );
 			}
-			else {
-				// We can delay the client instantiation to when the backend starts; we'll check that the dialect is appropriate then.
-				clientProvider = new ElasticsearchClientProvider(
-						clientFactoryHolder, defaultGsonProvider, dialectFactory, dialectName
-				);
 
-				dialect = dialectFactory.create( dialectName );
-			}
+			dialect = dialectFactory.create( dialectName );
 
 			GsonProvider dialectSpecificGsonProvider =
 					DefaultGsonProvider.create( dialect::createGsonBuilderBase, logPrettyPrinting );
@@ -159,7 +151,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( BeanHolder::close, clientFactoryHolder )
-					.push( ElasticsearchClientImplementor::close, client );
+					.push( ElasticsearchClientProvider::onStop, clientProvider );
 			throw e;
 		}
 	}

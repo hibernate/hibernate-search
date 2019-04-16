@@ -30,6 +30,7 @@ class ElasticsearchClientProvider implements Supplier<ElasticsearchClient> {
 	private final ElasticsearchDialectName configuredDialectName;
 
 	private ElasticsearchClientImplementor clientImplementor;
+	private ElasticsearchVersion elasticsearchVersion;
 
 	ElasticsearchClientProvider(BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder,
 			GsonProvider defaultGsonProvider,
@@ -39,36 +40,28 @@ class ElasticsearchClientProvider implements Supplier<ElasticsearchClient> {
 		this.defaultGsonProvider = defaultGsonProvider;
 		this.dialectFactory = dialectFactory;
 		this.configuredDialectName = configuredDialectName;
-		this.clientImplementor = null;
-	}
-
-	ElasticsearchClientProvider(ElasticsearchClientImplementor clientImplementor) {
-		this.clientFactoryHolder = null;
-		this.defaultGsonProvider = null;
-		this.dialectFactory = null;
-		this.configuredDialectName = null;
-		this.clientImplementor = clientImplementor;
 	}
 
 	@Override
 	public ElasticsearchClient get() {
-		if ( clientImplementor == null ) {
-			throw new AssertionFailure(
-					"Cannot retrieve the Elasticsearch client, which means the backend was not started."
-							+ "There is probably a bug in Hibernate Search, please report it."
-			);
-		}
-		else {
-			return clientImplementor;
-		}
+		checkStarted();
+		return clientImplementor;
+	}
+
+	ElasticsearchVersion getElasticsearchVersion() {
+		checkStarted();
+		return elasticsearchVersion;
 	}
 
 	void onStart(ConfigurationPropertySource propertySource) {
 		if ( clientImplementor == null ) {
 			clientImplementor = clientFactoryHolder.get().create( propertySource, defaultGsonProvider );
 			clientFactoryHolder.close(); // We won't need it anymore
-			ElasticsearchVersion version = ElasticsearchClientUtils.getElasticsearchVersion( clientImplementor );
-			dialectFactory.checkAppropriate( configuredDialectName, version );
+			elasticsearchVersion = ElasticsearchClientUtils.getElasticsearchVersion( clientImplementor );
+
+			if ( !ElasticsearchDialectName.AUTO.equals( configuredDialectName ) ) {
+				dialectFactory.checkAppropriate( configuredDialectName, elasticsearchVersion );
+			}
 		}
 	}
 
@@ -76,6 +69,15 @@ class ElasticsearchClientProvider implements Supplier<ElasticsearchClient> {
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( BeanHolder::close, clientFactoryHolder ); // Just in case start() was not called
 			closer.push( ElasticsearchClientImplementor::close, clientImplementor );
+		}
+	}
+
+	private void checkStarted() {
+		if ( clientImplementor == null ) {
+			throw new AssertionFailure(
+					"Attempt to retrieve Elasticsearch client or version before the backend was started."
+							+ "There is probably a bug in Hibernate Search, please report it."
+			);
 		}
 	}
 }
