@@ -155,7 +155,7 @@ This <<configuration-property-types,boolean property>> is set at the index level
 
 [source]
 ----
-hibernate.search.indexes.<index name>.refresh_after_write false (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.refresh_after_write false (default)
 # OR
 hibernate.search.backends.<backend name>.index_defaults.refresh_after_write false (default)
 ----
@@ -269,9 +269,9 @@ You can fine-tune the strategy using the following properties:
 
 [source]
 ----
-hibernate.search.indexes.<index name>.lifecycle.strategy create (default)
-hibernate.search.indexes.<index name>.lifecycle.minimal_required_status green (default)
-hibernate.search.indexes.<index name>.lifecycle.minimal_required_status_wait_timeout 10000 (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.strategy create (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.minimal_required_status green (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.minimal_required_status_wait_timeout 10000 (default)
 # OR
 hibernate.search.backends.<backend name>.index_defaults.lifecycle.strategy create (default)
 hibernate.search.backends.<backend name>.index_defaults.lifecycle.minimal_required_status green (default)
