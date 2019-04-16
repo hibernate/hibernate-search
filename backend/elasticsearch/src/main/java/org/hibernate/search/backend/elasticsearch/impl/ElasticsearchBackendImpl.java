@@ -12,13 +12,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSharedWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
@@ -52,7 +49,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchClientProvider clientProvider;
+	private final ElasticsearchLinkImpl link;
 
 	private final String name;
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
@@ -71,20 +68,18 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
-	ElasticsearchBackendImpl(ElasticsearchClientProvider clientProvider,
-			GsonProvider dialectSpecificGsonProvider, String name,
-			ElasticsearchWorkBuilderFactory workFactory,
+	ElasticsearchBackendImpl(ElasticsearchLinkImpl link,
+			String name,
 			ElasticsearchIndexFieldTypeFactoryContextProvider typeFactoryContextProvider,
-			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
-		this.clientProvider = clientProvider;
+		this.link = link;
 		this.name = name;
 
 		this.orchestratorProvider = new ElasticsearchWorkOrchestratorProvider(
 				"Elasticsearch parallel work orchestrator for backend " + name,
-				clientProvider, dialectSpecificGsonProvider, workFactory,
+				link,
 				// TODO the LogErrorHandler should be replaced with a user-configurable instance at some point. See HSEARCH-3110.
 				new LogErrorHandler()
 		);
@@ -95,11 +90,11 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.typeFactoryContextProvider = typeFactoryContextProvider;
 
 		this.eventContext = EventContexts.fromBackendName( name );
-		this.indexingContext = new IndexingBackendContext( eventContext, workFactory, multiTenancyStrategy,
+		this.indexingContext = new IndexingBackendContext( eventContext, link, multiTenancyStrategy,
 				orchestratorProvider
 		);
 		this.searchContext = new SearchBackendContext(
-				eventContext, workFactory, searchResultExtractorFactory, userFacingGson,
+				eventContext, link, userFacingGson,
 				( String elasticsearchIndexName ) -> {
 					String result = hibernateSearchIndexNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
 					if ( result == null ) {
@@ -126,7 +121,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			closer.push( ElasticsearchWorkOrchestrator::close, queryOrchestrator );
 			closer.push( ElasticsearchWorkOrchestratorProvider::close, orchestratorProvider );
 			// Close the client after the orchestrators, when we're sure all works have been performed
-			closer.push( ElasticsearchClientProvider::onStop, clientProvider );
+			closer.push( ElasticsearchLinkImpl::onStop, link );
 		}
 		catch (IOException | RuntimeException e) {
 			throw log.failedToShutdownBackend( e, eventContext );
@@ -135,7 +130,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	@Override
 	public void start(BackendStartContext context) {
-		clientProvider.onStart( context.getConfigurationPropertySource() );
+		link.onStart( context.getConfigurationPropertySource() );
 		orchestratorProvider.start();
 		queryOrchestrator.start();
 	}
@@ -156,7 +151,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	@Override
 	public <T> T getClient(Class<T> clientClass) {
-		return clientProvider.get().unwrap( clientClass );
+		return link.getClient().unwrap( clientClass );
 	}
 
 	@Override

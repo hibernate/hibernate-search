@@ -7,8 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**
@@ -27,11 +27,11 @@ public class ElasticsearchIndexAdministrationClient {
 	private final URLEncodedString elasticsearchIndexName;
 	private final IndexMetadata expectedMetadata;
 
-	public ElasticsearchIndexAdministrationClient(ElasticsearchWorkBuilderFactory workFactory,
+	public ElasticsearchIndexAdministrationClient(ElasticsearchLink link,
 			ElasticsearchWorkOrchestrator workOrchestrator,
 			URLEncodedString elasticsearchIndexName,
 			IndexMetadata expectedMetadata) {
-		ElasticsearchSchemaAccessor schemaAccessor = new ElasticsearchSchemaAccessor( workFactory, workOrchestrator );
+		ElasticsearchSchemaAccessor schemaAccessor = new ElasticsearchSchemaAccessor( link, workOrchestrator );
 
 		this.schemaCreator = new ElasticsearchSchemaCreatorImpl( schemaAccessor );
 		this.schemaDropper = new ElasticsearchSchemaDropperImpl( schemaAccessor );

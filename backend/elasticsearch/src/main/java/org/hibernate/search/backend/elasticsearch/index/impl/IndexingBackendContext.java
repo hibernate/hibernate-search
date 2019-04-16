@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSharedWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
@@ -14,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.index.admin.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
@@ -25,14 +25,14 @@ import org.hibernate.search.util.common.reporting.EventContext;
 public class IndexingBackendContext {
 
 	private final EventContext eventContext;
-	private final ElasticsearchWorkBuilderFactory workFactory;
+	private final ElasticsearchLink link;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
 
-	public IndexingBackendContext(EventContext eventContext, ElasticsearchWorkBuilderFactory workFactory, MultiTenancyStrategy multiTenancyStrategy,
+	public IndexingBackendContext(EventContext eventContext, ElasticsearchLink link, MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestratorProvider orchestratorProvider) {
 		this.eventContext = eventContext;
-		this.workFactory = workFactory;
+		this.link = link;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestratorProvider = orchestratorProvider;
 	}
@@ -53,7 +53,7 @@ public class IndexingBackendContext {
 		metadata.setSettings( model.getSettings() );
 		metadata.setMapping( model.getMapping() );
 		return new ElasticsearchIndexAdministrationClient(
-				workFactory, orchestratorProvider.getRootParallelOrchestrator(),
+				link, orchestratorProvider.getRootParallelOrchestrator(),
 				indexName, metadata
 		);
 	}
@@ -78,7 +78,7 @@ public class IndexingBackendContext {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexWorkPlan(
-				workFactory, multiTenancyStrategy, orchestrator,
+				link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator,
 				indexName,
 				refreshAfterWrite,
 				sessionContext
@@ -91,11 +91,11 @@ public class IndexingBackendContext {
 			SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new ElasticsearchIndexDocumentWorkExecutor( workFactory, multiTenancyStrategy, orchestrator,
+		return new ElasticsearchIndexDocumentWorkExecutor( link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator,
 				indexName, sessionContext );
 	}
 
 	IndexWorkExecutor createWorkExecutor(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName) {
-		return new ElasticsearchIndexWorkExecutor( workFactory, multiTenancyStrategy, orchestrator, indexName, eventContext );
+		return new ElasticsearchIndexWorkExecutor( link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator, indexName, eventContext );
 	}
 }

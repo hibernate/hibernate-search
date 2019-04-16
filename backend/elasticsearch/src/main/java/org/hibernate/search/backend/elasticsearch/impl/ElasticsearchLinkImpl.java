@@ -9,43 +9,74 @@ package org.hibernate.search.backend.elasticsearch.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
+import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
+import org.hibernate.search.backend.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class ElasticsearchClientProvider implements Supplier<ElasticsearchClient> {
+class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder;
 	private final GsonProvider defaultGsonProvider;
+	private final boolean logPrettyPrinting;
+	private final ElasticsearchDialectFactory dialectFactory;
 	private final Optional<ElasticsearchVersion> configuredVersionOptional;
 
 	private ElasticsearchClientImplementor clientImplementor;
 	private ElasticsearchVersion elasticsearchVersion;
+	private GsonProvider gsonProvider;
+	private ElasticsearchWorkBuilderFactory workBuilderFactory;
+	private ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
 
-	ElasticsearchClientProvider(BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder,
-			GsonProvider defaultGsonProvider,
+	ElasticsearchLinkImpl(BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder,
+			GsonProvider defaultGsonProvider, boolean logPrettyPrinting,
+			ElasticsearchDialectFactory dialectFactory,
 			Optional<ElasticsearchVersion> configuredVersionOptional) {
 		this.clientFactoryHolder = clientFactoryHolder;
 		this.defaultGsonProvider = defaultGsonProvider;
+		this.logPrettyPrinting = logPrettyPrinting;
+		this.dialectFactory = dialectFactory;
 		this.configuredVersionOptional = configuredVersionOptional;
 	}
 
 	@Override
-	public ElasticsearchClient get() {
+	public ElasticsearchClient getClient() {
 		checkStarted();
 		return clientImplementor;
+	}
+
+	@Override
+	public GsonProvider getGsonProvider() {
+		checkStarted();
+		return gsonProvider;
+	}
+
+	@Override
+	public ElasticsearchWorkBuilderFactory getWorkBuilderFactory() {
+		checkStarted();
+		return workBuilderFactory;
+	}
+
+	@Override
+	public ElasticsearchSearchResultExtractorFactory getSearchResultExtractorFactory() {
+		checkStarted();
+		return searchResultExtractorFactory;
 	}
 
 	ElasticsearchVersion getElasticsearchVersion() {
@@ -57,14 +88,19 @@ class ElasticsearchClientProvider implements Supplier<ElasticsearchClient> {
 		if ( clientImplementor == null ) {
 			clientImplementor = clientFactoryHolder.get().create( propertySource, defaultGsonProvider );
 			clientFactoryHolder.close(); // We won't need it anymore
-			elasticsearchVersion = ElasticsearchClientUtils.getElasticsearchVersion( clientImplementor );
 
+			elasticsearchVersion = ElasticsearchClientUtils.getElasticsearchVersion( clientImplementor );
 			if ( configuredVersionOptional.isPresent() ) {
 				ElasticsearchVersion configuredVersion = configuredVersionOptional.get();
 				if ( !configuredVersion.matches( elasticsearchVersion ) ) {
 					throw log.unexpectedElasticsearchVersion( configuredVersion, elasticsearchVersion );
 				}
 			}
+
+			ElasticsearchProtocolDialect protocolDialect = dialectFactory.createProtocolDialect( elasticsearchVersion );
+			gsonProvider = DefaultGsonProvider.create( protocolDialect::createGsonBuilderBase, logPrettyPrinting );
+			workBuilderFactory = protocolDialect.createWorkBuilderFactory( gsonProvider );
+			searchResultExtractorFactory = protocolDialect.createSearchResultExtractorFactory();
 		}
 	}
 
@@ -78,7 +114,7 @@ class ElasticsearchClientProvider implements Supplier<ElasticsearchClient> {
 	private void checkStarted() {
 		if ( clientImplementor == null ) {
 			throw new AssertionFailure(
-					"Attempt to retrieve Elasticsearch client or version before the backend was started."
+					"Attempt to retrieve Elasticsearch client or related information before the backend was started."
 							+ "There is probably a bug in Hibernate Search, please report it."
 			);
 		}

@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
-import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
@@ -26,9 +26,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -99,52 +97,41 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 		BeanProvider beanProvider = buildContext.getBeanProvider();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
-		ElasticsearchClientProvider clientProvider = null;
+		ElasticsearchLinkImpl link = null;
 		try {
 			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanProvider::getBean );
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
-			clientProvider = new ElasticsearchClientProvider(
-					clientFactoryHolder, defaultGsonProvider, configuredVersion
+			link = new ElasticsearchLinkImpl(
+					clientFactoryHolder, defaultGsonProvider, logPrettyPrinting, dialectFactory, configuredVersion
 			);
 
-			ElasticsearchDialect dialect;
+			ElasticsearchModelDialect dialect;
 			ElasticsearchVersion version;
 			if ( configuredVersion.isPresent() ) {
 				version = configuredVersion.get();
 			}
 			else {
 				// We must determine the Elasticsearch version, and thus instantiate the client, right now.
-				clientProvider.onStart( propertySource );
+				link.onStart( propertySource );
 
-				version = clientProvider.getElasticsearchVersion();
+				version = link.getElasticsearchVersion();
 			}
 
-			dialect = dialectFactory.create( version );
-
-			GsonProvider dialectSpecificGsonProvider =
-					DefaultGsonProvider.create( dialect::createGsonBuilderBase, logPrettyPrinting );
+			dialect = dialectFactory.createModelDialect( version );
 
 			Gson userFacingGson = new GsonBuilder().setPrettyPrinting().create();
 
-			ElasticsearchWorkBuilderFactory workFactory = dialect.createWorkBuilderFactory( dialectSpecificGsonProvider );
-
 			ElasticsearchIndexFieldTypeFactoryContextProvider typeFactoryContextProvider =
 					dialect.createIndexTypeFieldFactoryContextProvider( userFacingGson );
-
-			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory =
-					dialect.createSearchResultExtractorFactory();
 
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
 					getAnalysisDefinitionRegistry( backendContext, buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
-					clientProvider,
-					dialectSpecificGsonProvider,
+					link,
 					name,
-					workFactory,
 					typeFactoryContextProvider,
-					searchResultExtractorFactory,
 					userFacingGson,
 					analysisDefinitionRegistry,
 					getMultiTenancyStrategy( name, propertySource )
@@ -153,7 +140,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( BeanHolder::close, clientFactoryHolder )
-					.push( ElasticsearchClientProvider::onStop, clientProvider );
+					.push( ElasticsearchLinkImpl::onStop, link );
 			throw e;
 		}
 	}
