@@ -107,30 +107,27 @@ Expects a positive integer, in seconds.
 * `discovery.default_scheme` defines the default scheme to use when connecting to automatically discovered nodes.
 Expects a String: either "http" or "https".
 
+[[backend-elasticsearch-configuration-version]]
+=== Version
+// Keep the old anchor to avoid dead links
 [[backend-elasticsearch-configuration-dialect]]
-=== Dialect
 
 Different versions of Elasticsearch expose slightly different APIs.
 As a result, Hibernate Search needs to be aware of the version of Elasticsearch it is talking to
 in order to generate correct HTTP requests.
 
 By default, Hibernate Search will query the Elasticsearch cluster at boot time to know its version,
-and will infer the correct dialect to use.
+and will infer the correct behavior to adopt.
 
-Alternatively, you can tell Hibernate Search the dialect to use.
-Hibernate Search will still query the Elasticsearch cluster to check that the dialect is suitable,
+Alternatively, you can tell Hibernate Search the Elasticsearch version to target.
+Hibernate Search will still query the Elasticsearch cluster to check that the configured version matches the actual version,
 but only after most of the metadata has been validated.
 This can be helpful when developing, in particular.
 
-To select a dialect, set the `hibernate.search.backends.<backend name>.dialect` property to one of these values:
-
-[options="header"]
-|====
-|Value|Elasticsearch version
-|`5.6`|Elasticsearch 5.6.x
-|`6`|Elasticsearch 6.x
-|`7`|Elasticsearch 7.x
-|====
+To configure the version, set the `hibernate.search.backends.<backend name>.version` property
+to a string following the format `x.y.z-qualifier`,
+where `x`, `y` and `z` are integers
+and `qualifier` is an optional string of word characters (alphanumeric or `_`).
 
 [[backend-elasticsearch-configuration-logging]]
 === Logging

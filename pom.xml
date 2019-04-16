@@ -1579,6 +1579,7 @@
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
                             <org.hibernate.search.integrationtest.backend.elasticsearch.testdialect>${test.elasticsearch.testdialect}</org.hibernate.search.integrationtest.backend.elasticsearch.testdialect>
+                            <org.hibernate.search.integrationtest.backend.elasticsearch.version>${test.elasticsearch.host.version}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
                         </systemPropertyVariables>
                         <argLine>${failsafe.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>

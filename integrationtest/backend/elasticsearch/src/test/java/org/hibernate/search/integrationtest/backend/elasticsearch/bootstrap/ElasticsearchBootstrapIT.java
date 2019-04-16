@@ -31,17 +31,15 @@ public class ElasticsearchBootstrapIT {
 	@Rule
 	public ElasticsearchClientSpy elasticsearchClientSpy = new ElasticsearchClientSpy();
 
-	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
-
 	/**
-	 * Check that we boot successfully when the Elasticsearch dialect is configured explicitly,
+	 * Check that we boot successfully when the Elasticsearch version is configured explicitly,
 	 * and that the Elasticsearch client starts in the second phase of bootstrap in that case.
 	 */
 	@Test
 	public void explicitDialect() {
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSettings.DIALECT, dialect.getName()
+						BACKEND_NAME, ElasticsearchBackendSettings.VERSION, ElasticsearchTestDialect.getClusterVersion()
 				)
 				.withBackendProperty(
 						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
