@@ -8,7 +8,8 @@ package org.hibernate.search.backend.elasticsearch.cfg;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,11 +20,12 @@ public class ElasticsearchVersion {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final Pattern pattern = Pattern.compile( "(\\d+)\\.(\\d+)\\.(\\d+)(?:-(\\w+))?" );
+	private static final Pattern pattern = Pattern.compile( "(\\d+)(?:\\.(\\d+)(?:\\.(\\d+)(?:-(\\w+))?)?)?" );
 
 	/**
 	 * @param versionString A version string following the format {@code x.y.z-qualifier},
-	 * where {@code x}, {@code y} and {@code z} are integers and {@code qualifier} is an optional string of word characters (alphanumeric or '_')
+	 * where {@code x}, {@code y} and {@code z} are integers and {@code qualifier} is a string of word characters (alphanumeric or '_').
+	 * Incomplete versions are allowed, for example {@code 7.0} or just {@code 7}.
 	 * @return An {@link ElasticsearchVersion} object representing the given version.
 	 * @throws org.hibernate.search.util.common.SearchException If the input string doesn't follow the required format.
 	 */
@@ -39,16 +41,19 @@ public class ElasticsearchVersion {
 		String micro = matcher.group( 3 );
 		String qualifier = matcher.group( 4 );
 		return new ElasticsearchVersion(
-				Integer.parseInt( major ), Integer.parseInt( minor ), Integer.parseInt( micro ), qualifier
+				Integer.parseInt( major ),
+				minor == null ? null : Integer.parseInt( minor ),
+				micro == null ? null : Integer.parseInt( micro ),
+				qualifier
 		);
 	}
 
 	private final int major;
-	private final int minor;
-	private final int micro;
+	private final Integer minor;
+	private final Integer micro;
 	private final String qualifier;
 
-	private ElasticsearchVersion(int major, int minor, int micro, String qualifier) {
+	private ElasticsearchVersion(int major, Integer minor, Integer micro, String qualifier) {
 		this.major = major;
 		this.minor = minor;
 		this.micro = micro;
@@ -57,29 +62,47 @@ public class ElasticsearchVersion {
 
 	@Override
 	public String toString() {
-		return major + "." + minor + "." + micro + (qualifier == null ? "" : "-" + qualifier);
+		StringBuilder builder = new StringBuilder();
+		builder.append( major );
+		if ( minor != null ) {
+			builder.append( "." ).append( minor );
+		}
+		if ( micro != null ) {
+			builder.append( "." ).append( micro );
+		}
+		if ( qualifier != null ) {
+			builder.append( "-" ).append( qualifier );
+		}
+		return builder.toString();
 	}
 
 	public int getMajor() {
 		return major;
 	}
 
-	public int getMinor() {
-		return minor;
+	public OptionalInt getMinor() {
+		return minor == null ? OptionalInt.empty() : OptionalInt.of( minor );
 	}
 
-	public int getMicro() {
-		return micro;
+	public OptionalInt getMicro() {
+		return micro == null ? OptionalInt.empty() : OptionalInt.of( micro );
 	}
 
-	public String getQualifier() {
-		return qualifier;
+	public Optional<String> getQualifier() {
+		return Optional.ofNullable( qualifier );
 	}
 
+	/**
+	 * @param other A version to be matched against this version.
+	 * @return {@code true} if the other version matches this version,
+	 * i.e. if all the components defined in this version are also defined in the other version with the same value.
+	 * {@code false} otherwise.
+	 * Components that are not defined in this version do not matter.
+	 */
 	public boolean matches(ElasticsearchVersion other) {
 		return major == other.major
-				&& minor == other.minor
-				&& micro == other.micro
-				&& Objects.equals( qualifier, other.qualifier );
+				&& ( minor == null || minor.equals( other.minor ) )
+				&& ( micro == null || micro.equals( other.micro ) )
+				&& ( qualifier == null || qualifier.equals( other.qualifier ) );
 	}
 }

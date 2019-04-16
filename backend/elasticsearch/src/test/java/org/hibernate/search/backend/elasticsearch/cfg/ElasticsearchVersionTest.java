@@ -30,19 +30,68 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
+	public void lenientMatch() {
+		assertMatch( "5", "5.6.0" ).isTrue();
+		assertMatch( "5", "5.6.1" ).isTrue();
+		assertMatch( "5", "5.7.1" ).isTrue();
+		assertMatch( "5.6", "5.6.0" ).isTrue();
+		assertMatch( "5.6", "5.6.1" ).isTrue();
+		assertMatch( "6", "6.0.0" ).isTrue();
+		assertMatch( "6", "6.0.1" ).isTrue();
+		assertMatch( "6", "6.6.0" ).isTrue();
+		assertMatch( "6", "6.6.1" ).isTrue();
+		assertMatch( "6", "6.7.0" ).isTrue();
+		assertMatch( "6", "6.7.1" ).isTrue();
+		assertMatch( "6.0", "6.0.0" ).isTrue();
+		assertMatch( "6.0", "6.0.1" ).isTrue();
+		assertMatch( "6.6", "6.6.0" ).isTrue();
+		assertMatch( "6.6", "6.6.1" ).isTrue();
+		assertMatch( "6.7", "6.7.0" ).isTrue();
+		assertMatch( "6.7", "6.7.1" ).isTrue();
+		assertMatch( "7", "7.0.0" ).isTrue();
+		assertMatch( "7", "7.0.1" ).isTrue();
+		assertMatch( "7", "7.0.0-beta1" ).isTrue();
+		assertMatch( "7.0", "7.0.0" ).isTrue();
+		assertMatch( "7.0", "7.0.1" ).isTrue();
+		assertMatch( "7.0", "7.0.0-beta1" ).isTrue();
+	}
+
+	@Test
 	public void nonMatching() {
 		assertMatch( "5.6.0", "5.5.0" ).isFalse();
 		assertMatch( "5.6.0", "5.7.0" ).isFalse();
 		assertMatch( "5.6.0", "6.0.0" ).isFalse();
+		assertMatch( "5.6", "6.0.0" ).isFalse();
+		assertMatch( "5", "6.0.0" ).isFalse();
 		assertMatch( "6.0.0", "5.6.0" ).isFalse();
 		assertMatch( "6.7.0", "6.6.0" ).isFalse();
 		assertMatch( "6.6.0", "6.7.0" ).isFalse();
 		assertMatch( "6.0.0", "7.0.0" ).isFalse();
 		assertMatch( "6.6.0", "7.0.0" ).isFalse();
+		assertMatch( "6.0", "5.6.0" ).isFalse();
+		assertMatch( "6.0", "7.0.0" ).isFalse();
+		assertMatch( "6.0", "6.5.0" ).isFalse();
+		assertMatch( "6.0", "6.6.0" ).isFalse();
+		assertMatch( "6.6", "5.6.0" ).isFalse();
+		assertMatch( "6.6", "7.0.0" ).isFalse();
+		assertMatch( "6.6", "6.0.0" ).isFalse();
+		assertMatch( "6.6", "6.5.0" ).isFalse();
+		assertMatch( "6", "5.6.0" ).isFalse();
+		assertMatch( "6", "7.0.0" ).isFalse();
 		assertMatch( "7.0.0", "6.6.0" ).isFalse();
 		assertMatch( "7.0.0", "5.6.0" ).isFalse();
 		assertMatch( "7.0.0", "7.0.1" ).isFalse();
-		assertMatch( "7.0.0", "7.0.0-beta1" ).isFalse();
+		assertMatch( "7.0.0", "7.1.0" ).isFalse();
+		assertMatch( "7.0", "5.6.0" ).isFalse();
+		assertMatch( "7.0", "6.0.0" ).isFalse();
+		assertMatch( "7.0", "6.5.0" ).isFalse();
+		assertMatch( "7.0", "6.6.0" ).isFalse();
+		assertMatch( "7.0", "7.1.0" ).isFalse();
+		assertMatch( "7", "5.6.0" ).isFalse();
+		assertMatch( "7", "6.6.0" ).isFalse();
+		assertMatch( "7.0.0", "6.6.0" ).isFalse();
+		assertMatch( "7.0.0-beta1", "5.6.0" ).isFalse();
+		assertMatch( "7.0.0-beta1", "6.0.0" ).isFalse();
 		assertMatch( "7.0.0-beta1", "7.0.0" ).isFalse();
 	}
 

@@ -14,6 +14,7 @@ import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -25,62 +26,98 @@ public class ElasticsearchDialectFactoryTest {
 	private ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 
 	@Test
-	public void es0() {
+	public void es09012() {
 		testUnsupported( "0.90.12" );
 	}
 
 	@Test
-	public void es10() {
+	public void es100() {
 		testUnsupported( "1.0.0" );
 	}
 
 	@Test
-	public void es20() {
+	public void es200() {
 		testUnsupported( "2.0.0" );
 	}
 
 	@Test
-	public void es24() {
+	public void es244() {
 		testUnsupported( "2.4.4" );
 	}
 
 	@Test
-	public void es50() {
+	public void es500() {
 		testUnsupported( "5.0.0" );
 	}
 
 	@Test
-	public void es52() {
+	public void es520() {
 		testUnsupported( "5.2.0" );
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3563")
+	public void es5() {
+		testAmbiguous( "5" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3563")
 	public void es56() {
+		testSuccess( "5.6", Elasticsearch56Dialect.class );
+	}
+
+	@Test
+	public void es5612() {
 		testSuccess( "5.6.12", Elasticsearch56Dialect.class );
 	}
 
 	@Test
-	public void es57() {
+	public void es570() {
 		testSuccessWithWarning( "5.7.0", Elasticsearch56Dialect.class );
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3563")
+	public void es6() {
+		testAmbiguous( "6" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3563")
 	public void es60() {
+		testSuccess( "6.0", Elasticsearch60Dialect.class );
+	}
+
+	@Test
+	public void es600() {
 		testSuccess( "6.0.0", Elasticsearch60Dialect.class );
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3563")
 	public void es66() {
+		testSuccess( "6.6", Elasticsearch60Dialect.class );
+	}
+
+	@Test
+	public void es660() {
 		testSuccess( "6.6.0", Elasticsearch60Dialect.class );
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3563")
 	public void es67() {
+		testSuccess( "6.7", Elasticsearch67Dialect.class );
+	}
+
+	@Test
+	public void es670() {
 		testSuccess( "6.7.0", Elasticsearch67Dialect.class );
 	}
 
 	@Test
-	public void es68() {
+	public void es680() {
 		testSuccessWithWarning( "6.8.0", Elasticsearch67Dialect.class );
 	}
 
@@ -91,14 +128,38 @@ public class ElasticsearchDialectFactoryTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3490")
+	@TestForIssue(jiraKey = "HSEARCH-3563")
+	public void es7() {
+		testSuccess( "7", Elasticsearch7Dialect.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3563")
 	public void es70() {
+		testSuccess( "7.0", Elasticsearch7Dialect.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3490")
+	public void es700() {
 		testSuccess( "7.0.0", Elasticsearch7Dialect.class );
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2748")
+	@TestForIssue(jiraKey = "HSEARCH-3563")
+	public void es8() {
+		testSuccessWithWarning( "8", Elasticsearch7Dialect.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3563")
 	public void es80() {
+		testSuccessWithWarning( "8.0", Elasticsearch7Dialect.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2748")
+	public void es800() {
 		testSuccessWithWarning( "8.0.0", Elasticsearch7Dialect.class );
 	}
 
@@ -113,6 +174,20 @@ public class ElasticsearchDialectFactoryTest {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "HSEARCH400081" )
 				.hasMessageContaining( "'" + unsupportedVersionString + "'" );
+	}
+
+	private void testAmbiguous(String versionString) {
+		SubTest.expectException(
+				"Test ambiguous version " + versionString,
+				() -> {
+					dialectFactory.create( ElasticsearchVersion.of( versionString ) );
+				}
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "HSEARCH400561" )
+				.hasMessageContaining( "Ambiguous Elasticsearch version: '" + versionString + "'." )
+				.hasMessageContaining( "Please use a more precise version to remove the ambiguity" );
 	}
 
 	private void testSuccessWithWarning(String versionString, Class<?> expectedDialectClass) {
