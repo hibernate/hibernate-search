@@ -73,9 +73,14 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 		ElasticsearchVersion version = ElasticsearchClientUtils.getElasticsearchVersion( clientMock );
 		assertThat( version ).isNotNull();
 		assertThat( version.getMajor() ).isEqualTo( expectedMajor );
-		assertThat( version.getMinor() ).isEqualTo( expectedMinor );
-		assertThat( version.getMicro() ).isEqualTo( expectedMicro );
-		assertThat( version.getQualifier() ).isEqualTo( expectedQualifier );
+		assertThat( version.getMinor() ).hasValue( expectedMinor );
+		assertThat( version.getMicro() ).hasValue( expectedMicro );
+		if ( expectedQualifier != null ) {
+			assertThat( version.getQualifier() ).hasValue( expectedQualifier );
+		}
+		else {
+			assertThat( version.getQualifier() ).isEmpty();
+		}
 	}
 
 	@Test

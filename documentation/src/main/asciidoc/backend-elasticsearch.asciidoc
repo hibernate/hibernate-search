@@ -129,6 +129,11 @@ to a string following the format `x.y.z-qualifier`,
 where `x`, `y` and `z` are integers
 and `qualifier` is an optional string of word characters (alphanumeric or `_`).
 
+Incomplete versions are allowed in some cases, for example `7.0` or just `7`.
+This is not possible for all versions, however.
+For example, Elasticsearch 5 is only supported from 5.6.0 onwards,
+so `5` is not an acceptable value and will trigger an exception: `5.6` must be used instead.
+
 [[backend-elasticsearch-configuration-logging]]
 === Logging
 // Search 5 anchors backward compatibility

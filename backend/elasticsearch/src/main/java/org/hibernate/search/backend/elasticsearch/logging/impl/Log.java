@@ -474,7 +474,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 56, value = "Invalid Elasticsearch version: '%1$s'."
 			+ " The version must be in the form 'x.y.z-qualifier', where 'x', 'y' and 'z' are integers,"
-			+ " and '-qualifier' is an optional string of word characters (alphanumeric or '_').")
+			+ " and 'qualifier' is an string of word characters (alphanumeric or '_')."
+			+ " Incomplete versions are allowed, for example '7.0' or just '7'.")
 	SearchException invalidElasticsearchVersion(String versionString);
 
 	@Message(id = ID_OFFSET_3 + 59, value = "Unexpected Elasticsearch version running on the cluster: '%2$s'."
@@ -484,4 +485,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 60, value = "Elasticsearch backend does not support skip analysis on not analyzed field: '%1$s'.")
 	SearchException skipAnalysisOnKeywordField(String absoluteFieldPath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 61,
+			value = "Ambiguous Elasticsearch version: '%s'."
+					+ " This version matches multiple dialects."
+					+ " Please use a more precise version to remove the ambiguity." )
+	SearchException ambiguousElasticsearchVersion(ElasticsearchVersion version);
 }
