@@ -46,6 +46,11 @@ public final class DefaultJavaNetURLValueBridge implements ValueBridge<URL, Stri
 	}
 
 	@Override
+	public String parse(String value) {
+		return value;
+	}
+
+	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
 	}

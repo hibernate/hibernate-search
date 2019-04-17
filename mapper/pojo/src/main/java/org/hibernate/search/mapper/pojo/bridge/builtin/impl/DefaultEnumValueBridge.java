@@ -42,6 +42,11 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 	}
 
 	@Override
+	public String parse(String value) {
+		return value;
+	}
+
+	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;

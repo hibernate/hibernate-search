@@ -72,6 +72,17 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	V cast(Object value);
 
 	/**
+	 * Parse an input String to the raw index field value.
+	 *
+	 * @param value The value to parse.
+	 * @return The raw index field value.
+	 * @throws RuntimeException If the value cannot be parsed to the raw index field value.
+	 */
+	default F parse(String value) {
+		throw new UnsupportedOperationException( "Bridge " + toString() + " does not support parsing a value from a String. Trying to parse the value: " + value + "." );
+	}
+
+	/**
 	 * @param other Another {@link ValueBridge}, never {@code null}.
 	 * @return {@code true} if the given object is also a {@link ValueBridge}
 	 * that behaves exactly the same as this object, i.e. its {@link #cast(Object)} and {@link #toIndexedValue(Object, ValueBridgeToIndexedValueContext)}

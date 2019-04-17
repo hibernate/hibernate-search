@@ -12,6 +12,7 @@ import java.time.Duration;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -42,6 +43,11 @@ public final class DefaultDurationValueBridge implements ValueBridge<Duration, L
 	@Override
 	public Duration cast(Object value) {
 		return (Duration) value;
+	}
+
+	@Override
+	public Long parse(String value) {
+		return ConvertUtils.convertLong( value );
 	}
 
 	@Override

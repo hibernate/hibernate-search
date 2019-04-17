@@ -40,6 +40,11 @@ public final class DefaultUUIDValueBridge implements ValueBridge<UUID, String> {
 	}
 
 	@Override
+	public String parse(String value) {
+		return value;
+	}
+
+	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
 	}

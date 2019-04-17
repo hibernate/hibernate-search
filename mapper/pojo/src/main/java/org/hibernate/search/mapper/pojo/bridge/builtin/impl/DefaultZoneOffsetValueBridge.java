@@ -11,6 +11,7 @@ import java.time.ZoneOffset;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -37,6 +38,11 @@ public final class DefaultZoneOffsetValueBridge implements ValueBridge<ZoneOffse
 	@Override
 	public ZoneOffset cast(Object value) {
 		return (ZoneOffset) value;
+	}
+
+	@Override
+	public Integer parse(String value) {
+		return ConvertUtils.convertInteger( value );
 	}
 
 	@Override

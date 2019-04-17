@@ -53,6 +53,11 @@ public final class DefaultPeriodValueBridge implements ValueBridge<Period, Strin
 	}
 
 	@Override
+	public String parse(String value) {
+		return value;
+	}
+
+	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
 	}

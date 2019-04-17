@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
+import java.util.function.Function;
+
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
@@ -25,10 +27,12 @@ import org.hibernate.search.util.common.impl.Contracts;
 public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 
 	private final Class<F> fieldType;
+	private final Function<String, F> parsingFunction;
 
-	public PassThroughValueBridge(Class<F> fieldType) {
+	public PassThroughValueBridge(Class<F> fieldType, Function<String, F> parsingFunction) {
 		Contracts.assertNotNull( fieldType, "fieldType" );
 		this.fieldType = fieldType;
+		this.parsingFunction = parsingFunction;
 	}
 
 	@Override
@@ -45,6 +49,11 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 	@Override
 	public F cast(Object value) {
 		return fieldType.cast( value );
+	}
+
+	@Override
+	public F parse(String value) {
+		return parsingFunction.apply( value );
 	}
 
 	@Override

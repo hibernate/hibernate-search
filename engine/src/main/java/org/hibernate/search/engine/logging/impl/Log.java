@@ -7,12 +7,15 @@
 
 package org.hibernate.search.engine.logging.impl;
 
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.engine.logging.spi.MappingKeyFormatter;
+import org.hibernate.search.engine.logging.spi.SimpleNameClassFormatter;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -266,5 +269,10 @@ public interface Log extends BasicLogger {
 			value = "Invalid pattern: the pattern to match in wildcard predicates must be non-null.")
 	SearchException wildcardPredicateCannotMatchNullPattern(@Param EventContext context);
 
+	@Message(id = ID_OFFSET_2 + 57, value = "'%1$s' instance cannot be parsed from value: '%2$s', using the expected formatter: '%3$s'.")
+	SearchException unableToParseTemporal(@FormatWith(SimpleNameClassFormatter.class) Class<? extends TemporalAccessor> type, String value, DateTimeFormatter formatter,
+			@Cause Exception cause);
 
+	@Message(id = ID_OFFSET_2 + 58, value = "Invalid %1$s value: expected either a Number or a String that can be parsed into a %1$s. %2$s")
+	SearchException invalidNumberPropertyValue(@FormatWith(SimpleNameClassFormatter.class) Class<? extends Number> type, String nestedErrorMessage, @Cause Exception cause);
 }

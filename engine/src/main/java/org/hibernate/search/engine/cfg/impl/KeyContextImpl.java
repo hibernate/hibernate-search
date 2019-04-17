@@ -8,6 +8,7 @@ package org.hibernate.search.engine.cfg.impl;
 
 import java.util.function.Function;
 
+import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.engine.cfg.spi.KeyContext;
 import org.hibernate.search.engine.cfg.spi.OptionalPropertyContext;
 import org.hibernate.search.engine.environment.bean.BeanReference;

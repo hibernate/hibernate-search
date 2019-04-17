@@ -40,6 +40,11 @@ public final class DefaultZoneIdValueBridge implements ValueBridge<ZoneId, Strin
 	}
 
 	@Override
+	public String parse(String value) {
+		return value;
+	}
+
+	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
 	}

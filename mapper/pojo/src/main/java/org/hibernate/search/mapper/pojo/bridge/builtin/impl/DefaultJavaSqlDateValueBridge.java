@@ -12,6 +12,7 @@ import java.time.Instant;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -37,6 +38,11 @@ public final class DefaultJavaSqlDateValueBridge implements ValueBridge<Date, In
 	@Override
 	public Date cast(Object value) {
 		return (Date) value;
+	}
+
+	@Override
+	public Instant parse(String value) {
+		return ParseUtils.parseInstant( value );
 	}
 
 	@Override

@@ -39,6 +39,11 @@ public final class DefaultCharacterValueBridge implements ValueBridge<Character,
 	}
 
 	@Override
+	public String parse(String value) {
+		return value;
+	}
+
+	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
 	}
