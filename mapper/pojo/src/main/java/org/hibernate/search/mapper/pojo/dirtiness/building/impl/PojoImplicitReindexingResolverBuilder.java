@@ -13,7 +13,9 @@ import java.util.Set;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.DefaultPojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
@@ -22,6 +24,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 
 class PojoImplicitReindexingResolverBuilder<T> {
+
+	static Walker walker() {
+		return Walker.INSTANCE;
+	}
 
 	private final PojoRawTypeModel<T> rawTypeModel;
 
@@ -108,4 +114,30 @@ class PojoImplicitReindexingResolverBuilder<T> {
 		}
 	}
 
+	static class Walker implements PojoModelPathWalker<
+			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?>,
+			PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?>,
+			PojoImplicitReindexingResolverValueNodeBuilderDelegate<?>
+			> {
+		public static final Walker INSTANCE = new Walker();
+
+		@Override
+		public PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> property(
+				AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> typeNode, String propertyName) {
+			return typeNode.property( propertyName );
+		}
+
+		@Override
+		public PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> value(
+				PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> propertyNode,
+				ContainerExtractorPath extractorPath) {
+			return propertyNode.value( extractorPath );
+		}
+
+		@Override
+		public AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> type(
+				PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> valueNode) {
+			return valueNode.type();
+		}
+	}
 }

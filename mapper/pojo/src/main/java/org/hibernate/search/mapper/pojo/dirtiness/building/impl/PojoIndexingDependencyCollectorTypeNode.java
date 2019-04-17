@@ -11,10 +11,8 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.common.AssertionFailure;
 
 /**
@@ -24,7 +22,7 @@ import org.hibernate.search.util.common.AssertionFailure;
  *
  * @param <T> The represented type
  */
-public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoIndexingDependencyCollectorNode {
+public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDependencyCollectorNode {
 
 	private final PojoIndexingDependencyCollectorValueNode<?, T> parentNode;
 	/**

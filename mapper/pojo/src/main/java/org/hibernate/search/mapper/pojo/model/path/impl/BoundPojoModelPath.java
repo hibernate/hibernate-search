@@ -6,7 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
@@ -20,6 +24,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
  * </code>
  */
 public abstract class BoundPojoModelPath {
+
+	public static Walker walker(ContainerExtractorBinder containerExtractorBinder) {
+		return new Walker( containerExtractorBinder );
+	}
 
 	public static <T> BoundPojoModelPathOriginalTypeNode<T> root(PojoTypeModel<T> typeModel) {
 		return new BoundPojoModelPathOriginalTypeNode<>( null, typeModel );
@@ -55,6 +63,43 @@ public abstract class BoundPojoModelPath {
 			parent.appendPath( builder );
 			builder.append( " => " );
 			appendSelfPath( builder );
+		}
+	}
+
+	public static class Walker implements PojoModelPathWalker<
+			BoundPojoModelPathTypeNode<?>,
+			BoundPojoModelPathPropertyNode<?, ?>,
+			BoundPojoModelPathValueNode<?, ?, ?>
+			> {
+
+		private final ContainerExtractorBinder containerExtractorBinder;
+
+		private Walker(ContainerExtractorBinder containerExtractorBinder) {
+			this.containerExtractorBinder = containerExtractorBinder;
+		}
+
+		@Override
+		public BoundPojoModelPathPropertyNode<?, ?> property(BoundPojoModelPathTypeNode<?> typeNode,
+				String propertyName) {
+			return typeNode.property( propertyName );
+		}
+
+		@Override
+		public BoundPojoModelPathValueNode<?, ?, ?> value(BoundPojoModelPathPropertyNode<?, ?> propertyNode,
+				ContainerExtractorPath extractorPath) {
+			return doValue( propertyNode, extractorPath );
+		}
+
+		@Override
+		public BoundPojoModelPathTypeNode<?> type(BoundPojoModelPathValueNode<?, ?, ?> valueNode) {
+			return valueNode.type();
+		}
+
+		private <P> BoundPojoModelPathValueNode<?, P, ?> doValue(BoundPojoModelPathPropertyNode<?, P> propertyNode,
+				ContainerExtractorPath extractorPath) {
+			BoundContainerExtractorPath<P, ?> boundExtractorPath = containerExtractorBinder
+					.bindPath( propertyNode.getPropertyModel().getTypeModel(), extractorPath );
+			return propertyNode.value( boundExtractorPath );
 		}
 	}
 }

@@ -124,6 +124,10 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return builder;
 	}
 
+	ContainerExtractorBinder getExtractorBinder() {
+		return extractorBinder;
+	}
+
 	<T> BoundContainerExtractorPath<T, ?> bindExtractorPath(
 			PojoGenericTypeModel<T> typeModel, ContainerExtractorPath extractorPath) {
 		return extractorBinder.bindPath( typeModel, extractorPath );
