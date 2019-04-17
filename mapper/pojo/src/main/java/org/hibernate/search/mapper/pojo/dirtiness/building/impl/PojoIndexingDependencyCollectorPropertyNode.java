@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
  *
  * @param <P> The property type
  */
-public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends AbstractPojoIndexingDependencyCollectorNode {
+public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndexingDependencyCollectorNode {
 
 	private final PojoIndexingDependencyCollectorTypeNode<T> parentNode;
 	/**
@@ -66,7 +66,7 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends AbstractP
 	PojoIndexingDependencyCollectorValueNode<P, ?> value(
 			ContainerExtractorPath extractorPath) {
 		BoundContainerExtractorPath<P, ?> boundExtractorPath =
-				buildingHelper.bindExtractorPath(
+				buildingHelper.getExtractorBinder().bindPath(
 						modelPathFromRootEntityNode.getPropertyModel().getTypeModel(),
 						extractorPath
 				);

@@ -69,7 +69,7 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 			if ( containerElementNodeBuilder == null && !containerElementNodeBuilders.containsKey( extractorPath ) ) {
 				checkNotFrozen();
 				BoundContainerExtractorPath<P, ?> boundExtractorPath =
-						buildingHelper.bindExtractorPath(
+						buildingHelper.getExtractorBinder().bindPath(
 								modelPath.getPropertyModel().getTypeModel(), extractorPath
 						);
 				ContainerExtractorPath explicitExtractorPath = boundExtractorPath.getExtractorPath();

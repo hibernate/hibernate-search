@@ -15,12 +15,10 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
-import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
@@ -52,7 +50,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <P> The property type
  * @param <V> The extracted value type
  */
-public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojoIndexingDependencyCollectorNode {
+public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexingDependencyCollectorNode {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -129,7 +127,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		doCollectDependency( null );
 	}
 
-	private void doCollectDependency(PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency) {
+	void doCollectDependency(PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency) {
 		if ( initialNodeCollectingDependency != null ) {
 			if ( initialNodeCollectingDependency.unboundModelPathFromLastTypeNode.equals( unboundModelPathFromLastTypeNode ) ) {
 				/*
@@ -172,7 +170,10 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 				 */
 				PojoIndexingDependencyCollectorTypeNode<?> lastTypeNode = parentNode.getParentNode();
 				for ( PojoModelPathValueNode path : derivedFrom ) {
-					doCollectDependency( initialNodeCollectingDependency, lastTypeNode, path );
+					PojoModelPathBinder.bind(
+							lastTypeNode, path,
+							PojoIndexingDependencyCollectorNode.walker( initialNodeCollectingDependency )
+					);
 				}
 			}
 		}
@@ -271,7 +272,9 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> valueNodeBuilderDelegate;
 		Set<? extends PojoRawTypeModel<?>> valueNodeTypeConcreteEntitySubTypes;
 		try {
-			valueNodeBuilderDelegate = applyPath( typeNodeBuilder, inverseAssociationPath );
+			valueNodeBuilderDelegate = PojoModelPathBinder.bind(
+					typeNodeBuilder, inverseAssociationPath, PojoImplicitReindexingResolverBuilder.walker()
+			);
 
 			/*
 			 * The entities to reindex will always be instances of both the entity type on the original side
@@ -333,87 +336,13 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		}
 	}
 
-	private PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> applyPath(
-			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> builder,
-			PojoModelPathValueNode unboundPath) {
-		PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> propertyNodeBuilder =
-				applyPath( builder, unboundPath.getParent() );
-		ContainerExtractorPath extractorPath = unboundPath.getExtractorPath();
-		return propertyNodeBuilder.value( extractorPath );
-	}
-
-	private PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> applyPath(
-			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> rootBuilder,
-			PojoModelPathPropertyNode unboundPath) {
-		PojoModelPathValueNode parent = unboundPath.getParent();
-		AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> parentBuilder;
-		if ( parent != null ) {
-			parentBuilder = applyPath( rootBuilder, parent ).type();
-		}
-		else {
-			parentBuilder = rootBuilder;
-		}
-		String propertyName = unboundPath.getPropertyName();
-		return parentBuilder.property( propertyName );
-	}
-
-	private PojoIndexingDependencyCollectorValueNode<?, ?> doCollectDependency(
-			PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency,
-			PojoIndexingDependencyCollectorTypeNode<?> rootCollectorTypeNode,
-			PojoModelPathValueNode unboundPath) {
-		PojoIndexingDependencyCollectorPropertyNode<?, ?> propertyCollectorNode =
-				doCollectDependency( initialNodeCollectingDependency, rootCollectorTypeNode, unboundPath.getParent() );
-		ContainerExtractorPath extractorPath = unboundPath.getExtractorPath();
-		PojoIndexingDependencyCollectorValueNode<?, ?> result = propertyCollectorNode.value( extractorPath );
-		result.doCollectDependency( initialNodeCollectingDependency );
-		return result;
-	}
-
-	private PojoIndexingDependencyCollectorPropertyNode<?, ?> doCollectDependency(
-			PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency,
-			PojoIndexingDependencyCollectorTypeNode<?> rootCollectorTypeNode,
-			PojoModelPathPropertyNode unboundPath) {
-		PojoModelPathValueNode parent = unboundPath.getParent();
-		PojoIndexingDependencyCollectorTypeNode<?> parentCollectorNode;
-		if ( parent != null ) {
-			parentCollectorNode = doCollectDependency( initialNodeCollectingDependency, rootCollectorTypeNode, parent )
-					.type();
-		}
-		else {
-			parentCollectorNode = rootCollectorTypeNode;
-		}
-		String propertyName = unboundPath.getPropertyName();
-		return parentCollectorNode.property( propertyName );
-	}
-
 	private BoundPojoModelPathValueNode<?, ?, ?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
 			BoundPojoModelPathValueNode<?, ?, ?> source) {
-		BoundPojoModelPathPropertyNode<?, ?> targetParent = applyProcessingPathToSubType( rootSubType, source.getParent() );
-		return bindAndApplyExtractorPath( targetParent, source.getExtractorPath() );
-	}
-
-	private BoundPojoModelPathPropertyNode<?, ?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
-			BoundPojoModelPathPropertyNode<?, ?> source) {
-		BoundPojoModelPathTypeNode<?> targetParent = applyProcessingPathToSubType( rootSubType, source.getParent() );
-		return targetParent.property( source.getPropertyModel().getName() );
-	}
-
-	private BoundPojoModelPathTypeNode<?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
-			BoundPojoModelPathTypeNode<?> source) {
-		BoundPojoModelPathValueNode<?, ?, ?> sourceParent = source.getParent();
-		if ( sourceParent != null ) {
-			return applyProcessingPathToSubType( rootSubType, sourceParent ).type();
-		}
-		else {
-			return BoundPojoModelPath.root( rootSubType );
-		}
-	}
-
-	private <T2, P2> BoundPojoModelPathValueNode<T2, P2, ?> bindAndApplyExtractorPath(
-			BoundPojoModelPathPropertyNode<T2, P2> propertyNode, ContainerExtractorPath extractorPath) {
-		BoundContainerExtractorPath<P2, ?> boundExtractorPath =
-				buildingHelper.bindExtractorPath( propertyNode.getPropertyModel().getTypeModel(), extractorPath );
-		return propertyNode.value( boundExtractorPath );
+		return PojoModelPathBinder.bind(
+				BoundPojoModelPath.root( rootSubType ),
+				source.toUnboundPath(),
+				BoundPojoModelPath.walker( buildingHelper.getExtractorBinder() )
+		);
 	}
 
 }
