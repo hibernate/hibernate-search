@@ -161,8 +161,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 				.orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
 				.getEntityIdPropertyName();
 		if ( entityIdPropertyName.isPresent() ) {
-			PojoPropertyModel<?> propertyModel = typeModel.getProperty( entityIdPropertyName.get() );
-			return Optional.of( BoundPojoModelPath.root( typeModel ).property( propertyModel.getHandle() ) );
+			return Optional.of( BoundPojoModelPath.root( typeModel ).property( entityIdPropertyName.get() ) );
 		}
 		else {
 			return Optional.empty();

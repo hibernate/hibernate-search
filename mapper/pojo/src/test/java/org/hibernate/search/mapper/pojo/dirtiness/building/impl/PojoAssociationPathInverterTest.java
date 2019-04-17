@@ -69,7 +69,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 
 		PojoGenericTypeModel<?> originalSidePropertyTypeMock =
 				createMock( "originalSidePropertyTypeMock", PojoGenericTypeModel.class );
-		PropertyHandle<?> originalSidePropertyHandleMock = setupPropertyStub(
+		setupPropertyStub(
 				originalSideEntityTypeMock, originalSidePropertyName, originalSidePropertyTypeMock
 		);
 
@@ -168,7 +168,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		replayAll();
 		BoundPojoModelPathValueNode<?, ?, ?> boundPathToInvert =
 				BoundPojoModelPathValueNode.root( originalSideEntityTypeMock )
-						.property( originalSidePropertyHandleMock )
+						.property( originalSidePropertyName )
 						.value( (BoundContainerExtractorPath) BoundContainerExtractorPath.noExtractors(
 								originalSidePropertyTypeMock
 						) );
@@ -187,7 +187,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		}
 	}
 
-	private PropertyHandle<?> setupPropertyStub(PojoTypeModel<?> holdingTypeMock, String propertyName,
+	private void setupPropertyStub(PojoTypeModel<?> holdingTypeMock, String propertyName,
 			PojoGenericTypeModel<?> propertyTypeMock) {
 		PropertyHandle<?> propertyHandleMock =
 				createMock( propertyName + "HandleMock", PropertyHandle.class );
@@ -200,7 +200,6 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		EasyMock.expect( propertyModelMock.getHandle() ).andStubReturn( (PropertyHandle) propertyHandleMock );
 		EasyMock.expect( propertyModelMock.getTypeModel() )
 				.andStubReturn( (PojoGenericTypeModel) propertyTypeMock );
-		return propertyHandleMock;
 	}
 
 	private void setupSingletonEmbeddedPropertiesAdditionalMetadataStub(PojoTypeAdditionalMetadata typeAdditionalMetadata, String propertyName) {

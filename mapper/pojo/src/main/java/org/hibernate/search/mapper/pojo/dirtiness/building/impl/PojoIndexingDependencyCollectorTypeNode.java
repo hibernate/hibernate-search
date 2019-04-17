@@ -76,23 +76,18 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends AbstractPojoInde
 	/*
 	 * modelPathFromCurrentNode, modelPathFromRootEntityNode and modelPathFromLastEntityNode
 	 * reference the same type, just from a different root.
-	 * Thus applying the same property handle results in the same property type.
+	 * Thus fetching the same property results in the same property type.
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public PojoIndexingDependencyCollectorPropertyNode<T, ?> property(PropertyHandle<?> propertyHandle) {
+	public PojoIndexingDependencyCollectorPropertyNode<T, ?> property(String propertyName) {
 		return new PojoIndexingDependencyCollectorPropertyNode<>(
 				this,
-				modelPathFromCurrentNode.property( propertyHandle ),
+				(BoundPojoModelPathPropertyNode) modelPathFromCurrentNode.property( propertyName ),
 				lastEntityNode,
-				(BoundPojoModelPathPropertyNode) modelPathFromLastEntityNode.property( propertyHandle ),
-				(BoundPojoModelPathPropertyNode) modelPathFromRootEntityNode.property( propertyHandle ),
+				(BoundPojoModelPathPropertyNode) modelPathFromLastEntityNode.property( propertyName ),
+				(BoundPojoModelPathPropertyNode) modelPathFromRootEntityNode.property( propertyName ),
 				buildingHelper
 		);
-	}
-
-	PojoIndexingDependencyCollectorPropertyNode<T, ?> property(String propertyName) {
-		PojoPropertyModel<?> propertyModel = getTypeModel().getProperty( propertyName );
-		return property( propertyModel.getHandle() );
 	}
 
 	@Override

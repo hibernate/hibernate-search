@@ -51,9 +51,9 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 
 	public void contributeDependencies(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
 		if ( hasAccessor() ) {
-			@SuppressWarnings( "unchecked" ) // We used the same handle as in modelPath, on the same type. The result must have the same type.
+			@SuppressWarnings( "unchecked" ) // We used the same property as in modelPath, on the same type. The result must have the same type.
 			PojoIndexingDependencyCollectorPropertyNode<T, P> collectorPropertyNode =
-					(PojoIndexingDependencyCollectorPropertyNode<T, P>) dependencyCollector.property( getHandle() );
+					(PojoIndexingDependencyCollectorPropertyNode<T, P>) dependencyCollector.property( getName() );
 			PojoIndexingDependencyCollectorValueNode<P, P> collectorValueNode =
 					collectorPropertyNode.value( modelPath.getBoundExtractorPath() );
 			collectorValueNode.collectDependency();

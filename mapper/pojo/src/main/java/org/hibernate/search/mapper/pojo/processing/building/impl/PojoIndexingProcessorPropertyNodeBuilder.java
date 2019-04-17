@@ -163,10 +163,10 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 
 	private Optional<PojoIndexingProcessorPropertyNode<T, P>> doBuild(
 			PojoIndexingDependencyCollectorTypeNode<T> parentDependencyCollector) {
-		@SuppressWarnings("unchecked") // We know from the property model that this handle returns a result of type P
+		@SuppressWarnings("unchecked") // We know from the property model that this property has type P
 		PojoIndexingDependencyCollectorPropertyNode<T, P> propertyDependencyCollector =
 				(PojoIndexingDependencyCollectorPropertyNode<T, P>)
-						parentDependencyCollector.property( modelPath.getPropertyHandle() );
+						parentDependencyCollector.property( modelPath.getPropertyModel().getName() );
 
 		Collection<PojoIndexingProcessor<? super P>> immutableNestedNodes = Collections.emptyList();
 		try {
