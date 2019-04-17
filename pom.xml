@@ -346,7 +346,7 @@
         <!-- JBoss public repository -->
 
         <jboss.public.repo.id>jboss-public-repository-group</jboss.public.repo.id>
-        <jboss.public.repo.url>http://repository.jboss.org/nexus/content/groups/public-jboss/</jboss.public.repo.url>
+        <jboss.public.repo.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</jboss.public.repo.url>
 
         <!-- Repository Deployment URLs -->
 
