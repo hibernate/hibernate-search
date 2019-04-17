@@ -55,7 +55,7 @@ public class ProjectionConverterIT {
 
 	@Before
 	public void setup() {
-		entityManagerFactory = backendSetupStrategy.startSetup( setupHelper ).setup( Order.class );
+		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper ).setup( Order.class );
 		initData();
 	}
 

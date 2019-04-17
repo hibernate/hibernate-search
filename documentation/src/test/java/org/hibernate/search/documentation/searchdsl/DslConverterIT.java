@@ -55,7 +55,7 @@ public class DslConverterIT {
 
 	@Before
 	public void setup() {
-		entityManagerFactory = backendSetupStrategy.startSetup( setupHelper ).setup( AuthenticationEvent.class );
+		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper ).setup( AuthenticationEvent.class );
 		initData();
 	}
 

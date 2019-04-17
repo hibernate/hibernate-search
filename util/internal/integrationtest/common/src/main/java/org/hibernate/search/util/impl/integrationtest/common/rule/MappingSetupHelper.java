@@ -33,11 +33,8 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 				.withPropertyRadical( EngineSettings.DEFAULT_BACKEND, backendName );
 	}
 
-	public C withBackend(String configurationId, String backendName) {
-		String propertiesPath = getPropertiesPath( configurationId );
-		return createSetupContext()
-				.withPropertyRadical( EngineSettings.DEFAULT_BACKEND, backendName )
-				.withProperties( configurationProvider.getPropertiesFromFile( propertiesPath ) );
+	public C startSetup() {
+		return createSetupContext();
 	}
 
 	@Override
@@ -76,6 +73,15 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		protected AbstractSetupContext() {
 		}
 
+		public C withDefaultBackend(String backendName) {
+			return withPropertyRadical( EngineSettings.DEFAULT_BACKEND, backendName );
+		}
+
+		public C withBackend(String configurationId, String backendName) {
+			String propertiesPath = getPropertiesPath( configurationId );
+			return withBackendProperties( backendName, configurationProvider.getPropertiesFromFile( propertiesPath ) );
+		}
+
 		public C withBackendMock(BackendMock backendMock) {
 			String backendName = backendMock.getBackendName();
 			return withBackendProperty( backendName, "type", StubBackendFactory.class.getName() );
@@ -89,8 +95,8 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 			return withPropertyRadical( "backends." + backendName + "." + keyRadical, value );
 		}
 
-		protected C withProperties(Map<String, Object> properties) {
-			properties.forEach( this::withProperty );
+		protected C withBackendProperties(String backendName, Map<String, Object> relativeProperties) {
+			relativeProperties.forEach( (k, v) -> withBackendProperty( backendName, k, v ) );
 			return thisAsC();
 		}
 
