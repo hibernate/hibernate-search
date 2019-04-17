@@ -595,7 +595,7 @@
         <repository>
             <id>central</id>
             <name>Maven Central</name>
-            <url>http://repo.maven.apache.org/maven2/</url>
+            <url>https://repo.maven.apache.org/maven2/</url>
             <snapshots>
                 <enabled>false</enabled>
                 <updatePolicy>never</updatePolicy>
@@ -621,7 +621,7 @@
         <pluginRepository>
             <id>central</id>
             <name>Maven Central</name>
-            <url>http://repo.maven.apache.org/maven2/</url>
+            <url>https://repo.maven.apache.org/maven2/</url>
             <snapshots>
                 <enabled>false</enabled>
                 <updatePolicy>never</updatePolicy>
