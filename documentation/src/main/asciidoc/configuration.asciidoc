@@ -19,6 +19,7 @@ you can set Hibernate Search properties:
 * In the configuration file of your framework,
 for example `application.yaml`/`application.properties` for Spring Boot.
 
+[[configuration-structure]]
 == Structure of configuration properties
 
 Configuration properties are all grouped under a common root.
