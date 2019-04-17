@@ -532,6 +532,7 @@ stage('Non-default environment ITs') {
 								${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \
 								-Dtest.elasticsearch.host.provided=true \
 								-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \
+								-Dtest.elasticsearch.host.version=$itEnv.version \
 								-Dtest.elasticsearch.host.aws.signing.enabled=true \
 								-Dtest.elasticsearch.host.aws.signing.access_key=$AWS_ACCESS_KEY_ID \
 								-Dtest.elasticsearch.host.aws.signing.secret_key=$AWS_SECRET_ACCESS_KEY \
