@@ -55,7 +55,7 @@ public class HibernateOrmSimpleMappingIT {
 
 	@Before
 	public void setup() {
-		entityManagerFactory = backendSetupStrategy.startSetup( setupHelper ).setup( Book.class );
+		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper ).setup( Book.class );
 		initData();
 	}
 

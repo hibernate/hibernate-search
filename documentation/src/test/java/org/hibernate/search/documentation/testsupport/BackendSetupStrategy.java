@@ -14,10 +14,16 @@ import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 
 public interface BackendSetupStrategy {
-	OrmSetupHelper.SetupContext startSetup(OrmSetupHelper setupHelper);
+	String DEFAULT_BACKEND_NAME = "backendName";
+
+	default OrmSetupHelper.SetupContext withSingleBackend(OrmSetupHelper setupHelper) {
+		return withBackend( setupHelper.startSetup(), DEFAULT_BACKEND_NAME )
+				.withDefaultBackend( DEFAULT_BACKEND_NAME );
+	}
+
+	OrmSetupHelper.SetupContext withBackend(OrmSetupHelper.SetupContext setupContext, String backendName);
 
 	static List<BackendSetupStrategy> simple() {
-		String backendName = "backendName";
 		return Arrays.asList(
 				new BackendSetupStrategy() {
 					@Override
@@ -25,8 +31,8 @@ public interface BackendSetupStrategy {
 						return "lucene";
 					}
 					@Override
-					public OrmSetupHelper.SetupContext startSetup(OrmSetupHelper setupHelper) {
-						return setupHelper.withBackend( "lucene", backendName )
+					public OrmSetupHelper.SetupContext withBackend(OrmSetupHelper.SetupContext setupContext, String backendName) {
+						return setupContext.withBackend( "backend-lucene", backendName )
 								.withBackendProperty(
 										backendName,
 										LuceneBackendSettings.ANALYSIS_CONFIGURER,
@@ -40,8 +46,8 @@ public interface BackendSetupStrategy {
 						return "elasticsearch";
 					}
 					@Override
-					public OrmSetupHelper.SetupContext startSetup(OrmSetupHelper setupHelper) {
-						return setupHelper.withBackend( "elasticsearch", backendName )
+					public OrmSetupHelper.SetupContext withBackend(OrmSetupHelper.SetupContext setupContext, String backendName) {
+						return setupContext.withBackend( "backend-elasticsearch", backendName )
 								.withBackendProperty(
 										backendName,
 										ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
