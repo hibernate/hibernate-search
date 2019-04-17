@@ -36,7 +36,7 @@ class PropertyFullTextFieldMappingContextImpl
 
 	@Override
 	public PropertyFullTextFieldMappingContext analyzer(String normalizerName) {
-		fieldModelContributor.add( c -> c.analyzer( normalizerName ) );
+		fieldModelContributor.add( (c, b) -> c.analyzer( normalizerName ) );
 		return thisAsS();
 	}
 

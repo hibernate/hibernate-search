@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
@@ -311,7 +311,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		);
 
 		// Then give the mapping a chance to override some of the model (add storage, ...)
-		contributor.contribute( fieldTypeContext );
+		contributor.contribute( fieldTypeContext, new FieldModelContributorBridgeContextImpl<>( bridge, fieldTypeContext ) );
 
 		IndexFieldReference<? super F> indexFieldReference = schemaElement.field( relativeFieldName, fieldTypeContext )
 				.toReference();

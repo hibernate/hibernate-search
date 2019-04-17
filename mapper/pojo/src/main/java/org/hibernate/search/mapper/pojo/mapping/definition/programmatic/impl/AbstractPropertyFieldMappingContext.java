@@ -56,7 +56,7 @@ abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappin
 
 	@Override
 	public S projectable(Projectable projectable) {
-		fieldModelContributor.add( c -> c.projectable( projectable ) );
+		fieldModelContributor.add( (c, b) -> c.projectable( projectable ) );
 		return thisAsS();
 	}
 

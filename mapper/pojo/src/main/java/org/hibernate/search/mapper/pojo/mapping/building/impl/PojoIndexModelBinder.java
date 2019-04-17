@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;

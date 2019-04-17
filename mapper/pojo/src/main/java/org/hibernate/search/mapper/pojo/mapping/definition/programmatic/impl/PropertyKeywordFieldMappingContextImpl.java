@@ -33,7 +33,7 @@ class PropertyKeywordFieldMappingContextImpl
 
 	@Override
 	public PropertyKeywordFieldMappingContext normalizer(String normalizerName) {
-		fieldModelContributor.add( c -> c.normalizer( normalizerName ) );
+		fieldModelContributor.add( (c, b) -> c.normalizer( normalizerName ) );
 		return thisAsS();
 	}
 

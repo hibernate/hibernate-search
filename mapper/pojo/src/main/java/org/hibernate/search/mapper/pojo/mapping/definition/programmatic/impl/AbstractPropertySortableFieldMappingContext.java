@@ -25,7 +25,7 @@ abstract class AbstractPropertySortableFieldMappingContext<S extends PropertySor
 
 	@Override
 	public S sortable(Sortable sortable) {
-		fieldModelContributor.add( c -> c.sortable( sortable ) );
+		fieldModelContributor.add( (c, b) -> c.sortable( sortable ) );
 		return thisAsS();
 	}
 

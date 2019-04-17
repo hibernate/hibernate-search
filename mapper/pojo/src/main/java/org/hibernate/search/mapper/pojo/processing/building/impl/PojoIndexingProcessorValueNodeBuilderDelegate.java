@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
