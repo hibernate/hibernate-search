@@ -48,6 +48,11 @@ public @interface GenericField {
 	Sortable sortable() default Sortable.DEFAULT;
 
 	/**
+	 * @return An optional value to replace any null value.
+	 */
+	String indexNullAs() default AnnotationDefaultValues.DO_NOT_INDEX_NULL;
+
+	/**
 	 * @return A reference to the value bridge to use for this field.
 	 * @see ValueBridgeRef
 	 */

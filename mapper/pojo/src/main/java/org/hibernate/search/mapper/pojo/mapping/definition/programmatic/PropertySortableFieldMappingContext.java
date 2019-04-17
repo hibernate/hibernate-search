@@ -16,4 +16,6 @@ public interface PropertySortableFieldMappingContext<S extends PropertySortableF
 
 	S sortable(Sortable sortable);
 
+	S indexNullAs(String indexNullAs);
+
 }

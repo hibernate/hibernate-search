@@ -29,4 +29,9 @@ abstract class AbstractPropertySortableFieldMappingContext<S extends PropertySor
 		return thisAsS();
 	}
 
+	@Override
+	public S indexNullAs(String indexNullAs) {
+		fieldModelContributor.add( (c, b) -> b.indexNullAs( indexNullAs ) );
+		return thisAsS();
+	}
 }

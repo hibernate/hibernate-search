@@ -271,6 +271,11 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
+		String getIndexNullAs(GenericField annotation) {
+			return annotation.indexNullAs();
+		}
+
+		@Override
 		ValueBridgeRef getValueBridge(GenericField annotation) {
 			return annotation.valueBridge();
 		}
@@ -343,6 +348,11 @@ class AnnotationProcessorProvider {
 		@Override
 		Sortable getSortable(KeywordField annotation) {
 			return annotation.sortable();
+		}
+
+		@Override
+		String getIndexNullAs(KeywordField annotation) {
+			return annotation.indexNullAs();
 		}
 
 		@Override

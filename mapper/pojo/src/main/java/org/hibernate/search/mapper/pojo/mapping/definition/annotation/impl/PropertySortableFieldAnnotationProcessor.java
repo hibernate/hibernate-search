@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 import java.lang.annotation.Annotation;
 
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertySortableFieldMappingContext;
@@ -31,6 +32,11 @@ abstract class PropertySortableFieldAnnotationProcessor<A extends Annotation> ex
 			fieldContext.sortable( sortable );
 		}
 
+		String indexNullAs = getIndexNullAs( annotation );
+		if ( indexNullAs != null && !AnnotationDefaultValues.DO_NOT_INDEX_NULL.equals( indexNullAs ) ) {
+			fieldContext.indexNullAs( indexNullAs );
+		}
+
 		return fieldContext;
 	}
 
@@ -38,4 +44,6 @@ abstract class PropertySortableFieldAnnotationProcessor<A extends Annotation> ex
 			PojoPropertyModel<?> propertyModel, A annotation, String fieldName);
 
 	abstract Sortable getSortable(A annotation);
+
+	abstract String getIndexNullAs(A annotation);
 }
