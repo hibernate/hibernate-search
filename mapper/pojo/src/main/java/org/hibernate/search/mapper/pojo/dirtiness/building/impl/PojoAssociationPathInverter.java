@@ -32,7 +32,6 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueN
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -188,10 +187,8 @@ public final class PojoAssociationPathInverter {
 		for ( Map.Entry<String, PojoPropertyAdditionalMetadata> propertyEntry :
 				inverseSideTypeAdditionalMetadata.getPropertiesAdditionalMetadata().entrySet() ) {
 			String inverseSidePropertyName = propertyEntry.getKey();
-			PojoPropertyModel<?> inverseSidePropertyModel = inverseSideTypeModel.getProperty( inverseSidePropertyName );
-			PropertyHandle<?> propertyHandle = inverseSidePropertyModel.getHandle();
 			BoundPojoModelPathPropertyNode<?, ?> inverseSidePathPropertyNode =
-					inverseSidePathTypeNode.property( propertyHandle );
+					inverseSidePathTypeNode.property( inverseSidePropertyName );
 			PojoPropertyAdditionalMetadata inverseSidePropertyAdditionalMetadata = propertyEntry.getValue();
 
 			for ( Map.Entry<ContainerExtractorPath, PojoValueAdditionalMetadata> valueEntry :

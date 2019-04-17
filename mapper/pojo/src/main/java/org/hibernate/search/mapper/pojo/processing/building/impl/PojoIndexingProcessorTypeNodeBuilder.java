@@ -27,8 +27,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorPropertyNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorTypeNode;
@@ -51,7 +49,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	private BoundRoutingKeyBridge<T> boundRoutingKeyBridge;
 	private final Collection<BoundTypeBridge<T>> boundBridges = new ArrayList<>();
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<PropertyHandle<?>, PojoIndexingProcessorPropertyNodeBuilder<T, ?>> propertyNodeBuilders =
+	private final Map<String, PojoIndexingProcessorPropertyNodeBuilder<T, ?>> propertyNodeBuilders =
 			new LinkedHashMap<>();
 
 	public PojoIndexingProcessorTypeNodeBuilder(
@@ -83,14 +81,12 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	@Override
 	public PojoMappingCollectorPropertyNode property(String propertyName) {
 		// TODO HSEARCH-3318 also pass an access type ("default" if not mentioned by the user, method/field otherwise) and take it into account to retrieve the right property model/handle
-		PojoPropertyModel<?> propertyModel = getModelPath().getTypeModel().getProperty( propertyName );
-		PropertyHandle<?> propertyHandle = propertyModel.getHandle();
-		return propertyNodeBuilders.computeIfAbsent( propertyHandle, this::createPropertyNodeBuilder );
+		return propertyNodeBuilders.computeIfAbsent( propertyName, this::createPropertyNodeBuilder );
 	}
 
-	private PojoIndexingProcessorPropertyNodeBuilder<T, ?> createPropertyNodeBuilder(PropertyHandle<?> propertyHandle) {
+	private PojoIndexingProcessorPropertyNodeBuilder<T, ?> createPropertyNodeBuilder(String propertyName) {
 		return new PojoIndexingProcessorPropertyNodeBuilder<>(
-				modelPath.property( propertyHandle ),
+				modelPath.property( propertyName ),
 				mappingHelper, bindingContext, identityMappingCollector
 		);
 	}

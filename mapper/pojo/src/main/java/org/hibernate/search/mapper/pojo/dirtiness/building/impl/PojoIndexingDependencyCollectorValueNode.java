@@ -395,7 +395,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 	private BoundPojoModelPathPropertyNode<?, ?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
 			BoundPojoModelPathPropertyNode<?, ?> source) {
 		BoundPojoModelPathTypeNode<?> targetParent = applyProcessingPathToSubType( rootSubType, source.getParent() );
-		return targetParent.property( source.getPropertyHandle() );
+		return targetParent.property( source.getPropertyModel().getName() );
 	}
 
 	private BoundPojoModelPathTypeNode<?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,

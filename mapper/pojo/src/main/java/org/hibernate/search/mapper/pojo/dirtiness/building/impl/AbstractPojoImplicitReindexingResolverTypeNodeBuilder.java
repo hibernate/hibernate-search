@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.common.impl.Closer;
 
 abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
@@ -118,9 +117,8 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> createPropertyBuilder(String propertyName) {
 		checkNotFrozen();
-		PropertyHandle<?> handle = modelPath.getTypeModel().getProperty( propertyName ).getHandle();
 		return new PojoImplicitReindexingResolverPropertyNodeBuilder<>(
-				modelPath.property( handle ), buildingHelper
+				modelPath.property( propertyName ), buildingHelper
 		);
 	}
 }

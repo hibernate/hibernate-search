@@ -70,11 +70,10 @@ abstract class AbstractPojoModelCompositeElement<V> implements PojoModelComposit
 	public PojoModelNestedCompositeElement<?, ?> property(String relativeFieldName) {
 		return properties.computeIfAbsent( relativeFieldName, name -> {
 			BoundPojoModelPathTypeNode<V> modelPathTypeNode = getModelPathTypeNode();
-			PojoPropertyModel<?> model = modelPathTypeNode.getTypeModel().getProperty( name );
 			PojoPropertyAdditionalMetadata additionalMetadata = getTypeAdditionalMetadata().getPropertyAdditionalMetadata( name );
 			return new PojoModelNestedCompositeElement<>(
 					this,
-					modelPathTypeNode.property( model.getHandle() ),
+					modelPathTypeNode.property( name ),
 					additionalMetadata,
 					typeAdditionalMetadataProvider
 			);

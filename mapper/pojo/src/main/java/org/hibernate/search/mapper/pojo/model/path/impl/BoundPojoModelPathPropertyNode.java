@@ -24,11 +24,10 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 	private final PropertyHandle<P> propertyHandle;
 	private final PojoPropertyModel<P> propertyModel;
 
-	BoundPojoModelPathPropertyNode(BoundPojoModelPathTypeNode<T> parent, PropertyHandle<P> propertyHandle,
-			PojoPropertyModel<P> propertyModel) {
+	BoundPojoModelPathPropertyNode(BoundPojoModelPathTypeNode<T> parent, PojoPropertyModel<P> propertyModel) {
 		this.parent = parent;
-		this.propertyHandle = propertyHandle;
 		this.propertyModel = propertyModel;
+		this.propertyHandle = propertyModel.getHandle();
 	}
 
 	@Override
