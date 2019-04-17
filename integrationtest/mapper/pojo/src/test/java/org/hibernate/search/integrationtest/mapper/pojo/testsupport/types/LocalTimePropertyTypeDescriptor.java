@@ -74,6 +74,16 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public LocalTime getNullAsValueBridge1() {
+				return LocalTime.MIDNIGHT;
+			}
+
+			@Override
+			public LocalTime getNullAsValueBridge2() {
+				return LocalTime.of( 12, 30, 15 );
+			}
 		} );
 	}
 
@@ -81,13 +91,21 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		LocalTime myProperty;
+		LocalTime indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public LocalTime getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "00:00:00")
+		public LocalTime getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -95,13 +113,21 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		LocalTime myProperty;
+		LocalTime indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public LocalTime getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "12:30:15")
+		public LocalTime getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

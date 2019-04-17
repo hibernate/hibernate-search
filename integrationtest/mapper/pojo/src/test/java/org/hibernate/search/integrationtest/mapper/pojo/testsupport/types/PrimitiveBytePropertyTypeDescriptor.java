@@ -73,6 +73,16 @@ public class PrimitiveBytePropertyTypeDescriptor extends PropertyTypeDescriptor<
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Byte getNullAsValueBridge1() {
+				return 0;
+			}
+
+			@Override
+			public Byte getNullAsValueBridge2() {
+				return -64;
+			}
 		} );
 	}
 

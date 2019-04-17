@@ -89,6 +89,16 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public String getNullAsValueBridge1() {
+				return "https://www.redhat.com";
+			}
+
+			@Override
+			public String getNullAsValueBridge2() {
+				return "https://hibernate.org";
+			}
 		} );
 	}
 
@@ -96,6 +106,7 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		URL myProperty;
+		URL indexNullAsProperty;
 
 		@DocumentId
 		public Integer getId() {
@@ -105,6 +116,11 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 		@GenericField
 		public URL getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "https://www.redhat.com")
+		public URL getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -112,6 +128,7 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		URL myProperty;
+		URL indexNullAsProperty;
 
 		@DocumentId
 		public Integer getId() {
@@ -121,6 +138,11 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 		@GenericField
 		public URL getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "https://hibernate.org")
+		public URL getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 

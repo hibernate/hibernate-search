@@ -144,6 +144,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return this;
 		}
 
+		public <F> Builder indexNullAs(F indexNullAs) {
+			attribute( "indexNullAs", indexNullAs );
+			return this;
+		}
+
 		public Builder converter(StubFieldConverter<?> converter) {
 			this.converter = converter;
 			return this;

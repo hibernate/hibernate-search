@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -116,6 +117,16 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public ZonedDateTime getNullAsValueBridge1() {
+				return ZonedDateTime.of( LocalDateTime.of( 1970, Month.JANUARY, 1, 0, 0, 0 ), ZoneId.of( "GMT" ) );
+			}
+
+			@Override
+			public ZonedDateTime getNullAsValueBridge2() {
+				return ZonedDateTime.of( LocalDateTime.of( 2017, Month.NOVEMBER, 5, 19, 0, 54 ), ZoneId.of( "Europe/Paris" ) );
+			}
 		} );
 	}
 
@@ -152,6 +163,7 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Calendar myProperty;
+		Calendar indexNullAsProperty;
 
 		@DocumentId
 		public Integer getId() {
@@ -161,6 +173,11 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 		@GenericField
 		public Calendar getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "1970-01-01T00:00:00Z[GMT]")
+		public Calendar getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -168,6 +185,7 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Calendar myProperty;
+		Calendar indexNullAsProperty;
 
 		@DocumentId
 		public Integer getId() {
@@ -177,6 +195,11 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 		@GenericField
 		public Calendar getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "2017-11-05T19:00:54+01:00[Europe/Paris]")
+		public Calendar getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

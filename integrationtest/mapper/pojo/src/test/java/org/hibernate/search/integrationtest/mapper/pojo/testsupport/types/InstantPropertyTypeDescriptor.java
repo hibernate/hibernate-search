@@ -74,6 +74,16 @@ public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instan
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Instant getNullAsValueBridge1() {
+				return Instant.parse( "1970-01-01T00:00:00.00Z" );
+			}
+
+			@Override
+			public Instant getNullAsValueBridge2() {
+				return Instant.parse( "2017-11-06T19:19:03.54Z" );
+			}
 		} );
 	}
 
@@ -81,13 +91,21 @@ public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instan
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Instant myProperty;
+		Instant indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Instant getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "1970-01-01T00:00:00.00Z")
+		public Instant getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -95,13 +113,21 @@ public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instan
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Instant myProperty;
+		Instant indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Instant getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "2017-11-06T19:19:03.54Z")
+		public Instant getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

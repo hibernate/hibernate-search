@@ -80,6 +80,16 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public String getNullAsValueBridge1() {
+				return "+0000000000+0000000000+0000000000";
+			}
+
+			@Override
+			public String getNullAsValueBridge2() {
+				return "+0000001900+0000000012+0000000021";
+			}
 		} );
 	}
 
@@ -87,13 +97,21 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Period myProperty;
+		Period indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Period getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "+0000000000+0000000000+0000000000")
+		public Period getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -101,13 +119,21 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Period myProperty;
+		Period indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Period getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "+0000001900+0000000012+0000000021")
+		public Period getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

@@ -51,6 +51,7 @@ import org.easymock.Capture;
 @RunWith(Parameterized.class)
 public class FieldDefaultBridgeIT<V, F> {
 	private static final String FIELD_NAME = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_NAME;
+	private static final String FIELD_INDEXNULLAS_NAME = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_INDEXNULLAS_NAME;
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[] types() {
@@ -82,14 +83,22 @@ public class FieldDefaultBridgeIT<V, F> {
 		Capture<StubIndexSchemaNode> schemaCapture1 = Capture.newInstance();
 		Capture<StubIndexSchemaNode> schemaCapture2 = Capture.newInstance();
 		backendMock.expectSchema(
-				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME,
-				b -> b.field( FIELD_NAME, expectations.getIndexFieldJavaType() ),
-				schemaCapture1
+				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME, b -> {
+					b.field( FIELD_NAME, expectations.getIndexFieldJavaType() );
+
+					if ( expectations.isNullTranslatedAsNull() ) {
+						b.field( FIELD_INDEXNULLAS_NAME, expectations.getIndexFieldJavaType(), f -> f.indexNullAs( expectations.getNullAsValueBridge1() ) );
+					}
+				}, schemaCapture1
 		);
 		backendMock.expectSchema(
-				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME,
-				b -> b.field( FIELD_NAME, expectations.getIndexFieldJavaType() ),
-				schemaCapture2
+				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME, b -> {
+					b.field( FIELD_NAME, expectations.getIndexFieldJavaType() );
+
+					if ( expectations.isNullTranslatedAsNull() ) {
+						b.field( FIELD_INDEXNULLAS_NAME, expectations.getIndexFieldJavaType(), f -> f.indexNullAs( expectations.getNullAsValueBridge2() ) );
+					}
+				}, schemaCapture2
 		);
 		mapping = setupHelper.withBackendMock( backendMock )
 				.setup( expectations.getTypeWithValueBridge1(), expectations.getTypeWithValueBridge2() );
@@ -113,10 +122,14 @@ public class FieldDefaultBridgeIT<V, F> {
 			);
 			id = 0;
 			for ( F expectedFieldValue : getDocumentFieldValues() ) {
-				expectationSetter.add(
-						String.valueOf( id ),
-						b -> b.field( FIELD_NAME, expectedFieldValue )
-				);
+				expectationSetter.add( String.valueOf( id ), b -> {
+					b.field( FIELD_NAME, expectedFieldValue );
+
+					if ( expectations.isNullTranslatedAsNull() ) {
+						// Stub backend is not supposed to use 'indexNullAs' option
+						b.field( FIELD_INDEXNULLAS_NAME, null );
+					}
+				} );
 				++id;
 			}
 			expectationSetter.preparedThenExecuted();

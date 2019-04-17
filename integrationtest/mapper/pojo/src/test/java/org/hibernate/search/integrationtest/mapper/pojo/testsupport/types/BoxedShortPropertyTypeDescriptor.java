@@ -96,6 +96,16 @@ public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Sho
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Short getNullAsValueBridge1() {
+				return 0;
+			}
+
+			@Override
+			public Short getNullAsValueBridge2() {
+				return 531;
+			}
 		} );
 	}
 
@@ -121,13 +131,21 @@ public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Sho
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Short myProperty;
+		Short indexNullAsProperty;
+
 		@DocumentId
 		public int getId() {
 			return id;
 		}
+
 		@GenericField
 		public Short getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "0")
+		public Short getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -135,13 +153,21 @@ public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Sho
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Short myProperty;
+		Short indexNullAsProperty;
+
 		@DocumentId
 		public int getId() {
 			return id;
 		}
+
 		@GenericField
 		public Short getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "531")
+		public Short getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

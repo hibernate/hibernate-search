@@ -77,6 +77,16 @@ public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Off
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public OffsetTime getNullAsValueBridge1() {
+				return LocalTime.MIDNIGHT.atOffset( ZoneOffset.UTC );
+			}
+
+			@Override
+			public OffsetTime getNullAsValueBridge2() {
+				return LocalTime.of( 12, 30, 55 ).atOffset( ZoneOffset.ofHours( -3 ) );
+			}
 		} );
 	}
 
@@ -84,13 +94,21 @@ public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Off
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		OffsetTime myProperty;
+		OffsetTime indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public OffsetTime getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "00:00:00Z")
+		public OffsetTime getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -98,13 +116,21 @@ public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Off
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		OffsetTime myProperty;
+		OffsetTime indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public OffsetTime getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "12:30:55-03:00")
+		public OffsetTime getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

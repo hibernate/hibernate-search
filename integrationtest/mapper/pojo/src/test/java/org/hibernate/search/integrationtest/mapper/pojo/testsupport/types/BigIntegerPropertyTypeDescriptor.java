@@ -97,13 +97,23 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public BigInteger getNullAsValueBridge1() {
+				return BigInteger.ZERO;
+			}
+
+			@Override
+			public BigInteger getNullAsValueBridge2() {
+				return BigInteger.valueOf( -10301 );
+			}
 		} );
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME)
 	public static class TypeWithIdentifierBridge1 {
-
 		BigInteger id;
+
 		@DocumentId
 		public BigInteger getId() {
 			return id;
@@ -112,8 +122,8 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	}
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_INDEX_NAME)
 	public static class TypeWithIdentifierBridge2 {
-
 		BigInteger id;
+
 		@DocumentId
 		public BigInteger getId() {
 			return id;
@@ -122,9 +132,10 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	}
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME)
 	public static class TypeWithValueBridge1 {
-
 		Integer id;
 		BigInteger myProperty;
+		BigInteger indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
@@ -135,12 +146,17 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			return myProperty;
 		}
 
+		@GenericField(indexNullAs = "0")
+		public BigInteger getIndexNullAsProperty() {
+			return indexNullAsProperty;
+		}
 	}
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME)
 	public static class TypeWithValueBridge2 {
-
 		Integer id;
 		BigInteger myProperty;
+		BigInteger indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
@@ -151,6 +167,10 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			return myProperty;
 		}
 
+		@GenericField(indexNullAs = "-10301")
+		public BigInteger getIndexNullAsProperty() {
+			return indexNullAsProperty;
+		}
 	}
 
 	private List<BigInteger> takeBigIntegerSequence() {

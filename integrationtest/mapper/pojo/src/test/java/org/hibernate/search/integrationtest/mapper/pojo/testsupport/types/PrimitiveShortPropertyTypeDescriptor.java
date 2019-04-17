@@ -103,6 +103,16 @@ public class PrimitiveShortPropertyTypeDescriptor extends PropertyTypeDescriptor
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Short getNullAsValueBridge1() {
+				return 0;
+			}
+
+			@Override
+			public Short getNullAsValueBridge2() {
+				return 739;
+			}
 		} );
 	}
 

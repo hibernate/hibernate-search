@@ -73,6 +73,16 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Boolean getNullAsValueBridge1() {
+				return false;
+			}
+
+			@Override
+			public Boolean getNullAsValueBridge2() {
+				return true;
+			}
 		} );
 	}
 

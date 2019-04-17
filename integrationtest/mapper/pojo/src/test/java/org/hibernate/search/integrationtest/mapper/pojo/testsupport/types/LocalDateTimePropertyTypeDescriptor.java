@@ -75,6 +75,16 @@ public class LocalDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public LocalDateTime getNullAsValueBridge1() {
+				return LocalDateTime.of( 1970, Month.JANUARY, 1, 0, 0, 0 );
+			}
+
+			@Override
+			public LocalDateTime getNullAsValueBridge2() {
+				return LocalDateTime.of( 2030, Month.NOVEMBER, 21, 15, 15, 15 );
+			}
 		} );
 	}
 
@@ -82,13 +92,21 @@ public class LocalDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		LocalDateTime myProperty;
+		LocalDateTime indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public LocalDateTime getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "1970-01-01T00:00:00")
+		public LocalDateTime getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -96,13 +114,21 @@ public class LocalDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		LocalDateTime myProperty;
+		LocalDateTime indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public LocalDateTime getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "2030-11-21T15:15:15")
+		public LocalDateTime getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

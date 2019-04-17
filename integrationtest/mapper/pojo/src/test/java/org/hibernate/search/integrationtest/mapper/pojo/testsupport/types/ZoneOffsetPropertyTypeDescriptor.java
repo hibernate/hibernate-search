@@ -82,6 +82,16 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Integer getNullAsValueBridge1() {
+				return ZoneOffset.UTC.getTotalSeconds();
+			}
+
+			@Override
+			public Integer getNullAsValueBridge2() {
+				return ZoneOffset.ofHours( 7 ).getTotalSeconds();
+			}
 		} );
 	}
 
@@ -89,13 +99,21 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		ZoneOffset myProperty;
+		ZoneOffset indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public ZoneOffset getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "0")
+		public ZoneOffset getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -103,13 +121,21 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		ZoneOffset myProperty;
+		ZoneOffset indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public ZoneOffset getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "25200")
+		public ZoneOffset getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

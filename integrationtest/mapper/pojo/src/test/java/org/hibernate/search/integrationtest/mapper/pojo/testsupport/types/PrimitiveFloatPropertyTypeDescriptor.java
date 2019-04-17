@@ -73,6 +73,16 @@ public class PrimitiveFloatPropertyTypeDescriptor extends PropertyTypeDescriptor
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Float getNullAsValueBridge1() {
+				return 0.0f;
+			}
+
+			@Override
+			public Float getNullAsValueBridge2() {
+				return 739.937f;
+			}
 		} );
 	}
 

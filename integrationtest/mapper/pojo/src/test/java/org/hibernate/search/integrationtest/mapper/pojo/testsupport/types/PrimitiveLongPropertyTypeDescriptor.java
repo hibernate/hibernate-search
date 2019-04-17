@@ -103,6 +103,16 @@ public class PrimitiveLongPropertyTypeDescriptor extends PropertyTypeDescriptor<
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Long getNullAsValueBridge1() {
+				return 0L;
+			}
+
+			@Override
+			public Long getNullAsValueBridge2() {
+				return 739937L;
+			}
 		} );
 	}
 

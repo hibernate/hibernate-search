@@ -75,6 +75,16 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public MonthDay getNullAsValueBridge1() {
+				return MonthDay.of( Month.JANUARY, 1 );
+			}
+
+			@Override
+			public MonthDay getNullAsValueBridge2() {
+				return MonthDay.of( Month.NOVEMBER, 21 );
+			}
 		} );
 	}
 
@@ -82,13 +92,21 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		MonthDay myProperty;
+		MonthDay indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public MonthDay getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "--01-01")
+		public MonthDay getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -96,13 +114,21 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		MonthDay myProperty;
+		MonthDay indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public MonthDay getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "--11-21")
+		public MonthDay getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

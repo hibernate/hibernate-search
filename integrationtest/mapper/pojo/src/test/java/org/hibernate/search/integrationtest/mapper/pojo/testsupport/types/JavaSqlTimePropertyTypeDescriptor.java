@@ -95,6 +95,16 @@ public class JavaSqlTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Ti
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Instant getNullAsValueBridge1() {
+				return Instant.parse( "1970-01-01T00:00:00.00Z" );
+			}
+
+			@Override
+			public Instant getNullAsValueBridge2() {
+				return Instant.parse( "2001-03-31T02:59:01.99Z" );
+			}
 		} );
 	}
 
@@ -114,13 +124,21 @@ public class JavaSqlTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Ti
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Time myProperty;
+		Time indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Time getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "1970-01-01T00:00:00.00Z")
+		public Time getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -128,13 +146,21 @@ public class JavaSqlTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Ti
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Time myProperty;
+		Time indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Time getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "2001-03-31T02:59:01.99Z")
+		public Time getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

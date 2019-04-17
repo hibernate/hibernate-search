@@ -103,6 +103,16 @@ public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescript
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Integer getNullAsValueBridge1() {
+				return 0;
+			}
+
+			@Override
+			public Integer getNullAsValueBridge2() {
+				return 0;
+			}
 		} );
 	}
 

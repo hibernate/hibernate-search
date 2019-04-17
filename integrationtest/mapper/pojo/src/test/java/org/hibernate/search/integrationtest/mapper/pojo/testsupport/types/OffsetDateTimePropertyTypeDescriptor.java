@@ -77,6 +77,16 @@ public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public OffsetDateTime getNullAsValueBridge1() {
+				return OffsetDateTime.of( LocalDateTime.of( 1970, Month.JANUARY, 1, 0, 0, 0 ), ZoneOffset.UTC );
+			}
+
+			@Override
+			public OffsetDateTime getNullAsValueBridge2() {
+				return OffsetDateTime.of( LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 30, 59 ), ZoneOffset.ofHours( -6 ) );
+			}
 		} );
 	}
 
@@ -84,13 +94,21 @@ public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		OffsetDateTime myProperty;
+		OffsetDateTime indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public OffsetDateTime getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "1970-01-01T00:00:00Z")
+		public OffsetDateTime getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -98,13 +116,21 @@ public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		OffsetDateTime myProperty;
+		OffsetDateTime indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public OffsetDateTime getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "1999-01-01T07:30:59-06:00")
+		public OffsetDateTime getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

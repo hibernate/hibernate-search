@@ -95,6 +95,16 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public String getNullAsValueBridge1() {
+				return "80000000-0000-0000-8000-000000000000";
+			}
+
+			@Override
+			public String getNullAsValueBridge2() {
+				return "8cea97f9-9696-4299-9f05-636a208b6c1f";
+			}
 		} );
 	}
 
@@ -122,6 +132,7 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		UUID myProperty;
+		UUID indexNullAsProperty;
 
 		@DocumentId
 		public Integer getId() {
@@ -131,6 +142,11 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 		@GenericField
 		public UUID getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "80000000-0000-0000-8000-000000000000")
+		public UUID getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -138,6 +154,7 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		UUID myProperty;
+		UUID indexNullAsProperty;
 
 		@DocumentId
 		public Integer getId() {
@@ -147,6 +164,11 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 		@GenericField
 		public UUID getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "8cea97f9-9696-4299-9f05-636a208b6c1f")
+		public UUID getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 

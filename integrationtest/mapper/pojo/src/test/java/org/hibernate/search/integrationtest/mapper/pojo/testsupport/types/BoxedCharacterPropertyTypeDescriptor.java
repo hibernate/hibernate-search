@@ -67,6 +67,16 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public String getNullAsValueBridge1() {
+				return "7";
+			}
+
+			@Override
+			public String getNullAsValueBridge2() {
+				return "F";
+			}
 		} );
 	}
 
@@ -74,13 +84,21 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Character myProperty;
+		Character indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Character getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "7")
+		public Character getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -88,13 +106,21 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Character myProperty;
+		Character indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Character getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "F")
+		public Character getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

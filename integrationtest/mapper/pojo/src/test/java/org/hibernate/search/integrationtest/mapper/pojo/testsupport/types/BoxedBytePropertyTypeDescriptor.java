@@ -67,6 +67,16 @@ public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Byte getNullAsValueBridge1() {
+				return (byte)0;
+			}
+
+			@Override
+			public Byte getNullAsValueBridge2() {
+				return (byte)-64;
+			}
 		} );
 	}
 
@@ -74,13 +84,21 @@ public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Byte myProperty;
+		Byte indexNullAsProperty;
+
 		@DocumentId
 		public int getId() {
 			return id;
 		}
+
 		@GenericField
 		public Byte getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "0")
+		public Byte getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -88,13 +106,21 @@ public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Byte myProperty;
+		Byte indexNullAsProperty;
+
 		@DocumentId
 		public int getId() {
 			return id;
 		}
+
 		@GenericField
 		public Byte getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "-64")
+		public Byte getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

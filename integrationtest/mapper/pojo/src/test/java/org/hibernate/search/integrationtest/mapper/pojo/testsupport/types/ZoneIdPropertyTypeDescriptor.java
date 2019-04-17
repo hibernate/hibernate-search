@@ -83,6 +83,16 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId>
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public String getNullAsValueBridge1() {
+				return ZoneOffset.UTC.getId();
+			}
+
+			@Override
+			public String getNullAsValueBridge2() {
+				return ZoneId.of( "Europe/Paris" ).getId();
+			}
 		} );
 	}
 
@@ -90,13 +100,21 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId>
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		ZoneId myProperty;
+		ZoneId indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public ZoneId getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "Z")
+		public ZoneId getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -104,13 +122,21 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId>
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		ZoneId myProperty;
+		ZoneId indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public ZoneId getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "Europe/Paris")
+		public ZoneId getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

@@ -70,6 +70,16 @@ public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year> {
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Year getNullAsValueBridge1() {
+				return Year.of( 0 );
+			}
+
+			@Override
+			public Year getNullAsValueBridge2() {
+				return Year.of( 2020 );
+			}
 		} );
 	}
 
@@ -77,13 +87,21 @@ public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year> {
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Year myProperty;
+		Year indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Year getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "0000")
+		public Year getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -91,13 +109,21 @@ public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year> {
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Year myProperty;
+		Year indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Year getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "2020")
+		public Year getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

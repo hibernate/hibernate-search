@@ -82,6 +82,16 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public String getNullAsValueBridge1() {
+				return "https://www.redhat.com";
+			}
+
+			@Override
+			public String getNullAsValueBridge2() {
+				return "file:///~calendar";
+			}
 		} );
 	}
 
@@ -89,6 +99,7 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		URI myProperty;
+		URI indexNullAsProperty;
 
 		@DocumentId
 		public Integer getId() {
@@ -98,6 +109,11 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 		@GenericField
 		public URI getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "https://www.redhat.com")
+		public URI getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -105,6 +121,7 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		URI myProperty;
+		URI indexNullAsProperty;
 
 		@DocumentId
 		public Integer getId() {
@@ -114,6 +131,11 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 		@GenericField
 		public URI getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "file:///~calendar")
+		public URI getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

@@ -69,6 +69,16 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public BigDecimal getNullAsValueBridge1() {
+				return BigDecimal.ZERO;
+			}
+
+			@Override
+			public BigDecimal getNullAsValueBridge2() {
+				return BigDecimal.valueOf( 42571524, 231254 );
+			}
 		} );
 	}
 
@@ -76,13 +86,21 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		BigDecimal myProperty;
+		BigDecimal indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public BigDecimal getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "0")
+		public BigDecimal getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -90,13 +108,21 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		BigDecimal myProperty;
+		BigDecimal indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public BigDecimal getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "4.2571524E-231247")
+		public BigDecimal getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

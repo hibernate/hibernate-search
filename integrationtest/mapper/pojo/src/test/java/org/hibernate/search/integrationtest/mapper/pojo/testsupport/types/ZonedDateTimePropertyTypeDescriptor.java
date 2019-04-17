@@ -77,6 +77,16 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public ZonedDateTime getNullAsValueBridge1() {
+				return ZonedDateTime.of( LocalDateTime.of( 1970, Month.JANUARY, 1, 0, 0, 0 ), ZoneId.of( "GMT" ) );
+			}
+
+			@Override
+			public ZonedDateTime getNullAsValueBridge2() {
+				return ZonedDateTime.of( LocalDateTime.of( 1999, Month.MAY, 31, 9, 30, 10 ), ZoneId.of( "America/Chicago" ) );
+			}
 		} );
 	}
 
@@ -84,13 +94,21 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		ZonedDateTime myProperty;
+		ZonedDateTime indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public ZonedDateTime getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "1970-01-01T00:00:00Z[GMT]")
+		public ZonedDateTime getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -98,13 +116,21 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		ZonedDateTime myProperty;
+		ZonedDateTime indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public ZonedDateTime getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "1999-05-31T09:30:10-05:00[America/Chicago]")
+		public ZonedDateTime getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

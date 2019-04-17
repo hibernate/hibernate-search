@@ -73,6 +73,16 @@ public class PrimitiveDoublePropertyTypeDescriptor extends PropertyTypeDescripto
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Double getNullAsValueBridge1() {
+				return 0.0;
+			}
+
+			@Override
+			public Double getNullAsValueBridge2() {
+				return 7.739;
+			}
 		} );
 	}
 

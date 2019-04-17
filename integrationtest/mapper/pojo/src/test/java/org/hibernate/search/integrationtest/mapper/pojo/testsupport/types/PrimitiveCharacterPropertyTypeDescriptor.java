@@ -73,6 +73,16 @@ public class PrimitiveCharacterPropertyTypeDescriptor extends PropertyTypeDescri
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public String getNullAsValueBridge1() {
+				return "0";
+			}
+
+			@Override
+			public String getNullAsValueBridge2() {
+				return "F";
+			}
 		} );
 	}
 

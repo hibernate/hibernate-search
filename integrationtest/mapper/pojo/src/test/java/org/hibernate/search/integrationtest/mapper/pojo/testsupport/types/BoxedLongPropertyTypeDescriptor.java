@@ -96,6 +96,16 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Long getNullAsValueBridge1() {
+				return 0L;
+			}
+
+			@Override
+			public Long getNullAsValueBridge2() {
+				return 739739L;
+			}
 		} );
 	}
 
@@ -121,13 +131,21 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Long myProperty;
+		Long indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Long getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "0")
+		public Long getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -135,13 +153,21 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Long myProperty;
+		Long indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Long getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "739739")
+		public Long getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

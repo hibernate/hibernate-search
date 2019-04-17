@@ -67,6 +67,16 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Float getNullAsValueBridge1() {
+				return 0.0f;
+			}
+
+			@Override
+			public Float getNullAsValueBridge2() {
+				return 37.33379f;
+			}
 		} );
 	}
 
@@ -74,13 +84,21 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Float myProperty;
+		Float indexNullAsProperty;
+
 		@DocumentId
 		public int getId() {
 			return id;
 		}
+
 		@GenericField
 		public Float getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "0")
+		public Float getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -88,13 +106,21 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Float myProperty;
+		Float indexNullAsProperty;
+
 		@DocumentId
 		public int getId() {
 			return id;
 		}
+
 		@GenericField
 		public Float getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "37.33379")
+		public Float getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

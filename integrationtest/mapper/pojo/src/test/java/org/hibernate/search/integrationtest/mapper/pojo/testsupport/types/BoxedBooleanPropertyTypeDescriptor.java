@@ -67,6 +67,16 @@ public class BoxedBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<B
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Boolean getNullAsValueBridge1() {
+				return Boolean.FALSE;
+			}
+
+			@Override
+			public Boolean getNullAsValueBridge2() {
+				return Boolean.TRUE;
+			}
 		} );
 	}
 
@@ -74,13 +84,21 @@ public class BoxedBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<B
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Boolean myProperty;
+		Boolean indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Boolean getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "false")
+		public Boolean getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -88,13 +106,21 @@ public class BoxedBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<B
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Boolean myProperty;
+		Boolean indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Boolean getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "true")
+		public Boolean getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

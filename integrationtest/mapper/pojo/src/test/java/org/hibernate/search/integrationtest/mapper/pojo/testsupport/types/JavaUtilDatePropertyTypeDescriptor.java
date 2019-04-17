@@ -95,6 +95,16 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Instant getNullAsValueBridge1() {
+				return Instant.parse( "1970-01-01T00:00:00.00Z" );
+			}
+
+			@Override
+			public Instant getNullAsValueBridge2() {
+				return Instant.parse( "2012-02-29T12:10:01.12Z" );
+			}
 		} );
 	}
 
@@ -114,13 +124,21 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Date myProperty;
+		Date indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Date getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "1970-01-01T00:00:00.00Z")
+		public Date getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -128,13 +146,21 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Date myProperty;
+		Date indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Date getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "2012-02-29T12:10:01.12Z")
+		public Date getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

@@ -80,6 +80,16 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Long getNullAsValueBridge1() {
+				return Duration.ZERO.toNanos();
+			}
+
+			@Override
+			public Long getNullAsValueBridge2() {
+				return Duration.ofSeconds( 1, 123L ).toNanos();
+			}
 		} );
 	}
 
@@ -87,13 +97,21 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Duration myProperty;
+		Duration indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Duration getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "0")
+		public Duration getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -101,13 +119,21 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Duration myProperty;
+		Duration indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public Duration getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "1000000123")
+		public Duration getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

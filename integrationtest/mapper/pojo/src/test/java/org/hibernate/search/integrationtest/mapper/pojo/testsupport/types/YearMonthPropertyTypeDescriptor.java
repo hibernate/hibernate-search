@@ -76,6 +76,16 @@ public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<Year
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public YearMonth getNullAsValueBridge1() {
+				return YearMonth.of( 2019, Month.FEBRUARY );
+			}
+
+			@Override
+			public YearMonth getNullAsValueBridge2() {
+				return YearMonth.of( 2100, Month.NOVEMBER );
+			}
 		} );
 	}
 

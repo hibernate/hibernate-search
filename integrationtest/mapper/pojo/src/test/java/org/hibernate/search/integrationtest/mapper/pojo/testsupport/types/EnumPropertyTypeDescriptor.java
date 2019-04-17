@@ -94,6 +94,16 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public String getNullAsValueBridge1() {
+				return "VALUE1";
+			}
+
+			@Override
+			public String getNullAsValueBridge2() {
+				return "VALUE2";
+			}
 		} );
 	}
 
@@ -124,13 +134,21 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		MyEnum myProperty;
+		MyEnum indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public MyEnum getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "VALUE1")
+		public MyEnum getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -138,13 +156,21 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		MyEnum myProperty;
+		MyEnum indexNullAsProperty;
+
 		@DocumentId
 		public Integer getId() {
 			return id;
 		}
+
 		@GenericField
 		public MyEnum getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "VALUE2")
+		public MyEnum getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }

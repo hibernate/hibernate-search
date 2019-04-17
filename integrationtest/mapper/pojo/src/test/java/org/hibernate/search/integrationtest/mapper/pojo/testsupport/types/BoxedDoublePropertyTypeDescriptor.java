@@ -67,6 +67,16 @@ public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Do
 			public Class<?> getTypeWithValueBridge2() {
 				return TypeWithValueBridge2.class;
 			}
+
+			@Override
+			public Double getNullAsValueBridge1() {
+				return 0.0;
+			}
+
+			@Override
+			public Double getNullAsValueBridge2() {
+				return 739739.739;
+			}
 		} );
 	}
 
@@ -74,13 +84,21 @@ public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Do
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Double myProperty;
+		Double indexNullAsProperty;
+
 		@DocumentId
 		public int getId() {
 			return id;
 		}
+
 		@GenericField
 		public Double getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "0")
+		public Double getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 
@@ -88,13 +106,21 @@ public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Do
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Double myProperty;
+		Double indexNullAsProperty;
+
 		@DocumentId
 		public int getId() {
 			return id;
 		}
+
 		@GenericField
 		public Double getMyProperty() {
 			return myProperty;
+		}
+
+		@GenericField(indexNullAs = "739739.739")
+		public Double getIndexNullAsProperty() {
+			return indexNullAsProperty;
 		}
 	}
 }
