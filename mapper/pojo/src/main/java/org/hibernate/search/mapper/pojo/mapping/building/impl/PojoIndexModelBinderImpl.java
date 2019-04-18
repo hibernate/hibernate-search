@@ -38,6 +38,8 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyDependencyContext;
+import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeDependencyContext;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
@@ -124,13 +126,16 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		try {
 			PojoModelTypeRootElement<T> pojoModelRootElement =
 					new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
+			PojoTypeDependencyContext<T> pojoDependencyContext =
+					new PojoTypeDependencyContext<>( extractorBinder, modelPath.getTypeModel() );
 			bridgeHolder.get().bind( new RoutingKeyBridgeBindingContextImpl(
-					pojoModelRootElement
+					pojoModelRootElement,
+					pojoDependencyContext
 			) );
 
 			bindingContext.explicitRouting();
 
-			return new BoundRoutingKeyBridge<>( bridgeHolder, pojoModelRootElement );
+			return new BoundRoutingKeyBridge<>( bridgeHolder, pojoModelRootElement, pojoDependencyContext );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -149,15 +154,18 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 			PojoModelTypeRootElement<T> pojoModelRootElement =
 					new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
+			PojoTypeDependencyContext<T> pojoDependencyContext =
+					new PojoTypeDependencyContext<>( extractorBinder, modelPath.getTypeModel() );
 			bridgeHolder.get().bind( new TypeBridgeBindingContextImpl(
 					pojoModelRootElement,
+					pojoDependencyContext,
 					bindingContext.getTypeFactory(),
 					bindingContext.getSchemaElement( listener )
 			) );
 
 			// If all fields are filtered out, we should ignore the bridge
 			if ( listener.schemaContributed ) {
-				return Optional.of( new BoundTypeBridge<>( bridgeHolder, pojoModelRootElement ) );
+				return Optional.of( new BoundTypeBridge<>( bridgeHolder, pojoModelRootElement, pojoDependencyContext ) );
 			}
 			else {
 				try ( Closer<RuntimeException> closer = new Closer<>() ) {
@@ -184,15 +192,20 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 			PojoModelPropertyRootElement<P> pojoModelRootElement =
 					new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
+			PojoPropertyDependencyContext<P> pojoDependencyContext =
+					new PojoPropertyDependencyContext<>( extractorBinder, modelPath.getPropertyModel() );
 			bridgeHolder.get().bind( new PropertyBridgeBindingContextImpl(
 					pojoModelRootElement,
+					pojoDependencyContext,
 					bindingContext.getTypeFactory(),
 					bindingContext.getSchemaElement( listener )
 			) );
 
 			// If all fields are filtered out, we should ignore the bridge
 			if ( listener.schemaContributed ) {
-				return Optional.of( new BoundPropertyBridge<>( bridgeHolder, pojoModelRootElement ) );
+				return Optional.of( new BoundPropertyBridge<>(
+						bridgeHolder, pojoModelRootElement, pojoDependencyContext
+				) );
 			}
 			else {
 				try ( Closer<RuntimeException> closer = new Closer<>() ) {

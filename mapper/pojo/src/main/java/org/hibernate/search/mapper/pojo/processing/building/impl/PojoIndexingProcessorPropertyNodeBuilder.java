@@ -174,7 +174,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 					? Collections.emptyList() : new ArrayList<>();
 			for ( BoundPropertyBridge<P> boundBridge : boundPropertyBridges ) {
 				immutableBridgeHolders.add( boundBridge.getBridgeHolder() );
-				boundBridge.getPojoModelRootElement().contributeDependencies( propertyDependencyCollector );
+				boundBridge.contributeDependencies( propertyDependencyCollector );
 			}
 			Collection<PojoIndexingProcessor<? super P>> valueWithoutExtractorNodes =
 					valueWithoutExtractorBuilderDelegate.build( propertyDependencyCollector );

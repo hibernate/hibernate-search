@@ -10,6 +10,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoDependencyContext;
 
 /**
  * The context provided to the {@link TypeBridge#bind(TypeBridgeBindingContext)} method.
@@ -20,6 +21,11 @@ public interface TypeBridgeBindingContext {
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO type.
 	 */
 	PojoModelType getBridgedElement();
+
+	/**
+	 * @return An entry point allowing to declare the parts of the entity graph that this bridge will depend on.
+	 */
+	PojoDependencyContext getDependencies();
 
 	/**
 	 * @return An entry point allowing to define a new field type.

@@ -31,10 +31,17 @@ public interface PropertyBridge extends AutoCloseable {
 	 * It allows the bridge to:
 	 * <ul>
 	 *     <li>Declare its expectations regarding the index schema (field names and field types, storage options, ...)
+	 *     and retrieve references to the index fields that will later be used in the
+	 * 	   {@link #write(DocumentElement, PojoElement, PropertyBridgeWriteContext)} method
 	 *     using {@link PropertyBridgeBindingContext#getIndexSchemaElement()}.
-	 *     <li>Declare its expectations regarding the POJO model (input type, expected properties and their type, ...)
+	 *     <li>Check the type of bridged elements
 	 *     using {@link PropertyBridgeBindingContext#getBridgedElement()}.
-	 *     <li>Retrieve accessors to the POJO and to the index fields that will later be used in the
+	 *     <li>Declare its dependencies, i.e. the properties
+	 * 	   that will later be used in the
+	 *     {@link #write(DocumentElement, PojoElement, PropertyBridgeWriteContext)} method
+	 * 	   using {@link PropertyBridgeBindingContext#getDependencies()}.
+	 *     <li>Optionally (advanced use) use reflection to retrieve accessors to the bridged element
+	 *     that will later be used in the
 	 *     {@link #write(DocumentElement, PojoElement, PropertyBridgeWriteContext)} method
 	 *     using {@link PropertyBridgeBindingContext#getBridgedElement()}.
 	 * </ul>
