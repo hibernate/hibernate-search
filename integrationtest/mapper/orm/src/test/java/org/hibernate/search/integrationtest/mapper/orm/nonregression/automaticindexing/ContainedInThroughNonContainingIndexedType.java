@@ -17,6 +17,7 @@ import javax.persistence.OneToOne;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.AutomaticIndexingBridgeAccessorsIT;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
@@ -36,7 +37,7 @@ import org.junit.Test;
 
 /**
  * Tests a corner case that is not covered by
- * {@link org.hibernate.search.integrationtest.mapper.orm.automaticindexing.AutomaticIndexingBridgeIT},
+ * {@link AutomaticIndexingBridgeAccessorsIT},
  * where the contained entity type is also indexed.
  * This should not matter given the current implementation, but better safe than sorry.
  */

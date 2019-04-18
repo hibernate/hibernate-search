@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
@@ -21,23 +17,12 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -48,10 +33,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test automatic indexing based on Hibernate ORM entity events when
+ * An abstract base for tests dealing with automatic indexing based on Hibernate ORM entity events when
  * {@link TypeBridge}s or {@link PropertyBridge}s are involved.
  */
-public class AutomaticIndexingBridgeIT {
+public abstract class AbstractAutomaticIndexingBridgeIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -76,6 +61,18 @@ public class AutomaticIndexingBridgeIT {
 		);
 
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						new HibernateOrmSearchMappingConfigurer() {
+							@Override
+							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+								context.programmaticMapping().type( ContainingEntity.class )
+										.bridge( getContainingEntityTypeBridgeClass() )
+										.property( "child" )
+												.bridge( getContainingEntityPropertyBridgeClass() );
+							}
+						}
+				)
 				.setup(
 						IndexedEntity.class,
 						ContainedEntity.class
@@ -585,8 +582,11 @@ public class AutomaticIndexingBridgeIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	protected abstract Class<? extends TypeBridge> getContainingEntityTypeBridgeClass();
+
+	protected abstract Class<? extends PropertyBridge> getContainingEntityPropertyBridgeClass();
+
 	@Entity(name = "containing")
-	@ContainingEntityTypeBridgeAnnotation
 	public static class ContainingEntity {
 
 		@Id
@@ -596,7 +596,6 @@ public class AutomaticIndexingBridgeIT {
 		private ContainingEntity parent;
 
 		@OneToOne(mappedBy = "parent")
-		@ContainingEntityPropertyBridgeAnnotation
 		private ContainingEntity child;
 
 		@ManyToOne
@@ -706,89 +705,6 @@ public class AutomaticIndexingBridgeIT {
 
 		public void setExcludedFromAll(String excludedFromAll) {
 			this.excludedFromAll = excludedFromAll;
-		}
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ ElementType.TYPE })
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(type = ContainingEntityTypeBridge.class))
-	public @interface ContainingEntityTypeBridgeAnnotation {
-	}
-
-	public static class ContainingEntityTypeBridge implements TypeBridge {
-
-		private PojoElementAccessor<String> directFieldSourceAccessor;
-		private PojoElementAccessor<String> includedInTypeBridgeFieldSourceAccessor;
-		private IndexObjectFieldReference typeBridgeObjectFieldReference;
-		private IndexFieldReference<String> directFieldReference;
-		private IndexObjectFieldReference childObjectFieldReference;
-		private IndexFieldReference<String> includedInTypeBridgeFieldReference;
-
-		@Override
-		public void bind(TypeBridgeBindingContext context) {
-			PojoModelType bridgedElement = context.getBridgedElement();
-			directFieldSourceAccessor = bridgedElement.property( "directField" )
-					.createAccessor( String.class );
-			includedInTypeBridgeFieldSourceAccessor = bridgedElement.property( "child" )
-					.property( "containedSingle" )
-					.property( "includedInTypeBridge" )
-					.createAccessor( String.class );
-			IndexSchemaObjectField typeBridgeObjectField = context.getIndexSchemaElement().objectField( "typeBridge" );
-			typeBridgeObjectFieldReference = typeBridgeObjectField.toReference();
-			directFieldReference = typeBridgeObjectField.field( "directField", f -> f.asString() )
-					.toReference();
-			IndexSchemaObjectField childObjectField = typeBridgeObjectField.objectField( "child" );
-			childObjectFieldReference = childObjectField.toReference();
-			includedInTypeBridgeFieldReference = childObjectField.field(
-					"includedInTypeBridge", f -> f.asString()
-			)
-					.toReference();
-		}
-
-		@Override
-		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			DocumentElement typeBridgeObjectField = target.addObject( typeBridgeObjectFieldReference );
-			typeBridgeObjectField.addValue( directFieldReference, directFieldSourceAccessor.read( bridgedElement ) );
-			DocumentElement childObjectField = typeBridgeObjectField.addObject( childObjectFieldReference );
-			childObjectField.addValue(
-					includedInTypeBridgeFieldReference, includedInTypeBridgeFieldSourceAccessor.read( bridgedElement )
-			);
-		}
-	}
-
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ ElementType.METHOD, ElementType.FIELD })
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(type = ContainingEntityPropertyBridge.class))
-	public @interface ContainingEntityPropertyBridgeAnnotation {
-	}
-
-	public static class ContainingEntityPropertyBridge implements PropertyBridge {
-
-		private PojoElementAccessor<String> includedInPropertyBridgeSourceAccessor;
-		private IndexObjectFieldReference propertyBridgeObjectFieldReference;
-		private IndexFieldReference<String> includedInPropertyBridgeFieldReference;
-
-		@Override
-		public void bind(PropertyBridgeBindingContext context) {
-			includedInPropertyBridgeSourceAccessor = context.getBridgedElement().property( "containedSingle" )
-					.property( "includedInPropertyBridge" )
-					.createAccessor( String.class );
-			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "propertyBridge" );
-			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
-			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
-					"includedInPropertyBridge", f -> f.asString()
-			)
-					.toReference();
-		}
-
-		@Override
-		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-			DocumentElement propertyBridgeObjectField = target.addObject( propertyBridgeObjectFieldReference );
-			propertyBridgeObjectField.addValue(
-					includedInPropertyBridgeFieldReference, includedInPropertyBridgeSourceAccessor.read(
-							bridgedElement )
-			);
 		}
 	}
 }
