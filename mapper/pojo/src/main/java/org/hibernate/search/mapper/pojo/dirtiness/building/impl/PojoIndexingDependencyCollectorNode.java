@@ -10,7 +10,11 @@ import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
 
-abstract class PojoIndexingDependencyCollectorNode {
+public abstract class PojoIndexingDependencyCollectorNode {
+
+	public static Walker walker() {
+		return new Walker( null );
+	}
 
 	static Walker walker(PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency) {
 		return new Walker( initialNodeCollectingDependency );

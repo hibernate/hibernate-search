@@ -117,7 +117,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 
 	private Optional<PojoIndexingProcessor<T>> doBuild(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
 		if ( boundRoutingKeyBridge != null ) {
-			boundRoutingKeyBridge.getPojoModelRootElement().contributeDependencies( dependencyCollector );
+			boundRoutingKeyBridge.contributeDependencies( dependencyCollector );
 		}
 
 		Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> immutablePropertyNodes =
@@ -128,7 +128,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 					? Collections.emptyList() : new ArrayList<>();
 			for ( BoundTypeBridge<T> boundBridge : boundBridges ) {
 				immutableBridgeHolders.add( boundBridge.getBridgeHolder() );
-				boundBridge.getPojoModelRootElement().contributeDependencies( dependencyCollector );
+				boundBridge.contributeDependencies( dependencyCollector );
 			}
 			propertyNodeBuilders.values().stream()
 					.map( builder -> builder.build( dependencyCollector ) )

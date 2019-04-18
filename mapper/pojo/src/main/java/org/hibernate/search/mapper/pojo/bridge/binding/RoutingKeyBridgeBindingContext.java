@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.binding;
 
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoDependencyContext;
 
 /**
  * The context provided to the {@link RoutingKeyBridge#bind(RoutingKeyBridgeBindingContext)} method.
@@ -18,5 +19,10 @@ public interface RoutingKeyBridgeBindingContext {
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO type.
 	 */
 	PojoModelType getBridgedElement();
+
+	/**
+	 * @return An entry point allowing to declare the parts of the entity graph that this bridge will depend on.
+	 */
+	PojoDependencyContext getDependencies();
 
 }

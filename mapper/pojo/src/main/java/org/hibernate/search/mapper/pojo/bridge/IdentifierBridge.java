@@ -25,7 +25,8 @@ public interface IdentifierBridge<I> extends AutoCloseable {
 	 * i.e. to an object property in the POJO model.
 	 * <p>
 	 * This method is called exactly once for each bridge instance, before any other method.
-	 * It allows the bridge to inspect the type of values extracted from the POJO model that will be passed to this bridge.
+	 * It allows the bridge to check the type of bridged elements
+	 * using {@link IdentifierBridgeBindingContext#getBridgedElement()}.
 	 *
 	 * @param context An entry point to perform the operations listed above.
 	 */
