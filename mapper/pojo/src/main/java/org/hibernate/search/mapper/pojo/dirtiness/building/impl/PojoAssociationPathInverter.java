@@ -115,11 +115,10 @@ public final class PojoAssociationPathInverter {
 		}
 		else {
 			// We reached the root: collect the first paths
-			PojoModelPathPropertyNode basePropertyPath = PojoModelPath.fromRoot( propertyName );
-			associationPathsToMatch.add( basePropertyPath.value( extractorPath ) );
+			associationPathsToMatch.add( PojoModelPath.ofValue( propertyName, extractorPath ) );
 			if ( isDefaultExtractorPath ) {
 				// The may be two versions of this path, similarly to what we do above
-				associationPathsToMatch.add( basePropertyPath.value( ContainerExtractorPath.defaultExtractors() ) );
+				associationPathsToMatch.add( PojoModelPath.ofValue( propertyName, ContainerExtractorPath.defaultExtractors() ) );
 			}
 		}
 	}

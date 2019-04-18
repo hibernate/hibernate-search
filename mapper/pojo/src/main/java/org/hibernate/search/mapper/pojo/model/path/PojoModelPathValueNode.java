@@ -9,13 +9,26 @@ package org.hibernate.search.mapper.pojo.model.path;
 import java.util.Objects;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.util.common.impl.Contracts;
 
+/**
+ * A node in a {@link PojoModelPath} representing the value(s) of a property.
+ * <p>
+ * Value node give information as to how to extract values from a property,
+ * by specifying a {@link ContainerExtractorPath}.
+ * That path will tell Hibernate Search whether it should
+ * it just represent how to access the property itself.
+ * To access the value(s) of that property, additional information is required,
+ * and that information is provided by a {@link PojoModelPathValueNode}.
+ */
 public final class PojoModelPathValueNode extends PojoModelPath {
 
 	private final PojoModelPathPropertyNode parent;
 	private final ContainerExtractorPath extractorPath;
 
 	PojoModelPathValueNode(PojoModelPathPropertyNode parent, ContainerExtractorPath extractorPath) {
+		Contracts.assertNotNull( parent, "parent" );
+		Contracts.assertNotNull( extractorPath, "extractorPath" );
 		this.parent = parent;
 		this.extractorPath = extractorPath;
 	}

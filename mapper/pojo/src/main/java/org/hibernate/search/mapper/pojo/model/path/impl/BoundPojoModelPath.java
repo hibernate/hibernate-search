@@ -66,6 +66,16 @@ public abstract class BoundPojoModelPath {
 		}
 	}
 
+	abstract void appendSelfPath(PojoModelPath.Builder builder);
+
+	final void appendPath(PojoModelPath.Builder builder) {
+		BoundPojoModelPath parent = getParent();
+		if ( parent != null ) {
+			parent.appendPath( builder );
+		}
+		appendSelfPath( builder );
+	}
+
 	public static class Walker implements PojoModelPathWalker<
 			BoundPojoModelPathTypeNode<?>,
 			BoundPojoModelPathPropertyNode<?, ?>,

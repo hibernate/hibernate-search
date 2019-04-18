@@ -30,7 +30,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojo
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
-import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -180,19 +179,18 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		StringTokenizer tokenizer = new StringTokenizer( mappedByPath, ".", false );
 
 		String rootPropertyName = tokenizer.nextToken();
-		PojoModelPathPropertyNode inverseSidePropertyPath = PojoModelPath.fromRoot( rootPropertyName );
-		PojoModelPathValueNode inverseSideValuePath;
+		PojoModelPath.Builder inverseSidePathBuilder = PojoModelPath.builder().property( rootPropertyName );
 		Property property = persistentClasses.get( inverseSideEntity ).getProperty( rootPropertyName );
 
 		do {
 			Value value = property.getValue();
-			inverseSideValuePath = inverseSidePropertyPath.value( getExtractorPath( value ) );
+			inverseSidePathBuilder.value( getExtractorPath( value ) );
 
 			if ( tokenizer.hasMoreTokens() ) {
 				Component component = (Component) value;
 				String propertyName = tokenizer.nextToken();
 				property = component.getProperty( propertyName );
-				inverseSidePropertyPath = inverseSideValuePath.property( propertyName );
+				inverseSidePathBuilder.property( propertyName );
 			}
 			else {
 				property = null;
@@ -200,7 +198,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		}
 		while ( property != null );
 
-		return inverseSideValuePath;
+		return inverseSidePathBuilder.toValuePath();
 	}
 
 	private ContainerExtractorPath getExtractorPath(Value value) {

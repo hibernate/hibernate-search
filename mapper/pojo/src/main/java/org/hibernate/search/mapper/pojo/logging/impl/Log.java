@@ -337,10 +337,10 @@ public interface Log extends BasicLogger {
 	SearchException notDirectlyIndexedType(@FormatWith(ClassFormatter.class) Class<?> targetedType);
 
 	@Message(id = ID_OFFSET_2 + 41,
-			value = "Annotation @ContainerExtractorRef requests automatic resolution of the container extractor, but automatic resolution cannot be used in extractor chains."
-					+ " Use explicit references to the type of each extractor to be applied instead."
+			value = "A chain of multiple container extractors cannot include the default extractors."
+					+ " Either use only the default extractors, or explicitly reference every single extractor to be applied instead."
 	)
-	SearchException cannotUseAutomaticContainerExtractorInMultiExtractorChain();
+	SearchException cannotUseDefaultExtractorsInMultiExtractorChain();
 
 	@SuppressWarnings("rawtypes")
 	@Message(id = ID_OFFSET_2 + 42,
@@ -355,4 +355,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 44, value = "Error creating URI from String '%1$s'.")
 	SearchException badURISyntax(String value, @Cause URISyntaxException e);
+
+	@Message(id = ID_OFFSET_2 + 45,
+			value = "A PojoModelPath must include at least one property."
+	)
+	SearchException cannotDefinePojoModelPathWithoutProperty();
 }

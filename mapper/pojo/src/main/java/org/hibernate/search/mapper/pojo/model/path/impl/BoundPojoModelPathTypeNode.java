@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -42,13 +43,14 @@ public abstract class BoundPojoModelPathTypeNode<T> extends BoundPojoModelPath {
 
 	@Override
 	public PojoModelPathValueNode toUnboundPath() {
-		BoundPojoModelPathValueNode<?, ?, ?> parent = getParent();
-		if ( parent == null ) {
-			return null;
-		}
-		else {
-			return parent.toUnboundPath();
-		}
+		PojoModelPath.Builder builder = PojoModelPath.builder();
+		appendPath( builder );
+		return builder.toValuePathOrNull();
+	}
+
+	@Override
+	void appendSelfPath(PojoModelPath.Builder builder) {
+		// Nothing to do
 	}
 
 	public abstract PojoTypeModel<T> getTypeModel();

@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.model.path.impl;
 
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -45,7 +46,9 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 
 	@Override
 	public PojoModelPathValueNode toUnboundPath() {
-		return parent.toUnboundPath().value( getExtractorPath() );
+		PojoModelPath.Builder builder = PojoModelPath.builder();
+		appendPath( builder );
+		return builder.toValuePathOrNull();
 	}
 
 	/**
@@ -89,5 +92,10 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 	@Override
 	void appendSelfPath(StringBuilder builder) {
 		builder.append( getExtractorPath() );
+	}
+
+	@Override
+	void appendSelfPath(PojoModelPath.Builder builder) {
+		builder.value( getExtractorPath() );
 	}
 }

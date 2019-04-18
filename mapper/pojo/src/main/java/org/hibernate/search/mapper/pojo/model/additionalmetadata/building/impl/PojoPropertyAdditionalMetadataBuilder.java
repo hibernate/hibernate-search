@@ -39,7 +39,7 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 	@Override
 	public ContextualFailureCollector getFailureCollector() {
 		return rootBuilder.getFailureCollector().withContext(
-				PojoEventContexts.fromPath( PojoModelPath.fromRoot( propertyName ) )
+				PojoEventContexts.fromPath( PojoModelPath.ofProperty( propertyName ) )
 		);
 	}
 

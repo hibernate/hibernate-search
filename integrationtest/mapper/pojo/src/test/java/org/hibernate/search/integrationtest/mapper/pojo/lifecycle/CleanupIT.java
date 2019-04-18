@@ -387,10 +387,9 @@ public class CleanupIT {
 													) )
 									.property( "embedded" )
 											.associationInverseSide(
-													PojoModelPath.fromRoot( "embedding" )
-															.value( ContainerExtractorPath.explicitExtractor(
-																	StartupStubContainerExtractor.class
-															) )
+													PojoModelPath.builder().property( "embedding" )
+															.value( StartupStubContainerExtractor.class )
+															.toValuePath()
 											)
 											.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 											/*
@@ -402,10 +401,9 @@ public class CleanupIT {
 													.includePaths( "text" )
 									.property( "otherEmbedded" )
 											.associationInverseSide(
-													PojoModelPath.fromRoot( "otherEmbedding" )
-															.value( ContainerExtractorPath.explicitExtractor(
-																	StartupStubContainerExtractor.class
-															) )
+													PojoModelPath.builder().property( "otherEmbedding" )
+															.value( StartupStubContainerExtractor.class )
+															.toValuePath()
 											);
 
 							additionalMappingContributor.accept( mappingDefinition );
