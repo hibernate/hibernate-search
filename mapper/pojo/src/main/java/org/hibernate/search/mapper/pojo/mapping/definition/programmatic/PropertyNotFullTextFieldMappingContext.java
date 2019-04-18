@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 /**
  * @author Yoann Rodiere
  */
-public interface PropertySortableFieldMappingContext<S extends PropertySortableFieldMappingContext<?>>
+public interface PropertyNotFullTextFieldMappingContext<S extends PropertyNotFullTextFieldMappingContext<?>>
 		extends PropertyFieldMappingContext<S> {
 
 	S sortable(Sortable sortable);

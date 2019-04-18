@@ -12,18 +12,18 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertySortableFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyNotFullTextFieldMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
-abstract class PropertySortableFieldAnnotationProcessor<A extends Annotation> extends PropertyFieldAnnotationProcessor<A> {
-	PropertySortableFieldAnnotationProcessor(AnnotationProcessorHelper helper, Class<A> annotationType) {
+abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation> extends PropertyFieldAnnotationProcessor<A> {
+	PropertyNotFullTextFieldAnnotationProcessor(AnnotationProcessorHelper helper, Class<A> annotationType) {
 		super( helper, annotationType );
 	}
 
 	@Override
 	final PropertyFieldMappingContext<?> initFieldMappingContext(PropertyMappingContext mappingContext,
 			PojoPropertyModel<?> propertyModel, A annotation, String fieldName) {
-		PropertySortableFieldMappingContext<?> fieldContext = initSortableFieldMappingContext(
+		PropertyNotFullTextFieldMappingContext<?> fieldContext = initSortableFieldMappingContext(
 				mappingContext, propertyModel, annotation, fieldName
 		);
 
@@ -40,7 +40,7 @@ abstract class PropertySortableFieldAnnotationProcessor<A extends Annotation> ex
 		return fieldContext;
 	}
 
-	abstract PropertySortableFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
+	abstract PropertyNotFullTextFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
 			PojoPropertyModel<?> propertyModel, A annotation, String fieldName);
 
 	abstract Sortable getSortable(A annotation);

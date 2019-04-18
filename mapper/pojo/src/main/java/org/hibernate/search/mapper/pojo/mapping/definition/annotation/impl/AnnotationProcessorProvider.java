@@ -45,7 +45,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Indexing
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertySortableFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyNotFullTextFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -244,13 +244,13 @@ class AnnotationProcessorProvider {
 		}
 	}
 
-	private static class GenericFieldProcessor extends PropertySortableFieldAnnotationProcessor<GenericField> {
+	private static class GenericFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<GenericField> {
 		GenericFieldProcessor(AnnotationProcessorHelper helper) {
 			super( helper, GenericField.class );
 		}
 
 		@Override
-		PropertySortableFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
+		PropertyNotFullTextFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
 				PojoPropertyModel<?> propertyModel, GenericField annotation, String fieldName) {
 			return mappingContext.genericField( fieldName );
 		}
@@ -319,13 +319,13 @@ class AnnotationProcessorProvider {
 		}
 	}
 
-	private static class KeywordFieldProcessor extends PropertySortableFieldAnnotationProcessor<KeywordField> {
+	private static class KeywordFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<KeywordField> {
 		KeywordFieldProcessor(AnnotationProcessorHelper helper) {
 			super( helper, KeywordField.class );
 		}
 
 		@Override
-		PropertySortableFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
+		PropertyNotFullTextFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
 				PojoPropertyModel<?> propertyModel, KeywordField annotation, String fieldName) {
 			PropertyKeywordFieldMappingContext fieldContext = mappingContext.keywordField( fieldName );
 			String normalizer = annotation.normalizer();

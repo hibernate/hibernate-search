@@ -11,14 +11,14 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertySortableFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyNotFullTextFieldMappingContext;
 
 
-abstract class AbstractPropertySortableFieldMappingContext<S extends PropertySortableFieldMappingContext<?>, C extends StandardIndexFieldTypeContext<?, ?>>
+abstract class AbstractPropertyNotFullTextFieldMappingContext<S extends PropertyNotFullTextFieldMappingContext<?>, C extends StandardIndexFieldTypeContext<?, ?>>
 		extends AbstractPropertyFieldMappingContext<S, C>
-		implements PropertySortableFieldMappingContext<S> {
+		implements PropertyNotFullTextFieldMappingContext<S> {
 
-	AbstractPropertySortableFieldMappingContext(PropertyMappingContext parent, String relativeFieldName,
+	AbstractPropertyNotFullTextFieldMappingContext(PropertyMappingContext parent, String relativeFieldName,
 			Function<StandardIndexFieldTypeContext<?, ?>, C> contextConverter) {
 		super( parent, relativeFieldName, contextConverter );
 	}
