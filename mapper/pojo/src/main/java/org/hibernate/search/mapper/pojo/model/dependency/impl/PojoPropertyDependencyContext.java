@@ -53,7 +53,7 @@ public class PojoPropertyDependencyContext<P> implements PojoDependencyContext {
 				BoundContainerExtractorPath.noExtractors( propertyModel.getTypeModel() )
 		);
 		dependencyCollectorValueNode.collectDependency();
-		
+
 		PojoIndexingDependencyCollectorTypeNode<?> dependencyCollectorTypeNode =
 				dependencyCollectorValueNode.type();
 		for ( BoundPojoModelPathValueNode<?, ?, ?> usedPath : usedPaths ) {

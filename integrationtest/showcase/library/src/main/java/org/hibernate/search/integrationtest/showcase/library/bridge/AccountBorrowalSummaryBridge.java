@@ -16,7 +16,6 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.integrationtest.showcase.library.model.Account;
 import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
 
@@ -33,7 +32,6 @@ import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
  */
 public class AccountBorrowalSummaryBridge implements TypeBridge {
 
-	private PojoElementAccessor<Account> accountAccessor;
 	private IndexObjectFieldReference borrowalsObjectFieldReference;
 	private IndexFieldReference<Integer> shortTermBorrowalCountReference;
 	private IndexFieldReference<Integer> longTermBorrowalCountReference;
@@ -41,8 +39,8 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 
 	@Override
 	public void bind(TypeBridgeBindingContext context) {
-		// TODO allow to access collections properly, and more importantly to declare dependencies on parts of collection items
-		accountAccessor = context.getBridgedElement().createAccessor( Account.class );
+		context.getDependencies()
+				.use( "borrowals.type" );
 
 		IndexSchemaObjectField borrowalsObjectField = context.getIndexSchemaElement().objectField( "borrowals" );
 		borrowalsObjectFieldReference = borrowalsObjectField.toReference();
@@ -62,12 +60,11 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 
 	@Override
 	public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-		Account account = accountAccessor.read( bridgedElement );
+		Account account = (Account) bridgedElement;
 		if ( account == null ) {
 			return;
 		}
 
-		// TODO this is bad, see the bind() method
 		List<Borrowal> borrowals = account.getBorrowals();
 
 		int shortTermBorrowalCount = 0;
