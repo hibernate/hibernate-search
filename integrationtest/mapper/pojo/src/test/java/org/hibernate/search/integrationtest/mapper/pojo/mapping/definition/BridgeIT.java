@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
@@ -31,8 +32,11 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.util.common.SearchException;
@@ -453,6 +457,88 @@ public class BridgeIT {
 		@Override
 		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
 			throw new UnsupportedOperationException( "This should not be called" );
+		}
+	}
+
+	@Test
+	public void valueBridge_indexNullAs() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Integer integer;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(valueBridge = @ValueBridgeRef(type = ParsingValueBridge.class), indexNullAs = "7")
+			public Integer getInteger() { return integer; }
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "integer", Integer.class, f -> f.indexNullAs( 7 ) )
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity();
+			entity.id = 1;
+			session.getMainWorkPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					// Stub backend is not supposed to use 'indexNullAs' option
+					.add( "1", b -> b.field( "integer", null ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void valueBridge_indexNullAs_noParsing() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Integer integer;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(valueBridge = @ValueBridgeRef(type = NoParsingValueBridge.class), indexNullAs = "7")
+			public Integer getInteger() { return integer; }
+		}
+
+		SubTest.expectException( () -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "does not support parsing a value from a String" )
+				.hasMessageContaining( "integer" );
+	}
+
+	public static class NoParsingValueBridge implements ValueBridge<Integer, Integer> {
+
+		public NoParsingValueBridge() {
+		}
+
+		@Override
+		public Integer toIndexedValue(Integer value, ValueBridgeToIndexedValueContext context) {
+			return value;
+		}
+
+		@Override
+		public Integer cast(Object value) {
+			return (Integer) value;
+		}
+	}
+
+	public static class ParsingValueBridge extends NoParsingValueBridge {
+
+		public ParsingValueBridge() {
+		}
+
+		@Override
+		public Integer parse(String value) {
+			return Integer.parseInt( value );
 		}
 	}
 }
