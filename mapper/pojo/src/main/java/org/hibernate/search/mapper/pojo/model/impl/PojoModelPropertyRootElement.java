@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
@@ -55,8 +55,8 @@ public class PojoModelPropertyRootElement<P> extends AbstractPojoModelCompositeE
 	}
 
 	@Override
-	PojoModelElementAccessor<P> doCreateAccessor() {
-		return new PojoModelRootElementAccessor<>();
+	PojoElementAccessor<P> doCreateAccessor() {
+		return new PojoRootElementAccessor<>();
 	}
 
 	@Override

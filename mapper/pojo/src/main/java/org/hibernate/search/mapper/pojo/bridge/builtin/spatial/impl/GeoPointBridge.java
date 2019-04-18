@@ -28,9 +28,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.StreamHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -95,7 +94,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	private final String markerSet;
 
 	private IndexFieldReference<GeoPoint> indexFieldReference;
-	private Function<PojoElement, GeoPoint> coordinatesExtractor;
+	private Function<Object, GeoPoint> coordinatesExtractor;
 
 	/**
 	 * Private constructor, use {@link GeoPointBridgeBuilder#forType()} or {@link GeoPointBridgeBuilder#forProperty()} instead.
@@ -139,16 +138,16 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 				.toReference();
 
 		if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
-			PojoModelElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );
+			PojoElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );
 			coordinatesExtractor = sourceAccessor::read;
 		}
 		else {
-			PojoModelElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
+			PojoElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
 					.filter( model -> model.markers( LatitudeMarker.class )
 							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
 					.collect( singleMarkedProperty( "latitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );
-			PojoModelElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
+			PojoElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
 					.filter( model -> model.markers( LongitudeMarker.class )
 							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
 					.collect( singleMarkedProperty( "longitude", defaultedFieldName, markerSet ) )
@@ -176,17 +175,17 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-		doWrite( target, source );
+	public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
+		doWrite( target, bridgedElement );
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
-		doWrite( target, source );
+	public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
+		doWrite( target, bridgedElement );
 	}
 
-	private void doWrite(DocumentElement target, PojoElement source) {
-		GeoPoint coordinates = coordinatesExtractor.apply( source );
+	private void doWrite(DocumentElement target, Object bridgedElement) {
+		GeoPoint coordinates = coordinatesExtractor.apply( bridgedElement );
 		target.addValue( indexFieldReference, coordinates );
 	}
 

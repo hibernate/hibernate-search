@@ -8,12 +8,12 @@ package org.hibernate.search.mapper.pojo.model;
 
 
 /**
- * An accessor allowing to retrieve information from a {@link PojoElement}.
+ * An accessor allowing to retrieve an element of a POJO, e.g. a property.
  * <p>
  * Accessors are created by {@link PojoModelCompositeElement} instances.
  */
-public interface PojoModelElementAccessor<T> {
+public interface PojoElementAccessor<T> {
 
-	T read(PojoElement bridgedElement);
+	T read(Object bridgedElement);
 
 }

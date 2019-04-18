@@ -27,8 +27,7 @@ import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingRes
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -309,7 +308,7 @@ public class AutomaticIndexingOverReindexingIT {
 
 	public static class Level3Property1Bridge implements TypeBridge {
 
-		private PojoModelElementAccessor<String> level3Property1SourceAccessor;
+		private PojoElementAccessor<String> level3Property1SourceAccessor;
 		private IndexFieldReference<String> property1FromBridgeFieldReference;
 
 		@Override
@@ -325,10 +324,10 @@ public class AutomaticIndexingOverReindexingIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
+		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 			target.addValue(
 					property1FromBridgeFieldReference,
-					level3Property1SourceAccessor.read( source )
+					level3Property1SourceAccessor.read( bridgedElement )
 			);
 		}
 	}

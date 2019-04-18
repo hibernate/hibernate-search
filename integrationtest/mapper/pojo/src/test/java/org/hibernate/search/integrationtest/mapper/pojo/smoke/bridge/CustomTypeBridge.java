@@ -18,8 +18,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 
 public final class CustomTypeBridge implements TypeBridge {
@@ -51,8 +50,8 @@ public final class CustomTypeBridge implements TypeBridge {
 
 	private final String objectName;
 
-	private PojoModelElementAccessor<String> textPropertyAccessor;
-	private PojoModelElementAccessor<LocalDate> localDatePropertyAccessor;
+	private PojoElementAccessor<String> textPropertyAccessor;
+	private PojoElementAccessor<LocalDate> localDatePropertyAccessor;
 	private IndexObjectFieldReference objectFieldReference;
 	private IndexFieldReference<String> textFieldReference;
 	private IndexFieldReference<LocalDate> localDateFieldReference;
@@ -75,9 +74,9 @@ public final class CustomTypeBridge implements TypeBridge {
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-		String textSourceValue = textPropertyAccessor.read( source );
-		LocalDate localDateSourceValue = localDatePropertyAccessor.read( source );
+	public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
+		String textSourceValue = textPropertyAccessor.read( bridgedElement );
+		LocalDate localDateSourceValue = localDatePropertyAccessor.read( bridgedElement );
 		if ( textSourceValue != null || localDateSourceValue != null ) {
 			DocumentElement object = target.addObject( objectFieldReference );
 			object.addValue( textFieldReference, textSourceValue );

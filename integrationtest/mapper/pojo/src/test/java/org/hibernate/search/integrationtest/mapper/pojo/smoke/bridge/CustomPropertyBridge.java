@@ -18,8 +18,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingCont
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 
 public final class CustomPropertyBridge implements PropertyBridge {
@@ -52,8 +51,8 @@ public final class CustomPropertyBridge implements PropertyBridge {
 
 	private final String objectName;
 
-	private PojoModelElementAccessor<String> textPropertyAccessor;
-	private PojoModelElementAccessor<LocalDate> localDatePropertyAccessor;
+	private PojoElementAccessor<String> textPropertyAccessor;
+	private PojoElementAccessor<LocalDate> localDatePropertyAccessor;
 	private IndexObjectFieldReference objectFieldReference;
 	private IndexFieldReference<String> textFieldReference;
 	private IndexFieldReference<LocalDate> localDateFieldReference;
@@ -76,9 +75,9 @@ public final class CustomPropertyBridge implements PropertyBridge {
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
-		String textSourceValue = textPropertyAccessor.read( source );
-		LocalDate localDateSourceValue = localDatePropertyAccessor.read( source );
+	public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
+		String textSourceValue = textPropertyAccessor.read( bridgedElement );
+		LocalDate localDateSourceValue = localDatePropertyAccessor.read( bridgedElement );
 		if ( textSourceValue != null || localDateSourceValue != null ) {
 			DocumentElement object = target.addObject( objectFieldReference );
 			object.addValue( textFieldReference, textSourceValue );

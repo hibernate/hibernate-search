@@ -6,21 +6,20 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 
 /**
  * @param <T> The type of the root element.
  */
-class PojoModelRootElementAccessor<T> implements PojoModelElementAccessor<T> {
+class PojoRootElementAccessor<T> implements PojoElementAccessor<T> {
 
-	PojoModelRootElementAccessor() {
+	PojoRootElementAccessor() {
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // By construction, this accessor will only be passed PojoElement returning type T
-	public T read(PojoElement bridgedElement) {
-		return (T) ((PojoElementImpl) bridgedElement).get();
+	public T read(Object bridgedElement) {
+		return (T) bridgedElement;
 	}
 
 }

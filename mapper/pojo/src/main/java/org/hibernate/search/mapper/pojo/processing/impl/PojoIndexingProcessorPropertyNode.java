@@ -11,8 +11,6 @@ import java.util.Collection;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.common.impl.Closer;
@@ -67,11 +65,8 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 	@Override
 	public final void process(DocumentElement target, T source, AbstractPojoSessionContextImplementor sessionContext) {
 		P propertyValue = handle.get( source );
-		if ( !propertyBridgeHolders.isEmpty() ) {
-			PojoElement bridgedElement = new PojoElementImpl( propertyValue );
-			for ( BeanHolder<? extends PropertyBridge> bridgeHolder : propertyBridgeHolders ) {
-				bridgeHolder.get().write( target, bridgedElement, sessionContext.getPropertyBridgeWriteContext() );
-			}
+		for ( BeanHolder<? extends PropertyBridge> bridgeHolder : propertyBridgeHolders ) {
+			bridgeHolder.get().write( target, propertyValue, sessionContext.getPropertyBridgeWriteContext() );
 		}
 		for ( PojoIndexingProcessor<? super P> nestedNode : nestedNodes ) {
 			nestedNode.process( target, propertyValue, sessionContext );

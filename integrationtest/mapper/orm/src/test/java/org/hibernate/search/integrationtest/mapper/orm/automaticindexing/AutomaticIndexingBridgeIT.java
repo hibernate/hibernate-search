@@ -36,8 +36,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -718,8 +717,8 @@ public class AutomaticIndexingBridgeIT {
 
 	public static class ContainingEntityTypeBridge implements TypeBridge {
 
-		private PojoModelElementAccessor<String> directFieldSourceAccessor;
-		private PojoModelElementAccessor<String> includedInTypeBridgeFieldSourceAccessor;
+		private PojoElementAccessor<String> directFieldSourceAccessor;
+		private PojoElementAccessor<String> includedInTypeBridgeFieldSourceAccessor;
 		private IndexObjectFieldReference typeBridgeObjectFieldReference;
 		private IndexFieldReference<String> directFieldReference;
 		private IndexObjectFieldReference childObjectFieldReference;
@@ -747,12 +746,12 @@ public class AutomaticIndexingBridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
+		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 			DocumentElement typeBridgeObjectField = target.addObject( typeBridgeObjectFieldReference );
-			typeBridgeObjectField.addValue( directFieldReference, directFieldSourceAccessor.read( source ) );
+			typeBridgeObjectField.addValue( directFieldReference, directFieldSourceAccessor.read( bridgedElement ) );
 			DocumentElement childObjectField = typeBridgeObjectField.addObject( childObjectFieldReference );
 			childObjectField.addValue(
-					includedInTypeBridgeFieldReference, includedInTypeBridgeFieldSourceAccessor.read( source )
+					includedInTypeBridgeFieldReference, includedInTypeBridgeFieldSourceAccessor.read( bridgedElement )
 			);
 		}
 	}
@@ -766,7 +765,7 @@ public class AutomaticIndexingBridgeIT {
 
 	public static class ContainingEntityPropertyBridge implements PropertyBridge {
 
-		private PojoModelElementAccessor<String> includedInPropertyBridgeSourceAccessor;
+		private PojoElementAccessor<String> includedInPropertyBridgeSourceAccessor;
 		private IndexObjectFieldReference propertyBridgeObjectFieldReference;
 		private IndexFieldReference<String> includedInPropertyBridgeFieldReference;
 
@@ -784,10 +783,11 @@ public class AutomaticIndexingBridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
+		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
 			DocumentElement propertyBridgeObjectField = target.addObject( propertyBridgeObjectFieldReference );
 			propertyBridgeObjectField.addValue(
-					includedInPropertyBridgeFieldReference, includedInPropertyBridgeSourceAccessor.read( source )
+					includedInPropertyBridgeFieldReference, includedInPropertyBridgeSourceAccessor.read(
+							bridgedElement )
 			);
 		}
 	}

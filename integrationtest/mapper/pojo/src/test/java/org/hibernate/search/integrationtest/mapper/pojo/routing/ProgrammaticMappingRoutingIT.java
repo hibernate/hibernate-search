@@ -15,8 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingCo
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -178,7 +177,7 @@ public class ProgrammaticMappingRoutingIT {
 
 	public static final class MyRoutingKeyBridge implements RoutingKeyBridge {
 
-		private PojoModelElementAccessor<EntityCategory> categoryAccessor;
+		private PojoElementAccessor<EntityCategory> categoryAccessor;
 
 		@Override
 		public void bind(RoutingKeyBridgeBindingContext context) {
@@ -187,9 +186,9 @@ public class ProgrammaticMappingRoutingIT {
 		}
 
 		@Override
-		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoElement source,
+		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, Object bridgedElement,
 				RoutingKeyBridgeToRoutingKeyContext context) {
-			EntityCategory category = categoryAccessor.read( source );
+			EntityCategory category = categoryAccessor.read( bridgedElement );
 			StringBuilder keyBuilder = new StringBuilder();
 			if ( tenantIdentifier != null ) {
 				keyBuilder.append( tenantIdentifier ).append( "/" );
