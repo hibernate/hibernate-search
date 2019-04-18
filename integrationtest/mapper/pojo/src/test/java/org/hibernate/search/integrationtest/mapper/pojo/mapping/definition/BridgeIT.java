@@ -38,6 +38,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -59,11 +60,14 @@ public class BridgeIT {
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
 
 	/**
-	 * Basic test checking that a "normal" custom type bridge will work as expected.
+	 * Basic test checking that a "normal" custom type bridge will work as expected
+	 * when relying on accessors.
+	 * <p>
+	 * Note that reindexing is tested in depth in the ORM mapper integration tests.
 	 */
 	@Test
 	@TestForIssue(jiraKey = {"HSEARCH-2055", "HSEARCH-2641"})
-	public void typeBridge() {
+	public void typeBridge_accessors() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
@@ -111,10 +115,11 @@ public class BridgeIT {
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
+		IndexedEntity entity = new IndexedEntity();
+		entity.id = 1;
+		entity.stringProperty = "some string";
+
 		try ( SearchSession session = mapping.createSession() ) {
-			IndexedEntity entity = new IndexedEntity();
-			entity.id = 1;
-			entity.stringProperty = "some string";
 			session.getMainWorkPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
@@ -122,14 +127,150 @@ public class BridgeIT {
 					.preparedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			entity.stringProperty = "some string 2";
+			session.getMainWorkPlan().update( entity, new String[] { "stringProperty" } );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
 	}
 
 	/**
-	 * Basic test checking that a "normal" custom property bridge will work as expected.
+	 * Basic test checking that a "normal" custom type bridge will work as expected
+	 * when relying on explicit dependency declaration.
+	 * <p>
+	 * Note that reindexing is tested in depth in the ORM mapper integration tests.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void typeBridge_explicitDependencies() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b ->
+				b.field( "someField", String.class, b2 -> {
+					b2.analyzerName( "myAnalyzer" ); // For HSEARCH-2641
+				} )
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+				b -> b.programmaticMapping().type( IndexedEntity.class )
+						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+							private IndexFieldReference<String> indexFieldReference;
+
+							@Override
+							public void bind(TypeBridgeBindingContext context) {
+								context.getDependencies().use( "stringProperty" );
+								indexFieldReference = context.getIndexSchemaElement().field(
+										"someField",
+										f -> f.asString().analyzer( "myAnalyzer" )
+								)
+										.toReference();
+							}
+
+							@Override
+							public void write(DocumentElement target, Object bridgedElement,
+									TypeBridgeWriteContext context) {
+								IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
+								target.addValue( indexFieldReference, castedBridgedElement.getStringProperty() );
+							}
+						} ) )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		IndexedEntity entity = new IndexedEntity();
+		entity.id = 1;
+		entity.stringProperty = "some string";
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.getMainWorkPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			entity.stringProperty = "some string 2";
+			session.getMainWorkPlan().update( entity, new String[] { "stringProperty" } );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void typeBridge_explicitDependencies_error_invalidProperty() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+						b -> b.programmaticMapping().type( IndexedEntity.class )
+								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+									@Override
+									public void bind(TypeBridgeBindingContext context) {
+										context.getDependencies().use( "doesNotExist" );
+									}
+
+									@Override
+									public void write(DocumentElement target, Object bridgedElement,
+											TypeBridgeWriteContext context) {
+										throw new AssertionFailure( "Should not be called" );
+									}
+								} ) )
+				)
+						.setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.failure(
+								"Unable to find property 'doesNotExist' on type '" + IndexedEntity.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	/**
+	 * Basic test checking that a "normal" custom property bridge will work as expected
+	 * when relying on accessors.
+	 * <p>
+	 * Note that reindexing is tested in depth in the ORM mapper integration tests.
 	 */
 	@Test
 	@TestForIssue(jiraKey = {"HSEARCH-2055", "HSEARCH-2641"})
-	public void propertyBridge() {
+	public void propertyBridge_accessors() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
@@ -176,10 +317,11 @@ public class BridgeIT {
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
+		IndexedEntity entity = new IndexedEntity();
+		entity.id = 1;
+		entity.stringProperty = "some string";
+
 		try ( SearchSession session = mapping.createSession() ) {
-			IndexedEntity entity = new IndexedEntity();
-			entity.id = 1;
-			entity.stringProperty = "some string";
 			session.getMainWorkPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
@@ -187,6 +329,156 @@ public class BridgeIT {
 					.preparedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			entity.stringProperty = "some string 2";
+			session.getMainWorkPlan().update( entity, new String[] { "stringProperty" } );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Basic test checking that a "normal" custom property bridge will work as expected
+	 * when relying on explicit dependency declaration.
+	 * <p>
+	 * Note that reindexing is tested in depth in the ORM mapper integration tests.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void propertyBridge_explicitDependencies() {
+		class Contained {
+			String stringProperty;
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Contained contained;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public Contained getContained() {
+				return contained;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b ->
+				b.field( "someField", String.class, b2 -> {
+					b2.analyzerName( "myAnalyzer" ); // For HSEARCH-2641
+				} )
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+				b -> b.programmaticMapping().type( IndexedEntity.class )
+						.property( "contained" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+							private IndexFieldReference<String> indexFieldReference;
+
+							@Override
+							public void bind(PropertyBridgeBindingContext context) {
+								context.getDependencies().use( "stringProperty" );
+								indexFieldReference = context.getIndexSchemaElement().field(
+										"someField",
+										f -> f.asString().analyzer( "myAnalyzer" )
+								)
+										.toReference();
+							}
+
+							@Override
+							public void write(DocumentElement target, Object bridgedElement,
+									PropertyBridgeWriteContext context) {
+								Contained castedBridgedElement = (Contained) bridgedElement;
+								target.addValue( indexFieldReference, castedBridgedElement.getStringProperty() );
+							}
+						} ) )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		IndexedEntity entity = new IndexedEntity();
+		entity.id = 1;
+		Contained contained = new Contained();
+		entity.contained = contained;
+		contained.stringProperty = "some string";
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.getMainWorkPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "someField", contained.stringProperty ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			contained.stringProperty = "some string 2";
+			session.getMainWorkPlan().update( entity, new String[] { "contained.stringProperty" } );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.update( "1", b -> b.field( "someField", contained.stringProperty ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void propertyBridge_explicitDependencies_error_invalidProperty() {
+		class Contained {
+			String stringProperty;
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Contained contained;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public Contained getContained() {
+				return contained;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+						b -> b.programmaticMapping().type( IndexedEntity.class )
+								.property( "contained" )
+								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+									@Override
+									public void bind(PropertyBridgeBindingContext context) {
+										context.getDependencies().use( "doesNotExist.stringProperty" );
+									}
+
+									@Override
+									public void write(DocumentElement target, Object bridgedElement,
+											PropertyBridgeWriteContext context) {
+										throw new AssertionFailure( "Should not be called" );
+									}
+								} ) )
+				)
+						.withAnnotatedTypes( Contained.class )
+						.setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".contained" )
+						.failure(
+								"Unable to find property 'doesNotExist' on type '" + Contained.class.getName() + "'"
+						)
+						.build()
+				);
 	}
 
 	@Test
