@@ -66,20 +66,15 @@ class AnnotationProcessorHelper {
 
 	Optional<PojoModelPathValueNode> getPojoModelPathValueNode(ObjectPath objectPath) {
 		PropertyValue[] inversePathElements = objectPath.value();
-		PojoModelPathValueNode inversePath = null;
+		PojoModelPath.Builder inversePathBuilder = PojoModelPath.builder();
 		for ( PropertyValue element : inversePathElements ) {
 			String inversePropertyName = element.propertyName();
 			ContainerExtractorPath inverseExtractorPath = getExtractorPath(
 					element.extractors()
 			);
-			if ( inversePath == null ) {
-				inversePath = PojoModelPath.fromRoot( inversePropertyName ).value( inverseExtractorPath );
-			}
-			else {
-				inversePath = inversePath.property( inversePropertyName ).value( inverseExtractorPath );
-			}
+			inversePathBuilder.property( inversePropertyName ).value( inverseExtractorPath );
 		}
-		return Optional.ofNullable( inversePath );
+		return Optional.ofNullable( inversePathBuilder.toValuePathOrNull() );
 	}
 
 	ContainerExtractorPath getExtractorPath(ContainerExtractorRef[] extractors) {
@@ -99,7 +94,7 @@ class AnnotationProcessorHelper {
 					if ( BuiltinContainerExtractor.AUTOMATIC.equals( extractor.value() ) ) {
 						// We know we're in a multi-extractor chain, because the above else if branch wasn't executed
 						// Using the default extractors in a multi-extractor chain is not yet supported (see HSEARCH-3463)
-						throw log.cannotUseAutomaticContainerExtractorInMultiExtractorChain();
+						throw log.cannotUseDefaultExtractorsInMultiExtractorChain();
 					}
 					explicitExtractorClasses.add( extractor.value().getType() );
 				}

@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.model.path.impl;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
-import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -42,14 +41,9 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 
 	@Override
 	public PojoModelPathPropertyNode toUnboundPath() {
-		String propertyName = propertyHandle.getName();
-		PojoModelPathValueNode parentUnboundPath = parent.toUnboundPath();
-		if ( parentUnboundPath == null ) {
-			return PojoModelPath.fromRoot( propertyName );
-		}
-		else {
-			return parentUnboundPath.property( propertyName );
-		}
+		PojoModelPath.Builder builder = PojoModelPath.builder();
+		appendPath( builder );
+		return builder.toPropertyPathOrNull();
 	}
 
 	public BoundPojoModelPathValueNode<T, P, P> valueWithoutExtractors() {
@@ -71,5 +65,10 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 	@Override
 	void appendSelfPath(StringBuilder builder) {
 		builder.append( "." ).append( propertyHandle.getName() );
+	}
+
+	@Override
+	void appendSelfPath(PojoModelPath.Builder builder) {
+		builder.property( propertyHandle.getName() );
 	}
 }

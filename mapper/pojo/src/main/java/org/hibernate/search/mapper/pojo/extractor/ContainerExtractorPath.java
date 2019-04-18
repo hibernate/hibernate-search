@@ -12,8 +12,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+
 /**
- * ContainerExtractorPath represents a list of container value extractor to be applied to a property.
+ * ContainerExtractorPath represents a list of container extractors to be applied to a property.
+ * <p>
+ * Container extractors tell Hibernate Search how to extract values:
+ * an empty container extractor path means the property value should be taken as is,
+ * a collection element extractor would extract each element of a collection,
+ * a map keys extractor would extract each key of a map, etc.
+ * <p>
+ * Container extractor paths can chain multiple extractors,
+ * so that for example the extraction of values from a {@code List<List<String>>} can be represented.
  * <p>
  * The extractors are either represented:
  * <ul>
@@ -49,6 +59,10 @@ public class ContainerExtractorPath {
 				false,
 				Collections.singletonList( extractorClass )
 		);
+	}
+
+	public static ContainerExtractorPath explicitExtractor(BuiltinContainerExtractor extractor) {
+		return explicitExtractor( extractor.getType() );
 	}
 
 	public static ContainerExtractorPath explicitExtractors(

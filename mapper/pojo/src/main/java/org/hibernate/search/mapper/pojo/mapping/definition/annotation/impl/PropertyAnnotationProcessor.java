@@ -53,7 +53,9 @@ abstract class PropertyAnnotationProcessor<A extends Annotation> {
 			catch (RuntimeException e) {
 				helper.getRootFailureCollector()
 						.withContext( PojoEventContexts.fromType( typeModel ) )
-						.withContext( PojoEventContexts.fromPath( PojoModelPath.fromRoot( propertyModel.getName() ) ) )
+						.withContext( PojoEventContexts.fromPath(
+								PojoModelPath.ofProperty( propertyModel.getName() )
+						) )
 						.withContext( PojoEventContexts.fromAnnotation( annotation ) )
 						.add( e );
 			}

@@ -132,8 +132,10 @@ public class FieldContainerExtractorBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
 						.annotationContextAnyParameters( GenericField.class )
-						.failure( "Annotation @ContainerExtractorRef requests automatic resolution of the container extractor," +
-								" but automatic resolution cannot be used in extractor chains. Use explicit references to the type of each extractor to be applied instead." )
+						.failure(
+								"A chain of multiple container extractors cannot include the default extractors.",
+								" Either use only the default extractors, or explicitly reference every single extractor to be applied instead"
+						)
 						.build()
 				);
 	}

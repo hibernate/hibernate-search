@@ -174,9 +174,11 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 						) );
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Found an infinite embedded recursion involving path '"
-				+ PojoModelPath.fromRoot( inverseSideProperty1Name ).value( ContainerExtractorPath.noExtractors() )
+				+ PojoModelPath.builder()
+						.property( inverseSideProperty1Name ).value( ContainerExtractorPath.noExtractors() )
 						.property( inverseSideProperty2Name ).value( ContainerExtractorPath.noExtractors() )
 						.property( inverseSideProperty3Name ).value( ContainerExtractorPath.noExtractors() )
+						.toValuePath()
 						.toPathString()
 				+ "' on type '" + inverseSideEntityTypeMock.getName() + "'" );
 		try {
