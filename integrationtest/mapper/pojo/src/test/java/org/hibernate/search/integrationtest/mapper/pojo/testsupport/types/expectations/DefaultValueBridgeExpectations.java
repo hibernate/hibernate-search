@@ -35,4 +35,8 @@ public interface DefaultValueBridgeExpectations<V, F> {
 	F getNullAsValueBridge1();
 
 	F getNullAsValueBridge2();
+
+	default String getUnparsableNullAsValue() {
+		return "---";
+	}
 }

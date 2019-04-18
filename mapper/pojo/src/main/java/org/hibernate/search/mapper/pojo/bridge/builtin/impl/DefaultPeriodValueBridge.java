@@ -54,6 +54,8 @@ public final class DefaultPeriodValueBridge implements ValueBridge<Period, Strin
 
 	@Override
 	public String parse(String value) {
+		// using convert to validate
+		PojoDefaultPeriodFromDocumentFieldValueConverter.INSTANCE.convert( value, null );
 		return value;
 	}
 

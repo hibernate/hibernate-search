@@ -92,6 +92,11 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 			public String getNullAsValueBridge2() {
 				return "file:///~calendar";
 			}
+
+			@Override
+			public String getUnparsableNullAsValue() {
+				return "http://www.wrong.uri.com?param1=0 param7=0";
+			}
 		} );
 	}
 

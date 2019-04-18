@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.cfg.spi.ValidateUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -41,6 +42,7 @@ public final class DefaultUUIDValueBridge implements ValueBridge<UUID, String> {
 
 	@Override
 	public String parse(String value) {
+		ValidateUtils.validateUUID( value );
 		return value;
 	}
 

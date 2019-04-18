@@ -4,7 +4,6 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-
 package org.hibernate.search.engine.logging.impl;
 
 import java.time.format.DateTimeFormatter;
@@ -275,4 +274,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 58, value = "Invalid %1$s value: expected either a Number or a String that can be parsed into a %1$s. %2$s")
 	SearchException invalidNumberPropertyValue(@FormatWith(SimpleNameClassFormatter.class) Class<? extends Number> type, String nestedErrorMessage, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 59, value = "Invalid '%1$s' value for type '%2$s'.")
+	SearchException invalidStringForType(String value, @FormatWith(SimpleNameClassFormatter.class) Class<?> type, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 60, value = "Invalid '%1$s' value for enum '%2$s'.")
+	SearchException invalidStringForEnum(String value, @FormatWith(ClassFormatter.class) Class<? extends Enum> enumType, @Cause Exception cause);
 }

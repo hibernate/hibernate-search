@@ -47,6 +47,11 @@ public final class DefaultJavaNetURLValueBridge implements ValueBridge<URL, Stri
 
 	@Override
 	public String parse(String value) {
+		if ( value == null ) {
+			return null;
+		}
+
+		PojoDefaultURLFromDocumentFieldValueConverter.toURL( value );
 		return value;
 	}
 
