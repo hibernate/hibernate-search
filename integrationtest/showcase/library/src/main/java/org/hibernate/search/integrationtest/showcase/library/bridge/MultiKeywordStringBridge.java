@@ -16,7 +16,6 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingCont
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 
 public class MultiKeywordStringBridge implements PropertyBridge {
 
@@ -54,7 +53,6 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 	private final String fieldName;
 	private final Pattern separatorPattern;
 
-	private PojoElementAccessor<String> sourceAccessor;
 	private IndexFieldReference<String> valueFieldReference;
 
 	private MultiKeywordStringBridge(Builder builder) {
@@ -64,7 +62,6 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 
 	@Override
 	public void bind(PropertyBridgeBindingContext context) {
-		sourceAccessor = context.getBridgedElement().createAccessor( String.class );
 		valueFieldReference = context.getIndexSchemaElement().field(
 				fieldName, f -> f.asString()
 		)
@@ -73,7 +70,7 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 
 	@Override
 	public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-		String sourceValue = sourceAccessor.read( bridgedElement );
+		String sourceValue = (String) bridgedElement;
 		if ( sourceValue != null ) {
 			String[] items = separatorPattern.split( sourceValue );
 			for ( String item : items ) {
