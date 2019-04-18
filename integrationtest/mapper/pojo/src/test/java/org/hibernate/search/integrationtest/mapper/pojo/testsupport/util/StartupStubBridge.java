@@ -22,7 +22,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContex
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -107,12 +106,12 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
+	public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 		throw unexpectedRuntimeUse();
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
+	public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
 		throw unexpectedRuntimeUse();
 	}
 
@@ -128,7 +127,7 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoElement source,
+	public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, Object bridgedElement,
 			RoutingKeyBridgeToRoutingKeyContext context) {
 		throw unexpectedRuntimeUse();
 	}

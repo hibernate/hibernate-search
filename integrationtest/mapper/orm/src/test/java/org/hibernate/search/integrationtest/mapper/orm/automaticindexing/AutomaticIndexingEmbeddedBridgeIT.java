@@ -33,8 +33,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -286,7 +285,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	public static class FirstTypeBridge implements TypeBridge {
 
-		private PojoModelElementAccessor<String> valueSourcePropertyAccessor;
+		private PojoElementAccessor<String> valueSourcePropertyAccessor;
 		private IndexObjectFieldReference firstBridgeObjectFieldReference;
 		private IndexFieldReference<String> valueFieldReference;
 
@@ -302,9 +301,9 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
+		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 			DocumentElement objectField = target.addObject( firstBridgeObjectFieldReference );
-			objectField.addValue( valueFieldReference, valueSourcePropertyAccessor.read( source ) );
+			objectField.addValue( valueFieldReference, valueSourcePropertyAccessor.read( bridgedElement ) );
 		}
 	}
 
@@ -316,7 +315,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	public static class SecondTypeBridge implements TypeBridge {
 
-		private PojoModelElementAccessor<String> valueSourcePropertyAccessor;
+		private PojoElementAccessor<String> valueSourcePropertyAccessor;
 		private IndexObjectFieldReference secondBridgeObjectFieldReference;
 		private IndexFieldReference<String> valueFieldReference;
 
@@ -332,9 +331,9 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
+		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 			DocumentElement objectField = target.addObject( secondBridgeObjectFieldReference );
-			objectField.addValue( valueFieldReference, valueSourcePropertyAccessor.read( source ) );
+			objectField.addValue( valueFieldReference, valueSourcePropertyAccessor.read( bridgedElement ) );
 		}
 	}
 }

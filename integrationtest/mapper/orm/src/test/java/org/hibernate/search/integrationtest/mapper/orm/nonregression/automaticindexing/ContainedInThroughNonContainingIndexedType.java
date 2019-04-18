@@ -24,8 +24,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -208,7 +207,7 @@ public class ContainedInThroughNonContainingIndexedType {
 
 	public static class BridgeGoingThroughEntityBoundaries implements PropertyBridge {
 
-		private PojoModelElementAccessor<Integer> sourceFieldAccessor;
+		private PojoElementAccessor<Integer> sourceFieldAccessor;
 		private IndexFieldReference<Integer> indexFieldReference;
 
 		@Override
@@ -222,8 +221,8 @@ public class ContainedInThroughNonContainingIndexedType {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
-			Integer value = sourceFieldAccessor.read( source );
+		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
+			Integer value = sourceFieldAccessor.read( bridgedElement );
 			target.addValue( indexFieldReference, value );
 		}
 	}

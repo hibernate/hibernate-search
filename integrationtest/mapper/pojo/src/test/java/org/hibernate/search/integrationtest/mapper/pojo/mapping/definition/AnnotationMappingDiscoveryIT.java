@@ -30,7 +30,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
@@ -265,7 +264,7 @@ public class AnnotationMappingDiscoveryIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
+		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
 			for ( IndexObjectFieldReference reference : objectFieldReferences ) {
 				target.addObject( reference );
 			}

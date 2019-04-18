@@ -37,8 +37,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -87,7 +86,7 @@ public class BridgeIT {
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
-							private PojoModelElementAccessor<String> pojoPropertyAccessor;
+							private PojoElementAccessor<String> pojoPropertyAccessor;
 							private IndexFieldReference<String> indexFieldReference;
 
 							@Override
@@ -103,9 +102,9 @@ public class BridgeIT {
 							}
 
 							@Override
-							public void write(DocumentElement target, PojoElement source,
+							public void write(DocumentElement target, Object bridgedElement,
 									TypeBridgeWriteContext context) {
-								target.addValue( indexFieldReference, pojoPropertyAccessor.read( source ) );
+								target.addValue( indexFieldReference, pojoPropertyAccessor.read( bridgedElement ) );
 							}
 						} ) )
 		)
@@ -153,7 +152,7 @@ public class BridgeIT {
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
-							private PojoModelElementAccessor<String> pojoPropertyAccessor;
+							private PojoElementAccessor<String> pojoPropertyAccessor;
 							private IndexFieldReference<String> indexFieldReference;
 
 							@Override
@@ -168,9 +167,9 @@ public class BridgeIT {
 							}
 
 							@Override
-							public void write(DocumentElement target, PojoElement source,
+							public void write(DocumentElement target, Object bridgedElement,
 									PropertyBridgeWriteContext context) {
-								target.addValue( indexFieldReference, pojoPropertyAccessor.read( source ) );
+								target.addValue( indexFieldReference, pojoPropertyAccessor.read( bridgedElement ) );
 							}
 						} ) )
 		)
@@ -301,7 +300,7 @@ public class BridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
+		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 			throw new UnsupportedOperationException( "This should not be called" );
 		}
 	}
@@ -455,7 +454,7 @@ public class BridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
+		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
 			throw new UnsupportedOperationException( "This should not be called" );
 		}
 	}

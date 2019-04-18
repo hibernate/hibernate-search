@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
@@ -62,8 +62,8 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 	}
 
 	@Override
-	PojoModelElementAccessor<P> doCreateAccessor() {
-		return new PojoModelPropertyElementAccessor<>( parent.createAccessor(), getHandle() );
+	PojoElementAccessor<P> doCreateAccessor() {
+		return new PojoPropertyElementAccessor<>( parent.createAccessor(), getHandle() );
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
@@ -38,7 +38,7 @@ abstract class AbstractPojoModelCompositeElement<V> implements PojoModelComposit
 	private PojoTypeAdditionalMetadata typeAdditionalMetadata;
 	private boolean propertiesInitialized = false;
 
-	private PojoModelElementAccessor<?> accessor;
+	private PojoElementAccessor<?> accessor;
 
 	AbstractPojoModelCompositeElement(PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
@@ -46,15 +46,15 @@ abstract class AbstractPojoModelCompositeElement<V> implements PojoModelComposit
 
 	@Override
 	@SuppressWarnings("unchecked") // The cast is checked using reflection
-	public final <T> PojoModelElementAccessor<T> createAccessor(Class<T> requestedType) {
+	public final <T> PojoElementAccessor<T> createAccessor(Class<T> requestedType) {
 		if ( !isAssignableTo( requestedType ) ) {
 			throw log.incompatibleRequestedType( getModelPathTypeNode().toUnboundPath(), requestedType );
 		}
-		return (PojoModelElementAccessor<T>) createAccessor();
+		return (PojoElementAccessor<T>) createAccessor();
 	}
 
 	@Override
-	public PojoModelElementAccessor<?> createAccessor() {
+	public PojoElementAccessor<?> createAccessor() {
 		if ( accessor == null ) {
 			accessor = doCreateAccessor();
 		}
@@ -93,7 +93,7 @@ abstract class AbstractPojoModelCompositeElement<V> implements PojoModelComposit
 		return properties.values().stream();
 	}
 
-	abstract PojoModelElementAccessor<V> doCreateAccessor();
+	abstract PojoElementAccessor<V> doCreateAccessor();
 
 	abstract BoundPojoModelPathTypeNode<V> getModelPathTypeNode();
 

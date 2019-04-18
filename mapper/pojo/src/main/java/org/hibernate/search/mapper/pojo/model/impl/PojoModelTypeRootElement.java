@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.impl;
 
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
@@ -35,8 +35,8 @@ public class PojoModelTypeRootElement<T> extends AbstractPojoModelCompositeEleme
 	}
 
 	@Override
-	PojoModelElementAccessor<T> doCreateAccessor() {
-		return new PojoModelRootElementAccessor<>();
+	PojoElementAccessor<T> doCreateAccessor() {
+		return new PojoRootElementAccessor<>();
 	}
 
 	@Override

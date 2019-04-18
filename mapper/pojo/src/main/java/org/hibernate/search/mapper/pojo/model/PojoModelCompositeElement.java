@@ -11,18 +11,18 @@ import java.util.stream.Stream;
 /**
  * A potentially composite element in the POJO model.
  * <p>
- * Offers ways to create {@link PojoModelElementAccessor accessors} allowing
- * to retrieve data from {@link PojoElement instances} passed to bridges.
+ * Offers ways to create {@link PojoElementAccessor accessors} allowing
+ * to retrieve data from objects passed to bridges.
  *
  * @see PojoModelType
  * @see PojoModelProperty
  */
 public interface PojoModelCompositeElement extends PojoModelElement {
 
-	// FIXME what if I want a PojoModelElementAccessor<List<MyType>>?
-	<T> PojoModelElementAccessor<T> createAccessor(Class<T> type);
+	// FIXME what if I want a PojoElementAccessor<List<MyType>>?
+	<T> PojoElementAccessor<T> createAccessor(Class<T> type);
 
-	PojoModelElementAccessor<?> createAccessor();
+	PojoElementAccessor<?> createAccessor();
 
 	PojoModelProperty property(String relativeFieldName);
 

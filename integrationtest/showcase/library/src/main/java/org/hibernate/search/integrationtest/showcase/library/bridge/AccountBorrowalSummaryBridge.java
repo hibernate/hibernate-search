@@ -16,8 +16,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.model.PojoElement;
-import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.integrationtest.showcase.library.model.Account;
 import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
 
@@ -34,7 +33,7 @@ import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
  */
 public class AccountBorrowalSummaryBridge implements TypeBridge {
 
-	private PojoModelElementAccessor<Account> accountAccessor;
+	private PojoElementAccessor<Account> accountAccessor;
 	private IndexObjectFieldReference borrowalsObjectFieldReference;
 	private IndexFieldReference<Integer> shortTermBorrowalCountReference;
 	private IndexFieldReference<Integer> longTermBorrowalCountReference;
@@ -62,8 +61,8 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-		Account account = accountAccessor.read( source );
+	public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
+		Account account = accountAccessor.read( bridgedElement );
 		if ( account == null ) {
 			return;
 		}
