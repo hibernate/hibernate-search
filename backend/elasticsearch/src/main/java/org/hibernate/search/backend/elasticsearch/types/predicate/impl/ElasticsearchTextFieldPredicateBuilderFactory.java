@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import java.util.Objects;
+
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -21,6 +23,8 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 		extends ElasticsearchStandardFieldPredicateBuilderFactory<String> {
 
 	private final DataType type;
+	private final String analyzer;
+	private final String normalizer;
 
 	public ElasticsearchTextFieldPredicateBuilderFactory(
 			ToDocumentFieldValueConverter<?, ? extends String> converter,
@@ -28,11 +32,23 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 			ElasticsearchFieldCodec<String> codec, PropertyMapping mapping) {
 		super( converter, rawConverter, codec );
 		this.type = mapping.getType();
+		this.analyzer = mapping.getAnalyzer();
+		this.normalizer = mapping.getNormalizer();
+	}
+
+	@Override
+	public boolean hasCompatibleAnalyzer(ElasticsearchFieldPredicateBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+
+		ElasticsearchTextFieldPredicateBuilderFactory castedOther = (ElasticsearchTextFieldPredicateBuilderFactory) other;
+		return Objects.equals( analyzer, castedOther.analyzer ) && Objects.equals( normalizer, castedOther.normalizer );
 	}
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchConverterCompatibilityChecker converterChecker) {
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker) {
 		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, type );
 	}
 

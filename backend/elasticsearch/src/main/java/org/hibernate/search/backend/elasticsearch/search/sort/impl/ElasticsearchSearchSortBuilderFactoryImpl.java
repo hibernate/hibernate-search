@@ -115,6 +115,12 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 		}
 
 		@Override
+		public boolean hasCompatibleAnalyzer(ElasticsearchFieldSortBuilderFactory component1, ElasticsearchFieldSortBuilderFactory component2) {
+			// analyzers are not involved in a sort clause
+			return true;
+		}
+
+		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				ElasticsearchFieldSortBuilderFactory component1, ElasticsearchFieldSortBuilderFactory component2,
 				EventContext context) {

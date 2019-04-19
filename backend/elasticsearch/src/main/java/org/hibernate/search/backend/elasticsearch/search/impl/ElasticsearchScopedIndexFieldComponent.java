@@ -8,19 +8,31 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 
 public class ElasticsearchScopedIndexFieldComponent<T> {
 
-	private final T component;
-	private final ElasticsearchConverterCompatibilityChecker converterChecker;
-
-	public ElasticsearchScopedIndexFieldComponent(T component, ElasticsearchConverterCompatibilityChecker converterChecker) {
-		this.component = component;
-		this.converterChecker = converterChecker;
-	}
+	private T component;
+	private ElasticsearchCompatibilityChecker converterCompatibilityChecker = new ElasticsearchSucceedingCompatibilityChecker();
+	private ElasticsearchCompatibilityChecker analyzerCompatibilityChecker = new ElasticsearchSucceedingCompatibilityChecker();
 
 	public T getComponent() {
 		return component;
 	}
 
-	public ElasticsearchConverterCompatibilityChecker getConverterCompatibilityChecker() {
-		return converterChecker;
+	public ElasticsearchCompatibilityChecker getConverterCompatibilityChecker() {
+		return converterCompatibilityChecker;
+	}
+
+	public ElasticsearchCompatibilityChecker getAnalyzerCompatibilityChecker() {
+		return analyzerCompatibilityChecker;
+	}
+
+	void setComponent(T component) {
+		this.component = component;
+	}
+
+	void setConverterCompatibilityChecker(ElasticsearchCompatibilityChecker converterCompatibilityChecker) {
+		this.converterCompatibilityChecker = converterCompatibilityChecker;
+	}
+
+	void setAnalyzerCompatibilityChecker(ElasticsearchCompatibilityChecker analyzerCompatibilityChecker) {
+		this.analyzerCompatibilityChecker = analyzerCompatibilityChecker;
 	}
 }

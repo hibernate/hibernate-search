@@ -78,49 +78,50 @@ public class ElasticsearchSearchScopeModel {
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
 		ElasticsearchIndexSchemaFieldNode<?> selectedSchemaNode = null;
-		T selectedComponent = null;
-		ElasticsearchConverterCompatibilityChecker converterChecker = null;
+		ElasticsearchScopedIndexFieldComponent<T> scopedIndexFieldComponent = new ElasticsearchScopedIndexFieldComponent<>();
 
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
 			ElasticsearchIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
+			if ( schemaNode == null ) {
+				continue;
+			}
 
-			if ( schemaNode != null ) {
-				T component = componentRetrievalStrategy.extractComponent( schemaNode );
+			T component = componentRetrievalStrategy.extractComponent( schemaNode );
+			if ( selectedSchemaNode == null ) {
+				selectedSchemaNode = schemaNode;
+				indexModelForSelectedSchemaNode = indexModel;
+				scopedIndexFieldComponent.setComponent( component );
+				continue;
+			}
 
-				if ( selectedSchemaNode == null ) {
-					selectedSchemaNode = schemaNode;
-					indexModelForSelectedSchemaNode = indexModel;
-					selectedComponent = component;
-				}
-				else if ( !componentRetrievalStrategy.hasCompatibleCodec( selectedComponent, component ) ) {
-					throw componentRetrievalStrategy.createCompatibilityException(
-							absoluteFieldPath,
-							selectedComponent,
-							component,
-							EventContexts.fromIndexNames(
-									indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
-									indexModel.getHibernateSearchIndexName()
-							)
-					);
-				}
-				else if ( !componentRetrievalStrategy.hasCompatibleConverter( selectedComponent, component ) ) {
-					converterChecker = new ElasticsearchFailingConverterCompatibilityChecker<>(
-							absoluteFieldPath, selectedComponent, component, EventContexts.fromIndexNames(
-							indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
-							indexModel.getHibernateSearchIndexName()
-					), componentRetrievalStrategy );
-				}
+			if ( !componentRetrievalStrategy.hasCompatibleCodec( scopedIndexFieldComponent.getComponent(), component ) ) {
+				throw componentRetrievalStrategy.createCompatibilityException(
+						absoluteFieldPath,
+						scopedIndexFieldComponent.getComponent(),
+						component,
+						EventContexts.fromIndexNames(
+								indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
+								indexModel.getHibernateSearchIndexName()
+						)
+				);
+			}
+			ElasticsearchFailingCompatibilityChecker<T> failingCompatibilityChecker = new ElasticsearchFailingCompatibilityChecker<>(
+					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
+					indexModelForSelectedSchemaNode.getHibernateSearchIndexName(), indexModel.getHibernateSearchIndexName()
+			), componentRetrievalStrategy );
+
+			if ( !componentRetrievalStrategy.hasCompatibleConverter( scopedIndexFieldComponent.getComponent(), component ) ) {
+				scopedIndexFieldComponent.setConverterCompatibilityChecker( failingCompatibilityChecker );
+			}
+			if ( !componentRetrievalStrategy.hasCompatibleAnalyzer( scopedIndexFieldComponent.getComponent(), component ) ) {
+				scopedIndexFieldComponent.setAnalyzerCompatibilityChecker( failingCompatibilityChecker );
 			}
 		}
 		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
-		if ( converterChecker == null ) {
-			// no converter incompatibility detected
-			converterChecker = new ElasticsearchSucceedingConverterCompatibilityChecker();
-		}
 
-		return new ElasticsearchScopedIndexFieldComponent( selectedComponent, converterChecker );
+		return scopedIndexFieldComponent;
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {

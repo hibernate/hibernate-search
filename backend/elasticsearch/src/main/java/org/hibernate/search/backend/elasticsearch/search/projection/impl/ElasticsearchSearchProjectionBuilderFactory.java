@@ -164,6 +164,12 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		}
 
 		@Override
+		public boolean hasCompatibleAnalyzer(ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2) {
+			// analyzers are not involved in a projection clause
+			return true;
+		}
+
+		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				ElasticsearchFieldProjectionBuilderFactory component1,
 				ElasticsearchFieldProjectionBuilderFactory component2,

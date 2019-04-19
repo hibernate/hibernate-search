@@ -23,6 +23,12 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory implements Elas
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
+	public boolean hasCompatibleAnalyzer(ElasticsearchFieldPredicateBuilderFactory other) {
+		// analyzers are not involved in a non-text field predicate clause
+		return true;
+	}
+
+	@Override
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
 			String absoluteFieldPath) {
 		throw log.textPredicatesNotSupportedByFieldType(

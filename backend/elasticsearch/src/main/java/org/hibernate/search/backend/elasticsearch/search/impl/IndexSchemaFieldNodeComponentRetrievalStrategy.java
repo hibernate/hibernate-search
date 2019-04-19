@@ -18,6 +18,8 @@ public interface IndexSchemaFieldNodeComponentRetrievalStrategy<T> {
 
 	boolean hasCompatibleConverter(T component1, T component2);
 
+	boolean hasCompatibleAnalyzer(T component1, T component2);
+
 	SearchException createCompatibilityException(String absoluteFieldPath,
 			T component1, T component2,
 			EventContext context);
