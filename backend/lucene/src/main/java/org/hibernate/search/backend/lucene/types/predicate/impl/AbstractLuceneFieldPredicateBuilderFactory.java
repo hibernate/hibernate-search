@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
@@ -55,7 +56,7 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath) {
+			String absoluteFieldPath, LuceneCompatibilityChecker analyzerChecker) {
 		throw log.textPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

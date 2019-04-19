@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
@@ -35,19 +36,23 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 	protected final String absoluteFieldPath;
 	protected final LuceneTextFieldCodec<?> codec;
 
+	private final LuceneCompatibilityChecker analyzerChecker;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private int slop;
 	private String phrase;
+
 	private Analyzer analyzer;
+	private boolean analyzerOverridden = false;
 
 	LuceneTextPhrasePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath,
 			LuceneTextFieldCodec<?> codec,
-			Analyzer analyzerOrNormalizer) {
+			Analyzer analyzerOrNormalizer, LuceneCompatibilityChecker analyzerChecker) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 		this.analyzer = analyzerOrNormalizer;
+		this.analyzerChecker = analyzerChecker;
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
 
@@ -67,15 +72,23 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 		if ( analyzer == null ) {
 			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
+		this.analyzerOverridden = true;
 	}
 
 	@Override
 	public void skipAnalysis() {
 		this.analyzer = AnalyzerUtils.KEYWORD_ANALYZER;
+		this.analyzerOverridden = true;
 	}
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
+		// in case of an overridden analyzer,
+		// any analyzer incompatibility is overridden too
+		if ( !this.analyzerOverridden ) {
+			analyzerChecker.failIfNotCompatible();
+		}
+
 		if ( analyzer != null ) {
 			Query analyzed = new QueryBuilder( analyzer ).createPhraseQuery( absoluteFieldPath, phrase, slop );
 			if ( analyzed == null ) {

@@ -13,8 +13,12 @@ import java.util.Map;
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneCompatibilityChecker;
+import org.hibernate.search.backend.lucene.search.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSucceedingCompatibilityChecker;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldContext;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 import org.hibernate.search.backend.lucene.util.impl.FieldContextSimpleQueryParser;
@@ -39,6 +43,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	private String simpleQueryString;
 	private Analyzer overrideAnalyzer;
 	private boolean ignoreAnalyzer = false;
+	private LuceneCompatibilityChecker analyzerChecker = new LuceneSucceedingCompatibilityChecker();
 
 	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneSearchScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
@@ -54,8 +59,10 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	public FieldContext field(String absoluteFieldPath) {
 		LuceneSimpleQueryStringPredicateBuilderFieldContext field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
-			field = scopeModel.getSchemaNodeComponent( absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-					.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
+			LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
+					absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
+			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
 			fields.put( absoluteFieldPath, field );
 		}
 		return field;
@@ -81,6 +88,10 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
+		if ( !ignoreAnalyzer && overrideAnalyzer == null ) {
+			analyzerChecker.failIfNotCompatible();
+		}
+
 		Analyzer analyzer = buildAnalyzer();
 		FieldContextSimpleQueryParser queryParser = new FieldContextSimpleQueryParser( analyzer, fields );
 		queryParser.setDefaultOperator( defaultOperator );

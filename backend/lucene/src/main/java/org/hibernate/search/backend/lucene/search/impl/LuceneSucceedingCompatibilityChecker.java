@@ -12,4 +12,10 @@ public class LuceneSucceedingCompatibilityChecker implements LuceneCompatibility
 	public void failIfNotCompatible() {
 		// this sub class never fails
 	}
+
+	@Override
+	public LuceneCompatibilityChecker combine(LuceneCompatibilityChecker other) {
+		// succeeding + any = any
+		return other;
+	}
 }
