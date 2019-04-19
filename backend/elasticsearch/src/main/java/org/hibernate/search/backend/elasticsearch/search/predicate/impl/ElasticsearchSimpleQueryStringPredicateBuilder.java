@@ -11,7 +11,11 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSucceedingCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerUtils;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
@@ -40,6 +44,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 	private String simpleQueryString;
 	private String analyzer;
+	private ElasticsearchCompatibilityChecker analyzerChecker = new ElasticsearchSucceedingCompatibilityChecker();
 
 	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchSearchScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
@@ -54,8 +59,10 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	public FieldContext field(String absoluteFieldPath) {
 		ElasticsearchSimpleQueryStringPredicateBuilderFieldContext field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
-			field = scopeModel.getSchemaNodeComponent( absoluteFieldPath, ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-					.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
+			ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
+					absoluteFieldPath, ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
+			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
 			fields.put( absoluteFieldPath, field );
 		}
 		return field;
@@ -79,6 +86,10 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
+		if ( analyzer == null ) {
+			analyzerChecker.failIfNotCompatible();
+		}
+
 		QUERY_ACCESSOR.set( innerObject, simpleQueryString );
 		DEFAULT_OPERATOR_ACCESSOR.set( innerObject, defaultOperator );
 
