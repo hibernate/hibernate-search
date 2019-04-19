@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
-public class ElasticsearchSucceedingConverterCompatibilityChecker implements ElasticsearchConverterCompatibilityChecker {
+public interface ElasticsearchCompatibilityChecker {
 
-	@Override
-	public void failIfNotCompatible() {
-		// this sub class never fails
-	}
+	void failIfNotCompatible();
+
+	ElasticsearchCompatibilityChecker combine(ElasticsearchCompatibilityChecker other);
+
 }

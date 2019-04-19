@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
@@ -43,7 +43,7 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	private final String absoluteFieldPath;
 	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
 	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
-	private final ElasticsearchConverterCompatibilityChecker converterChecker;
+	private final ElasticsearchCompatibilityChecker converterChecker;
 
 	private final ElasticsearchFieldCodec<F> codec;
 
@@ -55,7 +55,7 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	public ElasticsearchRangePredicateBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
-			ElasticsearchConverterCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
+			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;

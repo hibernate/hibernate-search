@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -40,7 +40,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 			ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends String> converter, ToDocumentFieldValueConverter<String, ? extends String> rawConverter,
-			ElasticsearchConverterCompatibilityChecker converterChecker, ElasticsearchFieldCodec<String> codec,
+			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<String> codec,
 			DataType type) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 		this.type = type;

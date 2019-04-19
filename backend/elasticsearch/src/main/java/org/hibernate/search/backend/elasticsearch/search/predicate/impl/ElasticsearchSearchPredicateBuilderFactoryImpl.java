@@ -183,6 +183,11 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 		}
 
 		@Override
+		public boolean hasCompatibleAnalyzer(ElasticsearchFieldPredicateBuilderFactory component1, ElasticsearchFieldPredicateBuilderFactory component2) {
+			return component1.hasCompatibleAnalyzer( component2 );
+		}
+
+		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				ElasticsearchFieldPredicateBuilderFactory component1, ElasticsearchFieldPredicateBuilderFactory component2,
 				EventContext context) {

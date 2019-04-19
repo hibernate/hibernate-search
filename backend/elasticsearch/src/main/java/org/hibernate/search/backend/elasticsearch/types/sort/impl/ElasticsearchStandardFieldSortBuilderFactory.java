@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchFieldSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
@@ -44,7 +44,7 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, ElasticsearchConverterCompatibilityChecker converterChecker) {
+			String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker) {
 		checkSortable( absoluteFieldPath, sortable );
 
 		return new ElasticsearchFieldSortBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
