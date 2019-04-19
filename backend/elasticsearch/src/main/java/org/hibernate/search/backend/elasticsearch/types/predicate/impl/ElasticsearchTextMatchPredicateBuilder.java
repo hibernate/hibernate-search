@@ -31,6 +31,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
 
 	private final DataType type;
+	private final ElasticsearchCompatibilityChecker analyzerChecker;
 
 	private Integer fuzziness;
 	private Integer prefixLength;
@@ -41,9 +42,10 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends String> converter, ToDocumentFieldValueConverter<String, ? extends String> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<String> codec,
-			DataType type) {
+			DataType type, ElasticsearchCompatibilityChecker analyzerChecker) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 		this.type = type;
+		this.analyzerChecker = analyzerChecker;
 	}
 
 	@Override
@@ -69,6 +71,10 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context, JsonObject outerObject,
 			JsonObject innerObject) {
+		if ( analyzer == null ) {
+			analyzerChecker.failIfNotCompatible();
+		}
+
 		if ( fuzziness != null ) {
 			FUZZINESS_ACCESSOR.set( innerObject, fuzziness );
 		}

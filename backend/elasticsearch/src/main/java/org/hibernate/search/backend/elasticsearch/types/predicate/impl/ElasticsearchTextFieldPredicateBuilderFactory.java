@@ -48,14 +48,15 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker) {
-		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, type );
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker,
+			ElasticsearchCompatibilityChecker analyzerChecker) {
+		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, type, analyzerChecker );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
-			String absoluteFieldPath) {
-		return new ElasticsearchTextPhrasePredicateBuilder( absoluteFieldPath );
+			String absoluteFieldPath, ElasticsearchCompatibilityChecker analyzerChecker) {
+		return new ElasticsearchTextPhrasePredicateBuilder( absoluteFieldPath, analyzerChecker );
 	}
 
 	@Override

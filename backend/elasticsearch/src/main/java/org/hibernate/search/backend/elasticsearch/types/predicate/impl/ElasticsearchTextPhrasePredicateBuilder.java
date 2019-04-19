@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
@@ -28,13 +29,15 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearc
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
 
 	private final String absoluteFieldPath;
+	private final ElasticsearchCompatibilityChecker analyzerChecker;
 
 	private Integer slop;
 	private JsonElement phrase;
 	private String analyzer;
 
-	ElasticsearchTextPhrasePredicateBuilder(String absoluteFieldPath) {
+	ElasticsearchTextPhrasePredicateBuilder(String absoluteFieldPath, ElasticsearchCompatibilityChecker analyzerChecker) {
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.analyzerChecker = analyzerChecker;
 	}
 
 	@Override
@@ -60,6 +63,10 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearc
 	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
+		if ( analyzer == null ) {
+			analyzerChecker.failIfNotCompatible();
+		}
+
 		QUERY_ACCESSOR.set( innerObject, phrase );
 		if ( slop != null ) {
 			SLOP_ACCESSOR.set( innerObject, slop );
