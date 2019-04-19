@@ -34,13 +34,13 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final LuceneCompatibilityChecker analyzerChecker;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private Integer maxEditDistance;
 	private Integer prefixLength;
 
 	private Analyzer analyzer;
-	private LuceneCompatibilityChecker analyzerChecker;
 	private boolean analyzerOverridden = false;
 
 	LuceneTextMatchPredicateBuilder(

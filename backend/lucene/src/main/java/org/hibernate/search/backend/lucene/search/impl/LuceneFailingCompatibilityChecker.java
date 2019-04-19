@@ -29,4 +29,10 @@ public class LuceneFailingCompatibilityChecker<T> implements LuceneCompatibility
 	public void failIfNotCompatible() {
 		throw componentRetrievalStrategy.createCompatibilityException( absoluteFieldPath, component1, component2, eventContext );
 	}
+
+	@Override
+	public LuceneCompatibilityChecker combine(LuceneCompatibilityChecker other) {
+		// failing + any = failing
+		return this;
+	}
 }

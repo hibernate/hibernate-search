@@ -10,4 +10,6 @@ public interface LuceneCompatibilityChecker {
 
 	void failIfNotCompatible();
 
+	LuceneCompatibilityChecker combine(LuceneCompatibilityChecker other);
+
 }
