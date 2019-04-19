@@ -102,6 +102,13 @@
             <url>http://in.relation.to/yoann-rodiere/</url>
         </developer>
         <developer>
+            <id>fabio.ercoli</id>
+            <name>Fabio Massimo Ercoli</name>
+            <email>fabio@hibernate.org</email>
+            <organization>Red Hat, Inc.</organization>
+            <url>http://in.relation.to/fabio-massimo-ercoli/</url>
+        </developer>
+        <developer>
             <id>mincong-h</id>
             <name>Mincong Huang</name>
             <email>mincong.h@gmail.com</email>

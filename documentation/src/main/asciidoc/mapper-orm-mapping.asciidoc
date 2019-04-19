@@ -175,6 +175,15 @@ i.e. whether the field value is stored in the index to allow later retrieval whe
 +
 Value: `Projectable.YES`, `Projectable.NO`, `Projectable.DEFAULT`.
 
+`indexNullAs`::
+Disabled by default. Whether it is set, it allows to provide a value to use as a replacement anytime the property value is null.
+
+[IMPORTANT]
+====
+The replacement is provided using a String. So its value has to be parsable according to the index field type relative to the property.
+Look up the column _Parsing method for 'indexNullAs'_ in the <<section-built-in-bridges>>.
+====
+
 [[mapper-orm-directfieldmapping-annotations]]
 === Available field annotations
 
@@ -326,45 +335,45 @@ see <<backend-lucene-field-types,Lucene field types>>
 or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on your backend.
 ====
 
-[cols="l,1",options="header"]
+[cols="l,1,1",options="header"]
 .Property types with built-in value bridges
-|====
-|Property type|Value of "raw" fields (if different)
-|All enum types|`name()` as a `java.lang.String`
-|java.lang.String|-
-|java.lang.Character, char|A single-character `java.lang.String`
-|java.lang.Byte, byte|-
-|java.lang.Short, short|-
-|java.lang.Integer, int|-
-|java.lang.Long, long|-
-|java.lang.Double, double|-
-|java.lang.Float, float|-
-|java.lang.Boolean, boolean|-
-|java.math.BigDecimal|-
-|java.math.BigInteger|-
-|java.net.URI|`toString()` as a `java.lang.String`
-|java.net.URL|`toExternalForm()` as a `java.lang.String`
-|java.time.Instant|-
-|java.time.LocalDate|-
-|java.time.LocalTime|-
-|java.time.LocalDateTime|-
-|java.time.OffsetDateTime|-
-|java.time.OffsetTime|-
-|java.time.ZonedDateTime|-
-|java.time.ZoneId|`getId()` as a `java.lang.String`
-|java.time.ZoneOffset|`getTotalSeconds()` as a `java.lang.Integer`
-|java.time.Period|A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>`
-|java.time.Duration|`toNanos()` as a `java.lang.Long`
-|java.time.Year|-
-|java.time.YearMonth|-
-|java.time.MonthDay|-
-|java.util.UUID|`toString()` as a `java.lang.String`
-|java.util.Calendar|A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>>
-|java.util.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>
-|java.sql.Timestamp|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>
-|java.sql.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>
-|java.sql.Time|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>
-|====
+|===
+|Property type|Value of "raw" fields (if different)| Parsing method for 'indexNullAs'
+|All enum types|`name()` as a `java.lang.String`| `Enum.valueOf(String)`
+|java.lang.String|- | -
+|java.lang.Character, char|A single-character `java.lang.String`| A single-character `java.lang.String`
+|java.lang.Byte, byte|-| `Byte.parseByte(String)`
+|java.lang.Short, short|-| `Short.parseShort(String)`
+|java.lang.Integer, int|-| `Integer.parseInt(String)`
+|java.lang.Long, long|-| `Long.parseLong(String)`
+|java.lang.Double, double|-| `Double.parseDouble(String)`
+|java.lang.Float, float|-| `Float.parseFloat(String)`
+|java.lang.Boolean, boolean|-| A `true` or `false` ignoring case `java.lang.String`
+|java.math.BigDecimal|-| `new BigDecimal(String)`
+|java.math.BigInteger|-| `new BigInteger(String)`
+|java.net.URI|`toString()` as a `java.lang.String` | `new URI(String)`
+|java.net.URL|`toExternalForm()` as a `java.lang.String`| `new URL(String)`
+|java.time.Instant|- | `Instant.parse(String)`
+|java.time.LocalDate|- | `LocalDate.parse(String)`
+|java.time.LocalTime|- | `LocalTime.parse(String)`
+|java.time.LocalDateTime|- | `LocalDateTime.parse(String)`
+|java.time.OffsetDateTime|- | `OffsetDateTime.parse(String)`
+|java.time.OffsetTime|- | `OffsetTime.parse(String)`
+|java.time.ZonedDateTime|- | Same as `ZonedDateTime.parse(String)` for JDK9+
+|java.time.ZoneId|`getId()` as a `java.lang.String` | ZoneId.of(String)
+|java.time.ZoneOffset|`getTotalSeconds()` as a `java.lang.Integer` | `getTotalSeconds()` as a `java.lang.String`
+|java.time.Period|A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>` |A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>`
+|java.time.Duration|`toNanos()` as a `java.lang.Long` | `Long.parseLong(String)`
+|java.time.Year|- | `Year.parse(String)`
+|java.time.YearMonth|- | `YearMonth.parse(String)`
+|java.time.MonthDay|- | `MonthDay.parse(String)`
+|java.util.UUID|`toString()` as a `java.lang.String` | `UUID.fromString(String)`
+|java.util.Calendar|A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>> |  Same as `ZonedDateTime.parse(String)` for JDK9+
+|java.util.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|java.sql.Timestamp|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|java.sql.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|java.sql.Time|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|===
 
 [[mapper-orm-bridge-typeandpropertybridge]]
 === Type bridges and property bridges
