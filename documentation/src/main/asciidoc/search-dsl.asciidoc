@@ -197,12 +197,13 @@ the corresponding fields are probably not going to be compatible.
 
 However, if you're interested in the details, Hibernate Search is a bit more flexible than that.
 
-There are two "levels" of constraints when it comes to field compatibility:
+There are three different constraints when it comes to field compatibility:
 
 1. The fields must be "encoded" in a compatible way.
 This means the backend must use the same representation for the two fields,
 for example they are both `Integer`, or they are both `LocalDate` with the same date format, etc.
 2. The fields must have a compatible DSL converter (for predicates and sorts) or projection converter (for projections).
+2. For full-text predicates, the fields must have a compatible analyzer.
 
 The following sections describe all the possible incompatibilities, and how to solve them.
 
@@ -212,7 +213,7 @@ In a search query targeting multiple indexes,
 if a field is encoded differently in each index,
 you cannot apply predicates, sorts or projections on that field.
 Your only option is to change your mapping,
-renaming some fields to avoid the conflict.
+renaming some fields or changing their type to avoid the conflict.
 
 If you need to apply a similar predicate to two fields with different names and incompatible codec,
 you will have to use two separate predicates and combine them with a <<search-dsl-predicate-boolean,boolean junction>>.
@@ -239,3 +240,17 @@ but that has a different projection converters
 you can still project on this field, but you will need to disable the projection converter
 as explained in <<search-dsl-projected-value-type>>:
 the projection will return the "index", unconverted value (using the same example, a `String`).
+
+=== Incompatible analyzer
+
+Incompatible analyzers are only a problem with full-text predicates:
+match predicate on a text field, phrase predicate, simple query string predicate, ...
+
+If two fields encoded in a compatible way (for example both as `String`),
+but that have different analyzers,
+you can still use these predicates, but you will need to explicitly configure the predicate to either
+set the search analyzer to an analyzer of your choosing with `.analyzer(analyzerName)`,
+or skip analysis completely with `.skipAnalysis()`.
+
+See <<search-dsl-predicate>> for more information about how to create predicates
+and about the available options.
