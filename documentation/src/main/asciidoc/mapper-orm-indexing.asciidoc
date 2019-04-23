@@ -43,3 +43,10 @@ include::todo-placeholder.asciidoc[]
 [[manual-index-changes]]
 
 include::todo-placeholder.asciidoc[]
+
+[[mapper-orm-indexing-massindexing]]
+=== Rebuilding the whole index
+// Search 5 anchors backward compatibility
+[[search-batchindex]]
+
+include::todo-placeholder.asciidoc[]
