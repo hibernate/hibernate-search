@@ -109,7 +109,7 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 			return myProperty;
 		}
 
-		@GenericField(indexNullAs = "0")
+		@GenericField(indexNullAs = "PT0S")
 		public Duration getIndexNullAsProperty() {
 			return indexNullAsProperty;
 		}
@@ -131,7 +131,7 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 			return myProperty;
 		}
 
-		@GenericField(indexNullAs = "1000000123")
+		@GenericField(indexNullAs = "PT1.000000123S")
 		public Duration getIndexNullAsProperty() {
 			return indexNullAsProperty;
 		}

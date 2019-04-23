@@ -14,6 +14,7 @@ import java.util.Locale;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -41,10 +42,7 @@ public final class DefaultPeriodValueBridge implements ValueBridge<Period, Strin
 
 	@Override
 	public String toIndexedValue(Period value, ValueBridgeToIndexedValueContext context) {
-		if ( value == null ) {
-			return null;
-		}
-		return String.format( Locale.ROOT, FORMAT, value.getYears(), value.getMonths(), value.getDays() );
+		return toIndexedValue( value );
 	}
 
 	@Override
@@ -54,14 +52,19 @@ public final class DefaultPeriodValueBridge implements ValueBridge<Period, Strin
 
 	@Override
 	public String parse(String value) {
-		// using convert to validate
-		PojoDefaultPeriodFromDocumentFieldValueConverter.INSTANCE.convert( value, null );
-		return value;
+		return toIndexedValue( ParseUtils.parsePeriod( value ) );
 	}
 
 	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
+	}
+
+	private String toIndexedValue(Period value) {
+		if ( value == null ) {
+			return null;
+		}
+		return String.format( Locale.ROOT, FORMAT, value.getYears(), value.getMonths(), value.getDays() );
 	}
 
 	private static class PojoDefaultPeriodFromDocumentFieldValueConverter implements FromDocumentFieldValueConverter<String, Period> {

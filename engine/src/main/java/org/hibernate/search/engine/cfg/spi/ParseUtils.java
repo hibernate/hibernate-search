@@ -11,6 +11,8 @@ import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.YEAR;
 
 import java.lang.invoke.MethodHandles;
+import java.time.DateTimeException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,8 +20,10 @@ import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
+import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -166,6 +170,33 @@ public final class ParseUtils {
 		}
 		catch (DateTimeParseException e) {
 			throw log.unableToParseTemporal( MonthDay.class, value, formatter, e );
+		}
+	}
+
+	public static ZoneOffset parseZoneOffset(String value) {
+		try {
+			return ZoneOffset.of( value );
+		}
+		catch (DateTimeException e) {
+			throw log.invalidStringForType( value, ZoneOffset.class, e );
+		}
+	}
+
+	public static Period parsePeriod(String value) {
+		try {
+			return Period.parse( value );
+		}
+		catch (DateTimeParseException e) {
+			throw log.invalidStringForType( value, Period.class, e );
+		}
+	}
+
+	public static Duration parseDuration(String value) {
+		try {
+			return Duration.parse( value );
+		}
+		catch (DateTimeParseException e) {
+			throw log.invalidStringForType( value, Duration.class, e );
 		}
 	}
 }

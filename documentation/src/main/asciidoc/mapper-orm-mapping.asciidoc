@@ -360,9 +360,9 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
 |java.time.OffsetTime|- | `OffsetTime.parse(String)`
 |java.time.ZonedDateTime|- | `ZonedDateTime.parse(String)`
 |java.time.ZoneId|`getId()` as a `java.lang.String` | `ZoneId.of(String)`
-|java.time.ZoneOffset|`getTotalSeconds()` as a `java.lang.Integer` | `getTotalSeconds()` as a `java.lang.String`
-|java.time.Period|A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>` |A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>`
-|java.time.Duration|`toNanos()` as a `java.lang.Long` | `Long.parseLong(String)`
+|java.time.ZoneOffset|`getTotalSeconds()` as a `java.lang.Integer` | `ZoneOffset.of(String)`
+|java.time.Period|A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>` |`Period.parse(String)`
+|java.time.Duration|`toNanos()` as a `java.lang.Long` | `Duration.parse(String)`
 |java.time.Year|- | `Year.parse(String)`
 |java.time.YearMonth|- | `YearMonth.parse(String)`
 |java.time.MonthDay|- | `MonthDay.parse(String)`

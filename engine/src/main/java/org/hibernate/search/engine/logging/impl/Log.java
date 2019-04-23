@@ -276,7 +276,7 @@ public interface Log extends BasicLogger {
 	SearchException invalidNumberPropertyValue(@FormatWith(SimpleNameClassFormatter.class) Class<? extends Number> type, String nestedErrorMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 59, value = "Invalid '%1$s' value for type '%2$s'.")
-	SearchException invalidStringForType(String value, @FormatWith(SimpleNameClassFormatter.class) Class<?> type, @Cause Exception cause);
+	SearchException invalidStringForType(String value, @FormatWith(ClassFormatter.class) Class<?> type, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 60, value = "Invalid '%1$s' value for enum '%2$s'.")
 	SearchException invalidStringForEnum(String value, @FormatWith(ClassFormatter.class) Class<? extends Enum> enumType, @Cause Exception cause);

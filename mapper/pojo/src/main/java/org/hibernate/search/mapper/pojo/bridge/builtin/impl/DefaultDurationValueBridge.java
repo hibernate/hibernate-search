@@ -12,7 +12,7 @@ import java.time.Duration;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
-import org.hibernate.search.engine.cfg.spi.ConvertUtils;
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -37,7 +37,7 @@ public final class DefaultDurationValueBridge implements ValueBridge<Duration, L
 
 	@Override
 	public Long toIndexedValue(Duration value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : toNanos( value );
+		return toIndexedValue( value );
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public final class DefaultDurationValueBridge implements ValueBridge<Duration, L
 
 	@Override
 	public Long parse(String value) {
-		return ConvertUtils.convertLong( value );
+		return toIndexedValue( ParseUtils.parseDuration( value ) );
 	}
 
 	@Override
@@ -55,7 +55,10 @@ public final class DefaultDurationValueBridge implements ValueBridge<Duration, L
 		return getClass().equals( other.getClass() );
 	}
 
-	private Long toNanos(Duration value) {
+	private Long toIndexedValue(Duration value) {
+		if ( value == null ) {
+			return null;
+		}
 		try {
 			return value.toNanos();
 		}

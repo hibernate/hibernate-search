@@ -90,7 +90,7 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 
 			@Override
 			public Integer getNullAsValueBridge2() {
-				return ZoneOffset.ofHours( 7 ).getTotalSeconds();
+				return ZoneOffset.ofHoursMinutesSeconds( -8, -30, -52 ).getTotalSeconds();
 			}
 		} );
 	}
@@ -111,7 +111,7 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 			return myProperty;
 		}
 
-		@GenericField(indexNullAs = "0")
+		@GenericField(indexNullAs = "+00:00")
 		public ZoneOffset getIndexNullAsProperty() {
 			return indexNullAsProperty;
 		}
@@ -133,7 +133,7 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 			return myProperty;
 		}
 
-		@GenericField(indexNullAs = "25200")
+		@GenericField(indexNullAs = "-08:30:52")
 		public ZoneOffset getIndexNullAsProperty() {
 			return indexNullAsProperty;
 		}

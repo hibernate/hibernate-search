@@ -109,7 +109,7 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 			return myProperty;
 		}
 
-		@GenericField(indexNullAs = "+0000000000+0000000000+0000000000")
+		@GenericField(indexNullAs = "P0D")
 		public Period getIndexNullAsProperty() {
 			return indexNullAsProperty;
 		}
@@ -131,7 +131,7 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 			return myProperty;
 		}
 
-		@GenericField(indexNullAs = "+0000001900+0000000012+0000000021")
+		@GenericField(indexNullAs = "P1900Y12M21D")
 		public Period getIndexNullAsProperty() {
 			return indexNullAsProperty;
 		}
