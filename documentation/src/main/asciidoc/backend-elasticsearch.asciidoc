@@ -6,6 +6,44 @@
 include::todo-placeholder.asciidoc[]
 
 [[backend-elasticsearch-configuration]]
+== Compatibility
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3262 Document upgrade policy, for how long we'll support each version, etc. Maybe just a link to a dedicated section on the website?
+
+Hibernate Search expects an Elasticsearch cluster running version 5.6, 6.x or 7.x.
+The version running on your cluster will be automatically detected on startup,
+and Hibernate Search will adapt based on the detected version;
+see <<backend-elasticsearch-configuration-version>> for details.
+
+The targeted version is mostly transparent to Hibernate Search users,
+but there are a few differences in how Hibernate Search behaves depending
+on the Elasticsearch version that may affect you.
+The following table details those differences.
+
+[cols="h,3*",options="header"]
+|===============
+||5.6|6.x|7.x
+|Formats for date fields in the Elasticsearch schema 3+|Formats changed in ES 7, see <<backend-elasticsearch-field-types>>
+|`indexNullAs` on `geo_point` fields |Not available 2+|Available
+|===============
+
+=== Upgrading Elasticsearch
+
+When upgrading your Elasticsearch cluster, some
+https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html[administrative tasks]
+are still required on your cluster: Hibernate Search will not take care of those.
+
+On top of that, there are some fundamental differences between some versions of Elasticsearch:
+for example date formats changed in Elasticsearch 7,
+meaning the schema defined in Elasticsearch 6 may not be compatible
+with the one expected by Hibernate Search for Elasticsearch 7.
+
+In such cases, the easiest way to upgrade is to delete your indexes manually,
+make Hibernate Search re-create the indexes along with their schema,
+and <<mapper-orm-indexing-massindexing,reindex your data>>.
+
+[[backend-elasticsearch-configuration]]
 == General configuration
 // Search 5 anchors backward compatibility
 [[elasticsearch-integration-configuration]]
