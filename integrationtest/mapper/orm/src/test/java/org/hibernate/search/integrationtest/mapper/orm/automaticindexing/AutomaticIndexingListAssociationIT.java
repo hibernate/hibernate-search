@@ -185,6 +185,17 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		}
 
 		@Override
+		public List<ContainedEntity> getContainedUsedInCrossEntityDerivedProperty(
+				ContainingEntity containingEntity) {
+			return containingEntity.getContainedUsedInCrossEntityDerivedProperty();
+		}
+
+		@Override
+		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty(ContainedEntity containedEntity) {
+			return containedEntity.getContainingAsUsedInCrossEntityDerivedProperty();
+		}
+
+		@Override
 		public void setIndexedField(ContainedEntity containedEntity, String value) {
 			containedEntity.setIndexedField( value );
 		}
@@ -271,6 +282,10 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private List<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
+		@ManyToMany
+		@JoinTable(name = "indexed_containedUsedInCrossEntityDerivedProperty")
+		private List<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new ArrayList<>();
+
 		public Integer getId() {
 			return id;
 		}
@@ -320,21 +335,30 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 			this.containedIndexedEmbeddedNoReindexOnUpdate = containedIndexedEmbeddedNoReindexOnUpdate;
 		}
 
+		public List<ContainedEntity> getContainedUsedInCrossEntityDerivedProperty() {
+			return containedUsedInCrossEntityDerivedProperty;
+		}
+
+		public void setContainedUsedInCrossEntityDerivedProperty(
+				List<ContainedEntity> containedUsedInCrossEntityDerivedProperty) {
+			this.containedUsedInCrossEntityDerivedProperty = containedUsedInCrossEntityDerivedProperty;
+		}
+
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
 				@ObjectPath({
-						@PropertyValue(propertyName = "containedIndexedEmbedded"),
+						@PropertyValue(propertyName = "containedUsedInCrossEntityDerivedProperty"),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField1")
 				}),
 				@ObjectPath({
-						@PropertyValue(propertyName = "containedIndexedEmbedded"),
+						@PropertyValue(propertyName = "containedUsedInCrossEntityDerivedProperty"),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField2")
 				})
 		})
 		public Optional<String> getCrossEntityDerivedField() {
 			return computeDerived(
-					containedIndexedEmbedded.stream().flatMap( c -> Stream.of(
+					containedUsedInCrossEntityDerivedProperty.stream().flatMap( c -> Stream.of(
 							c.getFieldUsedInCrossEntityDerivedField1(),
 							c.getFieldUsedInCrossEntityDerivedField2()
 					) )
@@ -367,6 +391,10 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		@ManyToMany(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
+
+		@ManyToMany(mappedBy = "containedUsedInCrossEntityDerivedProperty")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
 		@Basic
 		@GenericField
@@ -416,6 +444,10 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 
 		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
 			return containingAsIndexedEmbeddedNoReindexOnUpdate;
+		}
+
+		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {
+			return containingAsUsedInCrossEntityDerivedProperty;
 		}
 
 		public String getIndexedField() {

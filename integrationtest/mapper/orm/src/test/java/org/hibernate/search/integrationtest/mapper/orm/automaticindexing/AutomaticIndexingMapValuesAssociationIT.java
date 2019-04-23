@@ -189,6 +189,17 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		}
 
 		@Override
+		public Map<String, ContainedEntity> getContainedUsedInCrossEntityDerivedProperty(
+				ContainingEntity containingEntity) {
+			return containingEntity.getContainedUsedInCrossEntityDerivedProperty();
+		}
+
+		@Override
+		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty(ContainedEntity containedEntity) {
+			return containedEntity.getContainingAsUsedInCrossEntityDerivedProperty();
+		}
+
+		@Override
 		public void setIndexedField(ContainedEntity containedEntity, String value) {
 			containedEntity.setIndexedField( value );
 		}
@@ -293,6 +304,16 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<String, ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new LinkedHashMap<>();
 
+		@ManyToMany
+		@JoinTable(
+				name = "indexed_containedUsedInCrossEntityDerivedProperty",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
+		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		private Map<String, ContainedEntity> containedUsedInCrossEntityDerivedProperty = new LinkedHashMap<>();
+
 		public Integer getId() {
 			return id;
 		}
@@ -342,21 +363,30 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 			this.containedIndexedEmbeddedNoReindexOnUpdate = containedIndexedEmbeddedNoReindexOnUpdate;
 		}
 
+		public Map<String, ContainedEntity> getContainedUsedInCrossEntityDerivedProperty() {
+			return containedUsedInCrossEntityDerivedProperty;
+		}
+
+		public void setContainedUsedInCrossEntityDerivedProperty(
+				Map<String, ContainedEntity> containedUsedInCrossEntityDerivedProperty) {
+			this.containedUsedInCrossEntityDerivedProperty = containedUsedInCrossEntityDerivedProperty;
+		}
+
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
 				@ObjectPath({
-						@PropertyValue(propertyName = "containedIndexedEmbedded"),
+						@PropertyValue(propertyName = "containedUsedInCrossEntityDerivedProperty"),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField1")
 				}),
 				@ObjectPath({
-						@PropertyValue(propertyName = "containedIndexedEmbedded"),
+						@PropertyValue(propertyName = "containedUsedInCrossEntityDerivedProperty"),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField2")
 				})
 		})
 		public Optional<String> getCrossEntityDerivedField() {
 			return computeDerived(
-					containedIndexedEmbedded.values().stream().flatMap( c -> Stream.of(
+					containedUsedInCrossEntityDerivedProperty.values().stream().flatMap( c -> Stream.of(
 							c.getFieldUsedInCrossEntityDerivedField1(),
 							c.getFieldUsedInCrossEntityDerivedField2()
 					) )
@@ -389,6 +419,10 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		@ManyToMany(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
+
+		@ManyToMany(mappedBy = "containedUsedInCrossEntityDerivedProperty")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
 		@Basic
 		@GenericField
@@ -438,6 +472,10 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 
 		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
 			return containingAsIndexedEmbeddedNoReindexOnUpdate;
+		}
+
+		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {
+			return containingAsUsedInCrossEntityDerivedProperty;
 		}
 
 		public String getIndexedField() {

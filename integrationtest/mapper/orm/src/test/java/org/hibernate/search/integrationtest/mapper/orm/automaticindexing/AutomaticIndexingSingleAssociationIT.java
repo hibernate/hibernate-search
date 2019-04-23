@@ -517,6 +517,129 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * Test that updating an association in an entity
+	 * when this association is a component of a path in a @IndexingDependency.derivedFrom attribute
+	 * does trigger reindexing of the indexed entity.
+	 */
+	@Test
+	public void indirectAssociationUpdate_usedInCrossEntityDerivedProperty() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.setChild( containingEntity1 );
+			containingEntity1.setParent( entity1 );
+
+			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
+			deeplyNestedContainingEntity.setId( 3 );
+			containingEntity1.setChild( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setParent( containingEntity1 );
+
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 4 );
+			containedEntity.setFieldUsedInCrossEntityDerivedField1( "field1_initialValue" );
+			containedEntity.setFieldUsedInCrossEntityDerivedField2( "field2_initialValue" );
+
+			containingEntity1.setContainedUsedInCrossEntityDerivedProperty( containedEntity );
+			containedEntity.setContainingAsUsedInCrossEntityDerivedProperty( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.field(
+											"crossEntityDerivedField",
+											"field1_initialValue field2_initialValue"
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setFieldUsedInCrossEntityDerivedField1( "field1_updatedValue" );
+			containedEntity.setFieldUsedInCrossEntityDerivedField2( "field2_updatedValue" );
+
+			containingEntity1.getContainedUsedInCrossEntityDerivedProperty().setContainingAsUsedInCrossEntityDerivedProperty( null );
+			containingEntity1.setContainedUsedInCrossEntityDerivedProperty( containedEntity );
+			containedEntity.setContainingAsUsedInCrossEntityDerivedProperty( containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.field(
+											"crossEntityDerivedField",
+											"field1_updatedValue field2_updatedValue"
+									)
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value that is too deeply nested to matter (it's out of the path)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity deeplyNestedContainingEntity1 = session.get( ContainingEntity.class, 3 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 6 );
+			containedEntity.setFieldUsedInCrossEntityDerivedField1( "field1_outOfScopeValue" );
+			containedEntity.setFieldUsedInCrossEntityDerivedField2( "field2_outOfScopeValue" );
+
+			deeplyNestedContainingEntity1.setContainedUsedInCrossEntityDerivedProperty( containedEntity );
+			containedEntity.setContainingAsUsedInCrossEntityDerivedProperty( deeplyNestedContainingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
+
+			containingEntity1.getContainedUsedInCrossEntityDerivedProperty().setContainingAsUsedInCrossEntityDerivedProperty( null );
+			containingEntity1.setContainedUsedInCrossEntityDerivedProperty( null );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+
 	private static class SingleAssociationModelPrimitives
 			implements AssociationModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity> {
 
@@ -591,6 +714,18 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		public void setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle(ContainedEntity containedEntity,
 				ContainingEntity containingEntity) {
 			containedEntity.setContainingAsIndexedEmbeddedNoReindexOnUpdate( containingEntity );
+		}
+
+		@Override
+		public void setContainedUsedInCrossEntityDerivedPropertySingle(ContainingEntity containingEntity,
+				ContainedEntity containedEntity) {
+			containingEntity.setContainedUsedInCrossEntityDerivedProperty( containedEntity );
+		}
+
+		@Override
+		public void setContainingAsUsedInCrossEntityDerivedPropertySingle(ContainedEntity containedEntity,
+				ContainingEntity containingEntity) {
+			containedEntity.setContainingAsUsedInCrossEntityDerivedProperty( containingEntity );
 		}
 
 		@Override
@@ -677,6 +812,9 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private ContainedEntity containedIndexedEmbeddedNoReindexOnUpdate;
 
+		@OneToOne
+		private ContainedEntity containedUsedInCrossEntityDerivedProperty;
+
 		public Integer getId() {
 			return id;
 		}
@@ -726,24 +864,33 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			this.containedIndexedEmbeddedNoReindexOnUpdate = containedIndexedEmbeddedNoReindexOnUpdate;
 		}
 
+		public ContainedEntity getContainedUsedInCrossEntityDerivedProperty() {
+			return containedUsedInCrossEntityDerivedProperty;
+		}
+
+		public void setContainedUsedInCrossEntityDerivedProperty(
+				ContainedEntity containedUsedInCrossEntityDerivedProperty) {
+			this.containedUsedInCrossEntityDerivedProperty = containedUsedInCrossEntityDerivedProperty;
+		}
+
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
 				@ObjectPath({
-						@PropertyValue(propertyName = "containedIndexedEmbedded"),
+						@PropertyValue(propertyName = "containedUsedInCrossEntityDerivedProperty"),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField1")
 				}),
 				@ObjectPath({
-						@PropertyValue(propertyName = "containedIndexedEmbedded"),
+						@PropertyValue(propertyName = "containedUsedInCrossEntityDerivedProperty"),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField2")
 				})
 		})
 		public Optional<String> getCrossEntityDerivedField() {
-			return containedIndexedEmbedded == null
+			return containedUsedInCrossEntityDerivedProperty == null
 					? Optional.empty()
 					: computeDerived( Stream.of(
-							containedIndexedEmbedded.getFieldUsedInCrossEntityDerivedField1(),
-							containedIndexedEmbedded.getFieldUsedInCrossEntityDerivedField2()
+							containedUsedInCrossEntityDerivedProperty.getFieldUsedInCrossEntityDerivedField1(),
+							containedUsedInCrossEntityDerivedProperty.getFieldUsedInCrossEntityDerivedField2()
 					) );
 		}
 	}
@@ -769,6 +916,9 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 
 		@OneToOne(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
 		private ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate;
+
+		@OneToOne(mappedBy = "containedUsedInCrossEntityDerivedProperty")
+		private ContainingEntity containingAsUsedInCrossEntityDerivedProperty;
 
 		@Basic
 		@GenericField
@@ -831,6 +981,15 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		public void setContainingAsIndexedEmbeddedNoReindexOnUpdate(
 				ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate) {
 			this.containingAsIndexedEmbeddedNoReindexOnUpdate = containingAsIndexedEmbeddedNoReindexOnUpdate;
+		}
+
+		public ContainingEntity getContainingAsUsedInCrossEntityDerivedProperty() {
+			return containingAsUsedInCrossEntityDerivedProperty;
+		}
+
+		public void setContainingAsUsedInCrossEntityDerivedProperty(
+				ContainingEntity containingAsUsedInCrossEntityDerivedProperty) {
+			this.containingAsUsedInCrossEntityDerivedProperty = containingAsUsedInCrossEntityDerivedProperty;
 		}
 
 		public String getIndexedField() {

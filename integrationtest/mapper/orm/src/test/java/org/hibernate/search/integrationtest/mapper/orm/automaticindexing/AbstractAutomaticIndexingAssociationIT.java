@@ -71,7 +71,8 @@ import org.junit.Test;
  *      </li>
  *     <li>
  *         the second token defines how the association between TContaining and TContained is indexed:
- *         indexed-embedded, non-indexed-embedded, indexed-embbedded with ReindexOnUpdate.NO.
+ *         indexed-embedded, non-indexed-embedded, indexed-embbedded with ReindexOnUpdate.NO,
+ *         indexed as a side effect of being used in a cross-entity derived property.
  *     </li>
  *     <li>
  *         the third token (if any) defines which type of value is being updated/replaced:
@@ -630,8 +631,13 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * Test that updating a property in an entity
+	 * when this property is the last component of a path in a @IndexingDependency.derivedFrom attribute
+	 * does trigger reindexing of the indexed entity.
+	 */
 	@Test
-	public void indirectValueUpdate_indexedEmbedded_crossEntityDerivedValue_indexed() {
+	public void indirectValueUpdate_usedInCrossEntityDerivedProperty_crossEntityDerivedValue_indexed() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -642,8 +648,8 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TContained contained1 = primitives.newContained( 4 );
 			primitives.setFieldUsedInCrossEntityDerivedField1( contained1, "field1_initialValue" );
 			primitives.setFieldUsedInCrossEntityDerivedField2( contained1, "field2_initialValue" );
-			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+			primitives.setContainedUsedInCrossEntityDerivedPropertySingle( containingEntity1, contained1 );
+			primitives.setContainingAsUsedInCrossEntityDerivedPropertySingle( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -655,9 +661,6 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									.field(
 											"crossEntityDerivedField",
 											"field1_initialValue field2_initialValue"
-									)
-									.objectField( "containedIndexedEmbedded", b3 -> b3
-											.field( "indexedField", null )
 									)
 							)
 					)
@@ -677,9 +680,6 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											"crossEntityDerivedField",
 											"field1_updatedValue field2_initialValue"
 									)
-									.objectField( "containedIndexedEmbedded", b3 -> b3
-											.field( "indexedField", null )
-									)
 							)
 					)
 					.preparedThenExecuted();
@@ -697,9 +697,6 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									.field(
 											"crossEntityDerivedField",
 											"field1_updatedValue field2_updatedValue"
-									)
-									.objectField( "containedIndexedEmbedded", b3 -> b3
-											.field( "indexedField", null )
 									)
 							)
 					)
@@ -914,6 +911,10 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		void setContainedIndexedEmbeddedNoReindexOnUpdateSingle(TContaining containing, TContained contained);
 
 		void setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle(TContained contained, TContaining containing);
+
+		void setContainedUsedInCrossEntityDerivedPropertySingle(TContaining containing, TContained contained);
+
+		void setContainingAsUsedInCrossEntityDerivedPropertySingle(TContained contained, TContaining containing);
 
 		void setIndexedField(TContained contained, String value);
 
