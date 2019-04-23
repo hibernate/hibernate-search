@@ -19,7 +19,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsExpectactions;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
@@ -117,8 +117,8 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 	}
 
 	@Override
-	public Optional<IndexNullAsExpectactions<ZonedDateTime>> getIndexNullAsExpectations() {
-		return Optional.of( new IndexNullAsExpectactions<>(
+	public Optional<IndexNullAsMatchPredicateExpectactions<ZonedDateTime>> getIndexNullAsMatchPredicateExpectations() {
+		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atZone( ZoneId.of( "UTC" ) ),
 				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atZone( ZoneId.of( "Europe/Paris" ) )
 		) );

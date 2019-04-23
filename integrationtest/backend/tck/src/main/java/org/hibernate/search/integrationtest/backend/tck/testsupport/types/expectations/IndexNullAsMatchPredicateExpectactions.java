@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations;
 
-public class IndexNullAsExpectactions<F> {
+public class IndexNullAsMatchPredicateExpectactions<F> {
 
 	private final F indexNullAsValue;
 	private final F differentValue;
 
-	public IndexNullAsExpectactions(F indexNullAsValue, F differentValue) {
+	public IndexNullAsMatchPredicateExpectactions(F indexNullAsValue, F differentValue) {
 		this.indexNullAsValue = indexNullAsValue;
 		this.differentValue = differentValue;
 	}

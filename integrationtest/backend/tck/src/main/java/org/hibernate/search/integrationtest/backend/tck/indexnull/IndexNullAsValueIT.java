@@ -21,7 +21,7 @@ import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsExpectactions;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -52,7 +52,7 @@ public class IndexNullAsValueIT {
 		setUp();
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.matchFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object valueToMatch = fieldModel.indexNullAsValue.indexedValue;
 
@@ -112,21 +112,21 @@ public class IndexNullAsValueIT {
 		workPlan.add(
 				referenceProvider( DOCUMENT_WITH_INDEX_NULL_AS_VALUES ),
 				document -> {
-					indexMapping.supportedFieldModels.forEach( f -> f.indexNullAsValue.write( document ) );
+					indexMapping.matchFieldModels.forEach( f -> f.indexNullAsValue.write( document ) );
 					document.addValue( indexMapping.geoPointField, GeoPoint.of( 0.0, 0.0 ) );
 				}
 		);
 		workPlan.add(
 				referenceProvider( DOCUMENT_WITH_DIFFERENT_VALUES ),
 				document -> {
-					indexMapping.supportedFieldModels.forEach( f -> f.differentValue.write( document ) );
+					indexMapping.matchFieldModels.forEach( f -> f.differentValue.write( document ) );
 					document.addValue( indexMapping.geoPointField, GeoPoint.of( 40, 70 ) );
 				}
 		);
 		workPlan.add(
 				referenceProvider( DOCUMENT_WITH_NULL_VALUES ),
 				document -> {
-					indexMapping.supportedFieldModels.forEach( f -> f.nullValue.write( document ) );
+					indexMapping.matchFieldModels.forEach( f -> f.nullValue.write( document ) );
 					document.addValue( indexMapping.geoPointField, null );
 				}
 		);
@@ -134,12 +134,12 @@ public class IndexNullAsValueIT {
 	}
 
 	private static class IndexMapping {
-		final List<ByTypeFieldModel<?>> supportedFieldModels;
+		final List<ByTypeFieldModel<?>> matchFieldModels;
 		final IndexFieldReference<GeoPoint> geoPointField;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = FieldTypeDescriptor.getAll().stream()
-					.filter( typeDescriptor -> typeDescriptor.getIndexNullAsExpectations().isPresent() )
+			matchFieldModels = FieldTypeDescriptor.getAll().stream()
+					.filter( typeDescriptor -> typeDescriptor.getIndexNullAsMatchPredicateExpectations().isPresent() )
 					.map( typeDescriptor -> ByTypeFieldModel.mapper( root, typeDescriptor ) )
 					.collect( Collectors.toList() );
 
@@ -149,7 +149,7 @@ public class IndexNullAsValueIT {
 
 	private static class ByTypeFieldModel<F> {
 		static <F> ByTypeFieldModel<F> mapper(IndexSchemaElement root, FieldTypeDescriptor<F> typeDescriptor) {
-			IndexNullAsExpectactions<F> expectations = typeDescriptor.getIndexNullAsExpectations().get();
+			IndexNullAsMatchPredicateExpectactions<F> expectations = typeDescriptor.getIndexNullAsMatchPredicateExpectations().get();
 			F indexNullAsValue = expectations.getIndexNullAsValue();
 
 			return StandardFieldMapper.of(
@@ -163,7 +163,7 @@ public class IndexNullAsValueIT {
 		final ValueModel<F> differentValue;
 		final ValueModel<F> nullValue;
 
-		public ByTypeFieldModel(IndexFieldReference<F> reference, String relativeFieldName, IndexNullAsExpectactions<F> expectations) {
+		public ByTypeFieldModel(IndexFieldReference<F> reference, String relativeFieldName, IndexNullAsMatchPredicateExpectactions<F> expectations) {
 			this.relativeFieldName = relativeFieldName;
 			this.indexNullAsValue = new ValueModel<>( reference, expectations.getIndexNullAsValue() );
 			this.differentValue = new ValueModel<>( reference, expectations.getDifferentValue() );

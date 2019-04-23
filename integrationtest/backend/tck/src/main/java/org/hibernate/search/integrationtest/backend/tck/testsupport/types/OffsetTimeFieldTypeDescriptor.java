@@ -16,7 +16,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsExpectactions;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
@@ -92,8 +92,8 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 	}
 
 	@Override
-	public Optional<IndexNullAsExpectactions<OffsetTime>> getIndexNullAsExpectations() {
-		return Optional.of( new IndexNullAsExpectactions<>(
+	public Optional<IndexNullAsMatchPredicateExpectactions<OffsetTime>> getIndexNullAsMatchPredicateExpectations() {
+		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				LocalTime.of( 0, 0, 0 ).atOffset( ZoneOffset.UTC ),
 				LocalTime.of( 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
 		) );
