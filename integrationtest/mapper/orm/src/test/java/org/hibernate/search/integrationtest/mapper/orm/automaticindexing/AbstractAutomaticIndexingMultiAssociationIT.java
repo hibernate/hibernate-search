@@ -1034,6 +1034,22 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			addContaining( containingAssociation, containing );
 		}
 
+		@Override
+		default void setContainedUsedInCrossEntityDerivedPropertySingle(TContaining containing,
+				TContained contained) {
+			TContainedAssociation containedAssociation = getContainedUsedInCrossEntityDerivedProperty( containing );
+			clearContained( containedAssociation );
+			addContained( containedAssociation, contained );
+		}
+
+		@Override
+		default void setContainingAsUsedInCrossEntityDerivedPropertySingle(TContained contained,
+				TContaining containing) {
+			TContainingAssociation containingAssociation = getContainingAsUsedInCrossEntityDerivedProperty( contained );
+			clearContaining( containingAssociation );
+			addContaining( containingAssociation, containing );
+		}
+
 		TContainedAssociation newContainedAssociation(TContainedAssociation original);
 
 		void addContained(TContainedAssociation association, TContained contained);
@@ -1065,6 +1081,10 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		void setContainedIndexedEmbeddedNoReindexOnUpdate(TContaining containing, TContainedAssociation association);
 
 		TContainingAssociation getContainingAsIndexedEmbeddedNoReindexOnUpdate(TContained contained);
+
+		TContainedAssociation getContainedUsedInCrossEntityDerivedProperty(TContaining containing);
+
+		TContainingAssociation getContainingAsUsedInCrossEntityDerivedProperty(TContained contained);
 	}
 
 }

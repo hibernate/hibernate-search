@@ -193,6 +193,17 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		}
 
 		@Override
+		public Map<ContainedEntity, String> getContainedUsedInCrossEntityDerivedProperty(
+				ContainingEntity containingEntity) {
+			return containingEntity.getContainedUsedInCrossEntityDerivedProperty();
+		}
+
+		@Override
+		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty(ContainedEntity containedEntity) {
+			return containedEntity.getContainingAsUsedInCrossEntityDerivedProperty();
+		}
+
+		@Override
 		public void setIndexedField(ContainedEntity containedEntity, String value) {
 			containedEntity.setIndexedField( value );
 		}
@@ -306,6 +317,16 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		)
 		private Map<ContainedEntity, String> containedIndexedEmbeddedNoReindexOnUpdate = new LinkedHashMap<>();
 
+		@ElementCollection
+		@JoinTable(
+				name = "indexed_containedUsedInCrossEntityDerivedProperty",
+				joinColumns = @JoinColumn(name = "mapHolder")
+		)
+		@MapKeyJoinColumn(name = "map_key")
+		@Column(name = "value")
+		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		private Map<ContainedEntity, String> containedUsedInCrossEntityDerivedProperty = new LinkedHashMap<>();
+
 		public Integer getId() {
 			return id;
 		}
@@ -355,19 +376,28 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 			this.containedIndexedEmbeddedNoReindexOnUpdate = containedIndexedEmbeddedNoReindexOnUpdate;
 		}
 
+		public Map<ContainedEntity, String> getContainedUsedInCrossEntityDerivedProperty() {
+			return containedUsedInCrossEntityDerivedProperty;
+		}
+
+		public void setContainedUsedInCrossEntityDerivedProperty(
+				Map<ContainedEntity, String> containedUsedInCrossEntityDerivedProperty) {
+			this.containedUsedInCrossEntityDerivedProperty = containedUsedInCrossEntityDerivedProperty;
+		}
+
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
 				@ObjectPath({
 						@PropertyValue(
-								propertyName = "containedIndexedEmbedded",
+								propertyName = "containedUsedInCrossEntityDerivedProperty",
 								extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
 						),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField1")
 				}),
 				@ObjectPath({
 						@PropertyValue(
-								propertyName = "containedIndexedEmbedded",
+								propertyName = "containedUsedInCrossEntityDerivedProperty",
 								extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
 						),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField2")
@@ -375,7 +405,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		})
 		public Optional<String> getCrossEntityDerivedField() {
 			return computeDerived(
-					containedIndexedEmbedded.keySet().stream().flatMap( c -> Stream.of(
+					containedUsedInCrossEntityDerivedProperty.keySet().stream().flatMap( c -> Stream.of(
 							c.getFieldUsedInCrossEntityDerivedField1(),
 							c.getFieldUsedInCrossEntityDerivedField2()
 					) )
@@ -439,6 +469,21 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		)
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
+		/*
+		 * No mappedBy here, same reasons as above.
+		 */
+		@ManyToMany
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@AssociationInverseSide(
+				inversePath = @ObjectPath(
+						@PropertyValue(
+								propertyName = "containedUsedInCrossEntityDerivedProperty",
+								extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
+						)
+				)
+		)
+		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
+
 		@Basic
 		@GenericField
 		private String indexedField;
@@ -487,6 +532,10 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 
 		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
 			return containingAsIndexedEmbeddedNoReindexOnUpdate;
+		}
+
+		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {
+			return containingAsUsedInCrossEntityDerivedProperty;
 		}
 
 		public String getIndexedField() {
