@@ -174,14 +174,13 @@ Whether the field can be <<mapper-orm-query-projection, projected on>>,
 i.e. whether the field value is stored in the index to allow later retrieval when querying.
 +
 Value: `Projectable.YES`, `Projectable.NO`, `Projectable.DEFAULT`.
-
 `indexNullAs`::
-Disabled by default. Whether it is set, it allows to provide a value to use as a replacement anytime the property value is null.
-
+Disabled by default. When set, it defines the value to use as a replacement anytime the property value is null.
++
 [IMPORTANT]
 ====
-The replacement is provided using a String. So its value has to be parsable according to the index field type relative to the property.
-Look up the column _Parsing method for 'indexNullAs'_ in the <<section-built-in-bridges>>.
+The replacement is defined as a String. Thus its value has to be parsed.
+Look up the column _Parsing method for 'indexNullAs'_ in <<mapper-orm-bridge-valuebridge-builtin>> to find out the format used when parsing.
 ====
 
 [[mapper-orm-directfieldmapping-annotations]]
@@ -341,14 +340,14 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
 |Property type|Value of "raw" fields (if different)| Parsing method for 'indexNullAs'
 |All enum types|`name()` as a `java.lang.String`| `Enum.valueOf(String)`
 |java.lang.String|- | -
-|java.lang.Character, char|A single-character `java.lang.String`| A single-character `java.lang.String`
+|java.lang.Character, char|A single-character `java.lang.String`| Accepts any single-character `java.lang.String`
 |java.lang.Byte, byte|-| `Byte.parseByte(String)`
 |java.lang.Short, short|-| `Short.parseShort(String)`
 |java.lang.Integer, int|-| `Integer.parseInt(String)`
 |java.lang.Long, long|-| `Long.parseLong(String)`
 |java.lang.Double, double|-| `Double.parseDouble(String)`
 |java.lang.Float, float|-| `Float.parseFloat(String)`
-|java.lang.Boolean, boolean|-| A `true` or `false` ignoring case `java.lang.String`
+|java.lang.Boolean, boolean|-| Accepts the strings `true` or `false`, ignoring case
 |java.math.BigDecimal|-| `new BigDecimal(String)`
 |java.math.BigInteger|-| `new BigInteger(String)`
 |java.net.URI|`toString()` as a `java.lang.String` | `new URI(String)`
@@ -359,8 +358,8 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
 |java.time.LocalDateTime|- | `LocalDateTime.parse(String)`
 |java.time.OffsetDateTime|- | `OffsetDateTime.parse(String)`
 |java.time.OffsetTime|- | `OffsetTime.parse(String)`
-|java.time.ZonedDateTime|- | Same as `ZonedDateTime.parse(String)` for JDK9+
-|java.time.ZoneId|`getId()` as a `java.lang.String` | ZoneId.of(String)
+|java.time.ZonedDateTime|- | `ZonedDateTime.parse(String)`
+|java.time.ZoneId|`getId()` as a `java.lang.String` | `ZoneId.of(String)`
 |java.time.ZoneOffset|`getTotalSeconds()` as a `java.lang.Integer` | `getTotalSeconds()` as a `java.lang.String`
 |java.time.Period|A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>` |A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>`
 |java.time.Duration|`toNanos()` as a `java.lang.Long` | `Long.parseLong(String)`
@@ -368,7 +367,7 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
 |java.time.YearMonth|- | `YearMonth.parse(String)`
 |java.time.MonthDay|- | `MonthDay.parse(String)`
 |java.util.UUID|`toString()` as a `java.lang.String` | `UUID.fromString(String)`
-|java.util.Calendar|A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>> |  Same as `ZonedDateTime.parse(String)` for JDK9+
+|java.util.Calendar|A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>> | `ZonedDateTime.parse(String)`
 |java.util.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
 |java.sql.Timestamp|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
 |java.sql.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
