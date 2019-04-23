@@ -19,4 +19,8 @@ public class TckBackendFeatures {
 	public boolean distanceSortDesc() {
 		return true;
 	}
+
+	public boolean geoPointIndexNullAs() {
+		return true;
+	}
 }

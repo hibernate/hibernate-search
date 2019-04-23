@@ -23,12 +23,14 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -68,6 +70,11 @@ public class IndexNullAsValueIT {
 
 	@Test
 	public void indexNullAsValue_spatial() {
+		Assume.assumeTrue(
+				"indexNullAs on a GeoPoint field must be supported",
+				TckConfiguration.get().getBackendFeatures().geoPointIndexNullAs()
+		);
+
 		setUp();
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
@@ -113,21 +120,27 @@ public class IndexNullAsValueIT {
 				referenceProvider( DOCUMENT_WITH_INDEX_NULL_AS_VALUES ),
 				document -> {
 					indexMapping.matchFieldModels.forEach( f -> f.indexNullAsValue.write( document ) );
-					document.addValue( indexMapping.geoPointField, GeoPoint.of( 0.0, 0.0 ) );
+					if ( indexMapping.geoPointField != null ) {
+						document.addValue( indexMapping.geoPointField, GeoPoint.of( 0.0, 0.0 ) );
+					}
 				}
 		);
 		workPlan.add(
 				referenceProvider( DOCUMENT_WITH_DIFFERENT_VALUES ),
 				document -> {
 					indexMapping.matchFieldModels.forEach( f -> f.differentValue.write( document ) );
-					document.addValue( indexMapping.geoPointField, GeoPoint.of( 40, 70 ) );
+					if ( indexMapping.geoPointField != null ) {
+						document.addValue( indexMapping.geoPointField, GeoPoint.of( 40, 70 ) );
+					}
 				}
 		);
 		workPlan.add(
 				referenceProvider( DOCUMENT_WITH_NULL_VALUES ),
 				document -> {
 					indexMapping.matchFieldModels.forEach( f -> f.nullValue.write( document ) );
-					document.addValue( indexMapping.geoPointField, null );
+					if ( indexMapping.geoPointField != null ) {
+						document.addValue( indexMapping.geoPointField, null );
+					}
 				}
 		);
 		workPlan.execute().join();
@@ -143,7 +156,16 @@ public class IndexNullAsValueIT {
 					.map( typeDescriptor -> ByTypeFieldModel.mapper( root, typeDescriptor ) )
 					.collect( Collectors.toList() );
 
-			geoPointField = root.field( "geoPointField", c -> c.asGeoPoint().indexNullAs( GeoPoint.of( 0.0, 0.0 ) ) ).toReference();
+			if ( TckConfiguration.get().getBackendFeatures().geoPointIndexNullAs() ) {
+				geoPointField = root.field(
+						"geoPointField",
+						c -> c.asGeoPoint().indexNullAs( GeoPoint.of( 0.0, 0.0 ) )
+				)
+						.toReference();
+			}
+			else {
+				geoPointField = null;
+			}
 		}
 	}
 

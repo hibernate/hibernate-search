@@ -47,4 +47,9 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 	public void setTemplatePattern(JsonObject object, String pattern) {
 		object.addProperty( "template", pattern );
 	}
+
+	@Override
+	public boolean isGeoPointIndexNullAsPossible() {
+		return false;
+	}
 }
