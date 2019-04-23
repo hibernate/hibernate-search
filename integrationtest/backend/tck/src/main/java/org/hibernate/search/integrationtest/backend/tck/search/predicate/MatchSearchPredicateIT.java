@@ -54,6 +54,7 @@ public class MatchSearchPredicateIT {
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
 	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
+	private static final String INCOMPATIBLE_ANALYZER_INDEX_NAME = "IndexWithIncompatibleAnalyzer";
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -62,6 +63,7 @@ public class MatchSearchPredicateIT {
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
+	private static final String INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 = "incompatible_analyzer_1";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -76,6 +78,9 @@ public class MatchSearchPredicateIT {
 	private StubMappingIndexManager rawFieldCompatibleIndexManager;
 
 	private StubMappingIndexManager incompatibleIndexManager;
+
+	private IncompatibleAnalyzerIndexMapping incompatibleAnalyzerIndexMapping;
+	private StubMappingIndexManager incompatibleAnalyzerIndexManager;
 
 	@Before
 	public void setup() {
@@ -99,6 +104,11 @@ public class MatchSearchPredicateIT {
 						INCOMPATIBLE_INDEX_NAME,
 						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleIndexManager = indexManager
+				)
+				.withIndex(
+						INCOMPATIBLE_ANALYZER_INDEX_NAME,
+						ctx -> this.incompatibleAnalyzerIndexMapping = new IncompatibleAnalyzerIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.incompatibleAnalyzerIndexManager = indexManager
 				)
 				.setup();
 
@@ -1243,6 +1253,59 @@ public class MatchSearchPredicateIT {
 		}
 	}
 
+	@Test
+	public void multiIndex_incompatibleAnalyzer() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
+		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
+
+		SubTest.expectException(
+				() -> {
+					scope.query().asReference()
+							.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "fox" ) )
+							.toQuery();
+				}
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "'analyzedString'" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_NAME )
+				) );
+	}
+
+	@Test
+	public void multiIndex_incompatibleAnalyzer_overrideAnalyzer() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
+		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
+
+		IndexSearchQuery<DocumentReference> query = scope.query().asReference()
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "fox" )
+						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+			b.doc( INDEX_NAME, DOCUMENT_1 );
+			b.doc( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
+		} );
+	}
+
+	@Test
+	public void multiIndex_incompatibleAnalyzer_skipAnalysis() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
+		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
+
+		IndexSearchQuery<DocumentReference> query = scope.query().asReference()
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "fox" )
+						.skipAnalysis() )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+			b.doc( INDEX_NAME, DOCUMENT_1 );
+			b.doc( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
+		} );
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
@@ -1303,6 +1366,12 @@ public class MatchSearchPredicateIT {
 		} );
 		workPlan.execute().join();
 
+		workPlan = incompatibleAnalyzerIndexManager.createWorkPlan();
+		workPlan.add( referenceProvider( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
+			incompatibleAnalyzerIndexMapping.analyzedStringField.document1Value.write( document );
+		} );
+		workPlan.execute().join();
+
 		// Check that all documents are searchable
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
@@ -1319,6 +1388,11 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+		query = incompatibleAnalyzerIndexManager.createSearchScope().query()
+				.asReference()
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
@@ -1471,6 +1545,22 @@ public class MatchSearchPredicateIT {
 				}
 				mapper.map( root, "byType_" + typeDescriptor.getUniqueName() );
 			} );
+		}
+	}
+
+	private static class IncompatibleAnalyzerIndexMapping {
+		final MainFieldModel analyzedStringField;
+
+		/*
+		 * Unlike IndexMapping#analyzedStringField,
+		 * we're using here a different analyzer for the field.
+		 */
+		IncompatibleAnalyzerIndexMapping(IndexSchemaElement root) {
+			analyzedStringField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ),
+					"quick brown fox", "another word", "a"
+			)
+					.map( root, "analyzedString" );
 		}
 	}
 
