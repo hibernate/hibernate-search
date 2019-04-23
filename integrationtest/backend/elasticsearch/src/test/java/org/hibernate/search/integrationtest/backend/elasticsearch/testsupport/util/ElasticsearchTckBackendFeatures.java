@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 
 public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
+
+	private ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
 	@Override
 	public boolean localDateTypeOnMissingValueUse() {
@@ -16,4 +19,8 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		return false;
 	}
 
+	@Override
+	public boolean geoPointIndexNullAs() {
+		return dialect.isGeoPointIndexNullAsPossible();
+	}
 }

@@ -35,6 +35,10 @@ public interface ElasticsearchTestDialect {
 
 	void setTemplatePattern(JsonObject object, String pattern);
 
+	default boolean isGeoPointIndexNullAsPossible() {
+		return true;
+	}
+
 	static ElasticsearchTestDialect get() {
 		String dialectClassName = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.testdialect" );
 		try {
