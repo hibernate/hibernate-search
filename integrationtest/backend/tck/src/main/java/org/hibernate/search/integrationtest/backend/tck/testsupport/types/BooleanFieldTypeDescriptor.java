@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsExpectactions;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
@@ -67,8 +67,8 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	}
 
 	@Override
-	public Optional<IndexNullAsExpectactions<Boolean>> getIndexNullAsExpectations() {
-		return Optional.of( new IndexNullAsExpectactions<>(
+	public Optional<IndexNullAsMatchPredicateExpectactions<Boolean>> getIndexNullAsMatchPredicateExpectations() {
+		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				true, false
 		) );
 	}
