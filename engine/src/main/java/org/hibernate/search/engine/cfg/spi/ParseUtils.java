@@ -34,6 +34,26 @@ public final class ParseUtils {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	// The DateTimeFormatter class does not expose a public constant for the ISO format, so we need to do it ourselves.
+	private static final DateTimeFormatter ISO_YEAR = new DateTimeFormatterBuilder()
+			.appendValue( YEAR, 4, 10, SignStyle.EXCEEDS_PAD )
+			.toFormatter();
+
+	// The DateTimeFormatter class does not expose a public constant for the ISO format, so we need to do it ourselves.
+	private static final DateTimeFormatter ISO_YEAR_MONTH = new DateTimeFormatterBuilder()
+			.appendValue( YEAR, 4, 10, SignStyle.EXCEEDS_PAD )
+			.appendLiteral( '-' )
+			.appendValue( MONTH_OF_YEAR, 2 )
+			.toFormatter();
+
+	// The DateTimeFormatter class does not expose a public constant for the ISO format, so we need to do it ourselves.
+	private static final DateTimeFormatter ISO_MONTH_DAY = new DateTimeFormatterBuilder()
+			.appendLiteral( "--" )
+			.appendValue( MONTH_OF_YEAR, 2 )
+			.appendLiteral( '-' )
+			.appendValue( DAY_OF_MONTH, 2 )
+			.toFormatter();
+
 	private ParseUtils() {
 		// Private constructor, do not use
 	}
@@ -114,10 +134,8 @@ public final class ParseUtils {
 	}
 
 	public static Year parseYear(String value) {
-		// we prefer here to use a fixed format
-		DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-				.appendValue( YEAR, 4, 10, SignStyle.EXCEEDS_PAD )
-				.toFormatter();
+		// Using the default ISO format
+		DateTimeFormatter formatter = ISO_YEAR;
 
 		try {
 			return Year.parse( value );
@@ -128,12 +146,8 @@ public final class ParseUtils {
 	}
 
 	public static YearMonth parseYearMonth(String value) {
-		// we prefer here to use a fixed format
-		DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-				.appendValue( YEAR, 4, 10, SignStyle.EXCEEDS_PAD )
-				.appendLiteral( '-' )
-				.appendValue( MONTH_OF_YEAR, 2 )
-				.toFormatter();
+		// Using the default ISO format
+		DateTimeFormatter formatter = ISO_YEAR_MONTH;
 
 		try {
 			return YearMonth.parse( value );
@@ -144,13 +158,8 @@ public final class ParseUtils {
 	}
 
 	public static MonthDay parseMonthDay(String value) {
-		// we prefer here to use a fixed format
-		DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-				.appendLiteral( "--" )
-				.appendValue( MONTH_OF_YEAR, 2 )
-				.appendLiteral( '-' )
-				.appendValue( DAY_OF_MONTH, 2 )
-				.toFormatter();
+		// Using the default ISO format
+		DateTimeFormatter formatter = ISO_MONTH_DAY;
 
 		try {
 			return MonthDay.parse( value );
