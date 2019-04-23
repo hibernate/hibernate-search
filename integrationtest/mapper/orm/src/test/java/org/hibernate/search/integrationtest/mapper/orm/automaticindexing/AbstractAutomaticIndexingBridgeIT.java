@@ -28,7 +28,6 @@ import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -44,44 +43,10 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	@Rule
 	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
-		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
-				.objectField( "typeBridge", b2 -> b2
-						.field( "directField", String.class )
-						.objectField( "child", b3 -> b3
-								.field( "includedInTypeBridge", String.class )
-						)
-				)
-				.objectField( "propertyBridge", b2 -> b2
-						.field( "includedInPropertyBridge", String.class )
-				)
-		);
-
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
-				.withProperty(
-						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
-						new HibernateOrmSearchMappingConfigurer() {
-							@Override
-							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
-								context.programmaticMapping().type( ContainingEntity.class )
-										.bridge( getContainingEntityTypeBridgeClass() )
-										.property( "child" )
-												.bridge( getContainingEntityPropertyBridgeClass() );
-							}
-						}
-				)
-				.setup(
-						IndexedEntity.class,
-						ContainedEntity.class
-				);
-		backendMock.verifyExpectationsMet();
-	}
-
 	@Test
 	public void directPersistUpdateDelete() {
+		SessionFactory sessionFactory = setupWithTypeBridge();
+
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -96,9 +61,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.objectField( "child", b3 -> b3
 											.field( "includedInTypeBridge", null )
 									)
-							)
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", null )
 							)
 					)
 					.preparedThenExecuted();
@@ -116,9 +78,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.objectField( "child", b3 -> b3
 											.field( "includedInTypeBridge", null )
 									)
-							)
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", null )
 							)
 					)
 					.preparedThenExecuted();
@@ -139,6 +98,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 	@Test
 	public void indirectAssociationUpdate_typeBridge() {
+		SessionFactory sessionFactory = setupWithTypeBridge();
+
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -165,9 +126,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 											.field( "includedInTypeBridge", null )
 									)
 							)
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", null )
-							)
 					)
 					.preparedThenExecuted();
 		} );
@@ -192,9 +150,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.objectField( "child", b3 -> b3
 											.field( "includedInTypeBridge", "initialValue" )
 									)
-							)
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", null )
 							)
 					)
 					.preparedThenExecuted();
@@ -221,9 +176,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.objectField( "child", b3 -> b3
 											.field( "includedInTypeBridge", "updatedValue" )
 									)
-							)
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", null )
 							)
 					)
 					.preparedThenExecuted();
@@ -260,9 +212,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 											.field( "includedInTypeBridge", null )
 									)
 							)
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", null )
-							)
 					)
 					.preparedThenExecuted();
 		} );
@@ -271,6 +220,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 	@Test
 	public void indirectValueUpdate_typeBridge() {
+		SessionFactory sessionFactory = setupWithTypeBridge();
+
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -311,9 +262,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 											.field( "includedInTypeBridge", "initialValue" )
 									)
 							)
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", null )
-							)
 					)
 					.preparedThenExecuted();
 		} );
@@ -331,9 +279,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.objectField( "child", b3 -> b3
 											.field( "includedInTypeBridge", "updatedValue" )
 									)
-							)
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", null )
 							)
 					)
 					.preparedThenExecuted();
@@ -361,6 +306,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 	@Test
 	public void indirectAssociationUpdate_propertyBridge() {
+		SessionFactory sessionFactory = setupWithPropertyBridge();
+
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -381,12 +328,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
-							.objectField( "typeBridge", b2 -> b2
-									.field( "directField", null )
-									.objectField( "child", b3 -> b3
-											.field( "includedInTypeBridge", null )
-									)
-							)
 							.objectField( "propertyBridge", b2 -> b2
 									.field( "includedInPropertyBridge", null )
 							)
@@ -409,12 +350,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
-							.objectField( "typeBridge", b2 -> b2
-									.field( "directField", null )
-									.objectField( "child", b3 -> b3
-											.field( "includedInTypeBridge", null )
-									)
-							)
 							.objectField( "propertyBridge", b2 -> b2
 									.field( "includedInPropertyBridge", "initialValue" )
 							)
@@ -438,12 +373,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
-							.objectField( "typeBridge", b2 -> b2
-									.field( "directField", null )
-									.objectField( "child", b3 -> b3
-											.field( "includedInTypeBridge", null )
-									)
-							)
 							.objectField( "propertyBridge", b2 -> b2
 									.field( "includedInPropertyBridge", "updatedValue" )
 							)
@@ -476,12 +405,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
-							.objectField( "typeBridge", b2 -> b2
-									.field( "directField", null )
-									.objectField( "child", b3 -> b3
-											.field( "includedInTypeBridge", null )
-									)
-							)
 							.objectField( "propertyBridge", b2 -> b2
 									.field( "includedInPropertyBridge", null )
 							)
@@ -494,6 +417,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2496")
 	public void indirectValueUpdate_propertyBridge() {
+		SessionFactory sessionFactory = setupWithPropertyBridge();
+
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -528,12 +453,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
-							.objectField( "typeBridge", b2 -> b2
-									.field( "directField", null )
-									.objectField( "child", b3 -> b3
-											.field( "includedInTypeBridge", null )
-									)
-							)
 							.objectField( "propertyBridge", b2 -> b2
 									.field( "includedInPropertyBridge", "initialValue" )
 							)
@@ -549,12 +468,6 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
-							.objectField( "typeBridge", b2 -> b2
-									.field( "directField", null )
-									.objectField( "child", b3 -> b3
-											.field( "includedInTypeBridge", null )
-									)
-							)
 							.objectField( "propertyBridge", b2 -> b2
 									.field( "includedInPropertyBridge", "updatedValue" )
 							)
@@ -585,6 +498,64 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	protected abstract Class<? extends TypeBridge> getContainingEntityTypeBridgeClass();
 
 	protected abstract Class<? extends PropertyBridge> getContainingEntityPropertyBridgeClass();
+
+	private SessionFactory setupWithTypeBridge() {
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+				.objectField( "typeBridge", b2 -> b2
+						.field( "directField", String.class )
+						.objectField( "child", b3 -> b3
+								.field( "includedInTypeBridge", String.class )
+						)
+				)
+		);
+
+		SessionFactory sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						new HibernateOrmSearchMappingConfigurer() {
+							@Override
+							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+								context.programmaticMapping().type( ContainingEntity.class )
+										.bridge( getContainingEntityTypeBridgeClass() );
+							}
+						}
+				)
+				.setup(
+						IndexedEntity.class,
+						ContainedEntity.class
+				);
+		backendMock.verifyExpectationsMet();
+
+		return sessionFactory;
+	}
+
+	private SessionFactory setupWithPropertyBridge() {
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+				.objectField( "propertyBridge", b2 -> b2
+						.field( "includedInPropertyBridge", String.class )
+				)
+		);
+
+		SessionFactory sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						new HibernateOrmSearchMappingConfigurer() {
+							@Override
+							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+								context.programmaticMapping().type( ContainingEntity.class )
+										.property( "child" )
+										.bridge( getContainingEntityPropertyBridgeClass() );
+							}
+						}
+				)
+				.setup(
+						IndexedEntity.class,
+						ContainedEntity.class
+				);
+		backendMock.verifyExpectationsMet();
+
+		return sessionFactory;
+	}
 
 	@Entity(name = "containing")
 	public static class ContainingEntity {
