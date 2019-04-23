@@ -172,7 +172,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 				 */
 				PojoIndexingDependencyCollectorTypeNode<?> lastTypeNode = parentNode.getParentNode();
 				for ( PojoModelPathValueNode path : derivedFrom ) {
-					applyPath( lastTypeNode, path ).doCollectDependency( initialNodeCollectingDependency );
+					doCollectDependency( initialNodeCollectingDependency, lastTypeNode, path );
 				}
 			}
 		}
@@ -357,22 +357,27 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		return parentBuilder.property( propertyName );
 	}
 
-	private PojoIndexingDependencyCollectorValueNode<?, ?> applyPath(
+	private PojoIndexingDependencyCollectorValueNode<?, ?> doCollectDependency(
+			PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency,
 			PojoIndexingDependencyCollectorTypeNode<?> rootCollectorTypeNode,
 			PojoModelPathValueNode unboundPath) {
 		PojoIndexingDependencyCollectorPropertyNode<?, ?> propertyCollectorNode =
-				applyPath( rootCollectorTypeNode, unboundPath.getParent() );
+				doCollectDependency( initialNodeCollectingDependency, rootCollectorTypeNode, unboundPath.getParent() );
 		ContainerExtractorPath extractorPath = unboundPath.getExtractorPath();
-		return propertyCollectorNode.value( extractorPath );
+		PojoIndexingDependencyCollectorValueNode<?, ?> result = propertyCollectorNode.value( extractorPath );
+		result.doCollectDependency( initialNodeCollectingDependency );
+		return result;
 	}
 
-	private PojoIndexingDependencyCollectorPropertyNode<?, ?> applyPath(
+	private PojoIndexingDependencyCollectorPropertyNode<?, ?> doCollectDependency(
+			PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency,
 			PojoIndexingDependencyCollectorTypeNode<?> rootCollectorTypeNode,
 			PojoModelPathPropertyNode unboundPath) {
 		PojoModelPathValueNode parent = unboundPath.getParent();
 		PojoIndexingDependencyCollectorTypeNode<?> parentCollectorNode;
 		if ( parent != null ) {
-			parentCollectorNode = applyPath( rootCollectorTypeNode, parent ).type();
+			parentCollectorNode = doCollectDependency( initialNodeCollectingDependency, rootCollectorTypeNode, parent )
+					.type();
 		}
 		else {
 			parentCollectorNode = rootCollectorTypeNode;
