@@ -28,6 +28,7 @@ import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -106,13 +107,13 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			ContainingEntity containingEntity1 = new ContainingEntity();
 			containingEntity1.setId( 2 );
-			entity1.setChild( containingEntity1 );
-			containingEntity1.setParent( entity1 );
+			entity1.setAssociation1( containingEntity1 );
+			containingEntity1.setAssociation1InverseSide( entity1 );
 
 			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
 			deeplyNestedContainingEntity.setId( 3 );
-			containingEntity1.setChild( deeplyNestedContainingEntity );
-			deeplyNestedContainingEntity.setParent( containingEntity1 );
+			containingEntity1.setAssociation1( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setAssociation1InverseSide( containingEntity1 );
 
 			session.persist( deeplyNestedContainingEntity );
 			session.persist( containingEntity1 );
@@ -182,7 +183,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		// Test adding a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		// Test adding a value that is too deeply nested to matter (it's out of the bridge scope)
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 6 );
@@ -228,13 +229,13 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			ContainingEntity containingEntity1 = new ContainingEntity();
 			containingEntity1.setId( 2 );
-			entity1.setChild( containingEntity1 );
-			containingEntity1.setParent( entity1 );
+			entity1.setAssociation1( containingEntity1 );
+			containingEntity1.setAssociation1InverseSide( entity1 );
 
 			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
 			deeplyNestedContainingEntity.setId( 3 );
-			containingEntity1.setChild( deeplyNestedContainingEntity );
-			deeplyNestedContainingEntity.setParent( containingEntity1 );
+			containingEntity1.setAssociation1( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setAssociation1InverseSide( containingEntity1 );
 
 			ContainedEntity containedEntity1 = new ContainedEntity();
 			containedEntity1.setId( 4 );
@@ -294,7 +295,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		// Test updating a value that is too deeply nested to matter (it's out of the bridge scope)
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
 			containedEntity.setIncludedInTypeBridge( "updatedOutOfScopeValue" );
@@ -305,8 +306,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_propertyBridge() {
-		SessionFactory sessionFactory = setupWithPropertyBridge();
+	public void indirectAssociationUpdate_singleValuedPropertyBridge() {
+		SessionFactory sessionFactory = setupWithSingleValuedPropertyBridge();
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -314,13 +315,13 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			ContainingEntity containingEntity1 = new ContainingEntity();
 			containingEntity1.setId( 2 );
-			entity1.setChild( containingEntity1 );
-			containingEntity1.setParent( entity1 );
+			entity1.setAssociation1( containingEntity1 );
+			containingEntity1.setAssociation1InverseSide( entity1 );
 
 			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
 			deeplyNestedContainingEntity.setId( 3 );
-			containingEntity1.setChild( deeplyNestedContainingEntity );
-			deeplyNestedContainingEntity.setParent( containingEntity1 );
+			containingEntity1.setAssociation1( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setAssociation1InverseSide( containingEntity1 );
 
 			session.persist( deeplyNestedContainingEntity );
 			session.persist( containingEntity1 );
@@ -328,8 +329,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", null )
+							.objectField( "singleValuedPropertyBridge", b2 -> b2
+									.field( "includedInSingleValuedPropertyBridge", null )
 							)
 					)
 					.preparedThenExecuted();
@@ -340,7 +341,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 4 );
-			containedEntity.setIncludedInPropertyBridge( "initialValue" );
+			containedEntity.setIncludedInSingleValuedPropertyBridge( "initialValue" );
 
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			containingEntity1.setContainedSingle( containedEntity );
@@ -350,8 +351,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", "initialValue" )
+							.objectField( "singleValuedPropertyBridge", b2 -> b2
+									.field( "includedInSingleValuedPropertyBridge", "initialValue" )
 							)
 					)
 					.preparedThenExecuted();
@@ -362,7 +363,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 5 );
-			containedEntity.setIncludedInPropertyBridge( "updatedValue" );
+			containedEntity.setIncludedInSingleValuedPropertyBridge( "updatedValue" );
 
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			containingEntity1.getContainedSingle().getContainingAsSingle().clear();
@@ -373,19 +374,19 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", "updatedValue" )
+							.objectField( "singleValuedPropertyBridge", b2 -> b2
+									.field( "includedInSingleValuedPropertyBridge", "updatedValue" )
 							)
 					)
 					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
-		// Test adding a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		// Test adding a value that is too deeply nested to matter (it's out of the bridge scope)
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 6 );
-			containedEntity.setIncludedInPropertyBridge( "outOfScopeValue" );
+			containedEntity.setIncludedInSingleValuedPropertyBridge( "outOfScopeValue" );
 
 			ContainingEntity deeplyNestedContainingEntity1 = session.get( ContainingEntity.class, 3 );
 			deeplyNestedContainingEntity1.setContainedSingle( containedEntity );
@@ -405,8 +406,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", null )
+							.objectField( "singleValuedPropertyBridge", b2 -> b2
+									.field( "includedInSingleValuedPropertyBridge", null )
 							)
 					)
 					.preparedThenExecuted();
@@ -416,8 +417,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2496")
-	public void indirectValueUpdate_propertyBridge() {
-		SessionFactory sessionFactory = setupWithPropertyBridge();
+	public void indirectValueUpdate_singleValuedPropertyBridge() {
+		SessionFactory sessionFactory = setupWithSingleValuedPropertyBridge();
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -425,23 +426,23 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			ContainingEntity containingEntity1 = new ContainingEntity();
 			containingEntity1.setId( 2 );
-			entity1.setChild( containingEntity1 );
-			containingEntity1.setParent( entity1 );
+			entity1.setAssociation1( containingEntity1 );
+			containingEntity1.setAssociation1InverseSide( entity1 );
 
 			ContainingEntity deeplyNestedContainingEntity = new ContainingEntity();
 			deeplyNestedContainingEntity.setId( 3 );
-			containingEntity1.setChild( deeplyNestedContainingEntity );
-			deeplyNestedContainingEntity.setParent( containingEntity1 );
+			containingEntity1.setAssociation1( deeplyNestedContainingEntity );
+			deeplyNestedContainingEntity.setAssociation1InverseSide( containingEntity1 );
 
 			ContainedEntity containedEntity1 = new ContainedEntity();
 			containedEntity1.setId( 4 );
-			containedEntity1.setIncludedInPropertyBridge( "initialValue" );
+			containedEntity1.setIncludedInSingleValuedPropertyBridge( "initialValue" );
 			containingEntity1.setContainedSingle( containedEntity1 );
 			containedEntity1.getContainingAsSingle().add( containingEntity1 );
 
 			ContainedEntity containedEntity2 = new ContainedEntity();
 			containedEntity2.setId( 5 );
-			containedEntity2.setIncludedInPropertyBridge( "initialOutOfScopeValue" );
+			containedEntity2.setIncludedInSingleValuedPropertyBridge( "initialOutOfScopeValue" );
 			deeplyNestedContainingEntity.setContainedSingle( containedEntity2 );
 			containedEntity2.getContainingAsSingle().add( deeplyNestedContainingEntity );
 
@@ -453,8 +454,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", "initialValue" )
+							.objectField( "singleValuedPropertyBridge", b2 -> b2
+									.field( "includedInSingleValuedPropertyBridge", "initialValue" )
 							)
 					)
 					.preparedThenExecuted();
@@ -464,12 +465,12 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		// Test updating the value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
-			containedEntity.setIncludedInPropertyBridge( "updatedValue" );
+			containedEntity.setIncludedInSingleValuedPropertyBridge( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> b
-							.objectField( "propertyBridge", b2 -> b2
-									.field( "includedInPropertyBridge", "updatedValue" )
+							.objectField( "singleValuedPropertyBridge", b2 -> b2
+									.field( "includedInSingleValuedPropertyBridge", "updatedValue" )
 							)
 					)
 					.preparedThenExecuted();
@@ -485,19 +486,149 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		// Test updating a value that is too deeply nested to matter (it's out of the bridge scope)
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
-			containedEntity.setIncludedInPropertyBridge( "updatedOutOfScopeValue" );
+			containedEntity.setIncludedInSingleValuedPropertyBridge( "updatedOutOfScopeValue" );
 
 			// Do not expect any work
 		} );
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void directAssociationUpdate_multiValuedPropertyBridge() {
+		SessionFactory sessionFactory = setupWithMultiValuedPropertyBridge();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.objectField( "multiValuedPropertyBridge", b2 -> b2
+									.field( "includedInMultiValuedPropertyBridge", null )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainingEntity containingEntity1 = new ContainingEntity();
+			containingEntity1.setId( 2 );
+			entity1.getAssociation2().add( containingEntity1 );
+			containingEntity1.setAssociation2InverseSide( entity1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 3 );
+			containedEntity.setIncludedInMultiValuedPropertyBridge( "value1" );
+			containingEntity1.setContainedSingle( containedEntity );
+			containedEntity.getContainingAsSingle().add( containingEntity1 );
+
+			session.persist( containingEntity1 );
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "multiValuedPropertyBridge", b2 -> b2
+									.field( "includedInMultiValuedPropertyBridge", "value1" )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a second value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainingEntity containingEntity2 = new ContainingEntity();
+			containingEntity2.setId( 4 );
+			entity1.getAssociation2().add( containingEntity2 );
+			containingEntity2.setAssociation2InverseSide( entity1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 5 );
+			containedEntity.setIncludedInMultiValuedPropertyBridge( "value2" );
+			containingEntity2.setContainedSingle( containedEntity );
+			containedEntity.getContainingAsSingle().add( containingEntity2 );
+
+			session.persist( containingEntity2 );
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "multiValuedPropertyBridge", b2 -> b2
+									.field( "includedInMultiValuedPropertyBridge", "value1 value2" )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			ContainingEntity containingEntity3 = new ContainingEntity();
+			containingEntity3.setId( 6 );
+			for ( ContainingEntity containingEntity : entity1.getAssociation2() ) {
+				containingEntity.setAssociation2InverseSide( null );
+			}
+			entity1.getAssociation2().clear();
+			entity1.getAssociation2().add( containingEntity3 );
+			containingEntity3.setAssociation2InverseSide( entity1 );
+
+			ContainedEntity containedEntity = new ContainedEntity();
+			containedEntity.setId( 7 );
+			containedEntity.setIncludedInMultiValuedPropertyBridge( "updatedValue" );
+			containingEntity3.setContainedSingle( containedEntity );
+			containedEntity.getContainingAsSingle().add( containingEntity3 );
+
+			session.persist( containingEntity3 );
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "multiValuedPropertyBridge", b2 -> b2
+									.field( "includedInMultiValuedPropertyBridge", "updatedValue" )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			for ( ContainingEntity containingEntity : entity1.getAssociation2() ) {
+				containingEntity.setAssociation2InverseSide( null );
+			}
+			entity1.getAssociation2().clear();
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.objectField( "multiValuedPropertyBridge", b2 -> b2
+									.field( "includedInMultiValuedPropertyBridge", null )
+							)
+					)
+					.preparedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	protected abstract Class<? extends TypeBridge> getContainingEntityTypeBridgeClass();
 
-	protected abstract Class<? extends PropertyBridge> getContainingEntityPropertyBridgeClass();
+	protected abstract Class<? extends PropertyBridge> getContainingEntitySingleValuedPropertyBridgeClass();
+
+	protected abstract Class<? extends PropertyBridge> getContainingEntityMultiValuedPropertyBridgeClass();
 
 	private SessionFactory setupWithTypeBridge() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
@@ -529,10 +660,10 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		return sessionFactory;
 	}
 
-	private SessionFactory setupWithPropertyBridge() {
+	private SessionFactory setupWithSingleValuedPropertyBridge() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
-				.objectField( "propertyBridge", b2 -> b2
-						.field( "includedInPropertyBridge", String.class )
+				.objectField( "singleValuedPropertyBridge", b2 -> b2
+						.field( "includedInSingleValuedPropertyBridge", String.class )
 				)
 		);
 
@@ -543,8 +674,43 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 							@Override
 							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
 								context.programmaticMapping().type( ContainingEntity.class )
-										.property( "child" )
-										.bridge( getContainingEntityPropertyBridgeClass() );
+										.property( "association1" )
+										.bridge( getContainingEntitySingleValuedPropertyBridgeClass() );
+							}
+						}
+				)
+				.setup(
+						IndexedEntity.class,
+						ContainedEntity.class
+				);
+		backendMock.verifyExpectationsMet();
+
+		return sessionFactory;
+	}
+
+	private SessionFactory setupWithMultiValuedPropertyBridge() {
+		Class<? extends PropertyBridge> bridgeClass = getContainingEntityMultiValuedPropertyBridgeClass();
+
+		Assume.assumeTrue(
+				"Multi-valued property bridges must be supported",
+				bridgeClass != null
+		);
+
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+				.objectField( "multiValuedPropertyBridge", b2 -> b2
+						.field( "includedInMultiValuedPropertyBridge", String.class )
+				)
+		);
+
+		SessionFactory sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						new HibernateOrmSearchMappingConfigurer() {
+							@Override
+							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+								context.programmaticMapping().type( ContainingEntity.class )
+										.property( "association2" )
+										.bridge( bridgeClass );
 							}
 						}
 				)
@@ -564,10 +730,16 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		private Integer id;
 
 		@OneToOne
-		private ContainingEntity parent;
+		private ContainingEntity association1InverseSide;
 
-		@OneToOne(mappedBy = "parent")
-		private ContainingEntity child;
+		@OneToOne(mappedBy = "association1InverseSide")
+		private ContainingEntity association1;
+
+		@ManyToOne
+		private ContainingEntity association2InverseSide;
+
+		@OneToMany(mappedBy = "association2InverseSide")
+		private List<ContainingEntity> association2;
 
 		@ManyToOne
 		private ContainedEntity containedSingle;
@@ -583,20 +755,32 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			this.id = id;
 		}
 
-		public ContainingEntity getParent() {
-			return parent;
+		public ContainingEntity getAssociation1InverseSide() {
+			return association1InverseSide;
 		}
 
-		public void setParent(ContainingEntity parent) {
-			this.parent = parent;
+		public void setAssociation1InverseSide(ContainingEntity association1InverseSide) {
+			this.association1InverseSide = association1InverseSide;
 		}
 
-		public ContainingEntity getChild() {
-			return child;
+		public ContainingEntity getAssociation1() {
+			return association1;
 		}
 
-		public void setChild(ContainingEntity child) {
-			this.child = child;
+		public void setAssociation1(ContainingEntity association1) {
+			this.association1 = association1;
+		}
+
+		public ContainingEntity getAssociation2InverseSide() {
+			return association2InverseSide;
+		}
+
+		public void setAssociation2InverseSide(ContainingEntity association2InverseSide) {
+			this.association2InverseSide = association2InverseSide;
+		}
+
+		public List<ContainingEntity> getAssociation2() {
+			return association2;
 		}
 
 		public ContainedEntity getContainedSingle() {
@@ -637,7 +821,10 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		private String includedInTypeBridge;
 
 		@Basic
-		private String includedInPropertyBridge;
+		private String includedInSingleValuedPropertyBridge;
+
+		@Basic
+		private String includedInMultiValuedPropertyBridge;
 
 		@Basic
 		private String excludedFromAll;
@@ -662,12 +849,20 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			this.includedInTypeBridge = includedInTypeBridge;
 		}
 
-		public String getIncludedInPropertyBridge() {
-			return includedInPropertyBridge;
+		public String getIncludedInSingleValuedPropertyBridge() {
+			return includedInSingleValuedPropertyBridge;
 		}
 
-		public void setIncludedInPropertyBridge(String includedInPropertyBridge) {
-			this.includedInPropertyBridge = includedInPropertyBridge;
+		public void setIncludedInSingleValuedPropertyBridge(String includedInSingleValuedPropertyBridge) {
+			this.includedInSingleValuedPropertyBridge = includedInSingleValuedPropertyBridge;
+		}
+
+		public String getIncludedInMultiValuedPropertyBridge() {
+			return includedInMultiValuedPropertyBridge;
+		}
+
+		public void setIncludedInMultiValuedPropertyBridge(String includedInMultiValuedPropertyBridge) {
+			this.includedInMultiValuedPropertyBridge = includedInMultiValuedPropertyBridge;
 		}
 
 		public String getExcludedFromAll() {

@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -32,8 +35,13 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 	}
 
 	@Override
-	protected Class<? extends PropertyBridge> getContainingEntityPropertyBridgeClass() {
-		return ContainingEntityPropertyBridge.class;
+	protected Class<? extends PropertyBridge> getContainingEntitySingleValuedPropertyBridgeClass() {
+		return ContainingEntitySingleValuedPropertyBridge.class;
+	}
+
+	@Override
+	protected Class<? extends PropertyBridge> getContainingEntityMultiValuedPropertyBridgeClass() {
+		return ContainingEntityMultiValuedPropertyBridge.class;
 	}
 
 	public static class ContainingEntityTypeBridge implements TypeBridge {
@@ -47,7 +55,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		public void bind(TypeBridgeBindingContext context) {
 			context.getDependencies()
 					.use( "directField" )
-					.use( "child.containedSingle.includedInTypeBridge" );
+					.use( "association1.containedSingle.includedInTypeBridge" );
 
 			IndexSchemaObjectField typeBridgeObjectField = context.getIndexSchemaElement().objectField( "typeBridge" );
 			typeBridgeObjectFieldReference = typeBridgeObjectField.toReference();
@@ -71,7 +79,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 					castedBridgedElement.getDirectField()
 			);
 
-			ContainingEntity child = castedBridgedElement.getChild();
+			ContainingEntity child = castedBridgedElement.getAssociation1();
 			DocumentElement childObjectField = typeBridgeObjectField.addObject( childObjectFieldReference );
 
 			ContainedEntity containedSingle = child == null ? null : child.getContainedSingle();
@@ -82,7 +90,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 	}
 
-	public static class ContainingEntityPropertyBridge implements PropertyBridge {
+	public static class ContainingEntitySingleValuedPropertyBridge implements PropertyBridge {
 
 		private IndexObjectFieldReference propertyBridgeObjectFieldReference;
 		private IndexFieldReference<String> includedInPropertyBridgeFieldReference;
@@ -90,12 +98,12 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		@Override
 		public void bind(PropertyBridgeBindingContext context) {
 			context.getDependencies()
-					.use( "containedSingle.includedInPropertyBridge" );
+					.use( "containedSingle.includedInSingleValuedPropertyBridge" );
 
-			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "propertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "singleValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
-					"includedInPropertyBridge", f -> f.asString()
+					"includedInSingleValuedPropertyBridge", f -> f.asString()
 			)
 					.toReference();
 		}
@@ -109,7 +117,48 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 			ContainedEntity containedSingle = castedBridgedElement == null ? null : castedBridgedElement.getContainedSingle();
 			propertyBridgeObjectField.addValue(
 					includedInPropertyBridgeFieldReference,
-					containedSingle == null ? null : containedSingle.getIncludedInPropertyBridge()
+					containedSingle == null ? null : containedSingle.getIncludedInSingleValuedPropertyBridge()
+			);
+		}
+	}
+
+	public static class ContainingEntityMultiValuedPropertyBridge implements PropertyBridge {
+
+		private IndexObjectFieldReference propertyBridgeObjectFieldReference;
+		private IndexFieldReference<String> includedInPropertyBridgeFieldReference;
+
+		@Override
+		public void bind(PropertyBridgeBindingContext context) {
+			context.getDependencies()
+					.use( "containedSingle.includedInMultiValuedPropertyBridge" );
+
+			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "multiValuedPropertyBridge" );
+			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
+			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
+					"includedInMultiValuedPropertyBridge", f -> f.asString()
+			)
+					.toReference();
+		}
+
+		@Override
+		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
+			List<ContainingEntity> castedBridgedElement = (List<ContainingEntity>) bridgedElement;
+
+			DocumentElement propertyBridgeObjectField = target.addObject( propertyBridgeObjectFieldReference );
+
+			String concatenatedValue;
+			if ( castedBridgedElement == null || castedBridgedElement.isEmpty() ) {
+				concatenatedValue = null;
+			}
+			else {
+				concatenatedValue = castedBridgedElement.stream()
+						.map( ContainingEntity::getContainedSingle )
+						.map( ContainedEntity::getIncludedInMultiValuedPropertyBridge )
+						.collect( Collectors.joining( " " ) );
+			}
+			propertyBridgeObjectField.addValue(
+					includedInPropertyBridgeFieldReference,
+					concatenatedValue
 			);
 		}
 	}
