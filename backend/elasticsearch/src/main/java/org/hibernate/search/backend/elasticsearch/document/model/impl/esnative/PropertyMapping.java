@@ -33,8 +33,6 @@ public class PropertyMapping extends AbstractTypeMapping {
 	 * Attributes common to multiple datatypes
 	 */
 
-	private Float boost;
-
 	private Boolean index;
 
 	private Boolean norms;
@@ -101,14 +99,6 @@ public class PropertyMapping extends AbstractTypeMapping {
 
 	public void setFormat(List<String> format) {
 		this.format = format;
-	}
-
-	public Float getBoost() {
-		return boost;
-	}
-
-	public void setBoost(Float boost) {
-		this.boost = boost;
 	}
 
 	public Boolean getIndex() {
