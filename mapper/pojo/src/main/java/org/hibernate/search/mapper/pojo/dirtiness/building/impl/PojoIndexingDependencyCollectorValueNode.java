@@ -70,11 +70,6 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexing
 	 */
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode;
-	/**
-	 * The path to this node from the root node,
-	 * i.e. from the node representing the type for which dependencies are being collected.
-	 */
-	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode;
 
 	private final ReindexOnUpdate reindexOnUpdate;
 	private final Set<PojoModelPathValueNode> derivedFrom;
@@ -87,7 +82,6 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexing
 			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode,
 			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode,
-			BoundPojoModelPathValueNode<?, P, V> modelPathFromRootEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.parentNode = parentNode;
@@ -96,7 +90,6 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexing
 		this.unboundModelPathFromLastTypeNode = modelPathFromLastTypeNode.toUnboundPath();
 		this.lastEntityNode = lastEntityNode;
 		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
-		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
 
 		BoundPojoModelPathValueNode<?, P, V> modelPathValueNode = modelPathFromLastTypeNode;
 		BoundPojoModelPathPropertyNode<?, P> modelPathPropertyNode = modelPathFromLastTypeNode.getParent();
@@ -118,7 +111,6 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexing
 		return new PojoIndexingDependencyCollectorTypeNode<>(
 				this,
 				lastEntityNode, modelPathFromLastEntityNode.type(),
-				modelPathFromRootEntityNode.type(),
 				buildingHelper
 		);
 	}
@@ -195,11 +187,11 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexing
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode) {
 		PojoTypeModel<?> inverseSideEntityType = inverseSideEntityTypeNodeBuilder.getTypeModel();
 		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.getRawType();
-		PojoTypeModel<V> expectedInverseSideEntityType = modelPathFromRootEntityNode.type().getTypeModel();
+		PojoTypeModel<V> expectedInverseSideEntityType = modelPathFromLastEntityNode.type().getTypeModel();
 		PojoRawTypeModel<?> expectedInverseSideEntityRawType = expectedInverseSideEntityType.getRawType();
 		if ( !inverseSideRawEntityType.isSubTypeOf( expectedInverseSideEntityRawType ) ) {
 			throw new AssertionFailure(
-					"Error while building the automatic reindexing resolver at path " + modelPathFromRootEntityNode
+					"Error while building the automatic reindexing resolver at path " + modelPathFromLastEntityNode
 							+ ": the dependency collector was passed a resolver builder with incorrect type; "
 							+ " got " + inverseSideRawEntityType + ", but a subtype of " + expectedInverseSideEntityRawType
 							+ " was expected."
