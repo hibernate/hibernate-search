@@ -22,13 +22,15 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, LuceneTextFieldCodec<F>> {
 
 	private final Analyzer analyzerOrNormalizer;
+	private final Analyzer analyzer;
+	private final Analyzer normalizer;
 
-	public LuceneTextFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter,
-			ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
-			LuceneTextFieldCodec<F> codec,
-			Analyzer analyzerOrNormalizer) {
+	public LuceneTextFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			LuceneTextFieldCodec<F> codec, Analyzer analyzerOrNormalizer, Analyzer analyzer, Analyzer normalizer) {
 		super( converter, rawConverter, codec );
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
+		this.analyzer = analyzer;
+		this.normalizer = normalizer;
 	}
 
 	@Override
@@ -72,6 +74,6 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 		}
 
 		LuceneTextFieldPredicateBuilderFactory castedOther = (LuceneTextFieldPredicateBuilderFactory) other;
-		return Objects.equals( analyzerOrNormalizer, castedOther.analyzerOrNormalizer );
+		return Objects.equals( analyzer, castedOther.analyzer ) && Objects.equals( normalizer, castedOther.normalizer );
 	}
 }
