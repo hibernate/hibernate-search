@@ -246,7 +246,11 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			}
 		}
 		else if ( org.hibernate.mapping.Collection.class.isAssignableFrom( valueClass ) ) {
-			if ( extractorPath.isEmpty() ) {
+			if ( extractorPath.isEmpty() && !isWholePath ) {
+				/*
+				 * We only allow an empty extractor path for a collection at the very end of the path,
+				 * meaning "reindex whenever that collection changes, we don't really care about the values".
+				 */
 				throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), propertyNode, null );
 			}
 
@@ -262,7 +266,9 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			do {
 				collectionValue = (org.hibernate.mapping.Collection) containedValue;
 				try {
-					containedValue = resolveContainedValue( collectionValue, extractorClassIterator.next() );
+					Class<? extends ContainerExtractor> extractorClass =
+							extractorClassIterator.hasNext() ? extractorClassIterator.next() : null;
+					containedValue = resolveContainedValue( collectionValue, extractorClass );
 				}
 				catch (SearchException e) {
 					throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), path, e );
@@ -295,26 +301,24 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 	@SuppressWarnings("rawtypes")
 	private Value resolveContainedValue(org.hibernate.mapping.Collection collectionValue,
 			Class<? extends ContainerExtractor> extractorClass) {
-		if ( BuiltinContainerExtractor.ARRAY.getType().equals( extractorClass ) ) {
-			if ( collectionValue instanceof org.hibernate.mapping.Array ) {
+		if ( collectionValue instanceof org.hibernate.mapping.Array ) {
+			if ( extractorClass == null || BuiltinContainerExtractor.ARRAY.getType().equals( extractorClass ) ) {
 				return collectionValue.getElement();
 			}
 		}
-		else if ( BuiltinContainerExtractor.MAP_VALUE.getType().equals( extractorClass ) ) {
-			if ( collectionValue instanceof org.hibernate.mapping.Map ) {
-				return collectionValue.getElement();
-			}
-		}
-		else if ( BuiltinContainerExtractor.MAP_KEY.getType().equals( extractorClass ) ) {
-			if ( collectionValue instanceof org.hibernate.mapping.Map ) {
+		else if ( collectionValue instanceof org.hibernate.mapping.Map ) {
+			if ( BuiltinContainerExtractor.MAP_KEY.getType().equals( extractorClass ) ) {
 				/*
 				 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
 				 * but the value of the foreign key to the targeted entity...
 				 */
 				return ( (org.hibernate.mapping.Map) collectionValue ).getIndex();
 			}
+			else if ( extractorClass == null || BuiltinContainerExtractor.MAP_VALUE.getType().equals( extractorClass ) ) {
+				return collectionValue.getElement();
+			}
 		}
-		else if ( BuiltinContainerExtractor.COLLECTION.getType().equals( extractorClass ) ) {
+		else if ( extractorClass == null || BuiltinContainerExtractor.COLLECTION.getType().equals( extractorClass ) ) {
 			return collectionValue.getElement();
 		}
 
