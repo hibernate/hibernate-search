@@ -38,4 +38,39 @@ public interface PojoTypeDependencyContext {
 	 */
 	PojoTypeDependencyContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue);
 
+	/**
+	 * Start the declaration of dependencies to properties of another entity,
+	 * without specifying the path to that other entity.
+	 * <p>
+	 * <strong>Note:</strong> this is only useful when the path from the bridged type to that other entity
+	 * cannot be easily represented, but the inverse path can.
+	 * For almost all use cases, this method won't be useful and calling {@link #use(String)} will be enough.
+	 *
+	 * @param otherEntityType The raw type of the other entity.
+	 * @param pathFromOtherEntityTypeToBridgedType The path from the other entity type to the bridged type,
+	 * as a String. The string is interpreted with default value extractors: see {@link PojoModelPath#parse(String)}.
+	 * Used when the other entity changes, to collect the instances that must be reindexed.
+	 * @return A context allowing to declare which properties
+	 */
+	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
+			String pathFromOtherEntityTypeToBridgedType) {
+		return fromOtherEntity( otherEntityType, PojoModelPath.parse( pathFromOtherEntityTypeToBridgedType ) );
+	}
+
+	/**
+	 * Start the declaration of dependencies to properties of another entity,
+	 * without specifying the path to that other entity.
+	 * <p>
+	 * <strong>Note:</strong> this is only useful when the path from the bridged type to that other entity
+	 * cannot be easily represented, but the inverse path can.
+	 * For almost all use cases, this method won't be useful and calling {@link #use(PojoModelPathValueNode)} will be enough.
+	 *
+	 * @param otherEntityType The raw type of the other entity.
+	 * @param pathFromOtherEntityTypeToBridgedType The path from the other entity type to the bridged type.
+	 * Used when the other entity changes, to collect the instances that must be reindexed.
+	 * @return A context allowing to declare which properties
+	 */
+	PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
+			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType);
+
 }

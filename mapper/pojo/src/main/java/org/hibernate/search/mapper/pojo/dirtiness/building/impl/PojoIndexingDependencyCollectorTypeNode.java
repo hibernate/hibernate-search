@@ -31,7 +31,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoIndexingDependencyCollectorValueNode<?, T> parentNode;
+	private final AbstractPojoIndexingDependencyCollectorValueNode parentNode;
 	/**
 	 * The path to this node from this node, i.e. a root to be used to build model paths for child nodes.
 	 */
@@ -70,6 +70,16 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 		}
 	}
 
+	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorDisjointValueNode<T> parentNode,
+			PojoRawTypeModel<T> typeModel,
+			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
+		super( buildingHelper );
+		this.parentNode = parentNode;
+		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
+		this.lastEntityNode = this;
+		this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
+	}
+
 	/*
 	 * modelPathFromCurrentNode, modelPathFromRootEntityNode and modelPathFromLastEntityNode
 	 * reference the same type, just from a different root.
@@ -82,6 +92,27 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 				(BoundPojoModelPathPropertyNode) modelPathFromCurrentNode.property( propertyName ),
 				lastEntityNode,
 				(BoundPojoModelPathPropertyNode) modelPathFromLastEntityNode.property( propertyName ),
+				buildingHelper
+		);
+	}
+
+	public PojoIndexingDependencyCollectorDisjointValueNode<?> disjointValue(
+			BoundPojoModelPathValueNode<?, ?, ?> inverseAssociationPath) {
+		if ( lastEntityNode != this ) {
+			throw new AssertionFailure( "disjointValue() called on a non-entity node" );
+		}
+
+		PojoRawTypeModel<?> inverseSideEntityTypeModel = inverseAssociationPath.getRootType().getRawType();
+		if ( !buildingHelper.isEntity( inverseAssociationPath.getRootType().getRawType() ) ) {
+			throw new AssertionFailure(
+					"Encountered a type node whose parent is a disjoint value node, but does not represent an entity type?"
+			);
+		}
+
+		return new PojoIndexingDependencyCollectorDisjointValueNode<>(
+				this,
+				inverseSideEntityTypeModel,
+				inverseAssociationPath,
 				buildingHelper
 		);
 	}
@@ -132,7 +163,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 				PojoImplicitReindexingResolverOriginalTypeNodeBuilder<?> builder =
 						buildingHelper.getOrCreateResolverBuilder( concreteEntityType )
 								.containingEntitiesResolverRoot();
-				parentNode.markForReindexingUsingAssociationInverseSide( builder, dirtyPathFromEntityType );
+				parentNode.markForReindexing( builder, dirtyPathFromEntityType );
 			}
 		}
 	}
@@ -152,7 +183,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 			for ( PojoRawTypeModel<?> concreteEntityType : valueNodeTypeConcreteEntitySubTypes ) {
 				AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseValueTypeBuilder =
 						valueNodeBuilderDelegate.type( concreteEntityType );
-				parentNode.markForReindexingUsingAssociationInverseSide(
+				parentNode.markForReindexing(
 						inverseValueTypeBuilder, dependencyPathFromInverseSideEntityTypeNode
 				);
 			}
@@ -197,5 +228,4 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 	PojoTypeModel<T> getTypeModel() {
 		return modelPathFromLastEntityNode.getTypeModel();
 	}
-
 }

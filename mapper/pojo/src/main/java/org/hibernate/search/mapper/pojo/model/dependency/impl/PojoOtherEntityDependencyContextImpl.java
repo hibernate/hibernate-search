@@ -1,0 +1,60 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.mapper.pojo.model.dependency.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorDisjointValueNode;
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorNode;
+import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoOtherEntityDependencyContext;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+
+class PojoOtherEntityDependencyContextImpl<T> implements PojoOtherEntityDependencyContext {
+	private final BoundPojoModelPath.Walker bindingPathWalker;
+	private final BoundPojoModelPathTypeNode<T> modelPath;
+	private final BoundPojoModelPathValueNode<?, ?, ?> boundPathFromOtherEntityTypeToBridgedType;
+	private final List<BoundPojoModelPathValueNode<?, ?, ?>> usedPaths = new ArrayList<>();
+
+	PojoOtherEntityDependencyContextImpl(BoundPojoModelPath.Walker bindingPathWalker,
+			BoundPojoModelPathTypeNode<T> modelPath,
+			BoundPojoModelPathValueNode<?, ?, ?> boundPathFromOtherEntityTypeToBridgedType) {
+		this.bindingPathWalker = bindingPathWalker;
+		this.modelPath = modelPath;
+		this.boundPathFromOtherEntityTypeToBridgedType = boundPathFromOtherEntityTypeToBridgedType;
+	}
+
+	@Override
+	public PojoOtherEntityDependencyContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue) {
+		BoundPojoModelPathValueNode<?, ?, ?> boundPath = PojoModelPathBinder.bind(
+				modelPath, pathFromBridgedTypeToUsedValue, bindingPathWalker
+		);
+		usedPaths.add( boundPath );
+		return this;
+	}
+
+	void contributeDependencies(PojoIndexingDependencyCollectorTypeNode<?> dependencyCollector) {
+		PojoIndexingDependencyCollectorDisjointValueNode<?> dependencyCollectorDisjointValueNode =
+				dependencyCollector.disjointValue( boundPathFromOtherEntityTypeToBridgedType );
+
+		PojoIndexingDependencyCollectorTypeNode<?> dependencyCollectorTypeNode =
+				dependencyCollectorDisjointValueNode.type();
+
+		for ( BoundPojoModelPathValueNode<?, ?, ?> usedPath : usedPaths ) {
+			PojoModelPathBinder.bind(
+					dependencyCollectorTypeNode,
+					usedPath.toUnboundPath(),
+					PojoIndexingDependencyCollectorNode.walker()
+			);
+		}
+	}
+}

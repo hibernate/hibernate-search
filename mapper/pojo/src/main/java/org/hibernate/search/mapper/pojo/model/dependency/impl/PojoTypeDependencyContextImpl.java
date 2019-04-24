@@ -12,24 +12,30 @@ import java.util.List;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoOtherEntityDependencyContext;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeDependencyContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
-public class PojoTypeDependencyContextImpl<T> implements PojoTypeDependencyContext {
+public class PojoTypeDependencyContextImpl<T> extends AbstractPojoBridgedElementDependencyContext
+		implements PojoTypeDependencyContext {
 
-	private final BoundPojoModelPath.Walker bindingPathWalker;
 	private final BoundPojoModelPathTypeNode<T> modelPath;
 	private final List<BoundPojoModelPathValueNode<?, ?, ?>> usedPaths = new ArrayList<>();
+	private final List<PojoOtherEntityDependencyContextImpl<?>> otherEntityDependencyContexts = new ArrayList<>();
 
 	public PojoTypeDependencyContextImpl(
+			PojoBootstrapIntrospector introspector,
 			ContainerExtractorBinder containerExtractorBinder,
+			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
 			PojoTypeModel<T> typeModel) {
-		this.bindingPathWalker = BoundPojoModelPath.walker( containerExtractorBinder );
+		super( introspector, containerExtractorBinder, typeAdditionalMetadataProvider );
 		this.modelPath = BoundPojoModelPath.root( typeModel );
 	}
 
@@ -42,6 +48,21 @@ public class PojoTypeDependencyContextImpl<T> implements PojoTypeDependencyConte
 		return this;
 	}
 
+	@Override
+	public PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
+			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {
+		PojoOtherEntityDependencyContextImpl<?> otherEntityDependencyContext = createOtherEntityDependencyContext(
+				modelPath.getTypeModel().getRawType(),
+				otherEntityType, pathFromOtherEntityTypeToBridgedType
+		);
+
+		// If we get here, the path is valid
+
+		otherEntityDependencyContexts.add( otherEntityDependencyContext );
+
+		return otherEntityDependencyContext;
+	}
+
 	public void contributeDependencies(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
 		for ( BoundPojoModelPathValueNode<?, ?, ?> usedPath : usedPaths ) {
 			PojoModelPathBinder.bind(
@@ -49,6 +70,9 @@ public class PojoTypeDependencyContextImpl<T> implements PojoTypeDependencyConte
 					usedPath.toUnboundPath(),
 					PojoIndexingDependencyCollectorNode.walker()
 			);
+		}
+		for ( PojoOtherEntityDependencyContextImpl<?> otherEntityDependencyContext : otherEntityDependencyContexts ) {
+			otherEntityDependencyContext.contributeDependencies( dependencyCollector );
 		}
 	}
 
