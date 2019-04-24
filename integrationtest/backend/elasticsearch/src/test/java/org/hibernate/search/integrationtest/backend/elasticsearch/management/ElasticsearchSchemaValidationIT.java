@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -128,7 +125,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 		 */
 
-		withManagementStrategyConfiguration()
+		validateSchemaConfig()
 				.withIndex(
 						INDEX1_NAME,
 						ctx -> {
@@ -181,349 +178,35 @@ public class ElasticsearchSchemaValidationIT {
 	}
 
 	@Test
-	public void rootMapping_attribute_missing() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.failure( "Invalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'null'" )
-						.build()
-		);
-	}
-
-	@Test
-	public void rootMapping_attribute_dynamic_invalid() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': false,"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.failure( "Invalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'" )
-						.build()
-		);
-	}
-
-	@Test
-	public void properties_missing() throws Exception {
+	public void attribute_field_notPresent() {
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
 				"{"
 					+ "'dynamic': 'strict',"
 					+ "'properties': {"
+							+ "'notMyField': {"
+									+ "'type': 'integer',"
+									+ "'index': true"
+							+ "}"
 					+ "}"
 				+ "}"
-				);
+		);
 
 		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
+				() -> validateSchemaConfig()
+						.withIndex(
+								INDEX1_NAME,
+								ctx -> {
+									IndexSchemaElement root = ctx.getSchemaElement();
+									root.field( "myField", f -> f.asInteger() ).toReference();
+								}
+						)
+						.setup(),
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.failure( "Missing property mapping" )
-						.build()
-		);
-	}
-
-	@Test
-	public void property_missing() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'NOTmyField': {"
-									+ "'type': 'date',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField" )
-						.failure( "Missing property mapping" )
-						.build()
-		);
-	}
-
-	@Test
-	public void property_attribute_missing() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'object'"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'type'. Expected 'DATE', actual is 'OBJECT'" )
-						.build()
-		);
-	}
-
-	@Test
-	public void property_attribute_invalid() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-									+ "'index': false"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'index'. Expected 'true', actual is 'false'" )
-						.build()
-		);
-	}
-
-	@Test
-	public void property_analyzer_invalid() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'index': true,"
-									+ "'analyzer': 'keyword'"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
-						.withIndex(
-								INDEX1_NAME,
-								ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field(
-											"myField",
-											f -> f.asString().analyzer( "default" )
-									)
-											.toReference();
-								}
-						)
-						.setup(),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'analyzer'. Expected 'default', actual is 'keyword'" )
-						.build()
-		);
-	}
-
-	@Test
-	public void property_norms_invalid() throws Exception {
-		Assume.assumeTrue( "Norms configuration is not supported yet; see HSEARCH-3048", false );
-
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'norms': false"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
-						.withIndex(
-								INDEX1_NAME,
-								ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field(
-											"myField",
-											f -> f.asString().analyzer( "default" )
-											// TODO disable norms once the APIs allow it; see HSEARCH-3048
-									)
-											.toReference();
-								}
-						)
-						.setup(),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'norms'. Expected 'true', actual is 'false'" )
-						.build()
-		);
-	}
-
-	@Test
-	public void property_format_invalidOutputFormat() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': 'epoch_millis||strict_date_time'"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
-						.withIndex(
-								INDEX1_NAME,
-								ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asLocalDate() )
-											.toReference();
-								}
-						)
-						.setup(),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField" )
-						.failure(
-								"The output format (the first format in the 'format' attribute) is invalid. Expected '"
-										+ elasticSearchClient.getDialect().getFirstLocalDateDefaultMappingFormat()
-										+ "', actual is 'epoch_millis'"
-						)
-						.build()
-		);
-	}
-
-	@Test
-	public void property_format_missingInputFormat() throws Exception {
-		String firstFormat = elasticSearchClient.getDialect().getFirstLocalDateDefaultMappingFormat();
-		List<String> nextFormats = elasticSearchClient.getDialect().getAllLocalDateDefaultMappingFormats()
-				.stream().skip( 1 ).collect( Collectors.toList() );
-		Assume.assumeFalse(
-				"Skipping this test as we don't have a type with multiple default formats in " + elasticSearchClient.getDialect(),
-				nextFormats.isEmpty()
-		);
-
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'keyword',"
-									+ "'index': true,"
-									+ "'store': true"
-							+ "},"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': '" + firstFormat + "'"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
-						.withIndex(
-								INDEX1_NAME,
-								ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asLocalDate() )
-											.toReference();
-								}
-						)
-						.setup(),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField" )
-						.failure(
-								"Invalid formats for attribute 'format'",
-								"missing elements are '" + nextFormats + "'"
-						)
-						.build()
-		);
-	}
-
-	@Test
-	public void property_format_unexpectedInputFormat() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "||yyyy'"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
-
-		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField" )
-						.failure(
-								"Invalid formats for attribute 'format'",
-								"unexpected elements are '[yyyy]'"
-						)
 						.build()
 		);
 	}
@@ -552,7 +235,7 @@ public class ElasticsearchSchemaValidationIT {
 				+ "}"
 				);
 
-		withManagementStrategyConfiguration()
+		validateSchemaConfig()
 				.withIndex(
 						INDEX1_NAME,
 						ctx -> {
@@ -592,7 +275,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
+				() -> validateSchemaConfig()
 						.withIndex(
 								INDEX1_NAME,
 								ctx -> {
@@ -670,7 +353,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
+				() -> validateSchemaConfig()
 						.withIndex(
 								INDEX1_NAME,
 								ctx -> {
@@ -728,7 +411,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
+				() -> validateSchemaConfig()
 						// TODO add an index with a faceted field or sub-field when APIs allow it; see HSEARCH-3465, HSEARCH-3271
 						.setup(),
 				FailureReportUtils.buildFailureReportPattern()
@@ -768,7 +451,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
+				() -> validateSchemaConfig()
 						// TODO add an index with a faceted field or sub-field when APIs allow it; see HSEARCH-3465, HSEARCH-3271
 						.setup(),
 				FailureReportUtils.buildFailureReportPattern()
@@ -811,7 +494,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
+				() -> validateSchemaConfig()
 						// TODO add an index with a faceted field or sub-field when APIs allow it; see HSEARCH-3465, HSEARCH-3271
 						.setup(),
 				FailureReportUtils.buildFailureReportPattern()
@@ -833,7 +516,7 @@ public class ElasticsearchSchemaValidationIT {
 	}
 
 	private void setupSimpleIndexWithKeywordField(String indexName) {
-		withManagementStrategyConfiguration()
+		validateSchemaConfig()
 				.withIndex(
 						indexName,
 						ctx -> {
@@ -846,7 +529,7 @@ public class ElasticsearchSchemaValidationIT {
 	}
 
 	private void setupSimpleIndexWithLocalDateField(String indexName) {
-		withManagementStrategyConfiguration()
+		validateSchemaConfig()
 				.withIndex(
 						indexName,
 						ctx -> {
@@ -858,7 +541,7 @@ public class ElasticsearchSchemaValidationIT {
 				.setup();
 	}
 
-	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {
+	private SearchSetupHelper.SetupContext validateSchemaConfig() {
 		return setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
@@ -877,5 +560,4 @@ public class ElasticsearchSchemaValidationIT {
 						}
 				);
 	}
-
 }
