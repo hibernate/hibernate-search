@@ -42,11 +42,6 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 	 */
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode;
-	/**
-	 * The path to this node from the root node,
-	 * i.e. from the node representing the type for which dependencies are being collected.
-	 */
-	private final BoundPojoModelPathTypeNode<T> modelPathFromRootEntityNode;
 
 	PojoIndexingDependencyCollectorTypeNode(PojoRawTypeModel<T> typeModel,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
@@ -55,17 +50,15 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
 		this.lastEntityNode = this;
 		this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
-		this.modelPathFromRootEntityNode = modelPathFromCurrentNode;
 	}
 
 	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorValueNode<?, T> parentNode,
 			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode,
-			BoundPojoModelPathTypeNode<T> modelPathFromRootEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.parentNode = parentNode;
-		PojoTypeModel<T> typeModel = modelPathFromRootEntityNode.getTypeModel();
+		PojoTypeModel<T> typeModel = modelPathFromLastEntityNode.getTypeModel();
 		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
 		if ( buildingHelper.isEntity( typeModel.getRawType() ) ) {
 			this.lastEntityNode = this;
@@ -75,7 +68,6 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 			this.lastEntityNode = lastEntityNode;
 			this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
 		}
-		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
 	}
 
 	/*
@@ -90,7 +82,6 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 				(BoundPojoModelPathPropertyNode) modelPathFromCurrentNode.property( propertyName ),
 				lastEntityNode,
 				(BoundPojoModelPathPropertyNode) modelPathFromLastEntityNode.property( propertyName ),
-				(BoundPojoModelPathPropertyNode) modelPathFromRootEntityNode.property( propertyName ),
 				buildingHelper
 		);
 	}
@@ -104,7 +95,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 		if ( lastEntityNode != this ) {
 			throw new AssertionFailure( "collectDependency() called on a non-entity node" );
 		}
-		PojoRawTypeModel<? super T> rawType = modelPathFromRootEntityNode.getTypeModel().getRawType();
+		PojoRawTypeModel<? super T> rawType = modelPathFromLastEntityNode.getTypeModel().getRawType();
 		if ( parentNode == null ) {
 			/*
 			 * This node represents an indexed entity (A).
@@ -204,7 +195,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 	}
 
 	PojoTypeModel<T> getTypeModel() {
-		return modelPathFromRootEntityNode.getTypeModel();
+		return modelPathFromLastEntityNode.getTypeModel();
 	}
 
 }

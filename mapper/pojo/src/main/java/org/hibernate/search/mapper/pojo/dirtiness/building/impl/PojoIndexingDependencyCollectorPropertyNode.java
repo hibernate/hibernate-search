@@ -31,24 +31,17 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 	 */
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromLastEntityNode;
-	/**
-	 * The path to this node from the root node,
-	 * i.e. from the node representing the type for which dependencies are being collected.
-	 */
-	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromRootEntityNode;
 
 	PojoIndexingDependencyCollectorPropertyNode(PojoIndexingDependencyCollectorTypeNode<T> parentNode,
 			BoundPojoModelPathPropertyNode<T, P> modelPathFromParentNode,
 			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathPropertyNode<T, P> modelPathFromLastEntityNode,
-			BoundPojoModelPathPropertyNode<T, P> modelPathFromRootEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.parentNode = parentNode;
 		this.modelPathFromParentNode = modelPathFromParentNode;
 		this.lastEntityNode = lastEntityNode;
 		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
-		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
 	}
 
 	public <V> PojoIndexingDependencyCollectorValueNode<P, V> value(
@@ -58,7 +51,6 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 				modelPathFromParentNode.value( boundExtractorPath ),
 				lastEntityNode,
 				modelPathFromLastEntityNode.value( boundExtractorPath ),
-				modelPathFromRootEntityNode.value( boundExtractorPath ),
 				buildingHelper
 		);
 	}
@@ -67,7 +59,7 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 			ContainerExtractorPath extractorPath) {
 		BoundContainerExtractorPath<P, ?> boundExtractorPath =
 				buildingHelper.getExtractorBinder().bindPath(
-						modelPathFromRootEntityNode.getPropertyModel().getTypeModel(),
+						modelPathFromLastEntityNode.getPropertyModel().getTypeModel(),
 						extractorPath
 				);
 		return value( boundExtractorPath );
