@@ -538,8 +538,6 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 					? DEFAULT_DATE_FORMAT : Collections.emptyList();
 			validateFormatWithDefault( errorCollector, "format", expectedMapping.getFormat(), actualMapping.getFormat(), formatDefault );
 
-			validateEqualWithDefault( errorCollector, "boost", expectedMapping.getBoost(), actualMapping.getBoost(), DEFAULT_FLOAT_DELTA, 1.0f );
-
 			validateIndexOptions( errorCollector, expectedMapping, actualMapping );
 
 			Boolean expectedStore = expectedMapping.getStore();
