@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycl
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -778,6 +779,123 @@ public class ElasticsearchSchemaAttributeValidationIT {
 								// No-op
 							}
 						}
+				);
+	}
+
+	@Test
+	public void attribute_normalizer_valid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+				"index.analysis",
+				"{"
+					+ "'normalizer': {"
+							+ "'custom-normalizer': {"
+									+ "'char_filter': ['custom-char-mapping'],"
+									+ "'filter': ['custom-elision']"
+							+ "}"
+					+ "},"
+					+ "'char_filter': {"
+							+ "'custom-char-mapping': {"
+									+ "'type': 'mapping',"
+									+ "'mappings': ['foo => bar']"
+							+ "}"
+					+ "},"
+					+ "'filter': {"
+							+ "'custom-elision': {"
+									+ "'type': 'elision',"
+									+ "'articles': ['l', 'd']"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
+									+ "'normalizer': 'custom-normalizer'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaWithAnalyzerConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asString().normalizer( "custom-normalizer" ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void attribute_normalizer_invalid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+				"index.analysis",
+				"{"
+					+ "'normalizer': {"
+							+ "'custom-normalizer': {"
+									+ "'char_filter': ['custom-char-mapping'],"
+									+ "'filter': ['custom-elision']"
+							+ "}"
+					+ "},"
+					+ "'char_filter': {"
+							+ "'custom-char-mapping': {"
+									+ "'type': 'mapping',"
+									+ "'mappings': ['foo => bar']"
+							+ "}"
+					+ "},"
+					+ "'filter': {"
+							+ "'custom-elision': {"
+									+ "'type': 'elision',"
+									+ "'articles': ['l', 'd']"
+							+ "}"
+					+ "}"
+					+ "}"
+		);
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'keyword',"
+									+ "'index': true,"
+									+ "'normalizer': 'custom-normalizer'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		SubTest.expectException( () ->
+				validateSchemaWithAnalyzerConfig()
+						.withIndex( INDEX_NAME, ctx -> {
+									IndexSchemaElement root = ctx.getSchemaElement();
+									root.field( "myField", f -> f.asString().normalizer( "another-normalizer" ) ).toReference();
+								}
+						)
+						.setup() )
+				.assertThrown()
+				.isInstanceOf( Exception.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.indexFieldContext( "myField" )
+						.failure( "Invalid value for attribute 'normalizer'. Expected 'another-normalizer', actual is 'custom-normalizer'" )
+						.build() );
+	}
+
+	private SearchSetupHelper.SetupContext validateSchemaWithAnalyzerConfig() {
+		return setupHelper.withDefaultConfiguration( BACKEND_NAME )
+				.withIndexDefaultsProperty(
+						BACKEND_NAME,
+						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
+						ElasticsearchIndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
+				)
+				.withBackendProperty(
+						BACKEND_NAME,
+						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
+						new ElasticsearchNormalizerManagementITAnalysisConfigurer()
 				);
 	}
 }
