@@ -360,4 +360,31 @@ public interface Log extends BasicLogger {
 			value = "A PojoModelPath must include at least one property."
 	)
 	SearchException cannotDefinePojoModelPathWithoutProperty();
+
+	@Message(id = ID_OFFSET_2 + 46,
+			value = "Cannot apply the path '%2$s' to type '%1$s'."
+					+ " This path was declared as a path to collect entities of type '%3$s' to be reindexed."
+					+ " Hibernate Search needs to apply this path in order to reindex '%3$s' when '%1$s' is modified."
+					+ " Error was: '%4$s'")
+	SearchException cannotApplyExplicitInverseAssociationPath(
+			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> inverseSideTypeModel,
+			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode inverseSideAssociationPath,
+			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> originalSideTypeModel,
+			String errorMessage,
+			@Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 47,
+			value = "'fromOtherEntity' can only be used when the bridged element has an entity type,"
+					+ " but the bridged element has type '%1$s',"
+					+ " which is not an entity type.")
+	SearchException cannotDefineOtherEntityDependencyOnNonEntityBridgedType(
+			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> bridgedTypeModel);
+
+	@Message(id = ID_OFFSET_2 + 48,
+			value = "'fromOtherEntity' expects an entity type; type '%1$s' is not an entity type.")
+	SearchException cannotDefineOtherEntityDependencyFromNonEntityType(
+			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> otherType);
+
+
+
 }

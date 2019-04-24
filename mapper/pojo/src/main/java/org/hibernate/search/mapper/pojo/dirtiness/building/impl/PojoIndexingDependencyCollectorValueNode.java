@@ -16,7 +16,6 @@ import java.util.Set;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
@@ -50,7 +49,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <P> The property type
  * @param <V> The extracted value type
  */
-public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexingDependencyCollectorNode {
+public class PojoIndexingDependencyCollectorValueNode<P, V>
+		extends AbstractPojoIndexingDependencyCollectorValueNode {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -176,14 +176,8 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexing
 		return reindexOnUpdate;
 	}
 
-	/**
-	 * @param inverseSideEntityTypeNodeBuilder A type node builder representing the type of this value as viewed from the contained side.
-	 * Its type must be a subtype of the raw type of this value.
-	 * Its type must be an {@link PojoTypeAdditionalMetadata#isEntity() entity type}.
-	 * @param dependencyPathFromInverseSideEntityTypeNode The path from the given entity type node
-	 * to the property being used when reindexing.
-	 */
-	void markForReindexingUsingAssociationInverseSide(AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseSideEntityTypeNodeBuilder,
+	@Override
+	void markForReindexing(AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseSideEntityTypeNodeBuilder,
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode) {
 		PojoTypeModel<?> inverseSideEntityType = inverseSideEntityTypeNodeBuilder.getTypeModel();
 		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.getRawType();
