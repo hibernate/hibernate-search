@@ -8,15 +8,15 @@ package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
-import org.hibernate.search.mapper.pojo.model.dependency.PojoDependencyContext;
-import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeDependencyContext;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeDependencyContext;
+import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeDependencyContextImpl;
 
 public class RoutingKeyBridgeBindingContextImpl implements RoutingKeyBridgeBindingContext {
 	private final PojoModelType bridgedElement;
-	private final PojoTypeDependencyContext<?> pojoDependencyContext;
+	private final PojoTypeDependencyContextImpl pojoDependencyContext;
 
 	public RoutingKeyBridgeBindingContextImpl(PojoModelType bridgedElement,
-			PojoTypeDependencyContext<?> pojoDependencyContext) {
+			PojoTypeDependencyContextImpl pojoDependencyContext) {
 		this.bridgedElement = bridgedElement;
 		this.pojoDependencyContext = pojoDependencyContext;
 	}
@@ -27,7 +27,7 @@ public class RoutingKeyBridgeBindingContextImpl implements RoutingKeyBridgeBindi
 	}
 
 	@Override
-	public PojoDependencyContext getDependencies() {
+	public PojoTypeDependencyContext getDependencies() {
 		return pojoDependencyContext;
 	}
 }

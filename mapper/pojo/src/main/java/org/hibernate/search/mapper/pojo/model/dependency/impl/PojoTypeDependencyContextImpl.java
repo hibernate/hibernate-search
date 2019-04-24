@@ -10,55 +10,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorNode;
-import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
-import org.hibernate.search.mapper.pojo.model.dependency.PojoDependencyContext;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeDependencyContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
-public class PojoPropertyDependencyContext<P> implements PojoDependencyContext {
+public class PojoTypeDependencyContextImpl<T> implements PojoTypeDependencyContext {
 
 	private final BoundPojoModelPath.Walker bindingPathWalker;
-	private final PojoPropertyModel<P> propertyModel;
-	private final BoundPojoModelPathTypeNode<P> rootPath;
+	private final BoundPojoModelPathTypeNode<T> modelPath;
 	private final List<BoundPojoModelPathValueNode<?, ?, ?>> usedPaths = new ArrayList<>();
 
-	public PojoPropertyDependencyContext(
+	public PojoTypeDependencyContextImpl(
 			ContainerExtractorBinder containerExtractorBinder,
-			PojoPropertyModel<P> propertyModel) {
+			PojoTypeModel<T> typeModel) {
 		this.bindingPathWalker = BoundPojoModelPath.walker( containerExtractorBinder );
-		this.propertyModel = propertyModel;
-		this.rootPath = BoundPojoModelPath.root( propertyModel.getTypeModel() );
+		this.modelPath = BoundPojoModelPath.root( typeModel );
 	}
 
 	@Override
-	public PojoDependencyContext use(PojoModelPathValueNode pathFromBridgedElementToUsedValue) {
+	public PojoTypeDependencyContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue) {
 		BoundPojoModelPathValueNode<?, ?, ?> boundPath = PojoModelPathBinder.bind(
-				rootPath, pathFromBridgedElementToUsedValue, bindingPathWalker
+				modelPath, pathFromBridgedTypeToUsedValue, bindingPathWalker
 		);
 		usedPaths.add( boundPath );
 		return this;
 	}
 
-	public void contributeDependencies(PojoIndexingDependencyCollectorPropertyNode<?, P> dependencyCollector) {
-		// Always declare the value passed to the bridge as a dependency.
-		PojoIndexingDependencyCollectorValueNode<?, ?> dependencyCollectorValueNode = dependencyCollector.value(
-				BoundContainerExtractorPath.noExtractors( propertyModel.getTypeModel() )
-		);
-		dependencyCollectorValueNode.collectDependency();
-
-		PojoIndexingDependencyCollectorTypeNode<?> dependencyCollectorTypeNode =
-				dependencyCollectorValueNode.type();
+	public void contributeDependencies(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
 		for ( BoundPojoModelPathValueNode<?, ?, ?> usedPath : usedPaths ) {
 			PojoModelPathBinder.bind(
-					dependencyCollectorTypeNode,
+					dependencyCollector,
 					usedPath.toUnboundPath(),
 					PojoIndexingDependencyCollectorNode.walker()
 			);

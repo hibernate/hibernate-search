@@ -63,7 +63,7 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 		);
 	}
 
-	PojoIndexingDependencyCollectorValueNode<P, ?> value(
+	public PojoIndexingDependencyCollectorValueNode<P, ?> value(
 			ContainerExtractorPath extractorPath) {
 		BoundContainerExtractorPath<P, ?> boundExtractorPath =
 				buildingHelper.getExtractorBinder().bindPath(
