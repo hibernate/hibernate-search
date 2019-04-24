@@ -222,7 +222,7 @@ public interface Log extends BasicLogger {
 					+ " This path was resolved as the inverse side of the association '%4$s' on type '%3$s'."
 					+ " Hibernate Search needs to apply this path in order to reindex '%3$s' when '%1$s' is modified."
 					+ " Error was: '%5$s'")
-	SearchException cannotApplyInvertAssociationPath(
+	SearchException cannotApplyImplicitInverseAssociationPath(
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> inverseSideTypeModel,
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode inverseSideAssociationPath,
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> originalSideTypeModel,

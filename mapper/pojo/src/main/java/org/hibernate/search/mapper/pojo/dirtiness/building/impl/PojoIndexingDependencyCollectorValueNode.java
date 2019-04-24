@@ -191,7 +191,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexing
 	 * @param dependencyPathFromInverseSideEntityTypeNode The path from the given entity type node
 	 * to the property being used when reindexing.
 	 */
-	void markForReindexing(AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseSideEntityTypeNodeBuilder,
+	void markForReindexingUsingAssociationInverseSide(AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseSideEntityTypeNodeBuilder,
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode) {
 		PojoTypeModel<?> inverseSideEntityType = inverseSideEntityTypeNodeBuilder.getTypeModel();
 		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.getRawType();
@@ -210,7 +210,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexing
 		Map<PojoRawTypeModel<?>, PojoModelPathValueNode> inverseAssociationsPaths =
 				getInverseAssociationPathByConcreteEntityType( inverseSideEntityTypeNodeBuilder.getTypeModel() );
 		for ( Map.Entry<PojoRawTypeModel<?>, PojoModelPathValueNode> entry : inverseAssociationsPaths.entrySet() ) {
-			markForReindexingWithOriginalSideConcreteType(
+			markForReindexingUsingAssociationInverseSideWithOriginalSideConcreteType(
 					entry.getKey(), inverseSideEntityTypeNodeBuilder, entry.getValue(),
 					dependencyPathFromInverseSideEntityTypeNode
 			);
@@ -259,7 +259,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexing
 		return result;
 	}
 
-	private void markForReindexingWithOriginalSideConcreteType(PojoTypeModel<?> originalSideConcreteEntityType,
+	private void markForReindexingUsingAssociationInverseSideWithOriginalSideConcreteType(PojoTypeModel<?> originalSideConcreteEntityType,
 			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> typeNodeBuilder,
 			PojoModelPathValueNode inverseAssociationPath,
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode) {
@@ -276,64 +276,25 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends PojoIndexing
 					typeNodeBuilder, inverseAssociationPath, PojoImplicitReindexingResolverBuilder.walker()
 			);
 
-			/*
-			 * The entities to reindex will always be instances of both the entity type on the original side
-			 * (because that's the one we want to reindex)
-			 * and the type targeted by the inverse side of the association
-			 * (because that's all we will ever retrieve at runtime).
-			 * Thus we will only consider the most specific type of the two when resolving entities to reindex.
-			 */
-			PojoRawTypeModel<?> valueNodeRawType = valueNodeBuilderDelegate.getTypeModel().getRawType();
-			if ( valueNodeRawType.isSubTypeOf( originalSideRawConcreteEntityType ) ) {
-				valueNodeTypeConcreteEntitySubTypes =
-						buildingHelper.getConcreteEntitySubTypesForEntitySuperType( valueNodeRawType );
-			}
-			else if ( originalSideRawConcreteEntityType.isSubTypeOf( valueNodeRawType ) ) {
-				valueNodeTypeConcreteEntitySubTypes =
-						buildingHelper.getConcreteEntitySubTypesForEntitySuperType( originalSideRawConcreteEntityType );
-			}
-			else {
-				throw log.incorrectTargetTypeForInverseAssociation( valueNodeRawType, originalSideRawConcreteEntityType );
-			}
+			PojoRawTypeModel<?> inverseSideRawType = valueNodeBuilderDelegate.getTypeModel().getRawType();
+			valueNodeTypeConcreteEntitySubTypes = lastEntityNode.getConcreteEntitySubTypesForTypeToReindex(
+					originalSideRawConcreteEntityType, inverseSideRawType
+			);
 		}
 		// Note: this should catch errors related to properties not found, among others.
 		catch (RuntimeException e) {
-			throw log.cannotApplyInvertAssociationPath(
+			throw log.cannotApplyImplicitInverseAssociationPath(
 					inverseSideRawEntityType, inverseAssociationPath,
 					originalSideRawConcreteEntityType, modelPathFromLastEntityNode.toUnboundPath(),
 					e.getMessage(), e
 			);
 		}
 
-		// Recurse if necessary
-		PojoIndexingDependencyCollectorValueNode<?, ?> entityNodeParentValueNode = lastEntityNode.getParentNode();
-		if ( entityNodeParentValueNode != null ) {
-			/*
-			 * We did not reach the indexed type yet.
-			 * Continue to build the inverse path from the "potentially dirty" value to the indexed type.
-			 */
-			for ( PojoRawTypeModel<?> concreteEntityType : valueNodeTypeConcreteEntitySubTypes ) {
-				AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseValueTypeBuilder =
-						valueNodeBuilderDelegate.type( concreteEntityType );
-				entityNodeParentValueNode.markForReindexing(
-						inverseValueTypeBuilder, dependencyPathFromInverseSideEntityTypeNode
-				);
-			}
-		}
-		else {
-			/*
-			 * We fully built the inverse path from the "potentially dirty" entity to the indexed type.
-			 * Mark the values at the end of that inverse path as requiring reindexing
-			 * when the entity holding the inverse path is dirty on the given dependency path.
-			 */
-			for ( PojoRawTypeModel<?> concreteEntityType : valueNodeTypeConcreteEntitySubTypes ) {
-				AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseValueTypeBuilder =
-						valueNodeBuilderDelegate.type( concreteEntityType );
-				inverseValueTypeBuilder.addDirtyPathTriggeringReindexing(
-						dependencyPathFromInverseSideEntityTypeNode
-				);
-			}
-		}
+		lastEntityNode.markForReindexing(
+				valueNodeBuilderDelegate,
+				valueNodeTypeConcreteEntitySubTypes,
+				dependencyPathFromInverseSideEntityTypeNode
+		);
 	}
 
 	private BoundPojoModelPathValueNode<?, ?, ?> applyProcessingPathToSubType(PojoRawTypeModel<?> rootSubType,
