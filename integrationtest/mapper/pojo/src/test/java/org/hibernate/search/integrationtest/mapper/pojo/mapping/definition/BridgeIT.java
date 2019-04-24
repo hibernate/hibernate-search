@@ -33,6 +33,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -476,6 +479,65 @@ public class BridgeIT {
 						.pathContext( ".contained" )
 						.failure(
 								"Unable to find property 'doesNotExist' on type '" + Contained.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void propertyBridge_explicitDependencies_error_invalidContainerExtractorPath() {
+		class Contained {
+			String stringProperty;
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Contained contained;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public Contained getContained() {
+				return contained;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+						b -> b.programmaticMapping().type( IndexedEntity.class )
+								.property( "contained" )
+								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+									@Override
+									public void bind(PropertyBridgeBindingContext context) {
+										context.getDependencies()
+												.use(
+														ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractor.COLLECTION ),
+														"stringProperty"
+												);
+									}
+
+									@Override
+									public void write(DocumentElement target, Object bridgedElement,
+											PropertyBridgeWriteContext context) {
+										throw new AssertionFailure( "Should not be called" );
+									}
+								} ) )
+				)
+						.setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".contained" )
+						.failure(
+								"Cannot apply the requested container value extractor '"
+										+ CollectionElementExtractor.class.getName()
+										+ "' to type '" + Contained.class.getName() + "'"
 						)
 						.build()
 				);

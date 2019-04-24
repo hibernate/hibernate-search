@@ -32,8 +32,13 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 	}
 
 	@Override
-	protected Class<? extends PropertyBridge> getContainingEntityPropertyBridgeClass() {
-		return ContainingEntityPropertyBridge.class;
+	protected Class<? extends PropertyBridge> getContainingEntitySingleValuedPropertyBridgeClass() {
+		return ContainingEntitySingleValuedPropertyBridge.class;
+	}
+
+	@Override
+	protected Class<? extends PropertyBridge> getContainingEntityMultiValuedPropertyBridgeClass() {
+		return null; // Not supported with accessors
 	}
 
 	public static class ContainingEntityTypeBridge implements TypeBridge {
@@ -50,7 +55,7 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 			PojoModelType bridgedElement = context.getBridgedElement();
 			directFieldSourceAccessor = bridgedElement.property( "directField" )
 					.createAccessor( String.class );
-			includedInTypeBridgeFieldSourceAccessor = bridgedElement.property( "child" )
+			includedInTypeBridgeFieldSourceAccessor = bridgedElement.property( "association1" )
 					.property( "containedSingle" )
 					.property( "includedInTypeBridge" )
 					.createAccessor( String.class );
@@ -77,7 +82,7 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 		}
 	}
 
-	public static class ContainingEntityPropertyBridge implements PropertyBridge {
+	public static class ContainingEntitySingleValuedPropertyBridge implements PropertyBridge {
 
 		private PojoElementAccessor<String> includedInPropertyBridgeSourceAccessor;
 		private IndexObjectFieldReference propertyBridgeObjectFieldReference;
@@ -86,12 +91,12 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 		@Override
 		public void bind(PropertyBridgeBindingContext context) {
 			includedInPropertyBridgeSourceAccessor = context.getBridgedElement().property( "containedSingle" )
-					.property( "includedInPropertyBridge" )
+					.property( "includedInSingleValuedPropertyBridge" )
 					.createAccessor( String.class );
-			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "propertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "singleValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
-					"includedInPropertyBridge", f -> f.asString()
+					"includedInSingleValuedPropertyBridge", f -> f.asString()
 			)
 					.toReference();
 		}
