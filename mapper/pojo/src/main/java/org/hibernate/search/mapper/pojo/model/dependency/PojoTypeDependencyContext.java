@@ -51,6 +51,9 @@ public interface PojoTypeDependencyContext {
 	 * as a String. The string is interpreted with default value extractors: see {@link PojoModelPath#parse(String)}.
 	 * Used when the other entity changes, to collect the instances that must be reindexed.
 	 * @return A context allowing to declare which properties
+	 * @throws org.hibernate.search.util.common.SearchException If the bridged type is not an entity type,
+	 * or the given type is not an entity type,
+	 * or the given path cannot be applied to the given entity type.
 	 */
 	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
 			String pathFromOtherEntityTypeToBridgedType) {
@@ -69,6 +72,9 @@ public interface PojoTypeDependencyContext {
 	 * @param pathFromOtherEntityTypeToBridgedType The path from the other entity type to the bridged type.
 	 * Used when the other entity changes, to collect the instances that must be reindexed.
 	 * @return A context allowing to declare which properties
+	 * @throws org.hibernate.search.util.common.SearchException If the bridged type is not an entity type,
+	 * or the given type is not an entity type,
+	 * or the given path cannot be applied to the given entity type.
 	 */
 	PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType);
