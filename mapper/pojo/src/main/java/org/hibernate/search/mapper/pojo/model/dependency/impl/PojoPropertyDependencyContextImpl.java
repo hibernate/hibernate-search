@@ -40,9 +40,6 @@ public class PojoPropertyDependencyContextImpl<P> extends AbstractPojoBridgedEle
 			BoundPojoModelPathPropertyNode<?, P> modelPath) {
 		super( introspector, containerExtractorBinder, typeAdditionalMetadataProvider );
 		this.modelPath = modelPath;
-		// Always declare the value passed to the bridge as a dependency.
-		ContainerExtractorPath noExtractorPath = ContainerExtractorPath.noExtractors();
-		valueDependencyContexts.put( noExtractorPath, new ValueDependencyContext( noExtractorPath ) );
 	}
 
 	@Override
@@ -59,6 +56,27 @@ public class PojoPropertyDependencyContextImpl<P> extends AbstractPojoBridgedEle
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedPropertyExtractedType) {
 		return valueDependencyContexts.computeIfAbsent( extractorPathFromBridgedProperty, ValueDependencyContext::new )
 				.addOtherEntityDependencyContext( otherEntityType, pathFromOtherEntityTypeToBridgedPropertyExtractedType );
+	}
+
+	@Override
+	public void useRootOnly() {
+		super.useRootOnly();
+		// Declare the value passed to the bridge as a dependency
+		ContainerExtractorPath noExtractorPath = ContainerExtractorPath.noExtractors();
+		valueDependencyContexts.put( noExtractorPath, new ValueDependencyContext( noExtractorPath ) );
+	}
+
+	@Override
+	public boolean hasNonRootDependency() {
+		if ( valueDependencyContexts.isEmpty() ) {
+			return false;
+		}
+		if ( valueDependencyContexts.size() > 1 ) {
+			return true;
+		}
+		ValueDependencyContext noExtractorValue = valueDependencyContexts.get( ContainerExtractorPath.noExtractors() );
+		return noExtractorValue == null // If true, the only value dependency was added by a call to use(...), not useRootOnly()
+				|| noExtractorValue.hasExplicitDependency(); // If true, the only value dependency was populated with calls to use(...)
 	}
 
 	public void contributeDependencies(PojoIndexingDependencyCollectorPropertyNode<?, P> dependencyCollector) {
@@ -122,6 +140,10 @@ public class PojoPropertyDependencyContextImpl<P> extends AbstractPojoBridgedEle
 			// If we get here, the path is valid
 
 			usedPaths.add( pathFromExtractedBridgedPropertyValueToUsedValue );
+		}
+
+		public boolean hasExplicitDependency() {
+			return !usedPaths.isEmpty() || !otherEntityDependencyContexts.isEmpty();
 		}
 	}
 }

@@ -291,6 +291,7 @@ public class AnnotationMappingDiscoveryIT {
 					.filter( property -> property.markers( CustomMarker.class ).findAny().isPresent() )
 					.collect( Collectors.toList() );
 			for ( PojoModelProperty property : markedProperties ) {
+				property.createAccessor();
 				objectFieldReferences.add(
 						context.getIndexSchemaElement().objectField( property.getName() ).toReference()
 				);

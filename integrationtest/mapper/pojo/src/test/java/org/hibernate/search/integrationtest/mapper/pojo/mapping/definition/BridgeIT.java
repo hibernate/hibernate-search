@@ -11,6 +11,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -646,6 +648,196 @@ public class BridgeIT {
 						)
 						.build()
 				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void typeBridge_missingDependencyDeclaration() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+						b -> b.programmaticMapping().type( IndexedEntity.class )
+								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+									@Override
+									public void bind(TypeBridgeBindingContext context) {
+										// Do not declare any dependency
+									}
+
+									@Override
+									public void write(DocumentElement target, Object bridgedElement,
+											TypeBridgeWriteContext context) {
+										throw new AssertionFailure( "Should not be called" );
+									}
+								} ) )
+				)
+						.setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.failure(
+								"The bridge did not declare any dependency to the entity model during binding."
+								+ " Declare dependencies using context.getDependencies().use(...) or,"
+								+ " if the bridge really does not depend on the entity model, context.getDependencies().useRootOnly()"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void typeBridge_inconsistentDependencyDeclaration() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+						b -> b.programmaticMapping().type( IndexedEntity.class )
+								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+									@Override
+									public void bind(TypeBridgeBindingContext context) {
+										// Declare no dependency, but also a dependency: this is inconsistent.
+										context.getDependencies()
+												.use( "stringProperty" )
+												.useRootOnly();
+									}
+
+									@Override
+									public void write(DocumentElement target, Object bridgedElement,
+											TypeBridgeWriteContext context) {
+										throw new AssertionFailure( "Should not be called" );
+									}
+								} ) )
+				)
+						.setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.failure(
+								"The bridge called context.getDependencies().useRootOnly() during binding,"
+										+ " but also declared extra dependencies to the entity model."
+						)
+						.build()
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void typeBridge_useRootOnly() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			CustomEnum enumProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded
+			public CustomEnum getEnumProperty() {
+				return enumProperty;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "enumProperty", b2 -> b2
+						.field( "someField", String.class )
+				)
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+				b -> b.programmaticMapping().type( CustomEnum.class )
+						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+							private IndexFieldReference<String> indexFieldReference;
+
+							@Override
+							public void bind(TypeBridgeBindingContext context) {
+								context.getDependencies().useRootOnly();
+								indexFieldReference = context.getIndexSchemaElement().field(
+										"someField",
+										f -> f.asString()
+								)
+										.toReference();
+							}
+
+							@Override
+							public void write(DocumentElement target, Object bridgedElement,
+									TypeBridgeWriteContext context) {
+								CustomEnum castedBridgedElement = (CustomEnum) bridgedElement;
+								// This is a strange way to use bridges,
+								// but then again a type bridges that only use the root *is* strange
+								target.addValue( indexFieldReference, castedBridgedElement.stringProperty );
+							}
+						} ) )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		IndexedEntity entity = new IndexedEntity();
+		entity.id = 1;
+		entity.enumProperty = CustomEnum.VALUE1;
+
+		try ( SearchSession session = mapping.createSession() ) {
+
+			session.getMainWorkPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b
+							.objectField( "enumProperty", b2 -> b2
+									.field( "someField", entity.enumProperty.stringProperty )
+							)
+					)
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			entity.enumProperty = CustomEnum.VALUE2;
+
+			session.getMainWorkPlan().update( entity, new String[] { "enumProperty" } );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.update( "1", b -> b
+							.objectField( "enumProperty", b2 -> b2
+									.field( "someField", entity.enumProperty.stringProperty )
+							)
+					)
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	private enum CustomEnum {
+		VALUE1("value1String"),
+		VALUE2("value2String");
+		final String stringProperty;
+		CustomEnum(String stringProperty) {
+			this.stringProperty = stringProperty;
+		}
 	}
 
 	/**
@@ -1322,6 +1514,192 @@ public class BridgeIT {
 						)
 						.build()
 				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void propertyBridge_missingDependencyDeclaration() {
+		class Contained {
+			String stringProperty;
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Contained contained;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public Contained getContained() {
+				return contained;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+						b -> b.programmaticMapping().type( IndexedEntity.class )
+								.property( "contained" )
+								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+									@Override
+									public void bind(PropertyBridgeBindingContext context) {
+										// Do not declare any dependency
+									}
+
+									@Override
+									public void write(DocumentElement target, Object bridgedElement,
+											PropertyBridgeWriteContext context) {
+										throw new AssertionFailure( "Should not be called" );
+									}
+								} ) )
+				)
+						.setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".contained" )
+						.failure(
+								"The bridge did not declare any dependency to the entity model during binding."
+										+ " Declare dependencies using context.getDependencies().use(...) or,"
+										+ " if the bridge really does not depend on the entity model, context.getDependencies().useRootOnly()"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void propertyBridge_inconsistentDependencyDeclaration() {
+		class Contained {
+			String stringProperty;
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Contained contained;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public Contained getContained() {
+				return contained;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+						b -> b.programmaticMapping().type( IndexedEntity.class )
+								.property( "contained" )
+								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+									@Override
+									public void bind(PropertyBridgeBindingContext context) {
+										// Declare no dependency, but also a dependency: this is inconsistent.
+										context.getDependencies()
+												.use( "stringProperty" )
+												.useRootOnly();
+									}
+
+									@Override
+									public void write(DocumentElement target, Object bridgedElement,
+											PropertyBridgeWriteContext context) {
+										throw new AssertionFailure( "Should not be called" );
+									}
+								} ) )
+				)
+						.setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".contained" )
+						.failure(
+								"The bridge called context.getDependencies().useRootOnly() during binding,"
+										+ " but also declared extra dependencies to the entity model."
+						)
+						.build()
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void propertyBridge_useRootOnly() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			List<String> stringProperty = new ArrayList<>();
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public List<String> getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b ->
+				b.field( "someField", String.class, b2 -> {
+					b2.analyzerName( "myAnalyzer" ); // For HSEARCH-2641
+				} )
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+				b -> b.programmaticMapping().type( IndexedEntity.class )
+						.property( "stringProperty" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+							private IndexFieldReference<String> indexFieldReference;
+
+							@Override
+							public void bind(PropertyBridgeBindingContext context) {
+								context.getDependencies().useRootOnly();
+								indexFieldReference = context.getIndexSchemaElement().field(
+										"someField",
+										f -> f.asString().analyzer( "myAnalyzer" )
+								)
+										.toReference();
+							}
+
+							@Override
+							public void write(DocumentElement target, Object bridgedElement,
+									PropertyBridgeWriteContext context) {
+								List<String> castedBridgedElement = (List<String>) bridgedElement;
+								for ( String string : castedBridgedElement ) {
+									target.addValue( indexFieldReference, string );
+								}
+							}
+						} ) )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		IndexedEntity entity = new IndexedEntity();
+		entity.id = 1;
+		entity.stringProperty.add( "value1" );
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.getMainWorkPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "someField", "value1" ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			entity.stringProperty.add( "value2" );
+			session.getMainWorkPlan().update( entity, new String[] { "stringProperty" } );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.update( "1", b -> b.field( "someField", "value1", "value2" ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test

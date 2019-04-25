@@ -12,6 +12,18 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 public interface PojoTypeDependencyContext {
 
 	/**
+	 * Declare that the bridge will only use the type directly,
+	 * and will not access any mutable property.
+	 * <p>
+	 * This is unusual, and generally only possible for bridges that are applied to immutable types ({@code String}, an enum, ...),
+	 * or that do not rely on the bridged element at all (constant bridges, bridges adding the last indexing date, ...).
+	 * <p>
+	 * Note that calling this method prevents from declaring any other dependency,
+	 * and trying to do so will trigger an exception.
+	 */
+	void useRootOnly();
+
+	/**
 	 * Declare that the given path is read by the bridge at index time to populate the indexed document.
 	 *
 	 * @param pathFromBridgedTypeToUsedValue The path from the bridged type to the value used by the bridge,

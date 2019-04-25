@@ -38,8 +38,10 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.dependency.impl.AbstractPojoBridgedElementDependencyContext;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyDependencyContextImpl;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeDependencyContextImpl;
+import org.hibernate.search.mapper.pojo.model.impl.AbstractPojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
@@ -144,6 +146,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 			bindingContext.explicitRouting();
 
+			checkBridgeDependencies( pojoModelRootElement, pojoDependencyContext );
+
 			return new BoundRoutingKeyBridge<>( bridgeHolder, pojoModelRootElement, pojoDependencyContext );
 		}
 		catch (RuntimeException e) {
@@ -176,6 +180,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 					bindingContext.getTypeFactory(),
 					bindingContext.getSchemaElement( listener )
 			) );
+
+			checkBridgeDependencies( pojoModelRootElement, pojoDependencyContext );
 
 			// If all fields are filtered out, we should ignore the bridge
 			if ( listener.schemaContributed ) {
@@ -219,6 +225,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 					bindingContext.getTypeFactory(),
 					bindingContext.getSchemaElement( listener )
 			) );
+
+			checkBridgeDependencies( pojoModelRootElement, pojoDependencyContext );
 
 			// If all fields are filtered out, we should ignore the bridge
 			if ( listener.schemaContributed ) {
@@ -349,6 +357,21 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				.toReference();
 
 		return new BoundValueBridge<>( castedBridgeHolder, indexFieldReference );
+	}
+
+	private void checkBridgeDependencies(AbstractPojoModelCompositeElement<?> pojoModelRootElement,
+			AbstractPojoBridgedElementDependencyContext pojoDependencyContext) {
+		boolean isUseRootOnly = pojoDependencyContext.isUseRootOnly();
+		boolean hasDependency = pojoModelRootElement.hasDependency()
+				|| pojoDependencyContext.hasNonRootDependency();
+		boolean hasNonRootDependency = pojoModelRootElement.hasNonRootDependency()
+				|| pojoDependencyContext.hasNonRootDependency();
+		if ( isUseRootOnly && hasNonRootDependency ) {
+			throw log.inconsistentBridgeDependencyDeclaration();
+		}
+		else if ( !isUseRootOnly && !hasDependency ) {
+			throw log.missingBridgeDependencyDeclaration();
+		}
 	}
 
 	private class PojoIndexSchemaContributionListener implements IndexSchemaContributionListener {

@@ -82,6 +82,7 @@ public class StartupStubBridge
 
 	@Override
 	public void bind(PropertyBridgeBindingContext context) {
+		context.getDependencies().useRootOnly();
 		// Add at least one field so that the bridge is not removed
 		context.getIndexSchemaElement().field(
 				"startupStubBridgeFieldFromPropertyBridge",
@@ -92,6 +93,7 @@ public class StartupStubBridge
 
 	@Override
 	public void bind(TypeBridgeBindingContext context) {
+		context.getDependencies().useRootOnly();
 		// Add at least one field so that the bridge is not removed
 		context.getIndexSchemaElement().field(
 				"startupStubBridgeFieldFromTypeBridge",
@@ -102,7 +104,7 @@ public class StartupStubBridge
 
 	@Override
 	public void bind(RoutingKeyBridgeBindingContext context) {
-		// Nothing to do
+		context.getDependencies().useRootOnly();
 	}
 
 	@Override
