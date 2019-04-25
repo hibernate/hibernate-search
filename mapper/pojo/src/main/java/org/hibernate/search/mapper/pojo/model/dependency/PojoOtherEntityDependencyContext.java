@@ -17,6 +17,7 @@ public interface PojoOtherEntityDependencyContext {
 	 * @param pathFromOtherEntityTypeToUsedValue The path from the entity type to the value used by the bridge,
 	 * as a String. The string is interpreted with default value extractors: see {@link PojoModelPath#parse(String)}.
 	 * @return {@code this}, for method chaining.
+	 * @throws org.hibernate.search.util.common.SearchException If the given path cannot be applied to the entity type.
 	 * @see #use(PojoModelPathValueNode)
 	 */
 	default PojoOtherEntityDependencyContext use(String pathFromOtherEntityTypeToUsedValue) {
@@ -33,6 +34,7 @@ public interface PojoOtherEntityDependencyContext {
 	 *
 	 * @param pathFromBridgedTypeToUsedValue The path from the entity type to the value used by the bridge.
 	 * @return {@code this}, for method chaining.
+	 * @throws org.hibernate.search.util.common.SearchException If the given path cannot be applied to the entity type.
 	 */
 	PojoOtherEntityDependencyContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue);
 

@@ -89,6 +89,9 @@ public interface PojoPropertyDependencyContext {
 	 * as a String. The string is interpreted with default value extractors: see {@link PojoModelPath#parse(String)}.
 	 * Used when the other entity changes, to collect the instances that must be reindexed.
 	 * @return A context allowing to declare which properties
+	 * @throws org.hibernate.search.util.common.SearchException If the bridged property does not point to an entity type,
+	 * or the given type is not an entity type,
+	 * or the given path cannot be applied to the given entity type.
 	 */
 	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
 			String pathFromOtherEntityTypeToBridgedType) {
@@ -107,6 +110,9 @@ public interface PojoPropertyDependencyContext {
 	 * @param pathFromOtherEntityTypeToBridgedType The path from the other entity type to the bridged type.
 	 * Used when the other entity changes, to collect the instances that must be reindexed.
 	 * @return A context allowing to declare which properties
+	 * @throws org.hibernate.search.util.common.SearchException If the bridged property does not point to an entity type,
+	 * or the given type is not an entity type,
+	 * or the given path cannot be applied to the given entity type.
 	 */
 	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {
@@ -128,6 +134,10 @@ public interface PojoPropertyDependencyContext {
 	 * @param pathFromOtherEntityTypeToBridgedPropertyExtractedType The path from the other entity type to the type of extracted values for the bridged property.
 	 * Used when the other entity changes, to collect the instances that must be reindexed.
 	 * @return A context allowing to declare which properties
+	 * @throws org.hibernate.search.util.common.SearchException If the bridged property does not point to an entity type,
+	 * or the given type is not an entity type,
+	 * or the given extractor path cannot be applied to the bridged property,
+	 * or the given path cannot be applied to the given entity type.
 	 */
 	PojoOtherEntityDependencyContext fromOtherEntity(ContainerExtractorPath extractorPathFromBridgedProperty,
 			Class<?> otherEntityType,
