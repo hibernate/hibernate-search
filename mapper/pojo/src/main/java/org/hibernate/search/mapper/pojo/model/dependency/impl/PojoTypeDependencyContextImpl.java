@@ -40,6 +40,11 @@ public class PojoTypeDependencyContextImpl<T> extends AbstractPojoBridgedElement
 	}
 
 	@Override
+	public boolean hasNonRootDependency() {
+		return !usedPaths.isEmpty() || !otherEntityDependencyContexts.isEmpty();
+	}
+
+	@Override
 	public PojoTypeDependencyContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue) {
 		BoundPojoModelPathValueNode<?, ?, ?> boundPath = PojoModelPathBinder.bind(
 				modelPath, pathFromBridgedTypeToUsedValue, bindingPathWalker

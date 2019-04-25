@@ -20,13 +20,15 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class AbstractPojoBridgedElementDependencyContext {
+public abstract class AbstractPojoBridgedElementDependencyContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoBootstrapIntrospector introspector;
 	final BoundPojoModelPath.Walker bindingPathWalker;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
+
+	private boolean useRootOnly;
 
 	AbstractPojoBridgedElementDependencyContext(
 			PojoBootstrapIntrospector introspector,
@@ -36,6 +38,16 @@ class AbstractPojoBridgedElementDependencyContext {
 		this.bindingPathWalker = BoundPojoModelPath.walker( containerExtractorBinder );
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 	}
+
+	public void useRootOnly() {
+		this.useRootOnly = true;
+	}
+
+	public boolean isUseRootOnly() {
+		return useRootOnly;
+	}
+
+	public abstract boolean hasNonRootDependency();
 
 	PojoOtherEntityDependencyContextImpl<?> createOtherEntityDependencyContext(PojoRawTypeModel<?> bridgedType,
 			Class<?> otherEntityClass, PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {

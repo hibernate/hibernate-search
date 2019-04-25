@@ -62,6 +62,7 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 
 	@Override
 	public void bind(PropertyBridgeBindingContext context) {
+		context.getDependencies().useRootOnly();
 		valueFieldReference = context.getIndexSchemaElement().field(
 				fieldName, f -> f.asString()
 		)

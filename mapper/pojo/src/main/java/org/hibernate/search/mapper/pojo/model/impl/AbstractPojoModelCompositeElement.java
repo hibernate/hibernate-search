@@ -28,7 +28,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * @param <V> The type of the element, i.e. the type of values returned by accessors to this element.
  */
-abstract class AbstractPojoModelCompositeElement<V> implements PojoModelCompositeElement {
+public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelCompositeElement {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -91,6 +91,19 @@ abstract class AbstractPojoModelCompositeElement<V> implements PojoModelComposit
 			propertiesInitialized = true;
 		}
 		return properties.values().stream();
+	}
+
+	public boolean hasDependency() {
+		return hasAccessor();
+	}
+
+	public boolean hasNonRootDependency() {
+		for ( PojoModelNestedCompositeElement<V, ?> property : properties.values() ) {
+			if ( property.hasAccessor() ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	abstract PojoElementAccessor<V> doCreateAccessor();
