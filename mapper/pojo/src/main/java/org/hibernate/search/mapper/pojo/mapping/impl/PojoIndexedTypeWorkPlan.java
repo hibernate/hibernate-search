@@ -127,6 +127,7 @@ class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractP
 
 		private boolean shouldResolveToReindex;
 		private boolean considerAllDirty;
+		private boolean updatedBecauseOfContained;
 		private Set<String> dirtyPaths;
 
 		private IndexedEntityWorkPlan(I identifier) {
@@ -158,6 +159,7 @@ class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractP
 
 		void updateBecauseOfContained(Supplier<E> entitySupplier) {
 			doUpdate( entitySupplier );
+			updatedBecauseOfContained = true;
 			/*
 			 * We don't want contained entities that haven't been modified to trigger an update of their
 			 * containing entities.
@@ -174,6 +176,7 @@ class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractP
 				 */
 				shouldResolveToReindex = false;
 				considerAllDirty = false;
+				updatedBecauseOfContained = false;
 				dirtyPaths = null;
 				add = false;
 				delete = false;
@@ -199,7 +202,7 @@ class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractP
 					typeManager.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
 			if ( add ) {
 				if ( delete ) {
-					if ( considerAllDirty || typeManager.requiresSelfReindexing( dirtyPaths ) ) {
+					if ( considerAllDirty || updatedBecauseOfContained || typeManager.requiresSelfReindexing( dirtyPaths ) ) {
 						delegate.update(
 								referenceProvider,
 								typeManager.toDocumentContributor( entitySupplier, sessionContext )
