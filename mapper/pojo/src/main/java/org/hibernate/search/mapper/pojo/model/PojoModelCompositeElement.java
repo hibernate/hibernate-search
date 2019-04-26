@@ -16,6 +16,8 @@ import java.util.stream.Stream;
  *
  * @see PojoModelType
  * @see PojoModelProperty
+ * @hsearch.experimental This type is under active development.
+ *    You should be prepared for incompatible changes in future releases.
  */
 public interface PojoModelCompositeElement extends PojoModelElement {
 

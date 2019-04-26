@@ -19,6 +19,8 @@ public interface PropertyBridgeBindingContext {
 
 	/**
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO property.
+	 * @hsearch.experimental This feature is under active development.
+	 *    You should be prepared for incompatible changes in future releases.
 	 */
 	PojoModelProperty getBridgedElement();
 

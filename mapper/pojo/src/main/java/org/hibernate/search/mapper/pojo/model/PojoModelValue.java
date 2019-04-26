@@ -10,6 +10,8 @@ package org.hibernate.search.mapper.pojo.model;
  * A model element representing a value bound to a bridge.
  *
  * @see org.hibernate.search.mapper.pojo.bridge.ValueBridge
+ * @hsearch.experimental This type is under active development.
+ *    You should be prepared for incompatible changes in future releases.
  */
 public interface PojoModelValue<T> extends PojoModelElement {
 

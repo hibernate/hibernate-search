@@ -11,6 +11,8 @@ package org.hibernate.search.mapper.pojo.model;
  *
  * @see PojoModelType
  * @see PojoModelProperty
+ * @hsearch.experimental This type is under active development.
+ *    You should be prepared for incompatible changes in future releases.
  */
 public interface PojoModelElement {
 

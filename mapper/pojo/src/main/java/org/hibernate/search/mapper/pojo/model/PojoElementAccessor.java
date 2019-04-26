@@ -11,6 +11,8 @@ package org.hibernate.search.mapper.pojo.model;
  * An accessor allowing to retrieve an element of a POJO, e.g. a property.
  * <p>
  * Accessors are created by {@link PojoModelCompositeElement} instances.
+ * @hsearch.experimental This type is under active development.
+ *    You should be prepared for incompatible changes in future releases.
  */
 public interface PojoElementAccessor<T> {
 

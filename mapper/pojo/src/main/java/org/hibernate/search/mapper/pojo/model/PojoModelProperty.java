@@ -12,6 +12,8 @@ import java.util.stream.Stream;
  * A model element representing a property bound to a bridge.
  *
  * @see org.hibernate.search.mapper.pojo.bridge.PropertyBridge
+ * @hsearch.experimental This type is under active development.
+ *    You should be prepared for incompatible changes in future releases.
  */
 public interface PojoModelProperty extends PojoModelCompositeElement {
 
