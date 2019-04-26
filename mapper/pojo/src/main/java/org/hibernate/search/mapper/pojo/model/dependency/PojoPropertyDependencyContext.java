@@ -105,6 +105,8 @@ public interface PojoPropertyDependencyContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the bridged property does not point to an entity type,
 	 * or the given type is not an entity type,
 	 * or the given path cannot be applied to the given entity type.
+	 * @hsearch.experimental This feature is under active development.
+	 *    You should be prepared for incompatible changes in future releases.
 	 */
 	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
 			String pathFromOtherEntityTypeToBridgedType) {
@@ -126,6 +128,8 @@ public interface PojoPropertyDependencyContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the bridged property does not point to an entity type,
 	 * or the given type is not an entity type,
 	 * or the given path cannot be applied to the given entity type.
+	 * @hsearch.experimental This feature is under active development.
+	 *    You should be prepared for incompatible changes in future releases.
 	 */
 	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {
@@ -151,6 +155,8 @@ public interface PojoPropertyDependencyContext {
 	 * or the given type is not an entity type,
 	 * or the given extractor path cannot be applied to the bridged property,
 	 * or the given path cannot be applied to the given entity type.
+	 * @hsearch.experimental This feature is under active development.
+	 *    You should be prepared for incompatible changes in future releases.
 	 */
 	PojoOtherEntityDependencyContext fromOtherEntity(ContainerExtractorPath extractorPathFromBridgedProperty,
 			Class<?> otherEntityType,

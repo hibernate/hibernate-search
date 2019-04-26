@@ -47,6 +47,8 @@ public interface PojoTypeDependencyContext {
 	 * @param pathFromBridgedTypeToUsedValue The path from the bridged type to the value used by the bridge.
 	 * @return {@code this}, for method chaining.
 	 * @throws org.hibernate.search.util.common.SearchException If the given path cannot be applied to the bridged type.
+	 * @hsearch.experimental This feature is under active development.
+	 *    You should be prepared for incompatible changes in future releases.
 	 */
 	PojoTypeDependencyContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue);
 
@@ -66,6 +68,8 @@ public interface PojoTypeDependencyContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the bridged type is not an entity type,
 	 * or the given type is not an entity type,
 	 * or the given path cannot be applied to the given entity type.
+	 * @hsearch.experimental This feature is under active development.
+	 *    You should be prepared for incompatible changes in future releases.
 	 */
 	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
 			String pathFromOtherEntityTypeToBridgedType) {
@@ -87,6 +91,8 @@ public interface PojoTypeDependencyContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the bridged type is not an entity type,
 	 * or the given type is not an entity type,
 	 * or the given path cannot be applied to the given entity type.
+	 * @hsearch.experimental This feature is under active development.
+	 *    You should be prepared for incompatible changes in future releases.
 	 */
 	PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType);
