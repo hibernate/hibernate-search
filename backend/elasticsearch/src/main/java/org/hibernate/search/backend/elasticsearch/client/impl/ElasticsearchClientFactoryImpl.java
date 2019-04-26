@@ -139,13 +139,6 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		ServerUris hosts = ServerUris.fromStrings( HOST.get( propertySource ) );
 
 		return RestClient.builder( hosts.asHostsArray() )
-				/*
-				 * Note: this timeout is currently only used on retries,
-				 * but should we start using the synchronous methods of RestClient,
-				 * it would be applied to synchronous requests too.
-				 * See https://github.com/elastic/elasticsearch/issues/21789#issuecomment-287399115
-				 */
-				.setMaxRetryTimeoutMillis( maxRetryTimeoutMillis )
 				.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
 				.setHttpClientConfigCallback(
 						b -> customizeHttpClientConfig( b, httpClientConfigurers, propertySource, hosts )
