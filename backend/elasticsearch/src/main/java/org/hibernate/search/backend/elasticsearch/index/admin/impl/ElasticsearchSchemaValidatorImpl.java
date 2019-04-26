@@ -573,11 +573,6 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 			validateEqualWithDefault( errorCollector, "norms", expectedNorms, actualMapping.getNorms(), normsDefault );
 		}
 
-		Boolean expectedFieldData = expectedMapping.getFieldData();
-		if ( Boolean.TRUE.equals( expectedFieldData ) ) { // If we don't need an index, we don't care
-			validateEqualWithDefault( errorCollector, "fielddata", expectedFieldData, actualMapping.getFieldData(), false );
-		}
-
 		Boolean expectedDocValues = expectedMapping.getDocValues();
 		if ( Boolean.TRUE.equals( expectedDocValues ) ) { // If we don't need doc_values, we don't care
 			/*

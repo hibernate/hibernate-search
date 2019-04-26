@@ -69,9 +69,6 @@ public class PropertyMapping extends AbstractTypeMapping {
 
 	private String analyzer;
 
-	@SerializedName("fielddata")
-	private Boolean fieldData;
-
 	/*
 	 * Keyword datatype
 	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html
@@ -174,13 +171,5 @@ public class PropertyMapping extends AbstractTypeMapping {
 
 	public void setNormalizer(String normalizer) {
 		this.normalizer = normalizer;
-	}
-
-	public Boolean getFieldData() {
-		return fieldData;
-	}
-
-	public void setFieldData(Boolean fieldData) {
-		this.fieldData = fieldData;
 	}
 }
