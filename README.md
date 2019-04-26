@@ -103,8 +103,8 @@ The following profiles are available:
 
  * `elasticsearch-5.6` for 5.6.x and later 5.x
  * `elasticsearch-6.0` for 6.0.x to 6.6.x
- * `elasticsearch-6.7` for 6.7 (the default)
- * `elasticsearch-7.0` for 7.x
+ * `elasticsearch-6.7` for 6.7
+ * `elasticsearch-7.0` for 7.x (the default)
 
 A list of available versions for `test.elasticsearch.host.version` can be found on
 [Maven Central](https://search.maven.org/search?q=g:org.elasticsearch%20AND%20a:elasticsearch&core=gav).

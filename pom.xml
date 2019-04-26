@@ -188,7 +188,7 @@
         <!-- When updating the following versions you will likely need to update the
              matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
         <!-- The main version of Elasticsearch targeted by Hibernate Search, tested in the default profile -->
-        <version.org.elasticsearch.main>6.7.0</version.org.elasticsearch.main>
+        <version.org.elasticsearch.main>7.0.0</version.org.elasticsearch.main>
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently from the version of the remote cluster -->
         <version.org.elasticsearch.client>${version.org.elasticsearch.main}</version.org.elasticsearch.client>
         <documentation.org.elasticsearch.url>https://www.elastic.co/guide/en/elasticsearch/reference/${parsed-version.org.elasticsearch.main.majorVersion}.${parsed-version.org.elasticsearch.main.minorVersion}</documentation.org.elasticsearch.url>
@@ -2338,17 +2338,11 @@
             </build>
         </profile>
 
-        <!-- Elasticsearch 6.7 test environment (default) -->
+        <!-- Elasticsearch 6.7 test environment -->
         <profile>
             <id>elasticsearch-6.7</id>
-            <activation>
-                <!-- Activate by default, i.e. if test.elasticsearch.host.version has not been defined explicitly -->
-                <property>
-                    <name>!test.elasticsearch.host.version</name>
-                </property>
-            </activation>
             <properties>
-                <test.elasticsearch.host.version>${version.org.elasticsearch.main}</test.elasticsearch.host.version>
+                <test.elasticsearch.host.version>6.7.0</test.elasticsearch.host.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.Elasticsearch67TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
@@ -2368,11 +2362,17 @@
             </build>
         </profile>
 
-        <!-- Elasticsearch 7.0+ test environment -->
+        <!-- Elasticsearch 7.0+ test environment (default) -->
         <profile>
             <id>elasticsearch-7.0</id>
+            <activation>
+                <!-- Activate by default, i.e. if test.elasticsearch.host.version has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.host.version</name>
+                </property>
+            </activation>
             <properties>
-                <test.elasticsearch.host.version>7.0.0</test.elasticsearch.host.version>
+                <test.elasticsearch.host.version>${version.org.elasticsearch.main}</test.elasticsearch.host.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.Elasticsearch7TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
