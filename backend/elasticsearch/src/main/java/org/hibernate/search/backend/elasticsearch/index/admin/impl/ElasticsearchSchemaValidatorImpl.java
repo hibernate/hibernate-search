@@ -575,11 +575,8 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 
 		Boolean expectedDocValues = expectedMapping.getDocValues();
 		if ( Boolean.TRUE.equals( expectedDocValues ) ) { // If we don't need doc_values, we don't care
-			/*
-			 * Elasticsearch documentation (2.3) says doc_values is true by default on fields
-			 * supporting it, but tests show it's wrong.
-			 */
-			validateEqualWithDefault( errorCollector, "doc_values", expectedDocValues, actualMapping.getDocValues(), false );
+			// From ES 5.0 on, all indexable doc_values is true by default
+			validateEqualWithDefault( errorCollector, "doc_values", expectedDocValues, actualMapping.getDocValues(), true );
 		}
 	}
 

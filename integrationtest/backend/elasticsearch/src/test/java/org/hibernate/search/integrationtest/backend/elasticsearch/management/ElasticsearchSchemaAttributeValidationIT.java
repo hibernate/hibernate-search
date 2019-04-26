@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycl
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -726,6 +727,85 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.failure( "Invalid value for attribute 'null_value'. Expected '739', actual is '777'" )
+						.build() );
+	}
+
+	@Test
+	public void attribute_docValues_valid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'integer',"
+									+ "'doc_values': true"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void attribute_docValues_default() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'integer'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void attribute_docValues_invalid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'integer',"
+									+ "'doc_values': false"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		SubTest.expectException( () -> validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
+						}
+				)
+				.setup() )
+				.assertThrown()
+				.isInstanceOf( Exception.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.indexFieldContext( "myField" )
+						.failure( "Invalid value for attribute 'doc_values'. Expected 'true', actual is 'false'" )
 						.build() );
 	}
 
