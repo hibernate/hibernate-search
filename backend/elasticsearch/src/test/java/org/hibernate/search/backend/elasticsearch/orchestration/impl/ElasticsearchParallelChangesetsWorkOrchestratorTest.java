@@ -150,7 +150,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 	}
 
 	@Test
-	public void reuseBulkAccrossSequences() {
+	public void reuseBulkAcrossSequences() {
 		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
 		List<ElasticsearchWork<?>> changeset1 = Arrays.asList( work1 );
 
@@ -268,7 +268,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 	}
 
 	@Test
-	public void newBulkIfNonBulkable_differenceChangesets() {
+	public void newBulkIfNonBulkable_differentChangesets() {
 		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
 		List<ElasticsearchWork<?>> changeset1 = Arrays.asList( work1 );
 		ElasticsearchWork<?> work2 = work( 2 );
