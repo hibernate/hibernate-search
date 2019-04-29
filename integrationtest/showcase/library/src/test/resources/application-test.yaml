@@ -3,7 +3,8 @@ spring.jpa:
     ddl-auto: create-drop
   properties:
     hibernate.search:
-      indexing_strategy: ${indexing.strategy}
+      automatic_indexing:
+        strategy: ${automatic_indexing.strategy}
       backends:
         elasticsearch1:
           index_defaults:

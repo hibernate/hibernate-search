@@ -45,13 +45,15 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOREGISTER_LISTENERS = PREFIX + Radicals.AUTOREGISTER_LISTENERS;
 
 	/**
-	 * The indexing strategy to use.
+	 * The automatic indexing strategy to use.
 	 * <p>
-	 * Expects a {@link HibernateOrmIndexingStrategyName} value, or a String representation of such value.
+	 * Expects a {@link HibernateOrmAutomaticIndexingStrategyName} value, or a String representation of such value.
 	 * <p>
-	 * Defaults to {@link Defaults#INDEXING_STRATEGY}.
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_STRATEGY}.
+	 *
+	 * @see HibernateOrmAutomaticIndexingStrategyName
 	 */
-	public static final String INDEXING_STRATEGY = PREFIX + Radicals.INDEXING_STRATEGY;
+	public static final String AUTOMATIC_INDEXING_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_STRATEGY;
 
 	/**
 	 * Whether to check if dirty properties are relevant to indexing before actually reindexing an entity.
@@ -62,9 +64,9 @@ public final class HibernateOrmMapperSettings {
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed to such Boolean value.
 	 * <p>
-	 * Defaults to {@code Defaults#ENABLE_DIRTY_CHECK}.
+	 * Defaults to {@code Defaults#AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK}.
 	 */
-	public static final String ENABLE_DIRTY_CHECK = PREFIX + Radicals.ENABLE_DIRTY_CHECK;
+	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
 
 	/**
 	 * Whether annotations should be automatically processed for entity types,
@@ -96,8 +98,8 @@ public final class HibernateOrmMapperSettings {
 
 		public static final String ENABLE_CONFIGURATION_PROPERTY_TRACKING = "enable_configuration_property_tracking";
 		public static final String AUTOREGISTER_LISTENERS = "autoregister_listeners";
-		public static final String INDEXING_STRATEGY = "indexing_strategy";
-		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
+		public static final String AUTOMATIC_INDEXING_STRATEGY = "automatic_indexing.strategy";
+		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = "automatic_indexing.enable_dirty_check";
 		public static final String ENABLE_ANNOTATION_MAPPING = "enable_annotation_mapping";
 		public static final String MAPPING_CONFIGURER = "mapping_configurer";
 	}
@@ -112,8 +114,9 @@ public final class HibernateOrmMapperSettings {
 
 		public static final boolean ENABLE_CONFIGURATION_PROPERTY_TRACKING = true;
 		public static final boolean AUTOREGISTER_LISTENERS = true;
-		public static final HibernateOrmIndexingStrategyName INDEXING_STRATEGY = HibernateOrmIndexingStrategyName.EVENT;
-		public static final boolean ENABLE_DIRTY_CHECK = true;
+		public static final HibernateOrmAutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
+				HibernateOrmAutomaticIndexingStrategyName.SESSION;
+		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final boolean ENABLE_ANNOTATION_MAPPING = true;
 	}
 

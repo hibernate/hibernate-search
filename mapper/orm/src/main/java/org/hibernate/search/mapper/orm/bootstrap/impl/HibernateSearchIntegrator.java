@@ -20,7 +20,7 @@ import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
@@ -46,16 +46,16 @@ public class HibernateSearchIntegrator implements Integrator {
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOREGISTER_LISTENERS )
 					.build();
 
-	private static final ConfigurationProperty<HibernateOrmIndexingStrategyName> INDEXING_MODE =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.INDEXING_STRATEGY )
-					.as( HibernateOrmIndexingStrategyName.class, HibernateOrmIndexingStrategyName::of )
-					.withDefault( HibernateOrmMapperSettings.Defaults.INDEXING_STRATEGY )
+	private static final ConfigurationProperty<HibernateOrmAutomaticIndexingStrategyName> AUTOMATIC_INDEXING_STRATEGY =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY )
+					.as( HibernateOrmAutomaticIndexingStrategyName.class, HibernateOrmAutomaticIndexingStrategyName::of )
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_STRATEGY )
 					.build();
 
-	private static final ConfigurationProperty<Boolean> DIRTY_PROCESSING_ENABLED =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.ENABLE_DIRTY_CHECK )
+	private static final ConfigurationProperty<Boolean> DIRTY_CHECK_ENABLED =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
 					.asBoolean()
-					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLE_DIRTY_CHECK )
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
 					.build();
 
 	@Override
@@ -89,8 +89,8 @@ public class HibernateSearchIntegrator implements Integrator {
 		// Listen to Hibernate ORM events to index automatically
 		HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
 				contextFuture,
-				HibernateOrmIndexingStrategyName.EVENT.equals( INDEXING_MODE.get( propertySource ) ),
-				DIRTY_PROCESSING_ENABLED.get( propertySource )
+				HibernateOrmAutomaticIndexingStrategyName.SESSION.equals( AUTOMATIC_INDEXING_STRATEGY.get( propertySource ) ),
+				DIRTY_CHECK_ENABLED.get( propertySource )
 		);
 		registerHibernateSearchEventListener( hibernateSearchEventListener, serviceRegistry );
 	}

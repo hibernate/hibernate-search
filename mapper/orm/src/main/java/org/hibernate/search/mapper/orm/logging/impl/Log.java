@@ -130,8 +130,8 @@ public interface Log extends BasicLogger {
 	SearchException unexpectedSearchHitType(Class<?> entityType, Collection<? extends Class<?>> expectedTypes);
 
 	@Message(id = ID_OFFSET_2 + 3,
-			value = "Invalid indexing strategy name: '%1$s'. Valid names are: %2$s.")
-	SearchException invalidIndexingStrategyName(String invalidRepresentation, List<String> validRepresentations);
+			value = "Invalid automatic indexing strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidAutomaticIndexingStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@LogMessage(level = Logger.Level.INFO)
 	@Message(id = ID_OFFSET_2 + 5,

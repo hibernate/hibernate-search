@@ -14,37 +14,37 @@ import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * Modes for triggering indexing of entities.
- *
- * @author Gunnar Morling
+ * Strategy for automatic indexing in Hibernate Search.
  */
-public enum HibernateOrmIndexingStrategyName {
+public enum HibernateOrmAutomaticIndexingStrategyName {
 
 	/**
-	 * Indexing is triggered automatically upon entity insertion, update etc.
+	 * No automatic indexing is performed:
+	 * indexing will only happen when explicitly requested through APIs.
 	 */
-	EVENT("event"),
+	NONE("none"),
 
 	/**
-	 * Indexing is triggered explicitly.
+	 * Indexing is triggered automatically when entities are modified in the Hibernate ORM session:
+	 * entity insertion, update etc.
 	 */
-	MANUAL("manual");
+	SESSION("session");
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
-	public static HibernateOrmIndexingStrategyName of(String value) {
+	public static HibernateOrmAutomaticIndexingStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
-				HibernateOrmIndexingStrategyName.values(),
-				HibernateOrmIndexingStrategyName::getExternalRepresentation,
-				log::invalidIndexingStrategyName,
+				HibernateOrmAutomaticIndexingStrategyName.values(),
+				HibernateOrmAutomaticIndexingStrategyName::getExternalRepresentation,
+				log::invalidAutomaticIndexingStrategyName,
 				value
 		);
 	}
 
 	private final String externalRepresentation;
 
-	HibernateOrmIndexingStrategyName(String externalRepresentation) {
+	HibernateOrmAutomaticIndexingStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 

@@ -14,7 +14,7 @@ import javax.persistence.Table;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -44,7 +44,7 @@ public class PrimitiveIdMassIndexingIT {
 		backendMock.expectAnySchema( EntityWithPrimitiveId.INDEX );
 
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_STRATEGY, HibernateOrmIndexingStrategyName.MANUAL )
+				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, HibernateOrmAutomaticIndexingStrategyName.NONE )
 				.setup( EntityWithPrimitiveId.class );
 
 		backendMock.verifyExpectationsMet();
