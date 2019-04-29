@@ -31,6 +31,12 @@ import org.hibernate.service.Service;
 
 public class HibernateSearchContextService implements Service, AutoCloseable {
 
+	private static final String SEARCH_SESSION_KEY =
+			HibernateSearchContextService.class.getName() + "#SEARCH_SESSION_KEY";
+
+	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
+			HibernateSearchContextService.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
+
 	private volatile SearchIntegration integration;
 	private volatile HibernateOrmMapping mapping;
 
@@ -39,12 +45,6 @@ public class HibernateSearchContextService implements Service, AutoCloseable {
 	 * maybe there's something to change here...
 	 */
 	private boolean enlistInTransaction = false;
-
-	private static final String SEARCH_SESSION_KEY =
-			HibernateSearchContextService.class.getName() + "#SEARCH_SESSION_KEY";
-
-	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
-			HibernateSearchContextService.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
 
 	@Override
 	public void close() {
