@@ -18,7 +18,7 @@ public interface ValueBridgeBindingContext<V> {
 	/**
 	 * @return An entry point allowing to inspect the type of values that will be passed to this bridge.
 	 * @hsearch.experimental This feature is under active development.
-	 *    You should be prepared for incompatible changes in future releases.
+	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
 	PojoModelValue<V> getBridgedElement();
 

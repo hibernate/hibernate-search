@@ -106,7 +106,7 @@ public interface PojoPropertyDependencyContext {
 	 * or the given type is not an entity type,
 	 * or the given path cannot be applied to the given entity type.
 	 * @hsearch.experimental This feature is under active development.
-	 *    You should be prepared for incompatible changes in future releases.
+	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
 	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
 			String pathFromOtherEntityTypeToBridgedType) {
@@ -129,7 +129,7 @@ public interface PojoPropertyDependencyContext {
 	 * or the given type is not an entity type,
 	 * or the given path cannot be applied to the given entity type.
 	 * @hsearch.experimental This feature is under active development.
-	 *    You should be prepared for incompatible changes in future releases.
+	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
 	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {
@@ -156,7 +156,7 @@ public interface PojoPropertyDependencyContext {
 	 * or the given extractor path cannot be applied to the bridged property,
 	 * or the given path cannot be applied to the given entity type.
 	 * @hsearch.experimental This feature is under active development.
-	 *    You should be prepared for incompatible changes in future releases.
+	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
 	PojoOtherEntityDependencyContext fromOtherEntity(ContainerExtractorPath extractorPathFromBridgedProperty,
 			Class<?> otherEntityType,

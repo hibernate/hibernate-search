@@ -12,7 +12,7 @@ package org.hibernate.search.mapper.pojo.model;
  * @see PojoModelType
  * @see PojoModelProperty
  * @hsearch.experimental This type is under active development.
- *    You should be prepared for incompatible changes in future releases.
+ *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
 public interface PojoModelElement {
 

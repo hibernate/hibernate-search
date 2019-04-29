@@ -18,7 +18,7 @@ public interface RoutingKeyBridgeBindingContext {
 	/**
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO type.
 	 * @hsearch.experimental This feature is under active development.
-	 *    You should be prepared for incompatible changes in future releases.
+	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
 	PojoModelType getBridgedElement();
 

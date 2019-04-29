@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  *
  * @see org.hibernate.search.mapper.pojo.bridge.PropertyBridge
  * @hsearch.experimental This type is under active development.
- *    You should be prepared for incompatible changes in future releases.
+ *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
 public interface PojoModelProperty extends PojoModelCompositeElement {
 

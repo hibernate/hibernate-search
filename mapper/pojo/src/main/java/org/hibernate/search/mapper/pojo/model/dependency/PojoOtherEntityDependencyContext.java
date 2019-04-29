@@ -11,7 +11,7 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 /**
  * @hsearch.experimental This type is under active development.
- *    You should be prepared for incompatible changes in future releases.
+ *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
 public interface PojoOtherEntityDependencyContext {
 
@@ -24,7 +24,7 @@ public interface PojoOtherEntityDependencyContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the given path cannot be applied to the entity type.
 	 * @see #use(PojoModelPathValueNode)
 	 * @hsearch.experimental This feature is under active development.
-	 *    You should be prepared for incompatible changes in future releases.
+	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
 	default PojoOtherEntityDependencyContext use(String pathFromOtherEntityTypeToUsedValue) {
 		return use( PojoModelPath.parse( pathFromOtherEntityTypeToUsedValue ) );
@@ -42,7 +42,7 @@ public interface PojoOtherEntityDependencyContext {
 	 * @return {@code this}, for method chaining.
 	 * @throws org.hibernate.search.util.common.SearchException If the given path cannot be applied to the entity type.
 	 * @hsearch.experimental This feature is under active development.
-	 *    You should be prepared for incompatible changes in future releases.
+	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
 	PojoOtherEntityDependencyContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue);
 
