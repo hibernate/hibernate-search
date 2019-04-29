@@ -87,12 +87,19 @@ public class HibernateSearchIntegrator implements Integrator {
 				booter.orchestrateBootAndShutdown( sessionFactoryCreatedFuture, sessionFactoryClosingFuture );
 
 		// Listen to Hibernate ORM events to index automatically
-		HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
-				contextFuture,
-				HibernateOrmAutomaticIndexingStrategyName.SESSION.equals( AUTOMATIC_INDEXING_STRATEGY.get( propertySource ) ),
-				DIRTY_CHECK_ENABLED.get( propertySource )
-		);
-		registerHibernateSearchEventListener( hibernateSearchEventListener, serviceRegistry );
+		HibernateOrmAutomaticIndexingStrategyName automaticIndexingStrategyName =
+				AUTOMATIC_INDEXING_STRATEGY.get( propertySource );
+		if ( HibernateOrmAutomaticIndexingStrategyName.SESSION.equals( automaticIndexingStrategyName ) ) {
+			log.debug( "Hibernate Search event listeners activated" );
+			HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
+					contextFuture,
+					DIRTY_CHECK_ENABLED.get( propertySource )
+			);
+			registerHibernateSearchEventListener( hibernateSearchEventListener, serviceRegistry );
+		}
+		else {
+			log.debug( "Hibernate Search event listeners deactivated" );
+		}
 	}
 
 	@Override

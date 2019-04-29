@@ -50,15 +50,13 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-	private final boolean eventProcessingEnabled;
 	private final boolean dirtyCheckingEnabled;
 
 	private volatile EventsHibernateSearchState state;
 
 	public HibernateSearchEventListener(CompletableFuture<HibernateSearchContextService> contextFuture,
-			boolean eventProcessingEnabled, boolean dirtyCheckingEnabled) {
+			boolean dirtyCheckingEnabled) {
 		this.state = new InitializingHibernateSearchState( contextFuture.thenApply( this::doInitialize ) );
-		this.eventProcessingEnabled = eventProcessingEnabled;
 		this.dirtyCheckingEnabled = dirtyCheckingEnabled;
 	}
 
@@ -69,10 +67,6 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
-		if ( !eventProcessingEnabled ) {
-			return;
-		}
-
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
 		if ( isWorkable( context, entity ) ) {
@@ -85,10 +79,6 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	@Override
 	public void onPostInsert(PostInsertEvent event) {
-		if ( !eventProcessingEnabled ) {
-			return;
-		}
-
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
 		if ( isWorkable( context, entity ) ) {
@@ -99,10 +89,6 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	@Override
 	public void onPostUpdate(PostUpdateEvent event) {
-		if ( !eventProcessingEnabled ) {
-			return;
-		}
-
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
 		if ( isWorkable( context, entity ) ) {
@@ -137,10 +123,6 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	 */
 	@Override
 	public void onFlush(FlushEvent event) {
-		if ( !eventProcessingEnabled ) {
-			return;
-		}
-
 		// TODO handle the "simulated" transaction when a Flush listener is registered
 //		Session session = event.getSession();
 //		Synchronization synchronization = flushSynch.get( session );
@@ -154,10 +136,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	}
 
 	private HibernateSearchContextService doInitialize(HibernateSearchContextService context) {
-		log.debug( "Hibernate Search event listeners " + ( eventProcessingEnabled ? "activated" : "deactivated" ) );
-		if ( eventProcessingEnabled ) {
-			log.debug( "Hibernate Search dirty checks " + ( dirtyCheckingEnabled ? "enabled" : "disabled" ) );
-		}
+		log.debug( "Hibernate Search dirty checks " + ( dirtyCheckingEnabled ? "enabled" : "disabled" ) );
 		// discard the suboptimal EventsHibernateSearchState instances
 		this.state = new OptimalEventsHibernateSearchState( context );
 		return context;
@@ -184,10 +163,6 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 //	}
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
-		if ( !eventProcessingEnabled ) {
-			return;
-		}
-
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		Object entity = event.getAffectedOwnerOrNull();
 		if ( entity == null ) {
