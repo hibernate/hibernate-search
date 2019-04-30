@@ -37,6 +37,11 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 	}
 
 	@Override
+	public boolean isForceRefresh() {
+		return forceRefresh;
+	}
+
+	@Override
 	public JsonObject getBulkableActionMetadata() {
 		return bulkableActionMetadata;
 	}
@@ -83,8 +88,8 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 
 			result = generateResult( executionContext, bulkResponseItem );
 
-			if ( markIndexDirty ) {
-				executionContext.registerIndexToRefresh( dirtiedIndexName );
+			if ( forceRefresh ) {
+				executionContext.registerIndexToRefresh( refreshedIndexName );
 			}
 		}
 		catch (RuntimeException e) {

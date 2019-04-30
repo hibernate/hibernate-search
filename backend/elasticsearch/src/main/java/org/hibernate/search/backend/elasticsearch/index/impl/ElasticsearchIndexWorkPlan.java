@@ -73,7 +73,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 				builderFactory.delete(
 						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey
 				)
-						.markIndexDirty( refreshAfterWrite )
+						.forceRefresh( refreshAfterWrite )
 						.build()
 		);
 	}
@@ -110,7 +110,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 				builderFactory.index(
 						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
 				)
-						.markIndexDirty( refreshAfterWrite )
+						.forceRefresh( refreshAfterWrite )
 						.build()
 		);
 	}

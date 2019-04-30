@@ -28,15 +28,15 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 	private static final CompletableFuture<Void> SUCCESSFUL_FUTURE = CompletableFuture.completedFuture( null );
 
 	protected final ElasticsearchRequest request;
-	protected final URLEncodedString dirtiedIndexName;
+	protected final URLEncodedString refreshedIndexName;
 	protected final ElasticsearchRequestSuccessAssessor resultAssessor;
-	protected final boolean markIndexDirty;
+	protected final boolean forceRefresh;
 
 	protected AbstractSimpleElasticsearchWork(AbstractBuilder<?> builder) {
 		this.request = builder.buildRequest();
-		this.dirtiedIndexName = builder.dirtiedIndexName;
+		this.refreshedIndexName = builder.refreshedIndexName;
 		this.resultAssessor = builder.resultAssessor;
-		this.markIndexDirty = builder.markIndexDirty;
+		this.forceRefresh = builder.forceRefresh;
 	}
 
 	@Override
@@ -51,7 +51,8 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 				.append( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "path = " ).append( request.getPath() )
-				.append( ", dirtiedIndexName = " ).append( dirtiedIndexName )
+				.append( ", refreshedIndexName = " ).append( refreshedIndexName )
+				.append( ", forceRefresh = " ).append( forceRefresh )
 				.append( "]" )
 				.toString();
 	}
@@ -91,8 +92,8 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 
 			result = generateResult( executionContext, response );
 
-			if ( markIndexDirty ) {
-				executionContext.registerIndexToRefresh( dirtiedIndexName );
+			if ( forceRefresh ) {
+				executionContext.registerIndexToRefresh( refreshedIndexName );
 			}
 		}
 		catch (RuntimeException e) {
@@ -108,18 +109,18 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 
 	@SuppressWarnings("unchecked") // By contract, subclasses must implement B
 	protected abstract static class AbstractBuilder<B> {
-		protected final URLEncodedString dirtiedIndexName;
+		protected final URLEncodedString refreshedIndexName;
 		protected ElasticsearchRequestSuccessAssessor resultAssessor;
 
-		protected boolean markIndexDirty;
+		protected boolean forceRefresh;
 
-		public AbstractBuilder(URLEncodedString dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
-			this.dirtiedIndexName = dirtiedIndexName;
+		public AbstractBuilder(URLEncodedString refreshedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
+			this.refreshedIndexName = refreshedIndexName;
 			this.resultAssessor = resultAssessor;
 		}
 
-		public B markIndexDirty(boolean markIndexDirty) {
-			this.markIndexDirty = markIndexDirty;
+		public B forceRefresh(boolean forceRefresh) {
+			this.forceRefresh = forceRefresh;
 			return (B) this;
 		}
 

@@ -15,6 +15,8 @@ import com.google.gson.JsonObject;
  */
 public interface BulkableElasticsearchWork<T> extends ElasticsearchWork<T> {
 
+	boolean isForceRefresh();
+
 	JsonObject getBulkableActionMetadata();
 
 	JsonObject getBulkableActionBody();

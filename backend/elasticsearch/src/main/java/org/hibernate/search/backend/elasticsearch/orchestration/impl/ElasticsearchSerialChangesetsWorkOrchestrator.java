@@ -37,7 +37,7 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchAccu
 
 	@Override
 	public CompletableFuture<Void> submit(List<ElasticsearchWork<?>> nonBulkedWorks) {
-		aggregator.init( future );
+		aggregator.initSequence( future );
 		for ( ElasticsearchWork<?> work : nonBulkedWorks ) {
 			work.aggregate( aggregator );
 		}
@@ -48,7 +48,7 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchAccu
 
 	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
-		aggregator.init( future );
+		aggregator.initSequence( future );
 		CompletableFuture<T> workFuture = work.aggregate( aggregator );
 		future = aggregator.buildSequence();
 		return workFuture;
@@ -77,7 +77,7 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchAccu
 			this.bulker = bulker;
 		}
 
-		public void init(CompletableFuture<?> previous) {
+		public void initSequence(CompletableFuture<?> previous) {
 			sequenceBuilder.init( previous );
 		}
 

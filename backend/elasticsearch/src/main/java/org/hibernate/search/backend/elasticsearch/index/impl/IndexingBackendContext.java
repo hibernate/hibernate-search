@@ -58,9 +58,9 @@ public class IndexingBackendContext {
 		);
 	}
 
-	ElasticsearchSharedWorkOrchestrator createSerialOrchestrator(String indexName, boolean refreshAfterWrite) {
+	ElasticsearchSharedWorkOrchestrator createSerialOrchestrator(String indexName) {
 		return orchestratorProvider.createSerialOrchestrator(
-				"Elasticsearch serial work orchestrator for index " + indexName, refreshAfterWrite
+				"Elasticsearch serial work orchestrator for index " + indexName
 		);
 	}
 

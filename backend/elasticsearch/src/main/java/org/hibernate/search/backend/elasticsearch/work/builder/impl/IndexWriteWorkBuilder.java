@@ -11,6 +11,6 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
  */
 public interface IndexWriteWorkBuilder<B> {
 
-	B markIndexDirty(boolean markIndexDirty);
+	B forceRefresh(boolean forceRefresh);
 
 }

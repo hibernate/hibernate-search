@@ -116,7 +116,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 			 */
 			refreshAfterWrite = REFRESH_AFTER_WRITE.get( context.getConfigurationPropertySource() );
 			parallelOrchestrator = indexingBackendContext.createParallelOrchestrator( elasticsearchIndexName.original );
-			serialOrchestrator = indexingBackendContext.createSerialOrchestrator( elasticsearchIndexName.original, refreshAfterWrite );
+			serialOrchestrator = indexingBackendContext.createSerialOrchestrator( elasticsearchIndexName.original );
 
 			lifecycleStrategy.onStart( administrationClient, context );
 			serialOrchestrator.start();
