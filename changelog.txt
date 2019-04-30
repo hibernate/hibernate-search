@@ -1,6 +1,39 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Alpha5 (30-04-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3566 Reindexing is not triggered when an association mentioned in an IndexingDependency.derivedFrom is updated
+    * HSEARCH-3561 "transpositions" setting is ignored for FuzzyQuery in the Elasticsearch integration
+    * HSEARCH-3559 Obsolete hibernate.search.indexes.<index name> syntax for property keys in the documentation
+    * HSEARCH-3552 Field type compatibility checks ignore the analyzer
+    * HSEARCH-3535 Parameters are inverted in minimumShouldMatch error message
+    * HSEARCH-3534 Default value for "minimumShouldMatch" is different between Elasticsearch and Lucene
+
+** Improvement
+    * HSEARCH-3563 Simpler dialect configuration
+    * HSEARCH-3541 Upgrade to Elasticsearch 7.0.0 (release)
+    * HSEARCH-3518 Add support for Elasticsearch 6.7
+    * HSEARCH-2941 MassIndexerProgressMonitor should consitently use long types
+
+** New Feature
+    * HSEARCH-3297 Add an API to declare reindexing conditions in bridges
+    * HSEARCH-1656 Recognize annotations from implemented interfaces
+
+** Remove Feature
+    * HSEARCH-3553 Remove support for "default" null tokens
+    * HSEARCH-2465 Drop support for @IndexedEmbedded.indexNullAs
+
+** Task
+    * HSEARCH-3568 Upgrade to Elasticsearch 6.7.1
+    * HSEARCH-3547 Use different times for LocalDateTime and OffsetDateTime values used in backend TCK
+    * HSEARCH-3467 Add tests for all the attributes validated by the Elasticsearch schema validator
+    * HSEARCH-3298 Search 6 groundwork - Mark the accessor-based entity access API and explicit reindexing declaration API in bridges as experimental
+    * HSEARCH-3099 Search 6 groundwork - Restore support for "indexNullAs" in @Field
+    * HSEARCH-3058 Search 6 groundwork - Add generic type parameters to PropertyHandle
+
 6.0.0.Alpha4 (04-04-2019)
 -------------------------
 
