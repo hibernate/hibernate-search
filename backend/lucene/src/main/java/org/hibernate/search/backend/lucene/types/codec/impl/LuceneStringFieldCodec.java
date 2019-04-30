@@ -52,10 +52,7 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 		documentBuilder.addField( new Field( absoluteFieldPath, value, fieldType ) );
 
 		if ( sortable ) {
-			documentBuilder.addField( new SortedDocValuesField(
-					absoluteFieldPath,
-					new BytesRef( normalize( absoluteFieldPath, value ) )
-			) );
+			documentBuilder.addField( new SortedDocValuesField( absoluteFieldPath, normalize( absoluteFieldPath, value ) ) );
 		}
 
 		if ( !sortable && fieldType.omitNorms() ) {
@@ -103,13 +100,13 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 	}
 
 	@Override
-	public String normalize(String absoluteFieldPath, String value) {
+	public BytesRef normalize(String absoluteFieldPath, String value) {
 		if ( value == null ) {
 			return null;
 		}
-
-		return analyzerOrNormalizer != null
-				? analyzerOrNormalizer.normalize( absoluteFieldPath, value ).utf8ToString()
-				: value;
+		if ( analyzerOrNormalizer == null ) {
+			return new BytesRef( value );
+		}
+		return analyzerOrNormalizer.normalize( absoluteFieldPath, value );
 	}
 }

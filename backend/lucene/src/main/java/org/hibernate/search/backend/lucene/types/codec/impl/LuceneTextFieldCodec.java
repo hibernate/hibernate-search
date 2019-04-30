@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import org.apache.lucene.util.BytesRef;
+
 /**
  * @param <F> The field type exposed to the mapper.
  */
@@ -18,7 +20,8 @@ public interface LuceneTextFieldCodec<F> extends LuceneStandardFieldCodec<F, Str
 	 *
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param value The value to encode.
+	 * @return the BytesRef normalized value
 	 */
-	String normalize(String absoluteFieldPath, String value);
+	BytesRef normalize(String absoluteFieldPath, String value);
 
 }

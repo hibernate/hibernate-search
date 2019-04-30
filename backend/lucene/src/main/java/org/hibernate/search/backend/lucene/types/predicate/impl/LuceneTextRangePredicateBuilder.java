@@ -33,7 +33,7 @@ class LuceneTextRangePredicateBuilder<F>
 		// and we should even consider forcing having a normalizer here, instead of supporting
 		// range queries on analyzed fields.
 
-		return TermRangeQuery.newStringRange(
+		return new TermRangeQuery(
 				absoluteFieldPath,
 				codec.normalize( absoluteFieldPath, lowerLimit ),
 				codec.normalize( absoluteFieldPath, upperLimit ),

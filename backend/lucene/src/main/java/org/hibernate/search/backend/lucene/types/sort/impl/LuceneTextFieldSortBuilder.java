@@ -27,7 +27,7 @@ public class LuceneTextFieldSortBuilder<F>
 
 	@Override
 	protected Object encodeMissingAs(F converted) {
-		return codec.normalize( absoluteFieldPath, codec.encode( converted ) );
+		return codec.normalize( absoluteFieldPath, codec.encode( converted ) ).utf8ToString();
 	}
 
 	@Override
