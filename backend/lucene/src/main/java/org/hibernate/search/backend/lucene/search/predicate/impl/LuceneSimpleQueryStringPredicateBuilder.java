@@ -20,7 +20,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSucceedingCompatibilityChecker;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldContext;
-import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
+import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.util.impl.FieldContextSimpleQueryParser;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
@@ -101,7 +101,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 
 	private Analyzer buildAnalyzer() {
 		if ( ignoreAnalyzer ) {
-			return AnalyzerUtils.KEYWORD_ANALYZER;
+			return AnalyzerConstants.KEYWORD_ANALYZER;
 		}
 		if ( overrideAnalyzer != null ) {
 			return overrideAnalyzer;

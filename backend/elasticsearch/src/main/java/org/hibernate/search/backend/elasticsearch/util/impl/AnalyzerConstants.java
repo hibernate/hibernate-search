@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.util.impl;
 
-public final class AnalyzerUtils {
+public final class AnalyzerConstants {
 
 	public static final String KEYWORD_ANALYZER = "keyword";
 
-	private AnalyzerUtils() {
+	private AnalyzerConstants() {
 		// Not used
 	}
 }

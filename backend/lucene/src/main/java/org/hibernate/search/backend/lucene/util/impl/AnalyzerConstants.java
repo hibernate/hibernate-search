@@ -9,16 +9,11 @@ package org.hibernate.search.backend.lucene.util.impl;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 
-/**
- * Analysis helpers that have no reason to be exposed publicly.
- *
- * @author Yoann Rodiere
- */
-public final class AnalyzerUtils {
+public final class AnalyzerConstants {
 
 	public static final Analyzer KEYWORD_ANALYZER = new KeywordAnalyzer();
 
-	private AnalyzerUtils() {
+	private AnalyzerConstants() {
 		// Not used
 	}
 }
