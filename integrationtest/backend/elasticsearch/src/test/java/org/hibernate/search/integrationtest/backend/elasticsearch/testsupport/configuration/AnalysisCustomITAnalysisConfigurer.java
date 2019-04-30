@@ -13,9 +13,15 @@ import org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisCustomI
 public class AnalysisCustomITAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	@Override
 	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		String charFilterName = AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name + "_charFilter";
+		String tokenizerName = AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name + "_tokenizer";
+		String tokenFilterName = AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name + "_tokenFilter";
+
 		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_NOOP.name ).custom();
 		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_LOWERCASE.name ).custom()
 				.withTokenFilters( "lowercase" );
+		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_PATTERN_REPLACING.name ).custom()
+				.withCharFilters( charFilterName );
 
 		context.analyzer( AnalysisCustomIT.AnalysisDefinitions.ANALYZER_NOOP.name ).custom()
 				.withTokenizer( "keyword" );
@@ -23,9 +29,6 @@ public class AnalysisCustomITAnalysisConfigurer implements ElasticsearchAnalysis
 				.withTokenizer( "whitespace" )
 				.withTokenFilters( "lowercase" );
 
-		String charFilterName = AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name + "_charFilter";
-		String tokenizerName = AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name + "_tokenizer";
-		String tokenFilterName = AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name + "_tokenFilter";
 		context.analyzer( AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name ).custom()
 				.withTokenizer( tokenizerName )
 				.withCharFilters( charFilterName )
