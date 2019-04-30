@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSucceedingCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldContext;
-import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerUtils;
+import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerConstants;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import com.google.gson.JsonArray;
@@ -80,7 +80,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 
 	@Override
 	public void skipAnalysis() {
-		analyzer( AnalyzerUtils.KEYWORD_ANALYZER );
+		analyzer( AnalyzerConstants.KEYWORD_ANALYZER );
 	}
 
 	@Override

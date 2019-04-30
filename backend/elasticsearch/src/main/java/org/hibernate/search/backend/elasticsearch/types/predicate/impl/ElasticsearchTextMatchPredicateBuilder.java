@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchCompa
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerUtils;
+import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerConstants;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -65,7 +65,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 			throw log.skipAnalysisOnKeywordField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
-		analyzer( AnalyzerUtils.KEYWORD_ANALYZER );
+		analyzer( AnalyzerConstants.KEYWORD_ANALYZER );
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchCompa
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
-import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerUtils;
+import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerConstants;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 
 import com.google.gson.JsonElement;
@@ -57,7 +57,7 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearc
 
 	@Override
 	public void skipAnalysis() {
-		analyzer( AnalyzerUtils.KEYWORD_ANALYZER );
+		analyzer( AnalyzerConstants.KEYWORD_ANALYZER );
 	}
 
 	@Override
