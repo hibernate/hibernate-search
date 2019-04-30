@@ -23,6 +23,10 @@ public class AnalysisCustomITAnalysisConfigurer implements LuceneAnalysisConfigu
 		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_NOOP.name ).custom();
 		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_LOWERCASE.name ).custom()
 				.tokenFilter( LowerCaseFilterFactory.class );
+		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_PATTERN_REPLACING.name ).custom()
+				.charFilter( PatternReplaceCharFilterFactory.class )
+				.param( "pattern", "\\s+" )
+				.param( "replacement", "," );
 
 		context.analyzer( AnalysisCustomIT.AnalysisDefinitions.ANALYZER_NOOP.name ).custom()
 				.tokenizer( KeywordTokenizerFactory.class );

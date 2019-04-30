@@ -55,6 +55,10 @@ public class AnalysisCustomIT {
 		 */
 		NORMALIZER_LOWERCASE("normalizer_lowercase"),
 		/**
+		 * Normalizer with a pattern-replacing char filter replacing "\s+" with ",".
+		 */
+		NORMALIZER_PATTERN_REPLACING("normalizer_pattern_replacing"),
+		/**
 		 * No-op analyzer.
 		 */
 		ANALYZER_NOOP("analyzer_noop"),
@@ -134,6 +138,29 @@ public class AnalysisCustomIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
 		assertMatchQuery( "WorD Word" )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "4" );
+	}
+
+	@Test
+	public void normalizer_pattern_replacing() {
+		setupWithNormalizer( AnalysisDefinitions.NORMALIZER_PATTERN_REPLACING );
+		initData( b -> {
+			b.document( "empty" );
+			b.document( "1", "word" );
+			b.document( "2", "WORD" );
+			b.document( "3", "wôrd" );
+			b.document( "4", "word word" );
+			b.document( "5", "word,word" );
+		} );
+
+		// We expect any ',' will be treated as a space character
+		assertMatchQuery( "word" )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
+		assertMatchQuery( "WORD" )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" );
+		assertMatchQuery( "wôrd" )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
+		assertMatchQuery( "word word" )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "4", "5" );
 	}
 
 	@Test
