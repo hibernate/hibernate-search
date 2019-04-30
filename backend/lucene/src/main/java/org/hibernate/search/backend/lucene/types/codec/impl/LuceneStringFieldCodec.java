@@ -20,7 +20,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
 public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String> {
@@ -110,7 +109,7 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 		}
 
 		return analyzerOrNormalizer != null
-				? AnalyzerUtils.normalize( analyzerOrNormalizer, absoluteFieldPath, value )
+				? analyzerOrNormalizer.normalize( absoluteFieldPath, value ).utf8ToString()
 				: value;
 	}
 }

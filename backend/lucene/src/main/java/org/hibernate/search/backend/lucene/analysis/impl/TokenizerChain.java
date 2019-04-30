@@ -55,6 +55,25 @@ final class TokenizerChain extends Analyzer {
 	}
 
 	@Override
+	protected Reader initReaderForNormalization(String fieldName, Reader reader) {
+		// same as Lucene8's CustomAnalyzer
+		for ( CharFilterFactory charFilter : charFilters ) {
+			reader = charFilter.normalize( reader );
+		}
+		return reader;
+	}
+
+	@Override
+	protected TokenStream normalize(String fieldName, TokenStream in) {
+		// same as Lucene8's CustomAnalyzer
+		TokenStream result = in;
+		for ( TokenFilterFactory filter : filters ) {
+			result = filter.normalize( result );
+		}
+		return result;
+	}
+
+	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "TokenizerChain(" );
 		for ( CharFilterFactory filter : charFilters ) {
