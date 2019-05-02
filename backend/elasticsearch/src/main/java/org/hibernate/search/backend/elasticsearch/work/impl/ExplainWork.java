@@ -39,7 +39,17 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 		private final URLEncodedString id;
 		private final JsonObject payload;
 
-		public Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload) {
+		public static Builder forElasticsearch67AndBelow(URLEncodedString indexName, URLEncodedString typeName,
+				URLEncodedString id, JsonObject payload) {
+			return new Builder( indexName, typeName, id, payload );
+		}
+
+		public static Builder forElasticsearch7AndAbove(URLEncodedString indexName,
+				URLEncodedString id, JsonObject payload) {
+			return new Builder( indexName, null, id, payload );
+		}
+
+		private Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.typeName = typeName;
@@ -52,7 +62,7 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
 					.pathComponent( indexName )
-					.pathComponent( typeName )
+					.pathComponent( typeName != null ? typeName : Paths._DOC ) // _doc for ES7+
 					.pathComponent( id )
 					.pathComponent( Paths._EXPLAIN )
 					.body( payload );
