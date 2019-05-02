@@ -6,14 +6,19 @@
  */
 package org.hibernate.search.mapper.orm;
 
+import java.lang.invoke.MethodHandles;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.impl.LazyInitSearchSession;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class Search {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private Search() {
 		// Private constructor
@@ -28,9 +33,18 @@ public final class Search {
 	 *
 	 * @param session A Hibernate ORM session.
 	 * @return The corresponding {@link SearchSession}.
+	 * @throws org.hibernate.search.util.common.SearchException if the session NOT {@link Session#isOpen()}.
 	 */
 	public static SearchSession getSearchSession(Session session) {
-		return createSearchSession( session.unwrap( SessionImplementor.class ) );
+		SessionImplementor sessionImpl = null;
+		try {
+			sessionImpl = session.unwrap( SessionImplementor.class );
+		}
+		catch (IllegalStateException e) {
+			throw log.hibernateSessionAccessError( e );
+		}
+
+		return createSearchSession( sessionImpl );
 	}
 
 	/**
@@ -42,9 +56,18 @@ public final class Search {
 	 *
 	 * @param entityManager A JPA entity manager.
 	 * @return The corresponding {@link SearchSession}.
+	 * @throws org.hibernate.search.util.common.SearchException if the entity manager NOT {@link EntityManager#isOpen()}.
 	 */
 	public static SearchSession getSearchSession(EntityManager entityManager) {
-		return createSearchSession( entityManager.unwrap( SessionImplementor.class ) );
+		SessionImplementor sessionImpl = null;
+		try {
+			sessionImpl = entityManager.unwrap( SessionImplementor.class );
+		}
+		catch (IllegalStateException e) {
+			throw log.hibernateSessionAccessError( e );
+		}
+
+		return createSearchSession( sessionImpl );
 	}
 
 	private static SearchSession createSearchSession(SessionImplementor sessionImplementor) {

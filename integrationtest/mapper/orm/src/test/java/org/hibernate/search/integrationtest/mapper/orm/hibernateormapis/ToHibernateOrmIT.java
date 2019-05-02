@@ -15,6 +15,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.Search;
@@ -22,6 +23,7 @@ import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -81,6 +83,27 @@ public class ToHibernateOrmIT {
 			SearchSession searchSession = Search.getSearchSession( session );
 			assertThat( searchSession.toOrmSession() ).isSameAs( session );
 		} );
+	}
+
+	@Test
+	public void toHibernateOrmSession_withClosedSession() {
+		Session session = null;
+		try {
+			session = sessionFactory.openSession();
+		}
+		finally {
+			if ( session != null ) {
+				session.close();
+			}
+		}
+
+		Session closedSession = session;
+		SubTest.expectException( () -> {
+			Search.getSearchSession( closedSession );
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
 	}
 
 	@Test
