@@ -11,15 +11,19 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.R
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.CreateIndexWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.DeleteWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexTypeMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexExistsWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.IndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexTypeMappingWork;
 
 import com.google.gson.JsonObject;
@@ -39,6 +43,16 @@ public class Elasticsearch67WorkBuilderFactory extends Elasticsearch7WorkBuilder
 
 	public Elasticsearch67WorkBuilderFactory(GsonProvider gsonProvider) {
 		super( gsonProvider );
+	}
+
+	@Override
+	public IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString id, String routingKey, JsonObject document) {
+		return IndexWork.Builder.forElasticsearch67AndBelow( indexName, Paths.DOC, id, routingKey, document );
+	}
+
+	@Override
+	public DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString id, String routingKey) {
+		return DeleteWork.Builder.forElasticsearch67AndBelow( indexName, Paths.DOC, id, routingKey );
 	}
 
 	@Override

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -43,7 +44,17 @@ public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 		private final URLEncodedString id;
 		private final String routingKey;
 
-		public Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey) {
+		public static Builder forElasticsearch67AndBelow(URLEncodedString indexName, URLEncodedString typeName,
+				URLEncodedString id, String routingKey) {
+			return new Builder( indexName, typeName, id, routingKey );
+		}
+
+		public static Builder forElasticsearch7AndAbove(URLEncodedString indexName,
+				URLEncodedString id, String routingKey) {
+			return new Builder( indexName, null, id, routingKey );
+		}
+
+		private Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey) {
 			super( indexName, SUCCESS_ASSESSOR );
 			this.indexName = indexName;
 			this.typeName = typeName;
@@ -56,7 +67,7 @@ public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.delete()
 					.pathComponent( indexName )
-					.pathComponent( typeName )
+					.pathComponent( typeName != null ? typeName : Paths._DOC ) // _doc for ES7+
 					.pathComponent( id );
 
 			if ( routingKey != null ) {
@@ -70,7 +81,9 @@ public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 		protected JsonObject buildBulkableActionMetadata() {
 			JsonObject delete = new JsonObject();
 			delete.addProperty( "_index", indexName.original );
-			delete.addProperty( "_type", typeName.original );
+			if ( typeName != null ) { // ES6.7 and below only
+				delete.addProperty( "_type", typeName.original );
+			}
 			delete.addProperty( "_id", id.original );
 
 			JsonObject result = new JsonObject();
