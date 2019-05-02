@@ -253,6 +253,21 @@ public class ToJpaIT {
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
 
+	@Test
+	public void lazyCrateSearchSessionAfterEntityManagerIsClosed() {
+		EntityManager entityManager = sessionFactory.createEntityManager();
+		// Search session is not created, since we don't use it
+		SearchSession searchSession = Search.getSearchSession( entityManager );
+		entityManager.close();
+
+		SubTest.expectException( () -> {
+			createSimpleQuery( searchSession );
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
+	}
+
 	private SearchQuery<IndexedEntity> createSimpleQuery(SearchSession searchSession) {
 		return searchSession.search( IndexedEntity.class )
 				.asEntity()
