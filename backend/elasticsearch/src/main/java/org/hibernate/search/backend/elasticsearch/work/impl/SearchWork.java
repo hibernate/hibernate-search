@@ -26,13 +26,13 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchSearchWork<T> extends AbstractSimpleElasticsearchWork<ElasticsearchLoadableSearchResult<T>> {
+public class SearchWork<T> extends AbstractSimpleElasticsearchWork<ElasticsearchLoadableSearchResult<T>> {
 
 	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
 	private final ElasticsearchSearchResultExtractor<T> resultExtractor;
 
-	protected ElasticsearchSearchWork(Builder<T> builder) {
+	protected SearchWork(Builder<T> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
 	}
@@ -144,8 +144,8 @@ public class ElasticsearchSearchWork<T> extends AbstractSimpleElasticsearchWork<
 		}
 
 		@Override
-		public ElasticsearchSearchWork<T> build() {
-			return new ElasticsearchSearchWork<>( this );
+		public SearchWork<T> build() {
+			return new SearchWork<>( this );
 		}
 	}
 }

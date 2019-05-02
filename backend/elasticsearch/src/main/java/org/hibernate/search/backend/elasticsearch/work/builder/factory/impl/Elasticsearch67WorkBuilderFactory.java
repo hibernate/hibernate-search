@@ -21,7 +21,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBu
 import org.hibernate.search.backend.elasticsearch.work.impl.CreateIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.DeleteWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ExplainWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexTypeMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexExistsWork;
@@ -60,7 +60,7 @@ public class Elasticsearch67WorkBuilderFactory extends Elasticsearch7WorkBuilder
 	@Override
 	public <T> SearchWorkBuilder<T> search(JsonObject payload,
 			ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
-		return ElasticsearchSearchWork.Builder.forElasticsearch6AndBelow( payload, searchResultExtractor );
+		return SearchWork.Builder.forElasticsearch6AndBelow( payload, searchResultExtractor );
 	}
 
 	@Override
