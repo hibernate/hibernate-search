@@ -154,7 +154,7 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 
 	@Override
 	public IndexExistsWorkBuilder indexExists(URLEncodedString indexName) {
-		return new IndexExistsWork.Builder( indexName );
+		return IndexExistsWork.Builder.forElasticsearch7AndAbove( indexName );
 	}
 
 	@Override

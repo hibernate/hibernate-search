@@ -47,7 +47,8 @@ public class ElasticsearchFieldTypesIT {
 		);
 
 		clientSpy.expectNext(
-				ElasticsearchRequest.head().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(), ElasticsearchRequestAssertionMode.STRICT
+				ElasticsearchRequest.head().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(),
+				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 
 		clientSpy.expectNext(
