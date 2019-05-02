@@ -7,8 +7,11 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext.DistanceCollectorKey;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.apache.lucene.search.Collector;
@@ -32,6 +35,7 @@ public class LuceneCollectorsBuilder {
 	private boolean requireScore;
 
 	private final List<Collector> luceneCollectors = new ArrayList<>();
+	private final Map<DistanceCollectorKey, DistanceCollector> distanceCollectors = new HashMap<>();
 
 	public LuceneCollectorsBuilder(Sort sort, int maxDocs) {
 		this.sort = sort;
@@ -53,6 +57,7 @@ public class LuceneCollectorsBuilder {
 	public DistanceCollector addDistanceCollector(String absoluteFieldPath, GeoPoint center) {
 		DistanceCollector distanceCollector = new DistanceCollector( absoluteFieldPath, center, maxDocs );
 		luceneCollectors.add( distanceCollector );
+		distanceCollectors.put( new DistanceCollectorKey( absoluteFieldPath, center ), distanceCollector );
 		return distanceCollector;
 	}
 
@@ -109,7 +114,7 @@ public class LuceneCollectorsBuilder {
 		}
 
 		return new LuceneCollectors(
-				topDocsCollector, totalHitCountCollector, compositeCollector,
+				topDocsCollector, totalHitCountCollector, compositeCollector, distanceCollectors,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring
 		);
 	}

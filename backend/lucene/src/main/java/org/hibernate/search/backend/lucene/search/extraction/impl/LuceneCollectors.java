@@ -7,6 +7,9 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
+import java.util.Map;
+
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext.DistanceCollectorKey;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
@@ -26,17 +29,20 @@ public class LuceneCollectors {
 
 	private final Collector compositeCollector;
 
+	private final Map<DistanceCollectorKey, DistanceCollector> distanceCollectors;
+
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
 
 	private TopDocs topDocs = null;
 
 	LuceneCollectors(TopDocsCollector<?> topDocsCollector, TotalHitCountCollector totalHitCountCollector,
-			Collector compositeCollector,
+			Collector compositeCollector, Map<DistanceCollectorKey, DistanceCollector> distanceCollectors,
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring) {
 		this.topDocsCollector = topDocsCollector;
 		this.totalHitCountCollector = totalHitCountCollector;
 		this.compositeCollector = compositeCollector;
+		this.distanceCollectors = distanceCollectors;
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
 	}
@@ -70,6 +76,10 @@ public class LuceneCollectors {
 		else {
 			topDocs = null;
 		}
+	}
+
+	public Map<DistanceCollectorKey, DistanceCollector> getDistanceCollectors() {
+		return distanceCollectors;
 	}
 
 	public long getTotalHits() {
