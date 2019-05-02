@@ -83,7 +83,13 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	}
 
 	private SearchSessionBuilder createSessionBuilder(EntityManager entityManager) {
-		SessionImplementor sessionImplementor = entityManager.unwrap( SessionImplementor.class );
+		SessionImplementor sessionImplementor = null;
+		try {
+			sessionImplementor = entityManager.unwrap( SessionImplementor.class );
+		}
+		catch (IllegalStateException e) {
+			throw log.hibernateSessionAccessError( e );
+		}
 
 		SessionFactory expectedSessionFactory = mappingContext.getSessionFactory();
 		SessionFactory givenSessionFactory = sessionImplementor.getSessionFactory();
