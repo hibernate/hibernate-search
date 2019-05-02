@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.mapper.orm.session.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.search.SearchScope;
@@ -27,12 +29,16 @@ import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * The actual implementation of {@link SearchSession}.
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		implements SearchSessionImplementor, SearchSession {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final SessionImplementor sessionImplementor;
 
 	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder) {
@@ -57,6 +63,13 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
+		try {
+			sessionImplementor.checkOpen();
+		}
+		catch (IllegalStateException e) {
+			throw log.hibernateSessionIsClosed( e );
+		}
+
 		PojoSearchScopeDelegate<T, T> searchScopeDelegate = getDelegate().createPojoSearchScope( types );
 		return new SearchScopeImpl<>( searchScopeDelegate, sessionImplementor );
 	}

@@ -29,6 +29,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWork
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -225,6 +226,24 @@ public class ToHibernateOrmIT {
 			query.list();
 			backendMock.verifyExpectationsMet();
 		} );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HSEARCH-1857" )
+	public void reuseSearchSessionAfterOrmSessionIsClosed_noMatching() {
+		Session session = sessionFactory.openSession();
+		SearchSession searchSession = Search.getSearchSession( session );
+		// a SearchSession instance is created lazily,
+		// so we need to use it to have an instance of it
+		createSimpleQuery( searchSession );
+		session.close();
+
+		SubTest.expectException( () -> {
+			createSimpleQuery( searchSession );
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
 
 	private SearchQuery<IndexedEntity> createSimpleQuery(SearchSession searchSession) {
