@@ -8,8 +8,12 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
+import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Explanation;
@@ -22,10 +26,13 @@ public class SearchProjectionExtractContext {
 
 	private final IndexSearcher indexSearcher;
 	private final Query luceneQuery;
+	private final Map<DistanceCollectorKey, DistanceCollector> distanceCollectors;
 
-	public SearchProjectionExtractContext(IndexSearcher indexSearcher, Query luceneQuery) {
+	public SearchProjectionExtractContext(IndexSearcher indexSearcher, Query luceneQuery,
+			Map<DistanceCollectorKey, DistanceCollector> distanceCollectors) {
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
+		this.distanceCollectors = distanceCollectors;
 	}
 
 	public Explanation explain(int docId) {
@@ -34,6 +41,40 @@ public class SearchProjectionExtractContext {
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnExplain( e );
+		}
+	}
+
+	public DistanceCollector getDistanceCollector(String absoluteFieldPath, GeoPoint location) {
+		DistanceCollectorKey collectorKey = new DistanceCollectorKey( absoluteFieldPath, location );
+		return distanceCollectors.get( collectorKey );
+	}
+
+	public static class DistanceCollectorKey {
+		private final String absoluteFieldPath;
+		private final GeoPoint location;
+
+		public DistanceCollectorKey(String absoluteFieldPath, GeoPoint location) {
+			this.absoluteFieldPath = absoluteFieldPath;
+			this.location = location;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( obj == this ) {
+				return true;
+			}
+			if ( !( obj instanceof DistanceCollectorKey ) ) {
+				return false;
+			}
+
+			DistanceCollectorKey other = (DistanceCollectorKey) obj;
+
+			return Objects.equals( this.absoluteFieldPath, other.absoluteFieldPath )
+					&& Objects.equals( this.location, other.location );
+		}
+		@Override
+		public int hashCode() {
+			return Objects.hash( absoluteFieldPath, location );
 		}
 	}
 }

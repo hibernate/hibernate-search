@@ -66,7 +66,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		luceneCollectors.collect( indexSearcher, luceneQuery, offset, limit );
 
 		SearchProjectionExtractContext projectionExecutionContext =
-				new SearchProjectionExtractContext( indexSearcher, luceneQuery );
+				new SearchProjectionExtractContext( indexSearcher, luceneQuery, luceneCollectors.getDistanceCollectors() );
 
 		return searchResultExtractor.extract(
 				indexSearcher, luceneCollectors.getTotalHits(),

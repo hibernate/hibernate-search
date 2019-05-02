@@ -23,8 +23,6 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 
 	private final DistanceUnit unit;
 
-	private DistanceCollector distanceCollector;
-
 	LuceneDistanceToFieldProjection(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.center = center;
@@ -33,7 +31,7 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		this.distanceCollector = luceneCollectorBuilder.addDistanceCollector( absoluteFieldPath, center );
+		luceneCollectorBuilder.addDistanceCollector( absoluteFieldPath, center );
 	}
 
 	@Override
@@ -44,6 +42,8 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 	@Override
 	public Double extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
+
+		DistanceCollector distanceCollector = context.getDistanceCollector( absoluteFieldPath, center );
 		return unit.fromMeters( distanceCollector.getDistance( documentResult.getDocId() ) );
 	}
 
