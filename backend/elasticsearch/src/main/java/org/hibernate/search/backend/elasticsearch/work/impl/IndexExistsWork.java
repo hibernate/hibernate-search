@@ -34,10 +34,29 @@ public class IndexExistsWork extends AbstractSimpleElasticsearchWork<Boolean> {
 			extends AbstractBuilder<Builder>
 			implements IndexExistsWorkBuilder {
 		private final URLEncodedString indexName;
+		private final Boolean includeTypeName;
 
-		public Builder(URLEncodedString indexName) {
+		public static Builder forElasticsearch66AndBelow(URLEncodedString indexName) {
+			return new Builder( indexName, null );
+		}
+
+		public static Builder forElasticsearch67(URLEncodedString indexName) {
+			/*
+			 * We get warnings from Elasticsearch if we don't set include_type_name, even though it's just a HEAD request
+			 * and we don't include any type name.
+			 * It's probably a bug in ES, but it's gone in 7.0 so let's not bother with fixing it and let's just comply.
+			 */
+			return new Builder( indexName, false );
+		}
+
+		public static Builder forElasticsearch7AndAbove(URLEncodedString indexName) {
+			return new Builder( indexName, null );
+		}
+
+		private Builder(URLEncodedString indexName, Boolean includeTypeName) {
 			super( null, RESULT_ASSESSOR );
 			this.indexName = indexName;
+			this.includeTypeName = includeTypeName;
 		}
 
 		@Override
@@ -45,6 +64,10 @@ public class IndexExistsWork extends AbstractSimpleElasticsearchWork<Boolean> {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.head()
 					.pathComponent( indexName );
+			// ES6.7 only
+			if ( includeTypeName != null ) {
+				builder.param( "include_type_name", includeTypeName );
+			}
 			return builder.build();
 		}
 
