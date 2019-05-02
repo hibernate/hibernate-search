@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
@@ -20,9 +21,11 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -103,6 +106,38 @@ public class BasicMassIndexingIT {
 		} );
 
 		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void reuseSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
+		Session session = sessionFactory.openSession();
+		SearchSession searchSession = Search.getSearchSession( session );
+		// a SearchSession instance is created lazily,
+		// so we need to use it to have an instance of it
+		searchSession.createIndexer();
+		session.close();
+
+		SubTest.expectException( () -> {
+			searchSession.createIndexer();
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
+	}
+
+	@Test
+	public void lazyCrateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
+		Session session = sessionFactory.openSession();
+		// Search session is not created, since we don't use it
+		SearchSession searchSession = Search.getSearchSession( session );
+		session.close();
+
+		SubTest.expectException( () -> {
+			searchSession.createIndexer();
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
 	}
 
 	private void initData() {
