@@ -63,12 +63,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
-		try {
-			sessionImplementor.checkOpen();
-		}
-		catch (IllegalStateException e) {
-			throw log.hibernateSessionIsClosed( e );
-		}
+		checkOrmSessionIsOpen();
 
 		PojoSearchScopeDelegate<T, T> searchScopeDelegate = getDelegate().createPojoSearchScope( types );
 		return new SearchScopeImpl<>( searchScopeDelegate, sessionImplementor );
@@ -76,6 +71,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
+		checkOrmSessionIsOpen();
+
 		if ( types.length == 0 ) {
 			// by default reindex all entities
 			types = new Class<?>[] { Object.class };
@@ -92,6 +89,15 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public PojoSessionWorkExecutor createSessionWorkExecutor() {
 		return getDelegate().createSessionWorkExecutor();
+	}
+
+	private void checkOrmSessionIsOpen() {
+		try {
+			sessionImplementor.checkOpen();
+		}
+		catch (IllegalStateException e) {
+			throw log.hibernateSessionIsClosed( e );
+		}
 	}
 
 	public static class HibernateOrmSearchSessionBuilder extends AbstractBuilder<HibernateOrmSearchSession>
