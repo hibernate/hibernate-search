@@ -119,7 +119,7 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 
 	@Override
 	public ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload) {
-		return new ExplainWork.Builder( indexName, getTypeKeyword(), id, payload );
+		return ExplainWork.Builder.forElasticsearch7AndAbove( indexName, id, payload );
 	}
 
 	@Override
@@ -180,10 +180,6 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	@Override
 	public WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, ElasticsearchIndexStatus requiredStatus, String timeout) {
 		return new WaitForIndexStatusWork.Builder( indexName, requiredStatus, timeout );
-	}
-
-	protected URLEncodedString getTypeKeyword() {
-		return Paths._DOC;
 	}
 
 }

@@ -12,6 +12,7 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
@@ -21,6 +22,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.CreateIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.DeleteWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.ExplainWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexTypeMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexExistsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexWork;
@@ -62,6 +64,11 @@ public class Elasticsearch67WorkBuilderFactory extends Elasticsearch7WorkBuilder
 	}
 
 	@Override
+	public ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload) {
+		return ExplainWork.Builder.forElasticsearch67AndBelow( indexName, Paths.DOC, id, payload );
+	}
+
+	@Override
 	public CreateIndexWorkBuilder createIndex(URLEncodedString indexName) {
 		return CreateIndexWork.Builder.forElasticsearch67( gsonProvider, indexName, Paths.DOC );
 	}
@@ -79,10 +86,5 @@ public class Elasticsearch67WorkBuilderFactory extends Elasticsearch7WorkBuilder
 	@Override
 	public PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, RootTypeMapping mapping) {
 		return PutIndexTypeMappingWork.Builder.forElasticsearch67( gsonProvider, indexName, Paths.DOC, mapping );
-	}
-
-	@Override
-	protected URLEncodedString getTypeKeyword() {
-		return Paths.DOC;
 	}
 }
