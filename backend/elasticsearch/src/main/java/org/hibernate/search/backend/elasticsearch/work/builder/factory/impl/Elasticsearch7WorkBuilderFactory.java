@@ -74,12 +74,12 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 
 	@Override
 	public IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString id, String routingKey, JsonObject document) {
-		return new IndexWork.Builder( indexName, getTypeKeyword(), id, routingKey, document );
+		return IndexWork.Builder.forElasticsearch7AndAbove( indexName, id, routingKey, document );
 	}
 
 	@Override
 	public DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString id, String routingKey) {
-		return new DeleteWork.Builder( indexName, getTypeKeyword(), id, routingKey );
+		return DeleteWork.Builder.forElasticsearch7AndAbove( indexName, id, routingKey );
 	}
 
 	@Override

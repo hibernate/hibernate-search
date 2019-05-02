@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -41,7 +42,17 @@ public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 		private final String routingKey;
 		private final JsonObject document;
 
-		public Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document) {
+		public static Builder forElasticsearch67AndBelow(URLEncodedString indexName, URLEncodedString typeName,
+				URLEncodedString id, String routingKey, JsonObject document) {
+			return new Builder( indexName, typeName, id, routingKey, document );
+		}
+
+		public static Builder forElasticsearch7AndAbove(URLEncodedString indexName,
+				URLEncodedString id, String routingKey, JsonObject document) {
+			return new Builder( indexName, null, id, routingKey, document );
+		}
+
+		private Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document) {
 			super( indexName, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.typeName = typeName;
@@ -55,7 +66,7 @@ public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.put()
 					.pathComponent( indexName )
-					.pathComponent( typeName )
+					.pathComponent( typeName != null ? typeName : Paths._DOC ) // _doc for ES7+
 					.pathComponent( id )
 					.body( document );
 
@@ -70,7 +81,9 @@ public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 		protected JsonObject buildBulkableActionMetadata() {
 			JsonObject index = new JsonObject();
 			index.addProperty( "_index", indexName.original );
-			index.addProperty( "_type", typeName.original );
+			if ( typeName != null ) { // ES6.7 and below only
+				index.addProperty( "_type", typeName.original );
+			}
 			index.addProperty( "_id", id.original );
 
 			JsonObject result = new JsonObject();
