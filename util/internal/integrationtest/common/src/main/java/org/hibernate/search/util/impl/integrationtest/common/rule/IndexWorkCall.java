@@ -24,11 +24,21 @@ class IndexWorkCall extends Call<IndexWorkCall> {
 	private final String indexName;
 	private final WorkPhase phase;
 	private final StubIndexWork work;
+	private final CompletableFuture<?> completableFuture;
+
+	IndexWorkCall(String indexName, WorkPhase phase, StubIndexWork work,
+			CompletableFuture<?> completableFuture) {
+		this.indexName = indexName;
+		this.phase = phase;
+		this.work = work;
+		this.completableFuture = completableFuture;
+	}
 
 	IndexWorkCall(String indexName, WorkPhase phase, StubIndexWork work) {
 		this.indexName = indexName;
 		this.phase = phase;
 		this.work = work;
+		this.completableFuture = null;
 	}
 
 	public CompletableFuture<?> verify(IndexWorkCall actualCall) {
@@ -42,7 +52,7 @@ class IndexWorkCall extends Call<IndexWorkCall> {
 		StubIndexWorkAssert.assertThat( actualCall.work )
 				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
 				.matches( work );
-		return CompletableFuture.completedFuture( null );
+		return completableFuture;
 	}
 
 	@Override

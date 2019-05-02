@@ -230,22 +230,30 @@ public class BackendMock implements TestRule {
 			return this;
 		}
 
-		public BackendMock preparedThenExecuted() {
+		public BackendMock preparedThenExecuted(CompletableFuture<?> future) {
 			// First expect all works to be prepared, then expect all works to be executed
 			works.stream()
 					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ) )
 					.forEach( expectationConsumer );
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work, future ) )
+					.forEach( expectationConsumer );
+			return BackendMock.this;
+		}
+
+		public BackendMock preparedThenExecuted() {
+			return preparedThenExecuted( CompletableFuture.completedFuture( null ) );
+		}
+
+		public BackendMock executed(CompletableFuture<?> future) {
+			works.stream()
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work, future ) )
 					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}
 
 		public BackendMock executed() {
-			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ) )
-					.forEach( expectationConsumer );
-			return BackendMock.this;
+			return executed( CompletableFuture.completedFuture( null ) );
 		}
 
 		public BackendMock prepared() {
