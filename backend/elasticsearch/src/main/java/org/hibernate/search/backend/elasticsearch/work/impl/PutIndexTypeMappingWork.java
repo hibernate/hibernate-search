@@ -46,6 +46,12 @@ public class PutIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Voi
 
 		public static Builder forElasticsearch67(GsonProvider gsonProvider,
 				URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping typeMapping) {
+			/*
+			 * Pushing the mapping with a type name will trigger a warning,
+			 * but that's the only way to keep the index similar to what it was in 6.6,
+			 * i.e. to avoid changing the index when a user migrates from 6.6 to 6.7.
+			 * So we'll accept this single warning for now.
+			 */
 			return new Builder( gsonProvider, indexName, typeName, true, typeMapping );
 		}
 
