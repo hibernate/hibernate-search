@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.backend
 import java.util.Arrays;
 import java.util.List;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.Id;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -25,6 +26,7 @@ import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -85,6 +87,27 @@ public class ToJpaIT {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 			assertThat( searchSession.toEntityManager() ).isSameAs( entityManager );
 		} );
+	}
+
+	@Test
+	public void toJpaEntityManager_withClosedEntityManager() {
+		EntityManager entityManager = sessionFactory.createEntityManager();
+		try {
+			entityManager = sessionFactory.createEntityManager();
+		}
+		finally {
+			if ( entityManager != null ) {
+				entityManager.close();
+			}
+		}
+
+		EntityManager closedEntityManager = entityManager;
+		SubTest.expectException( () -> {
+			Search.getSearchSession( closedEntityManager );
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
 	}
 
 	@Test
