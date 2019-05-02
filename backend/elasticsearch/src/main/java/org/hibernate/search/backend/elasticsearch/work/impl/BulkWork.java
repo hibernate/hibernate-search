@@ -94,7 +94,7 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 	private BulkResult generateResult(ElasticsearchResponse response) {
 		JsonObject parsedResponseBody = response.getBody();
 		JsonArray resultItems = BULK_ITEMS.get( parsedResponseBody ).orElseGet( JsonArray::new );
-		return new BulkResultDefualt( resultItems, refreshInAPICall );
+		return new BulkResultImpl( resultItems, refreshInAPICall );
 	}
 
 	private static class NoIndexDirtyBulkExecutionContext extends ElasticsearchForwardingWorkExecutionContext {
@@ -146,11 +146,11 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 		}
 	}
 
-	private static class BulkResultDefualt implements BulkResult {
+	private static class BulkResultImpl implements BulkResult {
 		private final JsonArray results;
 		private final boolean refreshInAPICall;
 
-		public BulkResultDefualt(JsonArray results, boolean refreshInAPICall) {
+		public BulkResultImpl(JsonArray results, boolean refreshInAPICall) {
 			super();
 			this.results = results;
 			this.refreshInAPICall = refreshInAPICall;
@@ -169,17 +169,17 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 			else {
 				actualContext = context;
 			}
-			return new BulkItemResultExtractorDefault( results, actualContext );
+			return new BulkResultItemExtractorImpl( results, actualContext );
 		}
 	}
 
-	private static class BulkItemResultExtractorDefault implements BulkResultItemExtractor {
+	private static class BulkResultItemExtractorImpl implements BulkResultItemExtractor {
 		private final JsonArray results;
 
 		private final ElasticsearchWorkExecutionContext context;
 
 
-		public BulkItemResultExtractorDefault(JsonArray results, ElasticsearchWorkExecutionContext context) {
+		public BulkResultItemExtractorImpl(JsonArray results, ElasticsearchWorkExecutionContext context) {
 			super();
 			this.results = results;
 			this.context = context;
