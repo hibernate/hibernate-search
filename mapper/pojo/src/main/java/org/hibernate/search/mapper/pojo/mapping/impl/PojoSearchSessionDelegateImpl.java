@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.impl.PojoSessionWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
@@ -55,8 +56,8 @@ class PojoSearchSessionDelegateImpl implements PojoSearchSessionDelegate {
 	}
 
 	@Override
-	public PojoWorkPlan createWorkPlan() {
-		return new PojoWorkPlanImpl( indexedTypeManagers, containedTypeManagers, sessionContext );
+	public PojoWorkPlan createWorkPlan(DocumentRefreshStrategy refreshStrategy) {
+		return new PojoWorkPlanImpl( indexedTypeManagers, containedTypeManagers, sessionContext, refreshStrategy );
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.mapper.orm.session.impl.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
@@ -120,10 +121,12 @@ public class HibernateSearchContextService implements Service, AutoCloseable {
 			}
 			PojoWorkPlan workPlan = workPlanPerTransaction.get( transactionIdentifier );
 			if ( workPlan == null ) {
-				workPlan = searchSession.createWorkPlan();
+				AutomaticIndexingSynchronizationStrategy synchronizationStrategy =
+						searchSession.getAutomaticIndexingSynchronizationStrategy();
+				workPlan = searchSession.createWorkPlan( synchronizationStrategy.getDocumentRefreshStrategy() );
 				workPlanPerTransaction.put( transactionIdentifier, workPlan );
 				Synchronization txSync = createTransactionWorkQueueSynchronization(
-						workPlan, workPlanPerTransaction, transactionIdentifier
+						workPlan, workPlanPerTransaction, transactionIdentifier, synchronizationStrategy
 				);
 				registerSynchronization( sessionImplementor, txSync );
 			}
@@ -153,15 +156,18 @@ public class HibernateSearchContextService implements Service, AutoCloseable {
 	}
 
 	private Synchronization createTransactionWorkQueueSynchronization(PojoWorkPlan workPlan,
-			Map<Transaction, PojoWorkPlan> workPlanPerTransaction, Object transactionIdentifier) {
+			Map<Transaction, PojoWorkPlan> workPlanPerTransaction, Object transactionIdentifier,
+			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		if ( enlistInTransaction ) {
 			return new InTransactionWorkQueueSynchronization(
-					workPlan, workPlanPerTransaction, transactionIdentifier
+					workPlan, workPlanPerTransaction, transactionIdentifier,
+					synchronizationStrategy
 			);
 		}
 		else {
 			return new PostTransactionWorkQueueSynchronization(
-					workPlan, workPlanPerTransaction, transactionIdentifier
+					workPlan, workPlanPerTransaction, transactionIdentifier,
+					synchronizationStrategy
 			);
 		}
 	}

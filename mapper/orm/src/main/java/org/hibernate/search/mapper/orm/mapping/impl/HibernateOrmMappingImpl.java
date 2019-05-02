@@ -14,6 +14,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.mapper.orm.session.impl.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
@@ -31,10 +32,13 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmMappingContextImpl mappingContext;
+	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
-	HibernateOrmMappingImpl(PojoMappingDelegate mappingDelegate, SessionFactoryImplementor sessionFactoryImplementor) {
+	HibernateOrmMappingImpl(PojoMappingDelegate mappingDelegate, SessionFactoryImplementor sessionFactoryImplementor,
+			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		super( mappingDelegate );
 		this.mappingContext = new HibernateOrmMappingContextImpl( sessionFactoryImplementor );
+		this.synchronizationStrategy = synchronizationStrategy;
 	}
 
 	@Override
@@ -98,6 +102,9 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 			throw log.usingDifferentSessionFactories( expectedSessionFactory, givenSessionFactory );
 		}
 
-		return new HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder( getDelegate(), mappingContext, sessionImplementor );
+		return new HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder(
+				getDelegate(), mappingContext, sessionImplementor,
+				synchronizationStrategy
+		);
 	}
 }

@@ -13,6 +13,7 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.session.impl.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -28,12 +29,15 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 	private final PojoWorkPlan workPlan;
 	private final Map<?, ?> workPlanPerTransaction;
 	private final Object transactionIdentifier;
+	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
 	PostTransactionWorkQueueSynchronization(PojoWorkPlan workPlan,
-			Map<?, ?> workPlanPerTransaction, Object transactionIdentifier) {
+			Map<?, ?> workPlanPerTransaction, Object transactionIdentifier,
+			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		this.workPlan = workPlan;
 		this.workPlanPerTransaction = workPlanPerTransaction;
 		this.transactionIdentifier = transactionIdentifier;
+		this.synchronizationStrategy = synchronizationStrategy;
 	}
 
 	@Override
@@ -48,12 +52,7 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 			if ( Status.STATUS_COMMITTED == i ) {
 				log.tracef( "Processing Transaction's afterCompletion() phase for %s. Performing work.", this );
 				CompletableFuture<?> future = workPlan.execute();
-				/*
-				 * TODO decide whether we want the sync/async setting to be scoped per index,
-				 * or per EntityManager/SearchSession, or both (with one scope overriding the other).
-				 * See also InTransactionWorkQueueSynchronization#beforeCompletion
-				 */
-				future.join();
+				synchronizationStrategy.handleFuture( future );
 			}
 			else {
 				log.tracef(

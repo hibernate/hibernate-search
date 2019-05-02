@@ -19,6 +19,8 @@ import javax.persistence.Id;
 import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
 import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -55,7 +57,12 @@ public class DslConverterIT {
 
 	@Before
 	public void setup() {
-		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper ).setup( AuthenticationEvent.class );
+		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper )
+				.withProperty(
+						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
+						HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+				)
+				.setup( AuthenticationEvent.class );
 		initData();
 	}
 

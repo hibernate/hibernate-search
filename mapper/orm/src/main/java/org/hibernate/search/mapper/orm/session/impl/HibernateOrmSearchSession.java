@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
@@ -40,10 +41,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SessionImplementor sessionImplementor;
+	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
 	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder) {
 		super( builder );
 		this.sessionImplementor = builder.sessionImplementor;
+		this.synchronizationStrategy = builder.synchronizationStrategy;
 	}
 
 	@Override
@@ -82,13 +85,18 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public PojoWorkPlan createWorkPlan() {
-		return getDelegate().createWorkPlan();
+	public PojoWorkPlan createWorkPlan(DocumentRefreshStrategy refreshStrategy) {
+		return getDelegate().createWorkPlan( refreshStrategy );
 	}
 
 	@Override
 	public PojoSessionWorkExecutor createSessionWorkExecutor() {
 		return getDelegate().createSessionWorkExecutor();
+	}
+
+	@Override
+	public AutomaticIndexingSynchronizationStrategy getAutomaticIndexingSynchronizationStrategy() {
+		return synchronizationStrategy;
 	}
 
 	private void checkOrmSessionIsOpen() {
@@ -104,13 +112,16 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			implements SearchSessionBuilder {
 		private final HibernateOrmMappingContextImpl mappingContext;
 		private final SessionImplementor sessionImplementor;
+		private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
 		public HibernateOrmSearchSessionBuilder(PojoMappingDelegate mappingDelegate,
 				HibernateOrmMappingContextImpl mappingContext,
-				SessionImplementor sessionImplementor) {
+				SessionImplementor sessionImplementor,
+				AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 			super( mappingDelegate );
 			this.mappingContext = mappingContext;
 			this.sessionImplementor = sessionImplementor;
+			this.synchronizationStrategy = synchronizationStrategy;
 		}
 
 		@Override

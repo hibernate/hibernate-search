@@ -174,7 +174,8 @@ public final class Futures {
 	}
 
 	/**
-	 * Call join an unwrap any {@link CompletionException}, expecting the exception to be a {@link RuntimeException}.
+	 * Call {@link CompletableFuture#join()} and unwrap any {@link CompletionException},
+	 * expecting the exception to be a {@link RuntimeException}.
 	 * @param future The future to join on.
 	 * @param <T> The type of result the future will return.
 	 * @return The result returned by the future.

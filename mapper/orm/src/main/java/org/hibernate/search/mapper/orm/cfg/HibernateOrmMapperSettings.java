@@ -56,6 +56,18 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_STRATEGY;
 
 	/**
+	 * The synchronization strategy to use when indexing automatically.
+	 * <p>
+	 * Expects a {@link HibernateOrmAutomaticIndexingSynchronizationStrategyName} value,
+	 * or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY}.
+	 *
+	 * @see HibernateOrmAutomaticIndexingSynchronizationStrategyName
+	 */
+	public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
+
+	/**
 	 * Whether to check if dirty properties are relevant to indexing before actually reindexing an entity.
 	 * <p>
 	 * When enabled, re-indexing of an entity is skipped if the only changes are on properties that are not used when indexing.
@@ -99,6 +111,7 @@ public final class HibernateOrmMapperSettings {
 		public static final String ENABLE_CONFIGURATION_PROPERTY_TRACKING = "enable_configuration_property_tracking";
 		public static final String AUTOREGISTER_LISTENERS = "autoregister_listeners";
 		public static final String AUTOMATIC_INDEXING_STRATEGY = "automatic_indexing.strategy";
+		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = "automatic_indexing.synchronization_strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = "automatic_indexing.enable_dirty_check";
 		public static final String ENABLE_ANNOTATION_MAPPING = "enable_annotation_mapping";
 		public static final String MAPPING_CONFIGURER = "mapping_configurer";
@@ -116,6 +129,8 @@ public final class HibernateOrmMapperSettings {
 		public static final boolean AUTOREGISTER_LISTENERS = true;
 		public static final HibernateOrmAutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
 				HibernateOrmAutomaticIndexingStrategyName.SESSION;
+		public static final HibernateOrmAutomaticIndexingSynchronizationStrategyName AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+				HibernateOrmAutomaticIndexingSynchronizationStrategyName.COMMITTED;
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final boolean ENABLE_ANNOTATION_MAPPING = true;
 	}

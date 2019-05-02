@@ -14,6 +14,8 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -55,7 +57,12 @@ public class HibernateOrmSimpleMappingIT {
 
 	@Before
 	public void setup() {
-		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper ).setup( Book.class );
+		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper )
+				.withProperty(
+						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
+						HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+				)
+				.setup( Book.class );
 		initData();
 	}
 

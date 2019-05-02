@@ -189,4 +189,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 17, value = "Underlying Hibernate ORM Session seems to be closed." )
 	SearchException hibernateSessionIsClosed(@Cause IllegalStateException cause);
+
+	@Message(id = ID_OFFSET_2 + 18,
+			value = "Invalid automatic indexing synchronization strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidAutomaticIndexingSynchronizationStrategyName(String invalidRepresentation, List<String> validRepresentations);
 }

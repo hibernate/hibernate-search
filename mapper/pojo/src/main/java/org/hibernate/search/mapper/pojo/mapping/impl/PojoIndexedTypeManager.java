@@ -130,10 +130,10 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext) {
-		// FIXME allow users to control the refresh strategy
+	PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext,
+			DocumentRefreshStrategy refreshStrategy) {
 		return new PojoIndexedTypeWorkPlan<>(
-				this, sessionContext, indexManager.createWorkPlan( sessionContext, DocumentRefreshStrategy.FORCE )
+				this, sessionContext, indexManager.createWorkPlan( sessionContext, refreshStrategy )
 		);
 	}
 

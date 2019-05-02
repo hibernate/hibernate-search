@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.javabean.session.impl;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.search.SearchScope;
 import org.hibernate.search.mapper.javabean.search.impl.SearchScopeImpl;
@@ -47,7 +48,8 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession implements 
 	@Override
 	public SearchWorkPlan getMainWorkPlan() {
 		if ( workPlan == null ) {
-			workPlan = new SearchWorkPlanImpl( getDelegate().createWorkPlan() );
+			// FIXME allow to customize the refresh strategy
+			workPlan = new SearchWorkPlanImpl( getDelegate().createWorkPlan( DocumentRefreshStrategy.FORCE ) );
 		}
 		return workPlan;
 	}

@@ -22,6 +22,8 @@ import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -55,7 +57,12 @@ public class ProjectionConverterIT {
 
 	@Before
 	public void setup() {
-		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper ).setup( Order.class );
+		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper )
+				.withProperty(
+						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
+						HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+				)
+				.setup( Order.class );
 		initData();
 	}
 

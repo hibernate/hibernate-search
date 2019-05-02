@@ -236,7 +236,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmMapping mapping = partialBuildState.integrationBuildState.finalizeMapping(
 				partialBuildState.mappingKey,
-				mappingPartialBuildState -> mappingPartialBuildState.bindToSessionFactory( sessionFactoryImplementor )
+				mappingPartialBuildState -> mappingPartialBuildState.bindToSessionFactory( sessionFactoryImplementor, propertySource )
 		);
 		SearchIntegration integration = partialBuildState.integrationBuildState.finalizeIntegration( propertySource );
 

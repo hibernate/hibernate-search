@@ -15,6 +15,8 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
@@ -49,6 +51,11 @@ public class HibernateOrmIndexedIT {
 		backendSetupStrategies.get( 0 ).withBackend( setupContext, BACKEND_1 );
 		backendSetupStrategies.get( 1 ).withBackend( setupContext, BACKEND_2 );
 		setupContext.withDefaultBackend( BACKEND_1 );
+
+		setupContext.withProperty(
+				HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
+				HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+		);
 
 		entityManagerFactory = setupContext.setup( Book.class, User.class, Author.class );
 		initData();
