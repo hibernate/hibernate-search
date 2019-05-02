@@ -186,4 +186,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 16, value = "Error trying to access Hibernate ORM session." )
 	SearchException hibernateSessionAccessError(@Cause IllegalStateException cause);
+
+	@Message(id = ID_OFFSET_2 + 17, value = "Underlying Hibernate ORM Session seems to be closed." )
+	SearchException hibernateSessionIsClosed(@Cause IllegalStateException cause);
 }
