@@ -45,8 +45,6 @@ public final class ElasticsearchIndexSettings {
 	 */
 	public static final String LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = "lifecycle.minimal_required_status_wait_timeout";
 
-	public static final String REFRESH_AFTER_WRITE = "refresh_after_write";
-
 	/**
 	 * Default values for the different settings if no values are given.
 	 */

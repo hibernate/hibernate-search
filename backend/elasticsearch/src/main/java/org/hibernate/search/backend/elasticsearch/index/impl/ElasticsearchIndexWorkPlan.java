@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
@@ -33,7 +34,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final URLEncodedString indexName;
-	private final boolean refreshAfterWrite;
+	private final DocumentRefreshStrategy refreshStrategy;
 	private final String tenantId;
 
 	private final List<ElasticsearchWork<?>> works = new ArrayList<>();
@@ -42,13 +43,13 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,
-			boolean refreshAfterWrite,
+			DocumentRefreshStrategy refreshStrategy,
 			SessionContextImplementor sessionContext) {
 		this.builderFactory = builderFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexName;
-		this.refreshAfterWrite = refreshAfterWrite;
+		this.refreshStrategy = refreshStrategy;
 		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 
@@ -73,7 +74,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 				builderFactory.delete(
 						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey
 				)
-						.forceRefresh( refreshAfterWrite )
+						.refresh( refreshStrategy )
 						.build()
 		);
 	}
@@ -110,7 +111,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 				builderFactory.index(
 						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
 				)
-						.forceRefresh( refreshAfterWrite )
+						.refresh( refreshStrategy )
 						.build()
 		);
 	}

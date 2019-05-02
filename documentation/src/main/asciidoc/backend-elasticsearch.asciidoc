@@ -181,25 +181,6 @@ The `hibernate.search.backends.<backend name>.log.json_pretty_printing` <<config
 defines whether JSON included in logs should be pretty-printed (indented, with line breaks).
 It defaults to `false`.
 
-[[backend-elasticsearch-configuration-index-refresh-after-write]]
-=== Refresh after write (per index)
-
-Refresh after write makes sure that writes to an index are executed synchronously and are visible
-as soon as the write returns.
-
-This is useful in unit tests.
-You should not rely on the synchronous behaviour for your production code except in rare cases,
-as Elasticsearch is optimized for asynchronous writes.
-
-This <<configuration-property-types,boolean property>> is set at the index level:
-
-[source]
-----
-hibernate.search.backends.<backend name>.indexes.<index name>.refresh_after_write false (default)
-# OR
-hibernate.search.backends.<backend name>.index_defaults.refresh_after_write false (default)
-----
-
 [[backend-elasticsearch-configuration-aws]]
 === Authentication on Amazon Web Services
 // Search 5 anchors backward compatibility

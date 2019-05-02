@@ -5,12 +5,12 @@ spring.jpa:
     hibernate.search:
       automatic_indexing:
         strategy: ${automatic_indexing.strategy}
+        # FIXME HSEARCH-3316 add a mapper setting here to force refresh
       backends:
         elasticsearch1:
           index_defaults:
             lifecycle.strategy: drop-and-create-and-drop
             lifecycle.minimal_required_status: yellow
-            refresh_after_write: true
           log.json_pretty_printing: true
         lucene1:
           # Hack to use a different directory for each test

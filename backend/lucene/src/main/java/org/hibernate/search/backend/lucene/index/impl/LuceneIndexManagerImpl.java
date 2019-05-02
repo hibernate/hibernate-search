@@ -24,6 +24,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -80,7 +81,9 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext) {
+	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext,
+			DocumentRefreshStrategy refreshStrategy) {
+		// refreshStrategy is ignored because refreshes don't make sense here: changes are visible immediately.
 		return indexingBackendContext.createWorkPlan( serialOrchestrator, indexName, sessionContext );
 	}
 

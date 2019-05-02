@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
@@ -68,7 +69,9 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public IndexWorkPlan<StubDocumentElement> createWorkPlan(SessionContextImplementor context) {
+	public IndexWorkPlan<StubDocumentElement> createWorkPlan(SessionContextImplementor context,
+			DocumentRefreshStrategy refreshStrategy) {
+		// FIXME take the refresh strategy into account here and in assertions
 		return new StubIndexWorkPlan( this, context );
 	}
 

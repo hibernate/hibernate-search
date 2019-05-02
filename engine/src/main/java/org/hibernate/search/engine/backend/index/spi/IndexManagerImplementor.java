@@ -35,7 +35,7 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 	 */
 	IndexManager toAPI();
 
-	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext);
+	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext, DocumentRefreshStrategy refreshStrategy);
 
 	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext);
 

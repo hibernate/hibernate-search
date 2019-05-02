@@ -11,6 +11,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -26,7 +27,7 @@ public interface MappedIndexManager<D extends DocumentElement> {
 
 	IndexManager toAPI();
 
-	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext);
+	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext, DocumentRefreshStrategy refreshStrategy);
 
 	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext);
 

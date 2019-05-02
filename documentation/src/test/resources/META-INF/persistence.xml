@@ -93,8 +93,7 @@
             <!--
                 TODO HSEARCH-3316 remove this and replace it with proper in-transaction code setting a completion handler
              -->
-            <property name="hibernate.search.backends.myBackend.index_defaults.refresh_after_write"
-                      value="true"/>
+            <!-- FIXME HSEARCH-3316 add a mapper setting here to force refresh -->
         </properties>
     </persistence-unit>
 
@@ -167,8 +166,7 @@
             <!--
                 TODO HSEARCH-3316 remove this and replace it with proper in-transaction code setting a completion handler
              -->
-            <property name="hibernate.search.backends.myBackend.index_defaults.refresh_after_write"
-                      value="true"/>
+            <!-- FIXME HSEARCH-3316 add a mapper setting here to force refresh -->
         </properties>
     </persistence-unit>
 </persistence>

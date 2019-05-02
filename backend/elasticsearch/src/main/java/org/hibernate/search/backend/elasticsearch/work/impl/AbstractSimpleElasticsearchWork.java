@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -30,13 +31,13 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 	protected final ElasticsearchRequest request;
 	protected final URLEncodedString refreshedIndexName;
 	protected final ElasticsearchRequestSuccessAssessor resultAssessor;
-	protected final boolean forceRefresh;
+	protected final DocumentRefreshStrategy refreshStrategy;
 
 	protected AbstractSimpleElasticsearchWork(AbstractBuilder<?> builder) {
 		this.request = builder.buildRequest();
 		this.refreshedIndexName = builder.refreshedIndexName;
 		this.resultAssessor = builder.resultAssessor;
-		this.forceRefresh = builder.forceRefresh;
+		this.refreshStrategy = builder.refreshStrategy;
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 				.append( "[" )
 				.append( "path = " ).append( request.getPath() )
 				.append( ", refreshedIndexName = " ).append( refreshedIndexName )
-				.append( ", forceRefresh = " ).append( forceRefresh )
+				.append( ", refreshStrategy = " ).append( refreshStrategy )
 				.append( "]" )
 				.toString();
 	}
@@ -92,8 +93,12 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 
 			result = generateResult( executionContext, response );
 
-			if ( forceRefresh ) {
-				executionContext.registerIndexToRefresh( refreshedIndexName );
+			switch ( refreshStrategy ) {
+				case FORCE:
+					executionContext.registerIndexToRefresh( refreshedIndexName );
+					break;
+				case NONE:
+					break;
 			}
 		}
 		catch (RuntimeException e) {
@@ -112,15 +117,15 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 		protected final URLEncodedString refreshedIndexName;
 		protected ElasticsearchRequestSuccessAssessor resultAssessor;
 
-		protected boolean forceRefresh;
+		protected DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
 		public AbstractBuilder(URLEncodedString refreshedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
 			this.refreshedIndexName = refreshedIndexName;
 			this.resultAssessor = resultAssessor;
 		}
 
-		public B forceRefresh(boolean forceRefresh) {
-			this.forceRefresh = forceRefresh;
+		public B refresh(DocumentRefreshStrategy refreshStrategy) {
+			this.refreshStrategy = refreshStrategy;
 			return (B) this;
 		}
 

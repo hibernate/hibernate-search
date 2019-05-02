@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -130,8 +131,9 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 	}
 
 	PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext) {
+		// FIXME allow users to control the refresh strategy
 		return new PojoIndexedTypeWorkPlan<>(
-				this, sessionContext, indexManager.createWorkPlan( sessionContext )
+				this, sessionContext, indexManager.createWorkPlan( sessionContext, DocumentRefreshStrategy.FORCE )
 		);
 	}
 

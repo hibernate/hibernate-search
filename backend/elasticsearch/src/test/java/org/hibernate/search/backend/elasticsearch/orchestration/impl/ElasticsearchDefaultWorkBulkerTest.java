@@ -21,6 +21,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,11 +38,11 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 
 	private static final int DEFAULT_MAX_BULK_SIZE = 10;
 
-	private static final boolean DEFAULT_REFRESH = false;
+	private static final DocumentRefreshStrategy DEFAULT_REFRESH = DocumentRefreshStrategy.NONE;
 
 	private ElasticsearchWorkSequenceBuilder sequenceBuilderMock;
 	private ElasticsearchWorkSequenceBuilder.BulkResultExtractionStep bulkResultExtractionStepMock;
-	private BiFunction<List<? extends BulkableElasticsearchWork<?>>, Boolean, ElasticsearchWork<BulkResult>> bulkWorkFactoryMock;
+	private BiFunction<List<? extends BulkableElasticsearchWork<?>>, DocumentRefreshStrategy, ElasticsearchWork<BulkResult>> bulkWorkFactoryMock;
 
 	@Before
 	public void initMocks() {
@@ -71,14 +72,14 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		expect( work1.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
+		expect( work1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
 		replayAll();
 		work1Future = bulker.add( work1 );
 		verifyAll();
 		assertThat( work1Future ).isPending();
 
 		resetAll();
-		expect( work2.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
+		expect( work2.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
 		replayAll();
 		work2Future = bulker.add( work2 );
 		verifyAll();
@@ -131,7 +132,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		expect( work1.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
+		expect( work1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
 		replayAll();
 		work1Future = bulker.add( work1 );
 		verifyAll();
@@ -176,7 +177,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		expect( work1.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
+		expect( work1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
 		replayAll();
 		bulker.add( work1 );
 		verifyAll();
@@ -222,8 +223,8 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		expect( work1.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
-		expect( work2.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
+		expect( work1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
+		expect( work2.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
 		replayAll();
 		bulker.add( work1 );
 		bulker.add( work2 );
@@ -240,8 +241,8 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		assertThat( bulkWorkFutureCapture.getValue() ).isPending();
 
 		resetAll();
-		expect( work3.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
-		expect( work4.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
+		expect( work3.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
+		expect( work4.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
 		replayAll();
 		bulker.add( work3 );
 		bulker.add( work4 );
@@ -291,8 +292,8 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		expect( work1.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
-		expect( work2.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
+		expect( work1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
+		expect( work2.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
 		replayAll();
 		bulker.add( work1 );
 		bulker.add( work2 );
@@ -316,8 +317,8 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		assertThat( bulkWork1FutureCapture.getValue() ).isSuccessful( bulkWork1 );
 
 		resetAll();
-		expect( work3.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
-		expect( work4.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
+		expect( work3.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
+		expect( work4.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
 		replayAll();
 		bulker.add( work3 );
 		bulker.add( work4 );
@@ -375,7 +376,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork1ResultFuture ) ).andReturn( bulkResultExtractionStepMock );
 		for ( int i = 0 ; i < DEFAULT_MAX_BULK_SIZE ; ++i ) {
 			BulkableElasticsearchWork<Void> work = firstBulkWorks.get( i );
-			expect( work.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
+			expect( work.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
 			expect( bulkResultExtractionStepMock.add( work, i ) )
 					.andReturn( firstBulkWorksCompletableFuturesFromSequenceBuilder.get( i ) );
 		}
@@ -388,8 +389,8 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		assertThat( bulkWork1FutureCapture.getValue() ).isSuccessful( bulkWork1 );
 
 		resetAll();
-		expect( additionalWork1.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
-		expect( additionalWork2.isForceRefresh() ).andReturn( DEFAULT_REFRESH );
+		expect( additionalWork1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
+		expect( additionalWork2.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
 		replayAll();
 		bulker.add( additionalWork1 );
 		bulker.add( additionalWork2 );
@@ -440,40 +441,40 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		expect( work1.isForceRefresh() ).andReturn( false );
-		expect( work2.isForceRefresh() ).andReturn( false );
+		expect( work1.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.NONE );
+		expect( work2.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.NONE );
 		replayAll();
 		bulker.add( work1 );
 		bulker.add( work2 );
 		verifyAll();
 
-		// ForceRefresh from false to true => new bulk
+		// ForceRefresh from NONE to FORCE => new bulk
 		resetAll();
-		expect( work3.isForceRefresh() ).andReturn( true );
+		expect( work3.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.FORCE );
 		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWork1FutureCapture ) ) ).andReturn( bulkWork1ResultFuture );
 		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork1ResultFuture ) ).andReturn( bulkResultExtractionStepMock );
 		expect( bulkResultExtractionStepMock.add( work1, 0 ) ).andReturn( work1FutureFromSequenceBuilder );
 		expect( bulkResultExtractionStepMock.add( work2, 1 ) ).andReturn( work2FutureFromSequenceBuilder );
-		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1, work2 ), false ) ).andReturn( (ElasticsearchWork) bulkWork1 );
+		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1, work2 ), DocumentRefreshStrategy.NONE ) ).andReturn( (ElasticsearchWork) bulkWork1 );
 		replayAll();
 		bulker.add( work3 );
 		verifyAll();
 		assertThat( bulkWork1FutureCapture.getValue() ).isSuccessful( bulkWork1 );
 
 		resetAll();
-		expect( work4.isForceRefresh() ).andReturn( true );
+		expect( work4.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.FORCE );
 		replayAll();
 		bulker.add( work4 );
 		verifyAll();
 
-		// ForceRefresh from true to false => new bulk
+		// ForceRefresh from FORCE to NONE => new bulk
 		resetAll();
-		expect( work5.isForceRefresh() ).andReturn( false );
+		expect( work5.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.NONE );
 		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWork2FutureCapture ) ) ).andReturn( bulkWork2ResultFuture );
 		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork2ResultFuture ) ).andReturn( bulkResultExtractionStepMock );
 		expect( bulkResultExtractionStepMock.add( work3, 0 ) ).andReturn( work3FutureFromSequenceBuilder );
 		expect( bulkResultExtractionStepMock.add( work4, 1 ) ).andReturn( work4FutureFromSequenceBuilder );
-		expect( bulkWorkFactoryMock.apply( Arrays.asList( work3, work4 ), true ) ).andReturn( (ElasticsearchWork) bulkWork2 );
+		expect( bulkWorkFactoryMock.apply( Arrays.asList( work3, work4 ), DocumentRefreshStrategy.FORCE ) ).andReturn( (ElasticsearchWork) bulkWork2 );
 		replayAll();
 		bulker.add( work5 );
 		verifyAll();

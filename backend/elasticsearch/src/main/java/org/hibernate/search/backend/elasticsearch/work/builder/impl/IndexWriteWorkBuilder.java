@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
+
 /**
  * @author Yoann Rodiere
  */
 public interface IndexWriteWorkBuilder<B> {
 
-	B forceRefresh(boolean forceRefresh);
+	B refresh(DocumentRefreshStrategy refresh);
 
 }

@@ -203,8 +203,8 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	private ElasticsearchWorkBulker createBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder, int minBulkSize) {
 		return new ElasticsearchDefaultWorkBulker(
 				sequenceBuilder,
-				(worksToBulk, refreshInBulkAPICall) ->
-						link.getWorkBuilderFactory().bulk( worksToBulk ).refresh( refreshInBulkAPICall ).build(),
+				(worksToBulk, refreshStrategy) ->
+						link.getWorkBuilderFactory().bulk( worksToBulk ).refresh( refreshStrategy ).build(),
 				minBulkSize, MAX_BULK_SIZE
 				);
 	}

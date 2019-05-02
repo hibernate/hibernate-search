@@ -8,12 +8,13 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 
 /**
  * @author Yoann Rodiere
  */
 public interface BulkWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<BulkResult>> {
 
-	BulkWorkBuilder refresh(boolean refresh);
+	BulkWorkBuilder refresh(DocumentRefreshStrategy refreshStrategy);
 
 }

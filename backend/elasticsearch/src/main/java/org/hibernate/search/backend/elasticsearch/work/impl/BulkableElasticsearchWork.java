@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
+
 import com.google.gson.JsonObject;
 
 /**
@@ -15,7 +17,7 @@ import com.google.gson.JsonObject;
  */
 public interface BulkableElasticsearchWork<T> extends ElasticsearchWork<T> {
 
-	boolean isForceRefresh();
+	DocumentRefreshStrategy getRefreshStrategy();
 
 	JsonObject getBulkableActionMetadata();
 

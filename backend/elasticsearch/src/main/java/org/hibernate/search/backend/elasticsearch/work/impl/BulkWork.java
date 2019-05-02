@@ -19,6 +19,8 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -42,22 +44,22 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 	private final List<BulkableElasticsearchWork<?>> works;
 
 	/**
-	 * Whether to perform a refresh in the course of executing this bulk or not.
+	 * How to refresh indexes after executing this bulk.
 	 * <p>
 	 * Note that this will refresh all indexes touched by this bulk,
 	 * not only those given via {@link ElasticsearchWorkExecutionContext#registerIndexToRefresh(URLEncodedString)}.
 	 * That's acceptable.
 	 * <p>
-	 * If {@code true}, no additional refresh of the concerned indexes
+	 * If refresh is enabled, no additional refresh of the concerned indexes
 	 * is needed after executing the bulk.
 	 */
-	private final boolean refreshInAPICall;
+	private final DocumentRefreshStrategy refreshStrategy;
 
 	protected BulkWork(Builder builder) {
 		super();
 		this.request = builder.buildRequest();
 		this.works = new ArrayList<>( builder.bulkableWorks );
-		this.refreshInAPICall = builder.refreshInBulkAPICall;
+		this.refreshStrategy = builder.refreshStrategy;
 	}
 
 	@Override
@@ -66,7 +68,7 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 				.append( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "works = " ).append( works )
-				.append( ", refreshInAPICall = " ).append( refreshInAPICall )
+				.append( ", refreshStrategy = " ).append( refreshStrategy )
 				.append( "]" )
 				.toString();
 	}
@@ -94,7 +96,7 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 	private BulkResult generateResult(ElasticsearchResponse response) {
 		JsonObject parsedResponseBody = response.getBody();
 		JsonArray resultItems = BULK_ITEMS.get( parsedResponseBody ).orElseGet( JsonArray::new );
-		return new BulkResultImpl( resultItems, refreshInAPICall );
+		return new BulkResultImpl( resultItems, refreshStrategy );
 	}
 
 	private static class NoIndexDirtyBulkExecutionContext extends ElasticsearchForwardingWorkExecutionContext {
@@ -111,23 +113,29 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 
 	public static class Builder implements BulkWorkBuilder {
 		private final List<? extends BulkableElasticsearchWork<?>> bulkableWorks;
-		private boolean refreshInBulkAPICall;
+		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
 		public Builder(List<? extends BulkableElasticsearchWork<?>> bulkableWorks) {
 			this.bulkableWorks = bulkableWorks;
 		}
 
 		@Override
-		public Builder refresh(boolean refresh) {
-			this.refreshInBulkAPICall = refresh;
+		public Builder refresh(DocumentRefreshStrategy refreshStrategy) {
+			this.refreshStrategy = refreshStrategy;
 			return this;
 		}
 
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
-					.pathComponent( Paths._BULK )
-					.param( "refresh", refreshInBulkAPICall );
+					.pathComponent( Paths._BULK );
+			switch ( refreshStrategy ) {
+				case FORCE:
+					builder.param( "refresh", true );
+					break;
+				case NONE:
+					break;
+			}
 
 			for ( BulkableElasticsearchWork<?> work : bulkableWorks ) {
 				builder.body( work.getBulkableActionMetadata() );
@@ -148,26 +156,30 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 
 	private static class BulkResultImpl implements BulkResult {
 		private final JsonArray results;
-		private final boolean refreshInAPICall;
+		private final DocumentRefreshStrategy refreshStrategy;
 
-		public BulkResultImpl(JsonArray results, boolean refreshInAPICall) {
+		public BulkResultImpl(JsonArray results, DocumentRefreshStrategy refreshStrategy) {
 			super();
 			this.results = results;
-			this.refreshInAPICall = refreshInAPICall;
+			this.refreshStrategy = refreshStrategy;
 		}
 
 		@Override
 		public BulkResultItemExtractor withContext(ElasticsearchWorkExecutionContext context) {
 			ElasticsearchWorkExecutionContext actualContext;
-			if ( refreshInAPICall ) {
-				/*
-				 * Prevent bulked works to mark indexes as dirty,
-				 * since we refresh all indexes as part of the Bulk API call.
-				 */
-				actualContext = new NoIndexDirtyBulkExecutionContext( context );
-			}
-			else {
-				actualContext = context;
+			switch ( refreshStrategy ) {
+				case FORCE:
+					/*
+					 * Prevent bulked works to mark indexes as dirty,
+					 * since we refresh all indexes as part of the Bulk API call.
+					 */
+					actualContext = new NoIndexDirtyBulkExecutionContext( context );
+					break;
+				case NONE:
+					actualContext = context;
+					break;
+				default:
+					throw new AssertionFailure( "Unexpected refresh strategy: " + refreshStrategy );
 			}
 			return new BulkResultItemExtractorImpl( results, actualContext );
 		}
