@@ -37,7 +37,7 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	}
 
 	@Override
-	public SearchQueryResultContext<? extends SearchQuery<O>> asEntity() {
+	public SearchQueryResultContext<?, ? extends SearchQuery<O>> asEntity() {
 		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
 		return searchScopeDelegate.queryAsLoadedObject(
 				objectLoaderBuilder.build( loadingOptions ),
@@ -46,7 +46,7 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<? extends SearchQuery<T>> asProjection(SearchProjection<T> projection) {
+	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>> asProjection(SearchProjection<T> projection) {
 		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
 		return searchScopeDelegate.queryAsProjection(
 				objectLoaderBuilder.build( loadingOptions ),
@@ -56,13 +56,13 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<? extends SearchQuery<T>> asProjection(
+	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, O>, ? extends SearchProjectionTerminalContext<T>> projectionContributor) {
 		return asProjection( projectionContributor.apply( searchScopeDelegate.projection() ).toProjection() );
 	}
 
 	@Override
-	public SearchQueryResultContext<? extends SearchQuery<List<?>>> asProjections(
+	public SearchQueryResultContext<?, ? extends SearchQuery<List<?>>> asProjections(
 			SearchProjection<?>... projections) {
 		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
 		return searchScopeDelegate.queryAsProjections(

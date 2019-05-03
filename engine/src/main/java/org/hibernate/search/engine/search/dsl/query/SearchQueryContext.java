@@ -15,16 +15,19 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 /**
  * The context used when building a query, after the search predicate has been defined.
+ *
+ * @param <S> The type actually exposed to the user for this context (may be a subtype of SearchQueryContext, with more exposed methods).
+ * @param <Q> The type of the created query.
  */
-public interface SearchQueryContext<Q> {
+public interface SearchQueryContext<S extends SearchQueryContext<? extends S, Q>, Q> {
 
-	SearchQueryContext<Q> routing(String routingKey);
+	S routing(String routingKey);
 
-	SearchQueryContext<Q> routing(Collection<String> routingKeys);
+	S routing(Collection<String> routingKeys);
 
-	SearchQueryContext<Q> sort(SearchSort sort);
+	S sort(SearchSort sort);
 
-	SearchQueryContext<Q> sort(Consumer<? super SearchSortContainerContext> sortContributor);
+	S sort(Consumer<? super SearchSortContainerContext> sortContributor);
 
 	Q toQuery();
 

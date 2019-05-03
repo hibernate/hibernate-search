@@ -18,13 +18,13 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface SearchQueryResultDefinitionContext<O> {
 
-	SearchQueryResultContext<? extends SearchQuery<O>> asEntity();
+	SearchQueryResultContext<?, ? extends SearchQuery<O>> asEntity();
 
-	<T> SearchQueryResultContext<? extends SearchQuery<T>> asProjection(
+	<T> SearchQueryResultContext<?, ? extends SearchQuery<T>> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, O>, ? extends SearchProjectionTerminalContext<T>> projectionContributor);
 
-	<T> SearchQueryResultContext<? extends SearchQuery<T>> asProjection(SearchProjection<T> projection);
+	<T> SearchQueryResultContext<?, ? extends SearchQuery<T>> asProjection(SearchProjection<T> projection);
 
-	SearchQueryResultContext<? extends SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections);
+	SearchQueryResultContext<?, ? extends SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections);
 
 }

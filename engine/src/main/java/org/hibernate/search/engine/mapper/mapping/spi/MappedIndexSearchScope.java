@@ -29,12 +29,12 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
  */
 public interface MappedIndexSearchScope<R, O> {
 
-	<T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(
+	<T, Q> SearchQueryResultContext<?, Q> queryAsLoadedObject(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, T> objectLoader,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory);
 
-	<Q> SearchQueryResultContext<Q> queryAsReference(
+	<Q> SearchQueryResultContext<?, Q> queryAsReference(
 			SessionContextImplementor sessionContext,
 			Function<IndexSearchQuery<R>, Q> searchQueryWrapperFactory);
 
@@ -44,7 +44,7 @@ public interface MappedIndexSearchScope<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept an ObjectLoader<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	<T, Q> SearchQueryResultContext<Q> queryAsProjection(
+	<T, Q> SearchQueryResultContext<?, Q> queryAsProjection(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
@@ -56,7 +56,7 @@ public interface MappedIndexSearchScope<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept an ObjectLoader<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	<Q> SearchQueryResultContext<Q> queryAsProjections(
+	<Q> SearchQueryResultContext<?, Q> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
 			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,

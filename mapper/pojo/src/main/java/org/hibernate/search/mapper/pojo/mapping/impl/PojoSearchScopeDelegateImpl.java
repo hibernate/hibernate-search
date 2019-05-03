@@ -52,7 +52,7 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(ObjectLoader<PojoReference, T> objectLoader,
+	public <T, Q> SearchQueryResultContext<?, Q> queryAsLoadedObject(ObjectLoader<PojoReference, T> objectLoader,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		return getDelegate().queryAsLoadedObject(
 				sessionContext, objectLoader, searchQueryWrapperFactory
@@ -60,7 +60,7 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public <Q> SearchQueryResultContext<Q> queryAsReference(
+	public <Q> SearchQueryResultContext<?, Q> queryAsReference(
 			Function<IndexSearchQuery<PojoReference>, Q> searchQueryWrapperFactory) {
 		return getDelegate().queryAsReference(
 				sessionContext, searchQueryWrapperFactory
@@ -68,7 +68,7 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<Q> queryAsProjection(ObjectLoader<PojoReference, O> objectLoader,
+	public <T, Q> SearchQueryResultContext<?, Q> queryAsProjection(ObjectLoader<PojoReference, O> objectLoader,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<T> projection) {
 		return getDelegate().queryAsProjection(
@@ -78,7 +78,7 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public <Q> SearchQueryResultContext<Q> queryAsProjections(ObjectLoader<PojoReference, O> objectLoader,
+	public <Q> SearchQueryResultContext<?, Q> queryAsProjections(ObjectLoader<PojoReference, O> objectLoader,
 			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
 		return getDelegate().queryAsProjections(

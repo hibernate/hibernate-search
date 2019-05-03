@@ -11,18 +11,22 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * The context used when building a query, after the search result type has been defined.
+ *
+ * @param <N> The type of the next context, returned after a predicate is defined.
+ * @param <Q> The type of the created query.
  */
-public interface SearchQueryResultContext<Q> {
+public interface SearchQueryResultContext<N extends SearchQueryContext<? extends N, Q>, Q> {
 
 	/**
 	 * Set the predicate for this query.
 	 * @param predicate A {@link SearchPredicate} object obtained from the search scope.
 	 * @return A context allowing to define the query further.
 	 */
-	SearchQueryContext<Q> predicate(SearchPredicate predicate);
+	N predicate(SearchPredicate predicate);
 
 	/**
 	 * Set the predicate for this query.
@@ -31,6 +35,17 @@ public interface SearchQueryResultContext<Q> {
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to define the query further.
 	 */
-	SearchQueryContext<Q> predicate(Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor);
+	N predicate(Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor);
+
+	/**
+	 * Extend the current context with the given extension,
+	 * resulting in an extended context offering more query options.
+	 *
+	 * @param extension The extension to the predicate DSL.
+	 * @param <T> The type of context provided by the extension.
+	 * @return The extended context.
+	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
+	 */
+	<T> T extension(SearchQueryContextExtension<T, Q> extension);
 
 }

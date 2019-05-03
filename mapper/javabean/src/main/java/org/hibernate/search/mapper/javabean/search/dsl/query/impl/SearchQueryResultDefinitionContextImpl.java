@@ -28,25 +28,25 @@ public class SearchQueryResultDefinitionContextImpl implements SearchQueryResult
 	}
 
 	@Override
-	public SearchQueryResultContext<SearchQuery<PojoReference>> asReference() {
+	public SearchQueryResultContext<?, SearchQuery<PojoReference>> asReference() {
 		return searchScopeDelegate.queryAsReference( JavaBeanSearchQuery::new );
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<SearchQuery<T>> asProjection(
+	public <T> SearchQueryResultContext<?, SearchQuery<T>> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, ?>, ? extends SearchProjectionTerminalContext<T>> projectionContributor) {
 		return asProjection( projectionContributor.apply( searchScopeDelegate.projection() ).toProjection() );
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<SearchQuery<T>> asProjection(SearchProjection<T> projection) {
+	public <T> SearchQueryResultContext<?, SearchQuery<T>> asProjection(SearchProjection<T> projection) {
 		return searchScopeDelegate.queryAsProjection(
 				ObjectLoader.identity(), JavaBeanSearchQuery::new, projection
 		);
 	}
 
 	@Override
-	public SearchQueryResultContext<SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
+	public SearchQueryResultContext<?, SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
 		return searchScopeDelegate.queryAsProjections(
 				ObjectLoader.identity(), JavaBeanSearchQuery::new, projections
 		);
