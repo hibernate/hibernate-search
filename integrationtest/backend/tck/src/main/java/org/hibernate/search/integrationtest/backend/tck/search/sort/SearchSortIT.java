@@ -39,6 +39,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -276,7 +277,7 @@ public class SearchSortIT {
 	public void extension() {
 		IndexSearchQuery<DocumentReference> query;
 
-		// Mandatory extension
+		// Mandatory extension, supported
 		query = simpleQuery( c -> c
 				.extension( new SupportedExtension() ).byField( "string" ).onMissingValue().sortLast()
 		);
@@ -287,6 +288,13 @@ public class SearchSortIT {
 		);
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+
+		// Mandatory extension, unsupported
+		SubTest.expectException(
+				() -> indexManager.createSearchScope().sort().extension( new UnSupportedExtension() )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class );
 
 		// Conditional extensions with orElse - two, both supported
 		query = simpleQuery( b -> b
