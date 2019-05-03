@@ -61,10 +61,8 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 	}
 
 	@Override
-	public void contribute(LuceneSearchSortCollector collector, List<LuceneSearchSortBuilder> builders) {
-		for ( LuceneSearchSortBuilder builder : builders ) {
-			builder.buildAndContribute( collector );
-		}
+	public void contribute(LuceneSearchSortCollector collector, LuceneSearchSortBuilder builder) {
+		builder.buildAndContribute( collector );
 	}
 
 	@Override
