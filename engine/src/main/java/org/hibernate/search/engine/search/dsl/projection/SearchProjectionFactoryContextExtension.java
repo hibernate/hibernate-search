@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchPro
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 /**
- * An extension to the search query DSL, allowing to add non-standard predicates to a query.
+ * An extension to the search query DSL, allowing to add non-standard projections to a query.
  * <p>
  * <strong>WARNING:</strong> while this type is API, because instances should be manipulated by users,
  * all of its methods are considered SPIs and therefore should never be called or implemented directly by users.
@@ -37,7 +37,7 @@ public interface SearchProjectionFactoryContextExtension<T, R, O> {
 	 *
 	 * @param original The original, non-extended {@link SearchProjectionFactoryContext}.
 	 * @param factory A {@link SearchProjectionBuilderFactory}.
-	 * @return An optional containing the extended search predicate factory context ({@link T}) in case
+	 * @return An optional containing the extended search projection factory context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
 	Optional<T> extendOptional(SearchProjectionFactoryContext<R, O> original,
