@@ -10,6 +10,10 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
@@ -18,21 +22,34 @@ import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 
-public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
+public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q>, SearchQueryResultContext<Q> {
 
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
 	private final Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory;
-	private final SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector;
 
+	private final SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector;
 	private final SearchQuerySortCollector<? super C, ?> searchSortCollector;
 
 	public SearchQueryContextImpl(IndexSearchScope<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
-			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
-			SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector) {
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
-		this.searchPredicateCollector = searchPredicateCollector;
+		this.searchPredicateCollector = new SearchQueryPredicateCollector<>(
+				targetContext.getSearchPredicateBuilderFactory()
+		);
 		this.searchSortCollector = new SearchQuerySortCollector<>( targetContext.getSearchSortBuilderFactory() );
+	}
+
+	@Override
+	public SearchQueryContext<Q> predicate(SearchPredicate predicate) {
+		searchPredicateCollector.collect( predicate );
+		return this;
+	}
+
+	@Override
+	public SearchQueryContext<Q> predicate(Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> dslPredicateContributor) {
+		searchPredicateCollector.collect( dslPredicateContributor );
+		return this;
 	}
 
 	@Override
