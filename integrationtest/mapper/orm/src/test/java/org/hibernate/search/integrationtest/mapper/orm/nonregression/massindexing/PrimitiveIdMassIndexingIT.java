@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -60,7 +61,7 @@ public class PrimitiveIdMassIndexingIT {
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
-			backendMock.expectWorksAnyOrder( EntityWithPrimitiveId.INDEX )
+			backendMock.expectWorksAnyOrder( EntityWithPrimitiveId.INDEX, DocumentRefreshStrategy.NONE )
 					.add( "1", b -> { } )
 					.add( "2", b -> { } )
 					.add( "3", b -> { } )

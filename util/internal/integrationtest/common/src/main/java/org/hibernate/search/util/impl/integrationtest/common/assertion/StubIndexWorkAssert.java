@@ -52,6 +52,8 @@ public class StubIndexWorkAssert {
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 		mismatch = checkForMismatch( builder, "routingKey", expected.getRoutingKey(), actual.getRoutingKey() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
+		mismatch = checkForMismatch( builder, "refreshStrategy", expected.getRefreshStrategy(), actual.getRefreshStrategy() );
+		hasAnyMismatch = hasAnyMismatch || mismatch;
 
 		Map<String, StubTreeNodeMismatch> documentMismatches =
 				StubTreeNodeCompare.compare( expected.getDocument(), actual.getDocument() );

@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
@@ -108,13 +109,18 @@ public class BackendMock implements TestRule {
 	}
 
 	public WorkCallListContext expectWorks(String indexName) {
-		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( indexName );
-		return new WorkCallListContext( indexName, callQueue::expectInOrder );
+		// Default to no refresh, which is what the mapper should use by default
+		return expectWorks( indexName, DocumentRefreshStrategy.NONE );
 	}
 
-	public WorkCallListContext expectWorksAnyOrder(String indexName) {
+	public WorkCallListContext expectWorks(String indexName, DocumentRefreshStrategy refreshStrategyForDocumentWorks) {
 		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( indexName );
-		return new WorkCallListContext( indexName, callQueue::expectOutOfOrder );
+		return new WorkCallListContext( indexName, refreshStrategyForDocumentWorks, callQueue::expectInOrder );
+	}
+
+	public WorkCallListContext expectWorksAnyOrder(String indexName, DocumentRefreshStrategy refreshStrategyForDocumentWorks) {
+		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( indexName );
+		return new WorkCallListContext( indexName, refreshStrategyForDocumentWorks, callQueue::expectOutOfOrder );
 	}
 
 	public BackendMock expectSearchReferences(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
@@ -154,36 +160,39 @@ public class BackendMock implements TestRule {
 
 	public class WorkCallListContext {
 		private final String indexName;
+		private final DocumentRefreshStrategy refreshStrategyForDocumentWorks;
 		private final Consumer<IndexWorkCall> expectationConsumer;
 		private final List<StubIndexWork> works = new ArrayList<>();
 
-		private WorkCallListContext(String indexName, Consumer<IndexWorkCall> expectationConsumer) {
+		private WorkCallListContext(String indexName, DocumentRefreshStrategy refreshStrategyForDocumentWorks,
+				Consumer<IndexWorkCall> expectationConsumer) {
 			this.indexName = indexName;
+			this.refreshStrategyForDocumentWorks = refreshStrategyForDocumentWorks;
 			this.expectationConsumer = expectationConsumer;
 		}
 
 		public WorkCallListContext add(Consumer<StubIndexWork.Builder> contributor) {
-			return work( StubIndexWork.Type.ADD, contributor );
+			return documentWork( StubIndexWork.Type.ADD, contributor );
 		}
 
 		public WorkCallListContext add(String id, Consumer<StubDocumentNode.Builder> documentContributor) {
-			return work( StubIndexWork.Type.ADD, id, documentContributor );
+			return documentWork( StubIndexWork.Type.ADD, id, documentContributor );
 		}
 
 		public WorkCallListContext update(Consumer<StubIndexWork.Builder> contributor) {
-			return work( StubIndexWork.Type.UPDATE, contributor );
+			return documentWork( StubIndexWork.Type.UPDATE, contributor );
 		}
 
 		public WorkCallListContext update(String id, Consumer<StubDocumentNode.Builder> documentContributor) {
-			return work( StubIndexWork.Type.UPDATE, id, documentContributor );
+			return documentWork( StubIndexWork.Type.UPDATE, id, documentContributor );
 		}
 
 		public WorkCallListContext delete(String id) {
-			return work( StubIndexWork.Type.DELETE, b -> b.identifier( id ) );
+			return documentWork( StubIndexWork.Type.DELETE, b -> b.identifier( id ) );
 		}
 
 		public WorkCallListContext delete(Consumer<StubIndexWork.Builder> contributor) {
-			return work( StubIndexWork.Type.DELETE, contributor );
+			return documentWork( StubIndexWork.Type.DELETE, contributor );
 		}
 
 		public WorkCallListContext optimize() {
@@ -198,15 +207,17 @@ public class BackendMock implements TestRule {
 			return work( StubIndexWork.builder( StubIndexWork.Type.FLUSH ).build() );
 		}
 
-		WorkCallListContext work(StubIndexWork.Type type, Consumer<StubIndexWork.Builder> contributor) {
+		WorkCallListContext documentWork(StubIndexWork.Type type,
+				Consumer<StubIndexWork.Builder> contributor) {
 			StubIndexWork.Builder builder = StubIndexWork.builder( type );
 			contributor.accept( builder );
+			builder.refresh( refreshStrategyForDocumentWorks );
 			return work( builder.build() );
 		}
 
-		WorkCallListContext work(StubIndexWork.Type type, String id,
+		WorkCallListContext documentWork(StubIndexWork.Type type, String id,
 				Consumer<StubDocumentNode.Builder> documentContributor) {
-			return work( type, b -> {
+			return documentWork( type, b -> {
 				b.identifier( id );
 				StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 				documentContributor.accept( documentBuilder );

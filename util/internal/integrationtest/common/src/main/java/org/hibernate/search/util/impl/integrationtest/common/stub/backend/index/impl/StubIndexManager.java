@@ -71,8 +71,7 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	@Override
 	public IndexWorkPlan<StubDocumentElement> createWorkPlan(SessionContextImplementor context,
 			DocumentRefreshStrategy refreshStrategy) {
-		// FIXME take the refresh strategy into account here and in assertions
-		return new StubIndexWorkPlan( this, context );
+		return new StubIndexWorkPlan( this, context, refreshStrategy );
 	}
 
 	@Override

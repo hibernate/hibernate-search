@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
@@ -35,6 +36,7 @@ public class StubIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<
 				.identifier( documentReferenceProvider.getIdentifier() )
 				.routingKey( documentReferenceProvider.getRoutingKey() )
 				.document( documentBuilder.build() )
+				.refresh( DocumentRefreshStrategy.NONE )
 				.build();
 
 		return indexManager.prepareAndExecuteWork( work );

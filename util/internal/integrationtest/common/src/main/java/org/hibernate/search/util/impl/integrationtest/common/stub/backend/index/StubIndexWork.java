@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index;
 
+import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 
 public final class StubIndexWork {
@@ -22,6 +23,7 @@ public final class StubIndexWork {
 	private final String tenantIdentifier;
 	private final String identifier;
 	private final String routingKey;
+	private final DocumentRefreshStrategy refreshStrategy;
 	private final StubDocumentNode document;
 
 	private StubIndexWork(Builder builder) {
@@ -29,6 +31,7 @@ public final class StubIndexWork {
 		this.tenantIdentifier = builder.tenantIdentifier;
 		this.identifier = builder.identifier;
 		this.routingKey = builder.routingKey;
+		this.refreshStrategy = builder.refreshStrategy;
 		this.document = builder.document;
 	}
 
@@ -48,6 +51,10 @@ public final class StubIndexWork {
 		return routingKey;
 	}
 
+	public DocumentRefreshStrategy getRefreshStrategy() {
+		return refreshStrategy;
+	}
+
 	public StubDocumentNode getDocument() {
 		return document;
 	}
@@ -59,6 +66,7 @@ public final class StubIndexWork {
 				+ ", tenantIdentifier=" + tenantIdentifier
 				+ ", identifier=" + identifier
 				+ ", routingKey=" + routingKey
+				+ ", refreshStrategy=" + refreshStrategy
 				+ ", document=" + document
 				+ "]";
 	}
@@ -69,6 +77,7 @@ public final class StubIndexWork {
 		private String tenantIdentifier;
 		private String identifier;
 		private String routingKey;
+		private DocumentRefreshStrategy refreshStrategy;
 		private StubDocumentNode document;
 
 		private Builder(Type type) {
@@ -87,6 +96,11 @@ public final class StubIndexWork {
 
 		public Builder routingKey(String routingKey) {
 			this.routingKey = routingKey;
+			return this;
+		}
+
+		public Builder refresh(DocumentRefreshStrategy refreshStrategy) {
+			this.refreshStrategy = refreshStrategy;
 			return this;
 		}
 
