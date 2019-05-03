@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
+public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
 
 	private final LuceneWorkFactory workFactory;
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;

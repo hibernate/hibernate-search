@@ -13,7 +13,10 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearchPredicateFactoryContextImpl;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
 import org.hibernate.search.backend.lucene.search.dsl.projection.impl.LuceneSearchProjectionFactoryContextImpl;
+import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
+import org.hibernate.search.backend.lucene.search.dsl.query.impl.LuceneSearchQueryContextImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
@@ -27,11 +30,14 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
+import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -42,6 +48,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * all of its methods are considered SPIs and therefore should never be called directly by users.
  * In short, users are only expected to get instances of this type from an API and pass it to another API.
  *
+ * @param <Q> The query type.
+ * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+ * {@code .extension( LuceneExtension.get() }.
  * @param <R> The reference type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( LuceneExtension.get() }.
@@ -49,23 +58,40 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( LuceneExtension.get() }.
  */
-public final class LuceneExtension<R, O>
-		implements SearchPredicateFactoryContextExtension<LuceneSearchPredicateFactoryContext>,
+public final class LuceneExtension<Q, R, O>
+		implements SearchQueryContextExtension<LuceneSearchQueryResultContext<Q>, Q>,
+		SearchPredicateFactoryContextExtension<LuceneSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<LuceneSearchSortContainerContext>,
 		SearchProjectionFactoryContextExtension<LuceneSearchProjectionFactoryContext<R, O>, R, O>,
 		IndexFieldTypeFactoryContextExtension<LuceneIndexFieldTypeFactoryContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final LuceneExtension<Object, Object> INSTANCE = new LuceneExtension<>();
+	private static final LuceneExtension<Object, Object, Object> INSTANCE = new LuceneExtension<>();
 
-	@SuppressWarnings("unchecked") // The instance works for any R and O
-	public static <R, O> LuceneExtension<R, O> get() {
-		return (LuceneExtension<R, O>) INSTANCE;
+	@SuppressWarnings("unchecked") // The instance works for any Q, R and O
+	public static <Q, R, O> LuceneExtension<Q, R, O> get() {
+		return (LuceneExtension<Q, R, O>) INSTANCE;
 	}
 
 	private LuceneExtension() {
 		// Private constructor, use get() instead.
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<LuceneSearchQueryResultContext<Q>> extendOptional(SearchQueryContextImplementor<?, Q> original,
+			SearchQueryBuilder<?, ?> builder) {
+		if ( builder instanceof LuceneSearchQueryBuilder ) {
+			return Optional.of( new LuceneSearchQueryContextImpl<>(
+					original, (LuceneSearchQueryBuilder<?>) builder
+			) );
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 
 	/**
