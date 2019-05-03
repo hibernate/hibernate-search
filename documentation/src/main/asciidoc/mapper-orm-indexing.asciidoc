@@ -69,18 +69,78 @@ will automatically lead to a similar modification to the index.
 and indexing requires an explicit action (see <<mapper-orm-indexing-explicit>>).
 
 [[mapper-orm-indexing-automatic-synchronization]]
-=== Synchronization with the index
+=== Synchronization with the indexes
 
 include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3317 explain in transaction/post transaction synchronizations, when they can be used and what they mean
+// TODO HSEARCH-3305 explain explicit flush/refresh
 
-// TODO explain in transaction/post transaction synchronizations, when they can be used and what they mean
+Hibernate Search offers multiple strategies to control synchronization with the indexes
+during automatic indexing,
+i.e. to control the minimum progress of indexing before the transaction commit returns.
 
-// TODO explain how to configure how transactions should synchronize with the index (i.e. how they should wait for changes to propagate):
-// - HSEARCH-3316 completion handler (sync/async, refresh request?, flush request?)
-// - refresh_after_write setting (maybe we'll want to make that a mapper setting, forwarded to the work plan?)
-// - (experts) HSEARCH-3305 explicit flush/refresh
-// TODO Also link to the ES backend documentation, to a section explaining near-real-time and how to configure it
-// Link to ES doc explaining near-real-time: https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started-concepts.html#_near_realtime_nrt
+You can define a default strategy for all sessions by setting the configuration property
+`hibernate.search.automatic_indexing.synchronization_strategy`:
+
+* when set to `queued`, the transaction commit will return as soon as
+the index changes are queued in the backend.
++
+This strategy offers no guarantee as to whether indexing will be performed successfully,
+or even whether indexing will be performed at all:
+the local JVM may crash before the works are executed, in which case the indexing requests will be forgotten,
+or indexing may simply fail.
+* by default or when set to `committed`, the transaction commit will return as soon as
+the index changes are committed to disk.
++
+This generally means that at the very least
+that the backend validated the index changes,
+took appropriate measures to be able to recover the changes in the event of a crash,
+and confirmed to Hibernate Search it did so
+(e.g. for Elasticsearch, Hibernate Search received a successful response to the HTTP request).
++
+This strategy offers no guarantee as to whether indexed documents are searchable:
+the backend may delay indexing in order to improve performance,
+meaning a search query executed immediately after Hibernate ORM returns from the transaction
+may return outdated information.
++
+This is true in particular with the Elasticsearch backend,
+which is link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time]
+by default.
+* when set to `searchable`, the transaction commit will return as soon as
+the index changes are committed to disk
+*and* the relevant documents are searchable.
+The backend will be told to make the documents searchable as soon as possible.
++
+Depending on the backend and its configuration,
+this strategy may lead to poor indexing throughput,
+because the backend may not be optimized for frequent, on-demand index refreshes.
++
+That is why this strategy is only recommended if you know your backend is optimized for it
+(for example this is true for the default configuration of the Lucene backend, but not for the Elasticsearch backend),
+or for integration tests.
+
+While the above configuration property defines a default,
+it is possible to override this default on a particular session
+by calling `SearchSession#setAutomaticIndexingSynchronizationStrategy` and passing a different strategy.
+The built-in strategies can be retrieved by calling
+`AutomaticIndexingSynchronizationStrategy.queued()`,
+`AutomaticIndexingSynchronizationStrategy.committed()`
+or `AutomaticIndexingSynchronizationStrategy.searchable()`,
+but you can also define a custom strategy.
+
+.Overriding the automatic indexing synchronization strategy
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmAutomaticIndexingIT.java[tags=automatic-indexing-synchronization-strategy-override]
+----
+<1> Obtain the search session, which by default uses the synchronization strategy configured in properties.
+<2> Override the syncrhonization strategy.
+<3> Change an entity.
+<4> Commit the changes, triggering reindexing.
+<5> The overridden strategy guarantees that the modified book will be present in these results,
+even though the query was executed _just after_ the transaction commit.
+====
 
 [[mapper-orm-indexing-explicit]]
 == Explicit indexing

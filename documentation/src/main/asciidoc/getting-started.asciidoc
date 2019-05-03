@@ -245,8 +245,9 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 
 [IMPORTANT]
 ====
-By default, in particular when using the Elasticsearch backend, changes will not be visible right after the transaction is committed;
-a slight delay (by default one second) will be necessary for Elasticsearch to process the changes.
+By default, in particular when using the Elasticsearch backend,
+changes will not be visible right after the transaction is committed.
+A slight delay (by default one second) will be necessary for Elasticsearch to process the changes.
 
 For that reason, if you modify entities in a transaction,
 and then a execute search query right after that transaction,
