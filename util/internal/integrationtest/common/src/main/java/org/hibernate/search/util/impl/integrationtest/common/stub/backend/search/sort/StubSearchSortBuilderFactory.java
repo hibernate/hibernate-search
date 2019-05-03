@@ -31,8 +31,8 @@ public class StubSearchSortBuilderFactory
 	}
 
 	@Override
-	public void contribute(StubQueryElementCollector collector, List<StubSortBuilder> builders) {
-		builders.forEach( StubSortBuilder::simulateBuild );
+	public void contribute(StubQueryElementCollector collector, StubSortBuilder builder) {
+		builder.simulateBuild();
 		collector.simulateCollectCall();
 	}
 

@@ -59,10 +59,8 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchSortCollector collector, List<ElasticsearchSearchSortBuilder> builders) {
-		for ( ElasticsearchSearchSortBuilder builder : builders ) {
-			builder.buildAndAddTo( collector );
-		}
+	public void contribute(ElasticsearchSearchSortCollector collector, ElasticsearchSearchSortBuilder builder) {
+		builder.buildAndAddTo( collector );
 	}
 
 	@Override

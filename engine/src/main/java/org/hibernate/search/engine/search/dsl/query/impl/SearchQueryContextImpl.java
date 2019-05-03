@@ -13,42 +13,47 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
+import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
+import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 
 public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q>, SearchQueryResultContext<Q> {
 
+	private final IndexSearchScope<C> indexSearchScope;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
 	private final Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory;
 
-	private final SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector;
-	private final SearchQuerySortCollector<? super C, ?> searchSortCollector;
-
-	public SearchQueryContextImpl(IndexSearchScope<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
+	public SearchQueryContextImpl(IndexSearchScope<C> indexSearchScope, SearchQueryBuilder<T, C> searchQueryBuilder,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
+		this.indexSearchScope = indexSearchScope;
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
-		this.searchPredicateCollector = new SearchQueryPredicateCollector<>(
-				targetContext.getSearchPredicateBuilderFactory()
-		);
-		this.searchSortCollector = new SearchQuerySortCollector<>( targetContext.getSearchSortBuilderFactory() );
 	}
 
 	@Override
 	public SearchQueryContext<Q> predicate(SearchPredicate predicate) {
-		searchPredicateCollector.collect( predicate );
+		SearchPredicateBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchPredicateBuilderFactory();
+		contribute( factory, predicate );
 		return this;
 	}
 
 	@Override
-	public SearchQueryContext<Q> predicate(Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> dslPredicateContributor) {
-		searchPredicateCollector.collect( dslPredicateContributor );
+	public SearchQueryContext<Q> predicate(Function<? super SearchPredicateFactoryContext,
+			SearchPredicateTerminalContext> dslPredicateContributor) {
+		SearchPredicateBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchPredicateBuilderFactory();
+		SearchPredicateFactoryContext factoryContext = new DefaultSearchPredicateFactoryContext<>( factory );
+		SearchPredicate predicate = dslPredicateContributor.apply( factoryContext ).toPredicate();
+		contribute( factory, predicate );
 		return this;
 	}
 
@@ -66,33 +71,43 @@ public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext
 
 	@Override
 	public SearchQueryContext<Q> sort(SearchSort sort) {
-		searchSortCollector.collect( sort );
+		SearchSortBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchSortBuilderFactory();
+		contribute( factory, sort );
 		return this;
 	}
 
 	@Override
 	public SearchQueryContext<Q> sort(Consumer<? super SearchSortContainerContext> dslSortContributor) {
-		searchSortCollector.collect( dslSortContributor );
+		SearchSortBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchSortBuilderFactory();
+		contribute( factory, dslSortContributor );
 		return this;
 	}
 
 	@Override
 	public Q toQuery() {
-		/*
-		 * HSEARCH-3207: we must never call a contribution twice.
-		 * Contributions may have side-effects, such as finishing the building of a boolean predicate by adding
-		 * should clauses. Thus it's really not a good idea to execute a contribution twice,
-		 * and delaying the contribution until the very end of the query building prevents that from ever happening.
-		 *
-		 * This means we must delay the contribution to some time when the user cannot use the DSL anymore
-		 * (i.e. when this build() method is called),
-		 * otherwise we'd need to execute the contribution upon some DSL method being called
-		 * (an end() method for example), and this method could be called twice by the user.
-		 */
-		C collector = searchQueryBuilder.getQueryElementCollector();
-		searchPredicateCollector.contribute( collector );
-		searchSortCollector.contribute( collector );
 		return searchQueryBuilder.build( searchQueryWrapperFactory );
+	}
+
+	private <B> void contribute(SearchPredicateBuilderFactory<? super C, B> factory, SearchPredicate predicate) {
+		factory.contribute( searchQueryBuilder.getQueryElementCollector(), factory.toImplementation( predicate ) );
+	}
+
+	private <B> void contribute(SearchSortBuilderFactory<? super C, B> factory, SearchSort sort) {
+		factory.toImplementation( sort, b -> factory.contribute( searchQueryBuilder.getQueryElementCollector(), b ) );
+	}
+
+	private <B> void contribute(SearchSortBuilderFactory<? super C, B> factory,
+			Consumer<? super SearchSortContainerContext> dslSortContributor) {
+		C collector = searchQueryBuilder.getQueryElementCollector();
+
+		SearchSortDslContextImpl<B> rootDslContext = new SearchSortDslContextImpl<>( factory );
+		SearchSortContainerContext containerContext =
+				new DefaultSearchSortContainerContext<>( factory, rootDslContext );
+		dslSortContributor.accept( containerContext );
+
+		for ( B builder : rootDslContext.getResultingBuilders() ) {
+			factory.contribute( collector, builder );
+		}
 	}
 
 }

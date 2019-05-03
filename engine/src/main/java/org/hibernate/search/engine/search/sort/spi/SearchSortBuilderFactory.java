@@ -54,9 +54,9 @@ public interface SearchSortBuilderFactory<C, B> {
 	 * May be called multiple times per collector, if there are multiple sorts.
 	 *
 	 * @param collector The query element collector.
-	 * @param builders The sort builder implementations.
+	 * @param builder The sort builder implementation.
 	 */
-	void contribute(C collector, List<B> builders);
+	void contribute(C collector, B builder);
 
 	ScoreSortBuilder<B> score();
 
