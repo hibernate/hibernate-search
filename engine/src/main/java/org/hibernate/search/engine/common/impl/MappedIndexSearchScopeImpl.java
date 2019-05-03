@@ -13,13 +13,13 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.query.impl.SearchQueryContextImpl;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.query.impl.SearchQueryResultContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
@@ -59,7 +59,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 		SearchQueryBuilder<T, C> builder = delegate.getSearchQueryBuilderFactory()
 				.asObject( sessionContext, projectionHitMapper );
 
-		return new SearchQueryResultContextImpl<>(
+		return new SearchQueryContextImpl<>(
 				delegate, builder, searchQueryWrapperFactory
 		);
 	}
@@ -72,7 +72,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 		SearchQueryBuilder<R, C> builder = delegate.getSearchQueryBuilderFactory()
 				.asReference( sessionContext, referenceHitMapper );
 
-		return new SearchQueryResultContextImpl<>(
+		return new SearchQueryContextImpl<>(
 				delegate, builder, searchQueryWrapperFactory
 		);
 	}
@@ -87,7 +87,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 		SearchQueryBuilder<T, C> builder = delegate.getSearchQueryBuilderFactory()
 				.asProjection( sessionContext, projectionHitMapper, projection );
 
-		return new SearchQueryResultContextImpl<>(
+		return new SearchQueryContextImpl<>(
 				delegate, builder, searchQueryWrapperFactory
 		);
 	}
@@ -104,7 +104,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 		SearchQueryBuilder<List<?>, C> builder = delegate.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, projectionHitMapper, projections );
 
-		return new SearchQueryResultContextImpl<>(
+		return new SearchQueryContextImpl<>(
 				delegate, builder, searchQueryWrapperFactory
 		);
 	}
