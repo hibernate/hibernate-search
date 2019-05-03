@@ -31,6 +31,8 @@ import org.assertj.core.api.Assertions;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
+import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -91,6 +93,25 @@ public class LuceneExtensionIT {
 				.setup();
 
 		initData();
+	}
+
+	@Test
+	public void query() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		// Put intermediary contexts into variables to check they have the right type
+		LuceneSearchQueryResultContext<IndexSearchQuery<DocumentReference>> context1 = scope.query()
+				.asReference()
+				.extension( LuceneExtension.get() );
+		LuceneSearchQueryContext<IndexSearchQuery<DocumentReference>> context2 =
+				context1.predicate( f -> f.matchAll() );
+		LuceneSearchQueryContext<IndexSearchQuery<DocumentReference>> context3 =
+				context2.sort( c -> c.byIndexOrder() );
+		IndexSearchQuery<DocumentReference> query = context3.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
+				.hasTotalHitCount( 5 );
 	}
 
 	@Test
