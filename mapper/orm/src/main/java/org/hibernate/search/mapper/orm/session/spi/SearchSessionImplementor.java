@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.session.spi;
 
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
-import org.hibernate.search.mapper.orm.session.impl.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;

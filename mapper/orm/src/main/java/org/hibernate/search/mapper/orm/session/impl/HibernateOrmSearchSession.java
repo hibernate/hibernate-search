@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.search.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
@@ -41,7 +42,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SessionImplementor sessionImplementor;
-	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+	private AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
 	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder) {
 		super( builder );
@@ -92,6 +93,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public PojoSessionWorkExecutor createSessionWorkExecutor() {
 		return getDelegate().createSessionWorkExecutor();
+	}
+
+	@Override
+	public void setAutomaticIndexingSynchronizationStrategy(
+			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+		this.synchronizationStrategy = synchronizationStrategy;
 	}
 
 	@Override

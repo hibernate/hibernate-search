@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.session;
 
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 
 public interface SearchSessionBuilder {
 
@@ -15,6 +16,12 @@ public interface SearchSessionBuilder {
 	 * @return {@code this} for method chaining.
 	 */
 	SearchSessionBuilder tenantId(String tenantId);
+
+	/**
+	 * @param refreshStrategy The refresh strategy for indexing works added to the {@link SearchSession#getMainWorkPlan() main work plan}.
+	 * @return {@code this} for method chaining.
+	 */
+	SearchSessionBuilder refreshStrategy(DocumentRefreshStrategy refreshStrategy);
 
 	/**
 	 * @return The resulting session.

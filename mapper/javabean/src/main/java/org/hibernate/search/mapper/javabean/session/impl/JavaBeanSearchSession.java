@@ -24,10 +24,12 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionC
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 
 public class JavaBeanSearchSession extends AbstractPojoSearchSession implements SearchSession {
+	private final DocumentRefreshStrategy refreshStrategy;
 	private SearchWorkPlanImpl workPlan;
 
 	private JavaBeanSearchSession(JavaBeanSearchSessionBuilder builder) {
 		super( builder );
+		this.refreshStrategy = builder.refreshStrategy;
 	}
 
 	@Override
@@ -48,8 +50,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession implements 
 	@Override
 	public SearchWorkPlan getMainWorkPlan() {
 		if ( workPlan == null ) {
-			// FIXME allow to customize the refresh strategy
-			workPlan = new SearchWorkPlanImpl( getDelegate().createWorkPlan( DocumentRefreshStrategy.FORCE ) );
+			workPlan = new SearchWorkPlanImpl( getDelegate().createWorkPlan( refreshStrategy ) );
 		}
 		return workPlan;
 	}
@@ -58,6 +59,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession implements 
 			implements SearchSessionBuilder {
 		private final JavaBeanMappingContext mappingContext;
 		private String tenantId;
+		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
 		public JavaBeanSearchSessionBuilder(PojoMappingDelegate mappingDelegate, JavaBeanMappingContext mappingContext) {
 			super( mappingDelegate );
@@ -67,6 +69,12 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession implements 
 		@Override
 		public JavaBeanSearchSessionBuilder tenantId(String tenantId) {
 			this.tenantId = tenantId;
+			return this;
+		}
+
+		@Override
+		public SearchSessionBuilder refreshStrategy(DocumentRefreshStrategy refreshStrategy) {
+			this.refreshStrategy = refreshStrategy;
 			return this;
 		}
 

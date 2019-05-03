@@ -13,7 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.session.impl.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -51,11 +51,11 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.get( propertySource );
 		switch ( name ) {
 			case QUEUED:
-				return AutomaticIndexingSynchronizationStrategy.QUEUED;
+				return AutomaticIndexingSynchronizationStrategy.queued();
 			case COMMITTED:
-				return AutomaticIndexingSynchronizationStrategy.COMMITTED;
+				return AutomaticIndexingSynchronizationStrategy.committed();
 			case SEARCHABLE:
-				return AutomaticIndexingSynchronizationStrategy.SEARCHABLE;
+				return AutomaticIndexingSynchronizationStrategy.searchable();
 			default:
 				throw new AssertionFailure( "Unexpected automatic indexing synchronization strategy name: " + name );
 		}
