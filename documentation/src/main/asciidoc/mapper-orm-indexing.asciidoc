@@ -1,28 +1,72 @@
 [[mapper-orm-indexing]]
 = Indexing
 
-== Configuration
-
-The property `hibernate.search.automatic_indexing.strategy` controls how entities are indexed:
-
-* by default, or when set to `session`, each change to an indexed entity
-(persist, update, delete) through a Hibernate ORM Session/EntityManager
-will automatically lead to a similar modification to the index
-(see <<mapper-orm-indexing-automatic>>).
-* when set to `none`, changes to entities are ignored,
-and indexing requires an explicit action (see <<mapper-orm-indexing-explicit>>).
-
-The <<configuration-property-types,boolean property>> `hibernate.search.automatic_indexing.enable_dirty_check`
-controls how Hibernate Search decides to reindex a updated entity:
-
-* by default, or when set to `true`, Hibernate Search will only trigger reindexing if the properties of the entity that changed
-are actually used as a source to generate the indexable document.
-* when set to `false`, Hibernate Search will trigger reindexing regardless of the entity properties that changed.
-
 [[mapper-orm-indexing-automatic]]
 == Automatic indexing
 
-include::todo-placeholder.asciidoc[]
+By default, every time an entity is changed through a Hibernate ORM Session,
+if that entity is <<mapper-orm-entityindexmapping,mapped to an index>>,
+Hibernate Search updates the relevant index.
+
+Below are a few facts to explain how automatic indexing works.
+
+Changes have to occur in the ORM session in order to be detected::
+Hibernate Search uses internal events of Hibernate ORM in order to detect changes:
+these events will only be triggered if you actually manipulate managed entity objects in your code,
+updating them by setting their properties or deleting them by calling the appropriate method
+on the Hibernate ORM session.
++
+Conversely, changes resulting from `insert`/`delete`/`update` queries, be it SQL or JPQL/HQL queries,
+are not detected by Hibernate Search.
+This is because queries are executed on the database side,
+ without Hibernate having any knowledge of which entities are actually created, deleted or updated.
+One workaround is to <<mapper-orm-indexing-explicit,explicitly reindex>> after you run such queries.
+Indexing happens after transactions are committed::
+Indexes are not updated immediately, but only after transactions are successfully committed.
+That way, if a transaction is rolled back, the indexes will be left in a state consistent with the database.
+Index changes may not be visible immediately::
+By default, the transaction commit will return after index changes are committed to the indexes.
+This means index changes are safely stored to disk,
+but this does not mean a search query ran immediately after the transaction commit will take the changes into account:
+when using the Elasticsearch backend in particular, changes may take some time to be visible from search queries.
++
+See <<mapper-orm-indexing-automatic-synchronization>> for details.
+Only relevant changes trigger indexing::
+Hibernate Search is aware of the properties that are accessed when building indexed documents.
+Thanks to that knowledge, it is able to skip reindexing
+when a property is modified, but does not affect the indexed document.
++
+You can control this "dirty checking" by setting
+the <<configuration-property-types,boolean property>> `hibernate.search.automatic_indexing.enable_dirty_check`:
++
+* by default, or when set to `true`,
+Hibernate Search will consider whether modified properties are relevant
+before triggering reindexing.
+* when set to `false`, Hibernate Search will trigger reindexing upon any change,
+regardless of the entity properties that changed.
+Indexing may fetch extra data from the database::
+Even when you change only a single property of an indexed entity,
+if that property is indexed,
+Hibernate Search needs to rebuild the corresponding document *in full*.
++
+Even if Hibernate Search tries to only load what is necessary for indexing,
+depending on your mapping, this may lead to lazy associations being loaded just to reindex entities,
+even if you didn't need them in your business code.
++
+This extra cost can be mitigated to some extent by leveraging Hibernate ORM's batch fetching;
+see link:{hibernateDocUrl}#configurations-database-fetch[the `batch_fetch_size` property]
+and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
+
+Automatic indexing may be unnecessary if your index is read-only
+or if you update it regularly through <<mapper-orm-indexing-explicit,explicit indexing>>.
+You can enable or disable automatic indexing by setting the configuration property
+`hibernate.search.automatic_indexing.strategy`:
+
+* when set to `session`, each change to an indexed entity
+(persist, update, delete) through a Hibernate ORM Session/EntityManager
+will automatically lead to a similar modification to the index.
+* when set to `none`, changes to entities are ignored,
+and indexing requires an explicit action (see <<mapper-orm-indexing-explicit>>).
 
 [[mapper-orm-indexing-automatic-synchronization]]
 === Synchronization with the index
