@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-class ElasticsearchSearchQueryBuilder<T>
+public class ElasticsearchSearchQueryBuilder<T>
 		implements SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> {
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
