@@ -38,10 +38,12 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubObj
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingSearchScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -308,7 +310,7 @@ public class SearchProjectionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		IndexSearchQuery<String> query;
 
-		// Mandatory extension
+		// Mandatory extension, supported
 		query = scope.query()
 				.asProjection( f -> f.extension( new SupportedExtension<>() )
 						.extendedProjection( "string1", String.class )
@@ -317,6 +319,13 @@ public class SearchProjectionIT {
 				.toQuery();
 		assertThat( query )
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
+
+		// Mandatory extension, unsupported
+		SubTest.expectException(
+				() -> scope.projection().extension( new UnSupportedExtension<>() )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class );
 
 		// Conditional extensions with orElse - two, both supported
 		query = scope.query()

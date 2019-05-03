@@ -25,8 +25,10 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -189,7 +191,7 @@ public class SearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		IndexSearchQuery<DocumentReference> query;
 
-		// Mandatory extension
+		// Mandatory extension, supported
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.extension( new SupportedExtension() )
@@ -198,6 +200,13 @@ public class SearchPredicateIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// Mandatory extension, unsupported
+		SubTest.expectException(
+				() -> scope.predicate().extension( new UnSupportedExtension() )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class );
 
 		// Conditional extensions with orElse - two, both supported
 		query = scope.query()
