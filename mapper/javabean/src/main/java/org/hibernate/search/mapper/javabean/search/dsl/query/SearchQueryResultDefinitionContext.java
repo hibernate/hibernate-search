@@ -26,7 +26,7 @@ public interface SearchQueryResultDefinitionContext {
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	SearchQueryResultContext<SearchQuery<PojoReference>> asReference();
+	SearchQueryResultContext<?, SearchQuery<PojoReference>> asReference();
 
 	/**
 	 * Define the query results as one projection for each matching document.
@@ -38,7 +38,7 @@ public interface SearchQueryResultDefinitionContext {
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	<T> SearchQueryResultContext<SearchQuery<T>> asProjection(
+	<T> SearchQueryResultContext<?, SearchQuery<T>> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, ?>, ? extends SearchProjectionTerminalContext<T>> projectionContributor);
 
 	/**
@@ -49,7 +49,7 @@ public interface SearchQueryResultDefinitionContext {
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	<T> SearchQueryResultContext<SearchQuery<T>> asProjection(SearchProjection<T> projection);
+	<T> SearchQueryResultContext<?, SearchQuery<T>> asProjection(SearchProjection<T> projection);
 
 	/**
 	 * Define the query results as a list of projections for each matching document.
@@ -64,5 +64,5 @@ public interface SearchQueryResultDefinitionContext {
 	 * @see SearchProjectionFactoryContext#composite(BiFunction, SearchProjection, SearchProjection)
 	 * @see SearchQueryResultContext
 	 */
-	SearchQueryResultContext<SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections);
+	SearchQueryResultContext<?, SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections);
 }
