@@ -12,7 +12,10 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.ElasticsearchSearchProjectionFactoryContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.impl.ElasticsearchSearchQueryContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
@@ -27,11 +30,14 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
+import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -42,6 +48,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * all of its methods are considered SPIs and therefore should never be called directly by users.
  * In short, users are only expected to get instances of this type from an API and pass it to another API.
  *
+ * @param <Q> The query type.
+ * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * @param <R> The reference type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
@@ -49,23 +57,40 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
  */
-public final class ElasticsearchExtension<R, O>
-		implements SearchPredicateFactoryContextExtension<ElasticsearchSearchPredicateFactoryContext>,
+public final class ElasticsearchExtension<Q, R, O>
+		implements SearchQueryContextExtension<ElasticsearchSearchQueryResultContext<Q>, Q>,
+		SearchPredicateFactoryContextExtension<ElasticsearchSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<ElasticsearchSearchSortContainerContext>,
 		SearchProjectionFactoryContextExtension<ElasticsearchSearchProjectionFactoryContext<R, O>, R, O>,
 		IndexFieldTypeFactoryContextExtension<ElasticsearchIndexFieldTypeFactoryContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ElasticsearchExtension<Object, Object> INSTANCE = new ElasticsearchExtension<>();
+	private static final ElasticsearchExtension<Object, Object, Object> INSTANCE = new ElasticsearchExtension<>();
 
-	@SuppressWarnings("unchecked") // The instance works for any R and O
-	public static <R, O> ElasticsearchExtension<R, O> get() {
-		return (ElasticsearchExtension<R, O>) INSTANCE;
+	@SuppressWarnings("unchecked") // The instance works for any Q, R and O
+	public static <Q, R, O> ElasticsearchExtension<Q, R, O> get() {
+		return (ElasticsearchExtension<Q, R, O>) INSTANCE;
 	}
 
 	private ElasticsearchExtension() {
 		// Private constructor, use get() instead.
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<ElasticsearchSearchQueryResultContext<Q>> extendOptional(SearchQueryContextImplementor<?, Q> original,
+			SearchQueryBuilder<?, ?> builder) {
+		if ( builder instanceof ElasticsearchSearchQueryBuilder ) {
+			return Optional.of( new ElasticsearchSearchQueryContextImpl<>(
+					original, (ElasticsearchSearchQueryBuilder<?>) builder
+			) );
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 
 	/**

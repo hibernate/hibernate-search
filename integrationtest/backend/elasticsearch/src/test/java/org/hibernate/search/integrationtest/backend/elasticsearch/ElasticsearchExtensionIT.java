@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -78,6 +80,25 @@ public class ElasticsearchExtensionIT {
 				.setup();
 
 		initData();
+	}
+
+	@Test
+	public void query() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		// Put intermediary contexts into variables to check they have the right type
+		ElasticsearchSearchQueryResultContext<IndexSearchQuery<DocumentReference>> context1 = scope.query()
+				.asReference()
+				.extension( ElasticsearchExtension.get() );
+		ElasticsearchSearchQueryContext<IndexSearchQuery<DocumentReference>> context2 =
+				context1.predicate( f -> f.matchAll() );
+		ElasticsearchSearchQueryContext<IndexSearchQuery<DocumentReference>> context3 =
+				context2.sort( c -> c.byIndexOrder() );
+		IndexSearchQuery<DocumentReference> query = context3.toQuery();
+		
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
+				.hasTotalHitCount( 6 );
 	}
 
 	@Test
