@@ -261,6 +261,22 @@ public class ToHibernateOrmIT {
 				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
 	}
 
+	@Test
+	@TestForIssue( jiraKey = "HSEARCH-1857" )
+	public void reuseSearchQueryAfterOrmSessionIsClosed_noMatching() {
+		Session session = sessionFactory.openSession();
+		SearchSession searchSession = Search.getSearchSession( session );
+		SearchQuery<IndexedEntity> query = createSimpleQuery( searchSession );
+		session.close();
+
+		SubTest.expectException( () -> {
+			query.fetchHits();
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
+	}
+
 	private SearchQuery<IndexedEntity> createSimpleQuery(SearchSession searchSession) {
 		return searchSession.search( IndexedEntity.class )
 				.asEntity()
