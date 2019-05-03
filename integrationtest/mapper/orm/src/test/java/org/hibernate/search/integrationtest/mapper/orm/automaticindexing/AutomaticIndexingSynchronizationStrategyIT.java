@@ -12,14 +12,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -29,11 +32,16 @@ import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.assertj.core.api.Assertions;
+
 public class AutomaticIndexingSynchronizationStrategyIT {
 
 	// Let's say 3 seconds are long enough to consider that, if nothing changed after this time, nothing ever will.
 	private static final long ALMOST_FOREVER_VALUE = 3L;
 	private static final TimeUnit ALMOST_FOREVER_UNIT = TimeUnit.SECONDS;
+
+	private static final long SMALL_DURATION_VALUE = 100L;
+	private static final TimeUnit SMALL_DURATION_UNIT = TimeUnit.MILLISECONDS;
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -65,13 +73,80 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		testSynchronous( sessionFactory, DocumentRefreshStrategy.FORCE );
 	}
 
+	@Test
+	public void override_committedToSearchable() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.COMMITTED );
+		testSynchronous( sessionFactory, AutomaticIndexingSynchronizationStrategy.searchable(), DocumentRefreshStrategy.FORCE );
+	}
+
+	@Test
+	public void override_committedToCustom() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.COMMITTED );
+		CompletableFuture<?> workFuture = new CompletableFuture<>();
+
+		AtomicReference<CompletableFuture<?>> futurePushedToBackgroundServiceReference = new AtomicReference<>( null );
+
+		CompletableFuture<?> transactionFuture = runTransactionInDifferentThread(
+				sessionFactory,
+				new AutomaticIndexingSynchronizationStrategy() {
+					@Override
+					public DocumentRefreshStrategy getDocumentRefreshStrategy() {
+						return DocumentRefreshStrategy.FORCE;
+					}
+
+					@Override
+					public void handleFuture(CompletableFuture<?> future) {
+						// try to wait for the future to complete for a small duration...
+						try {
+							future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
+						}
+						catch (TimeoutException e) {
+							/*
+							 * If it takes too long, push the the completable future to some background service
+							 * to wait on it and report errors asynchronously if necessary.
+							 * Here we just simulate this by setting an AtomicReference.
+							 */
+							futurePushedToBackgroundServiceReference.set( future );
+						}
+						catch (InterruptedException | ExecutionException e) {
+							Assertions.fail( "Unexpected exception: " + e, e );
+						}
+					}
+				},
+				DocumentRefreshStrategy.FORCE,
+				workFuture,
+				/*
+				 * With this synchronization strategy, the transaction will unblock the thread
+				 * before the work future is complete.
+				 */
+				() -> assertThat( workFuture ).isPending()
+		);
+
+		/*
+		 * We didn't complete the work, but the transaction should unblock the thread anyway after some time.
+		 * Note that this will throw an ExecutionException it the transaction failed
+		 * or an assertion failed in the other thread.
+		 */
+		transactionFuture.get( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT );
+		// The strategy should have timed out and it should have set the future on this reference
+		Assertions.assertThat( futurePushedToBackgroundServiceReference ).isNotNull();
+	}
+
 	private void testSynchronous(SessionFactory sessionFactory,
+			DocumentRefreshStrategy expectedRefreshStrategy)
+			throws InterruptedException, ExecutionException, TimeoutException {
+		testSynchronous( sessionFactory, null, expectedRefreshStrategy );
+	}
+
+	private void testSynchronous(SessionFactory sessionFactory,
+			AutomaticIndexingSynchronizationStrategy customStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		CompletableFuture<?> workFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionFuture = runTransactionInDifferentThread(
 				sessionFactory,
+				customStrategy,
 				expectedRefreshStrategy,
 				workFuture,
 				/*
@@ -102,6 +177,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 		CompletableFuture<?> transactionFuture = runTransactionInDifferentThread(
 				sessionFactory,
+				null,
 				expectedRefreshStrategy,
 				workFuture,
 				/*
@@ -123,6 +199,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	 * Run a transaction in a different thread so that its progress can be inspected from the current thread.
 	 */
 	private CompletableFuture<?> runTransactionInDifferentThread(SessionFactory sessionFactory,
+			AutomaticIndexingSynchronizationStrategy customStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy,
 			CompletableFuture<?> workFuture,
 			Runnable afterTransactionAssertion)
@@ -130,6 +207,9 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		CompletableFuture<?> justBeforeTransactionCommitFuture = new CompletableFuture<>();
 		CompletableFuture<?> transactionFuture = CompletableFuture.runAsync( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
+				if ( customStrategy != null ) {
+					Search.getSearchSession( session ).setAutomaticIndexingSynchronizationStrategy( customStrategy );
+				}
 				IndexedEntity entity1 = new IndexedEntity();
 				entity1.setId( 1 );
 				entity1.setIndexedField( "initialValue" );
