@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
-import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;

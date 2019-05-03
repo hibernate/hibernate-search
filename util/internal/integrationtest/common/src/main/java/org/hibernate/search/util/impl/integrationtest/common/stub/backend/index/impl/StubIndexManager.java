@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
-import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.impl.Futures;
 
 public interface AutomaticIndexingSynchronizationStrategy {

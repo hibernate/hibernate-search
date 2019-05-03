@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.index.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;

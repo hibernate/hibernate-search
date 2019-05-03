@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;

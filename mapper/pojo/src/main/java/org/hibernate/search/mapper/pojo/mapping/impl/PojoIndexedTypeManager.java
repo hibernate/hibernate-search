@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;

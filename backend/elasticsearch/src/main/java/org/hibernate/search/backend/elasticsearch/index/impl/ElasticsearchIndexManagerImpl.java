@@ -25,7 +25,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBacken
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
-import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;

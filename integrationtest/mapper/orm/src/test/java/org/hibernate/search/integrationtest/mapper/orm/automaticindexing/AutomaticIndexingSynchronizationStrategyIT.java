@@ -17,7 +17,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.engine.backend.index.spi.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
