@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 /**
- * An extension to the search query DSL, allowing to add non-standard predicates to a query.
+ * An extension to the search query DSL, allowing to add non-standard sorts to a query.
  * <p>
  * <strong>WARNING:</strong> while this type is API, because instances should be manipulated by users,
  * all of its methods are considered SPIs and therefore should never be called or implemented directly by users.
@@ -39,7 +39,7 @@ public interface SearchSortContainerContextExtension<T> {
 	 * @param dslContext A {@link SearchSortDslContext}.
 	 * @param <C> The type of query element collector for the given sort builder factory.
 	 * @param <B> The implementation type of builders for the given sort builder factory.
-	 * @return An optional containing the extended search predicate container context ({@link T}) in case
+	 * @return An optional containing the extended search sort container context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
 	<C, B> Optional<T> extendOptional(SearchSortContainerContext original,
