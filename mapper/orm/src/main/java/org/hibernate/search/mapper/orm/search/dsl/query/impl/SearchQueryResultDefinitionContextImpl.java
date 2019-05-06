@@ -39,7 +39,7 @@ public class SearchQueryResultDefinitionContextImpl<O>
 				new ObjectLoaderBuilder<>( sessionImplementor, searchScopeDelegate.getIncludedIndexedTypes() );
 		this.loadingOptions = new MutableObjectLoadingOptions();
 		this.loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
-				searchScopeDelegate, objectLoaderBuilder, loadingOptions
+				sessionImplementor, searchScopeDelegate, objectLoaderBuilder, loadingOptions
 		);
 	}
 
