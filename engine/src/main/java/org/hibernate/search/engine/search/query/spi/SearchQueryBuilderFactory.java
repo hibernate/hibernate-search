@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 /**
  * A factory for search query builders.

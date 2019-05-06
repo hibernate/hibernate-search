@@ -24,9 +24,9 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
-import org.hibernate.search.engine.search.query.impl.DefaultProjectionHitMapper;
-import org.hibernate.search.engine.search.query.impl.NoLoadingProjectionHitMapper;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.impl.DefaultProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.impl.NoLoadingProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O> {

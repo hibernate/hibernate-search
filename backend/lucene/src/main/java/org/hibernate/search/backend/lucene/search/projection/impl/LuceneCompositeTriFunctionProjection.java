@@ -12,8 +12,8 @@ import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneS
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
-import org.hibernate.search.engine.search.query.spi.LoadingResult;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.function.TriFunction;
 
 public class LuceneCompositeTriFunctionProjection<P1, P2, P3, T> implements LuceneCompositeProjection<Object[], T> {

@@ -7,8 +7,8 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.search.query.spi.LoadingResult;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
 class StubFieldSearchProjection<T> implements StubSearchProjection<T> {

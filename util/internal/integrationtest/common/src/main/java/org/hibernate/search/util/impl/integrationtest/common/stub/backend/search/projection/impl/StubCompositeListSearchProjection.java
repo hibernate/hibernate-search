@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.search.query.spi.LoadingResult;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 public class StubCompositeListSearchProjection<T> implements StubCompositeSearchProjection<T> {
 

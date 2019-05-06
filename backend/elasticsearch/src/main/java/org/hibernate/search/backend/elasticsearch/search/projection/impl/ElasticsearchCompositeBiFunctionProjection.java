@@ -10,8 +10,8 @@ import static org.hibernate.search.backend.elasticsearch.search.projection.impl.
 
 import java.util.function.BiFunction;
 
-import org.hibernate.search.engine.search.query.spi.LoadingResult;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
