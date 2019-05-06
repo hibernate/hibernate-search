@@ -41,7 +41,7 @@ class IndexWorkCall extends Call<IndexWorkCall> {
 		this.completableFuture = null;
 	}
 
-	public CompletableFuture<?> verify(IndexWorkCall actualCall) {
+	public CallBehavior<CompletableFuture<?>> verify(IndexWorkCall actualCall) {
 		String whenThisWorkWasExpected = "when a " + phase + " call for a work on index '" + indexName
 				+ "', identifier '" + work.getIdentifier() + "' was expected";
 		if ( !Objects.equals( phase, actualCall.phase ) ) {
@@ -52,7 +52,7 @@ class IndexWorkCall extends Call<IndexWorkCall> {
 		StubIndexWorkAssert.assertThat( actualCall.work )
 				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
 				.matches( work );
-		return completableFuture;
+		return () -> completableFuture;
 	}
 
 	@Override

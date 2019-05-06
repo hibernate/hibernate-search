@@ -55,7 +55,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		this.behavior = behavior;
 	}
 
-	public <U> IndexSearchResult<U> verify(SearchWorkCall<U> actualCall) {
+	public <U> CallBehavior<IndexSearchResult<U>> verify(SearchWorkCall<U> actualCall) {
 		assertThat( actualCall.indexNames )
 				.as( "Search work did not target the expected indexes: " )
 				.isEqualTo( indexNames );
@@ -65,7 +65,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 
 		long totalHitCount = behavior.getTotalHitCount();
 
-		return new SimpleIndexSearchResult<>(
+		return () -> new SimpleIndexSearchResult<>(
 				totalHitCount,
 				getResults(
 						actualCall.convertContext,

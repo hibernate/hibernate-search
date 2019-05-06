@@ -266,7 +266,7 @@ public class BackendMock implements TestRule {
 
 	private class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
-		private final Map<IndexFieldKey, IndexFieldAddBehavior> indexFieldAddBehaviors = new HashMap<>();
+		private final Map<IndexFieldKey, CallBehavior> indexFieldAddBehaviors = new HashMap<>();
 
 		private final Map<String, CallQueue<PushSchemaCall>> pushSchemaCalls = new HashMap<>();
 
@@ -276,7 +276,7 @@ public class BackendMock implements TestRule {
 
 		private final CallQueue<CountWorkCall> countCalls = new CallQueue<>();
 
-		void setIndexFieldAddBehavior(String indexName, String absoluteFieldPath, IndexFieldAddBehavior behavior) {
+		void setIndexFieldAddBehavior(String indexName, String absoluteFieldPath, CallBehavior behavior) {
 			indexFieldAddBehaviors.put( new IndexFieldKey( indexName, absoluteFieldPath ), behavior );
 		}
 
@@ -311,7 +311,7 @@ public class BackendMock implements TestRule {
 
 		@Override
 		public void onAddField(String indexName, String absoluteFieldPath) {
-			IndexFieldAddBehavior behavior = indexFieldAddBehaviors.get( new IndexFieldKey( indexName, absoluteFieldPath ) );
+			CallBehavior behavior = indexFieldAddBehaviors.get( new IndexFieldKey( indexName, absoluteFieldPath ) );
 			if ( behavior != null ) {
 				behavior.execute();
 			}
@@ -362,7 +362,8 @@ public class BackendMock implements TestRule {
 				LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 			return searchCalls.verify(
 					new SearchWorkCall<>( indexNames, work, convertContext, loadingContext, rootProjection ),
-					SearchWorkCall::<T>verify );
+					(call1, call2) -> call1.verify( call2 )
+			);
 		}
 
 		@Override

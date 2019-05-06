@@ -118,7 +118,7 @@ public class ElasticsearchClientSpy implements TestRule {
 					// If there was an expectation, check it is met and forward the request to the actual client
 					(expectedCall, actualCall) -> {
 						expectedCall.verify( actualCall );
-						return delegate.submit( request );
+						return () -> delegate.submit( request );
 					},
 					// If there wasn't any expectation, just forward the request to the actual client
 					call -> delegate.submit( request )
