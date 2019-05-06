@@ -162,15 +162,6 @@ public interface SearchQuery<T> {
 	long fetchTotalHitCount();
 
 	/**
-	 * Set the JDBC fetch size for this query.
-	 *
-	 * @param fetchSize The fetch size. Must be positive or zero.
-	 * @return {@code this} for method chaining.
-	 * @see Query#setFetchSize(int)
-	 */
-	SearchQuery<T> setFetchSize(int fetchSize);
-
-	/**
 	 * Convert this query to a {@link TypedQuery JPA query}.
 	 * <p>
 	 * Note that the resulting query <strong>does not support all operations</strong>

@@ -75,4 +75,10 @@ public class SearchQueryResultDefinitionContextImpl<O>
 				projections
 		);
 	}
+
+	@Override
+	public SearchQueryResultDefinitionContext<O> fetchSize(int fetchSize) {
+		loadingOptions.setFetchSize( fetchSize );
+		return this;
+	}
 }

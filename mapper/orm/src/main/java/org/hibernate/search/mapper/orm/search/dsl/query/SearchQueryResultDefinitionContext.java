@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.search.dsl.query;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.query.Query;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
@@ -26,5 +27,14 @@ public interface SearchQueryResultDefinitionContext<O> {
 	<T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(SearchProjection<T> projection);
 
 	SearchQueryResultContext<?, ? extends SearchQuery<List<?>>, ?> asProjections(SearchProjection<?>... projections);
+
+	/**
+	 * Set the JDBC fetch size for this query.
+	 *
+	 * @param fetchSize The fetch size. Must be positive or zero.
+	 * @return {@code this} for method chaining.
+	 * @see Query#setFetchSize(int)
+	 */
+	SearchQueryResultDefinitionContext<O> fetchSize(int fetchSize);
 
 }
