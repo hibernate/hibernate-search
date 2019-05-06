@@ -120,7 +120,7 @@ public interface SearchQuery<T> {
 	 * Execute the query and return the hits as a {@link List}.
 	 *
 	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
-	 * @param offset The number of hits to skip. {@code null} means no offset. {@code null} means no offset.
+	 * @param offset The number of hits to skip. {@code null} means no offset.
 	 * @return The query hits.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
@@ -132,7 +132,7 @@ public interface SearchQuery<T> {
 	 * Execute the query and return the hits as a {@link List}.
 	 *
 	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
-	 * @param offset The number of hits to skip. {@code null} means no offset. {@code null} means no offset.
+	 * @param offset The number of hits to skip. {@code null} means no offset.
 	 * @return The query hits.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
