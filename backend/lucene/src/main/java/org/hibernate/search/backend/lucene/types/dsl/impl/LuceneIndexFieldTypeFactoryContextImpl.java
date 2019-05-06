@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtra
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
+import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -107,6 +109,9 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asGeoPoint();
+		}
+		else if ( BigDecimal.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asBigDecimal();
 		}
 		else {
 			// TODO implement other types
@@ -207,6 +212,12 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint() {
 		return new LuceneGeoPointIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public ScaledNumberIndexFieldTypeContext<?> asBigDecimal() {
+		// TODO implement within current issue
+		return null;
 	}
 
 	@Override

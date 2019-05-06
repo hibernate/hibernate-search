@@ -14,6 +14,12 @@ public final class AnnotationDefaultValues {
 	 */
 	public static final String DO_NOT_INDEX_NULL = "__HibernateSearch_indexNullAs_default";
 
+	/**
+	 * This extreme value is both invalid and very unlikely to be used.
+	 * So we use it to mark that the user has not set the value.
+	 */
+	public static final int DEFAULT_DECIMAL_SCALE = Integer.MAX_VALUE;
+
 	private AnnotationDefaultValues() {
 	}
 }

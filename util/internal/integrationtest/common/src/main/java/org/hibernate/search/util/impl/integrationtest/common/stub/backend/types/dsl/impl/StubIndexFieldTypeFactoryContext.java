@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -29,6 +31,9 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	public <F> StandardIndexFieldTypeContext<?, F> as(Class<F> inputType) {
 		if ( String.class.isAssignableFrom( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asString();
+		}
+		else if ( BigDecimal.class.isAssignableFrom( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asBigDecimal();
 		}
 		else {
 			return new StubGenericIndexFieldTypeContext<>( inputType );
@@ -128,5 +133,10 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	@Override
 	public StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint() {
 		return as( GeoPoint.class );
+	}
+
+	@Override
+	public ScaledNumberIndexFieldTypeContext<?> asBigDecimal() {
+		return new StubScaledNumberIndexFieldTypeContext();
 	}
 }
