@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-class StubLoadingContext implements LoadingContext<DocumentReference, DocumentReference> {
+public class StubLoadingContext implements LoadingContext<DocumentReference, DocumentReference> {
 	private final ProjectionHitMapper<DocumentReference, DocumentReference> projectionHitMapper;
 
 	StubLoadingContext() {

@@ -13,8 +13,11 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrc
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 
 import org.apache.lucene.search.Query;
@@ -31,6 +34,7 @@ public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	private final Set<String> indexNames;
 	private final Set<ReaderProvider> readerProviders;
 	private final SessionContextImplementor sessionContext;
+	private final LoadingContext<?, ?> loadingContext;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneCollectorProvider luceneCollectorProvider;
@@ -39,6 +43,7 @@ public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	public LuceneIndexSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
 			SessionContextImplementor sessionContext,
+			LoadingContext<?, ?> loadingContext,
 			Query luceneQuery, Sort luceneSort,
 			LuceneCollectorProvider luceneCollectorProvider, LuceneSearchResultExtractor<T> searchResultExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
@@ -46,6 +51,7 @@ public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 		this.indexNames = indexNames;
 		this.readerProviders = readerProviders;
 		this.sessionContext = sessionContext;
+		this.loadingContext = loadingContext;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
 		this.luceneCollectorProvider = luceneCollectorProvider;
@@ -60,6 +66,13 @@ public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[query=" + getQueryString() + ", sort=" + luceneSort + "]";
+	}
+
+	@Override
+	public <Q> Q extension(IndexSearchQueryExtension<Q, T> extension) {
+		return DslExtensionState.returnIfSupported(
+				extension, extension.extendOptional( this, loadingContext )
+		);
 	}
 
 	@Override

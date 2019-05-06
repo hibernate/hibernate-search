@@ -86,7 +86,7 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 				queryOrchestrator, workFactory,
 				scopeModel.getIndexNames(), scopeModel.getReaderProviders(),
 				sessionContext,
-				multiTenancyStrategy.decorateLuceneQuery( luceneQueryBuilder.build(), sessionContext.getTenantIdentifier() ),
+				loadingContext, multiTenancyStrategy.decorateLuceneQuery( luceneQueryBuilder.build(), sessionContext.getTenantIdentifier() ),
 				elementCollector.toLuceneSort(),
 				rootProjection, searchResultExtractor
 		);

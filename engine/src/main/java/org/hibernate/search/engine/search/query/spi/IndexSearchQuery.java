@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
+import org.hibernate.search.util.common.SearchException;
+
 /**
  * @param <T> The type of results.
  */
@@ -20,5 +22,16 @@ public interface IndexSearchQuery<T> {
 	long fetchTotalHitCount();
 
 	String getQueryString();
+
+	/**
+	 * Extend the current query with the given extension,
+	 * resulting in an extended query offering more options or a more detailed result type.
+	 *
+	 * @param extension The extension to the predicate DSL.
+	 * @param <Q> The type of queries provided by the extension.
+	 * @return The extended query.
+	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
+	 */
+	<Q> Q extension(IndexSearchQueryExtension<Q, T> extension);
 
 }

@@ -15,8 +15,11 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.util.common.impl.Futures;
 
@@ -37,6 +40,7 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final Set<URLEncodedString> indexNames;
 	private final SessionContextImplementor sessionContext;
+	private final LoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
 	private final ElasticsearchSearchResultExtractor<T> searchResultExtractor;
@@ -45,12 +49,14 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
+			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.indexNames = indexNames;
 		this.sessionContext = sessionContext;
+		this.loadingContext = loadingContext;
 		this.routingKeys = routingKeys;
 		this.payload = payload;
 		this.searchResultExtractor = searchResultExtractor;
@@ -64,6 +70,13 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[" + getQueryString() + "]";
+	}
+
+	@Override
+	public <Q> Q extension(IndexSearchQueryExtension<Q, T> extension) {
+		return DslExtensionState.returnIfSupported(
+				extension, extension.extendOptional( this, loadingContext )
+		);
 	}
 
 	@Override
