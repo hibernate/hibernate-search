@@ -29,7 +29,12 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 
 public final class DefaultSearchQueryContext<T, Q, C>
-		implements SearchQueryContextImplementor<DefaultSearchQueryContext<T, Q, C>, Q> {
+		implements SearchQueryContextImplementor<
+				DefaultSearchQueryContext<T, Q, C>,
+				Q,
+				SearchPredicateFactoryContext,
+				SearchSortContainerContext
+				> {
 
 	private final IndexSearchScope<C> indexSearchScope;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;

@@ -90,12 +90,14 @@ public class ElasticsearchExtensionIT {
 		ElasticsearchSearchQueryResultContext<IndexSearchQuery<DocumentReference>> context1 = scope.query()
 				.asReference()
 				.extension( ElasticsearchExtension.get() );
+		// Note we can use Elasticsearch-specific predicates immediately
 		ElasticsearchSearchQueryContext<IndexSearchQuery<DocumentReference>> context2 =
-				context1.predicate( f -> f.matchAll() );
+				context1.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
+		// Note we can use Elasticsearch-specific sorts immediately
 		ElasticsearchSearchQueryContext<IndexSearchQuery<DocumentReference>> context3 =
-				context2.sort( c -> c.byIndexOrder() );
+				context2.sort( c -> c.fromJson( "{'sort1': 'asc'}" ) );
 		IndexSearchQuery<DocumentReference> query = context3.toQuery();
-		
+
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
 				.hasTotalHitCount( 6 );

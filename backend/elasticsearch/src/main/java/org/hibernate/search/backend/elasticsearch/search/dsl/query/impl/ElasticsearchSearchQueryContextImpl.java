@@ -6,22 +6,30 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.query.impl;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public class ElasticsearchSearchQueryContextImpl<Q> extends AbstractDelegatingSearchQueryContext<
-						ElasticsearchSearchQueryContext<Q>,
-						Q
-						>
+public class ElasticsearchSearchQueryContextImpl<Q>
+		extends AbstractDelegatingSearchQueryContext<
+				ElasticsearchSearchQueryContext<Q>,
+				Q,
+				ElasticsearchSearchPredicateFactoryContext,
+				ElasticsearchSearchSortContainerContext
+				>
 		implements ElasticsearchSearchQueryResultContext<Q>, ElasticsearchSearchQueryContext<Q> {
 
 	// FIXME use the builder to make toQuery return an Elasticsearch-specific query type
 	private final ElasticsearchSearchQueryBuilder<?> builder;
 
-	public ElasticsearchSearchQueryContextImpl(SearchQueryContextImplementor<?, Q> original,
+	public ElasticsearchSearchQueryContextImpl(SearchQueryContextImplementor<?, Q, ?, ?> original,
 			ElasticsearchSearchQueryBuilder<?> builder) {
 		super( original );
 		this.builder = builder;
@@ -32,4 +40,15 @@ public class ElasticsearchSearchQueryContextImpl<Q> extends AbstractDelegatingSe
 		return this;
 	}
 
+	@Override
+	protected ElasticsearchSearchPredicateFactoryContext extendPredicateContext(
+			SearchPredicateFactoryContext predicateFactoryContext) {
+		return predicateFactoryContext.extension( ElasticsearchExtension.get() );
+	}
+
+	@Override
+	protected ElasticsearchSearchSortContainerContext extendSortContext(
+			SearchSortContainerContext sortContainerContext) {
+		return sortContainerContext.extension( ElasticsearchExtension.get() );
+	}
 }

@@ -50,7 +50,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<?, Q> queryAsLoadedObject(SessionContextImplementor sessionContext,
+	public <T, Q> SearchQueryResultContext<?, Q, ?> queryAsLoadedObject(SessionContextImplementor sessionContext,
 			ObjectLoader<R, T> objectLoader,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		ProjectionHitMapper<R, T> projectionHitMapper =
@@ -65,7 +65,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public <Q> SearchQueryResultContext<?, Q> queryAsReference(SessionContextImplementor sessionContext,
+	public <Q> SearchQueryResultContext<?, Q, ?> queryAsReference(SessionContextImplementor sessionContext,
 			Function<IndexSearchQuery<R>, Q> searchQueryWrapperFactory) {
 		ProjectionHitMapper<R, Void> referenceHitMapper = new NoLoadingProjectionHitMapper<>( documentReferenceTransformer );
 
@@ -78,7 +78,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<?, Q> queryAsProjection(SessionContextImplementor sessionContext,
+	public <T, Q> SearchQueryResultContext<?, Q, ?> queryAsProjection(SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory, SearchProjection<T> projection) {
 		ProjectionHitMapper<R, O> projectionHitMapper =
@@ -93,7 +93,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public <Q> SearchQueryResultContext<?, Q> queryAsProjections(
+	public <Q> SearchQueryResultContext<?, Q, ?> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
 			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
