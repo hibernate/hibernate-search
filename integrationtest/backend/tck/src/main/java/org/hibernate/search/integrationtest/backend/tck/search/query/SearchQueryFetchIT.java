@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
+import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalizeReference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -22,13 +25,17 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.assertj.core.api.Assertions;
 
 public class SearchQueryFetchIT {
 
@@ -55,7 +62,72 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void paging() {
+	public void fetch_noArg() {
+		SearchQuery<DocumentReference> query = matchAllQuery();
+		assertThat( query.fetch() ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+
+		query = matchFirstHalfQuery();
+		assertThat( query.fetch() ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT / 2 )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT / 2; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+	}
+
+	@Test
+	public void fetch_limit_long() {
+		SearchQuery<DocumentReference> query = matchAllQuery();
+		assertThat( query.fetch( (Long) null ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+
+		query = matchAllQuery();
+		assertThat( query.fetch( 1L ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ) );
+
+		query = matchAllQuery();
+		assertThat( query.fetch( 2L ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
+	}
+
+	@Test
+	public void fetch_limit_integer() {
+		SearchQuery<DocumentReference> query = matchAllQuery();
+		assertThat( query.fetch( (Integer) null ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+
+		query = matchAllQuery();
+		assertThat( query.fetch( 1 ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ) );
+
+		query = matchAllQuery();
+		assertThat( query.fetch( 2 ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
+	}
+
+	@Test
+	public void fetch_limitAndOffset_long() {
 		SearchQuery<DocumentReference> query = matchAllQuery();
 		assertThat( query.fetch( null, 1L ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
@@ -86,7 +158,179 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void paging_reuse_query() {
+	public void fetch_limitAndOffset_integer() {
+		SearchQuery<DocumentReference> query = matchAllQuery();
+		assertThat( query.fetch( null, 1 ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+
+		query = matchAllQuery();
+		assertThat( query.fetch( 1, 1 ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 1 ) );
+
+		query = matchAllQuery();
+		assertThat( query.fetch( 2, null ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
+
+		query = matchAllQuery();
+		assertThat( query.fetch( (Long) null, null ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+	}
+
+	@Test
+	public void fetchHits_noArg() {
+		SearchQuery<DocumentReference> query = matchAllQuery();
+		assertThat( query.fetchHits() ).fromQuery( query )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+
+		query = matchFirstHalfQuery();
+		assertThat( query.fetchHits() ).fromQuery( query )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT / 2; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+	}
+
+	@Test
+	public void fetchHits_limit_long() {
+		SearchQuery<DocumentReference> query = matchAllQuery();
+		assertThat( query.fetchHits( (Long) null ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+
+		query = matchAllQuery();
+		assertThat( query.fetchHits( 1L ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ) );
+
+		query = matchAllQuery();
+		assertThat( query.fetchHits( 2L ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
+	}
+
+	@Test
+	public void fetchHits_limit_integer() {
+		SearchQuery<DocumentReference> query = matchAllQuery();
+		assertThat( query.fetchHits( (Integer) null ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+
+		query = matchAllQuery();
+		assertThat( query.fetchHits( 1 ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ) );
+
+		query = matchAllQuery();
+		assertThat( query.fetchHits( 2 ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
+	}
+
+	@Test
+	public void fetchHits_limitAndOffset_long() {
+		SearchQuery<DocumentReference> query = matchAllQuery();
+		assertThat( query.fetchHits( null, 1L ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+
+		query = matchAllQuery();
+		assertThat( query.fetchHits( 1L, 1L ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 1 ) );
+
+		query = matchAllQuery();
+		assertThat( query.fetchHits( 2L, null ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
+
+		query = matchAllQuery();
+		assertThat( query.fetchHits( (Long) null, null ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+	}
+
+	@Test
+	public void fetchHits_limitAndOffset_integer() {
+		SearchQuery<DocumentReference> query = matchAllQuery();
+		assertThat( query.fetchHits( null, 1 ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+
+		query = matchAllQuery();
+		assertThat( query.fetchHits( 1, 1 ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 1 ) );
+
+		query = matchAllQuery();
+		assertThat( query.fetchHits( 2, null ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
+
+		query = matchAllQuery();
+		assertThat( query.fetchHits( (Integer) null, null ) ).fromQuery( query )
+				.hasDocRefHitsExactOrder( builder -> {
+					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
+						builder.doc( INDEX_NAME, docId( i ) );
+					}
+				} );
+	}
+
+	@Test
+	public void fetchTotalHitCount() {
+		SearchQuery<DocumentReference> query = matchAllQuery();
+		Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
+
+		query = matchFirstHalfQuery();
+		Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT / 2 );
+	}
+
+	@Test
+	public void fetchSingleHit() {
+		SearchQuery<DocumentReference> query = matchOneQuery( 4 );
+
+		Optional<DocumentReference> result = query.fetchSingleHit();
+		Assertions.assertThat( result ).isNotEmpty();
+		Assertions.assertThat( normalizeReference( result.get() ) )
+				.isEqualTo( normalizeReference( reference( INDEX_NAME, docId( 4 ) ) ) );
+
+		query = matchNoneQuery();
+		result = query.fetchSingleHit();
+		Assertions.assertThat( result ).isEmpty();
+
+		SubTest.expectException( () -> {
+			SearchQuery<DocumentReference> matchAllQuery = matchAllQuery();
+			matchAllQuery.fetchSingleHit();
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class );
+	}
+
+	@Test
+	public void fetch_limitAndOffset_long_reuseQuery() {
 		SearchQuery<DocumentReference> query = matchAllQuery();
 		assertThat( query.fetch( null, 1L ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
@@ -138,6 +382,39 @@ public class SearchQueryFetchIT {
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "integer" ).asc() )
 				.toQuery();
+	}
+
+	private SearchQuery<DocumentReference> matchFirstHalfQuery() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		return scope.query()
+				.asReference()
+				.predicate( f -> f.range().onField( "integer" ).below( DOCUMENT_COUNT / 2 ).excludeLimit() )
+				.sort( c -> c.byField( "integer" ).asc() )
+				.toQuery();
+	}
+
+	private SearchQuery<DocumentReference> matchOneQuery(int id) {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		return scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( "integer" ).matching( id ) )
+				.toQuery();
+	}
+
+	private SearchQuery<DocumentReference> matchNoneQuery() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		return scope.query()
+				.asReference()
+				.predicate( f -> f.match().onField( "integer" ).matching( DOCUMENT_COUNT + 2 ) )
+				.toQuery();
+	}
+
+	private DocumentReference[] references(int first, int afterLast) {
+		List<DocumentReference> references = new ArrayList<>();
+		for ( int i = first; i < afterLast; i++ ) {
+			references.add( reference( INDEX_NAME, docId( i ) ) );
+		}
+		return references.toArray( new DocumentReference[0] );
 	}
 
 	private void initData() {
