@@ -9,14 +9,14 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 
 public class Elasticsearch7SearchResultExtractorFactory implements ElasticsearchSearchResultExtractorFactory {
 	@Override
-	public <T> ElasticsearchSearchResultExtractor<T> createResultExtractor(ProjectionHitMapper<?, ?> projectionHitMapper,
+	public <T> ElasticsearchSearchResultExtractor<T> createResultExtractor(LoadingContext<?, ?> loadingContext,
 			ElasticsearchSearchProjection<?, T> rootProjection,
 			SearchProjectionExtractContext searchProjectionExecutionContext) {
-		return new Elasticsearch7SearchResultExtractor<>( projectionHitMapper, rootProjection,
+		return new Elasticsearch7SearchResultExtractor<>( loadingContext, rootProjection,
 				searchProjectionExecutionContext );
 	}
 }

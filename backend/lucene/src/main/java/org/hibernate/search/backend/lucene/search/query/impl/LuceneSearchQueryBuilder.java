@@ -75,7 +75,7 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
 		LuceneSearchResultExtractor<T> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
-				storedFieldVisitor, rootProjection, loadingContext.getProjectionHitMapper()
+				storedFieldVisitor, rootProjection, loadingContext
 		);
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
