@@ -12,14 +12,14 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQueryExtension;
-import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
-final class StubIndexSearchQuery<T> extends AbstractSearchQuery<T, IndexSearchResult<T>>
-		implements IndexSearchQuery<T> {
+final class StubSearchQuery<T> extends AbstractSearchQuery<T, SearchResult<T>>
+		implements SearchQuery<T> {
 
 	private final StubBackend backend;
 	private final List<String> indexNames;
@@ -28,7 +28,7 @@ final class StubIndexSearchQuery<T> extends AbstractSearchQuery<T, IndexSearchRe
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 
-	StubIndexSearchQuery(StubBackend backend, List<String> indexNames, StubSearchWork.Builder workBuilder,
+	StubSearchQuery(StubBackend backend, List<String> indexNames, StubSearchWork.Builder workBuilder,
 			FromDocumentFieldValueConvertContext convertContext,
 			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 		this.backend = backend;
@@ -45,14 +45,14 @@ final class StubIndexSearchQuery<T> extends AbstractSearchQuery<T, IndexSearchRe
 	}
 
 	@Override
-	public <Q> Q extension(IndexSearchQueryExtension<Q, T> extension) {
+	public <Q> Q extension(SearchQueryExtension<Q, T> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, loadingContext )
 		);
 	}
 
 	@Override
-	public IndexSearchResult<T> fetch(Long limit, Long offset) {
+	public SearchResult<T> fetch(Long limit, Long offset) {
 		workBuilder.limit( limit ).offset( offset );
 		return backend.getBehavior().executeSearchWork(
 				indexNames, workBuilder.build(), convertContext, loadingContext, rootProjection

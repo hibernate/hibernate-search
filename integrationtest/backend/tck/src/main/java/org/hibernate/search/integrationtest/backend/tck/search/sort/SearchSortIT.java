@@ -24,8 +24,8 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
@@ -86,7 +86,7 @@ public class SearchSortIT {
 		initData();
 	}
 
-	private IndexSearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
+	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
 				.asReference()
@@ -102,8 +102,8 @@ public class SearchSortIT {
 		 * Thus we just test that the order stays the same over several calls.
 		 */
 
-		IndexSearchQuery<DocumentReference> query = simpleQuery( b -> b.byIndexOrder() );
-		IndexSearchResult<DocumentReference> firstCallResult = query.fetch();
+		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byIndexOrder() );
+		SearchResult<DocumentReference> firstCallResult = query.fetch();
 		assertThat( firstCallResult ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		List<DocumentReference> firstCallHits = firstCallResult.getHits();
@@ -124,7 +124,7 @@ public class SearchSortIT {
 	@Test
 	public void byScore() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query;
+		SearchQuery<DocumentReference> query;
 
 		SearchPredicate predicate = scope.predicate()
 				.match().onField( "string_analyzed_forScore" ).matching( "hooray" ).toPredicate();
@@ -157,7 +157,7 @@ public class SearchSortIT {
 	@Test
 	public void separateSort() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query;
+		SearchQuery<DocumentReference> query;
 
 		SearchSort sortAsc = scope.sort()
 				.byField( "string" ).asc().onMissingValue().sortLast()
@@ -216,7 +216,7 @@ public class SearchSortIT {
 
 		Assertions.assertThat( cache ).hasValue( null );
 
-		IndexSearchQuery<DocumentReference> query;
+		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( cachingContributor );
 		assertThat( query )
@@ -231,7 +231,7 @@ public class SearchSortIT {
 
 	@Test
 	public void byDistance_asc() {
-		IndexSearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
+		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
@@ -251,7 +251,7 @@ public class SearchSortIT {
 				TckConfiguration.get().getBackendFeatures().distanceSortDesc()
 		);
 
-		IndexSearchQuery<DocumentReference> query = simpleQuery(
+		SearchQuery<DocumentReference> query = simpleQuery(
 				b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
 		);
 		assertThat( query )
@@ -275,7 +275,7 @@ public class SearchSortIT {
 
 	@Test
 	public void extension() {
-		IndexSearchQuery<DocumentReference> query;
+		SearchQuery<DocumentReference> query;
 
 		// Mandatory extension, supported
 		query = simpleQuery( c -> c
@@ -473,7 +473,7 @@ public class SearchSortIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

@@ -20,7 +20,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
@@ -61,7 +61,7 @@ public class LuceneSearchSortIT {
 		initData();
 	}
 
-	private IndexSearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
+	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
 				.asReference()
@@ -95,7 +95,7 @@ public class LuceneSearchSortIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

@@ -30,27 +30,24 @@ import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.internal.ParameterMetadataImpl;
 import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
 public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
 
 	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
-		// FIXME move .extension to SearchQuery, which will spare us this ugly cast
-		IndexSearchQuery<R> castedQuery = (IndexSearchQuery<R>) query;
-		return castedQuery.extension( HibernateOrmSearchQueryAdapterExtension.get() );
+		return query.extension( HibernateOrmSearchQueryAdapterExtension.get() );
 	}
 
-	private final IndexSearchQuery<R> delegate;
+	private final SearchQuery<R> delegate;
 	private final MutableObjectLoadingOptions loadingOptions;
 
 	private Integer firstResult;
 	private Integer maxResults;
 
-	HibernateOrmSearchQueryAdapter(IndexSearchQuery<R> delegate, SessionImplementor sessionImplementor,
+	HibernateOrmSearchQueryAdapter(SearchQuery<R> delegate, SessionImplementor sessionImplementor,
 			MutableObjectLoadingOptions loadingOptions) {
 		super( sessionImplementor, new ParameterMetadataImpl( null, null ) );
 		this.delegate = delegate;
@@ -69,7 +66,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> type) {
-		if ( type.equals( IndexSearchQuery.class ) ) {
+		if ( type.equals( SearchQuery.class ) ) {
 			return (T) delegate;
 		}
 		else {

@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
@@ -76,7 +76,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 	public void match_id() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.id().matching( 1 ) )
 				.toQuery();
@@ -89,7 +89,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 	public void match_multiple_ids() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.id()
 						.matching( 1 )
@@ -105,7 +105,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 	public void match_any_and_match_single_id() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.id()
 						.matching( 2 )
@@ -121,7 +121,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 	public void match_any_single_id() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.id()
 						.matchingAny( Arrays.asList( 1 ) )
@@ -136,7 +136,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 	public void match_any_ids() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.id()
 						.matchingAny( Arrays.asList( 1, 3 ) )
@@ -156,7 +156,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

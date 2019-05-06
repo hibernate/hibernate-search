@@ -47,7 +47,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
@@ -123,11 +123,11 @@ public class FieldSearchSortIT {
 		initData();
 	}
 
-	private IndexSearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
+	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		return simpleQuery( sortContributor, indexManager.createSearchScope() );
 	}
 
-	private IndexSearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor, StubMappingSearchScope scope) {
+	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor, StubMappingSearchScope scope) {
 		return scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
@@ -138,7 +138,7 @@ public class FieldSearchSortIT {
 	@Test
 	public void byField() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			IndexSearchQuery<DocumentReference> query;
+			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
 			// Default order
@@ -187,7 +187,7 @@ public class FieldSearchSortIT {
 	@Test
 	public void byField_withDslConverters_dslConverterEnabled() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
-			IndexSearchQuery<DocumentReference> query;
+			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
 			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
@@ -218,7 +218,7 @@ public class FieldSearchSortIT {
 	@Test
 	public void byField_withDslConverters_dslConverterDisabled() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
-			IndexSearchQuery<DocumentReference> query;
+			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
 			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
@@ -249,7 +249,7 @@ public class FieldSearchSortIT {
 	@Test
 	public void byField_inFlattenedObject() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
-			IndexSearchQuery<DocumentReference> query;
+			SearchQuery<DocumentReference> query;
 			String fieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			query = simpleQuery( b -> b.byField( fieldPath ).onMissingValue().sortLast() );
@@ -276,7 +276,7 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void multipleFields() {
-		IndexSearchQuery<DocumentReference> query;
+		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( b -> b
 				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc().onMissingValue().sortFirst()
@@ -424,7 +424,7 @@ public class FieldSearchSortIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( compatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			IndexSearchQuery<DocumentReference> query;
+			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
 			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
@@ -479,7 +479,7 @@ public class FieldSearchSortIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			IndexSearchQuery<DocumentReference> query;
+			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
 			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
@@ -631,7 +631,7 @@ public class FieldSearchSortIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
+		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

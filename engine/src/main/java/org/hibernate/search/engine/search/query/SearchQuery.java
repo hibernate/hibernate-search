@@ -152,4 +152,15 @@ public interface SearchQuery<T> {
 	 */
 	String getQueryString();
 
+	/**
+	 * Extend the current query with the given extension,
+	 * resulting in an extended query offering more options or a more detailed result type.
+	 *
+	 * @param extension The extension to the predicate DSL.
+	 * @param <Q> The type of queries provided by the extension.
+	 * @return The extended query.
+	 * @throws org.hibernate.search.util.common.SearchException If the extension cannot be applied (wrong underlying backend, ...).
+	 */
+	<Q> Q extension(SearchQueryExtension<Q, T> extension);
+
 }

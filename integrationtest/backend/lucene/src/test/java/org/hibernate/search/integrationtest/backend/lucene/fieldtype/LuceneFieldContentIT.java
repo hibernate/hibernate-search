@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -59,7 +59,7 @@ public class LuceneFieldContentIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1640")
 	public void verifyProjectionsOnDifferentTypes() {
-		IndexSearchQuery<Document> query = indexManager.createSearchScope().query()
+		SearchQuery<Document> query = indexManager.createSearchScope().query()
 				.asProjection(
 						f -> f.extension( LuceneExtension.get() ).document()
 				)

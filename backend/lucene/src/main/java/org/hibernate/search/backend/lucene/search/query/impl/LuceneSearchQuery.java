@@ -17,9 +17,9 @@ import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQueryExtension;
-import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.engine.search.query.SearchResult;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -28,8 +28,8 @@ import org.apache.lucene.search.Sort;
 /**
  * @author Guillaume Smet
  */
-public class LuceneIndexSearchQuery<T> extends AbstractSearchQuery<T, IndexSearchResult<T>>
-		implements IndexSearchQuery<T> {
+public class LuceneSearchQuery<T> extends AbstractSearchQuery<T, SearchResult<T>>
+		implements SearchQuery<T> {
 
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
@@ -42,7 +42,7 @@ public class LuceneIndexSearchQuery<T> extends AbstractSearchQuery<T, IndexSearc
 	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final LuceneSearchResultExtractor<T> searchResultExtractor;
 
-	LuceneIndexSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
+	LuceneSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
@@ -71,14 +71,14 @@ public class LuceneIndexSearchQuery<T> extends AbstractSearchQuery<T, IndexSearc
 	}
 
 	@Override
-	public <Q> Q extension(IndexSearchQueryExtension<Q, T> extension) {
+	public <Q> Q extension(SearchQueryExtension<Q, T> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, loadingContext )
 		);
 	}
 
 	@Override
-	public IndexSearchResult<T> fetch(Long limit, Long offset) {
+	public SearchResult<T> fetch(Long limit, Long offset) {
 		LuceneQueryWork<LuceneLoadableSearchResult<T>> work = workFactory.search(
 				new LuceneSearcher<>(
 						indexNames,

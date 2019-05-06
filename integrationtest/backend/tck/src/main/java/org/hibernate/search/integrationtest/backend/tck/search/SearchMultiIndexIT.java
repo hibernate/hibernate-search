@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -115,7 +115,7 @@ public class SearchMultiIndexIT {
 	public void search_across_multiple_indexes() {
 		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.toQuery();
@@ -130,7 +130,7 @@ public class SearchMultiIndexIT {
 	public void sort_across_multiple_indexes() {
 		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "sortField" ).asc() )
@@ -159,7 +159,7 @@ public class SearchMultiIndexIT {
 	public void projection_across_multiple_indexes() {
 		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
-		IndexSearchQuery<String> query = scope.query()
+		SearchQuery<String> query = scope.query()
 				.asProjection( f -> f.field( "sortField", String.class ) )
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -176,7 +176,7 @@ public class SearchMultiIndexIT {
 		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
 		// Predicate
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
 				.toQuery();
@@ -191,7 +191,7 @@ public class SearchMultiIndexIT {
 
 		// Projection
 
-		IndexSearchQuery<String> projectionQuery = scope.query()
+		SearchQuery<String> projectionQuery = scope.query()
 				.asProjection( f -> f.field( "additionalField", String.class ) )
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -319,7 +319,7 @@ public class SearchMultiIndexIT {
 		workPlan.execute().join();
 
 		StubMappingSearchScope scope = indexManager_1_1.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

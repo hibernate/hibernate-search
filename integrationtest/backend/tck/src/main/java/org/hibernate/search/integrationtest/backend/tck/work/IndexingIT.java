@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
@@ -106,7 +106,7 @@ public class IndexingIT<F> {
 		String absoluteFieldPath = indexMapping.fieldModel.relativeFieldName;
 
 		for ( int i = 0; i < values.size(); i++ ) {
-			IndexSearchQuery<IdAndValue<F>> query = scope.query()
+			SearchQuery<IdAndValue<F>> query = scope.query()
 					.asProjection( f -> f.composite(
 							(ref, val) -> new IdAndValue<>( ref.getId(), val ),
 							f.reference(),

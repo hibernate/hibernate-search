@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
@@ -129,7 +129,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	public void simpleQueryString() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		Function<String, IndexSearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
@@ -155,7 +155,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	public void withAndAsDefaultOperator() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		IndexSearchQuery<DocumentReference> query;
+		SearchQuery<DocumentReference> query;
 
 		query = scope.query().asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath )
@@ -183,7 +183,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringFieldWithDslConverter.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_1 ) )
 				.toQuery();
@@ -199,7 +199,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( fieldModel.relativeFieldName ).matching( "" ) )
 				.toQuery();
@@ -215,7 +215,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( fieldModel.relativeFieldName ).matching( "   " ) )
 				.toQuery();
@@ -229,7 +229,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				// Use stopwords, which should be removed by the analysis
 				.predicate( f -> f.simpleQueryString().onField( fieldModel.relativeFieldName ).matching( "the a" ) )
@@ -246,7 +246,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( whitespaceAnalyzedField ).matching( "HERE | PANDA" ) )
 				.toQuery();
@@ -294,7 +294,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "HERE | PANDA" ) )
 				.toQuery();
@@ -368,7 +368,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	public void phrase() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		Function<String, IndexSearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
@@ -396,7 +396,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
-		IndexSearchQuery<DocumentReference> query;
+		SearchQuery<DocumentReference> query;
 
 		query = scope.query().asReference()
 				.predicate( f -> f.simpleQueryString()
@@ -427,7 +427,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.simpleQueryString().onField( absoluteFieldPath1 )
@@ -468,7 +468,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.simpleQueryString().onField( absoluteFieldPath1 )
@@ -511,7 +511,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	public void fuzzy() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		Function<String, IndexSearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
@@ -540,7 +540,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 		String absoluteFieldPath3 = indexMapping.analyzedStringField3.relativeFieldName;
-		Function<String, IndexSearchQuery<DocumentReference>> createQuery;
+		Function<String, SearchQuery<DocumentReference>> createQuery;
 
 		// onField(...)
 
@@ -659,7 +659,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		);
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_1 ) )
 				.toQuery();
@@ -675,7 +675,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_1 ) )
 				.toQuery();
@@ -713,7 +713,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query().asReference()
+		SearchQuery<DocumentReference> query = scope.query().asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_5 )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
@@ -729,7 +729,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query().asReference()
+		SearchQuery<DocumentReference> query = scope.query().asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_5 )
 						.skipAnalysis() )
 				.toQuery();
@@ -792,7 +792,7 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

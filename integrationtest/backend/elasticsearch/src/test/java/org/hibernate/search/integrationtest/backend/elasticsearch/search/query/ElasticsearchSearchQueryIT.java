@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -31,7 +31,7 @@ import com.google.gson.JsonObject;
 /**
  * Test the content of generated Elasticsearch search queries.
  */
-public class ElasticsearchIndexSearchQueryIT {
+public class ElasticsearchSearchQueryIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "indexname";
@@ -65,7 +65,7 @@ public class ElasticsearchIndexSearchQueryIT {
 	public void projection_sourceFiltering() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Object> query = scope.query()
+		SearchQuery<Object> query = scope.query()
 				.asProjection( f -> f.field( "string" ) )
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -88,7 +88,7 @@ public class ElasticsearchIndexSearchQueryIT {
 
 		String routingKey = "someRoutingKey";
 
-		IndexSearchQuery<?> query = scope.query()
+		SearchQuery<?> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.routing( routingKey )

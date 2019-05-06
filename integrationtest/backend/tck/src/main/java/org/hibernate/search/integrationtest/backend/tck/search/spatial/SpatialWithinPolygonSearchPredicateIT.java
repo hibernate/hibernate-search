@@ -14,7 +14,7 @@ import java.util.List;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.util.common.SearchException;
@@ -58,7 +58,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	public void within_polygon() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).polygon( POLYGON_2 ) )
 				.toQuery();
@@ -95,7 +95,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	public void fieldLevelBoost() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// Base score: less than 2
@@ -134,7 +134,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	public void predicateLevelBoost() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// Base score: less than 2
@@ -179,7 +179,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	public void predicateLevelBoost_andFieldLevelBoost() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// Base score boosted 0.1*7=0.7x: less than 8
@@ -224,7 +224,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	public void predicateLevelBoost_multiFields() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// Base score boosted 0.1x: less than 2
@@ -273,7 +273,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		// onField(...).orField(...)
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_1 ) )
 				.toQuery();

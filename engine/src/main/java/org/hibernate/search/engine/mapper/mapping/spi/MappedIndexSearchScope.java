@@ -11,7 +11,7 @@ import java.util.List;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
@@ -28,11 +28,11 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
  */
 public interface MappedIndexSearchScope<R, O> {
 
-	<T> SearchQueryResultContext<?, IndexSearchQuery<T>, ?> queryAsLoadedObject(
+	<T> SearchQueryResultContext<?, SearchQuery<T>, ?> queryAsLoadedObject(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, T> loadingContextBuilder);
 
-	SearchQueryResultContext<?, IndexSearchQuery<R>, ?> queryAsReference(
+	SearchQueryResultContext<?, SearchQuery<R>, ?> queryAsReference(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, ?> loadingContextBuilder);
 
@@ -42,7 +42,7 @@ public interface MappedIndexSearchScope<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	<T> SearchQueryResultContext<?, IndexSearchQuery<T>, ?> queryAsProjection(
+	<T> SearchQueryResultContext<?, SearchQuery<T>, ?> queryAsProjection(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, O> loadingContextBuilder,
 			SearchProjection<T> projection);
@@ -53,7 +53,7 @@ public interface MappedIndexSearchScope<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	SearchQueryResultContext<?, IndexSearchQuery<List<?>>, ?> queryAsProjections(
+	SearchQueryResultContext<?, SearchQuery<List<?>>, ?> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, O> loadingContextBuilder,
 			SearchProjection<?>... projections);

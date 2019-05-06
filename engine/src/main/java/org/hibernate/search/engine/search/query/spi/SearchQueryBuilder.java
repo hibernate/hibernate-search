@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
+import org.hibernate.search.engine.search.query.SearchQuery;
+
 /**
  * A builder for search queries.
  *
@@ -20,6 +22,6 @@ public interface SearchQueryBuilder<T, C> {
 
 	// TODO add more arguments, such as faceting options
 
-	IndexSearchQuery<T> build();
+	SearchQuery<T> build();
 
 }

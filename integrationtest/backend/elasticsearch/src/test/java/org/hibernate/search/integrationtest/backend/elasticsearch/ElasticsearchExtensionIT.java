@@ -28,7 +28,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -87,16 +87,16 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		ElasticsearchSearchQueryResultContext<IndexSearchQuery<DocumentReference>> context1 = scope.query()
+		ElasticsearchSearchQueryResultContext<SearchQuery<DocumentReference>> context1 = scope.query()
 				.asReference()
 				.extension( ElasticsearchExtension.get() );
 		// Note we can use Elasticsearch-specific predicates immediately
-		ElasticsearchSearchQueryContext<IndexSearchQuery<DocumentReference>> context2 =
+		ElasticsearchSearchQueryContext<SearchQuery<DocumentReference>> context2 =
 				context1.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
 		// Note we can use Elasticsearch-specific sorts immediately
-		ElasticsearchSearchQueryContext<IndexSearchQuery<DocumentReference>> context3 =
+		ElasticsearchSearchQueryContext<SearchQuery<DocumentReference>> context3 =
 				context2.sort( c -> c.fromJson( "{'sort1': 'asc'}" ) );
-		IndexSearchQuery<DocumentReference> query = context3.toQuery();
+		SearchQuery<DocumentReference> query = context3.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
@@ -107,7 +107,7 @@ public class ElasticsearchExtensionIT {
 	public void predicate_fromJson() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
@@ -169,7 +169,7 @@ public class ElasticsearchExtensionIT {
 				.should( predicate4 )
 				.toPredicate();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( booleanPredicate )
 				.toQuery();
@@ -182,7 +182,7 @@ public class ElasticsearchExtensionIT {
 	public void sort_fromJson() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c
@@ -241,7 +241,7 @@ public class ElasticsearchExtensionIT {
 				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				.toSort();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
@@ -276,7 +276,7 @@ public class ElasticsearchExtensionIT {
 	public void projection_document() throws JSONException {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<String> query = scope.query()
+		SearchQuery<String> query = scope.query()
 				.asProjection(
 						f -> f.extension( ElasticsearchExtension.get() ).source()
 				)
@@ -306,7 +306,7 @@ public class ElasticsearchExtensionIT {
 	public void projection_documentAndField() throws JSONException {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = scope.query()
+		SearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								f.extension( ElasticsearchExtension.get() ).source(),
@@ -337,7 +337,7 @@ public class ElasticsearchExtensionIT {
 	public void projection_explanation() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<String> query = scope.query()
+		SearchQuery<String> query = scope.query()
 				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
@@ -463,7 +463,7 @@ public class ElasticsearchExtensionIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

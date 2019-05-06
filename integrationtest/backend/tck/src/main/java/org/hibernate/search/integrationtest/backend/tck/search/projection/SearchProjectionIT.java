@@ -24,8 +24,8 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
@@ -92,7 +92,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 	public void noProjections() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = scope.query()
+		SearchQuery<List<?>> query = scope.query()
 				.asProjections()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -104,7 +104,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 	public void references() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query;
+		SearchQuery<List<?>> query;
 		DocumentReference document1Reference = reference( INDEX_NAME, DOCUMENT_1 );
 		DocumentReference document2Reference = reference( INDEX_NAME, DOCUMENT_2 );
 		DocumentReference document3Reference = reference( INDEX_NAME, DOCUMENT_3 );
@@ -169,7 +169,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		replayAll();
 		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createGenericSearchScope();
-		IndexSearchQuery<List<?>> query;
+		SearchQuery<List<?>> query;
 		/*
 		 * Note to test writers: make sure to assign these projections to variables,
 		 * just so that tests do not compile if someone changes the APIs in an incorrect way.
@@ -221,13 +221,13 @@ public class SearchProjectionIT extends EasyMockSupport {
 	public void score() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Float> query = scope.query()
+		SearchQuery<Float> query = scope.query()
 				.asProjection( f -> f.score() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( c -> c.byScore().desc() )
 				.toQuery();
 
-		IndexSearchResult<Float> result = query.fetch();
+		SearchResult<Float> result = query.fetch();
 		assertThat( result ).hasTotalHitCount( 2 );
 
 		Float score1 = result.getHits().get( 0 );
@@ -246,13 +246,13 @@ public class SearchProjectionIT extends EasyMockSupport {
 	public void score_noScoreSort() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Float> query = scope.query()
+		SearchQuery<Float> query = scope.query()
 				.asProjection( f -> f.score() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( c -> c.byIndexOrder() )
 				.toQuery();
 
-		IndexSearchResult<Float> result = query.fetch();
+		SearchResult<Float> result = query.fetch();
 		assertThat( result ).hasTotalHitCount( 2 );
 
 		Float score1 = result.getHits().get( 0 );
@@ -270,7 +270,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 	public void mixed() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query;
+		SearchQuery<List<?>> query;
 
 		query = scope.query()
 				.asProjection( f ->
@@ -309,7 +309,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 	@Test
 	public void extension() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<String> query;
+		SearchQuery<String> query;
 
 		// Mandatory extension, supported
 		query = scope.query()
@@ -414,7 +414,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
