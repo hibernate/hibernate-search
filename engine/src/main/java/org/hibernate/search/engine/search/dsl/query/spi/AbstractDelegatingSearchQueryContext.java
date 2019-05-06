@@ -18,12 +18,17 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public abstract class AbstractDelegatingSearchQueryContext<S extends SearchQueryContext<S, Q>, Q>
-		implements SearchQueryContextImplementor<S, Q> {
+public abstract class AbstractDelegatingSearchQueryContext<
+		S extends SearchQueryContext<S, Q, SC>,
+		Q,
+		PC extends SearchPredicateFactoryContext,
+		SC extends SearchSortContainerContext
+		>
+		implements SearchQueryContextImplementor<S, Q, PC, SC> {
 
-	private final SearchQueryContextImplementor<?, Q> delegate;
+	private final SearchQueryContextImplementor<?, Q, ?, ?> delegate;
 
-	public AbstractDelegatingSearchQueryContext(SearchQueryContextImplementor<?, Q> delegate) {
+	public AbstractDelegatingSearchQueryContext(SearchQueryContextImplementor<?, Q, ?, ?> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -34,9 +39,8 @@ public abstract class AbstractDelegatingSearchQueryContext<S extends SearchQuery
 	}
 
 	@Override
-	public S predicate(
-			Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor) {
-		delegate.predicate( predicateContributor );
+	public S predicate(Function<? super PC, SearchPredicateTerminalContext> predicateContributor) {
+		delegate.predicate( f -> predicateContributor.apply( extendPredicateContext( f ) ) );
 		return thisAsS();
 	}
 
@@ -64,8 +68,8 @@ public abstract class AbstractDelegatingSearchQueryContext<S extends SearchQuery
 	}
 
 	@Override
-	public S sort(Consumer<? super SearchSortContainerContext> sortContributor) {
-		delegate.sort( sortContributor );
+	public S sort(Consumer<? super SC> sortContributor) {
+		delegate.sort( f -> sortContributor.accept( extendSortContext( f ) ) );
 		return thisAsS();
 	}
 
@@ -75,4 +79,8 @@ public abstract class AbstractDelegatingSearchQueryContext<S extends SearchQuery
 	}
 
 	protected abstract S thisAsS();
+
+	protected abstract PC extendPredicateContext(SearchPredicateFactoryContext predicateFactoryContext);
+
+	protected abstract SC extendSortContext(SearchSortContainerContext sortContainerContext);
 }

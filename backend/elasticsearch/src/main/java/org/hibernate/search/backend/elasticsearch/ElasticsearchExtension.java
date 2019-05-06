@@ -81,7 +81,8 @@ public final class ElasticsearchExtension<Q, R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchQueryResultContext<Q>> extendOptional(SearchQueryContextImplementor<?, Q> original,
+	public Optional<ElasticsearchSearchQueryResultContext<Q>> extendOptional(
+			SearchQueryContextImplementor<?, Q, ?, ?> original,
 			SearchQueryBuilder<?, ?> builder) {
 		if ( builder instanceof ElasticsearchSearchQueryBuilder ) {
 			return Optional.of( new ElasticsearchSearchQueryContextImpl<>(

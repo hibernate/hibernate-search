@@ -6,9 +6,16 @@
  */
 package org.hibernate.search.engine.search.dsl.query.spi;
 
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public interface SearchQueryContextImplementor<N extends SearchQueryContext<N, Q>, Q>
-		extends SearchQueryResultContext<N, Q>, SearchQueryContext<N, Q> {
+public interface SearchQueryContextImplementor<
+		N extends SearchQueryContext<N, Q, SC>,
+		Q,
+		PC extends SearchPredicateFactoryContext,
+		SC extends SearchSortContainerContext
+		>
+		extends SearchQueryResultContext<N, Q, PC>, SearchQueryContext<N, Q, SC> {
 }

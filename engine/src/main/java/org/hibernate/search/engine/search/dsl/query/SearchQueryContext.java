@@ -18,8 +18,13 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
  *
  * @param <S> The type actually exposed to the user for this context (may be a subtype of SearchQueryContext, with more exposed methods).
  * @param <Q> The type of the created query.
+ * @param <SC> The type of contexts used to create sorts in {@link #sort(Consumer)}.
  */
-public interface SearchQueryContext<S extends SearchQueryContext<? extends S, Q>, Q> {
+public interface SearchQueryContext<
+		S extends SearchQueryContext<? extends S, Q, SC>,
+		Q,
+		SC extends SearchSortContainerContext
+		> {
 
 	S routing(String routingKey);
 
@@ -27,7 +32,7 @@ public interface SearchQueryContext<S extends SearchQueryContext<? extends S, Q>
 
 	S sort(SearchSort sort);
 
-	S sort(Consumer<? super SearchSortContainerContext> sortContributor);
+	S sort(Consumer<? super SC> sortContributor);
 
 	Q toQuery();
 

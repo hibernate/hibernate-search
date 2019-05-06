@@ -82,7 +82,8 @@ public final class LuceneExtension<Q, R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchQueryResultContext<Q>> extendOptional(SearchQueryContextImplementor<?, Q> original,
+	public Optional<LuceneSearchQueryResultContext<Q>> extendOptional(
+			SearchQueryContextImplementor<?, Q, ?, ?> original,
 			SearchQueryBuilder<?, ?> builder) {
 		if ( builder instanceof LuceneSearchQueryBuilder ) {
 			return Optional.of( new LuceneSearchQueryContextImpl<>(

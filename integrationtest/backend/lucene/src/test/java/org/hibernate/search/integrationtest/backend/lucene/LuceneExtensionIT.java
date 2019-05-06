@@ -23,6 +23,7 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
@@ -103,10 +104,12 @@ public class LuceneExtensionIT {
 		LuceneSearchQueryResultContext<IndexSearchQuery<DocumentReference>> context1 = scope.query()
 				.asReference()
 				.extension( LuceneExtension.get() );
+		// Note we can use Lucene-specific predicates immediately
 		LuceneSearchQueryContext<IndexSearchQuery<DocumentReference>> context2 =
-				context1.predicate( f -> f.matchAll() );
+				context1.predicate( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
+		// Note we can use Lucene-specific sorts immediately
 		LuceneSearchQueryContext<IndexSearchQuery<DocumentReference>> context3 =
-				context2.sort( c -> c.byIndexOrder() );
+				context2.sort( c -> c.fromLuceneSortField( new SortField( "sort1", Type.STRING ) ) );
 		IndexSearchQuery<DocumentReference> query = context3.toQuery();
 
 		assertThat( query )

@@ -18,8 +18,13 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @param <N> The type of the next context, returned after a predicate is defined.
  * @param <Q> The type of the created query.
+ * @param <PC> The type of contexts used to create predicates in {@link #predicate(Function)}.
  */
-public interface SearchQueryResultContext<N extends SearchQueryContext<? extends N, Q>, Q> {
+public interface SearchQueryResultContext<
+		N extends SearchQueryContext<? extends N, Q, ?>,
+		Q,
+		PC extends SearchPredicateFactoryContext
+		> {
 
 	/**
 	 * Set the predicate for this query.
@@ -35,7 +40,7 @@ public interface SearchQueryResultContext<N extends SearchQueryContext<? extends
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to define the query further.
 	 */
-	N predicate(Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor);
+	N predicate(Function<? super PC, SearchPredicateTerminalContext> predicateContributor);
 
 	/**
 	 * Extend the current context with the given extension,

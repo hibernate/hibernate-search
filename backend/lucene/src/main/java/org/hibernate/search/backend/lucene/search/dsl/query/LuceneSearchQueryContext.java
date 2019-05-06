@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.dsl.query;
 
+import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 
-public interface LuceneSearchQueryContext<Q> extends SearchQueryContext<LuceneSearchQueryContext<Q>, Q> {
+public interface LuceneSearchQueryContext<Q>
+		extends SearchQueryContext<LuceneSearchQueryContext<Q>, Q, LuceneSearchSortContainerContext> {
 
 	// FIXME make toQuery return a Lucene-specific query type
-
-	// FIXME make sort(Consumer) accept a function that expects Lucene-specific input
 
 }

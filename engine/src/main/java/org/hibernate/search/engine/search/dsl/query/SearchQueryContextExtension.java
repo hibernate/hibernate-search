@@ -41,7 +41,7 @@ public interface SearchQueryContextExtension<T, Q> {
 	 * @return An optional containing the extended search query context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchQueryContextImplementor<?, Q> original,
+	Optional<T> extendOptional(SearchQueryContextImplementor<?, Q, ?, ?> original,
 			SearchQueryBuilder<?, ?> builder);
 
 }

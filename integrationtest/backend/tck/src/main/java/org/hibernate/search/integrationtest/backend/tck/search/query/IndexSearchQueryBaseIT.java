@@ -147,7 +147,7 @@ public class IndexSearchQueryBaseIT {
 
 	private static class SupportedQueryDslExtension<Q> implements SearchQueryContextExtension<MyExtendedDslContext<Q>, Q> {
 		@Override
-		public Optional<MyExtendedDslContext<Q>> extendOptional(SearchQueryContextImplementor<?, Q> original,
+		public Optional<MyExtendedDslContext<Q>> extendOptional(SearchQueryContextImplementor<?, Q, ?, ?> original,
 				SearchQueryBuilder<?, ?> searchQueryBuilder) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( searchQueryBuilder ).isNotNull();
@@ -157,7 +157,7 @@ public class IndexSearchQueryBaseIT {
 
 	private static class UnSupportedQueryDslExtension<Q> implements SearchQueryContextExtension<MyExtendedDslContext<Q>, Q> {
 		@Override
-		public Optional<MyExtendedDslContext<Q>> extendOptional(SearchQueryContextImplementor<?, Q> original,
+		public Optional<MyExtendedDslContext<Q>> extendOptional(SearchQueryContextImplementor<?, Q, ?, ?> original,
 				SearchQueryBuilder<?, ?> searchQueryBuilder) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( searchQueryBuilder ).isNotNull();
@@ -166,9 +166,9 @@ public class IndexSearchQueryBaseIT {
 	}
 
 	private static class MyExtendedDslContext<Q> {
-		private final SearchQueryContextImplementor<?, Q> delegate;
+		private final SearchQueryContextImplementor<?, Q, ?, ?> delegate;
 
-		MyExtendedDslContext(SearchQueryContextImplementor<?, Q> delegate) {
+		MyExtendedDslContext(SearchQueryContextImplementor<?, Q, ?, ?> delegate) {
 			this.delegate = delegate;
 		}
 

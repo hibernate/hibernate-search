@@ -28,19 +28,19 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 public interface PojoSearchScopeDelegate<E, O> {
 	Set<Class<? extends E>> getIncludedIndexedTypes();
 
-	<T, Q> SearchQueryResultContext<?, Q> queryAsLoadedObject(
+	<T, Q> SearchQueryResultContext<?, Q, ?> queryAsLoadedObject(
 			ObjectLoader<PojoReference, T> objectLoader,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory);
 
-	<Q> SearchQueryResultContext<?, Q> queryAsReference(
+	<Q> SearchQueryResultContext<?, Q, ?> queryAsReference(
 			Function<IndexSearchQuery<PojoReference>, Q> searchQueryWrapperFactory);
 
-	<T, Q> SearchQueryResultContext<?, Q> queryAsProjection(
+	<T, Q> SearchQueryResultContext<?, Q, ?> queryAsProjection(
 			ObjectLoader<PojoReference, O> objectLoader,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<T> projection);
 
-	<Q> SearchQueryResultContext<?, Q> queryAsProjections(
+	<Q> SearchQueryResultContext<?, Q, ?> queryAsProjections(
 			ObjectLoader<PojoReference, O> objectLoader,
 			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections);

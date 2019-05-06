@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.dsl.query;
 
+import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 
-public interface LuceneSearchQueryResultContext<Q> extends SearchQueryResultContext<LuceneSearchQueryContext<Q>, Q> {
-
-	// FIXME make predicate(Function) accept a function that expects Lucene-specific input
+public interface LuceneSearchQueryResultContext<Q>
+		extends SearchQueryResultContext<LuceneSearchQueryContext<Q>, Q, LuceneSearchPredicateFactoryContext> {
 
 }

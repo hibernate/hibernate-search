@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.query;
 
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 
 public interface ElasticsearchSearchQueryResultContext<Q>
-		extends SearchQueryResultContext<ElasticsearchSearchQueryContext<Q>, Q> {
-
-	// FIXME make predicate(Function) accept a function that expects Elasticsearch-specific input
+		extends SearchQueryResultContext<ElasticsearchSearchQueryContext<Q>, Q, ElasticsearchSearchPredicateFactoryContext> {
 
 }
