@@ -111,7 +111,7 @@ public class ToHibernateOrmIT {
 	public void toHibernateOrmQuery() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toOrmQuery();
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
 		} );
 	}
@@ -120,7 +120,7 @@ public class ToHibernateOrmIT {
 	public void list() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toOrmQuery();
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -145,7 +145,7 @@ public class ToHibernateOrmIT {
 	public void uniqueResult() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toOrmQuery();
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -205,7 +205,7 @@ public class ToHibernateOrmIT {
 	public void pagination() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toOrmQuery();
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			assertThat( query.getFirstResult() ).isEqualTo( 0 );
 			assertThat( query.getMaxResults() ).isEqualTo( Integer.MAX_VALUE );

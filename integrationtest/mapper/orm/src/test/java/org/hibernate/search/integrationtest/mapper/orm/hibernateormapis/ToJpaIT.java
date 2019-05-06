@@ -115,7 +115,7 @@ public class ToJpaIT {
 	public void toJpaQuery() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
-			TypedQuery<IndexedEntity> query = createSimpleQuery( searchSession ).toJpaQuery();
+			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
 		} );
 	}
@@ -124,7 +124,7 @@ public class ToJpaIT {
 	public void getResultList() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
-			TypedQuery<IndexedEntity> query = createSimpleQuery( searchSession ).toJpaQuery();
+			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -149,7 +149,7 @@ public class ToJpaIT {
 	public void getSingleResult() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
-			TypedQuery<IndexedEntity> query = createSimpleQuery( searchSession ).toJpaQuery();
+			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -212,7 +212,7 @@ public class ToJpaIT {
 	public void pagination() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
-			TypedQuery<IndexedEntity> query = createSimpleQuery( searchSession ).toJpaQuery();
+			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
 			assertThat( query.getFirstResult() ).isEqualTo( 0 );
 			assertThat( query.getMaxResults() ).isEqualTo( Integer.MAX_VALUE );

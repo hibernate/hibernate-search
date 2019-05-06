@@ -6,14 +6,9 @@
  */
 package org.hibernate.search.mapper.orm.search.query.impl;
 
-import javax.persistence.TypedQuery;
-
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.query.Query;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
-import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.query.SearchResult;
 
@@ -21,29 +16,9 @@ public class HibernateOrmSearchQuery<R> extends AbstractSearchQuery<R, SearchRes
 		implements SearchQuery<R> {
 
 	private final IndexSearchQuery<R> delegate;
-	private final SessionImplementor sessionImplementor;
-	private final MutableObjectLoadingOptions loadingOptions;
 
-	private HibernateOrmSearchQueryAdapter<R> adapter;
-
-	public HibernateOrmSearchQuery(IndexSearchQuery<R> delegate, SessionImplementor sessionImplementor,
-			MutableObjectLoadingOptions loadingOptions) {
+	public HibernateOrmSearchQuery(IndexSearchQuery<R> delegate) {
 		this.delegate = delegate;
-		this.sessionImplementor = sessionImplementor;
-		this.loadingOptions = loadingOptions;
-	}
-
-	@Override
-	public TypedQuery<R> toJpaQuery() {
-		return toOrmQuery();
-	}
-
-	@Override
-	public Query<R> toOrmQuery() {
-		if ( adapter == null ) {
-			adapter = new HibernateOrmSearchQueryAdapter<>( this, sessionImplementor, loadingOptions );
-		}
-		return adapter;
 	}
 
 	@Override

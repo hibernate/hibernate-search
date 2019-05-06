@@ -28,10 +28,14 @@ public final class HibernateOrmLoadingContext<O> implements LoadingContext<PojoR
 
 	private final ProjectionHitMapper<PojoReference, O> projectionHitMapper;
 
+	private final MutableObjectLoadingOptions loadingOptions;
+
 	private HibernateOrmLoadingContext(SessionImplementor sessionImplementor,
-			ProjectionHitMapper<PojoReference, O> projectionHitMapper) {
+			ProjectionHitMapper<PojoReference, O> projectionHitMapper,
+			MutableObjectLoadingOptions loadingOptions) {
 		this.sessionImplementor = sessionImplementor;
 		this.projectionHitMapper = projectionHitMapper;
+		this.loadingOptions = loadingOptions;
 	}
 
 	@Override
@@ -44,6 +48,14 @@ public final class HibernateOrmLoadingContext<O> implements LoadingContext<PojoR
 		}
 
 		return projectionHitMapper;
+	}
+
+	public SessionImplementor getSessionImplementor() {
+		return sessionImplementor;
+	}
+
+	public MutableObjectLoadingOptions getLoadingOptions() {
+		return loadingOptions;
 	}
 
 	public static final class Builder<O> implements LoadingContextBuilder<PojoReference, O> {
@@ -68,7 +80,7 @@ public final class HibernateOrmLoadingContext<O> implements LoadingContext<PojoR
 					scopeDelegate::toPojoReference,
 					objectLoaderBuilder.build( loadingOptions )
 			);
-			return new HibernateOrmLoadingContext<>( sessionImplementor, projectionHitMapper );
+			return new HibernateOrmLoadingContext<>( sessionImplementor, projectionHitMapper, loadingOptions );
 		}
 	}
 }
