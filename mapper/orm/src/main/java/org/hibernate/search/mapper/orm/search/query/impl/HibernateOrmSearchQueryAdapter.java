@@ -36,15 +36,21 @@ import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
-class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
+public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
 
-	private final HibernateOrmSearchQuery<R> delegate;
+	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
+		// FIXME move .extension to SearchQuery, which will spare us this ugly cast
+		HibernateOrmSearchQuery<R> castedQuery = (HibernateOrmSearchQuery<R>) query;
+		return castedQuery.getIndexSearchQuery().extension( HibernateOrmSearchQueryAdapterExtension.get() );
+	}
+
+	private final IndexSearchQuery<R> delegate;
 	private final MutableObjectLoadingOptions loadingOptions;
 
 	private Integer firstResult;
 	private Integer maxResults;
 
-	HibernateOrmSearchQueryAdapter(HibernateOrmSearchQuery<R> delegate, SessionImplementor sessionImplementor,
+	HibernateOrmSearchQueryAdapter(IndexSearchQuery<R> delegate, SessionImplementor sessionImplementor,
 			MutableObjectLoadingOptions loadingOptions) {
 		super( sessionImplementor, new ParameterMetadataImpl( null, null ) );
 		this.delegate = delegate;
@@ -63,11 +69,8 @@ class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> type) {
-		if ( type.equals( SearchQuery.class ) ) {
+		if ( type.equals( IndexSearchQuery.class ) ) {
 			return (T) delegate;
-		}
-		else if ( type.equals( IndexSearchQuery.class ) ) {
-			return (T) delegate.getIndexSearchQuery();
 		}
 		else {
 			return super.unwrap( type );

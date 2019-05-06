@@ -26,7 +26,6 @@ import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 public class SearchQueryResultDefinitionContextImpl<O>
 		implements SearchQueryResultDefinitionContext<O> {
 	private final PojoSearchScopeDelegate<O, O> searchScopeDelegate;
-	private final SessionImplementor sessionImplementor;
 	private final HibernateOrmLoadingContext.Builder<O> loadingContextBuilder;
 	private final MutableObjectLoadingOptions loadingOptions;
 
@@ -34,7 +33,6 @@ public class SearchQueryResultDefinitionContextImpl<O>
 			PojoSearchScopeDelegate<O, O> searchScopeDelegate,
 			SessionImplementor sessionImplementor) {
 		this.searchScopeDelegate = searchScopeDelegate;
-		this.sessionImplementor = sessionImplementor;
 		ObjectLoaderBuilder<O> objectLoaderBuilder =
 				new ObjectLoaderBuilder<>( sessionImplementor, searchScopeDelegate.getIncludedIndexedTypes() );
 		this.loadingOptions = new MutableObjectLoadingOptions();
@@ -47,7 +45,7 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	public SearchQueryResultContext<?, ? extends SearchQuery<O>, ?> asEntity() {
 		return searchScopeDelegate.queryAsLoadedObject(
 				loadingContextBuilder,
-				q -> new HibernateOrmSearchQuery<>( q, sessionImplementor, loadingOptions )
+				HibernateOrmSearchQuery::new
 		);
 	}
 
@@ -55,7 +53,7 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(SearchProjection<T> projection) {
 		return searchScopeDelegate.queryAsProjection(
 				loadingContextBuilder,
-				q -> new HibernateOrmSearchQuery<>( q, sessionImplementor, loadingOptions ),
+				HibernateOrmSearchQuery::new,
 				projection
 		);
 	}
@@ -71,7 +69,7 @@ public class SearchQueryResultDefinitionContextImpl<O>
 			SearchProjection<?>... projections) {
 		return searchScopeDelegate.queryAsProjections(
 				loadingContextBuilder,
-				q -> new HibernateOrmSearchQuery<>( q, sessionImplementor, loadingOptions ),
+				HibernateOrmSearchQuery::new,
 				projections
 		);
 	}

@@ -8,10 +8,14 @@ package org.hibernate.search.mapper.orm;
 
 import java.lang.invoke.MethodHandles;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.impl.LazyInitSearchSession;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -68,6 +72,40 @@ public final class Search {
 		}
 
 		return createSearchSession( sessionImpl );
+	}
+
+	/**
+	 * Convert a {@link SearchQuery} to a {@link TypedQuery JPA query}.
+	 * <p>
+	 * Note that the resulting query <strong>does not support all operations</strong>
+	 * and may behave slightly differently from what is expected from a {@link TypedQuery} in some cases
+	 * (including, but not limited to, the type of thrown exceptions).
+	 * For these reasons, it is recommended to only use this method when absolutely required,
+	 * for example when integrating to an external library that expects JPA queries.
+	 *
+	 * @param searchQuery The search query to convert.
+	 * @param <T> The type of query hits.
+	 * @return A representation of the given query as a JPA query.
+	 */
+	public static <T> TypedQuery<T> toJpaQuery(SearchQuery<T> searchQuery) {
+		return HibernateOrmSearchQueryAdapter.create( searchQuery );
+	}
+
+	/**
+	 * Convert a {@link SearchQuery} to a {@link Query Hibernate ORM query}.
+	 * <p>
+	 * Note that the resulting query <strong>does not support all operations</strong>
+	 * and may behave slightly differently from what is expected from a {@link Query} in some cases
+	 * (including, but not limited to, the type of thrown exceptions).
+	 * For these reasons, it is recommended to only use this method when absolutely required,
+	 * for example when integrating to an external library that expects Hibernate ORM queries.
+	 *
+	 * @param searchQuery The search query to convert.
+	 * @param <T> The type of query hits.
+	 * @return A representation of the given query as a Hibernate ORM query.
+	 */
+	public static <T> Query<T> toOrmQuery(SearchQuery<T> searchQuery) {
+		return HibernateOrmSearchQueryAdapter.create( searchQuery );
 	}
 
 	private static SearchSession createSearchSession(SessionImplementor sessionImplementor) {
