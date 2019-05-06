@@ -31,6 +31,7 @@ import org.hibernate.query.internal.ParameterMetadataImpl;
 import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
@@ -38,13 +39,16 @@ import org.hibernate.type.Type;
 class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
 
 	private final HibernateOrmSearchQuery<R> delegate;
+	private final MutableObjectLoadingOptions loadingOptions;
 
 	private Integer firstResult;
 	private Integer maxResults;
 
-	HibernateOrmSearchQueryAdapter(HibernateOrmSearchQuery<R> delegate, SessionImplementor sessionImplementor) {
+	HibernateOrmSearchQueryAdapter(HibernateOrmSearchQuery<R> delegate, SessionImplementor sessionImplementor,
+			MutableObjectLoadingOptions loadingOptions) {
 		super( sessionImplementor, new ParameterMetadataImpl( null, null ) );
 		this.delegate = delegate;
+		this.loadingOptions = loadingOptions;
 	}
 
 	@Override
@@ -127,7 +131,7 @@ class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setFetchSize(int fetchSize) {
-		delegate.setFetchSize( fetchSize );
+		loadingOptions.setFetchSize( fetchSize );
 		return this;
 	}
 

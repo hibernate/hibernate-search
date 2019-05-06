@@ -51,7 +51,7 @@ public class HibernateOrmSearchQuery<R> implements SearchQuery<R> {
 	@Override
 	public Query<R> toOrmQuery() {
 		if ( adapter == null ) {
-			adapter = new HibernateOrmSearchQueryAdapter<>( this, sessionImplementor );
+			adapter = new HibernateOrmSearchQueryAdapter<>( this, sessionImplementor, loadingOptions );
 		}
 		return adapter;
 	}
@@ -86,12 +86,6 @@ public class HibernateOrmSearchQuery<R> implements SearchQuery<R> {
 		else {
 			return Optional.of( hits.get( 0 ) );
 		}
-	}
-
-	@Override
-	public HibernateOrmSearchQuery<R> setFetchSize(int fetchSize) {
-		loadingOptions.setFetchSize( fetchSize );
-		return this;
 	}
 
 	IndexSearchQuery<R> getIndexSearchQuery() {
