@@ -9,8 +9,10 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.List;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
@@ -38,6 +40,13 @@ final class StubIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	@Override
 	public String getQueryString() {
 		return getClass().getName() + "@" + Integer.toHexString( hashCode() );
+	}
+
+	@Override
+	public <Q> Q extension(IndexSearchQueryExtension<Q, T> extension) {
+		return DslExtensionState.returnIfSupported(
+				extension, extension.extendOptional( this, loadingContext )
+		);
 	}
 
 	@Override

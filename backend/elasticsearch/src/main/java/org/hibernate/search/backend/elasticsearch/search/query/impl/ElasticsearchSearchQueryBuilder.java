@@ -104,7 +104,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 
 		return new ElasticsearchIndexSearchQuery<>(
 				workFactory, queryOrchestrator,
-				indexNames, sessionContext, routingKeys,
+				indexNames, sessionContext, loadingContext, routingKeys,
 				payload,
 				searchResultExtractor
 		);
