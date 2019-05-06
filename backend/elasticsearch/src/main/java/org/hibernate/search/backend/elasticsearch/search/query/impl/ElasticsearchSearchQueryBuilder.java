@@ -98,7 +98,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 
 		ElasticsearchSearchResultExtractor<T> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(
-						loadingContext.getProjectionHitMapper(),
+						loadingContext,
 						rootProjection, searchProjectionExecutionContext
 				);
 

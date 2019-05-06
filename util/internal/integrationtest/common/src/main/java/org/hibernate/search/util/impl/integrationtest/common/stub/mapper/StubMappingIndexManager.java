@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
-import java.util.function.Function;
-
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
@@ -80,13 +78,12 @@ public class StubMappingIndexManager {
 	/**
 	 * @return A search target scoped to this index and the given other indexes.
 	 */
-	public <R, O> GenericStubMappingSearchScope<R, O> createSearchScope(
-			Function<DocumentReference, R> documentReferenceTransformer, StubMappingIndexManager... others) {
+	public <R, O> GenericStubMappingSearchScope<R, O> createGenericSearchScope(StubMappingIndexManager... others) {
 		MappedIndexSearchScopeBuilder<R, O> builder =
 				indexManager.createSearchScopeBuilder( new StubMappingContext() );
 		for ( StubMappingIndexManager other : others ) {
 			other.indexManager.addTo( builder );
 		}
-		return new GenericStubMappingSearchScope<>( builder.build(), documentReferenceTransformer );
+		return new GenericStubMappingSearchScope<>( builder.build() );
 	}
 }

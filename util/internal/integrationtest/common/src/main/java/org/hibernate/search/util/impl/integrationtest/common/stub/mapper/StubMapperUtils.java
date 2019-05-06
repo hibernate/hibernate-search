@@ -6,14 +6,21 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
+import static org.easymock.EasyMock.expect;
+import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.referenceMatcher;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
+import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils;
 
@@ -33,18 +40,40 @@ public final class StubMapperUtils {
 	}
 
 	/**
+	 * @param loadingContextMock The EasyMock mock for the loading context.
+	 * @param referenceTransformerMock The EasyMock mock for the reference transformer.
 	 * @param objectLoaderMock The EasyMock mock for the object loader.
-	 * @param loadingDefinition A definition of the reference -> loaded object mapping.
+	 * @param hitMappingDefinition A definition of the reference -> loaded object mapping.
 	 * @param <R> The reference type.
 	 * @param <O> The loaded object type.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <R, O> void expectLoad(ObjectLoader<R, O> objectLoaderMock,
-			Consumer<LoadingDefinitionContext<R, O>> loadingDefinition) {
-		LoadingDefinitionContext<R, O> context = new LoadingDefinitionContext<>();
-		loadingDefinition.accept( context );
+	public static <R, O> void expectHitMapping(
+			LoadingContext<R, O> loadingContextMock,
+			Function<DocumentReference, R> referenceTransformerMock,
+			ObjectLoader<R, O> objectLoaderMock,
+			Consumer<HitMappingDefinitionContext<R, O>> hitMappingDefinition) {
+		/*
+		 * We expect getProjectionHitMapper to be called *every time* a load is performed,
+		 * so that the mapper can check its state (session is open in ORM, for example).
+		 */
+		expect( loadingContextMock.getProjectionHitMapper() )
+				.andReturn( new DefaultProjectionHitMapper<>(
+						referenceTransformerMock,
+						objectLoaderMock
+				) );
 
-		EasyMock.expect( objectLoaderMock.loadBlocking(
+		HitMappingDefinitionContext<R, O> context = new HitMappingDefinitionContext<>();
+		hitMappingDefinition.accept( context );
+
+		for ( Map.Entry<DocumentReference, List<R>> entry : context.referenceMap.entrySet() ) {
+			for ( R transformedReference : entry.getValue() ) {
+				expect( referenceTransformerMock.apply( referenceMatcher( entry.getKey() ) ) )
+						.andReturn( transformedReference );
+			}
+		}
+
+		expect( objectLoaderMock.loadBlocking(
 				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) )
 		) )
 				.andAnswer(
@@ -54,11 +83,21 @@ public final class StubMapperUtils {
 				);
 	}
 
-	public static class LoadingDefinitionContext<R, O> {
+	public static class HitMappingDefinitionContext<R, O> {
+		private final Map<DocumentReference, List<R>> referenceMap = new HashMap<>();
 		private final Map<R, O> loadingMap = new HashMap<>();
 
-		public LoadingDefinitionContext<R, O> load(R reference, O loadedObject) {
-			loadingMap.put( reference, loadedObject );
+		public HitMappingDefinitionContext<R, O> reference(DocumentReference documentReference, R transformedReference) {
+			referenceMap.computeIfAbsent( documentReference, ignored -> new ArrayList<>() )
+					.add( transformedReference );
+			return this;
+		}
+
+		public HitMappingDefinitionContext<R, O> load(DocumentReference documentReference, R transformedReference, O loadedObject) {
+			// For each load, the backend must first transform the reference
+			reference( documentReference, transformedReference );
+			// Then it will need to trigger loading
+			loadingMap.put( transformedReference, loadedObject );
 			return this;
 		}
 	}

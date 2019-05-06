@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
-import static org.easymock.EasyMock.expect;
-import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.referenceMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
@@ -25,6 +23,7 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeConte
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
@@ -53,7 +52,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import org.assertj.core.api.Assertions;
-import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
 /**
@@ -159,36 +157,19 @@ public class SearchProjectionIT extends EasyMockSupport {
 		StubLoadedObject document3LoadedObject = new StubLoadedObject( document3Reference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
+		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				createMock( LoadingContext.class );
 		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
 				createMock( StubDocumentReferenceTransformer.class );
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				createMock( StubObjectLoader.class );
 
-		expect( referenceTransformerMock.apply( referenceMatcher( document1Reference ) ) )
-				.andReturn( document1TransformedReference )
-				.times( 2 );
-		expect( referenceTransformerMock.apply( referenceMatcher( document2Reference ) ) )
-				.andReturn( document2TransformedReference )
-				.times( 2 );
-		expect( referenceTransformerMock.apply( referenceMatcher( document3Reference ) ) )
-				.andReturn( document3TransformedReference )
-				.times( 2 );
-		expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
-				.andReturn( emptyTransformedReference )
-				.times( 2 );
-		StubMapperUtils.expectLoad(
-				objectLoaderMock,
-				c -> c.load( document1TransformedReference, document1LoadedObject )
-						.load( document2TransformedReference, document2LoadedObject )
-						.load( document3TransformedReference, document3LoadedObject )
-						.load( emptyTransformedReference, emptyLoadedObject )
-		);
+		resetAll();
+		// No call expected on the mocks
 		replayAll();
-
 		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createSearchScope( referenceTransformerMock );
+				indexManager.createGenericSearchScope();
 		IndexSearchQuery<List<?>> query;
-
 		/*
 		 * Note to test writers: make sure to assign these projections to variables,
 		 * just so that tests do not compile if someone changes the APIs in an incorrect way.
@@ -199,8 +180,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				scope.projection().reference().toProjection();
 		SearchProjection<StubLoadedObject> objectProjection =
 				scope.projection().object().toProjection();
-
-		query = scope.query( objectLoaderMock )
+		query = scope.query( loadingContextMock )
 				.asProjections(
 						documentReferenceProjection,
 						referenceProjection,
@@ -208,13 +188,32 @@ public class SearchProjectionIT extends EasyMockSupport {
 				)
 				.predicate( f -> f.matchAll() )
 				.toQuery();
+		verifyAll();
+
+		resetAll();
+		StubMapperUtils.expectHitMapping(
+				loadingContextMock, referenceTransformerMock, objectLoaderMock,
+				/*
+				 * Expect each reference to be transformed because of the reference projection,
+				 * but also loaded because of the object projection.
+				 */
+				c -> c
+						.reference( document1Reference, document1TransformedReference )
+						.load( document1Reference, document1TransformedReference, document1LoadedObject )
+						.reference( document2Reference, document2TransformedReference )
+						.load( document2Reference, document2TransformedReference, document2LoadedObject )
+						.reference( document3Reference, document3TransformedReference )
+						.load( document3Reference, document3TransformedReference, document3LoadedObject )
+						.reference( emptyReference, emptyTransformedReference )
+						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+		);
+		replayAll();
 		assertThat( query ).hasListHitsAnyOrder( b -> {
 			b.list( document1Reference, document1TransformedReference, document1LoadedObject );
 			b.list( document2Reference, document2TransformedReference, document2LoadedObject );
 			b.list( document3Reference, document3TransformedReference, document3LoadedObject );
 			b.list( emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
-
 		verifyAll();
 	}
 

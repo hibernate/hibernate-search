@@ -19,27 +19,32 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<T> {
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LuceneSearchProjection<?, T> rootProjection;
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final LoadingContext<?, ?> loadingContext;
 
 	LuceneSearchResultExtractorImpl(
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LuceneSearchProjection<?, T> rootProjection,
-			ProjectionHitMapper<?, ?> projectionHitMapper) {
+			LoadingContext<?, ?> loadingContext) {
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.rootProjection = rootProjection;
-		this.projectionHitMapper = projectionHitMapper;
+		this.loadingContext = loadingContext;
 	}
 
 	@Override
 	public LuceneLoadableSearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
 			SearchProjectionExtractContext projectionExecutionContext) throws IOException {
-		List<Object> extractedData = extractHits( indexSearcher, topDocs, projectionExecutionContext );
+		ProjectionHitMapper<?, ?> projectionHitMapper = loadingContext.getProjectionHitMapper();
+
+		List<Object> extractedData = extractHits(
+				projectionHitMapper, indexSearcher, topDocs, projectionExecutionContext
+		);
 
 		return new LuceneLoadableSearchResult<>(
 				projectionHitMapper, rootProjection,
@@ -47,7 +52,8 @@ class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<
 		);
 	}
 
-	private List<Object> extractHits(IndexSearcher indexSearcher, TopDocs topDocs,
+	private List<Object> extractHits(ProjectionHitMapper<?, ?> projectionHitMapper,
+			IndexSearcher indexSearcher, TopDocs topDocs,
 			SearchProjectionExtractContext projectionExecutionContext) throws IOException {
 		if ( topDocs == null ) {
 			return Collections.emptyList();
