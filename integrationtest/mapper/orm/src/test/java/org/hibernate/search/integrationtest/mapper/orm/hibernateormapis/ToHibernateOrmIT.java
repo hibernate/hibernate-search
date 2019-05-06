@@ -269,6 +269,13 @@ public class ToHibernateOrmIT {
 		SearchQuery<IndexedEntity> query = createSimpleQuery( searchSession );
 		session.close();
 
+		backendMock.expectSearchObjects(
+				Arrays.asList( IndexedEntity.INDEX ),
+				b -> { },
+				// The call will fail, this doesn't matter
+				StubSearchWorkBehavior.empty()
+		);
+
 		SubTest.expectException( () -> {
 			query.fetchHits();
 		} )

@@ -103,13 +103,6 @@ public class HibernateOrmSearchQuery<R> implements SearchQuery<R> {
 	}
 
 	private SearchResult<R> doFetch(Long limit, Long offset) {
-		try {
-			sessionImplementor.checkOpen();
-		}
-		catch (IllegalStateException e) {
-			throw log.hibernateSessionIsClosed( e );
-		}
-
 		// TODO HSEARCH-3352 handle timeouts
 		final IndexSearchResult<R> results = delegate.fetch( limit, offset );
 		return new HibernateOrmSearchResult<>( results );
