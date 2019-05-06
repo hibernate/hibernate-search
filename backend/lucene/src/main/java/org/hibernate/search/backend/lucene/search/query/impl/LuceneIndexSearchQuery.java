@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
@@ -27,7 +28,8 @@ import org.apache.lucene.search.Sort;
 /**
  * @author Guillaume Smet
  */
-public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
+public class LuceneIndexSearchQuery<T> extends AbstractSearchQuery<T, IndexSearchResult<T>>
+		implements IndexSearchQuery<T> {
 
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
@@ -40,7 +42,7 @@ public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final LuceneSearchResultExtractor<T> searchResultExtractor;
 
-	public LuceneIndexSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
+	LuceneIndexSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,

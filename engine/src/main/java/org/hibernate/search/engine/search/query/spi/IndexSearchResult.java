@@ -6,15 +6,8 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
-import java.util.List;
+import org.hibernate.search.engine.search.query.SearchResult;
 
-/**
- * @param <T> The type of results.
- */
-public interface IndexSearchResult<T> {
-
-	long getTotalHitCount();
-
-	List<T> getHits();
+public interface IndexSearchResult<T> extends SearchResult<T> {
 
 }

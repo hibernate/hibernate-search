@@ -6,21 +6,21 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.common.SearchException;
 
 /**
  * @param <T> The type of results.
  */
-public interface IndexSearchQuery<T> {
+public interface IndexSearchQuery<T> extends SearchQuery<T> {
 
-	default IndexSearchResult<T> fetch() {
-		return fetch( null, null );
-	}
+	@Override
+	IndexSearchResult<T> fetch();
 
+	@Override
 	IndexSearchResult<T> fetch(Long limit, Long offset);
 
-	long fetchTotalHitCount();
-
+	@Override
 	String getQueryString();
 
 	/**

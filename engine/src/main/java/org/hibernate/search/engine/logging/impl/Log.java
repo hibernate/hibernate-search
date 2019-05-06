@@ -280,4 +280,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 60, value = "Invalid '%1$s' value for enum '%2$s'.")
 	SearchException invalidStringForEnum(String value, @FormatWith(ClassFormatter.class) Class<? extends Enum> enumType, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 61, value = "Multiple hits when a single hit was expected: got %1$s hits.")
+	SearchException nonSingleHit(long totalHitCount);
 }

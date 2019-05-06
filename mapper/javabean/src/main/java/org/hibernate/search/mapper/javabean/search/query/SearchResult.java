@@ -6,21 +6,9 @@
  */
 package org.hibernate.search.mapper.javabean.search.query;
 
-import java.util.List;
-
 /**
  * @param <T> The type of results.
  */
-public interface SearchResult<T> {
-
-	/**
-	 * @return The total number of matching entities, ignoring pagination settings.
-	 */
-	long getTotalHitCount();
-
-	/**
-	 * @return The hits as a {@link List} containing one element for each matched entity.
-	 */
-	List<T> getHits();
+public interface SearchResult<T> extends org.hibernate.search.engine.search.query.SearchResult<T> {
 
 }
