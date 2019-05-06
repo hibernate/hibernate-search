@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.common.impl;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -43,52 +42,49 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<?, Q, ?> queryAsLoadedObject(SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, T> loadingContextBuilder,
-			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
+	public <T> SearchQueryResultContext<?, IndexSearchQuery<T>, ?> queryAsLoadedObject(SessionContextImplementor sessionContext,
+			LoadingContextBuilder<R, T> loadingContextBuilder) {
 		SearchQueryBuilder<T, C> builder = delegate.getSearchQueryBuilderFactory()
 				.asObject( sessionContext, loadingContextBuilder );
 
 		return new DefaultSearchQueryContext<>(
-				delegate, builder, searchQueryWrapperFactory
+				delegate, builder
 		);
 	}
 
 	@Override
-	public <Q> SearchQueryResultContext<?, Q, ?> queryAsReference(SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, ?> loadingContextBuilder,
-			Function<IndexSearchQuery<R>, Q> searchQueryWrapperFactory) {
+	public SearchQueryResultContext<?, IndexSearchQuery<R>, ?> queryAsReference(SessionContextImplementor sessionContext,
+			LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		SearchQueryBuilder<R, C> builder = delegate.getSearchQueryBuilderFactory()
 				.asReference( sessionContext, loadingContextBuilder );
 
 		return new DefaultSearchQueryContext<>(
-				delegate, builder, searchQueryWrapperFactory
+				delegate, builder
 		);
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<?, Q, ?> queryAsProjection(SessionContextImplementor sessionContext,
+	public <T> SearchQueryResultContext<?, IndexSearchQuery<T>, ?> queryAsProjection(SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, O> loadingContextBuilder,
-			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory, SearchProjection<T> projection) {
+			SearchProjection<T> projection) {
 		SearchQueryBuilder<T, C> builder = delegate.getSearchQueryBuilderFactory()
 				.asProjection( sessionContext, loadingContextBuilder, projection );
 
 		return new DefaultSearchQueryContext<>(
-				delegate, builder, searchQueryWrapperFactory
+				delegate, builder
 		);
 	}
 
 	@Override
-	public <Q> SearchQueryResultContext<?, Q, ?> queryAsProjections(
+	public SearchQueryResultContext<?, IndexSearchQuery<List<?>>, ?> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, O> loadingContextBuilder,
-			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
 		SearchQueryBuilder<List<?>, C> builder = delegate.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, loadingContextBuilder, projections );
 
 		return new DefaultSearchQueryContext<>(
-				delegate, builder, searchQueryWrapperFactory
+				delegate, builder
 		);
 	}
 

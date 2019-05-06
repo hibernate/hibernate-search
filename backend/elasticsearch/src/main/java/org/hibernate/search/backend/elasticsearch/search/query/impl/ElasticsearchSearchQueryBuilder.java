@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
@@ -76,7 +75,8 @@ public class ElasticsearchSearchQueryBuilder<T>
 		this.routingKeys.add( routingKey );
 	}
 
-	private IndexSearchQuery<T> build() {
+	@Override
+	public IndexSearchQuery<T> build() {
 		JsonObject payload = new JsonObject();
 
 		JsonObject jsonQuery = getJsonQuery();
@@ -112,10 +112,5 @@ public class ElasticsearchSearchQueryBuilder<T>
 
 	private JsonObject getJsonQuery() {
 		return multiTenancyStrategy.decorateJsonQuery( elementCollector.toJsonPredicate(), sessionContext.getTenantIdentifier() );
-	}
-
-	@Override
-	public <Q> Q build(Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
-		return searchQueryWrapperFactory.apply( build() );
 	}
 }

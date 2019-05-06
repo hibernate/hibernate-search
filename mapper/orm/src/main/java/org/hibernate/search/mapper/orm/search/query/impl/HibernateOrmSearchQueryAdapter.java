@@ -32,7 +32,7 @@ import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
-import org.hibernate.search.mapper.orm.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
@@ -40,8 +40,8 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
 		// FIXME move .extension to SearchQuery, which will spare us this ugly cast
-		HibernateOrmSearchQuery<R> castedQuery = (HibernateOrmSearchQuery<R>) query;
-		return castedQuery.getIndexSearchQuery().extension( HibernateOrmSearchQueryAdapterExtension.get() );
+		IndexSearchQuery<R> castedQuery = (IndexSearchQuery<R>) query;
+		return castedQuery.extension( HibernateOrmSearchQueryAdapterExtension.get() );
 	}
 
 	private final IndexSearchQuery<R> delegate;

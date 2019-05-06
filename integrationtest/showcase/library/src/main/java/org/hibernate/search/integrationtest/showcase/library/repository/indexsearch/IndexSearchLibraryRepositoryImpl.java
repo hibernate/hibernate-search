@@ -12,7 +12,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

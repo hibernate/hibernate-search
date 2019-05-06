@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.util.function.Function;
-
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -71,7 +69,8 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 		throw new UnsupportedOperationException( "Routing keys are not supported by the Lucene backend yet." );
 	}
 
-	private IndexSearchQuery<T> build() {
+	@Override
+	public IndexSearchQuery<T> build() {
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
 		LuceneSearchResultExtractor<T> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
@@ -90,10 +89,5 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 				elementCollector.toLuceneSort(),
 				rootProjection, searchResultExtractor
 		);
-	}
-
-	@Override
-	public <Q> Q build(Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
-		return searchQueryWrapperFactory.apply( build() );
 	}
 }
