@@ -8,14 +8,13 @@ package org.hibernate.search.mapper.orm.search.query.impl;
 
 import java.util.List;
 
-import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.mapper.orm.search.query.SearchResult;
 
 class HibernateOrmSearchResult<T> implements SearchResult<T> {
 
-	private final IndexSearchResult<T> delegate;
+	private final org.hibernate.search.engine.search.query.SearchResult<T> delegate;
 
-	HibernateOrmSearchResult(IndexSearchResult<T> delegate) {
+	HibernateOrmSearchResult(org.hibernate.search.engine.search.query.SearchResult<T> delegate) {
 		this.delegate = delegate;
 	}
 

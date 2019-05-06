@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.mapper.javabean.search.query.impl;
 
+import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.search.query.SearchResult;
 
-public class JavaBeanSearchQuery<T> implements SearchQuery<T> {
+public class JavaBeanSearchQuery<T> extends AbstractSearchQuery<T, SearchResult<T>>
+		implements SearchQuery<T> {
 
 	private final IndexSearchQuery<T> delegate;
 

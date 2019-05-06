@@ -6,24 +6,19 @@
  */
 package org.hibernate.search.mapper.orm.search.query.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-import java.util.Optional;
 import javax.persistence.TypedQuery;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.Query;
+import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.query.SearchResult;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class HibernateOrmSearchQuery<R> implements SearchQuery<R> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+public class HibernateOrmSearchQuery<R> extends AbstractSearchQuery<R, SearchResult<R>>
+		implements SearchQuery<R> {
 
 	private final IndexSearchQuery<R> delegate;
 	private final SessionImplementor sessionImplementor;
@@ -36,11 +31,6 @@ public class HibernateOrmSearchQuery<R> implements SearchQuery<R> {
 		this.delegate = delegate;
 		this.sessionImplementor = sessionImplementor;
 		this.loadingOptions = loadingOptions;
-	}
-
-	@Override
-	public String toString() {
-		return "HibernateOrmSearchQuery(" + delegate.getQueryString() + ")";
 	}
 
 	@Override
@@ -62,38 +52,17 @@ public class HibernateOrmSearchQuery<R> implements SearchQuery<R> {
 	}
 
 	@Override
-	public List<R> fetchHits(Long limit, Long offset) {
-		return fetch( limit, offset ).getHits();
-	}
-
-	@Override
 	public long fetchTotalHitCount() {
 		return delegate.fetchTotalHitCount();
 	}
 
 	@Override
-	public Optional<R> fetchSingleHit() {
-		// We don't need to fetch more than two elements to detect a problem
-		SearchResult<R> result = fetch( 2L );
-		List<R> hits = result.getHits();
-		int fetchedHitCount = result.getHits().size();
-		if ( fetchedHitCount == 0 ) {
-			return Optional.empty();
-		}
-		else if ( fetchedHitCount > 1 ) {
-			throw log.nonSingleHit( result.getTotalHitCount() );
-		}
-		else {
-			return Optional.of( hits.get( 0 ) );
-		}
+	public String getQueryString() {
+		return delegate.getQueryString();
 	}
 
 	IndexSearchQuery<R> getIndexSearchQuery() {
 		return delegate;
-	}
-
-	String getQueryString() {
-		return delegate.getQueryString();
 	}
 
 	private SearchResult<R> doFetch(Long limit, Long offset) {

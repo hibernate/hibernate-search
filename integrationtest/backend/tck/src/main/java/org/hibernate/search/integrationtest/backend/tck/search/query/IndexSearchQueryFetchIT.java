@@ -76,7 +76,7 @@ public class IndexSearchQueryFetchIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
 
 		query = matchAllQuery();
-		assertThat( query.fetch( null, null ) ).fromQuery( query )
+		assertThat( query.fetch( (Long) null, null ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -104,7 +104,7 @@ public class IndexSearchQueryFetchIT {
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
 
-		assertThat( query.fetch( null, null ) ).fromQuery( query )
+		assertThat( query.fetch( (Long) null, null ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {

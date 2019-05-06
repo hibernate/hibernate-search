@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchR
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
@@ -29,7 +30,8 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
+public class ElasticsearchIndexSearchQuery<T> extends AbstractSearchQuery<T, IndexSearchResult<T>>
+		implements IndexSearchQuery<T> {
 
 	/**
 	 * ES default limit for (limit + offset); any search query beyond that limit will be rejected.
@@ -45,7 +47,7 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	private final JsonObject payload;
 	private final ElasticsearchSearchResultExtractor<T> searchResultExtractor;
 
-	public ElasticsearchIndexSearchQuery(ElasticsearchWorkBuilderFactory workFactory,
+	ElasticsearchIndexSearchQuery(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
