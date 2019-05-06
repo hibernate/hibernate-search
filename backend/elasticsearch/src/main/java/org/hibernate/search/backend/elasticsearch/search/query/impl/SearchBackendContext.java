@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchP
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
@@ -82,12 +82,12 @@ public class SearchBackendContext {
 	<T> ElasticsearchSearchQueryBuilder<T> createSearchQueryBuilder(
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper,
+			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, T> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 		return new ElasticsearchSearchQueryBuilder<>(
 				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(), orchestrator, multiTenancyStrategy,
-				indexNames, sessionContext, projectionHitMapper, rootProjection
+				indexNames, sessionContext, loadingContextBuilder, rootProjection
 		);
 	}
 

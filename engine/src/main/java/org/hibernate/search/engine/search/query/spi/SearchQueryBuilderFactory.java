@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 /**
  * A factory for search query builders.
@@ -23,15 +23,15 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 public interface SearchQueryBuilderFactory<C> {
 
 	<O> SearchQueryBuilder<O, C> asObject(SessionContextImplementor sessionContext,
-			ProjectionHitMapper<?, O> projectionHitMapper);
+			LoadingContextBuilder<?, O> loadingContextBuilder);
 
 	<T> SearchQueryBuilder<T, C> asReference(SessionContextImplementor sessionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper);
+			LoadingContextBuilder<T, ?> loadingContextBuilder);
 
 	<T> SearchQueryBuilder<T, C> asProjection(SessionContextImplementor sessionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper, SearchProjection<T> projection);
+			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<T> projection);
 
 	SearchQueryBuilder<List<?>, C> asProjections(SessionContextImplementor sessionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper, SearchProjection<?>... projections);
+			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<?>... projections);
 
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -26,19 +27,19 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	private final List<String> indexNames;
 	private final StubSearchWork work;
 	private final FromDocumentFieldValueConvertContext convertContext;
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubSearchWorkBehavior<?> behavior;
 
 	SearchWorkCall(List<String> indexNames,
 			StubSearchWork work,
 			FromDocumentFieldValueConvertContext convertContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper,
+			LoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection) {
 		this.indexNames = indexNames;
 		this.work = work;
 		this.convertContext = convertContext;
-		this.projectionHitMapper = projectionHitMapper;
+		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
 		this.behavior = null;
 	}
@@ -49,7 +50,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		this.indexNames = indexNames;
 		this.work = work;
 		this.convertContext = null;
-		this.projectionHitMapper = null;
+		this.loadingContext = null;
 		this.rootProjection = null;
 		this.behavior = behavior;
 	}
@@ -68,7 +69,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 				totalHitCount,
 				getResults(
 						actualCall.convertContext,
-						actualCall.projectionHitMapper,
+						actualCall.loadingContext.getProjectionHitMapper(),
 						actualCall.rootProjection,
 						behavior.getRawHits()
 				)

@@ -61,7 +61,7 @@ public class StubMappingIndexManager {
 	 */
 	public StubMappingSearchScope createSearchScope() {
 		MappedIndexSearchScopeBuilder<DocumentReference, DocumentReference> builder =
-				indexManager.createSearchScopeBuilder( new StubMappingContext(), Function.identity() );
+				indexManager.createSearchScopeBuilder( new StubMappingContext() );
 		return new StubMappingSearchScope( builder.build() );
 	}
 
@@ -70,7 +70,7 @@ public class StubMappingIndexManager {
 	 */
 	public StubMappingSearchScope createSearchScope(StubMappingIndexManager... others) {
 		MappedIndexSearchScopeBuilder<DocumentReference, DocumentReference> builder =
-				indexManager.createSearchScopeBuilder( new StubMappingContext(), Function.identity() );
+				indexManager.createSearchScopeBuilder( new StubMappingContext() );
 		for ( StubMappingIndexManager other : others ) {
 			other.indexManager.addTo( builder );
 		}
@@ -83,10 +83,10 @@ public class StubMappingIndexManager {
 	public <R, O> GenericStubMappingSearchScope<R, O> createSearchScope(
 			Function<DocumentReference, R> documentReferenceTransformer, StubMappingIndexManager... others) {
 		MappedIndexSearchScopeBuilder<R, O> builder =
-				indexManager.createSearchScopeBuilder( new StubMappingContext(), documentReferenceTransformer );
+				indexManager.createSearchScopeBuilder( new StubMappingContext() );
 		for ( StubMappingIndexManager other : others ) {
 			other.indexManager.addTo( builder );
 		}
-		return new GenericStubMappingSearchScope<>( builder.build() );
+		return new GenericStubMappingSearchScope<>( builder.build(), documentReferenceTransformer );
 	}
 }

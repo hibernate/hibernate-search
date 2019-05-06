@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchReferenceProjection;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 
@@ -41,35 +41,37 @@ class ElasticsearchSearchQueryBuilderFactory
 
 	@Override
 	public <O> SearchQueryBuilder<O, ElasticsearchSearchQueryElementCollector> asObject(
-			SessionContextImplementor sessionContext, ProjectionHitMapper<?, O> projectionHitMapper) {
+			SessionContextImplementor sessionContext, LoadingContextBuilder<?, O> loadingContextBuilder) {
 		return createSearchQueryBuilder(
-				sessionContext, projectionHitMapper,
+				sessionContext, loadingContextBuilder,
 				new ElasticsearchObjectProjection<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
 		);
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asReference(
-			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper) {
+			SessionContextImplementor sessionContext, LoadingContextBuilder<T, ?> loadingContextBuilder) {
 		return createSearchQueryBuilder(
-				sessionContext, projectionHitMapper,
+				sessionContext, loadingContextBuilder,
 				new ElasticsearchReferenceProjection<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
 		);
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asProjection(
-			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
+			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			SearchProjection<T> projection) {
-		return createSearchQueryBuilder( sessionContext, projectionHitMapper,
-				searchProjectionFactory.toImplementation( projection ) );
+		return createSearchQueryBuilder(
+				sessionContext, loadingContextBuilder,
+				searchProjectionFactory.toImplementation( projection )
+		);
 	}
 
 	@Override
 	public SearchQueryBuilder<List<?>, ElasticsearchSearchQueryElementCollector> asProjections(
-			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
+			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			SearchProjection<?>... projections) {
-		return createSearchQueryBuilder( sessionContext, projectionHitMapper, createRootProjection( projections ) );
+		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, createRootProjection( projections ) );
 	}
 
 	private ElasticsearchSearchProjection<?, List<?>> createRootProjection(SearchProjection<?>[] projections) {
@@ -83,12 +85,12 @@ class ElasticsearchSearchQueryBuilderFactory
 	}
 
 	private <T> ElasticsearchSearchQueryBuilder<T> createSearchQueryBuilder(
-			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
+			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, T> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
 				scopeModel.getElasticsearchIndexNames(),
 				sessionContext,
-				projectionHitMapper, rootProjection
+				loadingContextBuilder, rootProjection
 		);
 	}
 }

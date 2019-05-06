@@ -19,8 +19,9 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
@@ -33,7 +34,7 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 	private final SessionContextImplementor sessionContext;
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<?, T> rootProjection;
 	private final LuceneSearchQueryElementCollector elementCollector;
 
@@ -44,7 +45,7 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 			LuceneSearchScopeModel scopeModel,
 			SessionContextImplementor sessionContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
-			ProjectionHitMapper<?, ?> projectionHitMapper,
+			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, T> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
@@ -55,7 +56,7 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 
 		this.elementCollector = new LuceneSearchQueryElementCollector();
 		this.storedFieldVisitor = storedFieldVisitor;
-		this.projectionHitMapper = projectionHitMapper;
+		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 	}
 
@@ -71,8 +72,10 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 	}
 
 	private IndexSearchQuery<T> build() {
+		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
+
 		LuceneSearchResultExtractor<T> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
-				storedFieldVisitor, rootProjection, projectionHitMapper
+				storedFieldVisitor, rootProjection, loadingContext.getProjectionHitMapper()
 		);
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();

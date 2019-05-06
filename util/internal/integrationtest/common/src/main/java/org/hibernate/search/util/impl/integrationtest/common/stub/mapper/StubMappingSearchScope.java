@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
+import java.util.function.Function;
+
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
@@ -20,7 +22,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionCon
 public class StubMappingSearchScope extends GenericStubMappingSearchScope<DocumentReference, DocumentReference> {
 
 	StubMappingSearchScope(MappedIndexSearchScope<DocumentReference, DocumentReference> delegate) {
-		super( delegate );
+		super( delegate, Function.identity() );
 	}
 
 	public StubMappingQueryResultDefinitionContext<DocumentReference, DocumentReference> query() {

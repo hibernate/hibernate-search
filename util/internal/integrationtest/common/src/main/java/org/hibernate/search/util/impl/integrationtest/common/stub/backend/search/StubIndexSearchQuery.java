@@ -9,9 +9,9 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.List;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
@@ -21,17 +21,17 @@ final class StubIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	private final List<String> indexNames;
 	private final StubSearchWork.Builder workBuilder;
 	private final FromDocumentFieldValueConvertContext convertContext;
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 
 	StubIndexSearchQuery(StubBackend backend, List<String> indexNames, StubSearchWork.Builder workBuilder,
 			FromDocumentFieldValueConvertContext convertContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
+			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 		this.backend = backend;
 		this.indexNames = indexNames;
 		this.workBuilder = workBuilder;
 		this.convertContext = convertContext;
-		this.projectionHitMapper = projectionHitMapper;
+		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
 	}
 
@@ -44,7 +44,7 @@ final class StubIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	public IndexSearchResult<T> fetch(Long limit, Long offset) {
 		workBuilder.limit( limit ).offset( offset );
 		return backend.getBehavior().executeSearchWork(
-				indexNames, workBuilder.build(), convertContext, projectionHitMapper, rootProjection
+				indexNames, workBuilder.build(), convertContext, loadingContext, rootProjection
 		);
 	}
 

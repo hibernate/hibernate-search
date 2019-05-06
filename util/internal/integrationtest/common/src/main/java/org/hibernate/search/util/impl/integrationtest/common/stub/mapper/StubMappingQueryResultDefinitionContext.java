@@ -11,25 +11,25 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 public final class StubMappingQueryResultDefinitionContext<R, O> {
 
 	private final MappedIndexSearchScope<R, O> searchScopeDelegate;
 	private final StubSessionContext sessionContext;
-	private final ObjectLoader<R, O> objectLoader;
+	private final LoadingContextBuilder<R, O> loadingContextBuilder;
 
 	StubMappingQueryResultDefinitionContext(MappedIndexSearchScope<R, O> searchScopeDelegate,
 			StubSessionContext sessionContext,
-			ObjectLoader<R, O> objectLoader) {
+			LoadingContextBuilder<R, O> loadingContextBuilder) {
 		this.searchScopeDelegate = searchScopeDelegate;
 		this.sessionContext = sessionContext;
-		this.objectLoader = objectLoader;
+		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
 	public SearchQueryResultContext<?, IndexSearchQuery<O>, ?> asObject() {
@@ -38,7 +38,7 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 
 	public <Q> SearchQueryResultContext<?, Q, ?> asObject(Function<IndexSearchQuery<O>, Q> searchQueryWrapperFactory) {
 		return searchScopeDelegate.queryAsLoadedObject(
-				sessionContext, objectLoader, searchQueryWrapperFactory
+				sessionContext, loadingContextBuilder, searchQueryWrapperFactory
 		);
 	}
 
@@ -49,7 +49,7 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 	public <Q> SearchQueryResultContext<?, Q, ?> asReference(
 			Function<IndexSearchQuery<R>, Q> searchQueryWrapperFactory) {
 		return searchScopeDelegate.queryAsReference(
-				sessionContext, searchQueryWrapperFactory
+				sessionContext, loadingContextBuilder, searchQueryWrapperFactory
 		);
 	}
 
@@ -66,7 +66,7 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<T> projection) {
 		return searchScopeDelegate.queryAsProjection(
-				sessionContext, objectLoader, searchQueryWrapperFactory,
+				sessionContext, loadingContextBuilder, searchQueryWrapperFactory,
 				projection
 		);
 	}
@@ -79,7 +79,7 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
 		return searchScopeDelegate.queryAsProjections(
-				sessionContext, objectLoader, searchQueryWrapperFactory,
+				sessionContext, loadingContextBuilder, searchQueryWrapperFactory,
 				projections
 		);
 	}

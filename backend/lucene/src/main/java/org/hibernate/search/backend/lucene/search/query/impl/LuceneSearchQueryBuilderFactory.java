@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneObjectPr
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneReferenceProjection;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 
@@ -42,29 +42,29 @@ class LuceneSearchQueryBuilderFactory
 
 	@Override
 	public <O> SearchQueryBuilder<O, LuceneSearchQueryElementCollector> asObject(
-			SessionContextImplementor sessionContext, ProjectionHitMapper<?, O> projectionHitMapper) {
-		return createSearchQueryBuilder( sessionContext, projectionHitMapper, LuceneObjectProjection.get() );
+			SessionContextImplementor sessionContext, LoadingContextBuilder<?, O> loadingContextBuilder) {
+		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, LuceneObjectProjection.get() );
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asReference(
-			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper) {
-		return createSearchQueryBuilder( sessionContext, projectionHitMapper, LuceneReferenceProjection.get() );
+			SessionContextImplementor sessionContext, LoadingContextBuilder<T, ?> loadingContextBuilder) {
+		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, LuceneReferenceProjection.get() );
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asProjection(
-			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
+			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			SearchProjection<T> projection) {
-		return createSearchQueryBuilder( sessionContext, projectionHitMapper,
+		return createSearchQueryBuilder( sessionContext, loadingContextBuilder,
 				searchProjectionFactory.toImplementation( projection ) );
 	}
 
 	@Override
 	public SearchQueryBuilder<List<?>, LuceneSearchQueryElementCollector> asProjections(
-			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
+			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			SearchProjection<?>... projections) {
-		return createSearchQueryBuilder( sessionContext, projectionHitMapper, createRootProjection( projections ) );
+		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, createRootProjection( projections ) );
 	}
 
 	private LuceneSearchProjection<?, List<?>> createRootProjection(SearchProjection<?>[] projections) {
@@ -78,10 +78,10 @@ class LuceneSearchQueryBuilderFactory
 	}
 
 	private <T> LuceneSearchQueryBuilder<T> createSearchQueryBuilder(
-			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
+			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, T> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
-				scopeModel, sessionContext, projectionHitMapper, rootProjection
+				scopeModel, sessionContext, loadingContextBuilder, rootProjection
 		);
 	}
 }

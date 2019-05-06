@@ -13,7 +13,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
@@ -36,44 +36,44 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 
 	@Override
 	public <O> SearchQueryBuilder<O, StubQueryElementCollector> asObject(SessionContextImplementor sessionContext,
-			ProjectionHitMapper<?, O> projectionHitMapper) {
+			LoadingContextBuilder<?, O> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.OBJECTS,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
-				projectionHitMapper,
+				loadingContextBuilder,
 				StubObjectSearchProjection.get()
 		);
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asReference(SessionContextImplementor sessionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper) {
+			LoadingContextBuilder<T, ?> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.REFERENCES,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
-				projectionHitMapper,
+				loadingContextBuilder,
 				StubReferenceSearchProjection.get()
 		);
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asProjection(SessionContextImplementor sessionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper, SearchProjection<T> projection) {
+			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<T> projection) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
-				projectionHitMapper,
+				loadingContextBuilder,
 				(StubSearchProjection<T>) projection
 		);
 	}
 
 	@Override
 	public SearchQueryBuilder<List<?>, StubQueryElementCollector> asProjections(SessionContextImplementor sessionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper, SearchProjection<?>... projections) {
+			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<?>... projections) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
-				projectionHitMapper,
+				loadingContextBuilder,
 				createRootProjection( projections )
 		);
 	}

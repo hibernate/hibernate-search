@@ -17,9 +17,9 @@ import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
 public class SearchScopeImpl implements SearchScope {
 
-	private final PojoSearchScopeDelegate<?, PojoReference> delegate;
+	private final PojoSearchScopeDelegate<?, Void> delegate;
 
-	public SearchScopeImpl(PojoSearchScopeDelegate<?, PojoReference> delegate) {
+	public SearchScopeImpl(PojoSearchScopeDelegate<?, Void> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -39,7 +39,7 @@ public class SearchScopeImpl implements SearchScope {
 	}
 
 	@Override
-	public SearchProjectionFactoryContext<PojoReference, PojoReference> projection() {
+	public SearchProjectionFactoryContext<PojoReference, ?> projection() {
 		return delegate.projection();
 	}
 }

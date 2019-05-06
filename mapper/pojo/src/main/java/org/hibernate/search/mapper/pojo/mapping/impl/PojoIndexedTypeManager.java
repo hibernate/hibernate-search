@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -17,7 +16,6 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
@@ -137,9 +135,8 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	<R, O> MappedIndexSearchScopeBuilder<R, O> createSearchScopeBuilder(MappingContextImplementor mappingContext,
-			Function<DocumentReference, R> documentReferenceTransformer) {
-		return indexManager.createSearchScopeBuilder( mappingContext, documentReferenceTransformer );
+	<R, O> MappedIndexSearchScopeBuilder<R, O> createSearchScopeBuilder(MappingContextImplementor mappingContext) {
+		return indexManager.createSearchScopeBuilder( mappingContext );
 	}
 
 	void addTo(MappedIndexSearchScopeBuilder<?, ?> builder) {
