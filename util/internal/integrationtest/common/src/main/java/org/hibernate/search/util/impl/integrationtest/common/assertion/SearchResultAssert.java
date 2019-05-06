@@ -6,22 +6,14 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
-import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.ListAssert;
-import org.assertj.core.error.BasicErrorMessageFactory;
-import org.assertj.core.internal.Failures;
 
 public class SearchResultAssert<T> {
 
@@ -31,6 +23,10 @@ public class SearchResultAssert<T> {
 
 	public static <T> SearchResultAssert<T> assertThat(SearchResult<? extends T> actual) {
 		return new SearchResultAssert<>( actual );
+	}
+
+	public static <T> SearchHitsAssert<T> assertThat(List<? extends T> actual) {
+		return SearchHitsAssert.assertThat( actual );
 	}
 
 	private final SearchResult<? extends T> actual;
@@ -46,9 +42,7 @@ public class SearchResultAssert<T> {
 	}
 
 	public SearchResultAssert<T> hasNoHits() {
-		Assertions.<T>assertThat( actual.getHits() )
-				.as( "Hits of " + queryDescription )
-				.isEmpty();
+		assertHits().isEmpty();
 		return this;
 	}
 
@@ -61,156 +55,58 @@ public class SearchResultAssert<T> {
 
 	@SafeVarargs
 	public final SearchResultAssert<T> hasHitsExactOrder(T... hits) {
-		Assertions.<T>assertThat( actual.getHits() )
-				.as( "Hits of " + queryDescription )
-				.containsExactly( hits );
+		assertHits().hasHitsExactOrder( hits );
 		return this;
 	}
 
 	@SafeVarargs
 	public final SearchResultAssert<T> hasHitsAnyOrder(T... hits) {
-		Assertions.<T>assertThat( actual.getHits() )
-				.as( "Hits of " + queryDescription )
-				.containsExactlyInAnyOrder( hits );
+		assertHits().hasHitsAnyOrder( hits );
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	public final SearchResultAssert<T> hasHitsExactOrder(Collection<T> hits) {
-		return hasHitsExactOrder( (T[]) hits.toArray() );
+		assertHits().hasHitsExactOrder( hits );
+		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	public final SearchResultAssert<T> hasHitsAnyOrder(Collection<T> hits) {
-		return hasHitsAnyOrder( (T[]) hits.toArray() );
+		assertHits().hasHitsAnyOrder( hits );
+		return this;
 	}
 
 	public SearchResultAssert<T> hasDocRefHitsExactOrder(String indexName, String firstId, String... otherIds) {
-		return hasDocRefHitsExactOrder( ctx -> {
-			ctx.doc( indexName, firstId, otherIds );
-		} );
+		assertHits().hasDocRefHitsExactOrder( indexName, firstId, otherIds );
+		return this;
 	}
 
 	public SearchResultAssert<T> hasDocRefHitsAnyOrder(String indexName, String firstId, String... otherIds) {
-		return hasDocRefHitsAnyOrder( ctx -> {
-			ctx.doc( indexName, firstId, otherIds );
-		} );
+		assertHits().hasDocRefHitsAnyOrder( indexName, firstId, otherIds );
+		return this;
 	}
 
 	public SearchResultAssert<T> hasDocRefHitsExactOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
-		DocumentReferenceHitsBuilder context = new DocumentReferenceHitsBuilder();
-		expectation.accept( context );
-		Assertions.assertThat( getNormalizedActualDocumentReferencesHits() )
-				.as( "Hits of " + queryDescription )
-				.containsExactly( context.getExpectedHits() );
+		assertHits().hasDocRefHitsExactOrder( expectation );
 		return this;
 	}
 
 	public SearchResultAssert<T> hasDocRefHitsAnyOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
-		DocumentReferenceHitsBuilder context = new DocumentReferenceHitsBuilder();
-		expectation.accept( context );
-		Assertions.assertThat( getNormalizedActualDocumentReferencesHits() )
-				.as( "Hits of " + queryDescription )
-				.containsExactlyInAnyOrder( context.getExpectedHits() );
+		assertHits().hasDocRefHitsAnyOrder( expectation );
 		return this;
 	}
 
 	public SearchResultAssert<T> hasListHitsExactOrder(Consumer<ListHitsBuilder> expectation) {
-		ListHitsBuilder context = new ListHitsBuilder();
-		expectation.accept( context );
-		Assertions.assertThat( getNormalizedActualListHits() )
-				.as( "Hits of " + queryDescription )
-				.containsExactly( context.getExpectedHits() );
+		assertHits().hasListHitsExactOrder( expectation );
 		return this;
 	}
 
 	public SearchResultAssert<T> hasListHitsAnyOrder(Consumer<ListHitsBuilder> expectation) {
-		ListHitsBuilder context = new ListHitsBuilder();
-		expectation.accept( context );
-		Assertions.assertThat( getNormalizedActualListHits() )
-				.as( "Hits of " + queryDescription )
-				.containsExactlyInAnyOrder( context.getExpectedHits() );
+		assertHits().hasListHitsAnyOrder( expectation );
 		return this;
 	}
 
-	@SuppressWarnings( "unchecked" ) // We check that at runtime, that's what the assertion is for
-	private List<DocumentReference> getNormalizedActualDocumentReferencesHits() {
-		List<? extends T> hits = actual.getHits();
-		shouldHaveOnlyElementsOfTypeOrNull(
-				Assertions.assertThat( hits )
-						.as( "Hits of " + queryDescription ),
-				DocumentReference.class
-		);
-		return ( (List<? extends DocumentReference>) hits ).stream()
-				.map( NormalizationUtils::normalizeReference )
-				.collect( Collectors.toList() );
-	}
-
-	@SuppressWarnings( "unchecked" ) // We check that at runtime, that's what the assertion is for
-	private List<List<?>> getNormalizedActualListHits() {
-		List<? extends T> hits = actual.getHits();
-		shouldHaveOnlyElementsOfTypeOrNull(
-				Assertions.assertThat( hits )
-						.as( "Hits of " + queryDescription ),
-				List.class
-		);
-		return ( (List<? extends List<?>>) hits ).stream()
-				.map( NormalizationUtils::normalizeList )
-				.collect( Collectors.toList() );
-	}
-
-	private void shouldHaveOnlyElementsOfTypeOrNull(ListAssert<? extends T> theAssert, Class<?> type) {
-		theAssert.satisfies( actual -> {
-			for ( Object element : actual ) {
-				if ( element != null && !type.isInstance( element ) ) {
-					throw Failures.instance().failure(
-							theAssert.getWritableAssertionInfo(),
-							new BasicErrorMessageFactory(
-									"%nExpecting:%n  <%s>%nto only have elements that are null or of type:%n  <%s>%nbut found:%n  <%s>",
-									actual, type, element.getClass()
-							)
-					);
-				}
-			}
-		} );
-	}
-
-	public class DocumentReferenceHitsBuilder {
-
-		private final List<DocumentReference> expectedHits = new ArrayList<>();
-
-		private DocumentReferenceHitsBuilder() {
-		}
-
-		public DocumentReferenceHitsBuilder doc(String indexName, String firstId, String... otherIds) {
-			expectedHits.add( NormalizationUtils.reference( indexName, firstId ) );
-			for ( String id : otherIds ) {
-				expectedHits.add( NormalizationUtils.reference( indexName, id ) );
-			}
-			return this;
-		}
-
-		private DocumentReference[] getExpectedHits() {
-			return expectedHits.toArray( new DocumentReference[0] );
-		}
-	}
-
-	public class ListHitsBuilder {
-		private final List<List<?>> expectedHits = new ArrayList<>();
-
-		private ListHitsBuilder() {
-		}
-
-		public ListHitsBuilder list(Object firstProjectionItem, Object ... otherProjectionItems) {
-			List<?> projectionItems = CollectionHelper.asList( firstProjectionItem, otherProjectionItems );
-			expectedHits.add( NormalizationUtils.normalizeList( projectionItems ) );
-			return this;
-		}
-
-		@SuppressWarnings("rawtypes")
-		private List[] getExpectedHits() {
-			return expectedHits.toArray( new List[0] );
-		}
+	private SearchHitsAssert<T> assertHits() {
+		return SearchHitsAssert.<T>assertThat( actual.getHits() ).as( "Hits of " + queryDescription );
 	}
 
 }
