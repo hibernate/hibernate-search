@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.easymock.EasyMock.expect;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.referenceMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
@@ -53,11 +54,12 @@ import org.junit.rules.ExpectedException;
 
 import org.assertj.core.api.Assertions;
 import org.easymock.EasyMock;
+import org.easymock.EasyMockSupport;
 
 /**
  * Generic tests for projections. More specific tests can be found in other classes, such as {@link FieldSearchProjectionIT}.
  */
-public class SearchProjectionIT {
+public class SearchProjectionIT extends EasyMockSupport {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -158,20 +160,20 @@ public class SearchProjectionIT {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
 		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
-				EasyMock.createMock( StubDocumentReferenceTransformer.class );
+				createMock( StubDocumentReferenceTransformer.class );
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				EasyMock.createMock( StubObjectLoader.class );
+				createMock( StubObjectLoader.class );
 
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( document1Reference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( document1Reference ) ) )
 				.andReturn( document1TransformedReference )
 				.times( 2 );
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( document2Reference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( document2Reference ) ) )
 				.andReturn( document2TransformedReference )
 				.times( 2 );
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( document3Reference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( document3Reference ) ) )
 				.andReturn( document3TransformedReference )
 				.times( 2 );
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
 				.andReturn( emptyTransformedReference )
 				.times( 2 );
 		StubMapperUtils.expectLoad(
@@ -181,7 +183,7 @@ public class SearchProjectionIT {
 						.load( document3TransformedReference, document3LoadedObject )
 						.load( emptyTransformedReference, emptyLoadedObject )
 		);
-		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
+		replayAll();
 
 		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createSearchScope( referenceTransformerMock );
@@ -213,7 +215,7 @@ public class SearchProjectionIT {
 			b.list( emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
 
-		EasyMock.verify( referenceTransformerMock, objectLoaderMock );
+		verifyAll();
 	}
 
 	@Test
