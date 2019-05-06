@@ -23,9 +23,9 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQueryExtension;
-import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -41,7 +41,7 @@ import org.junit.Test;
 
 import org.assertj.core.api.Assertions;
 
-public class IndexSearchQueryBaseIT {
+public class SearchQueryBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -66,7 +66,7 @@ public class IndexSearchQueryBaseIT {
 	public void getQueryString() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
 				.toQuery();
@@ -80,7 +80,7 @@ public class IndexSearchQueryBaseIT {
 
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query().asReference()
+		SearchQuery<DocumentReference> query = scope.query().asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
@@ -102,7 +102,7 @@ public class IndexSearchQueryBaseIT {
 		initData( 5 );
 
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query;
+		SearchQuery<DocumentReference> query;
 
 		// Mandatory extension, supported
 		query = scope.query()
@@ -137,7 +137,7 @@ public class IndexSearchQueryBaseIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -154,20 +154,20 @@ public class IndexSearchQueryBaseIT {
 	}
 
 	private static class QueryWrapper<T> {
-		private final IndexSearchQuery<T> query;
+		private final SearchQuery<T> query;
 
-		private QueryWrapper(IndexSearchQuery<T> query) {
+		private QueryWrapper(SearchQuery<T> query) {
 			this.query = query;
 		}
 
-		public IndexSearchResult<T> extendedFetch() {
+		public SearchResult<T> extendedFetch() {
 			return query.fetch();
 		}
 	}
 
-	private static class SupportedQueryExtension<T> implements IndexSearchQueryExtension<QueryWrapper<T>, T> {
+	private static class SupportedQueryExtension<T> implements SearchQueryExtension<QueryWrapper<T>, T> {
 		@Override
-		public Optional<QueryWrapper<T>> extendOptional(IndexSearchQuery<T> original,
+		public Optional<QueryWrapper<T>> extendOptional(SearchQuery<T> original,
 				LoadingContext<?, ?> loadingContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( loadingContext ).isNotNull().isInstanceOf( StubLoadingContext.class );
@@ -175,9 +175,9 @@ public class IndexSearchQueryBaseIT {
 		}
 	}
 
-	private static class UnSupportedQueryExtension<T> implements IndexSearchQueryExtension<QueryWrapper<T>, T> {
+	private static class UnSupportedQueryExtension<T> implements SearchQueryExtension<QueryWrapper<T>, T> {
 		@Override
-		public Optional<QueryWrapper<T>> extendOptional(IndexSearchQuery<T> original,
+		public Optional<QueryWrapper<T>> extendOptional(SearchQuery<T> original,
 				LoadingContext<?, ?> loadingContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( loadingContext ).isNotNull().isInstanceOf( StubLoadingContext.class );

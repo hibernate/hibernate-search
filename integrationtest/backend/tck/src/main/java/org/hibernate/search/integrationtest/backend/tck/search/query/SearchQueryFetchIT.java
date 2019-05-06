@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class IndexSearchQueryFetchIT {
+public class SearchQueryFetchIT {
 
 	private static final String INDEX_NAME = "IndexName";
 	private static final int DOCUMENT_COUNT = 200;
@@ -56,7 +56,7 @@ public class IndexSearchQueryFetchIT {
 
 	@Test
 	public void paging() {
-		IndexSearchQuery<DocumentReference> query = matchAllQuery();
+		SearchQuery<DocumentReference> query = matchAllQuery();
 		assertThat( query.fetch( null, 1L ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
@@ -87,7 +87,7 @@ public class IndexSearchQueryFetchIT {
 
 	@Test
 	public void paging_reuse_query() {
-		IndexSearchQuery<DocumentReference> query = matchAllQuery();
+		SearchQuery<DocumentReference> query = matchAllQuery();
 		assertThat( query.fetch( null, 1L ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
@@ -124,14 +124,14 @@ public class IndexSearchQueryFetchIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3389")
 	public void maxResults_zero() {
-		IndexSearchQuery<DocumentReference> query = matchAllQuery();
+		SearchQuery<DocumentReference> query = matchAllQuery();
 
 		assertThat( query.fetch( 0L, 0L ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasNoHits();
 	}
 
-	private IndexSearchQuery<DocumentReference> matchAllQuery() {
+	private SearchQuery<DocumentReference> matchAllQuery() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
 				.asReference()
@@ -155,7 +155,7 @@ public class IndexSearchQueryFetchIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -176,9 +176,9 @@ public class IndexSearchQueryFetchIT {
 	}
 
 	private static class QueryWrapper {
-		private final IndexSearchQuery<?> query;
+		private final SearchQuery<?> query;
 
-		private QueryWrapper(IndexSearchQuery<?> query) {
+		private QueryWrapper(SearchQuery<?> query) {
 			this.query = query;
 		}
 	}

@@ -33,7 +33,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Invalid
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -123,7 +123,7 @@ public class MatchSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object valueToMatch = fieldModel.predicateParameterValue;
 
-			IndexSearchQuery<DocumentReference> query = scope.query()
+			SearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
 					.toQuery();
@@ -141,7 +141,7 @@ public class MatchSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object valueToMatch = new ValueWrapper<>( fieldModel.predicateParameterValue );
 
-			IndexSearchQuery<DocumentReference> query = scope.query()
+			SearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
 					.toQuery();
@@ -158,7 +158,7 @@ public class MatchSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
-			IndexSearchQuery<DocumentReference> query = scope.query()
+			SearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( fieldModel.predicateParameterValue, DslConverter.DISABLED ) )
 					.toQuery();
@@ -174,7 +174,7 @@ public class MatchSearchPredicateIT {
 
 		MainFieldModel fieldModel = indexMapping.analyzedStringField;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "" ) )
 				.toQuery();
@@ -189,7 +189,7 @@ public class MatchSearchPredicateIT {
 
 		MainFieldModel fieldModel = indexMapping.analyzedStringField;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				// Use a stopword, which should be removed by the analysis
 				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "a" ) )
@@ -257,7 +257,7 @@ public class MatchSearchPredicateIT {
 	public void fieldLevelBoost() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( indexMapping.string1Field.relativeFieldName )
@@ -294,7 +294,7 @@ public class MatchSearchPredicateIT {
 	public void predicateLevelBoost() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( indexMapping.string1Field.relativeFieldName )
@@ -333,7 +333,7 @@ public class MatchSearchPredicateIT {
 	public void predicateLevelBoost_andFieldLevelBoost() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// 4 * 2 => boost x8
@@ -377,7 +377,7 @@ public class MatchSearchPredicateIT {
 	public void withConstantScore() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// 0.287682
@@ -420,7 +420,7 @@ public class MatchSearchPredicateIT {
 	public void predicateLevelBoost_withConstantScore() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( indexMapping.string1Field.relativeFieldName )
@@ -461,7 +461,7 @@ public class MatchSearchPredicateIT {
 	public void predicateLevelBoost_multiFields() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( indexMapping.string1Field.relativeFieldName )
@@ -507,7 +507,7 @@ public class MatchSearchPredicateIT {
 	public void fuzzy() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
-		Function<String, IndexSearchQuery<DocumentReference>> createQuery =
+		Function<String, SearchQuery<DocumentReference>> createQuery =
 				text -> scope.query()
 						.asReference()
 						.predicate( f -> f.match()
@@ -532,7 +532,7 @@ public class MatchSearchPredicateIT {
 	public void fuzzy_maxEditDistance() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
-		BiFunction<String, Integer, IndexSearchQuery<DocumentReference>> createQuery =
+		BiFunction<String, Integer, SearchQuery<DocumentReference>> createQuery =
 				(text, maxEditDistance) -> scope.query()
 						.asReference()
 						.predicate( f -> f.match()
@@ -577,7 +577,7 @@ public class MatchSearchPredicateIT {
 	public void fuzzy_exactPrefixLength() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
-		BiFunction<String, Integer, IndexSearchQuery<DocumentReference>> createQuery =
+		BiFunction<String, Integer, SearchQuery<DocumentReference>> createQuery =
 				(text, exactPrefixLength) -> scope.query()
 						.asReference()
 						.predicate( f -> f.match()
@@ -621,7 +621,7 @@ public class MatchSearchPredicateIT {
 	public void fuzzy_normalizedStringField() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.normalizedStringField.relativeFieldName;
-		Function<String, IndexSearchQuery<DocumentReference>> createQuery;
+		Function<String, SearchQuery<DocumentReference>> createQuery;
 
 		createQuery = param -> scope.query()
 				.asReference()
@@ -657,7 +657,7 @@ public class MatchSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath1 = indexMapping.analyzedStringField.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
-		Function<String, IndexSearchQuery<DocumentReference>> createQuery;
+		Function<String, SearchQuery<DocumentReference>> createQuery;
 
 		createQuery = param -> scope.query()
 				.asReference()
@@ -768,7 +768,7 @@ public class MatchSearchPredicateIT {
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( whitespaceAnalyzedField ).matching( "NEW WORLD" ) )
 				.toQuery();
@@ -801,7 +801,7 @@ public class MatchSearchPredicateIT {
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( whitespaceAnalyzedField ).matching( "WORD" ).fuzzy() )
 				.toQuery();
@@ -866,7 +866,7 @@ public class MatchSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "world another world" ) )
 				.toQuery();
@@ -899,7 +899,7 @@ public class MatchSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "word another word" ).fuzzy() )
 				.toQuery();
@@ -932,7 +932,7 @@ public class MatchSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.normalizedStringField.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				// the matching parameter will be tokenized even if the field has a normalizer
 				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "Auster Coe" )
@@ -949,7 +949,7 @@ public class MatchSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "worldofwordcraft" ) )
 				.toQuery();
@@ -972,7 +972,7 @@ public class MatchSearchPredicateIT {
 
 		// onField(...).orField(...)
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
@@ -1054,7 +1054,7 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void multiFields_withDslConverter_dslConverterEnabled() {
-		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
+		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.match()
 						.onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
@@ -1068,7 +1068,7 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void multiFields_withDslConverter_dslConverterDisabled() {
-		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
+		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.match()
 						.onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
@@ -1157,7 +1157,7 @@ public class MatchSearchPredicateIT {
 				String absoluteFieldPath = model.relativeFieldName;
 				Object valueToMatch = model.predicateParameterValue;
 
-				IndexSearchQuery<DocumentReference> query = scope.query()
+				SearchQuery<DocumentReference> query = scope.query()
 						.asReference()
 						.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
 						.toQuery();
@@ -1200,7 +1200,7 @@ public class MatchSearchPredicateIT {
 				String absoluteFieldPath = model.relativeFieldName;
 				Object valueToMatch = model.predicateParameterValue;
 
-				IndexSearchQuery<DocumentReference> query = scope.query()
+				SearchQuery<DocumentReference> query = scope.query()
 						.asReference()
 						.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch, DslConverter.DISABLED ) )
 						.toQuery();
@@ -1279,7 +1279,7 @@ public class MatchSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query().asReference()
+		SearchQuery<DocumentReference> query = scope.query().asReference()
 				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "fox" )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
@@ -1295,7 +1295,7 @@ public class MatchSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = scope.query().asReference()
+		SearchQuery<DocumentReference> query = scope.query().asReference()
 				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( "fox" )
 						.skipAnalysis() )
 				.toQuery();
@@ -1373,7 +1373,7 @@ public class MatchSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
+		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
@@ -31,7 +31,7 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 public final class DefaultSearchQueryContext<T, C>
 		implements SearchQueryContextImplementor<
 				DefaultSearchQueryContext<T, C>,
-				IndexSearchQuery<T>,
+				SearchQuery<T>,
 				SearchPredicateFactoryContext,
 				SearchSortContainerContext
 				> {
@@ -62,7 +62,7 @@ public final class DefaultSearchQueryContext<T, C>
 	}
 
 	@Override
-	public <T2> T2 extension(SearchQueryContextExtension<T2, IndexSearchQuery<T>> extension) {
+	public <T2> T2 extension(SearchQueryContextExtension<T2, SearchQuery<T>> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, searchQueryBuilder )
 		);
@@ -95,7 +95,7 @@ public final class DefaultSearchQueryContext<T, C>
 	}
 
 	@Override
-	public IndexSearchQuery<T> toQuery() {
+	public SearchQuery<T> toQuery() {
 		return searchQueryBuilder.build();
 	}
 

@@ -10,11 +10,12 @@ package org.hibernate.search.mapper.orm.search.query.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQueryExtension;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 
-final class HibernateOrmSearchQueryAdapterExtension<T> implements IndexSearchQueryExtension<HibernateOrmSearchQueryAdapter<T>, T> {
+final class HibernateOrmSearchQueryAdapterExtension<T> implements
+		SearchQueryExtension<HibernateOrmSearchQueryAdapter<T>, T> {
 	private static final HibernateOrmSearchQueryAdapterExtension<Object> INSTANCE = new HibernateOrmSearchQueryAdapterExtension<>();
 
 	@SuppressWarnings("unchecked") // The instance works for any T
@@ -23,7 +24,7 @@ final class HibernateOrmSearchQueryAdapterExtension<T> implements IndexSearchQue
 	}
 
 	@Override
-	public Optional<HibernateOrmSearchQueryAdapter<T>> extendOptional(IndexSearchQuery<T> original, LoadingContext<?, ?> loadingContext) {
+	public Optional<HibernateOrmSearchQueryAdapter<T>> extendOptional(SearchQuery<T> original, LoadingContext<?, ?> loadingContext) {
 		if ( loadingContext instanceof HibernateOrmLoadingContext ) {
 			HibernateOrmLoadingContext<?> castedLoadingContext = (HibernateOrmLoadingContext<?>) loadingContext;
 			return Optional.of( new HibernateOrmSearchQueryAdapter<>(

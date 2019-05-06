@@ -19,9 +19,9 @@ import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQueryExtension;
-import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.common.impl.Futures;
 
 import com.google.gson.JsonObject;
@@ -30,8 +30,8 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchIndexSearchQuery<T> extends AbstractSearchQuery<T, IndexSearchResult<T>>
-		implements IndexSearchQuery<T> {
+public class ElasticsearchSearchQuery<T> extends AbstractSearchQuery<T, SearchResult<T>>
+		implements SearchQuery<T> {
 
 	/**
 	 * ES default limit for (limit + offset); any search query beyond that limit will be rejected.
@@ -47,7 +47,7 @@ public class ElasticsearchIndexSearchQuery<T> extends AbstractSearchQuery<T, Ind
 	private final JsonObject payload;
 	private final ElasticsearchSearchResultExtractor<T> searchResultExtractor;
 
-	ElasticsearchIndexSearchQuery(ElasticsearchWorkBuilderFactory workFactory,
+	ElasticsearchSearchQuery(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
@@ -75,14 +75,14 @@ public class ElasticsearchIndexSearchQuery<T> extends AbstractSearchQuery<T, Ind
 	}
 
 	@Override
-	public <Q> Q extension(IndexSearchQueryExtension<Q, T> extension) {
+	public <Q> Q extension(SearchQueryExtension<Q, T> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, loadingContext )
 		);
 	}
 
 	@Override
-	public IndexSearchResult<T> fetch(Long limit, Long offset) {
+	public SearchResult<T> fetch(Long limit, Long offset) {
 		// TODO restore scrolling support. See HSEARCH-3323
 		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( indexNames )

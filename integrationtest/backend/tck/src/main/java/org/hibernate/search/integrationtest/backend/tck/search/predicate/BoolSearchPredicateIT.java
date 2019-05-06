@@ -20,7 +20,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -85,7 +85,7 @@ public class BoolSearchPredicateIT {
 	public void must() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -121,7 +121,7 @@ public class BoolSearchPredicateIT {
 	public void must_function() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -138,7 +138,7 @@ public class BoolSearchPredicateIT {
 
 		SearchPredicate predicate = scope.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate(	f -> f.bool().must( predicate ) )
 				.toQuery();
@@ -151,7 +151,7 @@ public class BoolSearchPredicateIT {
 	public void should() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -177,7 +177,7 @@ public class BoolSearchPredicateIT {
 	public void should_function() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -196,7 +196,7 @@ public class BoolSearchPredicateIT {
 		SearchPredicate predicate1 = scope.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
 		SearchPredicate predicate2 = scope.predicate().match().onField( "field1" ).matching( FIELD1_VALUE3 ).toPredicate();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( predicate1 )
@@ -212,7 +212,7 @@ public class BoolSearchPredicateIT {
 	public void mustNot() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -238,7 +238,7 @@ public class BoolSearchPredicateIT {
 	public void mustNot_function() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.mustNot( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -255,7 +255,7 @@ public class BoolSearchPredicateIT {
 
 		SearchPredicate predicate = scope.predicate().match().onField( "field1" ).matching( FIELD1_VALUE2 ).toPredicate();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.mustNot( predicate )
@@ -270,7 +270,7 @@ public class BoolSearchPredicateIT {
 	public void filter() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -306,7 +306,7 @@ public class BoolSearchPredicateIT {
 	public void filter_function() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.filter( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -323,7 +323,7 @@ public class BoolSearchPredicateIT {
 
 		SearchPredicate predicate = scope.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate(	f -> f.bool().filter( predicate ) )
 				.toQuery();
@@ -336,7 +336,7 @@ public class BoolSearchPredicateIT {
 	public void should_mustNot() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -353,7 +353,7 @@ public class BoolSearchPredicateIT {
 	public void must_mustNot() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -379,7 +379,7 @@ public class BoolSearchPredicateIT {
 	public void nested() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.bool()
@@ -411,7 +411,7 @@ public class BoolSearchPredicateIT {
 	public void withConstantScore() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// 0.287682
@@ -446,7 +446,7 @@ public class BoolSearchPredicateIT {
 	public void predicateLevelBoost_withConstantScore() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.bool().withConstantScore().boostedTo( 7 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
@@ -479,7 +479,7 @@ public class BoolSearchPredicateIT {
 		// documents should match regardless of whether should clauses match.
 
 		// Non-matching "should" clauses
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -513,7 +513,7 @@ public class BoolSearchPredicateIT {
 		// documents should match regardless of whether should clauses match.
 
 		// Non-matching "should" clauses
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -547,7 +547,7 @@ public class BoolSearchPredicateIT {
 		// documents should match only if at least one should clause matches
 
 		// Non-matching "should" clauses
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
@@ -580,7 +580,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Expect default behavior (1 "should" clause has to match)
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( 1 )
@@ -639,7 +639,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Expect default behavior (1 "should" clause has to match)
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( -1 )
@@ -685,7 +685,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Expect default behavior (1 "should" clause has to match)
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( 50 )
@@ -744,7 +744,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Expect default behavior (1 "should" clause has to match)
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( -50 )
@@ -794,7 +794,7 @@ public class BoolSearchPredicateIT {
 				.ifMoreThan( 4 ).thenRequirePercent( 70 );
 
 		// 0 "should" clause: expect the constraints to be ignored
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
@@ -904,7 +904,7 @@ public class BoolSearchPredicateIT {
 				.ifMoreThan( 4 ).thenRequirePercent( 70 );
 
 		// 1 "should" clause: expect to require 1 "should" clause to match
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
@@ -994,7 +994,7 @@ public class BoolSearchPredicateIT {
 
 		// If the should is alone ( not having any sibling must ),
 		// the default minimum should match will be 1.
-		IndexSearchQuery<DocumentReference> query = searchScope.query()
+		SearchQuery<DocumentReference> query = searchScope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "field1" ).matching( "no-match" ) )
@@ -1038,7 +1038,7 @@ public class BoolSearchPredicateIT {
 		// We're following here the Lucene's conventions.
 		// If the should has a sibling must, even if the should is inside a filter,
 		// the default minimum should match will be 0.
-		IndexSearchQuery<DocumentReference> query = searchScope.query()
+		SearchQuery<DocumentReference> query = searchScope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.filter( f.bool()
@@ -1058,7 +1058,7 @@ public class BoolSearchPredicateIT {
 		// Differently from must predicate,
 		// if the should has a sibling must-not inside a filter,
 		// the default minimum should match will be still 1.
-		IndexSearchQuery<DocumentReference> query = searchScope.query()
+		SearchQuery<DocumentReference> query = searchScope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.filter( f.bool()
@@ -1078,7 +1078,7 @@ public class BoolSearchPredicateIT {
 		// We're following here the Lucene's conventions.
 		// If the should has a sibling filter, even if the should is inside a filter,
 		// the default minimum should match will be 0.
-		IndexSearchQuery<DocumentReference> query = searchScope.query()
+		SearchQuery<DocumentReference> query = searchScope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.filter( f.bool()
@@ -1119,7 +1119,7 @@ public class BoolSearchPredicateIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

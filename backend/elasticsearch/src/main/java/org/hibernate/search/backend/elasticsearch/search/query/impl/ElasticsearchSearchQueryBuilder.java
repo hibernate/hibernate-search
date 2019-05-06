@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchR
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 import com.google.gson.JsonArray;
@@ -76,7 +76,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 	}
 
 	@Override
-	public IndexSearchQuery<T> build() {
+	public SearchQuery<T> build() {
 		JsonObject payload = new JsonObject();
 
 		JsonObject jsonQuery = getJsonQuery();
@@ -102,7 +102,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 						rootProjection, searchProjectionExecutionContext
 				);
 
-		return new ElasticsearchIndexSearchQuery<>(
+		return new ElasticsearchSearchQuery<>(
 				workFactory, queryOrchestrator,
 				indexNames, sessionContext, loadingContext, routingKeys,
 				payload,

@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.integrationtest.backend.tck.search.SearchMultiIndexIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 
@@ -87,7 +87,7 @@ public class LuceneSearchMultiIndexIT {
 	public void field_in_one_index_only_is_supported_for_sorting() {
 		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "additionalField" ).asc().onMissingValue().sortLast() )
@@ -127,7 +127,7 @@ public class LuceneSearchMultiIndexIT {
 		workPlan.execute().join();
 
 		StubMappingSearchScope scope = indexManager_1_1.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

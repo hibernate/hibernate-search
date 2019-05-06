@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
@@ -75,7 +75,7 @@ public class BooleanSortAndRangePredicateIT {
 		initData();
 	}
 
-	private IndexSearchQuery<DocumentReference> sortQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
+	private SearchQuery<DocumentReference> sortQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
 				.asReference()
@@ -84,7 +84,7 @@ public class BooleanSortAndRangePredicateIT {
 				.toQuery();
 	}
 
-	private IndexSearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactoryContext, SearchPredicateTerminalContext> rangePredicate) {
+	private SearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactoryContext, SearchPredicateTerminalContext> rangePredicate) {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
 				.asReference()
@@ -95,7 +95,7 @@ public class BooleanSortAndRangePredicateIT {
 	@Test
 	public void sortByFieldQuery() {
 		// Default order
-		IndexSearchQuery<DocumentReference> query = sortQuery( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() );
+		SearchQuery<DocumentReference> query = sortQuery( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE, null );
 
 		// Explicit order with onMissingValue().sortLast()
@@ -113,26 +113,26 @@ public class BooleanSortAndRangePredicateIT {
 
 	@Test
 	public void rangeQueryAbove() {
-		IndexSearchQuery<DocumentReference> query = rangeQuery( f -> f.range().onField( FIELD_PATH ).above( Boolean.TRUE ) );
+		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().onField( FIELD_PATH ).above( Boolean.TRUE ) );
 		assertHasHitsWithBooleanProperties( query, Boolean.TRUE, Boolean.TRUE );
 	}
 
 	@Test
 	public void rangeQueryBelow() {
-		IndexSearchQuery<DocumentReference> query = rangeQuery( f -> f.range().onField( FIELD_PATH ).below( Boolean.FALSE ) );
+		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().onField( FIELD_PATH ).below( Boolean.FALSE ) );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE );
 	}
 
 	@Test
 	public void rangeQueryFromTo() {
-		IndexSearchQuery<DocumentReference> query = rangeQuery( f -> f.range().onField( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.FALSE ) );
+		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().onField( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.FALSE ) );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE );
 	}
 
 	@Test
 	public void rangeFromToSortByFieldQuery() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.TRUE ) )
 				.sort( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() )
@@ -141,7 +141,7 @@ public class BooleanSortAndRangePredicateIT {
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE );
 	}
 
-	private void assertHasHitsWithBooleanProperties(IndexSearchQuery<DocumentReference> query, Boolean... expectedPropertyValues) {
+	private void assertHasHitsWithBooleanProperties(SearchQuery<DocumentReference> query, Boolean... expectedPropertyValues) {
 		List<DocumentReference> hits = query.fetch().getHits();
 		assertEquals( expectedPropertyValues.length, hits.size() );
 
@@ -199,7 +199,7 @@ public class BooleanSortAndRangePredicateIT {
 
 	private void checkAllDocumentsAreSearchable() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

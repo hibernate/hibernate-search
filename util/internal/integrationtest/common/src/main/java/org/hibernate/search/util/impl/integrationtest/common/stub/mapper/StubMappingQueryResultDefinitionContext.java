@@ -12,7 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
@@ -32,24 +32,24 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
-	public SearchQueryResultContext<?, IndexSearchQuery<O>, ?> asObject() {
+	public SearchQueryResultContext<?, SearchQuery<O>, ?> asObject() {
 		return searchScopeDelegate.queryAsLoadedObject(
 				sessionContext, loadingContextBuilder
 		);
 	}
 
-	public SearchQueryResultContext<?, IndexSearchQuery<R>, ?> asReference() {
+	public SearchQueryResultContext<?, SearchQuery<R>, ?> asReference() {
 		return searchScopeDelegate.queryAsReference(
 				sessionContext, loadingContextBuilder
 		);
 	}
 
-	public <P> SearchQueryResultContext<?, IndexSearchQuery<P>, ?> asProjection(
+	public <P> SearchQueryResultContext<?, SearchQuery<P>, ?> asProjection(
 			Function<SearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
 		return asProjection( projectionContributor.apply( searchScopeDelegate.projection() ).toProjection() );
 	}
 
-	public <P> SearchQueryResultContext<?, IndexSearchQuery<P>, ?> asProjection(
+	public <P> SearchQueryResultContext<?, SearchQuery<P>, ?> asProjection(
 			SearchProjection<P> projection) {
 		return searchScopeDelegate.queryAsProjection(
 				sessionContext, loadingContextBuilder,
@@ -57,7 +57,7 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 		);
 	}
 
-	public SearchQueryResultContext<?, IndexSearchQuery<List<?>>, ?> asProjections(
+	public SearchQueryResultContext<?, SearchQuery<List<?>>, ?> asProjections(
 			SearchProjection<?>... projections) {
 		return searchScopeDelegate.queryAsProjections(
 				sessionContext, loadingContextBuilder,

@@ -29,7 +29,7 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeConte
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -135,7 +135,7 @@ public class FieldSearchProjectionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			IndexSearchQuery<Object> query;
+			SearchQuery<Object> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = scope.query()
@@ -155,7 +155,7 @@ public class FieldSearchProjectionIT {
 	public void validSuperClass() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<CharSequence> query = scope.query()
+		SearchQuery<CharSequence> query = scope.query()
 				.asProjection( f ->
 						f.field( indexMapping.string1Field.relativeFieldName, CharSequence.class )
 				)
@@ -282,7 +282,7 @@ public class FieldSearchProjectionIT {
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
 			@SuppressWarnings("rawtypes") // The projection DSL only allows to work with raw types, not with parameterized types
-					IndexSearchQuery<ValueWrapper> query;
+					SearchQuery<ValueWrapper> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = scope.query()
@@ -639,7 +639,7 @@ public class FieldSearchProjectionIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
+		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

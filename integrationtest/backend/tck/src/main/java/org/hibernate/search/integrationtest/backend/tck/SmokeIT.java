@@ -21,7 +21,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,7 +60,7 @@ public class SmokeIT {
 	public void predicate_match() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ) )
 				.toQuery();
@@ -105,7 +105,7 @@ public class SmokeIT {
 	public void predicate_range() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( "string" ).from( "text 2" ).to( "text 42" ) )
 				.toQuery();
@@ -153,7 +153,7 @@ public class SmokeIT {
 	public void predicate_boolean() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "integer" ).matching( 1 ) )
@@ -192,7 +192,7 @@ public class SmokeIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Without nested storage, we expect predicates to be able to match on different objects
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "flattenedObject.string" ).matching( "text 1_2" ) )
@@ -246,7 +246,7 @@ public class SmokeIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchPredicate predicate = scope.predicate().match().onField( "string" ).matching( "text 1" ).toPredicate();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( predicate )
 				.toQuery();
@@ -340,7 +340,7 @@ public class SmokeIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
-		IndexSearchQuery<DocumentReference> query = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
