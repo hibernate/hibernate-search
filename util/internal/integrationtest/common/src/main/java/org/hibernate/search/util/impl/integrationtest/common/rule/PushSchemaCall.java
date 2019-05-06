@@ -31,14 +31,20 @@ class PushSchemaCall extends Call<PushSchemaCall> {
 		this.capture = capture;
 	}
 
-	public Void verify(PushSchemaCall actualCall) {
+	public CallBehavior<Void> verify(PushSchemaCall actualCall) {
 		if ( schemaNode != null ) {
 			StubTreeNodeAssert.assertThat( actualCall.schemaNode )
 					.as( "Schema for index '" + indexName + "' did not match:\n" )
 					.matches( schemaNode );
-			capture.setValue( actualCall.schemaNode );
+			return () -> {
+				capture.setValue( actualCall.schemaNode );
+				return null;
+			};
 		}
-		return null;
+		else {
+			// We don't care about the actual schema
+			return () -> null;
+		}
 	}
 
 	@Override

@@ -6,6 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
-public interface IndexFieldAddBehavior {
-	void execute();
+public interface CallBehavior<T> {
+	T execute();
 }

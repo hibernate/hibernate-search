@@ -21,7 +21,7 @@ public class CountWorkCall extends Call<CountWorkCall> {
 		this.expectedResult = expectedResult;
 	}
 
-	public long verify(CountWorkCall actualCall) {
+	public CallBehavior<Long> verify(CountWorkCall actualCall) {
 		assertThat( actualCall.indexNames )
 				.as( "Count work did not target the expected indexes: " )
 				.isEqualTo( indexNames );
@@ -30,8 +30,7 @@ public class CountWorkCall extends Call<CountWorkCall> {
 				.as( "Actual Call should not carry an expectedResult" )
 				.isNull();
 
-		// Call queue stored item should curry the expected result
-		return expectedResult;
+		return () -> expectedResult;
 	}
 
 	@Override
