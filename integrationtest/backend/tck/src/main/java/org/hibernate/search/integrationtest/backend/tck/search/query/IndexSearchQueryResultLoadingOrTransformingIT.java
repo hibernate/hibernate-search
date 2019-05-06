@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
+import static org.easymock.EasyMock.expect;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.projectionMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.referenceMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
@@ -16,8 +17,6 @@ import static org.junit.Assert.assertEquals;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
-
-import org.easymock.EasyMock;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -48,7 +47,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class IndexSearchQueryResultLoadingOrTransformingIT {
+import org.easymock.EasyMockSupport;
+
+public class IndexSearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -118,9 +119,9 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
-				EasyMock.createMock( StubDocumentReferenceTransformer.class );
+				createMock( StubDocumentReferenceTransformer.class );
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				EasyMock.createMock( StubObjectLoader.class );
+				createMock( StubObjectLoader.class );
 
 		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createSearchScope( referenceTransformerMock );
@@ -130,13 +131,13 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
 				.andReturn( mainTransformedReference );
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
 				.andReturn( emptyTransformedReference );
-		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
+		replayAll();
 		assertThat( referencesQuery ).hasHitsAnyOrder( mainTransformedReference, emptyTransformedReference );
-		EasyMock.verify( referenceTransformerMock, objectLoaderMock );
+		verifyAll();
 	}
 
 	@Test
@@ -149,20 +150,20 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
 		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
-				EasyMock.createMock( StubDocumentReferenceTransformer.class );
+				createMock( StubDocumentReferenceTransformer.class );
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				EasyMock.createMock( StubObjectLoader.class );
+				createMock( StubObjectLoader.class );
 
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
 				.andReturn( mainTransformedReference );
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
 				.andReturn( emptyTransformedReference );
 		StubMapperUtils.expectLoad(
 				objectLoaderMock,
 				c -> c.load( mainTransformedReference, mainLoadedObject )
 						.load( emptyTransformedReference, emptyLoadedObject )
 		);
-		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
+		replayAll();
 
 		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createSearchScope( referenceTransformerMock );
@@ -173,7 +174,7 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 		assertThat( objectsQuery ).hasHitsExactOrder( mainLoadedObject, emptyLoadedObject );
 
-		EasyMock.verify( referenceTransformerMock, objectLoaderMock );
+		verifyAll();
 	}
 
 	@Test
@@ -186,14 +187,14 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
 		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
-				EasyMock.createMock( StubDocumentReferenceTransformer.class );
+				createMock( StubDocumentReferenceTransformer.class );
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				EasyMock.createMock( StubObjectLoader.class );
+				createMock( StubObjectLoader.class );
 
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
 				.andReturn( mainTransformedReference )
 				.times( 2 );
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
 				.andReturn( emptyTransformedReference )
 				.times( 2 );
 		StubMapperUtils.expectLoad(
@@ -201,7 +202,7 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 				c -> c.load( mainTransformedReference, mainLoadedObject )
 						.load( emptyTransformedReference, emptyLoadedObject )
 		);
-		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
+		replayAll();
 
 		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createSearchScope( referenceTransformerMock );
@@ -222,7 +223,7 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 			b.list( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
 
-		EasyMock.verify( referenceTransformerMock, objectLoaderMock );
+		verifyAll();
 	}
 
 	@Test
@@ -234,7 +235,7 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
 		StubTransformedHit emptyTransformedHit = new StubTransformedHit( emptyReference );
 
-		Function<List<?>, StubTransformedHit> hitTransformerMock = EasyMock.createMock( StubHitTransformer.class );
+		Function<List<?>, StubTransformedHit> hitTransformerMock = createMock( StubHitTransformer.class );
 
 		IndexSearchQuery<StubTransformedHit> query = scope.query()
 				.asProjection( f ->
@@ -253,19 +254,19 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		EasyMock.expect( hitTransformerMock.apply( projectionMatcher(
+		expect( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE,
 				mainReference, mainReference, mainReference
 		) ) )
 				.andReturn( mainTransformedHit );
-		EasyMock.expect( hitTransformerMock.apply( projectionMatcher(
+		expect( hitTransformerMock.apply( projectionMatcher(
 				null, null, null, null, null,
 				emptyReference, emptyReference, emptyReference
 		) ) )
 				.andReturn( emptyTransformedHit );
-		EasyMock.replay( hitTransformerMock );
+		replayAll();
 		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
-		EasyMock.verify( hitTransformerMock );
+		verifyAll();
 	}
 
 	@Test
@@ -280,15 +281,15 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
 		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
-				EasyMock.createMock( StubDocumentReferenceTransformer.class );
+				createMock( StubDocumentReferenceTransformer.class );
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				EasyMock.createMock( StubObjectLoader.class );
-		Function<List<?>, StubTransformedHit> hitTransformerMock = EasyMock.createMock( StubHitTransformer.class );
+				createMock( StubObjectLoader.class );
+		Function<List<?>, StubTransformedHit> hitTransformerMock = createMock( StubHitTransformer.class );
 
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
 				.andReturn( mainTransformedReference )
 				.times( 2 );
-		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
+		expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
 				.andReturn( emptyTransformedReference )
 				.times( 2 );
 		StubMapperUtils.expectLoad(
@@ -296,15 +297,15 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 				c -> c.load( mainTransformedReference, mainLoadedObject )
 						.load( emptyTransformedReference, emptyLoadedObject )
 		);
-		EasyMock.expect( hitTransformerMock.apply( projectionMatcher(
+		expect( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject
 		) ) )
 				.andReturn( mainTransformedHit );
-		EasyMock.expect( hitTransformerMock.apply( projectionMatcher(
+		expect( hitTransformerMock.apply( projectionMatcher(
 				null, emptyReference, emptyTransformedReference, emptyLoadedObject
 		) ) )
 				.andReturn( emptyTransformedHit );
-		EasyMock.replay( referenceTransformerMock, objectLoaderMock, hitTransformerMock );
+		replayAll();
 
 		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createSearchScope( referenceTransformerMock );
@@ -323,7 +324,7 @@ public class IndexSearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 
-		EasyMock.verify( referenceTransformerMock, objectLoaderMock, hitTransformerMock );
+		verifyAll();
 	}
 
 	@Test
