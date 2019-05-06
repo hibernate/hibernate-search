@@ -20,42 +20,39 @@ import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplem
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
-import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 
-public final class DefaultSearchQueryContext<T, Q, C>
+public final class DefaultSearchQueryContext<T, C>
 		implements SearchQueryContextImplementor<
-				DefaultSearchQueryContext<T, Q, C>,
-				Q,
+				DefaultSearchQueryContext<T, C>,
+				IndexSearchQuery<T>,
 				SearchPredicateFactoryContext,
 				SearchSortContainerContext
 				> {
 
 	private final IndexSearchScope<C> indexSearchScope;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
-	private final Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory;
 
-	public DefaultSearchQueryContext(IndexSearchScope<C> indexSearchScope, SearchQueryBuilder<T, C> searchQueryBuilder,
-			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
+	public DefaultSearchQueryContext(IndexSearchScope<C> indexSearchScope, SearchQueryBuilder<T, C> searchQueryBuilder) {
 		this.indexSearchScope = indexSearchScope;
 		this.searchQueryBuilder = searchQueryBuilder;
-		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
 	}
 
 	@Override
-	public DefaultSearchQueryContext<T, Q, C> predicate(SearchPredicate predicate) {
+	public DefaultSearchQueryContext<T, C> predicate(SearchPredicate predicate) {
 		SearchPredicateBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchPredicateBuilderFactory();
 		contribute( factory, predicate );
 		return this;
 	}
 
 	@Override
-	public DefaultSearchQueryContext<T, Q, C> predicate(Function<? super SearchPredicateFactoryContext,
+	public DefaultSearchQueryContext<T, C> predicate(Function<? super SearchPredicateFactoryContext,
 			SearchPredicateTerminalContext> dslPredicateContributor) {
 		SearchPredicateBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchPredicateBuilderFactory();
 		SearchPredicateFactoryContext factoryContext = new DefaultSearchPredicateFactoryContext<>( factory );
@@ -65,41 +62,41 @@ public final class DefaultSearchQueryContext<T, Q, C>
 	}
 
 	@Override
-	public <T2> T2 extension(SearchQueryContextExtension<T2, Q> extension) {
+	public <T2> T2 extension(SearchQueryContextExtension<T2, IndexSearchQuery<T>> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, searchQueryBuilder )
 		);
 	}
 
 	@Override
-	public DefaultSearchQueryContext<T, Q, C> routing(String routingKey) {
+	public DefaultSearchQueryContext<T, C> routing(String routingKey) {
 		searchQueryBuilder.addRoutingKey( routingKey );
 		return this;
 	}
 
 	@Override
-	public DefaultSearchQueryContext<T, Q, C> routing(Collection<String> routingKeys) {
+	public DefaultSearchQueryContext<T, C> routing(Collection<String> routingKeys) {
 		routingKeys.forEach( searchQueryBuilder::addRoutingKey );
 		return this;
 	}
 
 	@Override
-	public DefaultSearchQueryContext<T, Q, C> sort(SearchSort sort) {
+	public DefaultSearchQueryContext<T, C> sort(SearchSort sort) {
 		SearchSortBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchSortBuilderFactory();
 		contribute( factory, sort );
 		return this;
 	}
 
 	@Override
-	public DefaultSearchQueryContext<T, Q, C> sort(Consumer<? super SearchSortContainerContext> dslSortContributor) {
+	public DefaultSearchQueryContext<T, C> sort(Consumer<? super SearchSortContainerContext> dslSortContributor) {
 		SearchSortBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchSortBuilderFactory();
 		contribute( factory, dslSortContributor );
 		return this;
 	}
 
 	@Override
-	public Q toQuery() {
-		return searchQueryBuilder.build( searchQueryWrapperFactory );
+	public IndexSearchQuery<T> toQuery() {
+		return searchQueryBuilder.build();
 	}
 
 	private <B> void contribute(SearchPredicateBuilderFactory<? super C, B> factory, SearchPredicate predicate) {

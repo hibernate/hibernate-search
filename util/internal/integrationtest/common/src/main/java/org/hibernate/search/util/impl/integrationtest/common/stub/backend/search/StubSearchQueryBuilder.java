@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search;
 
-import java.util.function.Function;
-
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
@@ -48,12 +46,10 @@ public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQuer
 	}
 
 	@Override
-	public <Q> Q build(Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
-		StubIndexSearchQuery<T> searchQuery = new StubIndexSearchQuery<>(
+	public IndexSearchQuery<T> build() {
+		return new StubIndexSearchQuery<>(
 				backend, scopeModel.getIndexNames(), workBuilder, convertContext,
 				loadingContextBuilder.build(), rootProjection
 		);
-
-		return searchQueryWrapperFactory.apply( searchQuery );
 	}
 }

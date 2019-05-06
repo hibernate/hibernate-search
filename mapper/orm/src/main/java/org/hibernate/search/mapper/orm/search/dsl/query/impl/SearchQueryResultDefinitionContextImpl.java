@@ -15,9 +15,8 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
-import org.hibernate.search.mapper.orm.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQuery;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.impl.ObjectLoaderBuilder;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -44,8 +43,7 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	@Override
 	public SearchQueryResultContext<?, ? extends SearchQuery<O>, ?> asEntity() {
 		return searchScopeDelegate.queryAsLoadedObject(
-				loadingContextBuilder,
-				HibernateOrmSearchQuery::new
+				loadingContextBuilder
 		);
 	}
 
@@ -53,7 +51,6 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(SearchProjection<T> projection) {
 		return searchScopeDelegate.queryAsProjection(
 				loadingContextBuilder,
-				HibernateOrmSearchQuery::new,
 				projection
 		);
 	}
@@ -69,7 +66,6 @@ public class SearchQueryResultDefinitionContextImpl<O>
 			SearchProjection<?>... projections) {
 		return searchScopeDelegate.queryAsProjections(
 				loadingContextBuilder,
-				HibernateOrmSearchQuery::new,
 				projections
 		);
 	}

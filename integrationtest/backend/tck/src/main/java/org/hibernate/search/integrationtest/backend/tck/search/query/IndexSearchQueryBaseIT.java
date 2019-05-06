@@ -75,17 +75,6 @@ public class IndexSearchQueryBaseIT {
 	}
 
 	@Test
-	public void queryWrapper() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
-
-		QueryWrapper queryWrapper = scope.query()
-				.asReference( QueryWrapper::new )
-				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
-				.toQuery();
-		assertThat( queryWrapper.query.getQueryString() ).contains( "platypus" );
-	}
-
-	@Test
 	public void extension() {
 		initData( 2 );
 

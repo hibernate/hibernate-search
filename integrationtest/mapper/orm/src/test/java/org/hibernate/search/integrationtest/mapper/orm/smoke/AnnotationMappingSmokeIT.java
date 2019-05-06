@@ -31,7 +31,7 @@ import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomProper
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBridgeAnnotation;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;

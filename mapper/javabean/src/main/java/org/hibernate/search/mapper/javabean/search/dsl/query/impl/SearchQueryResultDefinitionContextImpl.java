@@ -15,8 +15,7 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTermina
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.javabean.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
-import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
-import org.hibernate.search.mapper.javabean.search.query.impl.JavaBeanSearchQuery;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
@@ -30,27 +29,27 @@ public class SearchQueryResultDefinitionContextImpl implements SearchQueryResult
 	}
 
 	@Override
-	public SearchQueryResultContext<?, SearchQuery<PojoReference>, ?> asReference() {
-		return searchScopeDelegate.queryAsReference( loadingContextBuilder, JavaBeanSearchQuery::new );
+	public SearchQueryResultContext<?, ? extends SearchQuery<PojoReference>, ?> asReference() {
+		return searchScopeDelegate.queryAsReference( loadingContextBuilder );
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<?, SearchQuery<T>, ?> asProjection(
+	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, ?>, ? extends SearchProjectionTerminalContext<T>> projectionContributor) {
 		return asProjection( projectionContributor.apply( searchScopeDelegate.projection() ).toProjection() );
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<?, SearchQuery<T>, ?> asProjection(SearchProjection<T> projection) {
+	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(SearchProjection<T> projection) {
 		return searchScopeDelegate.queryAsProjection(
-				loadingContextBuilder, JavaBeanSearchQuery::new, projection
+				loadingContextBuilder, projection
 		);
 	}
 
 	@Override
-	public SearchQueryResultContext<?, SearchQuery<List<?>>, ?> asProjections(SearchProjection<?>... projections) {
+	public SearchQueryResultContext<?, ? extends SearchQuery<List<?>>, ?> asProjections(SearchProjection<?>... projections) {
 		return searchScopeDelegate.queryAsProjections(
-				loadingContextBuilder, JavaBeanSearchQuery::new, projections
+				loadingContextBuilder, projections
 		);
 	}
 }

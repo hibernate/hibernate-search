@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
-import java.util.function.Function;
-
 /**
  * A builder for search queries.
  *
@@ -22,6 +20,6 @@ public interface SearchQueryBuilder<T, C> {
 
 	// TODO add more arguments, such as faceting options
 
-	<Q> Q build(Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory);
+	IndexSearchQuery<T> build();
 
 }

@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.mapper.mapping.spi;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -20,24 +19,22 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 /**
  * @param <R> The type of references, i.e. the type of hits returned by
- * {@link #queryAsReference(SessionContextImplementor, LoadingContextBuilder, Function) reference queries},
+ * {@link #queryAsReference(SessionContextImplementor, LoadingContextBuilder) reference queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#reference() reference projections}.
  * @param <O> The type of loaded objects, i.e. the type of hits returned by
- * {@link #queryAsLoadedObject(SessionContextImplementor, LoadingContextBuilder, Function) loaded object queries}
+ * {@link #queryAsLoadedObject(SessionContextImplementor, LoadingContextBuilder) loaded object queries}
  * when not using any hit transformer,
  * or the type of objects returned for {@link SearchProjectionFactoryContext#object() loaded object projections}.
  */
 public interface MappedIndexSearchScope<R, O> {
 
-	<T, Q> SearchQueryResultContext<?, Q, ?> queryAsLoadedObject(
+	<T> SearchQueryResultContext<?, IndexSearchQuery<T>, ?> queryAsLoadedObject(
 			SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, T> loadingContextBuilder,
-			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory);
+			LoadingContextBuilder<R, T> loadingContextBuilder);
 
-	<Q> SearchQueryResultContext<?, Q, ?> queryAsReference(
+	SearchQueryResultContext<?, IndexSearchQuery<R>, ?> queryAsReference(
 			SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, ?> loadingContextBuilder,
-			Function<IndexSearchQuery<R>, Q> searchQueryWrapperFactory);
+			LoadingContextBuilder<R, ?> loadingContextBuilder);
 
 	/*
 	 * IMPLEMENTATION NOTE: we *must* only accept a loading context with the same R/O type parameters as this class,
@@ -45,10 +42,9 @@ public interface MappedIndexSearchScope<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	<T, Q> SearchQueryResultContext<?, Q, ?> queryAsProjection(
+	<T> SearchQueryResultContext<?, IndexSearchQuery<T>, ?> queryAsProjection(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, O> loadingContextBuilder,
-			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<T> projection);
 
 	/*
@@ -57,10 +53,9 @@ public interface MappedIndexSearchScope<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	<Q> SearchQueryResultContext<?, Q, ?> queryAsProjections(
+	SearchQueryResultContext<?, IndexSearchQuery<List<?>>, ?> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, O> loadingContextBuilder,
-			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections);
 
 	SearchPredicateFactoryContext predicate();
