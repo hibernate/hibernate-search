@@ -23,6 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyScaledNumberFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
@@ -122,6 +123,13 @@ public class InitialPropertyMappingContext
 	@Override
 	public PropertyKeywordFieldMappingContext keywordField(String relativeFieldName) {
 		PropertyKeywordFieldMappingContextImpl child = new PropertyKeywordFieldMappingContextImpl( this, relativeFieldName );
+		children.add( child );
+		return child;
+	}
+
+	@Override
+	public PropertyScaledNumberFieldMappingContext scaledNumberField(String relativeFieldName) {
+		PropertyScaledNumberFieldMappingContextImpl child = new PropertyScaledNumberFieldMappingContextImpl( this, relativeFieldName );
 		children.add( child );
 		return child;
 	}

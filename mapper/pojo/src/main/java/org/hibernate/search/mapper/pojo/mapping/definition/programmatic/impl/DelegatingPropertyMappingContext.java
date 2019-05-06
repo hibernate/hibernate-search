@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyScaledNumberFieldMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 
@@ -90,6 +91,11 @@ class DelegatingPropertyMappingContext implements PropertyMappingContext {
 	@Override
 	public PropertyKeywordFieldMappingContext keywordField(String relativeFieldName) {
 		return delegate.keywordField( relativeFieldName );
+	}
+
+	@Override
+	public PropertyScaledNumberFieldMappingContext scaledNumberField(String relativeFieldName) {
+		return delegate.scaledNumberField( relativeFieldName );
 	}
 
 	@Override

@@ -31,6 +31,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -40,12 +41,14 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyNotFullTextFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyScaledNumberFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -77,6 +80,7 @@ class AnnotationProcessorProvider {
 				new GenericFieldProcessor( helper ),
 				new FullTextFieldProcessor( helper ),
 				new KeywordFieldProcessor( helper ),
+				new ScaledNumberFieldProcessor( helper ),
 				new IndexedEmbeddedProcessor( helper )
 		) );
 	}
@@ -366,6 +370,52 @@ class AnnotationProcessorProvider {
 		}
 	}
 
+	private static class ScaledNumberFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<ScaledNumberField> {
+		ScaledNumberFieldProcessor(AnnotationProcessorHelper helper) {
+			super( helper, ScaledNumberField.class );
+		}
+
+		@Override
+		PropertyNotFullTextFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
+				PojoPropertyModel<?> propertyModel, ScaledNumberField annotation, String fieldName) {
+			PropertyScaledNumberFieldMappingContext fieldContext = mappingContext.scaledNumberField( fieldName );
+			int decimalScale = annotation.decimalScale();
+			if ( decimalScale != AnnotationDefaultValues.DEFAULT_DECIMAL_SCALE ) {
+				fieldContext.decimalScale( decimalScale );
+			}
+			return fieldContext;
+		}
+
+		@Override
+		String getName(ScaledNumberField annotation) {
+			return annotation.name();
+		}
+
+		@Override
+		Projectable getProjectable(ScaledNumberField annotation) {
+			return annotation.projectable();
+		}
+
+		@Override
+		Sortable getSortable(ScaledNumberField annotation) {
+			return annotation.sortable();
+		}
+
+		@Override
+		String getIndexNullAs(ScaledNumberField annotation) {
+			return annotation.indexNullAs();
+		}
+
+		@Override
+		ValueBridgeRef getValueBridge(ScaledNumberField annotation) {
+			return annotation.valueBridge();
+		}
+
+		@Override
+		ContainerExtractorRef[] getExtractors(ScaledNumberField annotation) {
+			return annotation.extractors();
+		}
+	}
 
 	private static class IndexedEmbeddedProcessor extends PropertyAnnotationProcessor<IndexedEmbedded> {
 		IndexedEmbeddedProcessor(AnnotationProcessorHelper helper) {

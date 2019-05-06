@@ -65,7 +65,9 @@ public interface IndexFieldTypeFactoryContext {
 
 	StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint();
 
-	// TODO HSEARCH-3487 add asBigDecimal() and asBigInteger() methods here
+	ScaledNumberIndexFieldTypeContext<?> asBigDecimal();
+
+	// TODO HSEARCH-3487 add asBigInteger() method here
 
 	default <T> T extension(IndexFieldTypeFactoryContextExtension<T> extension) {
 		return extension.extendOrFail( this );
