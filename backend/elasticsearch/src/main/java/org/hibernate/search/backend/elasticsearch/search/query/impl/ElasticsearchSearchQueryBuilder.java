@@ -19,8 +19,9 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 import com.google.gson.JsonArray;
@@ -39,7 +40,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 	private final Set<String> routingKeys;
 
 	private final ElasticsearchSearchQueryElementCollector elementCollector;
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final ElasticsearchSearchProjection<?, T> rootProjection;
 
 	ElasticsearchSearchQueryBuilder(
@@ -49,7 +50,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 			MultiTenancyStrategy multiTenancyStrategy,
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper,
+			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, T> rootProjection) {
 		this.workFactory = workFactory;
 		this.searchResultExtractorFactory = searchResultExtractorFactory;
@@ -61,7 +62,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 		this.routingKeys = new HashSet<>();
 
 		this.elementCollector = new ElasticsearchSearchQueryElementCollector( sessionContext );
-		this.projectionHitMapper = projectionHitMapper;
+		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 	}
 
@@ -93,8 +94,13 @@ public class ElasticsearchSearchQueryBuilder<T>
 
 		rootProjection.contributeRequest( payload, searchProjectionExecutionContext );
 
+		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
+
 		ElasticsearchSearchResultExtractor<T> searchResultExtractor =
-				searchResultExtractorFactory.createResultExtractor( projectionHitMapper, rootProjection, searchProjectionExecutionContext );
+				searchResultExtractorFactory.createResultExtractor(
+						loadingContext.getProjectionHitMapper(),
+						rootProjection, searchProjectionExecutionContext
+				);
 
 		return new ElasticsearchIndexSearchQuery<>(
 				workFactory, queryOrchestrator,

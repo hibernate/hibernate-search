@@ -9,8 +9,8 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchScopeModel;
@@ -22,18 +22,18 @@ public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQuer
 	private final StubSearchScopeModel scopeModel;
 	private final StubSearchWork.Builder workBuilder;
 	private final FromDocumentFieldValueConvertContext convertContext;
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final StubSearchProjection<T> rootProjection;
 
 	public StubSearchQueryBuilder(StubBackend backend, StubSearchScopeModel scopeModel,
 			StubSearchWork.ResultType resultType,
 			FromDocumentFieldValueConvertContext convertContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
+			LoadingContextBuilder<?, ?> loadingContextBuilder, StubSearchProjection<T> rootProjection) {
 		this.backend = backend;
 		this.scopeModel = scopeModel;
 		this.workBuilder = StubSearchWork.builder( resultType );
 		this.convertContext = convertContext;
-		this.projectionHitMapper = projectionHitMapper;
+		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 	}
 
@@ -51,7 +51,7 @@ public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQuer
 	public <Q> Q build(Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		StubIndexSearchQuery<T> searchQuery = new StubIndexSearchQuery<>(
 				backend, scopeModel.getIndexNames(), workBuilder, convertContext,
-				projectionHitMapper, rootProjection
+				loadingContextBuilder.build(), rootProjection
 		);
 
 		return searchQueryWrapperFactory.apply( searchQuery );

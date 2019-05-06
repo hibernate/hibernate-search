@@ -38,4 +38,5 @@ public interface ProjectionHitMapper<R, O> {
 	 * @return The loaded entities.
 	 */
 	LoadingResult<O> loadBlocking();
+
 }

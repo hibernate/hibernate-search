@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import java.util.function.Function;
-
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -19,7 +17,6 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.search.DocumentReference;
 
 class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexManager<D> {
 
@@ -50,11 +47,9 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public <R, O> MappedIndexSearchScopeBuilder<R, O> createSearchScopeBuilder(MappingContextImplementor mappingContext,
-			Function<DocumentReference, R> documentReferenceTransformer) {
+	public <R, O> MappedIndexSearchScopeBuilder<R, O> createSearchScopeBuilder(MappingContextImplementor mappingContext) {
 		return new MappedIndexSearchScopeBuilderImpl<>(
-				implementor, mappingContext,
-				documentReferenceTransformer
+				implementor, mappingContext
 		);
 	}
 

@@ -14,6 +14,7 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
+import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQuery;
@@ -26,30 +27,34 @@ public class SearchQueryResultDefinitionContextImpl<O>
 		implements SearchQueryResultDefinitionContext<O> {
 	private final PojoSearchScopeDelegate<O, O> searchScopeDelegate;
 	private final SessionImplementor sessionImplementor;
-	private final ObjectLoaderBuilder<O> objectLoaderBuilder;
+	private final HibernateOrmLoadingContext.Builder<O> loadingContextBuilder;
+	private final MutableObjectLoadingOptions loadingOptions;
 
 	public SearchQueryResultDefinitionContextImpl(
 			PojoSearchScopeDelegate<O, O> searchScopeDelegate,
 			SessionImplementor sessionImplementor) {
 		this.searchScopeDelegate = searchScopeDelegate;
 		this.sessionImplementor = sessionImplementor;
-		this.objectLoaderBuilder = new ObjectLoaderBuilder<>( sessionImplementor, searchScopeDelegate.getIncludedIndexedTypes() );
+		ObjectLoaderBuilder<O> objectLoaderBuilder =
+				new ObjectLoaderBuilder<>( sessionImplementor, searchScopeDelegate.getIncludedIndexedTypes() );
+		this.loadingOptions = new MutableObjectLoadingOptions();
+		this.loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
+				searchScopeDelegate, objectLoaderBuilder, loadingOptions
+		);
 	}
 
 	@Override
 	public SearchQueryResultContext<?, ? extends SearchQuery<O>, ?> asEntity() {
-		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
 		return searchScopeDelegate.queryAsLoadedObject(
-				objectLoaderBuilder.build( loadingOptions ),
+				loadingContextBuilder,
 				q -> new HibernateOrmSearchQuery<>( q, sessionImplementor, loadingOptions )
 		);
 	}
 
 	@Override
 	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(SearchProjection<T> projection) {
-		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
 		return searchScopeDelegate.queryAsProjection(
-				objectLoaderBuilder.build( loadingOptions ),
+				loadingContextBuilder,
 				q -> new HibernateOrmSearchQuery<>( q, sessionImplementor, loadingOptions ),
 				projection
 		);
@@ -64,9 +69,8 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	@Override
 	public SearchQueryResultContext<?, ? extends SearchQuery<List<?>>, ?> asProjections(
 			SearchProjection<?>... projections) {
-		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
 		return searchScopeDelegate.queryAsProjections(
-				objectLoaderBuilder.build( loadingOptions ),
+				loadingContextBuilder,
 				q -> new HibernateOrmSearchQuery<>( q, sessionImplementor, loadingOptions ),
 				projections
 		);

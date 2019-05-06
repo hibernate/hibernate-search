@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
@@ -23,7 +24,6 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionC
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
@@ -52,37 +52,47 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<?, Q, ?> queryAsLoadedObject(ObjectLoader<PojoReference, T> objectLoader,
+	public PojoReference toPojoReference(DocumentReference documentReference) {
+		PojoIndexedTypeManager<?, ?, ?> typeManager = typeManagers.getByIndexName( documentReference.getIndexName() )
+				.orElseThrow( () -> new AssertionFailure(
+						"Document reference " + documentReference + " could not be converted to a PojoReference" ) );
+		// TODO error handling if typeManager is null
+		Object id = typeManager.getIdentifierMapping().fromDocumentIdentifier( documentReference.getId(), sessionContext );
+		return new PojoReferenceImpl( typeManager.getIndexedJavaClass(), id );
+	}
+
+	@Override
+	public <T, Q> SearchQueryResultContext<?, Q, ?> queryAsLoadedObject(LoadingContextBuilder<PojoReference, T> loadingContextBuilder,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		return getDelegate().queryAsLoadedObject(
-				sessionContext, objectLoader, searchQueryWrapperFactory
+				sessionContext, loadingContextBuilder, searchQueryWrapperFactory
 		);
 	}
 
 	@Override
-	public <Q> SearchQueryResultContext<?, Q, ?> queryAsReference(
+	public <Q> SearchQueryResultContext<?, Q, ?> queryAsReference(LoadingContextBuilder<PojoReference, ?> loadingContextBuilder,
 			Function<IndexSearchQuery<PojoReference>, Q> searchQueryWrapperFactory) {
 		return getDelegate().queryAsReference(
-				sessionContext, searchQueryWrapperFactory
+				sessionContext, loadingContextBuilder, searchQueryWrapperFactory
 		);
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<?, Q, ?> queryAsProjection(ObjectLoader<PojoReference, O> objectLoader,
+	public <T, Q> SearchQueryResultContext<?, Q, ?> queryAsProjection(LoadingContextBuilder<PojoReference, O> loadingContextBuilder,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<T> projection) {
 		return getDelegate().queryAsProjection(
-				sessionContext, objectLoader, searchQueryWrapperFactory,
+				sessionContext, loadingContextBuilder, searchQueryWrapperFactory,
 				projection
 		);
 	}
 
 	@Override
-	public <Q> SearchQueryResultContext<?, Q, ?> queryAsProjections(ObjectLoader<PojoReference, O> objectLoader,
+	public <Q> SearchQueryResultContext<?, Q, ?> queryAsProjections(LoadingContextBuilder<PojoReference, O> loadingContextBuilder,
 			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
 		return getDelegate().queryAsProjections(
-				sessionContext, objectLoader, searchQueryWrapperFactory,
+				sessionContext, loadingContextBuilder, searchQueryWrapperFactory,
 				projections
 		);
 	}
@@ -107,7 +117,7 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 		if ( delegate == null ) {
 			Iterator<PojoIndexedTypeManager<?, ? extends E, ?>> iterator = targetedTypeManagers.iterator();
 			MappedIndexSearchScopeBuilder<PojoReference, O> builder = iterator.next().createSearchScopeBuilder(
-					mappingContext, this::toPojoReference
+					mappingContext
 			);
 			while ( iterator.hasNext() ) {
 				iterator.next().addTo( builder );
@@ -115,14 +125,5 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 			delegate = builder.build();
 		}
 		return delegate;
-	}
-
-	private PojoReference toPojoReference(DocumentReference documentReference) {
-		PojoIndexedTypeManager<?, ?, ?> typeManager = typeManagers.getByIndexName( documentReference.getIndexName() )
-				.orElseThrow( () -> new AssertionFailure(
-						"Document reference " + documentReference + " could not be converted to a PojoReference" ) );
-		// TODO error handling if typeManager is null
-		Object id = typeManager.getIdentifierMapping().fromDocumentIdentifier( documentReference.getId(), sessionContext );
-		return new PojoReferenceImpl( typeManager.getIndexedJavaClass(), id );
 	}
 }

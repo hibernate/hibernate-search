@@ -87,6 +87,6 @@ public interface SearchScope {
 	 * and ultimately {@link SearchProjectionTerminalContext#toProjection() get the resulting projection}.
 	 * @see SearchProjectionFactoryContext
 	 */
-	SearchProjectionFactoryContext<PojoReference, PojoReference> projection();
+	SearchProjectionFactoryContext<PojoReference, ?> projection();
 
 }
