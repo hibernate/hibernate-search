@@ -11,6 +11,7 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearchQueryContext;
@@ -26,13 +27,17 @@ public class LuceneSearchQueryContextImpl<T>
 				>
 		implements LuceneSearchQueryResultContext<T>, LuceneSearchQueryContext<T> {
 
-	// FIXME use the builder to make toQuery return a Lucene-specific query type
 	private final LuceneSearchQueryBuilder<T> builder;
 
 	public LuceneSearchQueryContextImpl(SearchQueryContextImplementor<?, T, ?, ?> original,
 			LuceneSearchQueryBuilder<T> builder) {
 		super( original );
 		this.builder = builder;
+	}
+
+	@Override
+	public LuceneSearchQuery<T> toQuery() {
+		return builder.build();
 	}
 
 	@Override
