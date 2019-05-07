@@ -11,33 +11,35 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneIndexSearchScope;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
+import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public class LuceneSearchQueryContextImpl<T>
-		extends AbstractDelegatingSearchQueryContext<
-				LuceneSearchQueryContext<T>,
-				T,
-				LuceneSearchPredicateFactoryContext,
-				LuceneSearchSortContainerContext
-				>
+class LuceneSearchQueryContextImpl<T>
+		extends AbstractSearchQueryContext<
+		LuceneSearchQueryContext<T>,
+		T,
+		LuceneSearchPredicateFactoryContext,
+		LuceneSearchSortContainerContext,
+		LuceneSearchQueryElementCollector
+		>
 		implements LuceneSearchQueryResultContext<T>, LuceneSearchQueryContext<T> {
 
-	private final LuceneSearchQueryBuilder<T> builder;
+	private final LuceneSearchQueryBuilder<T> searchQueryBuilder;
 
-	public LuceneSearchQueryContextImpl(SearchQueryContextImplementor<?, T, ?, ?> original,
-			LuceneSearchQueryBuilder<T> builder) {
-		super( original );
-		this.builder = builder;
+	LuceneSearchQueryContextImpl(LuceneIndexSearchScope indexSearchScope,
+			LuceneSearchQueryBuilder<T> searchQueryBuilder) {
+		super( indexSearchScope, searchQueryBuilder );
+		this.searchQueryBuilder = searchQueryBuilder;
 	}
 
 	@Override
 	public LuceneSearchQuery<T> toQuery() {
-		return builder.build();
+		return searchQueryBuilder.build();
 	}
 
 	@Override
@@ -52,7 +54,8 @@ public class LuceneSearchQueryContextImpl<T>
 	}
 
 	@Override
-	protected LuceneSearchSortContainerContext extendSortContext(SearchSortContainerContext sortContainerContext) {
+	protected LuceneSearchSortContainerContext extendSortContext(
+			SearchSortContainerContext sortContainerContext) {
 		return sortContainerContext.extension( LuceneExtension.get() );
 	}
 }

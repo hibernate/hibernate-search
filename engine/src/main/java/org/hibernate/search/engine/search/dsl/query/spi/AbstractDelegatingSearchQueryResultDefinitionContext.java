@@ -12,6 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 
@@ -51,4 +52,8 @@ public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, O>
 		return delegate.asProjections( projections );
 	}
 
+	@Override
+	public <T> T extension(SearchQueryContextExtension<T, R, O> extension) {
+		return delegate.extension( extension );
+	}
 }

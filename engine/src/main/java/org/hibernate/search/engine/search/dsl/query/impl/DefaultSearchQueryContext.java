@@ -6,29 +6,21 @@
  */
 package org.hibernate.search.engine.search.dsl.query.impl;
 
-import java.util.Collection;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
-import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
+import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
-import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
-import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
-
 
 final class DefaultSearchQueryContext<T, C>
+		extends AbstractSearchQueryContext<
+						DefaultSearchQueryContext<T, C>,
+						T,
+						SearchPredicateFactoryContext,
+						SearchSortContainerContext,
+						C
+				>
 		implements SearchQueryContextImplementor<
 				DefaultSearchQueryContext<T, C>,
 				T,
@@ -36,89 +28,25 @@ final class DefaultSearchQueryContext<T, C>
 				SearchSortContainerContext
 				> {
 
-	private final IndexSearchScope<C> indexSearchScope;
-	private final SearchQueryBuilder<T, C> searchQueryBuilder;
-
 	DefaultSearchQueryContext(IndexSearchScope<C> indexSearchScope, SearchQueryBuilder<T, C> searchQueryBuilder) {
-		this.indexSearchScope = indexSearchScope;
-		this.searchQueryBuilder = searchQueryBuilder;
+		super( indexSearchScope, searchQueryBuilder );
 	}
 
 	@Override
-	public DefaultSearchQueryContext<T, C> predicate(SearchPredicate predicate) {
-		SearchPredicateBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchPredicateBuilderFactory();
-		contribute( factory, predicate );
+	protected SearchPredicateFactoryContext extendPredicateContext(
+			SearchPredicateFactoryContext predicateFactoryContext) {
+		// We don't extend anything.
+		return predicateFactoryContext;
+	}
+
+	@Override
+	protected SearchSortContainerContext extendSortContext(SearchSortContainerContext sortContainerContext) {
+		// We don't extend anything.
+		return sortContainerContext;
+	}
+
+	@Override
+	protected DefaultSearchQueryContext<T, C> thisAsS() {
 		return this;
 	}
-
-	@Override
-	public DefaultSearchQueryContext<T, C> predicate(Function<? super SearchPredicateFactoryContext,
-			SearchPredicateTerminalContext> dslPredicateContributor) {
-		SearchPredicateBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchPredicateBuilderFactory();
-		SearchPredicateFactoryContext factoryContext = new DefaultSearchPredicateFactoryContext<>( factory );
-		SearchPredicate predicate = dslPredicateContributor.apply( factoryContext ).toPredicate();
-		contribute( factory, predicate );
-		return this;
-	}
-
-	@Override
-	public <T2> T2 extension(SearchQueryContextExtension<T2, T> extension) {
-		return DslExtensionState.returnIfSupported(
-				extension, extension.extendOptional( this, searchQueryBuilder )
-		);
-	}
-
-	@Override
-	public DefaultSearchQueryContext<T, C> routing(String routingKey) {
-		searchQueryBuilder.addRoutingKey( routingKey );
-		return this;
-	}
-
-	@Override
-	public DefaultSearchQueryContext<T, C> routing(Collection<String> routingKeys) {
-		routingKeys.forEach( searchQueryBuilder::addRoutingKey );
-		return this;
-	}
-
-	@Override
-	public DefaultSearchQueryContext<T, C> sort(SearchSort sort) {
-		SearchSortBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchSortBuilderFactory();
-		contribute( factory, sort );
-		return this;
-	}
-
-	@Override
-	public DefaultSearchQueryContext<T, C> sort(Consumer<? super SearchSortContainerContext> dslSortContributor) {
-		SearchSortBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchSortBuilderFactory();
-		contribute( factory, dslSortContributor );
-		return this;
-	}
-
-	@Override
-	public SearchQuery<T> toQuery() {
-		return searchQueryBuilder.build();
-	}
-
-	private <B> void contribute(SearchPredicateBuilderFactory<? super C, B> factory, SearchPredicate predicate) {
-		factory.contribute( searchQueryBuilder.getQueryElementCollector(), factory.toImplementation( predicate ) );
-	}
-
-	private <B> void contribute(SearchSortBuilderFactory<? super C, B> factory, SearchSort sort) {
-		factory.toImplementation( sort, b -> factory.contribute( searchQueryBuilder.getQueryElementCollector(), b ) );
-	}
-
-	private <B> void contribute(SearchSortBuilderFactory<? super C, B> factory,
-			Consumer<? super SearchSortContainerContext> dslSortContributor) {
-		C collector = searchQueryBuilder.getQueryElementCollector();
-
-		SearchSortDslContextImpl<B> rootDslContext = new SearchSortDslContextImpl<>( factory );
-		SearchSortContainerContext containerContext =
-				new DefaultSearchSortContainerContext<>( factory, rootDslContext );
-		dslSortContributor.accept( containerContext );
-
-		for ( B builder : rootDslContext.getResultingBuilders() ) {
-			factory.contribute( collector, builder );
-		}
-	}
-
 }

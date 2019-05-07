@@ -11,33 +11,35 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchIndexSearchScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
+import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public class ElasticsearchSearchQueryContextImpl<T>
-		extends AbstractDelegatingSearchQueryContext<
+class ElasticsearchSearchQueryContextImpl<T>
+		extends AbstractSearchQueryContext<
 				ElasticsearchSearchQueryContext<T>,
 				T,
 				ElasticsearchSearchPredicateFactoryContext,
-				ElasticsearchSearchSortContainerContext
-				>
+				ElasticsearchSearchSortContainerContext,
+				ElasticsearchSearchQueryElementCollector
+		>
 		implements ElasticsearchSearchQueryResultContext<T>, ElasticsearchSearchQueryContext<T> {
 
-	private final ElasticsearchSearchQueryBuilder<T> builder;
+	private final ElasticsearchSearchQueryBuilder<T> searchQueryBuilder;
 
-	public ElasticsearchSearchQueryContextImpl(SearchQueryContextImplementor<?, T, ?, ?> original,
-			ElasticsearchSearchQueryBuilder<T> builder) {
-		super( original );
-		this.builder = builder;
+	ElasticsearchSearchQueryContextImpl(ElasticsearchIndexSearchScope indexSearchScope,
+			ElasticsearchSearchQueryBuilder<T> searchQueryBuilder) {
+		super( indexSearchScope, searchQueryBuilder );
+		this.searchQueryBuilder = searchQueryBuilder;
 	}
 
 	@Override
 	public ElasticsearchSearchQuery<T> toQuery() {
-		return builder.build();
+		return searchQueryBuilder.build();
 	}
 
 	@Override

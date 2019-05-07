@@ -20,10 +20,9 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneReferenc
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 
-class LuceneSearchQueryBuilderFactory
+public class LuceneSearchQueryBuilderFactory
 		implements SearchQueryBuilderFactory<LuceneSearchQueryElementCollector> {
 
 	private final SearchBackendContext searchBackendContext;
@@ -41,19 +40,19 @@ class LuceneSearchQueryBuilderFactory
 	}
 
 	@Override
-	public <O> SearchQueryBuilder<O, LuceneSearchQueryElementCollector> asObject(
+	public <O> LuceneSearchQueryBuilder<O> asObject(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, O> loadingContextBuilder) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, LuceneObjectProjection.get() );
 	}
 
 	@Override
-	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asReference(
+	public <T> LuceneSearchQueryBuilder<T> asReference(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<T, ?> loadingContextBuilder) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, LuceneReferenceProjection.get() );
 	}
 
 	@Override
-	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asProjection(
+	public <T> LuceneSearchQueryBuilder<T> asProjection(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			SearchProjection<T> projection) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder,
@@ -61,7 +60,7 @@ class LuceneSearchQueryBuilderFactory
 	}
 
 	@Override
-	public SearchQueryBuilder<List<?>, LuceneSearchQueryElementCollector> asProjections(
+	public LuceneSearchQueryBuilder<List<?>> asProjections(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			SearchProjection<?>... projections) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, createRootProjection( projections ) );

@@ -19,14 +19,17 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
-import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.SearchResult;
-import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
@@ -106,7 +109,6 @@ public class SearchQueryBaseIT {
 
 		// Mandatory extension, supported
 		query = scope.query()
-				.asReference()
 				.extension( new SupportedQueryDslExtension<>() )
 				.extendedFeature( "string", "value1", "value2" );
 		SearchResultAssert.assertThat( query )
@@ -115,7 +117,6 @@ public class SearchQueryBaseIT {
 		// Mandatory extension, unsupported
 		SubTest.expectException(
 				() -> scope.query()
-				.asReference()
 				.extension( new UnSupportedQueryDslExtension<>() )
 		)
 				.assertThrown()
@@ -185,30 +186,36 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class SupportedQueryDslExtension<T> implements SearchQueryContextExtension<MyExtendedDslContext<T>, T> {
+	private static class SupportedQueryDslExtension<R, O> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, O> {
 		@Override
-		public Optional<MyExtendedDslContext<T>> extendOptional(SearchQueryContextImplementor<?, T, ?, ?> original,
-				SearchQueryBuilder<T, ?> searchQueryBuilder) {
+		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<R, O, ?> original,
+				IndexSearchScope<?> indexSearchScope, SessionContextImplementor sessionContext,
+				LoadingContextBuilder<R, O> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( searchQueryBuilder ).isNotNull();
-			return Optional.of( new MyExtendedDslContext<>( original ) );
+			Assertions.assertThat( indexSearchScope ).isNotNull();
+			Assertions.assertThat( sessionContext ).isNotNull();
+			Assertions.assertThat( loadingContextBuilder ).isNotNull();
+			return Optional.of( new MyExtendedDslContext<R>( original.asReference() ) );
 		}
 	}
 
-	private static class UnSupportedQueryDslExtension<T> implements SearchQueryContextExtension<MyExtendedDslContext<T>, T> {
+	private static class UnSupportedQueryDslExtension<R, O> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, O> {
 		@Override
-		public Optional<MyExtendedDslContext<T>> extendOptional(SearchQueryContextImplementor<?, T, ?, ?> original,
-				SearchQueryBuilder<T, ?> searchQueryBuilder) {
+		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<R, O, ?> original,
+				IndexSearchScope<?> indexSearchScope, SessionContextImplementor sessionContext,
+				LoadingContextBuilder<R, O> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( searchQueryBuilder ).isNotNull();
+			Assertions.assertThat( indexSearchScope ).isNotNull();
+			Assertions.assertThat( sessionContext ).isNotNull();
+			Assertions.assertThat( loadingContextBuilder ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
 	private static class MyExtendedDslContext<T> {
-		private final SearchQueryContextImplementor<?, T, ?, ?> delegate;
+		private final SearchQueryResultContext<?, T, ?> delegate;
 
-		MyExtendedDslContext(SearchQueryContextImplementor<?, T, ?, ?> delegate) {
+		MyExtendedDslContext(SearchQueryResultContext<?, T, ?> delegate) {
 			this.delegate = delegate;
 		}
 

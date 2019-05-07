@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.engine.backend.Backend;
@@ -25,6 +26,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
@@ -89,27 +91,45 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
+	@SuppressWarnings("unused")
 	public void queryContext() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		ElasticsearchSearchQueryResultContext<DocumentReference> context1 = scope.query()
-				.asReference()
-				.extension( ElasticsearchExtension.get() );
+		ElasticsearchSearchQueryResultDefinitionContext<DocumentReference, DocumentReference> context1 =
+				scope.query().extension( ElasticsearchExtension.get() );
+		ElasticsearchSearchQueryResultContext<DocumentReference> context2 = context1.asProjection(
+				f -> f.composite(
+						// We don't care about the source, it's just to test that the factory context allows ES-specific projection
+						(docRef, source) -> docRef,
+						f.documentReference(), f.source()
+				)
+		);
 		// Note we can use Elasticsearch-specific predicates immediately
-		ElasticsearchSearchQueryContext<DocumentReference> context2 =
-				context1.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
-		// Note we can use Elasticsearch-specific sorts immediately
 		ElasticsearchSearchQueryContext<DocumentReference> context3 =
-				context2.sort( c -> c.fromJson( "{'sort1': 'asc'}" ) );
+				context2.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
+		// Note we can use Elasticsearch-specific sorts immediately
+		ElasticsearchSearchQueryContext<DocumentReference> context4 =
+				context3.sort( c -> c.fromJson( "{'sort1': 'asc'}" ) );
 
 		// Put the query and result into variables to check they have the right type
-		ElasticsearchSearchQuery<DocumentReference> query = context3.toQuery();
+		ElasticsearchSearchQuery<DocumentReference> query = context4.toQuery();
 		ElasticsearchSearchResult<DocumentReference> result = query.fetch();
 
 		assertThat( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
 				.hasTotalHitCount( 6 );
+
+		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
+		ElasticsearchSearchQueryResultContext<DocumentReference> asReferenceContext =
+				scope.query().extension( ElasticsearchExtension.get() ).asReference();
+		ElasticsearchSearchQueryResultContext<DocumentReference> asEntityContext =
+				scope.query().extension( ElasticsearchExtension.get() ).asEntity();
+		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();
+		ElasticsearchSearchQueryResultContext<DocumentReference> asProjectionContext =
+				scope.query().extension( ElasticsearchExtension.get() ).asProjection( projection );
+		ElasticsearchSearchQueryResultContext<List<?>> asProjectionsContext =
+				scope.query().extension( ElasticsearchExtension.get() ).asProjections( projection, projection );
 	}
 
 	@Test
