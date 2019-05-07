@@ -14,13 +14,13 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 import com.google.gson.JsonArray;
@@ -76,7 +76,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 	}
 
 	@Override
-	public SearchQuery<T> build() {
+	public ElasticsearchSearchQuery<T> build() {
 		JsonObject payload = new JsonObject();
 
 		JsonObject jsonQuery = getJsonQuery();
@@ -102,7 +102,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 						rootProjection, searchProjectionExecutionContext
 				);
 
-		return new ElasticsearchSearchQuery<>(
+		return new ElasticsearchSearchQueryImpl<>(
 				workFactory, queryOrchestrator,
 				indexNames, sessionContext, loadingContext, routingKeys,
 				payload,

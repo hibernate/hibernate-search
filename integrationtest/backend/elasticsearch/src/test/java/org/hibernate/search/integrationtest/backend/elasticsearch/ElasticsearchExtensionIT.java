@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
@@ -17,11 +18,15 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -32,6 +37,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -83,7 +89,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void query() {
+	public void queryContext() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Put intermediary contexts into variables to check they have the right type
@@ -96,11 +102,44 @@ public class ElasticsearchExtensionIT {
 		// Note we can use Elasticsearch-specific sorts immediately
 		ElasticsearchSearchQueryContext<DocumentReference> context3 =
 				context2.sort( c -> c.fromJson( "{'sort1': 'asc'}" ) );
-		SearchQuery<DocumentReference> query = context3.toQuery();
 
-		assertThat( query )
+		// Put the query and result into variables to check they have the right type
+		ElasticsearchSearchQuery<DocumentReference> query = context3.toQuery();
+		ElasticsearchSearchResult<DocumentReference> result = query.fetch();
+
+		assertThat( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
 				.hasTotalHitCount( 6 );
+	}
+
+	@Test
+	public void query() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		SearchQuery<DocumentReference> genericQuery = scope.query()
+				.asReference()
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+
+		// Put the query and result into variables to check they have the right type
+		ElasticsearchSearchQuery<DocumentReference> query = genericQuery.extension( ElasticsearchExtension.get() );
+		ElasticsearchSearchResult<DocumentReference> result = query.fetch();
+		assertThat( result ).fromQuery( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
+				.hasTotalHitCount( 6 );
+
+		// Unsupported extension
+		SubTest.expectException(
+				() -> query.extension( new SearchQueryExtension<Void, DocumentReference>() {
+					@Override
+					public Optional<Void> extendOptional(SearchQuery<DocumentReference> original,
+							LoadingContext<?, ?> loadingContext) {
+						return Optional.empty();
+					}
+				} )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class );
 	}
 
 	@Test

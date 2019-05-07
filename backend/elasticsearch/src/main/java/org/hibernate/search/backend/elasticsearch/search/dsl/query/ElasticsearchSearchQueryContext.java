@@ -7,11 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.query;
 
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 
 public interface ElasticsearchSearchQueryContext<T>
 		extends SearchQueryContext<ElasticsearchSearchQueryContext<T>, T, ElasticsearchSearchSortContainerContext> {
 
-	// FIXME make toQuery return an Elasticsearch-specific query type
-
+	@Override
+	ElasticsearchSearchQuery<T> toQuery();
 }

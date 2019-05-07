@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.Ela
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.impl.ElasticsearchSearchQueryContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
@@ -35,8 +36,11 @@ import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplem
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -59,6 +63,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public final class ElasticsearchExtension<T, R, O>
 		implements SearchQueryContextExtension<ElasticsearchSearchQueryResultContext<T>, T>,
+		SearchQueryExtension<ElasticsearchSearchQuery<T>, T>,
 		SearchPredicateFactoryContextExtension<ElasticsearchSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<ElasticsearchSearchSortContainerContext>,
 		SearchProjectionFactoryContextExtension<ElasticsearchSearchProjectionFactoryContext<R, O>, R, O>,
@@ -89,6 +94,20 @@ public final class ElasticsearchExtension<T, R, O>
 			return Optional.of( new ElasticsearchSearchQueryContextImpl<>(
 					original, (ElasticsearchSearchQueryBuilder<T>) builder
 			) );
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<ElasticsearchSearchQuery<T>> extendOptional(SearchQuery<T> original,
+			LoadingContext<?, ?> loadingContext) {
+		if ( original instanceof ElasticsearchSearchQuery ) {
+			return Optional.of( (ElasticsearchSearchQuery<T>) original );
 		}
 		else {
 			return Optional.empty();
