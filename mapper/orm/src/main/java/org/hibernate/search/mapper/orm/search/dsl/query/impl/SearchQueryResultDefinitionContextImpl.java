@@ -15,7 +15,6 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.impl.ObjectLoaderBuilder;
@@ -41,14 +40,14 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	}
 
 	@Override
-	public SearchQueryResultContext<?, ? extends SearchQuery<O>, ?> asEntity() {
+	public SearchQueryResultContext<?, O, ?> asEntity() {
 		return searchScopeDelegate.queryAsLoadedObject(
 				loadingContextBuilder
 		);
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(SearchProjection<T> projection) {
+	public <T> SearchQueryResultContext<?, T, ?> asProjection(SearchProjection<T> projection) {
 		return searchScopeDelegate.queryAsProjection(
 				loadingContextBuilder,
 				projection
@@ -56,13 +55,13 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(
+	public <T> SearchQueryResultContext<?, T, ?> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, O>, ? extends SearchProjectionTerminalContext<T>> projectionContributor) {
 		return asProjection( projectionContributor.apply( searchScopeDelegate.projection() ).toProjection() );
 	}
 
 	@Override
-	public SearchQueryResultContext<?, ? extends SearchQuery<List<?>>, ?> asProjections(
+	public SearchQueryResultContext<?, List<?>, ?> asProjections(
 			SearchProjection<?>... projections) {
 		return searchScopeDelegate.queryAsProjections(
 				loadingContextBuilder,

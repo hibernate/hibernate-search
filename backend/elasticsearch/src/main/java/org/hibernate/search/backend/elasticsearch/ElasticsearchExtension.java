@@ -48,7 +48,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * all of its methods are considered SPIs and therefore should never be called directly by users.
  * In short, users are only expected to get instances of this type from an API and pass it to another API.
  *
- * @param <Q> The query type.
+ * @param <T> The type of query hits.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * @param <R> The reference type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
@@ -57,8 +57,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
  */
-public final class ElasticsearchExtension<Q, R, O>
-		implements SearchQueryContextExtension<ElasticsearchSearchQueryResultContext<Q>, Q>,
+public final class ElasticsearchExtension<T, R, O>
+		implements SearchQueryContextExtension<ElasticsearchSearchQueryResultContext<T>, T>,
 		SearchPredicateFactoryContextExtension<ElasticsearchSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<ElasticsearchSearchSortContainerContext>,
 		SearchProjectionFactoryContextExtension<ElasticsearchSearchProjectionFactoryContext<R, O>, R, O>,
@@ -68,7 +68,7 @@ public final class ElasticsearchExtension<Q, R, O>
 
 	private static final ElasticsearchExtension<Object, Object, Object> INSTANCE = new ElasticsearchExtension<>();
 
-	@SuppressWarnings("unchecked") // The instance works for any Q, R and O
+	@SuppressWarnings("unchecked") // The instance works for any T, R and O
 	public static <Q, R, O> ElasticsearchExtension<Q, R, O> get() {
 		return (ElasticsearchExtension<Q, R, O>) INSTANCE;
 	}
@@ -81,12 +81,13 @@ public final class ElasticsearchExtension<Q, R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchQueryResultContext<Q>> extendOptional(
-			SearchQueryContextImplementor<?, Q, ?, ?> original,
-			SearchQueryBuilder<?, ?> builder) {
+	@SuppressWarnings("unchecked") // Incorrect warning from IDEA. We do know the cast is safe inside the if() block.
+	public Optional<ElasticsearchSearchQueryResultContext<T>> extendOptional(
+			SearchQueryContextImplementor<?, T, ?, ?> original,
+			SearchQueryBuilder<T, ?> builder) {
 		if ( builder instanceof ElasticsearchSearchQueryBuilder ) {
 			return Optional.of( new ElasticsearchSearchQueryContextImpl<>(
-					original, (ElasticsearchSearchQueryBuilder<?>) builder
+					original, (ElasticsearchSearchQueryBuilder<T>) builder
 			) );
 		}
 		else {

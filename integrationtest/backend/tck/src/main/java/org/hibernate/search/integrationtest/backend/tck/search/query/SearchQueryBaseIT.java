@@ -185,34 +185,34 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class SupportedQueryDslExtension<Q> implements SearchQueryContextExtension<MyExtendedDslContext<Q>, Q> {
+	private static class SupportedQueryDslExtension<T> implements SearchQueryContextExtension<MyExtendedDslContext<T>, T> {
 		@Override
-		public Optional<MyExtendedDslContext<Q>> extendOptional(SearchQueryContextImplementor<?, Q, ?, ?> original,
-				SearchQueryBuilder<?, ?> searchQueryBuilder) {
+		public Optional<MyExtendedDslContext<T>> extendOptional(SearchQueryContextImplementor<?, T, ?, ?> original,
+				SearchQueryBuilder<T, ?> searchQueryBuilder) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( searchQueryBuilder ).isNotNull();
 			return Optional.of( new MyExtendedDslContext<>( original ) );
 		}
 	}
 
-	private static class UnSupportedQueryDslExtension<Q> implements SearchQueryContextExtension<MyExtendedDslContext<Q>, Q> {
+	private static class UnSupportedQueryDslExtension<T> implements SearchQueryContextExtension<MyExtendedDslContext<T>, T> {
 		@Override
-		public Optional<MyExtendedDslContext<Q>> extendOptional(SearchQueryContextImplementor<?, Q, ?, ?> original,
-				SearchQueryBuilder<?, ?> searchQueryBuilder) {
+		public Optional<MyExtendedDslContext<T>> extendOptional(SearchQueryContextImplementor<?, T, ?, ?> original,
+				SearchQueryBuilder<T, ?> searchQueryBuilder) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( searchQueryBuilder ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
-	private static class MyExtendedDslContext<Q> {
-		private final SearchQueryContextImplementor<?, Q, ?, ?> delegate;
+	private static class MyExtendedDslContext<T> {
+		private final SearchQueryContextImplementor<?, T, ?, ?> delegate;
 
-		MyExtendedDslContext(SearchQueryContextImplementor<?, Q, ?, ?> delegate) {
+		MyExtendedDslContext(SearchQueryContextImplementor<?, T, ?, ?> delegate) {
 			this.delegate = delegate;
 		}
 
-		public Q extendedFeature(String fieldName, String value1, String value2) {
+		public SearchQuery<T> extendedFeature(String fieldName, String value1, String value2) {
 			return delegate.predicate( f -> f.bool()
 					.should( f.match().onField( fieldName ).matching( value1 ) )
 					.should( f.match().onField( fieldName ).matching( value2 ) )

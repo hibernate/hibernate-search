@@ -22,14 +22,14 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
  * In short, users are only expected to get instances of this type from an API ({@code SomeExtension.get()})
  * and pass it to another API.
  *
- * @param <T> The type of extended search query contexts. Should generally extend
+ * @param <T2> The type of extended search query contexts. Should generally extend
  * {@link SearchQueryResultContext}.
- * @param <Q> The type of query returned by the original {@link SearchQueryResultContext}.
+ * @param <T> The type of hits for the created query.
  *
  * @see SearchQueryResultContext#extension(SearchQueryContextExtension)
  * @see AbstractDelegatingSearchQueryContext
  */
-public interface SearchQueryContextExtension<T, Q> {
+public interface SearchQueryContextExtension<T2, T> {
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
@@ -38,10 +38,10 @@ public interface SearchQueryContextExtension<T, Q> {
 	 *
 	 * @param original The original, non-extended {@link SearchQueryResultContext}.
 	 * @param builder A {@link SearchQueryBuilder}.
-	 * @return An optional containing the extended search query context ({@link T}) in case
+	 * @return An optional containing the extended search query context ({@link T2}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchQueryContextImplementor<?, Q, ?, ?> original,
-			SearchQueryBuilder<?, ?> builder);
+	Optional<T2> extendOptional(SearchQueryContextImplementor<?, T, ?, ?> original,
+			SearchQueryBuilder<T, ?> builder);
 
 }

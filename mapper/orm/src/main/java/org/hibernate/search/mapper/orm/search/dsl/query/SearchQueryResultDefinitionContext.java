@@ -14,19 +14,18 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface SearchQueryResultDefinitionContext<O> {
 
-	SearchQueryResultContext<?, ? extends SearchQuery<O>, ?> asEntity();
+	SearchQueryResultContext<?, O, ?> asEntity();
 
-	<T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(
+	<T> SearchQueryResultContext<?, T, ?> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, O>, ? extends SearchProjectionTerminalContext<T>> projectionContributor);
 
-	<T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(SearchProjection<T> projection);
+	<T> SearchQueryResultContext<?, T, ?> asProjection(SearchProjection<T> projection);
 
-	SearchQueryResultContext<?, ? extends SearchQuery<List<?>>, ?> asProjections(SearchProjection<?>... projections);
+	SearchQueryResultContext<?, List<?>, ?> asProjections(SearchProjection<?>... projections);
 
 	/**
 	 * Set the JDBC fetch size for this query.

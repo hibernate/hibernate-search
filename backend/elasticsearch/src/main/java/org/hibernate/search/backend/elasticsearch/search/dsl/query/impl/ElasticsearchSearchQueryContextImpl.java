@@ -17,26 +17,26 @@ import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearch
 import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public class ElasticsearchSearchQueryContextImpl<Q>
+public class ElasticsearchSearchQueryContextImpl<T>
 		extends AbstractDelegatingSearchQueryContext<
-				ElasticsearchSearchQueryContext<Q>,
-				Q,
+				ElasticsearchSearchQueryContext<T>,
+				T,
 				ElasticsearchSearchPredicateFactoryContext,
 				ElasticsearchSearchSortContainerContext
 				>
-		implements ElasticsearchSearchQueryResultContext<Q>, ElasticsearchSearchQueryContext<Q> {
+		implements ElasticsearchSearchQueryResultContext<T>, ElasticsearchSearchQueryContext<T> {
 
 	// FIXME use the builder to make toQuery return an Elasticsearch-specific query type
-	private final ElasticsearchSearchQueryBuilder<?> builder;
+	private final ElasticsearchSearchQueryBuilder<T> builder;
 
-	public ElasticsearchSearchQueryContextImpl(SearchQueryContextImplementor<?, Q, ?, ?> original,
-			ElasticsearchSearchQueryBuilder<?> builder) {
+	public ElasticsearchSearchQueryContextImpl(SearchQueryContextImplementor<?, T, ?, ?> original,
+			ElasticsearchSearchQueryBuilder<T> builder) {
 		super( original );
 		this.builder = builder;
 	}
 
 	@Override
-	protected ElasticsearchSearchQueryContextImpl<Q> thisAsS() {
+	protected ElasticsearchSearchQueryContextImpl<T> thisAsS() {
 		return this;
 	}
 

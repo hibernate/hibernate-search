@@ -16,7 +16,6 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
@@ -61,7 +60,7 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> queryAsLoadedObject(
+	public <T> SearchQueryResultContext<?, T, ?> queryAsLoadedObject(
 			LoadingContextBuilder<PojoReference, T> loadingContextBuilder) {
 		return getDelegate().queryAsLoadedObject(
 				sessionContext, loadingContextBuilder
@@ -69,7 +68,7 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public SearchQueryResultContext<?, ? extends SearchQuery<PojoReference>, ?> queryAsReference(
+	public SearchQueryResultContext<?, PojoReference, ?> queryAsReference(
 			LoadingContextBuilder<PojoReference, ?> loadingContextBuilder) {
 		return getDelegate().queryAsReference(
 				sessionContext, loadingContextBuilder
@@ -77,7 +76,7 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> queryAsProjection(LoadingContextBuilder<PojoReference, O> loadingContextBuilder,
+	public <T> SearchQueryResultContext<?, T, ?> queryAsProjection(LoadingContextBuilder<PojoReference, O> loadingContextBuilder,
 			SearchProjection<T> projection) {
 		return getDelegate().queryAsProjection(
 				sessionContext, loadingContextBuilder,
@@ -86,7 +85,7 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public SearchQueryResultContext<?, ? extends SearchQuery<List<?>>, ?> queryAsProjections(LoadingContextBuilder<PojoReference, O> loadingContextBuilder,
+	public SearchQueryResultContext<?, List<?>, ?> queryAsProjections(LoadingContextBuilder<PojoReference, O> loadingContextBuilder,
 			SearchProjection<?>... projections) {
 		return getDelegate().queryAsProjections(
 				sessionContext, loadingContextBuilder,

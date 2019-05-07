@@ -15,7 +15,6 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.javabean.search.SearchScope;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface SearchQueryResultDefinitionContext {
@@ -26,7 +25,7 @@ public interface SearchQueryResultDefinitionContext {
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	SearchQueryResultContext<?, ? extends SearchQuery<PojoReference>, ?> asReference();
+	SearchQueryResultContext<?, PojoReference, ?> asReference();
 
 	/**
 	 * Define the query results as one projection for each matching document.
@@ -38,7 +37,7 @@ public interface SearchQueryResultDefinitionContext {
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	<T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(
+	<T> SearchQueryResultContext<?, T, ?> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, ?>, ? extends SearchProjectionTerminalContext<T>> projectionContributor);
 
 	/**
@@ -49,7 +48,7 @@ public interface SearchQueryResultDefinitionContext {
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	<T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> asProjection(SearchProjection<T> projection);
+	<T> SearchQueryResultContext<?, T, ?> asProjection(SearchProjection<T> projection);
 
 	/**
 	 * Define the query results as a list of projections for each matching document.
@@ -64,5 +63,5 @@ public interface SearchQueryResultDefinitionContext {
 	 * @see SearchProjectionFactoryContext#composite(BiFunction, SearchProjection, SearchProjection)
 	 * @see SearchQueryResultContext
 	 */
-	SearchQueryResultContext<?, ? extends SearchQuery<List<?>>, ?> asProjections(SearchProjection<?>... projections);
+	SearchQueryResultContext<?, List<?>, ?> asProjections(SearchProjection<?>... projections);
 }

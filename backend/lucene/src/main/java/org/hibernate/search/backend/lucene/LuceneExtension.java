@@ -48,7 +48,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * all of its methods are considered SPIs and therefore should never be called directly by users.
  * In short, users are only expected to get instances of this type from an API and pass it to another API.
  *
- * @param <Q> The query type.
+ * @param <T> The type of query hits.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( LuceneExtension.get() }.
  * @param <R> The reference type for projections.
@@ -58,8 +58,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( LuceneExtension.get() }.
  */
-public final class LuceneExtension<Q, R, O>
-		implements SearchQueryContextExtension<LuceneSearchQueryResultContext<Q>, Q>,
+public final class LuceneExtension<T, R, O>
+		implements SearchQueryContextExtension<LuceneSearchQueryResultContext<T>, T>,
 		SearchPredicateFactoryContextExtension<LuceneSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<LuceneSearchSortContainerContext>,
 		SearchProjectionFactoryContextExtension<LuceneSearchProjectionFactoryContext<R, O>, R, O>,
@@ -69,7 +69,7 @@ public final class LuceneExtension<Q, R, O>
 
 	private static final LuceneExtension<Object, Object, Object> INSTANCE = new LuceneExtension<>();
 
-	@SuppressWarnings("unchecked") // The instance works for any Q, R and O
+	@SuppressWarnings("unchecked") // The instance works for any T, R and O
 	public static <Q, R, O> LuceneExtension<Q, R, O> get() {
 		return (LuceneExtension<Q, R, O>) INSTANCE;
 	}
@@ -82,12 +82,13 @@ public final class LuceneExtension<Q, R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchQueryResultContext<Q>> extendOptional(
-			SearchQueryContextImplementor<?, Q, ?, ?> original,
-			SearchQueryBuilder<?, ?> builder) {
+	@SuppressWarnings("unchecked") // Incorrect warning from IDEA. We do know the cast is safe inside the if() block.
+	public Optional<LuceneSearchQueryResultContext<T>> extendOptional(
+			SearchQueryContextImplementor<?, T, ?, ?> original,
+			SearchQueryBuilder<T, ?> builder) {
 		if ( builder instanceof LuceneSearchQueryBuilder ) {
 			return Optional.of( new LuceneSearchQueryContextImpl<>(
-					original, (LuceneSearchQueryBuilder<?>) builder
+					original, (LuceneSearchQueryBuilder<T>) builder
 			) );
 		}
 		else {

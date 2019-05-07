@@ -12,17 +12,18 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.query.SearchQuery;
 
 /**
  * The context used when building a query, after the search predicate has been defined.
  *
  * @param <S> The type actually exposed to the user for this context (may be a subtype of SearchQueryContext, with more exposed methods).
- * @param <Q> The type of the created query.
+ * @param <T> The type of hits for the created query.
  * @param <SC> The type of contexts used to create sorts in {@link #sort(Consumer)}.
  */
 public interface SearchQueryContext<
-		S extends SearchQueryContext<? extends S, Q, SC>,
-		Q,
+		S extends SearchQueryContext<? extends S, T, SC>,
+		T,
 		SC extends SearchSortContainerContext
 		> {
 
@@ -34,6 +35,6 @@ public interface SearchQueryContext<
 
 	S sort(Consumer<? super SC> sortContributor);
 
-	Q toQuery();
+	SearchQuery<T> toQuery();
 
 }

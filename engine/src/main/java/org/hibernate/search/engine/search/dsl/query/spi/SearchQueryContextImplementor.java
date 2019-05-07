@@ -12,10 +12,10 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 public interface SearchQueryContextImplementor<
-		N extends SearchQueryContext<N, Q, SC>,
-		Q,
+		N extends SearchQueryContext<N, T, SC>,
+		T,
 		PC extends SearchPredicateFactoryContext,
 		SC extends SearchSortContainerContext
 		>
-		extends SearchQueryResultContext<N, Q, PC>, SearchQueryContext<N, Q, SC> {
+		extends SearchQueryResultContext<N, T, PC>, SearchQueryContext<N, T, SC> {
 }

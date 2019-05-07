@@ -12,7 +12,6 @@ import java.util.Set;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
@@ -30,17 +29,17 @@ public interface PojoSearchScopeDelegate<E, O> {
 
 	PojoReference toPojoReference(DocumentReference documentReference);
 
-	<T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> queryAsLoadedObject(
+	<T> SearchQueryResultContext<?, T, ?> queryAsLoadedObject(
 			LoadingContextBuilder<PojoReference, T> loadingContextBuilder);
 
-	SearchQueryResultContext<?, ? extends SearchQuery<PojoReference>, ?> queryAsReference(
+	SearchQueryResultContext<?, PojoReference, ?> queryAsReference(
 			LoadingContextBuilder<PojoReference, ?> loadingContextBuilder);
 
-	<T> SearchQueryResultContext<?, ? extends SearchQuery<T>, ?> queryAsProjection(
+	<T> SearchQueryResultContext<?, T, ?> queryAsProjection(
 			LoadingContextBuilder<PojoReference, O> loadingContextBuilder,
 			SearchProjection<T> projection);
 
-	SearchQueryResultContext<?, ? extends SearchQuery<List<?>>, ?> queryAsProjections(
+	SearchQueryResultContext<?, List<?>, ?> queryAsProjections(
 			LoadingContextBuilder<PojoReference, O> loadingContextBuilder,
 			SearchProjection<?>... projections);
 

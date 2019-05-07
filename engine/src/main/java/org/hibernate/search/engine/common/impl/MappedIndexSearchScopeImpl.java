@@ -13,7 +13,6 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.query.impl.DefaultSearchQueryContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
@@ -42,7 +41,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<?, SearchQuery<T>, ?> queryAsLoadedObject(SessionContextImplementor sessionContext,
+	public <T> SearchQueryResultContext<?, T, ?> queryAsLoadedObject(SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, T> loadingContextBuilder) {
 		SearchQueryBuilder<T, C> builder = delegate.getSearchQueryBuilderFactory()
 				.asObject( sessionContext, loadingContextBuilder );
@@ -53,7 +52,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public SearchQueryResultContext<?, SearchQuery<R>, ?> queryAsReference(SessionContextImplementor sessionContext,
+	public SearchQueryResultContext<?, R, ?> queryAsReference(SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		SearchQueryBuilder<R, C> builder = delegate.getSearchQueryBuilderFactory()
 				.asReference( sessionContext, loadingContextBuilder );
@@ -64,7 +63,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<?, SearchQuery<T>, ?> queryAsProjection(SessionContextImplementor sessionContext,
+	public <T> SearchQueryResultContext<?, T, ?> queryAsProjection(SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, O> loadingContextBuilder,
 			SearchProjection<T> projection) {
 		SearchQueryBuilder<T, C> builder = delegate.getSearchQueryBuilderFactory()
@@ -76,7 +75,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public SearchQueryResultContext<?, SearchQuery<List<?>>, ?> queryAsProjections(
+	public SearchQueryResultContext<?, List<?>, ?> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, O> loadingContextBuilder,
 			SearchProjection<?>... projections) {

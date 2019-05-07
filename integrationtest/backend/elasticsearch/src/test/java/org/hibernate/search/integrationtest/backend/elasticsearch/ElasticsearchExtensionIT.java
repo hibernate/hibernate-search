@@ -87,14 +87,14 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		ElasticsearchSearchQueryResultContext<SearchQuery<DocumentReference>> context1 = scope.query()
+		ElasticsearchSearchQueryResultContext<DocumentReference> context1 = scope.query()
 				.asReference()
 				.extension( ElasticsearchExtension.get() );
 		// Note we can use Elasticsearch-specific predicates immediately
-		ElasticsearchSearchQueryContext<SearchQuery<DocumentReference>> context2 =
+		ElasticsearchSearchQueryContext<DocumentReference> context2 =
 				context1.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
 		// Note we can use Elasticsearch-specific sorts immediately
-		ElasticsearchSearchQueryContext<SearchQuery<DocumentReference>> context3 =
+		ElasticsearchSearchQueryContext<DocumentReference> context3 =
 				context2.sort( c -> c.fromJson( "{'sort1': 'asc'}" ) );
 		SearchQuery<DocumentReference> query = context3.toQuery();
 
