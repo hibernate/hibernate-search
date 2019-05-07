@@ -13,6 +13,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * The context used when building a query, after the search result type has been defined.
@@ -80,5 +81,16 @@ public interface SearchQueryResultDefinitionContext<R, O, PC extends SearchProje
 	 * @see SearchQueryResultContext
 	 */
 	SearchQueryResultContext<?, List<?>, ?> asProjections(SearchProjection<?>... projections);
+
+	/**
+	 * Extend the current context with the given extension,
+	 * resulting in an extended context offering more query options.
+	 *
+	 * @param extension The extension to the predicate DSL.
+	 * @param <T> The type of context provided by the extension.
+	 * @return The extended context.
+	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
+	 */
+	<T> T extension(SearchQueryContextExtension<T, R, O> extension);
 
 }

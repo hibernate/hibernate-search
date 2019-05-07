@@ -13,11 +13,11 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearchPredicateFactoryContextImpl;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
 import org.hibernate.search.backend.lucene.search.dsl.projection.impl.LuceneSearchProjectionFactoryContextImpl;
-import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
-import org.hibernate.search.backend.lucene.search.dsl.query.impl.LuceneSearchQueryContextImpl;
+import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultDefinitionContext;
+import org.hibernate.search.backend.lucene.search.dsl.query.impl.LuceneSearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneIndexSearchScope;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
@@ -27,21 +27,23 @@ import org.hibernate.search.backend.lucene.search.dsl.sort.impl.LuceneSearchSort
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
-import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
+import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
-import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -63,7 +65,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * {@code .extension( LuceneExtension.get() }.
  */
 public final class LuceneExtension<T, R, O>
-		implements SearchQueryContextExtension<LuceneSearchQueryResultContext<T>, T>,
+		implements SearchQueryContextExtension<LuceneSearchQueryResultDefinitionContext<R, O>, R, O>,
 		SearchQueryExtension<LuceneSearchQuery<T>, T>,
 		SearchPredicateFactoryContextExtension<LuceneSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<LuceneSearchSortContainerContext>,
@@ -87,13 +89,14 @@ public final class LuceneExtension<T, R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked") // Incorrect warning from IDEA. We do know the cast is safe inside the if() block.
-	public Optional<LuceneSearchQueryResultContext<T>> extendOptional(
-			SearchQueryContextImplementor<?, T, ?, ?> original,
-			SearchQueryBuilder<T, ?> builder) {
-		if ( builder instanceof LuceneSearchQueryBuilder ) {
-			return Optional.of( new LuceneSearchQueryContextImpl<>(
-					original, (LuceneSearchQueryBuilder<T>) builder
+	public Optional<LuceneSearchQueryResultDefinitionContext<R, O>> extendOptional(
+			SearchQueryResultDefinitionContext<R, O, ?> original,
+			IndexSearchScope<?> indexSearchScope,
+			SessionContextImplementor sessionContext,
+			LoadingContextBuilder<R, O> loadingContextBuilder) {
+		if ( indexSearchScope instanceof LuceneIndexSearchScope ) {
+			return Optional.of( new LuceneSearchQueryResultDefinitionContextImpl<>(
+					(LuceneIndexSearchScope) indexSearchScope, sessionContext, loadingContextBuilder
 			) );
 		}
 		else {

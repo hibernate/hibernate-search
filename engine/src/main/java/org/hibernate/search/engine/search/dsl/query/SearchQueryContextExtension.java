@@ -9,9 +9,10 @@ package org.hibernate.search.engine.search.dsl.query;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
-import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
+import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 /**
 
@@ -22,14 +23,18 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
  * In short, users are only expected to get instances of this type from an API ({@code SomeExtension.get()})
  * and pass it to another API.
  *
- * @param <T2> The type of extended search query contexts. Should generally extend
- * {@link SearchQueryResultContext}.
- * @param <T> The type of hits for the created query.
+ * @param <T> The type of extended search query contexts. Should generally extend
+ * {@link SearchQueryResultDefinitionContext}.
+ * @param <R> The reference type.
+ * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+ * {@code .extension( ElasticsearchExtension.get() }.
+ * @param <O> The loaded object type.
+ * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  *
- * @see SearchQueryResultContext#extension(SearchQueryContextExtension)
- * @see AbstractDelegatingSearchQueryContext
+ * @see SearchQueryResultDefinitionContext#extension(SearchQueryContextExtension)
+ * @see AbstractSearchQueryContext
  */
-public interface SearchQueryContextExtension<T2, T> {
+public interface SearchQueryContextExtension<T, R, O> {
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
@@ -37,11 +42,15 @@ public interface SearchQueryContextExtension<T2, T> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link SearchQueryResultContext}.
-	 * @param builder A {@link SearchQueryBuilder}.
-	 * @return An optional containing the extended search query context ({@link T2}) in case
+	 * @param indexSearchScope An {@link IndexSearchScope}.
+	 * @param sessionContext A {@link SessionContextImplementor}.
+	 * @param loadingContextBuilder A {@link LoadingContextBuilder}.
+	 * @return An optional containing the extended search query context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T2> extendOptional(SearchQueryContextImplementor<?, T, ?, ?> original,
-			SearchQueryBuilder<T, ?> builder);
+	Optional<T> extendOptional(SearchQueryResultDefinitionContext<R, O, ?> original,
+			IndexSearchScope<?> indexSearchScope,
+			SessionContextImplementor sessionContext,
+			LoadingContextBuilder<R, O> loadingContextBuilder);
 
 }

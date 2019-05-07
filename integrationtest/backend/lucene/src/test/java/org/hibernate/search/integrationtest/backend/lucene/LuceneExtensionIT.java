@@ -35,6 +35,7 @@ import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
+import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultDefinitionContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
@@ -47,6 +48,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -102,27 +104,45 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
+	@SuppressWarnings("unused")
 	public void queryContext() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		LuceneSearchQueryResultContext<DocumentReference> context1 = scope.query()
-				.asReference()
-				.extension( LuceneExtension.get() );
+		LuceneSearchQueryResultDefinitionContext<DocumentReference, DocumentReference> context1 =
+				scope.query().extension( LuceneExtension.get() );
+		LuceneSearchQueryResultContext<DocumentReference> context2 = context1.asProjection(
+				f -> f.composite(
+						// We don't care about the document, it's just to test that the factory context allows Lucene-specific projection
+						(docRef, document) -> docRef,
+						f.documentReference(), f.document()
+				)
+		);
 		// Note we can use Lucene-specific predicates immediately
-		LuceneSearchQueryContext<DocumentReference> context2 =
-				context1.predicate( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
-		// Note we can use Lucene-specific sorts immediately
 		LuceneSearchQueryContext<DocumentReference> context3 =
-				context2.sort( c -> c.fromLuceneSortField( new SortField( "sort1", Type.STRING ) ) );
+				context2.predicate( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
+		// Note we can use Lucene-specific sorts immediately
+		LuceneSearchQueryContext<DocumentReference> context4 =
+				context3.sort( c -> c.fromLuceneSortField( new SortField( "sort1", Type.STRING ) ) );
 
 		// Put the query and result into variables to check they have the right type
-		LuceneSearchQuery<DocumentReference> query = context3.toQuery();
+		LuceneSearchQuery<DocumentReference> query = context4.toQuery();
 		LuceneSearchResult<DocumentReference> result = query.fetch();
 
 		assertThat( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
 				.hasTotalHitCount( 5 );
+
+		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
+		LuceneSearchQueryResultContext<DocumentReference> asReferenceContext =
+				scope.query().extension( LuceneExtension.get() ).asReference();
+		LuceneSearchQueryResultContext<DocumentReference> asEntityContext =
+				scope.query().extension( LuceneExtension.get() ).asEntity();
+		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();
+		LuceneSearchQueryResultContext<DocumentReference> asProjectionContext =
+				scope.query().extension( LuceneExtension.get() ).asProjection( projection );
+		LuceneSearchQueryResultContext<List<?>> asProjectionsContext =
+				scope.query().extension( LuceneExtension.get() ).asProjections( projection, projection );
 	}
 
 	@Test
