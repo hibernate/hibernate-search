@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearchQueryContext;
@@ -26,13 +27,17 @@ public class ElasticsearchSearchQueryContextImpl<T>
 				>
 		implements ElasticsearchSearchQueryResultContext<T>, ElasticsearchSearchQueryContext<T> {
 
-	// FIXME use the builder to make toQuery return an Elasticsearch-specific query type
 	private final ElasticsearchSearchQueryBuilder<T> builder;
 
 	public ElasticsearchSearchQueryContextImpl(SearchQueryContextImplementor<?, T, ?, ?> original,
 			ElasticsearchSearchQueryBuilder<T> builder) {
 		super( original );
 		this.builder = builder;
+	}
+
+	@Override
+	public ElasticsearchSearchQuery<T> toQuery() {
+		return builder.build();
 	}
 
 	@Override

@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
@@ -19,9 +21,7 @@ import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
-import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.common.impl.Futures;
 
 import com.google.gson.JsonObject;
@@ -30,8 +30,8 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchSearchQuery<T> extends AbstractSearchQuery<T, SearchResult<T>>
-		implements SearchQuery<T> {
+public class ElasticsearchSearchQueryImpl<T> extends AbstractSearchQuery<T, ElasticsearchSearchResult<T>>
+		implements ElasticsearchSearchQuery<T> {
 
 	/**
 	 * ES default limit for (limit + offset); any search query beyond that limit will be rejected.
@@ -47,7 +47,7 @@ public class ElasticsearchSearchQuery<T> extends AbstractSearchQuery<T, SearchRe
 	private final JsonObject payload;
 	private final ElasticsearchSearchResultExtractor<T> searchResultExtractor;
 
-	ElasticsearchSearchQuery(ElasticsearchWorkBuilderFactory workFactory,
+	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
@@ -82,7 +82,7 @@ public class ElasticsearchSearchQuery<T> extends AbstractSearchQuery<T, SearchRe
 	}
 
 	@Override
-	public SearchResult<T> fetch(Long limit, Long offset) {
+	public ElasticsearchSearchResult<T> fetch(Long limit, Long offset) {
 		// TODO restore scrolling support. See HSEARCH-3323
 		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( indexNames )
