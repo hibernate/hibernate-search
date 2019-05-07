@@ -11,8 +11,8 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.mapper.orm.search.SearchScope;
-import org.hibernate.search.mapper.orm.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.orm.search.dsl.query.impl.SearchQueryResultDefinitionContextImpl;
+import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.dsl.query.impl.HibernateOrmSearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
@@ -28,8 +28,8 @@ public class SearchScopeImpl<O> implements SearchScope<O> {
 	}
 
 	@Override
-	public SearchQueryResultDefinitionContext<O> search() {
-		return new SearchQueryResultDefinitionContextImpl<>( delegate, sessionImplementor );
+	public HibernateOrmSearchQueryResultDefinitionContext<O> search() {
+		return new HibernateOrmSearchQueryResultDefinitionContextImpl<>( delegate, sessionImplementor );
 	}
 
 	@Override
