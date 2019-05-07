@@ -101,14 +101,14 @@ public class LuceneExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		LuceneSearchQueryResultContext<SearchQuery<DocumentReference>> context1 = scope.query()
+		LuceneSearchQueryResultContext<DocumentReference> context1 = scope.query()
 				.asReference()
 				.extension( LuceneExtension.get() );
 		// Note we can use Lucene-specific predicates immediately
-		LuceneSearchQueryContext<SearchQuery<DocumentReference>> context2 =
+		LuceneSearchQueryContext<DocumentReference> context2 =
 				context1.predicate( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
 		// Note we can use Lucene-specific sorts immediately
-		LuceneSearchQueryContext<SearchQuery<DocumentReference>> context3 =
+		LuceneSearchQueryContext<DocumentReference> context3 =
 				context2.sort( c -> c.fromLuceneSortField( new SortField( "sort1", Type.STRING ) ) );
 		SearchQuery<DocumentReference> query = context3.toQuery();
 

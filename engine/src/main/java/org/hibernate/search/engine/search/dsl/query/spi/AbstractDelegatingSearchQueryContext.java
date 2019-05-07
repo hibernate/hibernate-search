@@ -17,18 +17,19 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.query.SearchQuery;
 
 public abstract class AbstractDelegatingSearchQueryContext<
-		S extends SearchQueryContext<S, Q, SC>,
-		Q,
+		S extends SearchQueryContext<S, T, SC>,
+		T,
 		PC extends SearchPredicateFactoryContext,
 		SC extends SearchSortContainerContext
 		>
-		implements SearchQueryContextImplementor<S, Q, PC, SC> {
+		implements SearchQueryContextImplementor<S, T, PC, SC> {
 
-	private final SearchQueryContextImplementor<?, Q, ?, ?> delegate;
+	private final SearchQueryContextImplementor<?, T, ?, ?> delegate;
 
-	public AbstractDelegatingSearchQueryContext(SearchQueryContextImplementor<?, Q, ?, ?> delegate) {
+	public AbstractDelegatingSearchQueryContext(SearchQueryContextImplementor<?, T, ?, ?> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -45,7 +46,7 @@ public abstract class AbstractDelegatingSearchQueryContext<
 	}
 
 	@Override
-	public <T> T extension(SearchQueryContextExtension<T, Q> extension) {
+	public <T2> T2 extension(SearchQueryContextExtension<T2, T> extension) {
 		return delegate.extension( extension );
 	}
 
@@ -74,7 +75,7 @@ public abstract class AbstractDelegatingSearchQueryContext<
 	}
 
 	@Override
-	public Q toQuery() {
+	public SearchQuery<T> toQuery() {
 		return delegate.toQuery();
 	}
 

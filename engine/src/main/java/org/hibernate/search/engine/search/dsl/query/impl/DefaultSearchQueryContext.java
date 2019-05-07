@@ -31,7 +31,7 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 public final class DefaultSearchQueryContext<T, C>
 		implements SearchQueryContextImplementor<
 				DefaultSearchQueryContext<T, C>,
-				SearchQuery<T>,
+				T,
 				SearchPredicateFactoryContext,
 				SearchSortContainerContext
 				> {
@@ -62,7 +62,7 @@ public final class DefaultSearchQueryContext<T, C>
 	}
 
 	@Override
-	public <T2> T2 extension(SearchQueryContextExtension<T2, SearchQuery<T>> extension) {
+	public <T2> T2 extension(SearchQueryContextExtension<T2, T> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, searchQueryBuilder )
 		);

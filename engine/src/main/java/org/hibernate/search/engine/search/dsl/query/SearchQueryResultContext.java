@@ -17,12 +17,12 @@ import org.hibernate.search.util.common.SearchException;
  * The context used when building a query, after the search result type has been defined.
  *
  * @param <N> The type of the next context, returned after a predicate is defined.
- * @param <Q> The type of the created query.
+ * @param <T> The type of hits for the created query.
  * @param <PC> The type of contexts used to create predicates in {@link #predicate(Function)}.
  */
 public interface SearchQueryResultContext<
-		N extends SearchQueryContext<? extends N, Q, ?>,
-		Q,
+		N extends SearchQueryContext<? extends N, T, ?>,
+		T,
 		PC extends SearchPredicateFactoryContext
 		> {
 
@@ -47,10 +47,10 @@ public interface SearchQueryResultContext<
 	 * resulting in an extended context offering more query options.
 	 *
 	 * @param extension The extension to the predicate DSL.
-	 * @param <T> The type of context provided by the extension.
+	 * @param <T2> The type of context provided by the extension.
 	 * @return The extended context.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchQueryContextExtension<T, Q> extension);
+	<T2> T2 extension(SearchQueryContextExtension<T2, T> extension);
 
 }

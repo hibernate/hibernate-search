@@ -11,7 +11,6 @@ import java.util.List;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
@@ -28,11 +27,11 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
  */
 public interface MappedIndexSearchScope<R, O> {
 
-	<T> SearchQueryResultContext<?, SearchQuery<T>, ?> queryAsLoadedObject(
+	<T> SearchQueryResultContext<?, T, ?> queryAsLoadedObject(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, T> loadingContextBuilder);
 
-	SearchQueryResultContext<?, SearchQuery<R>, ?> queryAsReference(
+	SearchQueryResultContext<?, R, ?> queryAsReference(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, ?> loadingContextBuilder);
 
@@ -42,7 +41,7 @@ public interface MappedIndexSearchScope<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	<T> SearchQueryResultContext<?, SearchQuery<T>, ?> queryAsProjection(
+	<T> SearchQueryResultContext<?, T, ?> queryAsProjection(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, O> loadingContextBuilder,
 			SearchProjection<T> projection);
@@ -53,7 +52,7 @@ public interface MappedIndexSearchScope<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	SearchQueryResultContext<?, SearchQuery<List<?>>, ?> queryAsProjections(
+	SearchQueryResultContext<?, List<?>, ?> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, O> loadingContextBuilder,
 			SearchProjection<?>... projections);

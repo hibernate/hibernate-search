@@ -17,26 +17,26 @@ import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearch
 import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public class LuceneSearchQueryContextImpl<Q>
+public class LuceneSearchQueryContextImpl<T>
 		extends AbstractDelegatingSearchQueryContext<
-				LuceneSearchQueryContext<Q>,
-				Q,
+				LuceneSearchQueryContext<T>,
+				T,
 				LuceneSearchPredicateFactoryContext,
 				LuceneSearchSortContainerContext
 				>
-		implements LuceneSearchQueryResultContext<Q>, LuceneSearchQueryContext<Q> {
+		implements LuceneSearchQueryResultContext<T>, LuceneSearchQueryContext<T> {
 
 	// FIXME use the builder to make toQuery return a Lucene-specific query type
-	private final LuceneSearchQueryBuilder<?> builder;
+	private final LuceneSearchQueryBuilder<T> builder;
 
-	public LuceneSearchQueryContextImpl(SearchQueryContextImplementor<?, Q, ?, ?> original,
-			LuceneSearchQueryBuilder<?> builder) {
+	public LuceneSearchQueryContextImpl(SearchQueryContextImplementor<?, T, ?, ?> original,
+			LuceneSearchQueryBuilder<T> builder) {
 		super( original );
 		this.builder = builder;
 	}
 
 	@Override
-	protected LuceneSearchQueryContextImpl<Q> thisAsS() {
+	protected LuceneSearchQueryContextImpl<T> thisAsS() {
 		return this;
 	}
 
