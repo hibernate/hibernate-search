@@ -80,7 +80,7 @@ public class LuceneExtensionIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private SearchIntegration integration;
-	private IndxMapping indexMapping;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -88,7 +88,7 @@ public class LuceneExtensionIT {
 		this.integration = setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexMapping = new IndxMapping( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -596,7 +596,7 @@ public class LuceneExtensionIT {
 		);
 	}
 
-	private static class IndxMapping {
+	private static class IndexMapping {
 		final IndexFieldReference<Integer> integer;
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<GeoPoint> geoPoint;
@@ -608,7 +608,7 @@ public class LuceneExtensionIT {
 		final IndexFieldReference<String> sort2;
 		final IndexFieldReference<String> sort3;
 
-		IndxMapping(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			integer = root.field(
 					"integer",
 					f -> f.asInteger().projectable( Projectable.YES )
