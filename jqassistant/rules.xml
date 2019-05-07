@@ -393,6 +393,7 @@
             This allows to more easily understand which module a given type comes from.
             Exceptions are allowed when:
             - the misnamed type is an anonymous type, a generated type or a test type;
+            - or the misnamed type is an inner/nested type named "Builder" and its parent type does use the module-specific keyword;
             - or the implemented type is in a util module,
             in which case the implemented interface may just be a detail.
         </description>
@@ -409,6 +410,11 @@
                 AND NOT misnamedType:Anonymous
                 AND NOT misnamedType:Generated
                 AND NOT misnamedType:Test
+                AND NOT (
+                        misnamedType.nameWithoutContainingTypeName = "Builder"
+                        AND misnamedType.name =~ ("^(Abstract)?\\Q" + misnamedTypeArtifact.moduleSpecificKeyword + "\\E.*")
+                )
+                AND NOT externalParentTypeArtifact.name STARTS WITH "hibernate-search-util-"
                 AND NOT externalParentTypeArtifact.name STARTS WITH "hibernate-search-util-"
             RETURN misnamedTypeArtifact.moduleSpecificKeyword, misnamedType, externalParentType
         ]]></cypher>
