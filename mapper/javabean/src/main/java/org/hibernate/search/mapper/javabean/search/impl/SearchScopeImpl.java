@@ -8,10 +8,10 @@ package org.hibernate.search.mapper.javabean.search.impl;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.mapper.javabean.search.SearchScope;
-import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanSearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.javabean.search.dsl.query.impl.JavaBeanSearchQueryResultDefinitionContextImpl;
+import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
@@ -24,8 +24,8 @@ public class SearchScopeImpl implements SearchScope {
 	}
 
 	@Override
-	public JavaBeanSearchQueryResultDefinitionContext<?> search() {
-		return new JavaBeanSearchQueryResultDefinitionContextImpl( delegate );
+	public SearchQueryResultDefinitionContext<PojoReference, ?, ?> search() {
+		return delegate.search( new JavaBeanLoadingContext.Builder( delegate ) );
 	}
 
 	@Override

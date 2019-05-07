@@ -10,9 +10,10 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.javabean.search.SearchScope;
-import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanSearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface SearchSession extends AutoCloseable {
 
@@ -31,9 +32,9 @@ public interface SearchSession extends AutoCloseable {
 	 * @param type An indexed type, or a supertype of all indexed types that will be targeted by the search query.
 	 * @return A context allowing to define the search query,
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
-	 * @see JavaBeanSearchQueryResultDefinitionContext
+	 * @see SearchQueryResultDefinitionContext
 	 */
-	default JavaBeanSearchQueryResultDefinitionContext<?> search(Class<?> type) {
+	default SearchQueryResultDefinitionContext<PojoReference, ?, ?> search(Class<?> type) {
 		return scope( type ).search();
 	}
 
@@ -45,9 +46,9 @@ public interface SearchSession extends AutoCloseable {
 	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the search query.
 	 * @return A context allowing to define the search query,
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
-	 * @see JavaBeanSearchQueryResultDefinitionContext
+	 * @see SearchQueryResultDefinitionContext
 	 */
-	default JavaBeanSearchQueryResultDefinitionContext<?> search(Collection<? extends Class<?>> types) {
+	default SearchQueryResultDefinitionContext<PojoReference, ?, ?> search(Collection<? extends Class<?>> types) {
 		return scope( types ).search();
 	}
 
