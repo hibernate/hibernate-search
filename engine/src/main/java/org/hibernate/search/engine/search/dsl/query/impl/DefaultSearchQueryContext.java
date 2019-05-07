@@ -28,7 +28,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 
-public final class DefaultSearchQueryContext<T, C>
+final class DefaultSearchQueryContext<T, C>
 		implements SearchQueryContextImplementor<
 				DefaultSearchQueryContext<T, C>,
 				T,
@@ -39,7 +39,7 @@ public final class DefaultSearchQueryContext<T, C>
 	private final IndexSearchScope<C> indexSearchScope;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
 
-	public DefaultSearchQueryContext(IndexSearchScope<C> indexSearchScope, SearchQueryBuilder<T, C> searchQueryBuilder) {
+	DefaultSearchQueryContext(IndexSearchScope<C> indexSearchScope, SearchQueryBuilder<T, C> searchQueryBuilder) {
 		this.indexSearchScope = indexSearchScope;
 		this.searchQueryBuilder = searchQueryBuilder;
 	}

@@ -8,15 +8,13 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
@@ -60,37 +58,9 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<?, T, ?> queryAsLoadedObject(
-			LoadingContextBuilder<PojoReference, T> loadingContextBuilder) {
-		return getDelegate().queryAsLoadedObject(
-				sessionContext, loadingContextBuilder
-		);
-	}
-
-	@Override
-	public SearchQueryResultContext<?, PojoReference, ?> queryAsReference(
-			LoadingContextBuilder<PojoReference, ?> loadingContextBuilder) {
-		return getDelegate().queryAsReference(
-				sessionContext, loadingContextBuilder
-		);
-	}
-
-	@Override
-	public <T> SearchQueryResultContext<?, T, ?> queryAsProjection(LoadingContextBuilder<PojoReference, O> loadingContextBuilder,
-			SearchProjection<T> projection) {
-		return getDelegate().queryAsProjection(
-				sessionContext, loadingContextBuilder,
-				projection
-		);
-	}
-
-	@Override
-	public SearchQueryResultContext<?, List<?>, ?> queryAsProjections(LoadingContextBuilder<PojoReference, O> loadingContextBuilder,
-			SearchProjection<?>... projections) {
-		return getDelegate().queryAsProjections(
-				sessionContext, loadingContextBuilder,
-				projections
-		);
+	public SearchQueryResultDefinitionContext<PojoReference, O, SearchProjectionFactoryContext<PojoReference, O>> search(
+			LoadingContextBuilder<PojoReference, O> loadingContextBuilder) {
+		return getDelegate().search( sessionContext, loadingContextBuilder );
 	}
 
 	@Override

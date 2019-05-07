@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -26,14 +27,14 @@ public class GenericStubMappingSearchScope<R, O> {
 		this.delegate = delegate;
 	}
 
-	public StubMappingQueryResultDefinitionContext<R, O> query(LoadingContext<R, O> loadingContext) {
+	public SearchQueryResultDefinitionContext<R, O, ?> query(LoadingContext<R, O> loadingContext) {
 		return query( new StubSessionContext(), loadingContext );
 	}
 
-	public StubMappingQueryResultDefinitionContext<R, O> query(StubSessionContext sessionContext,
+	public SearchQueryResultDefinitionContext<R, O, ?> query(StubSessionContext sessionContext,
 			LoadingContext<R, O> loadingContext) {
 		LoadingContextBuilder<R, O> loadingContextBuilder = () -> loadingContext;
-		return new StubMappingQueryResultDefinitionContext<>( delegate, sessionContext, loadingContextBuilder );
+		return delegate.search( sessionContext, loadingContextBuilder );
 	}
 
 	public SearchPredicateFactoryContext predicate() {
