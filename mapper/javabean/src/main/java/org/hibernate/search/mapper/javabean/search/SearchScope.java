@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
-import org.hibernate.search.mapper.javabean.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanSearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 /**
@@ -34,9 +34,9 @@ public interface SearchScope {
 	 *
 	 * @return A context allowing to define the search query,
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
-	 * @see SearchQueryResultDefinitionContext
+	 * @see JavaBeanSearchQueryResultDefinitionContext
 	 */
-	SearchQueryResultDefinitionContext search();
+	JavaBeanSearchQueryResultDefinitionContext<?> search();
 
 	/**
 	 * Initiate the building of a search predicate.
@@ -79,7 +79,7 @@ public interface SearchScope {
 	 * or a wider scope.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
-	 * since you can {@link SearchQueryResultDefinitionContext#asProjection(Function)} define projections with lambdas}
+	 * since you can {@link JavaBeanSearchQueryResultDefinitionContext#asProjection(Function)} define projections with lambdas}
 	 * within the search query DSL,
 	 * removing the need to create separate objects to represent the projections.
 	 *

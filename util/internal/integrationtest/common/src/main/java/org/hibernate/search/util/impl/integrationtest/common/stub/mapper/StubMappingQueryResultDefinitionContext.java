@@ -11,13 +11,15 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
-public final class StubMappingQueryResultDefinitionContext<R, O> {
+public final class StubMappingQueryResultDefinitionContext<R, O>
+		implements SearchQueryResultDefinitionContext<R, O, SearchProjectionFactoryContext<R, O>> {
 
 	private final MappedIndexSearchScope<R, O> searchScopeDelegate;
 	private final StubSessionContext sessionContext;
@@ -31,23 +33,27 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
-	public SearchQueryResultContext<?, O, ?> asObject() {
+	@Override
+	public SearchQueryResultContext<?, O, ?> asEntity() {
 		return searchScopeDelegate.queryAsLoadedObject(
 				sessionContext, loadingContextBuilder
 		);
 	}
 
+	@Override
 	public SearchQueryResultContext<?, R, ?> asReference() {
 		return searchScopeDelegate.queryAsReference(
 				sessionContext, loadingContextBuilder
 		);
 	}
 
+	@Override
 	public <P> SearchQueryResultContext<?, P, ?> asProjection(
-			Function<SearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
+			Function<? super SearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
 		return asProjection( projectionContributor.apply( searchScopeDelegate.projection() ).toProjection() );
 	}
 
+	@Override
 	public <P> SearchQueryResultContext<?, P, ?> asProjection(
 			SearchProjection<P> projection) {
 		return searchScopeDelegate.queryAsProjection(
@@ -56,6 +62,7 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 		);
 	}
 
+	@Override
 	public SearchQueryResultContext<?, List<?>, ?> asProjections(
 			SearchProjection<?>... projections) {
 		return searchScopeDelegate.queryAsProjections(

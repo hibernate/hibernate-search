@@ -15,7 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
 
 public interface SearchSession {
 
@@ -28,9 +28,9 @@ public interface SearchSession {
 	 * @param <T> An indexed type, or a supertype of all indexed types that will be targeted by the search query.
 	 * @return A context allowing to define the search query,
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
-	 * @see SearchQueryResultDefinitionContext
+	 * @see HibernateOrmSearchQueryResultDefinitionContext
 	 */
-	default <T> SearchQueryResultDefinitionContext<T> search(Class<T> type) {
+	default <T> HibernateOrmSearchQueryResultDefinitionContext<T> search(Class<T> type) {
 		return scope( type ).search();
 	}
 
@@ -43,9 +43,9 @@ public interface SearchSession {
 	 * @param <T> A supertype of all indexed types that will be targeted by the search query.
 	 * @return A context allowing to define the search query,
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
-	 * @see SearchQueryResultDefinitionContext
+	 * @see HibernateOrmSearchQueryResultDefinitionContext
 	 */
-	default <T> SearchQueryResultDefinitionContext<T> search(Collection<? extends Class<? extends T>> types) {
+	default <T> HibernateOrmSearchQueryResultDefinitionContext<T> search(Collection<? extends Class<? extends T>> types) {
 		return scope( types ).search();
 	}
 

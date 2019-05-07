@@ -15,19 +15,19 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
-import org.hibernate.search.mapper.orm.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.impl.ObjectLoaderBuilder;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
-public class SearchQueryResultDefinitionContextImpl<O>
-		implements SearchQueryResultDefinitionContext<O> {
+public class HibernateOrmSearchQueryResultDefinitionContextImpl<O>
+		implements HibernateOrmSearchQueryResultDefinitionContext<O> {
 	private final PojoSearchScopeDelegate<O, O> searchScopeDelegate;
 	private final HibernateOrmLoadingContext.Builder<O> loadingContextBuilder;
 	private final MutableObjectLoadingOptions loadingOptions;
 
-	public SearchQueryResultDefinitionContextImpl(
+	public HibernateOrmSearchQueryResultDefinitionContextImpl(
 			PojoSearchScopeDelegate<O, O> searchScopeDelegate,
 			SessionImplementor sessionImplementor) {
 		this.searchScopeDelegate = searchScopeDelegate;
@@ -42,6 +42,13 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	@Override
 	public SearchQueryResultContext<?, O, ?> asEntity() {
 		return searchScopeDelegate.queryAsLoadedObject(
+				loadingContextBuilder
+		);
+	}
+
+	@Override
+	public SearchQueryResultContext<?, PojoReference, ?> asReference() {
+		return searchScopeDelegate.queryAsReference(
 				loadingContextBuilder
 		);
 	}
@@ -70,7 +77,7 @@ public class SearchQueryResultDefinitionContextImpl<O>
 	}
 
 	@Override
-	public SearchQueryResultDefinitionContext<O> fetchSize(int fetchSize) {
+	public HibernateOrmSearchQueryResultDefinitionContext<O> fetchSize(int fetchSize) {
 		loadingOptions.setFetchSize( fetchSize );
 		return this;
 	}

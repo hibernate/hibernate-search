@@ -13,18 +13,23 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.mapper.javabean.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanSearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
-public class SearchQueryResultDefinitionContextImpl implements SearchQueryResultDefinitionContext {
+public class JavaBeanSearchQueryResultDefinitionContextImpl implements JavaBeanSearchQueryResultDefinitionContext<Void> {
 	private final PojoSearchScopeDelegate<?, Void> searchScopeDelegate;
 	private final JavaBeanLoadingContext.Builder loadingContextBuilder;
 
-	public SearchQueryResultDefinitionContextImpl(PojoSearchScopeDelegate<?, Void> searchScopeDelegate) {
+	public JavaBeanSearchQueryResultDefinitionContextImpl(PojoSearchScopeDelegate<?, Void> searchScopeDelegate) {
 		this.searchScopeDelegate = searchScopeDelegate;
 		this.loadingContextBuilder = new JavaBeanLoadingContext.Builder( searchScopeDelegate );
+	}
+
+	@Override
+	public SearchQueryResultContext<?, Void, ?> asEntity() {
+		return searchScopeDelegate.queryAsLoadedObject( loadingContextBuilder );
 	}
 
 	@Override
@@ -34,7 +39,7 @@ public class SearchQueryResultDefinitionContextImpl implements SearchQueryResult
 
 	@Override
 	public <T> SearchQueryResultContext<?, T, ?> asProjection(
-			Function<? super SearchProjectionFactoryContext<PojoReference, ?>, ? extends SearchProjectionTerminalContext<T>> projectionContributor) {
+			Function<? super SearchProjectionFactoryContext<PojoReference, Void>, ? extends SearchProjectionTerminalContext<T>> projectionContributor) {
 		return asProjection( projectionContributor.apply( searchScopeDelegate.projection() ).toProjection() );
 	}
 

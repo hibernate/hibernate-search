@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.javabean.search.dsl.query;
+package org.hibernate.search.engine.search.dsl.query;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -13,19 +13,35 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.mapper.javabean.search.SearchScope;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-public interface SearchQueryResultDefinitionContext {
+/**
+ * The context used when building a query, after the search result type has been defined.
+ *
+ * @param <R> The type of references, i.e. the type of hits returned by
+ * {@link #asReference() reference queries},
+ * or the type of objects returned for {@link SearchProjectionFactoryContext#reference() reference projections}.
+ * @param <O> The type of loaded objects, i.e. the type of hits returned by
+ * {@link #asEntity() entity queries},
+ * or the type of objects returned for {@link SearchProjectionFactoryContext#object() loaded object projections}.
+ * @param <PC> The type of contexts used to create projections in {@link #asProjection(Function)}.
+ */
+public interface SearchQueryResultDefinitionContext<R, O, PC extends SearchProjectionFactoryContext<R, O>> {
 
 	/**
-	 * Define the query results as one {@link PojoReference} for each matching document.
+	 * Define the query results as the entity was originally indexed, loaded from an external source (database, ...).
 	 *
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	SearchQueryResultContext<?, PojoReference, ?> asReference();
+	SearchQueryResultContext<?, O, ?> asEntity();
+
+	/**
+	 * Define the query results as a reference to entity that was originally indexed.
+	 *
+	 * @return A context allowing to define the query further.
+	 * @see SearchQueryResultContext
+	 */
+	SearchQueryResultContext<?, R, ?> asReference();
 
 	/**
 	 * Define the query results as one projection for each matching document.
@@ -33,22 +49,22 @@ public interface SearchQueryResultDefinitionContext {
 	 * @param projectionContributor A function that will use the DSL context passed in parameter to create a projection,
 	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
-	 * @param <T> The resulting type of the projection.
+	 * @param <P> The resulting type of the projection.
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	<T> SearchQueryResultContext<?, T, ?> asProjection(
-			Function<? super SearchProjectionFactoryContext<PojoReference, ?>, ? extends SearchProjectionTerminalContext<T>> projectionContributor);
+	<P> SearchQueryResultContext<?, P, ?> asProjection(
+			Function<? super PC, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
 
 	/**
 	 * Define the query results as one projection for each matching document.
 	 *
-	 * @param projection A {@link SearchProjection} object obtained from the {@link SearchScope}.
-	 * @param <T> The resulting type of the projection.
+	 * @param projection A previously-created {@link SearchProjection} object.
+	 * @param <P> The resulting type of the projection.
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	<T> SearchQueryResultContext<?, T, ?> asProjection(SearchProjection<T> projection);
+	<P> SearchQueryResultContext<?, P, ?> asProjection(SearchProjection<P> projection);
 
 	/**
 	 * Define the query results as a list of projections for each matching document.
@@ -58,10 +74,11 @@ public interface SearchQueryResultDefinitionContext {
 	 * You can replace calls to this method advantageously with calls to {@link #asProjection(Function)}
 	 * defining a {@link SearchProjectionFactoryContext#composite(BiFunction, SearchProjection, SearchProjection) composite projection}.
 	 *
-	 * @param projections A list of {@link SearchProjection} object obtained from the {@link SearchScope}.
+	 * @param projections A list of previously-created {@link SearchProjection} objects.
 	 * @return A context allowing to define the query further.
 	 * @see SearchProjectionFactoryContext#composite(BiFunction, SearchProjection, SearchProjection)
 	 * @see SearchQueryResultContext
 	 */
 	SearchQueryResultContext<?, List<?>, ?> asProjections(SearchProjection<?>... projections);
+
 }
