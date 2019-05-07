@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.search.dsl.projection.impl.LuceneSear
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.impl.LuceneSearchQueryContextImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
@@ -35,8 +36,11 @@ import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplem
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -60,6 +64,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public final class LuceneExtension<T, R, O>
 		implements SearchQueryContextExtension<LuceneSearchQueryResultContext<T>, T>,
+		SearchQueryExtension<LuceneSearchQuery<T>, T>,
 		SearchPredicateFactoryContextExtension<LuceneSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<LuceneSearchSortContainerContext>,
 		SearchProjectionFactoryContextExtension<LuceneSearchProjectionFactoryContext<R, O>, R, O>,
@@ -90,6 +95,20 @@ public final class LuceneExtension<T, R, O>
 			return Optional.of( new LuceneSearchQueryContextImpl<>(
 					original, (LuceneSearchQueryBuilder<T>) builder
 			) );
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<LuceneSearchQuery<T>> extendOptional(SearchQuery<T> original,
+			LoadingContext<?, ?> loadingContext) {
+		if ( original instanceof LuceneSearchQuery ) {
+			return Optional.of( (LuceneSearchQuery<T>) original );
 		}
 		else {
 			return Optional.empty();

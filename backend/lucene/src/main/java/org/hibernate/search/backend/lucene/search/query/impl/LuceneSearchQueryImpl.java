@@ -11,15 +11,15 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
-import org.hibernate.search.engine.search.query.SearchResult;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -28,8 +28,8 @@ import org.apache.lucene.search.Sort;
 /**
  * @author Guillaume Smet
  */
-public class LuceneSearchQuery<T> extends AbstractSearchQuery<T, SearchResult<T>>
-		implements SearchQuery<T> {
+public class LuceneSearchQueryImpl<T> extends AbstractSearchQuery<T, LuceneSearchResult<T>>
+		implements LuceneSearchQuery<T> {
 
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
@@ -42,7 +42,7 @@ public class LuceneSearchQuery<T> extends AbstractSearchQuery<T, SearchResult<T>
 	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final LuceneSearchResultExtractor<T> searchResultExtractor;
 
-	LuceneSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
+	LuceneSearchQueryImpl(LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
@@ -78,7 +78,7 @@ public class LuceneSearchQuery<T> extends AbstractSearchQuery<T, SearchResult<T>
 	}
 
 	@Override
-	public SearchResult<T> fetch(Long limit, Long offset) {
+	public LuceneSearchResult<T> fetch(Long limit, Long offset) {
 		LuceneQueryWork<LuceneLoadableSearchResult<T>> work = workFactory.search(
 				new LuceneSearcher<>(
 						indexNames,

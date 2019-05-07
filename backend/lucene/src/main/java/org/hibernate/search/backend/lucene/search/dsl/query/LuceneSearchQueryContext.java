@@ -7,11 +7,13 @@
 package org.hibernate.search.backend.lucene.search.dsl.query;
 
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 
 public interface LuceneSearchQueryContext<T>
 		extends SearchQueryContext<LuceneSearchQueryContext<T>, T, LuceneSearchSortContainerContext> {
 
-	// FIXME make toQuery return a Lucene-specific query type
+	@Override
+	LuceneSearchQuery<T> toQuery();
 
 }

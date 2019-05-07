@@ -15,11 +15,11 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
@@ -70,7 +70,7 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 	}
 
 	@Override
-	public SearchQuery<T> build() {
+	public LuceneSearchQuery<T> build() {
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
 		LuceneSearchResultExtractor<T> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
@@ -81,7 +81,7 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 		luceneQueryBuilder.add( elementCollector.toLuceneQueryPredicate(), Occur.MUST );
 		luceneQueryBuilder.add( LuceneQueries.mainDocumentQuery(), Occur.FILTER );
 
-		return new LuceneSearchQuery<>(
+		return new LuceneSearchQueryImpl<>(
 				queryOrchestrator, workFactory,
 				scopeModel.getIndexNames(), scopeModel.getReaderProviders(),
 				sessionContext,

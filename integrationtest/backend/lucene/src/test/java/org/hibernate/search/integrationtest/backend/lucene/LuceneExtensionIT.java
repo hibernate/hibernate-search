@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,8 @@ import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -44,6 +47,8 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -97,7 +102,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void query() {
+	public void queryContext() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Put intermediary contexts into variables to check they have the right type
@@ -110,11 +115,44 @@ public class LuceneExtensionIT {
 		// Note we can use Lucene-specific sorts immediately
 		LuceneSearchQueryContext<DocumentReference> context3 =
 				context2.sort( c -> c.fromLuceneSortField( new SortField( "sort1", Type.STRING ) ) );
-		SearchQuery<DocumentReference> query = context3.toQuery();
 
-		assertThat( query )
+		// Put the query and result into variables to check they have the right type
+		LuceneSearchQuery<DocumentReference> query = context3.toQuery();
+		LuceneSearchResult<DocumentReference> result = query.fetch();
+
+		assertThat( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
 				.hasTotalHitCount( 5 );
+	}
+
+	@Test
+	public void query() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		SearchQuery<DocumentReference> genericQuery = scope.query()
+				.asReference()
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+
+		// Put the query and result into variables to check they have the right type
+		LuceneSearchQuery<DocumentReference> query = genericQuery.extension( LuceneExtension.get() );
+		LuceneSearchResult<DocumentReference> result = query.fetch();
+		assertThat( result ).fromQuery( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
+				.hasTotalHitCount( 5 );
+
+		// Unsupported extension
+		SubTest.expectException(
+				() -> query.extension( new SearchQueryExtension<Void, DocumentReference>() {
+					@Override
+					public Optional<Void> extendOptional(SearchQuery<DocumentReference> original,
+							LoadingContext<?, ?> loadingContext) {
+						return Optional.empty();
+					}
+				} )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
