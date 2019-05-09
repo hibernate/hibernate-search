@@ -18,13 +18,13 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocument
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class LuceneCompositeListProjection<T> implements LuceneCompositeProjection<List<Object>, T> {
+public class LuceneCompositeListProjection<P> implements LuceneCompositeProjection<List<Object>, P> {
 
-	private final Function<List<?>, T> transformer;
+	private final Function<List<?>, P> transformer;
 
 	private final List<LuceneSearchProjection<?, ?>> children;
 
-	public LuceneCompositeListProjection(Function<List<?>, T> transformer,
+	public LuceneCompositeListProjection(Function<List<?>, P> transformer,
 			List<LuceneSearchProjection<?, ?>> children) {
 		this.transformer = transformer;
 		this.children = children;
@@ -57,7 +57,7 @@ public class LuceneCompositeListProjection<T> implements LuceneCompositeProjecti
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, List<Object> extractedData,
+	public P transform(LoadingResult<?> loadingResult, List<Object> extractedData,
 			SearchProjectionTransformContext context) {
 		for ( int i = 0; i < extractedData.size(); i++ ) {
 			extractedData.set( i, transformUnsafe( children.get( i ), loadingResult, extractedData.get( i ), context ) );

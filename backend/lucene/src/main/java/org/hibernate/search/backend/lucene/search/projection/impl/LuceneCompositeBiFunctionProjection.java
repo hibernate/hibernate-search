@@ -16,15 +16,15 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocument
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class LuceneCompositeBiFunctionProjection<P1, P2, T> implements LuceneCompositeProjection<Object[], T> {
+public class LuceneCompositeBiFunctionProjection<P1, P2, P> implements LuceneCompositeProjection<Object[], P> {
 
-	private final BiFunction<P1, P2, T> transformer;
+	private final BiFunction<P1, P2, P> transformer;
 
 	private final LuceneSearchProjection<?, P1> projection1;
 
 	private final LuceneSearchProjection<?, P2> projection2;
 
-	public LuceneCompositeBiFunctionProjection(BiFunction<P1, P2, T> transformer,
+	public LuceneCompositeBiFunctionProjection(BiFunction<P1, P2, P> transformer,
 			LuceneSearchProjection<?, P1> projection1, LuceneSearchProjection<?, P2> projection2) {
 		this.transformer = transformer;
 		this.projection1 = projection1;
@@ -53,7 +53,7 @@ public class LuceneCompositeBiFunctionProjection<P1, P2, T> implements LuceneCom
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object[] extractedData,
+	public P transform(LoadingResult<?> loadingResult, Object[] extractedData,
 			SearchProjectionTransformContext context) {
 		return transformer.apply(
 				transformUnsafe( projection1, loadingResult, extractedData[0], context ),

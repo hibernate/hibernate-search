@@ -11,15 +11,15 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
-public class LuceneFieldProjectionBuilder<F, T> implements FieldProjectionBuilder<T> {
+public class LuceneFieldProjectionBuilder<F, V> implements FieldProjectionBuilder<V> {
 
 	private final String absoluteFieldPath;
 
-	private final FromDocumentFieldValueConverter<? super F, T> converter;
+	private final FromDocumentFieldValueConverter<? super F, V> converter;
 	private final LuceneFieldCodec<F> codec;
 
 	public LuceneFieldProjectionBuilder(String absoluteFieldPath,
-			FromDocumentFieldValueConverter<? super F, T> converter,
+			FromDocumentFieldValueConverter<? super F, V> converter,
 			LuceneFieldCodec<F> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
@@ -27,7 +27,7 @@ public class LuceneFieldProjectionBuilder<F, T> implements FieldProjectionBuilde
 	}
 
 	@Override
-	public SearchProjection<T> build() {
+	public SearchProjection<V> build() {
 		return new LuceneFieldProjection<>( absoluteFieldPath, codec, converter );
 	}
 }

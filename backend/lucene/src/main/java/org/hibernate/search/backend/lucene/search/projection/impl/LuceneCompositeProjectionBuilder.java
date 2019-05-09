@@ -10,16 +10,16 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 
 
-class LuceneCompositeProjectionBuilder<T> implements CompositeProjectionBuilder<T> {
+class LuceneCompositeProjectionBuilder<P> implements CompositeProjectionBuilder<P> {
 
-	private final LuceneCompositeProjection<?, T> projection;
+	private final LuceneCompositeProjection<?, P> projection;
 
-	LuceneCompositeProjectionBuilder(LuceneCompositeProjection<?, T> projection) {
+	LuceneCompositeProjectionBuilder(LuceneCompositeProjection<?, P> projection) {
 		this.projection = projection;
 	}
 
 	@Override
-	public SearchProjection<T> build() {
+	public SearchProjection<P> build() {
 		return projection;
 	}
 }

@@ -91,7 +91,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public <T> CompositeProjectionBuilder<T> composite(Function<List<?>, T> transformer,
+	public <P> CompositeProjectionBuilder<P> composite(Function<List<?>, P> transformer,
 			SearchProjection<?>... projections) {
 		List<ElasticsearchSearchProjection<?, ?>> typedProjections = new ArrayList<>( projections.length );
 		for ( SearchProjection<?> projection : projections ) {
@@ -104,15 +104,15 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public <P, T> CompositeProjectionBuilder<T> composite(Function<P, T> transformer,
-			SearchProjection<P> projection) {
+	public <P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer,
+			SearchProjection<P1> projection) {
 		return new ElasticsearchCompositeProjectionBuilder<>(
 				new ElasticsearchCompositeFunctionProjection<>( transformer, toImplementation( projection ) )
 		);
 	}
 
 	@Override
-	public <P1, P2, T> CompositeProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
+	public <P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		return new ElasticsearchCompositeProjectionBuilder<>(
 				new ElasticsearchCompositeBiFunctionProjection<>( transformer, toImplementation( projection1 ),
@@ -121,7 +121,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public <P1, P2, P3, T> CompositeProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	public <P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		return new ElasticsearchCompositeProjectionBuilder<>(
 				new ElasticsearchCompositeTriFunctionProjection<>( transformer, toImplementation( projection1 ),

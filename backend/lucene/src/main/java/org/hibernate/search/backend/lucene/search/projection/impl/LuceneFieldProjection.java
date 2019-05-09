@@ -15,16 +15,16 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-class LuceneFieldProjection<F, T> implements LuceneSearchProjection<F, T> {
+class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 
 	private final String absoluteFieldPath;
 
 	private final LuceneFieldCodec<F> codec;
 
-	private final FromDocumentFieldValueConverter<? super F, T> converter;
+	private final FromDocumentFieldValueConverter<? super F, V> converter;
 
 	LuceneFieldProjection(String absoluteFieldPath, LuceneFieldCodec<F> codec,
-			FromDocumentFieldValueConverter<? super F, T> converter) {
+			FromDocumentFieldValueConverter<? super F, V> converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 		this.converter = converter;
@@ -47,7 +47,7 @@ class LuceneFieldProjection<F, T> implements LuceneSearchProjection<F, T> {
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, F extractedData,
+	public V transform(LoadingResult<?> loadingResult, F extractedData,
 			SearchProjectionTransformContext context) {
 		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
 		return converter.convert( extractedData, convertContext );

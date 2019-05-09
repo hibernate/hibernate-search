@@ -15,16 +15,16 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchCompositeBiFunctionProjection<P1, P2, T> implements
-		ElasticsearchCompositeProjection<Object[], T> {
+public class ElasticsearchCompositeBiFunctionProjection<P1, P2, P> implements
+		ElasticsearchCompositeProjection<Object[], P> {
 
-	private final BiFunction<P1, P2, T> transformer;
+	private final BiFunction<P1, P2, P> transformer;
 
 	private final ElasticsearchSearchProjection<?, P1> projection1;
 
 	private final ElasticsearchSearchProjection<?, P2> projection2;
 
-	public ElasticsearchCompositeBiFunctionProjection(BiFunction<P1, P2, T> transformer,
+	public ElasticsearchCompositeBiFunctionProjection(BiFunction<P1, P2, P> transformer,
 			ElasticsearchSearchProjection<?, P1> projection1, ElasticsearchSearchProjection<?, P2> projection2) {
 		this.transformer = transformer;
 		this.projection1 = projection1;
@@ -48,7 +48,7 @@ public class ElasticsearchCompositeBiFunctionProjection<P1, P2, T> implements
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object[] extractedData,
+	public P transform(LoadingResult<?> loadingResult, Object[] extractedData,
 			SearchProjectionTransformContext context) {
 		return transformer.apply(
 				transformUnsafe( projection1, loadingResult, extractedData[0], context ),

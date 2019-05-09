@@ -35,13 +35,13 @@ public interface SearchProjectionBuilderFactory {
 
 	DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center);
 
-	<T> CompositeProjectionBuilder<T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
+	<P> CompositeProjectionBuilder<P> composite(Function<List<?>, P> transformer, SearchProjection<?>... projections);
 
-	<P, T> CompositeProjectionBuilder<T> composite(Function<P, T> transformer, SearchProjection<P> projection);
+	<P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer, SearchProjection<P1> projection);
 
-	<P1, P2, T> CompositeProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
+	<P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2);
 
-	<P1, P2, P3, T> CompositeProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	<P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3);
 }

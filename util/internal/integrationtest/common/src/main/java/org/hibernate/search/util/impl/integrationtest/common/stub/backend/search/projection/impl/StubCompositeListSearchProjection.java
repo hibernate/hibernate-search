@@ -14,13 +14,13 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class StubCompositeListSearchProjection<T> implements StubCompositeSearchProjection<T> {
+public class StubCompositeListSearchProjection<P> implements StubCompositeSearchProjection<P> {
 
-	private final Function<List<?>, T> transformer;
+	private final Function<List<?>, P> transformer;
 
 	private final List<StubSearchProjection<?>> children;
 
-	public StubCompositeListSearchProjection(Function<List<?>, T> transformer,
+	public StubCompositeListSearchProjection(Function<List<?>, P> transformer,
 			List<StubSearchProjection<?>> children) {
 		this.transformer = transformer;
 		this.children = children;
@@ -41,7 +41,7 @@ public class StubCompositeListSearchProjection<T> implements StubCompositeSearch
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public P transform(LoadingResult<?> loadingResult, Object extractedData) {
 		List<Object> extractedElements = (List<Object>) extractedData;
 		List<Object> results = new ArrayList<>( extractedElements.size() );
 

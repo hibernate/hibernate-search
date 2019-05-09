@@ -12,15 +12,15 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
 
-public class ElasticsearchFieldProjectionBuilder<F, T> implements FieldProjectionBuilder<T> {
+public class ElasticsearchFieldProjectionBuilder<F, V> implements FieldProjectionBuilder<V> {
 
 	private final String absoluteFieldPath;
 
-	private final FromDocumentFieldValueConverter<? super F, T> converter;
+	private final FromDocumentFieldValueConverter<? super F, V> converter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchFieldProjectionBuilder(String absoluteFieldPath,
-			FromDocumentFieldValueConverter<? super F, T> converter,
+			FromDocumentFieldValueConverter<? super F, V> converter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
@@ -28,7 +28,7 @@ public class ElasticsearchFieldProjectionBuilder<F, T> implements FieldProjectio
 	}
 
 	@Override
-	public SearchProjection<T> build() {
+	public SearchProjection<V> build() {
 		return new ElasticsearchFieldProjection<>( absoluteFieldPath, converter, codec );
 	}
 }
