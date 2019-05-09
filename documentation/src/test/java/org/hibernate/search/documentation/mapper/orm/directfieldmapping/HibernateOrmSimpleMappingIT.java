@@ -160,7 +160,7 @@ public class HibernateOrmSimpleMappingIT {
 			SearchQuery<MyEntityAndScoreBean<Book>> query = searchSession.search( Book.class )
 					.asProjection( f -> f.composite(
 							MyEntityAndScoreBean::new,
-							f.object(),
+							f.entity(),
 							f.score()
 					) )
 					.predicate( f -> f.matchAll() )

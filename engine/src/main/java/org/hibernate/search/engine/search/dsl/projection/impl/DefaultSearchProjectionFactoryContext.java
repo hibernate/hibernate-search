@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.dsl.projection.CompositeProjectionCont
 import org.hibernate.search.engine.search.dsl.projection.DistanceToFieldProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.FieldProjectionContext;
-import org.hibernate.search.engine.search.dsl.projection.ObjectProjectionContext;
+import org.hibernate.search.engine.search.dsl.projection.EntityProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.ReferenceProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
@@ -60,8 +60,8 @@ public class DefaultSearchProjectionFactoryContext<R, O> implements SearchProjec
 	}
 
 	@Override
-	public ObjectProjectionContext<O> object() {
-		return new ObjectProjectionContextImpl<>( factory );
+	public EntityProjectionContext<O> entity() {
+		return new EntityProjectionContextImpl<>( factory );
 	}
 
 	@Override

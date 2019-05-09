@@ -17,15 +17,15 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  * @param <R> The type of references, i.e. the type of hits returned by
  * {@link SearchQueryResultDefinitionContext#asReference() reference queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#reference() reference projections}.
- * @param <O> The type of loaded objects, i.e. the type of hits returned by
- * {@link SearchQueryResultDefinitionContext#asEntity() loaded object queries}
- * or the type of objects returned for {@link SearchProjectionFactoryContext#object() loaded object projections}.
+ * @param <O> The type of entities, i.e. the type of hits returned by
+ * {@link SearchQueryResultDefinitionContext#asEntity() entity queries}
+ * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
  */
 public interface MappedIndexSearchScope<R, O> {
 
 	/*
 	 * IMPLEMENTATION NOTE: we *must* only accept a loading context with the same R/O type parameters as this class,
-	 * otherwise some casts in ObjectProjectionContextImpl and ReferenceProjectionContextImpl
+	 * otherwise some casts in EntityProjectionContextImpl and ReferenceProjectionContextImpl
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> with any T.
 	 */
@@ -39,7 +39,7 @@ public interface MappedIndexSearchScope<R, O> {
 
 	/*
 	 * IMPLEMENTATION NOTE: we *must* return a factory with the same R/O type arguments as this class,
-	 * otherwise some casts in ObjectProjectionContextImpl and ReferenceProjectionContextImpl
+	 * otherwise some casts in EntityProjectionContextImpl and ReferenceProjectionContextImpl
 	 * will be wrong.
 	 */
 	SearchProjectionFactoryContext<R, O> projection();

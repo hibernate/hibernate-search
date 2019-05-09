@@ -119,7 +119,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SearchProjection<DocumentReference> referenceProjection =
 				scope.projection().reference().toProjection();
 		SearchProjection<DocumentReference> objectProjection =
-				scope.projection().object().toProjection();
+				scope.projection().entity().toProjection();
 
 		query = scope.query()
 				.asProjections(
@@ -138,7 +138,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 	}
 
 	/**
-	 * Test documentReference/reference/object projections as they are likely to be used by mappers,
+	 * Test documentReference/reference/entity projections as they are likely to be used by mappers,
 	 * i.e. with a custom reference transformer and a custom object loader.
 	 */
 	@Test
@@ -179,7 +179,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SearchProjection<StubTransformedReference> referenceProjection =
 				scope.projection().reference().toProjection();
 		SearchProjection<StubLoadedObject> objectProjection =
-				scope.projection().object().toProjection();
+				scope.projection().entity().toProjection();
 		query = scope.query( loadingContextMock )
 				.asProjections(
 						documentReferenceProjection,
@@ -195,7 +195,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				loadingContextMock, referenceTransformerMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the reference projection,
-				 * but also loaded because of the object projection.
+				 * but also loaded because of the entity projection.
 				 */
 				c -> c
 						.reference( document1Reference, document1TransformedReference )

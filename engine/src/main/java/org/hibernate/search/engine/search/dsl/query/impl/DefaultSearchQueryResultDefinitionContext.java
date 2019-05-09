@@ -37,7 +37,7 @@ public final class DefaultSearchQueryResultDefinitionContext<R, O, C>
 	@Override
 	public SearchQueryResultContext<?, O, ?> asEntity() {
 		SearchQueryBuilder<O, C> builder = indexSearchScope.getSearchQueryBuilderFactory()
-				.asObject( sessionContext, loadingContextBuilder );
+				.asEntity( sessionContext, loadingContextBuilder );
 		return new DefaultSearchQueryContext<>( indexSearchScope, builder );
 	}
 

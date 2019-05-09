@@ -14,7 +14,7 @@ public class SearchProjectionBackendContext {
 
 	private final ElasticsearchDocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
 	@SuppressWarnings("rawtypes")
-	private final ElasticsearchObjectProjectionBuilder objectProjectionBuilder;
+	private final ElasticsearchEntityProjectionBuilder objectProjectionBuilder;
 	@SuppressWarnings("rawtypes")
 	private final ElasticsearchReferenceProjectionBuilder referenceProjectionBuilder;
 	private final ElasticsearchScoreProjectionBuilder scoreProjectionBuilder;
@@ -25,7 +25,7 @@ public class SearchProjectionBackendContext {
 	public SearchProjectionBackendContext(DocumentReferenceExtractorHelper documentReferenceExtractorHelper,
 			Gson userFacingGson) {
 		this.documentReferenceProjectionBuilder = new ElasticsearchDocumentReferenceProjectionBuilder( documentReferenceExtractorHelper );
-		this.objectProjectionBuilder = new ElasticsearchObjectProjectionBuilder( documentReferenceExtractorHelper );
+		this.objectProjectionBuilder = new ElasticsearchEntityProjectionBuilder( documentReferenceExtractorHelper );
 		this.referenceProjectionBuilder = new ElasticsearchReferenceProjectionBuilder( documentReferenceExtractorHelper );
 		this.scoreProjectionBuilder = new ElasticsearchScoreProjectionBuilder();
 		this.sourceProjectionBuilder = new ElasticsearchSourceProjectionBuilder( userFacingGson );
@@ -37,7 +37,7 @@ public class SearchProjectionBackendContext {
 	}
 
 	@SuppressWarnings("unchecked")
-	<O> ElasticsearchObjectProjectionBuilder<O> getObjectProjectionBuilder() {
+	<O> ElasticsearchEntityProjectionBuilder<O> getEntityProjectionBuilder() {
 		return objectProjectionBuilder;
 	}
 

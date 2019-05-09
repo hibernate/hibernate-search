@@ -7,24 +7,24 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ObjectProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 
 
-public class LuceneObjectProjectionBuilder<O> implements ObjectProjectionBuilder<O> {
+public class LuceneEntityProjectionBuilder<O> implements EntityProjectionBuilder<O> {
 
 	@SuppressWarnings("rawtypes")
-	private static final LuceneObjectProjectionBuilder INSTANCE = new LuceneObjectProjectionBuilder();
+	private static final LuceneEntityProjectionBuilder INSTANCE = new LuceneEntityProjectionBuilder();
 
 	@SuppressWarnings("unchecked")
-	public static <T> LuceneObjectProjectionBuilder<T> get() {
+	public static <T> LuceneEntityProjectionBuilder<T> get() {
 		return INSTANCE;
 	}
 
-	private LuceneObjectProjectionBuilder() {
+	private LuceneEntityProjectionBuilder() {
 	}
 
 	@Override
 	public SearchProjection<O> build() {
-		return LuceneObjectProjection.get();
+		return LuceneEntityProjection.get();
 	}
 }

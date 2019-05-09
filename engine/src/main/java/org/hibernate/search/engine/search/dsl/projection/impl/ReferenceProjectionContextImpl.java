@@ -22,7 +22,7 @@ public class ReferenceProjectionContextImpl<R> implements ReferenceProjectionCon
 
 	@Override
 	/*
-	 * The backend has no control over the type of loaded objects.
+	 * The backend has no control over the type of entities.
 	 * This cast is only safe because we make sure to only use SearchProjectionFactoryContext
 	 * with generic type arguments that are consistent with the type of object loaders.
 	 * See comments in MappedIndexSearchScope.

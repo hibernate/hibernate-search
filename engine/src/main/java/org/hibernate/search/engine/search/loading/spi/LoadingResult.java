@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 /**
  * The result of the loading of the entities by the {@link ProjectionHitMapper}.
  *
- * @param <O> The type of the loaded objects.
+ * @param <O> The type of entities.
  */
 public interface LoadingResult<O> {
 

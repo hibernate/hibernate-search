@@ -27,7 +27,7 @@ public interface SearchProjectionBuilderFactory {
 
 	<T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz, ProjectionConverter projectionConverter);
 
-	<O> ObjectProjectionBuilder<O> object();
+	<O> EntityProjectionBuilder<O> entity();
 
 	<R> ReferenceProjectionBuilder<R> reference();
 

@@ -11,11 +11,11 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchObjectProjection<O> implements ElasticsearchSearchProjection<Object, O> {
+public class ElasticsearchEntityProjection<O> implements ElasticsearchSearchProjection<Object, O> {
 
 	private final DocumentReferenceExtractorHelper helper;
 
-	public ElasticsearchObjectProjection(DocumentReferenceExtractorHelper helper) {
+	public ElasticsearchEntityProjection(DocumentReferenceExtractorHelper helper) {
 		this.helper = helper;
 	}
 

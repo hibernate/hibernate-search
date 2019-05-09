@@ -46,7 +46,7 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, O>
 	@Override
 	public ElasticsearchSearchQueryResultContext<O> asEntity() {
 		ElasticsearchSearchQueryBuilder<O> builder = indexSearchScope.getSearchQueryBuilderFactory()
-				.asObject( sessionContext, loadingContextBuilder );
+				.asEntity( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
 

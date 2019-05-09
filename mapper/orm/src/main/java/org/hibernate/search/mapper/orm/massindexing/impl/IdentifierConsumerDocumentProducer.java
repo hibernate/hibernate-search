@@ -134,7 +134,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 
 	/**
 	 * Loads a list of entities of defined type using their identifiers.
-	 * The loaded objects are then transformed into Lucene Documents
+	 * entities are then transformed into Lucene Documents
 	 * and forwarded to the indexing backend.
 	 *
 	 * @param listIds the list of entity identifiers (of type

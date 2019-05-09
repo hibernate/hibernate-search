@@ -28,7 +28,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  * @param <R> The reference type.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
- * @param <O> The loaded object type.
+ * @param <O> The entity type.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  *
  * @see SearchQueryResultDefinitionContext#extension(SearchQueryContextExtension)

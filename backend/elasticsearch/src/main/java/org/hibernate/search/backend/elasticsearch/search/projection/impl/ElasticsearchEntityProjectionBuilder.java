@@ -7,15 +7,15 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ObjectProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 
 
-class ElasticsearchObjectProjectionBuilder<O> implements ObjectProjectionBuilder<O> {
+class ElasticsearchEntityProjectionBuilder<O> implements EntityProjectionBuilder<O> {
 
-	private final ElasticsearchObjectProjection<O> projection;
+	private final ElasticsearchEntityProjection<O> projection;
 
-	ElasticsearchObjectProjectionBuilder(DocumentReferenceExtractorHelper helper) {
-		this.projection = new ElasticsearchObjectProjection<>( helper );
+	ElasticsearchEntityProjectionBuilder(DocumentReferenceExtractorHelper helper) {
+		this.projection = new ElasticsearchEntityProjection<>( helper );
 	}
 
 	@Override
