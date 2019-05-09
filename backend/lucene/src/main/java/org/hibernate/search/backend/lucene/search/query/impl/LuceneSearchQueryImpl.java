@@ -92,7 +92,7 @@ public class LuceneSearchQueryImpl<T> extends AbstractSearchQuery<T, LuceneSearc
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async processing, we will have to add a loadAsync method here,
-				 * as well as in ProjectionHitMapper and ObjectLoader.
+				 * as well as in ProjectionHitMapper and EntityLoader.
 				 * This method may not be easy to implement for blocking mappers,
 				 * so we may choose to throw exceptions for those.
 				 */

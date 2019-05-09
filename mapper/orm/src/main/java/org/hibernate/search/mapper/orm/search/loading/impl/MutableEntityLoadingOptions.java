@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
-public class MutableObjectLoadingOptions {
+public class MutableEntityLoadingOptions {
 	private int fetchSize;
 
 	public int getFetchSize() {

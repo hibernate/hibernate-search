@@ -29,12 +29,12 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceTransformer;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubObjectLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -139,7 +139,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 	/**
 	 * Test documentReference/reference/entity projections as they are likely to be used by mappers,
-	 * i.e. with a custom reference transformer and a custom object loader.
+	 * i.e. with a custom reference transformer and a custom entity loader.
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3395")
@@ -161,8 +161,8 @@ public class SearchProjectionIT extends EasyMockSupport {
 				createMock( LoadingContext.class );
 		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
 				createMock( StubDocumentReferenceTransformer.class );
-		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				createMock( StubObjectLoader.class );
+		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
+				createMock( StubEntityLoader.class );
 
 		resetAll();
 		// No call expected on the mocks

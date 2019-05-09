@@ -9,11 +9,11 @@ package org.hibernate.search.engine.search.loading.spi;
 import java.util.List;
 
 @SuppressWarnings({ "unchecked", "rawtypes" }) // This implementation works for any T
-class IdentityObjectLoader<T> implements ObjectLoader<T, T> {
+class IdentityEntityLoader<T> implements EntityLoader<T, T> {
 
-	private static final IdentityObjectLoader INSTANCE = new IdentityObjectLoader();
+	private static final IdentityEntityLoader INSTANCE = new IdentityEntityLoader();
 
-	public static <T> IdentityObjectLoader<T> get() {
+	public static <T> IdentityEntityLoader<T> get() {
 		return INSTANCE;
 	}
 
