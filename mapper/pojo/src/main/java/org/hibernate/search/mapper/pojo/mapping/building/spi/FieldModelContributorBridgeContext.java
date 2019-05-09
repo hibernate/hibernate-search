@@ -6,12 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
-public interface FieldModelContributorIndirectContext {
+public interface FieldModelContributorBridgeContext {
 
 	void indexNullAs(String value);
-
-	void decimalScale(int decimalScale);
-
-	void defaultDecimalScale(int decimalScale);
 
 }

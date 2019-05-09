@@ -20,6 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBui
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -43,7 +44,8 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public LuceneIndexFieldTypeFactoryContext getTypeFactory() {
+	public LuceneIndexFieldTypeFactoryContext getTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
+		// TODO handle defaultsProvider instance for the current request
 		return typeFactory;
 	}
 

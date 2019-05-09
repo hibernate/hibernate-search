@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
@@ -34,7 +35,9 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext getTypeFactory() {
+	public IndexFieldTypeFactoryContext getTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
+		// set defaultsProvider instance for the current request
+		typeFactoryContext.setDefaultsProvider( defaultsProvider );
 		return typeFactoryContext;
 	}
 

@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldCo
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
@@ -257,9 +258,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			BridgeBuilder<? extends ValueBridge<?, ?>> builder,
 			String relativeFieldName, FieldModelContributor contributor) {
 		Integer decimalScale = typeAdditionalMetadataProvider.get( modelPath ).getDecimalScale();
-		if ( decimalScale != null ) {
-			contributor.defaultDecimalScale( decimalScale );
-		}
+		IndexFieldTypeDefaultsProvider defaultsProvider = new IndexFieldTypeDefaultsProvider( decimalScale );
 
 		PojoGenericTypeModel<V> valueTypeModel = modelPath.getTypeModel();
 
@@ -286,7 +285,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			 */
 			@SuppressWarnings({"unchecked", "rawtypes"})
 			BoundValueBridge<V, ?> boundValueBridge = bindValueBridge(
-					bindingContext.getTypeFactory(),
+					bindingContext.getTypeFactory( defaultsProvider ),
 					schemaElement, valueTypeModel, multiValued,
 					(BeanHolder<? extends ValueBridge>) bridgeHolder,
 					relativeFieldName, contributor
@@ -358,7 +357,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		);
 
 		// Then give the mapping a chance to override some of the model (add storage, ...)
-		contributor.contribute( fieldTypeContext, new FieldModelContributorIndirectContextImpl<>( bridge, fieldTypeContext ) );
+		contributor.contribute( fieldTypeContext, new FieldModelContributorBridgeContextImpl<>( bridge, fieldTypeContext ) );
 
 		IndexSchemaFieldContext<?, ? extends IndexFieldReference<? super F>> fieldContext =
 				schemaElement.field( relativeFieldName, fieldTypeContext );

@@ -159,6 +159,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return this;
 		}
 
+		public Builder defaultDecimalScale(int decimalScale) {
+			attribute( "defaultDecimalScale", decimalScale );
+			return this;
+		}
+
 		public Builder converter(StubFieldConverter<?> converter) {
 			this.converter = converter;
 			return this;

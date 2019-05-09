@@ -8,10 +8,11 @@ package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 
 public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder {
 
-	IndexFieldTypeFactoryContext getTypeFactory();
+	IndexFieldTypeFactoryContext getTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider);
 
 	/**
 	 * Inform the model collector that documents will always be provided along

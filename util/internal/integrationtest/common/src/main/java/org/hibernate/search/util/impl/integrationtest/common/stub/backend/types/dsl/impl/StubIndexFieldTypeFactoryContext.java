@@ -22,9 +22,12 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryContext {
+
+	private IndexFieldTypeDefaultsProvider defaultsProvider;
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -137,6 +140,10 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 
 	@Override
 	public ScaledNumberIndexFieldTypeContext<?> asBigDecimal() {
-		return new StubScaledNumberIndexFieldTypeContext();
+		return new StubScaledNumberIndexFieldTypeContext( defaultsProvider );
+	}
+
+	public void setDefaultsProvider(IndexFieldTypeDefaultsProvider defaultsProvider) {
+		this.defaultsProvider = defaultsProvider;
 	}
 }

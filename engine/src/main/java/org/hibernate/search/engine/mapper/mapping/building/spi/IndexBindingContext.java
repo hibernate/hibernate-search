@@ -26,7 +26,18 @@ public interface IndexBindingContext {
 	/**
 	 * @return The type factory of the bound index, allowing to create field types.
 	 */
-	IndexFieldTypeFactoryContext getTypeFactory();
+	default IndexFieldTypeFactoryContext getTypeFactory() {
+		return getTypeFactory( new IndexFieldTypeDefaultsProvider() );
+	}
+
+	/**
+	 * Use this method to provide some defaults to the current request.
+	 * {@link IndexFieldTypeDefaultsProvider} instance will be overridden by a subsequent request.
+	 *
+	 * @param defaultsProvider The defaults to apply
+	 * @return The type factory of the bound index, allowing to create field types.
+	 */
+	IndexFieldTypeFactoryContext getTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider);
 
 	/**
 	 * @return The element in the index schema that this context points to.

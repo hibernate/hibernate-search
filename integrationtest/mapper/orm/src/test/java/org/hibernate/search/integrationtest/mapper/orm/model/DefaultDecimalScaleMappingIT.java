@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class JpaColumnScaleMappingIT {
+public class DefaultDecimalScaleMappingIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -34,12 +34,13 @@ public class JpaColumnScaleMappingIT {
 	@Test
 	public void mapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "scaled", BigDecimal.class, f -> f.decimalScale( 7 ) )
-				.field( "unscaled", BigDecimal.class, f -> f.decimalScale( 0 ) )
-				.field( "defaultScaled", BigDecimal.class, f -> f.decimalScale( 2 ) )
-				.field( "hsearch", BigDecimal.class, f -> f.decimalScale( 7 ) )
+				.field( "scaled", BigDecimal.class, f -> f.defaultDecimalScale( 7 ) )
+				.field( "unscaled", BigDecimal.class, f -> f.defaultDecimalScale( 0 ) )
+				.field( "defaultScaled", BigDecimal.class, f -> f.defaultDecimalScale( 2 ) )
+				.field( "hsearch", BigDecimal.class, f -> f.defaultDecimalScale( 2 ).decimalScale( 7 ) )
 				.field( "notDecimal", Integer.class )
-				.field( "general", BigDecimal.class, f -> f.decimalScale( 3 ) )
+				.field( "general", BigDecimal.class, f -> f.defaultDecimalScale( 3 ) )
+				.field( "both", BigDecimal.class, f -> f.defaultDecimalScale( 3 ).decimalScale( 2 ) )
 		);
 
 		ormSetupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
@@ -84,5 +85,10 @@ public class JpaColumnScaleMappingIT {
 		// even if we use a @GenericField to annotate the field
 		@Column(precision = 14, scale = 3)
 		private BigDecimal general;
+
+		@ScaledNumberField(decimalScale = 2)
+		// Only use two digits after the dot in the full-text index
+		@Column(precision = 14, scale = 3)
+		private BigDecimal both;
 	}
 }
