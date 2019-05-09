@@ -30,8 +30,8 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchSearchQueryImpl<T> extends AbstractSearchQuery<T, ElasticsearchSearchResult<T>>
-		implements ElasticsearchSearchQuery<T> {
+public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, ElasticsearchSearchResult<H>>
+		implements ElasticsearchSearchQuery<H> {
 
 	/**
 	 * ES default limit for (limit + offset); any search query beyond that limit will be rejected.
@@ -45,7 +45,7 @@ public class ElasticsearchSearchQueryImpl<T> extends AbstractSearchQuery<T, Elas
 	private final LoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
-	private final ElasticsearchSearchResultExtractor<T> searchResultExtractor;
+	private final ElasticsearchSearchResultExtractor<H> searchResultExtractor;
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
@@ -53,7 +53,7 @@ public class ElasticsearchSearchQueryImpl<T> extends AbstractSearchQuery<T, Elas
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
-			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
+			JsonObject payload, ElasticsearchSearchResultExtractor<H> searchResultExtractor) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.indexNames = indexNames;
@@ -75,16 +75,16 @@ public class ElasticsearchSearchQueryImpl<T> extends AbstractSearchQuery<T, Elas
 	}
 
 	@Override
-	public <Q> Q extension(SearchQueryExtension<Q, T> extension) {
+	public <Q> Q extension(SearchQueryExtension<Q, H> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, loadingContext )
 		);
 	}
 
 	@Override
-	public ElasticsearchSearchResult<T> fetch(Long limit, Long offset) {
+	public ElasticsearchSearchResult<H> fetch(Long limit, Long offset) {
 		// TODO restore scrolling support. See HSEARCH-3323
-		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workFactory.search( payload, searchResultExtractor )
+		ElasticsearchWork<ElasticsearchLoadableSearchResult<H>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( indexNames )
 				.paging( defaultedLimit( limit, offset ), offset )
 				.routingKeys( routingKeys ).build();

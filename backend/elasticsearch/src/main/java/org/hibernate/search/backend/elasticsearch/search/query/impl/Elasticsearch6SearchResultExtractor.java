@@ -21,14 +21,14 @@ import com.google.gson.JsonObject;
  *     <li>The total hit count is retrieved from hits.total instead of hits.total.value</li>
  * </ul>
  */
-class Elasticsearch6SearchResultExtractor<T> extends Elasticsearch7SearchResultExtractor<T> {
+class Elasticsearch6SearchResultExtractor<H> extends Elasticsearch7SearchResultExtractor<H> {
 
 	private static final JsonAccessor<Long> HITS_TOTAL_ACCESSOR =
 			HITS_ACCESSOR.property( "total" ).asLong();
 
 	Elasticsearch6SearchResultExtractor(
 			LoadingContext<?, ?> loadingContext,
-			ElasticsearchSearchProjection<?, T> rootProjection,
+			ElasticsearchSearchProjection<?, H> rootProjection,
 			SearchProjectionExtractContext searchProjectionExecutionContext) {
 		super( loadingContext, rootProjection, searchProjectionExecutionContext );
 	}

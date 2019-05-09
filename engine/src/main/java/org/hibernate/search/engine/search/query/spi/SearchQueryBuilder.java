@@ -11,10 +11,10 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 /**
  * A builder for search queries.
  *
- * @param <T> The type of query results
+ * @param <H> The type of query results
  * @param <C> The type of query element collector
  */
-public interface SearchQueryBuilder<T, C> {
+public interface SearchQueryBuilder<H, C> {
 
 	C getQueryElementCollector();
 
@@ -22,6 +22,6 @@ public interface SearchQueryBuilder<T, C> {
 
 	// TODO add more arguments, such as faceting options
 
-	SearchQuery<T> build();
+	SearchQuery<H> build();
 
 }

@@ -20,74 +20,74 @@ import org.assertj.core.api.ListAssert;
 import org.assertj.core.error.BasicErrorMessageFactory;
 import org.assertj.core.internal.Failures;
 
-public class SearchHitsAssert<T> {
+public class SearchHitsAssert<H> {
 
-	public static <T> SearchHitsAssert<T> assertThat(List<? extends T> actual) {
+	public static <H> SearchHitsAssert<H> assertThat(List<? extends H> actual) {
 		return new SearchHitsAssert<>( actual );
 	}
 
-	private final List<? extends T> actual;
+	private final List<? extends H> actual;
 	private String description = "<unknown>";
 
-	private SearchHitsAssert(List<? extends T> actual) {
+	private SearchHitsAssert(List<? extends H> actual) {
 		this.actual = actual;
 	}
 
-	public SearchHitsAssert<T> fromQuery(SearchQuery<?> query) {
+	public SearchHitsAssert<H> fromQuery(SearchQuery<?> query) {
 		return as( "Hits of " + query.toString() );
 	}
 
-	public SearchHitsAssert<T> as(String description) {
+	public SearchHitsAssert<H> as(String description) {
 		this.description = description;
 		return this;
 	}
 
-	public SearchHitsAssert<T> isEmpty() {
-		Assertions.<T>assertThat( actual )
+	public SearchHitsAssert<H> isEmpty() {
+		Assertions.<H>assertThat( actual )
 				.as( description )
 				.isEmpty();
 		return this;
 	}
 
 	@SafeVarargs
-	public final SearchHitsAssert<T> hasHitsExactOrder(T... hits) {
-		Assertions.<T>assertThat( actual )
+	public final SearchHitsAssert<H> hasHitsExactOrder(H... hits) {
+		Assertions.<H>assertThat( actual )
 				.as( description )
 				.containsExactly( hits );
 		return this;
 	}
 
 	@SafeVarargs
-	public final SearchHitsAssert<T> hasHitsAnyOrder(T... hits) {
-		Assertions.<T>assertThat( actual )
+	public final SearchHitsAssert<H> hasHitsAnyOrder(H... hits) {
+		Assertions.<H>assertThat( actual )
 				.as( description )
 				.containsExactlyInAnyOrder( hits );
 		return this;
 	}
 
 	@SuppressWarnings("unchecked")
-	public final SearchHitsAssert<T> hasHitsExactOrder(Collection<T> hits) {
-		return hasHitsExactOrder( (T[]) hits.toArray() );
+	public final SearchHitsAssert<H> hasHitsExactOrder(Collection<H> hits) {
+		return hasHitsExactOrder( (H[]) hits.toArray() );
 	}
 
 	@SuppressWarnings("unchecked")
-	public final SearchHitsAssert<T> hasHitsAnyOrder(Collection<T> hits) {
-		return hasHitsAnyOrder( (T[]) hits.toArray() );
+	public final SearchHitsAssert<H> hasHitsAnyOrder(Collection<H> hits) {
+		return hasHitsAnyOrder( (H[]) hits.toArray() );
 	}
 
-	public SearchHitsAssert<T> hasDocRefHitsExactOrder(String indexName, String firstId, String... otherIds) {
+	public SearchHitsAssert<H> hasDocRefHitsExactOrder(String indexName, String firstId, String... otherIds) {
 		return hasDocRefHitsExactOrder( ctx -> {
 			ctx.doc( indexName, firstId, otherIds );
 		} );
 	}
 
-	public SearchHitsAssert<T> hasDocRefHitsAnyOrder(String indexName, String firstId, String... otherIds) {
+	public SearchHitsAssert<H> hasDocRefHitsAnyOrder(String indexName, String firstId, String... otherIds) {
 		return hasDocRefHitsAnyOrder( ctx -> {
 			ctx.doc( indexName, firstId, otherIds );
 		} );
 	}
 
-	public SearchHitsAssert<T> hasDocRefHitsExactOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
+	public SearchHitsAssert<H> hasDocRefHitsExactOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
 		DocumentReferenceHitsBuilder context = new DocumentReferenceHitsBuilder();
 		expectation.accept( context );
 		Assertions.assertThat( getNormalizedActualDocumentReferencesHits() )
@@ -96,7 +96,7 @@ public class SearchHitsAssert<T> {
 		return this;
 	}
 
-	public SearchHitsAssert<T> hasDocRefHitsAnyOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
+	public SearchHitsAssert<H> hasDocRefHitsAnyOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
 		DocumentReferenceHitsBuilder context = new DocumentReferenceHitsBuilder();
 		expectation.accept( context );
 		Assertions.assertThat( getNormalizedActualDocumentReferencesHits() )
@@ -105,7 +105,7 @@ public class SearchHitsAssert<T> {
 		return this;
 	}
 
-	public SearchHitsAssert<T> hasListHitsExactOrder(Consumer<ListHitsBuilder> expectation) {
+	public SearchHitsAssert<H> hasListHitsExactOrder(Consumer<ListHitsBuilder> expectation) {
 		ListHitsBuilder context = new ListHitsBuilder();
 		expectation.accept( context );
 		Assertions.assertThat( getNormalizedActualListHits() )
@@ -114,7 +114,7 @@ public class SearchHitsAssert<T> {
 		return this;
 	}
 
-	public SearchHitsAssert<T> hasListHitsAnyOrder(Consumer<ListHitsBuilder> expectation) {
+	public SearchHitsAssert<H> hasListHitsAnyOrder(Consumer<ListHitsBuilder> expectation) {
 		ListHitsBuilder context = new ListHitsBuilder();
 		expectation.accept( context );
 		Assertions.assertThat( getNormalizedActualListHits() )

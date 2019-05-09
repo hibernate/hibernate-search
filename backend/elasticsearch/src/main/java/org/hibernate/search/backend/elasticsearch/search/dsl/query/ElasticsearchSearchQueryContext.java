@@ -10,9 +10,9 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchS
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 
-public interface ElasticsearchSearchQueryContext<T>
-		extends SearchQueryContext<ElasticsearchSearchQueryContext<T>, T, ElasticsearchSearchSortContainerContext> {
+public interface ElasticsearchSearchQueryContext<H>
+		extends SearchQueryContext<ElasticsearchSearchQueryContext<H>, H, ElasticsearchSearchSortContainerContext> {
 
 	@Override
-	ElasticsearchSearchQuery<T> toQuery();
+	ElasticsearchSearchQuery<H> toQuery();
 }

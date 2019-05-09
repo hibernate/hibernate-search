@@ -95,7 +95,7 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 		return loadingContextBuilder;
 	}
 
-	private <T> ElasticsearchSearchQueryResultContext<T> createSearchQueryContext(ElasticsearchSearchQueryBuilder<T> builder) {
+	private <H> ElasticsearchSearchQueryResultContext<H> createSearchQueryContext(ElasticsearchSearchQueryBuilder<H> builder) {
 		return new ElasticsearchSearchQueryContextImpl<>( indexSearchScope, builder );
 	}
 }

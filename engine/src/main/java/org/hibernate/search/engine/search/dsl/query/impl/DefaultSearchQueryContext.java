@@ -14,18 +14,18 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-final class DefaultSearchQueryContext<T, C>
+final class DefaultSearchQueryContext<H, C>
 		extends AbstractSearchQueryContext<
-						DefaultSearchQueryContext<T, C>,
-						T,
+						DefaultSearchQueryContext<H, C>,
+		H,
 						SearchPredicateFactoryContext,
 						SearchSortContainerContext,
 						C
 				>
-		implements SearchQueryResultContext<DefaultSearchQueryContext<T, C>, T, SearchPredicateFactoryContext>,
-				SearchQueryContext<DefaultSearchQueryContext<T, C>, T, SearchSortContainerContext> {
+		implements SearchQueryResultContext<DefaultSearchQueryContext<H, C>, H, SearchPredicateFactoryContext>,
+				SearchQueryContext<DefaultSearchQueryContext<H, C>, H, SearchSortContainerContext> {
 
-	DefaultSearchQueryContext(IndexSearchScope<C> indexSearchScope, SearchQueryBuilder<T, C> searchQueryBuilder) {
+	DefaultSearchQueryContext(IndexSearchScope<C> indexSearchScope, SearchQueryBuilder<H, C> searchQueryBuilder) {
 		super( indexSearchScope, searchQueryBuilder );
 	}
 
@@ -43,7 +43,7 @@ final class DefaultSearchQueryContext<T, C>
 	}
 
 	@Override
-	protected DefaultSearchQueryContext<T, C> thisAsS() {
+	protected DefaultSearchQueryContext<H, C> thisAsS() {
 		return this;
 	}
 }

@@ -50,11 +50,11 @@ public class SearchBackendContext {
 		return analysisDefinitionRegistry;
 	}
 
-	<T> LuceneSearchQueryBuilder<T> createSearchQueryBuilder(
+	<H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
 			LuceneSearchScopeModel scopeModel,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
-			LuceneSearchProjection<?, T> rootProjection) {
+			LuceneSearchProjection<?, H> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		LuceneDocumentStoredFieldVisitorBuilder storedFieldFilterBuilder = new LuceneDocumentStoredFieldVisitorBuilder();

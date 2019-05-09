@@ -19,23 +19,23 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneExecuteQueryWork<T> implements LuceneQueryWork<LuceneLoadableSearchResult<T>> {
+public class LuceneExecuteQueryWork<H> implements LuceneQueryWork<LuceneLoadableSearchResult<H>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearcher<T> searcher;
+	private final LuceneSearcher<H> searcher;
 
-	public LuceneExecuteQueryWork(LuceneSearcher<T> searcher) {
+	public LuceneExecuteQueryWork(LuceneSearcher<H> searcher) {
 		this.searcher = searcher;
 	}
 
 	@Override
-	public CompletableFuture<LuceneLoadableSearchResult<T>> execute(LuceneQueryWorkExecutionContext context) {
+	public CompletableFuture<LuceneLoadableSearchResult<H>> execute(LuceneQueryWorkExecutionContext context) {
 		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
 		return Futures.create( () -> CompletableFuture.completedFuture( executeQuery( searcher ) ) );
 	}
 
-	private LuceneLoadableSearchResult<T> executeQuery(LuceneSearcher<T> searcher) {
+	private LuceneLoadableSearchResult<H> executeQuery(LuceneSearcher<H> searcher) {
 		try {
 			return searcher.execute();
 		}

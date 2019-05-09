@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
+public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, LuceneSearchQueryElementCollector> {
 
 	private final LuceneWorkFactory workFactory;
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
@@ -33,7 +33,7 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
-	private final LuceneSearchProjection<?, T> rootProjection;
+	private final LuceneSearchProjection<?, H> rootProjection;
 	private final LuceneSearchQueryElementCollector elementCollector;
 
 	LuceneSearchQueryBuilder(
@@ -44,7 +44,7 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 			SessionContextImplementor sessionContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
-			LuceneSearchProjection<?, T> rootProjection) {
+			LuceneSearchProjection<?, H> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -70,10 +70,10 @@ public class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, Lucene
 	}
 
 	@Override
-	public LuceneSearchQuery<T> build() {
+	public LuceneSearchQuery<H> build() {
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
-		LuceneSearchResultExtractor<T> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
+		LuceneSearchResultExtractor<H> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
 				storedFieldVisitor, rootProjection, loadingContext
 		);
 

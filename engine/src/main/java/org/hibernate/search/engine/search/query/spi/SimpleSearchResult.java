@@ -10,11 +10,11 @@ import java.util.List;
 
 import org.hibernate.search.engine.search.query.SearchResult;
 
-public class SimpleSearchResult<T> implements SearchResult<T> {
+public class SimpleSearchResult<H> implements SearchResult<H> {
 	private final long hitCount;
-	private final List<T> hits;
+	private final List<H> hits;
 
-	public SimpleSearchResult(long hitCount, List<T> hits) {
+	public SimpleSearchResult(long hitCount, List<H> hits) {
 		this.hitCount = hitCount;
 		this.hits = hits;
 	}
@@ -25,7 +25,7 @@ public class SimpleSearchResult<T> implements SearchResult<T> {
 	}
 
 	@Override
-	public List<T> getHits() {
+	public List<H> getHits() {
 		return hits;
 	}
 

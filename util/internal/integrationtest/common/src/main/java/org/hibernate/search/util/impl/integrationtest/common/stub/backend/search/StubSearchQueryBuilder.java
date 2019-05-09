@@ -14,19 +14,19 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
-public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQueryElementCollector> {
+public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQueryElementCollector> {
 
 	private final StubBackend backend;
 	private final StubSearchScopeModel scopeModel;
 	private final StubSearchWork.Builder workBuilder;
 	private final FromDocumentFieldValueConvertContext convertContext;
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
-	private final StubSearchProjection<T> rootProjection;
+	private final StubSearchProjection<H> rootProjection;
 
 	public StubSearchQueryBuilder(StubBackend backend, StubSearchScopeModel scopeModel,
 			StubSearchWork.ResultType resultType,
 			FromDocumentFieldValueConvertContext convertContext,
-			LoadingContextBuilder<?, ?> loadingContextBuilder, StubSearchProjection<T> rootProjection) {
+			LoadingContextBuilder<?, ?> loadingContextBuilder, StubSearchProjection<H> rootProjection) {
 		this.backend = backend;
 		this.scopeModel = scopeModel;
 		this.workBuilder = StubSearchWork.builder( resultType );
@@ -46,7 +46,7 @@ public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQuer
 	}
 
 	@Override
-	public SearchQuery<T> build() {
+	public SearchQuery<H> build() {
 		return new StubSearchQuery<>(
 				backend, scopeModel.getIndexNames(), workBuilder, convertContext,
 				loadingContextBuilder.build(), rootProjection

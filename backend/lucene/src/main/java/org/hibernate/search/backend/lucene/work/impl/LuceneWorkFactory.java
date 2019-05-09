@@ -29,5 +29,5 @@ public interface LuceneWorkFactory {
 
 	LuceneIndexWork<?> optimize(String indexName);
 
-	<T> LuceneExecuteQueryWork<T> search(LuceneSearcher<T> luceneSearcher);
+	<H> LuceneExecuteQueryWork<H> search(LuceneSearcher<H> luceneSearcher);
 }

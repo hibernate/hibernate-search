@@ -22,9 +22,9 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
- * @author Guillaume Smet
+ * @param <H> The type of query hits.
  */
-public class LuceneSearcher<T> implements AutoCloseable {
+public class LuceneSearcher<H> implements AutoCloseable {
 
 	private final Set<String> indexNames;
 	private final IndexSearcher indexSearcher;
@@ -36,7 +36,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 	private final Long limit;
 
 	private final LuceneCollectorProvider luceneCollectorProvider;
-	private final LuceneSearchResultExtractor<T> searchResultExtractor;
+	private final LuceneSearchResultExtractor<H> searchResultExtractor;
 
 	public LuceneSearcher(Set<String> indexNames,
 			Set<ReaderProvider> readerProviders,
@@ -45,7 +45,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 			Long offset,
 			Long limit,
 			LuceneCollectorProvider luceneCollectorProvider,
-			LuceneSearchResultExtractor<T> searchResultExtractor) {
+			LuceneSearchResultExtractor<H> searchResultExtractor) {
 		this.indexNames = indexNames;
 		this.indexSearcher = new IndexSearcher( MultiReaderFactory.openReader( indexNames, readerProviders ) );
 		this.luceneQuery = luceneQuery;
@@ -56,7 +56,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		this.searchResultExtractor = searchResultExtractor;
 	}
 
-	public LuceneLoadableSearchResult<T> execute() throws IOException {
+	public LuceneLoadableSearchResult<H> execute() throws IOException {
 		// TODO GSM implement timeout handling by wrapping the collector with the timeout limiting one
 
 		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( luceneSort, getMaxDocs() );

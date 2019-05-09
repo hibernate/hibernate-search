@@ -12,6 +12,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 /**
  * @author Yoann Rodiere
  */
-public interface ScrollWorkBuilder<T> extends ElasticsearchWorkBuilder<ElasticsearchWork<ElasticsearchLoadableSearchResult<T>>> {
+public interface ScrollWorkBuilder<H> extends ElasticsearchWorkBuilder<ElasticsearchWork<ElasticsearchLoadableSearchResult<H>>> {
 
 }

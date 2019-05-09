@@ -17,29 +17,29 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ScrollWork<T> extends AbstractSimpleElasticsearchWork<ElasticsearchLoadableSearchResult<T>> {
+public class ScrollWork<H> extends AbstractSimpleElasticsearchWork<ElasticsearchLoadableSearchResult<H>> {
 
-	private final ElasticsearchSearchResultExtractor<T> resultExtractor;
+	private final ElasticsearchSearchResultExtractor<H> resultExtractor;
 
-	protected ScrollWork(Builder<T> builder) {
+	protected ScrollWork(Builder<H> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
 	}
 
 	@Override
-	protected ElasticsearchLoadableSearchResult<T> generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected ElasticsearchLoadableSearchResult<H> generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.getBody();
 		return resultExtractor.extract( body );
 	}
 
-	public static class Builder<T>
-			extends AbstractBuilder<Builder<T>>
-			implements ScrollWorkBuilder<T> {
+	public static class Builder<H>
+			extends AbstractBuilder<Builder<H>>
+			implements ScrollWorkBuilder<H> {
 		private final String scrollId;
 		private final String scrollTimeout;
-		private final ElasticsearchSearchResultExtractor<T> resultExtractor;
+		private final ElasticsearchSearchResultExtractor<H> resultExtractor;
 
-		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<T> resultExtractor) {
+		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<H> resultExtractor) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.scrollId = scrollId;
 			this.scrollTimeout = scrollTimeout;
@@ -62,7 +62,7 @@ public class ScrollWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		@Override
-		public ScrollWork<T> build() {
+		public ScrollWork<H> build() {
 			return new ScrollWork<>( this );
 		}
 	}

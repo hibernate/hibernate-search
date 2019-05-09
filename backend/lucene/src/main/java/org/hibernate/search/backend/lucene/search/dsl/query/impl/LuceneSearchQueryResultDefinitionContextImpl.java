@@ -95,7 +95,7 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 		return loadingContextBuilder;
 	}
 
-	private <T> LuceneSearchQueryResultContext<T> createSearchQueryContext(LuceneSearchQueryBuilder<T> builder) {
+	private <H> LuceneSearchQueryResultContext<H> createSearchQueryContext(LuceneSearchQueryBuilder<H> builder) {
 		return new LuceneSearchQueryContextImpl<>( indexSearchScope, builder );
 	}
 }

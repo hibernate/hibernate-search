@@ -84,10 +84,10 @@ public final class Search {
 	 * for example when integrating to an external library that expects JPA queries.
 	 *
 	 * @param searchQuery The search query to convert.
-	 * @param <T> The type of query hits.
+	 * @param <H> The type of query hits.
 	 * @return A representation of the given query as a JPA query.
 	 */
-	public static <T> TypedQuery<T> toJpaQuery(SearchQuery<T> searchQuery) {
+	public static <H> TypedQuery<H> toJpaQuery(SearchQuery<H> searchQuery) {
 		return HibernateOrmSearchQueryAdapter.create( searchQuery );
 	}
 
@@ -101,10 +101,10 @@ public final class Search {
 	 * for example when integrating to an external library that expects Hibernate ORM queries.
 	 *
 	 * @param searchQuery The search query to convert.
-	 * @param <T> The type of query hits.
+	 * @param <H> The type of query hits.
 	 * @return A representation of the given query as a Hibernate ORM query.
 	 */
-	public static <T> Query<T> toOrmQuery(SearchQuery<T> searchQuery) {
+	public static <H> Query<H> toOrmQuery(SearchQuery<H> searchQuery) {
 		return HibernateOrmSearchQueryAdapter.create( searchQuery );
 	}
 

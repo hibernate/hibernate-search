@@ -54,7 +54,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * all of its methods are considered SPIs and therefore should never be called directly by users.
  * In short, users are only expected to get instances of this type from an API and pass it to another API.
  *
- * @param <T> The type of query hits.
+ * @param <H> The type of query hits.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( LuceneExtension.get() }.
  * @param <R> The reference type for projections.
@@ -64,9 +64,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( LuceneExtension.get() }.
  */
-public final class LuceneExtension<T, R, E>
+public final class LuceneExtension<H, R, E>
 		implements SearchQueryContextExtension<LuceneSearchQueryResultDefinitionContext<R, E>, R, E>,
-		SearchQueryExtension<LuceneSearchQuery<T>, T>,
+		SearchQueryExtension<LuceneSearchQuery<H>, H>,
 		SearchPredicateFactoryContextExtension<LuceneSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<LuceneSearchSortContainerContext>,
 		SearchProjectionFactoryContextExtension<LuceneSearchProjectionFactoryContext<R, E>, R, E>,
@@ -76,9 +76,9 @@ public final class LuceneExtension<T, R, E>
 
 	private static final LuceneExtension<Object, Object, Object> INSTANCE = new LuceneExtension<>();
 
-	@SuppressWarnings("unchecked") // The instance works for any T, R and E
-	public static <Q, R, E> LuceneExtension<Q, R, E> get() {
-		return (LuceneExtension<Q, R, E>) INSTANCE;
+	@SuppressWarnings("unchecked") // The instance works for any H, R and E
+	public static <H, R, E> LuceneExtension<H, R, E> get() {
+		return (LuceneExtension<H, R, E>) INSTANCE;
 	}
 
 	private LuceneExtension() {
@@ -108,10 +108,10 @@ public final class LuceneExtension<T, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchQuery<T>> extendOptional(SearchQuery<T> original,
+	public Optional<LuceneSearchQuery<H>> extendOptional(SearchQuery<H> original,
 			LoadingContext<?, ?> loadingContext) {
 		if ( original instanceof LuceneSearchQuery ) {
-			return Optional.of( (LuceneSearchQuery<T>) original );
+			return Optional.of( (LuceneSearchQuery<H>) original );
 		}
 		else {
 			return Optional.empty();

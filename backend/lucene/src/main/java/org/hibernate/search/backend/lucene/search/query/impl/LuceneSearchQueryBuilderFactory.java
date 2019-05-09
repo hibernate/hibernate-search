@@ -76,9 +76,9 @@ public class LuceneSearchQueryBuilderFactory
 		return new LuceneCompositeListProjection<>( Function.identity(), children );
 	}
 
-	private <T> LuceneSearchQueryBuilder<T> createSearchQueryBuilder(
+	private <H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
-			LuceneSearchProjection<?, T> rootProjection) {
+			LuceneSearchProjection<?, H> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
 				scopeModel, sessionContext, loadingContextBuilder, rootProjection
 		);

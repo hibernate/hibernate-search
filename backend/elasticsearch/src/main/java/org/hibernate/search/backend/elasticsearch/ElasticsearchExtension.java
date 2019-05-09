@@ -54,7 +54,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * all of its methods are considered SPIs and therefore should never be called directly by users.
  * In short, users are only expected to get instances of this type from an API and pass it to another API.
  *
- * @param <T> The type of query hits.
+ * @param <H> The type of query hits.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * @param <R> The reference type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
@@ -63,9 +63,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
  */
-public final class ElasticsearchExtension<T, R, E>
+public final class ElasticsearchExtension<H, R, E>
 		implements SearchQueryContextExtension<ElasticsearchSearchQueryResultDefinitionContext<R, E>, R, E>,
-		SearchQueryExtension<ElasticsearchSearchQuery<T>, T>,
+		SearchQueryExtension<ElasticsearchSearchQuery<H>, H>,
 		SearchPredicateFactoryContextExtension<ElasticsearchSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<ElasticsearchSearchSortContainerContext>,
 		SearchProjectionFactoryContextExtension<ElasticsearchSearchProjectionFactoryContext<R, E>, R, E>,
@@ -75,7 +75,7 @@ public final class ElasticsearchExtension<T, R, E>
 
 	private static final ElasticsearchExtension<Object, Object, Object> INSTANCE = new ElasticsearchExtension<>();
 
-	@SuppressWarnings("unchecked") // The instance works for any T, R and E
+	@SuppressWarnings("unchecked") // The instance works for any H, R and E
 	public static <Q, R, E> ElasticsearchExtension<Q, R, E> get() {
 		return (ElasticsearchExtension<Q, R, E>) INSTANCE;
 	}
@@ -107,10 +107,10 @@ public final class ElasticsearchExtension<T, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchQuery<T>> extendOptional(SearchQuery<T> original,
+	public Optional<ElasticsearchSearchQuery<H>> extendOptional(SearchQuery<H> original,
 			LoadingContext<?, ?> loadingContext) {
 		if ( original instanceof ElasticsearchSearchQuery ) {
-			return Optional.of( (ElasticsearchSearchQuery<T>) original );
+			return Optional.of( (ElasticsearchSearchQuery<H>) original );
 		}
 		else {
 			return Optional.empty();

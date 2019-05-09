@@ -22,15 +22,15 @@ import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjecti
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<T> {
+class LuceneSearchResultExtractorImpl<H> implements LuceneSearchResultExtractor<H> {
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
-	private final LuceneSearchProjection<?, T> rootProjection;
+	private final LuceneSearchProjection<?, H> rootProjection;
 	private final LoadingContext<?, ?> loadingContext;
 
 	LuceneSearchResultExtractorImpl(
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
-			LuceneSearchProjection<?, T> rootProjection,
+			LuceneSearchProjection<?, H> rootProjection,
 			LoadingContext<?, ?> loadingContext) {
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.rootProjection = rootProjection;
@@ -38,7 +38,7 @@ class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<
 	}
 
 	@Override
-	public LuceneLoadableSearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
+	public LuceneLoadableSearchResult<H> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
 			SearchProjectionExtractContext projectionExecutionContext) throws IOException {
 		ProjectionHitMapper<?, ?> projectionHitMapper = loadingContext.getProjectionHitMapper();
 

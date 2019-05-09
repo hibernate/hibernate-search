@@ -28,8 +28,8 @@ import org.apache.lucene.search.Sort;
 /**
  * @author Guillaume Smet
  */
-public class LuceneSearchQueryImpl<T> extends AbstractSearchQuery<T, LuceneSearchResult<T>>
-		implements LuceneSearchQuery<T> {
+public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearchResult<H>>
+		implements LuceneSearchQuery<H> {
 
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
@@ -40,14 +40,14 @@ public class LuceneSearchQueryImpl<T> extends AbstractSearchQuery<T, LuceneSearc
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneCollectorProvider luceneCollectorProvider;
-	private final LuceneSearchResultExtractor<T> searchResultExtractor;
+	private final LuceneSearchResultExtractor<H> searchResultExtractor;
 
 	LuceneSearchQueryImpl(LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Query luceneQuery, Sort luceneSort,
-			LuceneCollectorProvider luceneCollectorProvider, LuceneSearchResultExtractor<T> searchResultExtractor) {
+			LuceneCollectorProvider luceneCollectorProvider, LuceneSearchResultExtractor<H> searchResultExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.indexNames = indexNames;
@@ -71,15 +71,15 @@ public class LuceneSearchQueryImpl<T> extends AbstractSearchQuery<T, LuceneSearc
 	}
 
 	@Override
-	public <Q> Q extension(SearchQueryExtension<Q, T> extension) {
+	public <Q> Q extension(SearchQueryExtension<Q, H> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, loadingContext )
 		);
 	}
 
 	@Override
-	public LuceneSearchResult<T> fetch(Long limit, Long offset) {
-		LuceneQueryWork<LuceneLoadableSearchResult<T>> work = workFactory.search(
+	public LuceneSearchResult<H> fetch(Long limit, Long offset) {
+		LuceneQueryWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
 				new LuceneSearcher<>(
 						indexNames,
 						readerProviders,
@@ -101,7 +101,7 @@ public class LuceneSearchQueryImpl<T> extends AbstractSearchQuery<T, LuceneSearc
 
 	@Override
 	public long fetchTotalHitCount() {
-		LuceneQueryWork<LuceneLoadableSearchResult<T>> work = workFactory.search(
+		LuceneQueryWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
 				new LuceneSearcher<>(
 						indexNames,
 						readerProviders,

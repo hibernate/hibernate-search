@@ -10,8 +10,8 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearc
 
 import com.google.gson.JsonObject;
 
-public interface ElasticsearchSearchResultExtractor<T> {
+public interface ElasticsearchSearchResultExtractor<H> {
 
-	ElasticsearchLoadableSearchResult<T> extract(JsonObject responseBody);
+	ElasticsearchLoadableSearchResult<H> extract(JsonObject responseBody);
 
 }

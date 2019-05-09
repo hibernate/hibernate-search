@@ -18,10 +18,10 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * An abstract base for implementations of {@link SearchQuery}.
  *
- * @param <T> The type of query hits.
+ * @param <H> The type of query hits.
  * @param <R> The result type (extending {@link SearchResult}).
  */
-public abstract class AbstractSearchQuery<T, R extends SearchResult<T>> implements SearchQuery<T> {
+public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implements SearchQuery<H> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -54,35 +54,35 @@ public abstract class AbstractSearchQuery<T, R extends SearchResult<T>> implemen
 	}
 
 	@Override
-	public List<T> fetchHits() {
+	public List<H> fetchHits() {
 		return fetchHits( (Long) null, null );
 	}
 
 	@Override
-	public List<T> fetchHits(Long limit) {
+	public List<H> fetchHits(Long limit) {
 		return fetchHits( limit, null );
 	}
 
 	@Override
-	public List<T> fetchHits(Integer limit) {
+	public List<H> fetchHits(Integer limit) {
 		return fetchHits( limit == null ? null : limit.longValue(), null );
 	}
 
 	@Override
-	public List<T> fetchHits(Long limit, Long offset) {
+	public List<H> fetchHits(Long limit, Long offset) {
 		return fetch( limit, offset ).getHits();
 	}
 
 	@Override
-	public List<T> fetchHits(Integer limit, Integer offset) {
+	public List<H> fetchHits(Integer limit, Integer offset) {
 		return fetchHits( limit == null ? null : (long) limit, offset == null ? null : (long) offset );
 	}
 
 	@Override
-	public Optional<T> fetchSingleHit() {
+	public Optional<H> fetchSingleHit() {
 		// We don't need to fetch more than two elements to detect a problem
 		R result = fetch( 2L );
-		List<T> hits = result.getHits();
+		List<H> hits = result.getHits();
 		int fetchedHitCount = result.getHits().size();
 		if ( fetchedHitCount == 0 ) {
 			return Optional.empty();
