@@ -63,10 +63,12 @@ public class AutomaticIndexingEmbeddableIT {
 						)
 						.objectField( "containedEmbeddedList", b2 -> b2
 								.objectField( "containedList", b3 -> b3
+										.multiValued( true )
 										.field( "includedInEmbeddedList", String.class )
 								)
 						)
 						.objectField( "containedElementCollection", b2 -> b2
+								.multiValued( true )
 								.objectField( "containedSingle", b3 -> b3
 										.field( "includedInElementCollection", String.class )
 								)

@@ -36,7 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test the behavior of implementations of implementations of {@link DocumentElement}.
+ * Test the behavior of implementations of {@link DocumentElement}.
  */
 public class DocumentElementIT {
 
@@ -287,7 +287,7 @@ public class DocumentElementIT {
 
 			// Simulate an embedded context which excludes every subfield
 			IndexedEmbeddedBindingContext excludingEmbeddedContext = ctx.addIndexedEmbeddedIfIncluded(
-					new StubTypeModel( "embedded" ),
+					new StubTypeModel( "embedded" ), true,
 					"excludingObject.", ObjectFieldStorage.FLATTENED,
 					null, Collections.singleton( "pathThatDoesNotMatchAnything" )
 			).get();

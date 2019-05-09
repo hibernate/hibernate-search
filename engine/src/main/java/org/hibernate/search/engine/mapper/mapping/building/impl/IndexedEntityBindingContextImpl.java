@@ -26,4 +26,10 @@ public class IndexedEntityBindingContextImpl extends AbstractIndexBindingContext
 	public void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter) {
 		indexSchemaObjectNodeBuilder.idDslConverter( idConverter );
 	}
+
+	@Override
+	boolean isParentMultivaluedAndWithoutObjectField() {
+		// The root has no parent
+		return false;
+	}
 }

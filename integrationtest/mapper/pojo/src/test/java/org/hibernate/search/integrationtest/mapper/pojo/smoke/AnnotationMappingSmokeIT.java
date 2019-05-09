@@ -80,11 +80,13 @@ public class AnnotationMappingSmokeIT {
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
 				.objectField( "embeddedIterable", b2 -> b2
+						.multiValued( true )
 						.objectField( "embedded", b3 -> b3
 								.field( "prefix_myTextField", String.class )
 						)
 				)
 				.objectField( "embeddedList", b2 -> b2
+						.multiValued( true )
 						.objectField( "otherPrefix_embedded", b3 -> b3
 								.objectField( "prefix_customBridgeOnClass", b4 -> b4
 										.field( "text", String.class )
@@ -92,14 +94,16 @@ public class AnnotationMappingSmokeIT {
 						)
 				)
 				.objectField( "embeddedArrayList", b2 -> b2
+						.multiValued( true )
 						.objectField( "embedded", b3 -> b3
 								.objectField( "prefix_customBridgeOnProperty", b4 -> b4
 										.field( "text", String.class )
 								)
 						)
 				)
-				.field( "embeddedMapKeys", String.class )
+				.field( "embeddedMapKeys", String.class, b2 -> b2.multiValued( true ) )
 				.objectField( "embeddedMap", b2 -> b2
+						.multiValued( true )
 						.objectField( "embedded", b3 -> b3
 								.field( "prefix_myLocalDateField", LocalDate.class )
 						)

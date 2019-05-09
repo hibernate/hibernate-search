@@ -42,7 +42,8 @@ class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extend
 
 		valueNodeProcessorCollectionBuilder = new PojoIndexingProcessorValueNodeBuilderDelegate<>(
 				modelPath,
-				mappingHelper, bindingContext
+				mappingHelper, bindingContext,
+				extractorHolder.get().isMultiValued()
 		);
 	}
 

@@ -21,4 +21,9 @@ public class OptionalLongValueExtractor implements ContainerExtractor<OptionalLo
 			return Stream.empty();
 		}
 	}
+
+	@Override
+	public boolean isMultiValued() {
+		return false;
+	}
 }

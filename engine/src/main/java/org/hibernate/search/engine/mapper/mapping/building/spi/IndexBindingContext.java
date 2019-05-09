@@ -42,12 +42,15 @@ public interface IndexBindingContext {
 
 	/**
 	 * @param parentTypeModel The model representing the type holding the property with an indexed-embedded.
+	 * @param multiValued Whether the property with an indexed-embedded is to be considered as multi-valued
+	 * (i.e. multiple indexed-embedded objects may be processed for a single "embedding" object).
 	 * @param relativePrefix The prefix to apply to all index fields created in the context of the indexed-embedded.
 	 * @param storage The storage type to use for all object fields created as part of the {@code relativePrefix}.
 	 * @param maxDepth The maximum depth beyond which all created fields will be ignored. {@code null} for no limit.
 	 * @param includePaths The exhaustive list of paths of fields that are to be included. {@code null} for no limit.
 	 * @return The element in the index schema that this context points to.
 	 */
-	Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(MappableTypeModel parentTypeModel,
+	Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(
+			MappableTypeModel parentTypeModel, boolean multiValued,
 			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);
 }

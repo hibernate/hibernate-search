@@ -21,4 +21,9 @@ public class OptionalDoubleValueExtractor implements ContainerExtractor<Optional
 			return Stream.empty();
 		}
 	}
+
+	@Override
+	public boolean isMultiValued() {
+		return false;
+	}
 }

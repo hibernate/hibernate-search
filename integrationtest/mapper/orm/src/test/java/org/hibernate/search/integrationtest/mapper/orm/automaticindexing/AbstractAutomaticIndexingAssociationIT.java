@@ -11,11 +11,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -105,28 +107,41 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 
 	@Before
 	public void setup() {
+		Consumer<StubIndexSchemaNode.Builder> associationFieldContributor = b -> {
+			if ( primitives.isMultiValuedAssociation() ) {
+				b.multiValued( true );
+			}
+		};
 		backendMock.expectSchema( primitives.getIndexName(), b -> b
-				.objectField( "containedIndexedEmbedded", b2 -> b2
-						.field( "indexedField", String.class )
-						.field( "indexedElementCollectionField", String.class )
-						.field( "containedDerivedField", String.class )
+				.objectField( "containedIndexedEmbedded",
+						associationFieldContributor.andThen( b2 -> b2
+								.field( "indexedField", String.class )
+								.field( "indexedElementCollectionField", String.class, b3 -> b3.multiValued( true ) )
+								.field( "containedDerivedField", String.class )
+						)
 				)
-				.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
-						.field( "indexedField", String.class )
-						.field( "indexedElementCollectionField", String.class )
-						.field( "containedDerivedField", String.class )
+				.objectField( "containedIndexedEmbeddedNoReindexOnUpdate",
+						associationFieldContributor.andThen( b2 -> b2
+								.field( "indexedField", String.class )
+								.field( "indexedElementCollectionField", String.class, b3 -> b3.multiValued( true ) )
+								.field( "containedDerivedField", String.class )
+						)
 				)
 				.field( "crossEntityDerivedField", String.class )
 				.objectField( "child", b3 -> b3
-						.objectField( "containedIndexedEmbedded", b2 -> b2
-								.field( "indexedField", String.class )
-								.field( "indexedElementCollectionField", String.class )
-								.field( "containedDerivedField", String.class )
+						.objectField( "containedIndexedEmbedded",
+								associationFieldContributor.andThen( b2 -> b2
+										.field( "indexedField", String.class )
+										.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
+										.field( "containedDerivedField", String.class )
+								)
 						)
-						.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
-								.field( "indexedField", String.class )
-								.field( "indexedElementCollectionField", String.class )
-								.field( "containedDerivedField", String.class )
+						.objectField( "containedIndexedEmbeddedNoReindexOnUpdate",
+								associationFieldContributor.andThen( b2 -> b2
+										.field( "indexedField", String.class )
+										.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
+										.field( "containedDerivedField", String.class )
+								)
 						)
 						.field( "crossEntityDerivedField", String.class )
 				)
@@ -887,6 +902,8 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TContained
 			> {
 		String getIndexName();
+
+		boolean isMultiValuedAssociation();
 
 		Class<TIndexed> getIndexedClass();
 

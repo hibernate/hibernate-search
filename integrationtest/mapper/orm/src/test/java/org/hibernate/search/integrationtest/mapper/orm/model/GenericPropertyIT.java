@@ -53,7 +53,7 @@ public class GenericPropertyIT {
 						 * and Hibernate Search will fail to resolve the bridge for them
 						 */
 						.field( "content", String.class )
-						.field( "arrayContent", String.class )
+						.field( "arrayContent", String.class, b3 -> b3.multiValued( true ) )
 				)
 		);
 

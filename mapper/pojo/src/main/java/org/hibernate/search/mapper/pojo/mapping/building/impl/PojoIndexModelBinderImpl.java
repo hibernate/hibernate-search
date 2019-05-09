@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -252,7 +253,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexBindingContext bindingContext,
-			BoundPojoModelPathValueNode<?, ?, V> modelPath, BridgeBuilder<? extends ValueBridge<?, ?>> builder,
+			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
+			BridgeBuilder<? extends ValueBridge<?, ?>> builder,
 			String relativeFieldName, FieldModelContributor contributor) {
 		PojoGenericTypeModel<V> valueTypeModel = modelPath.getTypeModel();
 
@@ -280,7 +282,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			@SuppressWarnings({"unchecked", "rawtypes"})
 			BoundValueBridge<V, ?> boundValueBridge = bindValueBridge(
 					bindingContext.getTypeFactory(),
-					schemaElement, valueTypeModel,
+					schemaElement, valueTypeModel, multiValued,
 					(BeanHolder<? extends ValueBridge>) bridgeHolder,
 					relativeFieldName, contributor
 			);
@@ -307,7 +309,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	private <V, V2, F, B extends ValueBridge<V2, F>> BoundValueBridge<V, ?> bindValueBridge(
 			IndexFieldTypeFactoryContext indexFieldTypeFactory,
-			IndexSchemaElement schemaElement, PojoGenericTypeModel<V> valueTypeModel,
+			IndexSchemaElement schemaElement, PojoGenericTypeModel<V> valueTypeModel, boolean multiValued,
 			BeanHolder<? extends B> bridgeHolder,
 			String relativeFieldName, FieldModelContributor contributor) {
 		B bridge = bridgeHolder.get();
@@ -353,8 +355,12 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		// Then give the mapping a chance to override some of the model (add storage, ...)
 		contributor.contribute( fieldTypeContext, new FieldModelContributorBridgeContextImpl<>( bridge, fieldTypeContext ) );
 
-		IndexFieldReference<? super F> indexFieldReference = schemaElement.field( relativeFieldName, fieldTypeContext )
-				.toReference();
+		IndexSchemaFieldContext<?, ? extends IndexFieldReference<? super F>> fieldContext =
+				schemaElement.field( relativeFieldName, fieldTypeContext );
+		if ( multiValued ) {
+			fieldContext.multiValued();
+		}
+		IndexFieldReference<? super F> indexFieldReference = fieldContext.toReference();
 
 		return new BoundValueBridge<>( castedBridgeHolder, indexFieldReference );
 	}

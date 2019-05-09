@@ -16,8 +16,9 @@ class IndexSchemaObjectFieldImpl extends IndexSchemaElementImpl<IndexSchemaObjec
 
 	IndexSchemaObjectFieldImpl(IndexFieldTypeFactoryContext typeFactoryContext,
 			IndexSchemaObjectFieldNodeBuilder objectFieldBuilder,
-			IndexSchemaNestingContext nestingContext) {
-		super( typeFactoryContext, objectFieldBuilder, nestingContext );
+			IndexSchemaNestingContext nestingContext,
+			boolean directChildrenAreMultiValuedByDefault) {
+		super( typeFactoryContext, objectFieldBuilder, nestingContext, directChildrenAreMultiValuedByDefault );
 	}
 
 	@Override

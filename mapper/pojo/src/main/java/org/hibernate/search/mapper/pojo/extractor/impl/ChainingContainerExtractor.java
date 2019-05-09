@@ -27,6 +27,11 @@ class ChainingContainerExtractor<C, U, V> implements ContainerExtractor<C, V> {
 	}
 
 	@Override
+	public boolean isMultiValued() {
+		return parent.isMultiValued() || chained.isMultiValued();
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder( "[" );
 		appendToString( builder, this, true );

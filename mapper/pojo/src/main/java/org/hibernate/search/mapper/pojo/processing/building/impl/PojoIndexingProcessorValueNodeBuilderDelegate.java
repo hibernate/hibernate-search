@@ -51,11 +51,15 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 	private final Collection<PojoIndexingProcessorTypeNodeBuilder<V>> typeNodeBuilders = new ArrayList<>();
 
+	private final boolean multiValuedFromContainerExtractor;
+
 	PojoIndexingProcessorValueNodeBuilderDelegate(
 			BoundPojoModelPathValueNode<?, P, V> modelPath,
-			PojoMappingHelper mappingHelper, IndexBindingContext bindingContext) {
+			PojoMappingHelper mappingHelper, IndexBindingContext bindingContext,
+			boolean multiValuedFromContainerExtractor) {
 		super( mappingHelper, bindingContext );
 		this.modelPath = modelPath;
+		this.multiValuedFromContainerExtractor = multiValuedFromContainerExtractor;
 	}
 
 	@Override
@@ -67,7 +71,8 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 		}
 
 		mappingHelper.getIndexModelBinder().addValueBridge(
-				bindingContext, modelPath, builder, defaultedRelativeFieldName,
+				bindingContext, modelPath, multiValuedFromContainerExtractor,
+				builder, defaultedRelativeFieldName,
 				fieldModelContributor
 		)
 				.ifPresent( boundBridges::add );
@@ -84,7 +89,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 		BoundPojoModelPathTypeNode<?> holderTypePath = modelPath.getParent().getParent();
 
 		Optional<IndexedEmbeddedBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
-				holderTypePath.getTypeModel().getRawType(),
+				holderTypePath.getTypeModel().getRawType(), multiValuedFromContainerExtractor,
 				defaultedRelativePrefix, storage, maxDepth, includePaths
 		);
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {

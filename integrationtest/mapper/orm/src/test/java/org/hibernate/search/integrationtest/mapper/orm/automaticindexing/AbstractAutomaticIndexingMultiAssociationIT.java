@@ -1007,6 +1007,11 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			> extends AssociationModelPrimitives<TIndexed, TContaining, TContained> {
 
 		@Override
+		default boolean isMultiValuedAssociation() {
+			return true;
+		}
+
+		@Override
 		default void setContainedIndexedEmbeddedSingle(TContaining containing, TContained contained) {
 			TContainedAssociation containedAssociation = getContainedIndexedEmbedded( containing );
 			clearContained( containedAssociation );

@@ -29,12 +29,15 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	private final IndexFieldTypeFactoryContext typeFactoryContext;
 	final B objectNodeBuilder;
 	private final IndexSchemaNestingContext nestingContext;
+	private final boolean directChildrenAreMultiValuedByDefault;
 
 	public IndexSchemaElementImpl(IndexFieldTypeFactoryContext typeFactoryContext,
-			B objectNodeBuilder, IndexSchemaNestingContext nestingContext) {
+			B objectNodeBuilder, IndexSchemaNestingContext nestingContext,
+			boolean directChildrenAreMultiValuedByDefault) {
 		this.typeFactoryContext = typeFactoryContext;
 		this.objectNodeBuilder = objectNodeBuilder;
 		this.nestingContext = nestingContext;
+		this.directChildrenAreMultiValuedByDefault = directChildrenAreMultiValuedByDefault;
 	}
 
 	@Override
@@ -51,13 +54,17 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(
 			String relativeFieldName, IndexFieldType<F> type) {
 		checkRelativeFieldName( relativeFieldName );
-		return nestingContext.nest(
+		IndexSchemaFieldContext<?, IndexFieldReference<F>> fieldContext = nestingContext.nest(
 				relativeFieldName,
 				// If the field is included
 				prefixedName -> objectNodeBuilder.addField( prefixedName, type ),
 				// If the field is filtered out
 				prefixedName -> objectNodeBuilder.createExcludedField( prefixedName, type )
 		);
+		if ( directChildrenAreMultiValuedByDefault ) {
+			fieldContext.multiValued();
+		}
+		return fieldContext;
 	}
 
 	@Override
@@ -69,21 +76,25 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	@Override
 	public IndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage) {
 		checkRelativeFieldName( relativeFieldName );
-		return nestingContext.nest(
+		IndexSchemaObjectField fieldContext = nestingContext.nest(
 				relativeFieldName,
 				// If the field is included
 				(prefixedName, filter) -> {
 					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 							this.objectNodeBuilder.addObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( typeFactoryContext, objectFieldBuilder, filter );
+					return new IndexSchemaObjectFieldImpl( typeFactoryContext, objectFieldBuilder, filter, false );
 				},
 				// If the field is filtered out
 				(prefixedName, filter) -> {
 					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 							this.objectNodeBuilder.createExcludedObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( typeFactoryContext, objectFieldBuilder, filter );
+					return new IndexSchemaObjectFieldImpl( typeFactoryContext, objectFieldBuilder, filter, false );
 				}
 		);
+		if ( directChildrenAreMultiValuedByDefault ) {
+			fieldContext.multiValued();
+		}
+		return fieldContext;
 	}
 
 	private void checkRelativeFieldName(String relativeFieldName) {

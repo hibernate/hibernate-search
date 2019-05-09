@@ -71,7 +71,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		map.put( STRING_VALUE_3, STRING_VALUE_6 );
 		doTest(
 				IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ),
-				String.class,
+				String.class, true,
 				map,
 				STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3
 		);
@@ -107,7 +107,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		map.put( CollectionHelper.asList( STRING_VALUE_4, STRING_VALUE_5 ), STRING_VALUE_6 );
 		doTest(
 				IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ),
-				String.class,
+				String.class, true,
 				map,
 				STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_4, STRING_VALUE_5
 		);
@@ -137,7 +137,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		}
 		doTest(
 				IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ),
-				String.class,
+				String.class, false,
 				CollectionHelper.asList( STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3 ),
 				STRING_VALUE_1
 		);

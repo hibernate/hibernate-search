@@ -49,8 +49,8 @@ public class AutomaticIndexingBasicIT {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "indexedField", String.class )
 				.field( "noReindexOnUpdateField", String.class )
-				.field( "indexedElementCollectionField", String.class )
-				.field( "noReindexOnUpdateElementCollectionField", String.class )
+				.field( "indexedElementCollectionField", String.class, b2 -> b2.multiValued( true ) )
+				.field( "noReindexOnUpdateElementCollectionField", String.class, b2 -> b2.multiValued( true ) )
 		);
 
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )

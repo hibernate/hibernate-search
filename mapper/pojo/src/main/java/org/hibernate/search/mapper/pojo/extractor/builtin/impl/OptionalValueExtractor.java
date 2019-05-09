@@ -16,4 +16,9 @@ public class OptionalValueExtractor<T> implements ContainerExtractor<Optional<T>
 	public Stream<T> extract(Optional<T> container) {
 		return container == null ? Stream.empty() : container.map( Stream::of ).orElseGet( Stream::empty );
 	}
+
+	@Override
+	public boolean isMultiValued() {
+		return false;
+	}
 }

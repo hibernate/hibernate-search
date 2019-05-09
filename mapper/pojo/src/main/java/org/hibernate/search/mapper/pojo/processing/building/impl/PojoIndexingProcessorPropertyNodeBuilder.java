@@ -68,7 +68,8 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 
 		this.valueWithoutExtractorBuilderDelegate = new PojoIndexingProcessorValueNodeBuilderDelegate<>(
 				modelPath.valueWithoutExtractors(),
-				mappingHelper, bindingContext
+				mappingHelper, bindingContext,
+				false
 		);
 	}
 

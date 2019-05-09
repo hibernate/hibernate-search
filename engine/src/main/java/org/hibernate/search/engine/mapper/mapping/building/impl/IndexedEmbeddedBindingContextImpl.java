@@ -20,12 +20,16 @@ class IndexedEmbeddedBindingContextImpl
 		implements IndexedEmbeddedBindingContext {
 	private final Collection<IndexObjectFieldReference> parentIndexObjectReferences;
 
+	private final boolean parentMultivaluedAndWithoutObjectField;
+
 	IndexedEmbeddedBindingContextImpl(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
 			IndexSchemaObjectNodeBuilder indexSchemaObjectNodeBuilder,
 			Collection<IndexObjectFieldReference> parentIndexObjectReferences,
-			ConfiguredIndexSchemaNestingContext nestingContext) {
+			ConfiguredIndexSchemaNestingContext nestingContext,
+			boolean parentMultivaluedAndWithoutObjectField) {
 		super( indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder, nestingContext );
 		this.parentIndexObjectReferences = Collections.unmodifiableCollection( parentIndexObjectReferences );
+		this.parentMultivaluedAndWithoutObjectField = parentMultivaluedAndWithoutObjectField;
 	}
 
 	@Override
@@ -41,5 +45,10 @@ class IndexedEmbeddedBindingContextImpl
 	@Override
 	public Set<String> getEncounteredFieldPaths() {
 		return nestingContext.getEncounteredFieldPaths();
+	}
+
+	@Override
+	boolean isParentMultivaluedAndWithoutObjectField() {
+		return parentMultivaluedAndWithoutObjectField;
 	}
 }

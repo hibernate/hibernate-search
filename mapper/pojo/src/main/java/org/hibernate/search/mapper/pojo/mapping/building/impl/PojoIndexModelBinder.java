@@ -66,7 +66,8 @@ public interface PojoIndexModelBinder {
 			BoundPojoModelPathPropertyNode<?, P> modelPath, BridgeBuilder<? extends PropertyBridge> bridgeBuilder);
 
 	<V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexBindingContext bindingContext,
-			BoundPojoModelPathValueNode<?, ?, V> modelPath, BridgeBuilder<? extends ValueBridge<?, ?>> bridgeBuilder,
+			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
+			BridgeBuilder<? extends ValueBridge<?, ?>> bridgeBuilder,
 			String relativeFieldName, FieldModelContributor contributor);
 
 }

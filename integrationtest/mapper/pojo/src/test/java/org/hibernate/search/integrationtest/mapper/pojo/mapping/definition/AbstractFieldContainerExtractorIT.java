@@ -66,7 +66,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void objectArray() {
 		doTest(
 				testModelProvider.objectArray(),
-				String.class,
+				String.class, true,
 				new String[] { STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3 },
 				STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3
 		);
@@ -76,7 +76,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void iterable() {
 		doTest(
 				testModelProvider.iterable(),
-				String.class,
+				String.class, true,
 				CollectionHelper.asList( STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3 ),
 				STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3
 		);
@@ -86,7 +86,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void collection() {
 		doTest(
 				testModelProvider.collection(),
-				String.class,
+				String.class, true,
 				CollectionHelper.asList( STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3 ),
 				STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3
 		);
@@ -96,7 +96,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void list() {
 		doTest(
 				testModelProvider.list(),
-				String.class,
+				String.class, true,
 				CollectionHelper.asList( STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3 ),
 				STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3
 		);
@@ -106,7 +106,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void set() {
 		doTest(
 				testModelProvider.set(),
-				String.class,
+				String.class, true,
 				CollectionHelper.asLinkedHashSet( STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3 ),
 				STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3
 		);
@@ -120,7 +120,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 		Collections.addAll( set, STRING_VALUE_2, STRING_VALUE_1, STRING_VALUE_3 );
 		doTest(
 				testModelProvider.sortedSet(),
-				String.class,
+				String.class, true,
 				set,
 				STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3
 		);
@@ -134,7 +134,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 		map.put( STRING_VALUE_3, STRING_VALUE_6 );
 		doTest(
 				testModelProvider.mapValues(),
-				String.class,
+				String.class, true,
 				map,
 				STRING_VALUE_4, STRING_VALUE_5, STRING_VALUE_6
 		);
@@ -150,7 +150,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 		map.put( STRING_VALUE_3, STRING_VALUE_6 );
 		doTest(
 				testModelProvider.sortedMapValues(),
-				String.class,
+				String.class, true,
 				map,
 				STRING_VALUE_4, STRING_VALUE_5, STRING_VALUE_6
 		);
@@ -163,7 +163,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 		map.put( STRING_VALUE_4, CollectionHelper.asList( STRING_VALUE_5, STRING_VALUE_6 ) );
 		doTest(
 				testModelProvider.mapListValues(),
-				String.class,
+				String.class, true,
 				map,
 				STRING_VALUE_2, STRING_VALUE_3, STRING_VALUE_5, STRING_VALUE_6
 		);
@@ -173,7 +173,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void optional_nonEmpty() {
 		doTest(
 				testModelProvider.optional(),
-				String.class,
+				String.class, false,
 				Optional.of( STRING_VALUE_1 ),
 				STRING_VALUE_1
 		);
@@ -183,7 +183,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void optional_empty() {
 		doTestExpectMissing(
 				testModelProvider.optional(),
-				String.class,
+				String.class, false,
 				Optional.empty()
 		);
 	}
@@ -193,7 +193,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void optionalDouble_nonEmpty() {
 		doTest(
 				testModelProvider.optionalDouble(),
-				Double.class,
+				Double.class, false,
 				OptionalDouble.of( 42.42 ),
 				42.42
 		);
@@ -204,7 +204,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void optionalDouble_empty() {
 		doTestExpectMissing(
 				testModelProvider.optionalDouble(),
-				Double.class,
+				Double.class, false,
 				OptionalDouble.empty()
 		);
 	}
@@ -213,7 +213,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void optionalInt_nonEmpty() {
 		doTest(
 				testModelProvider.optionalInt(),
-				Integer.class,
+				Integer.class, false,
 				OptionalInt.of( 1 ),
 				1
 		);
@@ -223,7 +223,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void optionalInt_empty() {
 		doTestExpectMissing(
 				testModelProvider.optionalInt(),
-				Integer.class,
+				Integer.class, false,
 				OptionalInt.empty()
 		);
 	}
@@ -232,7 +232,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void optionalLong_nonEmpty() {
 		doTest(
 				testModelProvider.optionalLong(),
-				Long.class,
+				Long.class, false,
 				OptionalLong.of( 42L ),
 				42L
 		);
@@ -242,7 +242,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void optionalLong_empty() {
 		doTestExpectMissing(
 				testModelProvider.optionalLong(),
-				Long.class,
+				Long.class, false,
 				OptionalLong.empty()
 		);
 	}
@@ -254,7 +254,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void list_nonPassThroughBridge() {
 		doTest(
 				testModelProvider.list_implicitEnumBridge(),
-				String.class,
+				String.class, true,
 				CollectionHelper.asList( MyEnum.VALUE2, MyEnum.VALUE1 ),
 				MyEnum.VALUE2.name(), MyEnum.VALUE1.name()
 		);
@@ -268,7 +268,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public void list_customBridge() {
 		doTest(
 				testModelProvider.list_explicitPrefixedStringBridge(),
-				String.class,
+				String.class, true,
 				CollectionHelper.asList( STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3 ),
 				PrefixedStringBridge.PREFIX + STRING_VALUE_1,
 				PrefixedStringBridge.PREFIX + STRING_VALUE_2,
@@ -279,21 +279,26 @@ public abstract class AbstractFieldContainerExtractorIT {
 	@SafeVarargs
 	final <E, P, F> void doTest(Class<E> entityType,
 			BiFunction<Integer, P, E> newEntityFunction,
-			Class<F> indexedFieldType,
+			Class<F> indexedFieldType, boolean multiValued,
 			P propertyValue, F firstIndexedFieldValues, F... otherIndexedFieldValues) {
 		doTest(
 				new TestModel<>( entityType, newEntityFunction ),
 				indexedFieldType,
+				multiValued,
 				propertyValue, firstIndexedFieldValues, otherIndexedFieldValues
 		);
 	}
 
 	@SafeVarargs
-	final <E, P, F> void doTest(TestModel<E, P> testModel, Class<F> indexedFieldType,
+	final <E, P, F> void doTest(TestModel<E, P> testModel, Class<F> indexedFieldType, boolean multiValued,
 			P propertyValue, F firstIndexedFieldValues, F... otherIndexedFieldValues) {
 		// Schema
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "myProperty", indexedFieldType )
+				.field( "myProperty", indexedFieldType, b2 -> {
+					if ( multiValued ) {
+						b2.multiValued( true );
+					}
+				} )
 		);
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( testModel.getEntityClass() );
 		backendMock.verifyExpectationsMet();
@@ -319,11 +324,16 @@ public abstract class AbstractFieldContainerExtractorIT {
 		// TODO HSEARCH-3361 + HSEARCH-1895 also test projections going through the extractor
 	}
 
-	final <E, P, F> void doTestExpectMissing(TestModel<E, P> testModel, Class<F> indexedFieldType,
+	final <E, P, F> void doTestExpectMissing(TestModel<E, P> testModel,
+			Class<F> indexedFieldType, boolean multiValued,
 			P propertyValue) {
 		// Schema
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "myProperty", indexedFieldType )
+				.field( "myProperty", indexedFieldType, b2 -> {
+					if ( multiValued ) {
+						b2.multiValued( true );
+					}
+				} )
 		);
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( testModel.getEntityClass() );
 		backendMock.verifyExpectationsMet();

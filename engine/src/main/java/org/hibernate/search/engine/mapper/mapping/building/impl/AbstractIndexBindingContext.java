@@ -57,7 +57,8 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 		return new IndexSchemaElementImpl<>(
 				getTypeFactory(),
 				indexSchemaObjectNodeBuilder,
-				nestingContext
+				nestingContext,
+				isParentMultivaluedAndWithoutObjectField()
 		);
 	}
 
@@ -66,18 +67,31 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 		return new IndexSchemaElementImpl<>(
 				getTypeFactory(),
 				indexSchemaObjectNodeBuilder,
-				new NotifyingNestingContext( nestingContext, listener )
+				new NotifyingNestingContext( nestingContext, listener ),
+				isParentMultivaluedAndWithoutObjectField()
 		);
 	}
 
 	@Override
-	public Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(MappableTypeModel parentTypeModel,
+	public Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(
+			MappableTypeModel parentTypeModel, boolean multiValued,
 			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths) {
 		return nestingContext.addIndexedEmbeddedIfIncluded(
 				parentTypeModel, relativePrefix, maxDepth, includePaths,
-				new NestedContextBuilderImpl( indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder, storage )
+				new NestedContextBuilderImpl(
+						indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder, storage,
+						isParentMultivaluedAndWithoutObjectField() || multiValued
+				)
 		);
 	}
+
+	/**
+	 * @return {@code true} if the parent IndexedEmbedded was multi-valued,
+	 * and didn't add any object field.
+	 * This means in particular that any field added in this context will have to be considered multi-valued,
+	 * because it may be contributed multiple times from multiple parent values.
+	 */
+	abstract boolean isParentMultivaluedAndWithoutObjectField();
 
 	private static class NestedContextBuilderImpl
 			implements ConfiguredIndexSchemaNestingContext.NestedContextBuilder<IndexedEmbeddedBindingContext> {
@@ -86,18 +100,26 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 		private IndexSchemaObjectNodeBuilder currentNodeBuilder;
 		private final ObjectFieldStorage storage;
 		private final List<IndexObjectFieldReference> parentIndexObjectReferences = new ArrayList<>();
+		private boolean multiValued;
 
 		private NestedContextBuilderImpl(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
-				IndexSchemaObjectNodeBuilder currentNodeBuilder, ObjectFieldStorage storage) {
+				IndexSchemaObjectNodeBuilder currentNodeBuilder, ObjectFieldStorage storage,
+				boolean multiValued) {
 			this.indexSchemaRootNodeBuilder = indexSchemaRootNodeBuilder;
 			this.currentNodeBuilder = currentNodeBuilder;
 			this.storage = storage;
+			this.multiValued = multiValued;
 		}
 
 		@Override
 		public void appendObject(String objectName) {
 			IndexSchemaObjectFieldNodeBuilder nextNodeBuilder =
 					currentNodeBuilder.addObjectField( objectName, storage );
+			if ( multiValued ) {
+				// Only mark the first object as multi-valued
+				multiValued = false;
+				nextNodeBuilder.multiValued();
+			}
 			parentIndexObjectReferences.add( nextNodeBuilder.toReference() );
 			currentNodeBuilder = nextNodeBuilder;
 		}
@@ -106,7 +128,8 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 		public IndexedEmbeddedBindingContext build(ConfiguredIndexSchemaNestingContext nestingContext) {
 			return new IndexedEmbeddedBindingContextImpl(
 					indexSchemaRootNodeBuilder,
-					currentNodeBuilder, parentIndexObjectReferences, nestingContext
+					currentNodeBuilder, parentIndexObjectReferences, nestingContext,
+					multiValued
 			);
 		}
 	}

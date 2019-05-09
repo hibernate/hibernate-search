@@ -649,6 +649,11 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		}
 
 		@Override
+		public boolean isMultiValuedAssociation() {
+			return false;
+		}
+
+		@Override
 		public Class<IndexedEntity> getIndexedClass() {
 			return IndexedEntity.class;
 		}
