@@ -44,9 +44,9 @@ public final class DefaultProjectionHitMapper<R, O> implements ProjectionHitMapp
 
 	private static class DefaultLoadingResult<O> implements LoadingResult<O> {
 
-		private final List<O> loadedObjects;
+		private final List<? extends O> loadedObjects;
 
-		private DefaultLoadingResult(List<O> loadedObjects) {
+		private DefaultLoadingResult(List<? extends O> loadedObjects) {
 			this.loadedObjects = CollectionHelper.toImmutableList( loadedObjects );
 		}
 

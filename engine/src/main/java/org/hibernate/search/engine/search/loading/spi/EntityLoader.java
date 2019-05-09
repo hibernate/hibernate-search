@@ -23,7 +23,7 @@ public interface EntityLoader<R, O> {
 	 * @return A list of entities, in the same order the references were given.
 	 * {@code null} is inserted when an object is not found.
 	 */
-	List<O> loadBlocking(List<R> references);
+	List<? extends O> loadBlocking(List<R> references);
 
 	static <T> EntityLoader<T, T> identity() {
 		return IdentityEntityLoader.get();

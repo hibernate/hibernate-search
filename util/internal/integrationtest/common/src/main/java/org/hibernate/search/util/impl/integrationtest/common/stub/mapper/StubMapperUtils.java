@@ -47,7 +47,7 @@ public final class StubMapperUtils {
 	 * @param <R> The reference type.
 	 * @param <O> The entity type.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <R, O> void expectHitMapping(
 			LoadingContext<R, O> loadingContextMock,
 			Function<DocumentReference, R> referenceTransformerMock,
@@ -77,7 +77,8 @@ public final class StubMapperUtils {
 				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) )
 		) )
 				.andAnswer(
-						() -> ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
+						// We need to cast to a raw type to conform to List<? extends O>
+						() -> (List) ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
 						.map( context.loadingMap::get )
 						.collect( Collectors.toList() )
 				);

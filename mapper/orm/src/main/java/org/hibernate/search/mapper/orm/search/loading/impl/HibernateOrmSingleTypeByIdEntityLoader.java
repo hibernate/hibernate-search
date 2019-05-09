@@ -11,55 +11,47 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-class HibernateOrmSingleTypeByIdEntityLoader<O, T> implements HibernateOrmComposableEntityLoader<PojoReference, T> {
+class HibernateOrmSingleTypeByIdEntityLoader<O> implements HibernateOrmComposableEntityLoader<PojoReference, O> {
 	private final Session session;
-	private final Class<O> entityType;
+	private final Class<? extends O> entityType;
 	private final MutableEntityLoadingOptions loadingOptions;
-	private final Function<? super O, T> hitTransformer;
 
-	private MultiIdentifierLoadAccess<O> multiAccess;
+	private MultiIdentifierLoadAccess<? extends O> multiAccess;
 
 	public HibernateOrmSingleTypeByIdEntityLoader(
 			Session session,
-			Class<O> entityType,
-			MutableEntityLoadingOptions loadingOptions,
-			Function<? super O, T> hitTransformer) {
+			Class<? extends O> entityType,
+			MutableEntityLoadingOptions loadingOptions) {
 		this.session = session;
 		this.entityType = entityType;
 		this.loadingOptions = loadingOptions;
-		this.hitTransformer = hitTransformer;
 	}
 
 	@Override
-	public List<T> loadBlocking(List<PojoReference> references) {
-		List<O> loadedObjects = loadEntities( references );
-
-		// TODO avoid creating this list when the transformer is the identity; maybe cast the list in that case, or tranform in-place all the time?
-		return loadedObjects.stream().map( hitTransformer ).collect( Collectors.toList() );
+	public List<? extends O> loadBlocking(List<PojoReference> references) {
+		return loadEntities( references );
 	}
 
 	@Override
-	public void loadBlocking(List<PojoReference> references, Map<? super PojoReference, ? super T> objectsByReference) {
-		List<O> loadedObjects = loadEntities( references );
+	public void loadBlocking(List<PojoReference> references, Map<? super PojoReference, ? super O> objectsByReference) {
+		List<? extends O> loadedObjects = loadEntities( references );
 		Iterator<PojoReference> referencesIterator = references.iterator();
-		Iterator<O> loadedObjectIterator = loadedObjects.iterator();
+		Iterator<? extends O> loadedObjectIterator = loadedObjects.iterator();
 		while ( referencesIterator.hasNext() ) {
 			PojoReference reference = referencesIterator.next();
 			O loadedObject = loadedObjectIterator.next();
 			if ( loadedObject != null ) {
-				objectsByReference.put( reference, hitTransformer.apply( loadedObject ) );
+				objectsByReference.put( reference, loadedObject );
 			}
 		}
 	}
 
-	private List<O> loadEntities(List<PojoReference> references) {
+	private List<? extends O> loadEntities(List<PojoReference> references) {
 		List<Serializable> ids = new ArrayList<>( references.size() );
 		for ( PojoReference reference : references ) {
 			ids.add( (Serializable) reference.getId() );
@@ -68,7 +60,7 @@ class HibernateOrmSingleTypeByIdEntityLoader<O, T> implements HibernateOrmCompos
 		return getMultiAccess().multiLoad( ids );
 	}
 
-	private MultiIdentifierLoadAccess<O> getMultiAccess() {
+	private MultiIdentifierLoadAccess<? extends O> getMultiAccess() {
 		if ( multiAccess == null ) {
 			multiAccess = session.byMultipleIds( entityType );
 		}
