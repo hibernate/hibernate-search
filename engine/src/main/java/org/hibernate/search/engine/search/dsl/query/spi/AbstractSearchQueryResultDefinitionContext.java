@@ -15,11 +15,11 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionC
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
-public abstract class AbstractSearchQueryResultDefinitionContext<R, O, PC extends SearchProjectionFactoryContext<R, O>, C>
-		implements SearchQueryResultDefinitionContext<R, O, PC> {
+public abstract class AbstractSearchQueryResultDefinitionContext<R, E, PC extends SearchProjectionFactoryContext<R, E>, C>
+		implements SearchQueryResultDefinitionContext<R, E, PC> {
 
 	@Override
-	public <T> T extension(SearchQueryContextExtension<T, R, O> extension) {
+	public <T> T extension(SearchQueryContextExtension<T, R, E> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension,
 				extension.extendOptional(
@@ -28,7 +28,7 @@ public abstract class AbstractSearchQueryResultDefinitionContext<R, O, PC extend
 		);
 	}
 
-	protected final SearchProjectionFactoryContext<R, O> createDefaultProjectionFactoryContext() {
+	protected final SearchProjectionFactoryContext<R, E> createDefaultProjectionFactoryContext() {
 		return new DefaultSearchProjectionFactoryContext<>( getIndexSearchScope().getSearchProjectionFactory() );
 	}
 
@@ -36,5 +36,5 @@ public abstract class AbstractSearchQueryResultDefinitionContext<R, O, PC extend
 
 	protected abstract SessionContextImplementor getSessionContext();
 
-	protected abstract LoadingContextBuilder<R, O> getLoadingContextBuilder();
+	protected abstract LoadingContextBuilder<R, E> getLoadingContextBuilder();
 }

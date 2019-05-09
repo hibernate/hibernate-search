@@ -10,11 +10,11 @@ package org.hibernate.search.engine.search.loading.context.spi;
  * A builder for {@link LoadingContext},
  * allowing to change the parameters of object loading while a query is being built.
  *
- * @param <R> The type of object references.
- * @param <O> The type of loaded objects.
+ * @param <R> The type of entity references.
+ * @param <E> The type of loaded entities.
  */
-public interface LoadingContextBuilder<R, O> {
+public interface LoadingContextBuilder<R, E> {
 
-	LoadingContext<R, O> build();
+	LoadingContext<R, E> build();
 
 }

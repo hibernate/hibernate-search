@@ -12,20 +12,20 @@ import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryR
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-public class HibernateOrmSearchQueryResultDefinitionContextImpl<O>
-		extends AbstractDelegatingSearchQueryResultDefinitionContext<PojoReference, O>
-		implements HibernateOrmSearchQueryResultDefinitionContext<O> {
+public class HibernateOrmSearchQueryResultDefinitionContextImpl<E>
+		extends AbstractDelegatingSearchQueryResultDefinitionContext<PojoReference, E>
+		implements HibernateOrmSearchQueryResultDefinitionContext<E> {
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	public HibernateOrmSearchQueryResultDefinitionContextImpl(
-			SearchQueryResultDefinitionContext<PojoReference, O, ?> delegate,
+			SearchQueryResultDefinitionContext<PojoReference, E, ?> delegate,
 			MutableEntityLoadingOptions loadingOptions) {
 		super( delegate );
 		this.loadingOptions = loadingOptions;
 	}
 
 	@Override
-	public HibernateOrmSearchQueryResultDefinitionContext<O> fetchSize(int fetchSize) {
+	public HibernateOrmSearchQueryResultDefinitionContext<E> fetchSize(int fetchSize) {
 		loadingOptions.setFetchSize( fetchSize );
 		return this;
 	}

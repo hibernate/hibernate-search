@@ -38,7 +38,7 @@ class PojoSearchSessionDelegateImpl implements PojoSearchSessionDelegate {
 	}
 
 	@Override
-	public <E, O> PojoSearchScopeDelegate<E, O> createPojoSearchScope(
+	public <E, E2> PojoSearchScopeDelegate<E, E2> createPojoSearchScope(
 			Collection<? extends Class<? extends E>> targetedTypes) {
 		if ( targetedTypes.isEmpty() ) {
 			throw log.cannotSearchOnEmptyTarget();

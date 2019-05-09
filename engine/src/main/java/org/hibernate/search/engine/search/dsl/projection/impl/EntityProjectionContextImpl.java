@@ -12,9 +12,9 @@ import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
-public class EntityProjectionContextImpl<O> implements EntityProjectionContext<O> {
+public class EntityProjectionContextImpl<E> implements EntityProjectionContext<E> {
 
-	private final EntityProjectionBuilder<O> entityProjectionBuilder;
+	private final EntityProjectionBuilder<E> entityProjectionBuilder;
 
 	EntityProjectionContextImpl(SearchProjectionBuilderFactory factory) {
 		this.entityProjectionBuilder = factory.entity();
@@ -27,7 +27,7 @@ public class EntityProjectionContextImpl<O> implements EntityProjectionContext<O
 	 * with generic type arguments that are consistent with the type of entity loaders.
 	 * See comments in MappedIndexSearchScope.
 	 */
-	public SearchProjection<O> toProjection() {
+	public SearchProjection<E> toProjection() {
 		return entityProjectionBuilder.build();
 	}
 

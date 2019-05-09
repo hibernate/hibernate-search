@@ -497,10 +497,10 @@ public class SearchProjectionIT extends EasyMockSupport {
 		}
 	}
 
-	private static class SupportedExtension<R, O>
-			implements SearchProjectionFactoryContextExtension<MyExtendedContext<R, O>, R, O> {
+	private static class SupportedExtension<R, E>
+			implements SearchProjectionFactoryContextExtension<MyExtendedContext<R, E>, R, E> {
 		@Override
-		public Optional<MyExtendedContext<R, O>> extendOptional(SearchProjectionFactoryContext<R, O> original,
+		public Optional<MyExtendedContext<R, E>> extendOptional(SearchProjectionFactoryContext<R, E> original,
 				SearchProjectionBuilderFactory factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
@@ -508,10 +508,10 @@ public class SearchProjectionIT extends EasyMockSupport {
 		}
 	}
 
-	private static class UnSupportedExtension<R, O>
-			implements SearchProjectionFactoryContextExtension<MyExtendedContext<R, O>, R, O> {
+	private static class UnSupportedExtension<R, E>
+			implements SearchProjectionFactoryContextExtension<MyExtendedContext<R, E>, R, E> {
 		@Override
-		public Optional<MyExtendedContext<R, O>> extendOptional(SearchProjectionFactoryContext<R, O> original,
+		public Optional<MyExtendedContext<R, E>> extendOptional(SearchProjectionFactoryContext<R, E> original,
 				SearchProjectionBuilderFactory factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
@@ -519,10 +519,10 @@ public class SearchProjectionIT extends EasyMockSupport {
 		}
 	}
 
-	private static class MyExtendedContext<R, O> {
-		private final SearchProjectionFactoryContext<R, O> delegate;
+	private static class MyExtendedContext<R, E> {
+		private final SearchProjectionFactoryContext<R, E> delegate;
 
-		MyExtendedContext(SearchProjectionFactoryContext<R, O> delegate) {
+		MyExtendedContext(SearchProjectionFactoryContext<R, E> delegate) {
 			this.delegate = delegate;
 		}
 

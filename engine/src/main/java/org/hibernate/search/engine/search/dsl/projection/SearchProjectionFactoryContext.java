@@ -21,10 +21,10 @@ import org.hibernate.search.util.common.function.TriFunction;
  * A context allowing to create a projection.
  *
  * @param <R> The type of references, i.e. the type of objects returned for {@link #reference() reference projections}.
- * @param <O> The type of entities, i.e. the type of objects returned for
+ * @param <E> The type of entities, i.e. the type of objects returned for
  * {@link #entity() entity projections}.
  */
-public interface SearchProjectionFactoryContext<R, O> {
+public interface SearchProjectionFactoryContext<R, E> {
 
 	/**
 	 * Project the match to a {@link DocumentReference}.
@@ -52,7 +52,7 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 *
 	 * @return A context allowing to define the projection more precisely.
 	 */
-	EntityProjectionContext<O> entity();
+	EntityProjectionContext<E> entity();
 
 	/**
 	 * Project to the value of a field in the indexed document.
@@ -279,7 +279,7 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * @return The extended context.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchProjectionFactoryContextExtension<T, R, O> extension);
+	<T> T extension(SearchProjectionFactoryContextExtension<T, R, E> extension);
 
 	/**
 	 * Create a context allowing to try to apply multiple extensions one after the other,
@@ -294,5 +294,5 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * @param <T> The expected projected type.
 	 * @return A context allowing to define the extensions to attempt, and the corresponding projections.
 	 */
-	<T> SearchProjectionFactoryExtensionContext<T, R, O> extension();
+	<T> SearchProjectionFactoryExtensionContext<T, R, E> extension();
 }

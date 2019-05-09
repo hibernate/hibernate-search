@@ -22,8 +22,8 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  */
 public interface SearchQueryBuilderFactory<C> {
 
-	<O> SearchQueryBuilder<O, C> asEntity(SessionContextImplementor sessionContext,
-			LoadingContextBuilder<?, O> loadingContextBuilder);
+	<E> SearchQueryBuilder<E, C> asEntity(SessionContextImplementor sessionContext,
+			LoadingContextBuilder<?, E> loadingContextBuilder);
 
 	<T> SearchQueryBuilder<T, C> asReference(SessionContextImplementor sessionContext,
 			LoadingContextBuilder<T, ?> loadingContextBuilder);

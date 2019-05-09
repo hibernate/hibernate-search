@@ -25,11 +25,11 @@ import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
 
-public class DelegatingSearchProjectionFactoryContext<R, O> implements SearchProjectionFactoryContext<R, O> {
+public class DelegatingSearchProjectionFactoryContext<R, E> implements SearchProjectionFactoryContext<R, E> {
 
-	private final SearchProjectionFactoryContext<R, O> delegate;
+	private final SearchProjectionFactoryContext<R, E> delegate;
 
-	public DelegatingSearchProjectionFactoryContext(SearchProjectionFactoryContext<R, O> delegate) {
+	public DelegatingSearchProjectionFactoryContext(SearchProjectionFactoryContext<R, E> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -44,7 +44,7 @@ public class DelegatingSearchProjectionFactoryContext<R, O> implements SearchPro
 	}
 
 	@Override
-	public EntityProjectionContext<O> entity() {
+	public EntityProjectionContext<E> entity() {
 		return delegate.entity();
 	}
 
@@ -92,12 +92,12 @@ public class DelegatingSearchProjectionFactoryContext<R, O> implements SearchPro
 	}
 
 	@Override
-	public <T> T extension(SearchProjectionFactoryContextExtension<T, R, O> extension) {
+	public <T> T extension(SearchProjectionFactoryContextExtension<T, R, E> extension) {
 		return delegate.extension( extension );
 	}
 
 	@Override
-	public <P> SearchProjectionFactoryExtensionContext<P, R, O> extension() {
+	public <P> SearchProjectionFactoryExtensionContext<P, R, E> extension() {
 		return delegate.extension();
 	}
 }

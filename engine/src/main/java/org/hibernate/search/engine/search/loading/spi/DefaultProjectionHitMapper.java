@@ -13,15 +13,15 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-public final class DefaultProjectionHitMapper<R, O> implements ProjectionHitMapper<R, O> {
+public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapper<R, E> {
 
 	private final Function<DocumentReference, R> documentReferenceTransformer;
-	private final EntityLoader<R, O> objectLoader;
+	private final EntityLoader<R, E> objectLoader;
 
 	private final List<R> referencesToLoad = new ArrayList<>();
 
 	public DefaultProjectionHitMapper(Function<DocumentReference, R> documentReferenceTransformer,
-			EntityLoader<R, O> objectLoader) {
+			EntityLoader<R, E> objectLoader) {
 		this.documentReferenceTransformer = documentReferenceTransformer;
 		this.objectLoader = objectLoader;
 	}
@@ -38,20 +38,20 @@ public final class DefaultProjectionHitMapper<R, O> implements ProjectionHitMapp
 	}
 
 	@Override
-	public LoadingResult<O> loadBlocking() {
+	public LoadingResult<E> loadBlocking() {
 		return new DefaultLoadingResult<>( objectLoader.loadBlocking( referencesToLoad ) );
 	}
 
-	private static class DefaultLoadingResult<O> implements LoadingResult<O> {
+	private static class DefaultLoadingResult<E> implements LoadingResult<E> {
 
-		private final List<? extends O> loadedObjects;
+		private final List<? extends E> loadedObjects;
 
-		private DefaultLoadingResult(List<? extends O> loadedObjects) {
+		private DefaultLoadingResult(List<? extends E> loadedObjects) {
 			this.loadedObjects = CollectionHelper.toImmutableList( loadedObjects );
 		}
 
 		@Override
-		public O getLoaded(Object key) {
+		public E getLoaded(Object key) {
 			return loadedObjects.get( (int) key );
 		}
 	}

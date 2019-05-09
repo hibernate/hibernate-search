@@ -21,12 +21,12 @@ import org.hibernate.search.util.common.SearchException;
  * @param <R> The type of references, i.e. the type of hits returned by
  * {@link #asReference() reference queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#reference() reference projections}.
- * @param <O> The type of entities, i.e. the type of hits returned by
+ * @param <E> The type of entities, i.e. the type of hits returned by
  * {@link #asEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
  * @param <PC> The type of contexts used to create projections in {@link #asProjection(Function)}.
  */
-public interface SearchQueryResultDefinitionContext<R, O, PC extends SearchProjectionFactoryContext<R, O>> {
+public interface SearchQueryResultDefinitionContext<R, E, PC extends SearchProjectionFactoryContext<R, E>> {
 
 	/**
 	 * Define the query results as the entity was originally indexed, loaded from an external source (database, ...).
@@ -34,7 +34,7 @@ public interface SearchQueryResultDefinitionContext<R, O, PC extends SearchProje
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	SearchQueryResultContext<?, O, ?> asEntity();
+	SearchQueryResultContext<?, E, ?> asEntity();
 
 	/**
 	 * Define the query results as a reference to entity that was originally indexed.
@@ -91,6 +91,6 @@ public interface SearchQueryResultDefinitionContext<R, O, PC extends SearchProje
 	 * @return The extended context.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchQueryContextExtension<T, R, O> extension);
+	<T> T extension(SearchQueryContextExtension<T, R, E> extension);
 
 }

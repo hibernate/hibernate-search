@@ -39,8 +39,8 @@ public class ElasticsearchSearchQueryBuilderFactory
 	}
 
 	@Override
-	public <O> ElasticsearchSearchQueryBuilder<O> asEntity(
-			SessionContextImplementor sessionContext, LoadingContextBuilder<?, O> loadingContextBuilder) {
+	public <E> ElasticsearchSearchQueryBuilder<E> asEntity(
+			SessionContextImplementor sessionContext, LoadingContextBuilder<?, E> loadingContextBuilder) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
 				new ElasticsearchEntityProjection<>( searchBackendContext.getDocumentReferenceExtractorHelper() )

@@ -59,25 +59,25 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <R> The reference type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
- * @param <O> The entity type for projections.
+ * @param <E> The entity type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
  */
-public final class ElasticsearchExtension<T, R, O>
-		implements SearchQueryContextExtension<ElasticsearchSearchQueryResultDefinitionContext<R, O>, R, O>,
+public final class ElasticsearchExtension<T, R, E>
+		implements SearchQueryContextExtension<ElasticsearchSearchQueryResultDefinitionContext<R, E>, R, E>,
 		SearchQueryExtension<ElasticsearchSearchQuery<T>, T>,
 		SearchPredicateFactoryContextExtension<ElasticsearchSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<ElasticsearchSearchSortContainerContext>,
-		SearchProjectionFactoryContextExtension<ElasticsearchSearchProjectionFactoryContext<R, O>, R, O>,
+		SearchProjectionFactoryContextExtension<ElasticsearchSearchProjectionFactoryContext<R, E>, R, E>,
 		IndexFieldTypeFactoryContextExtension<ElasticsearchIndexFieldTypeFactoryContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ElasticsearchExtension<Object, Object, Object> INSTANCE = new ElasticsearchExtension<>();
 
-	@SuppressWarnings("unchecked") // The instance works for any T, R and O
-	public static <Q, R, O> ElasticsearchExtension<Q, R, O> get() {
-		return (ElasticsearchExtension<Q, R, O>) INSTANCE;
+	@SuppressWarnings("unchecked") // The instance works for any T, R and E
+	public static <Q, R, E> ElasticsearchExtension<Q, R, E> get() {
+		return (ElasticsearchExtension<Q, R, E>) INSTANCE;
 	}
 
 	private ElasticsearchExtension() {
@@ -88,11 +88,11 @@ public final class ElasticsearchExtension<T, R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchQueryResultDefinitionContext<R, O>> extendOptional(
-			SearchQueryResultDefinitionContext<R, O, ?> original,
+	public Optional<ElasticsearchSearchQueryResultDefinitionContext<R, E>> extendOptional(
+			SearchQueryResultDefinitionContext<R, E, ?> original,
 			IndexSearchScope<?> indexSearchScope,
 			SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, O> loadingContextBuilder) {
+			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		if ( indexSearchScope instanceof ElasticsearchIndexSearchScope ) {
 			return Optional.of( new ElasticsearchSearchQueryResultDefinitionContextImpl<>(
 					(ElasticsearchIndexSearchScope) indexSearchScope, sessionContext, loadingContextBuilder
@@ -152,8 +152,8 @@ public final class ElasticsearchExtension<T, R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchProjectionFactoryContext<R, O>> extendOptional(
-			SearchProjectionFactoryContext<R, O> original, SearchProjectionBuilderFactory factory) {
+	public Optional<ElasticsearchSearchProjectionFactoryContext<R, E>> extendOptional(
+			SearchProjectionFactoryContext<R, E> original, SearchProjectionBuilderFactory factory) {
 		if ( factory instanceof ElasticsearchSearchProjectionBuilderFactory ) {
 			return Optional.of( new ElasticsearchSearchProjectionFactoryContextImpl<>(
 					original, (ElasticsearchSearchProjectionBuilderFactory) factory

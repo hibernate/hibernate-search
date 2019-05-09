@@ -12,7 +12,7 @@ import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImpl
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
 
-class MappedIndexSearchScopeBuilderImpl<R, O> implements MappedIndexSearchScopeBuilder<R, O> {
+class MappedIndexSearchScopeBuilderImpl<R, E> implements MappedIndexSearchScopeBuilder<R, E> {
 	private final IndexSearchScopeBuilder delegate;
 
 	MappedIndexSearchScopeBuilderImpl(IndexManagerImplementor<?> firstIndexManager,
@@ -25,7 +25,7 @@ class MappedIndexSearchScopeBuilderImpl<R, O> implements MappedIndexSearchScopeB
 	}
 
 	@Override
-	public MappedIndexSearchScope<R, O> build() {
+	public MappedIndexSearchScope<R, E> build() {
 		return new MappedIndexSearchScopeImpl<>( delegate.build() );
 	}
 }

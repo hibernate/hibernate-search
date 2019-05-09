@@ -25,12 +25,12 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.util.common.AssertionFailure;
 
-class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O> {
+class PojoSearchScopeDelegateImpl<E, E2> implements PojoSearchScopeDelegate<E, E2> {
 
 	private final PojoIndexedTypeManagerContainer typeManagers;
 	private final Set<PojoIndexedTypeManager<?, ? extends E, ?>> targetedTypeManagers;
 	private final AbstractPojoSessionContextImplementor sessionContext;
-	private MappedIndexSearchScope<PojoReference, O> delegate;
+	private MappedIndexSearchScope<PojoReference, E2> delegate;
 
 	PojoSearchScopeDelegateImpl(PojoIndexedTypeManagerContainer typeManagers,
 			Set<PojoIndexedTypeManager<?, ? extends E, ?>> targetedTypeManagers,
@@ -58,8 +58,8 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public SearchQueryResultDefinitionContext<PojoReference, O, SearchProjectionFactoryContext<PojoReference, O>> search(
-			LoadingContextBuilder<PojoReference, O> loadingContextBuilder) {
+	public SearchQueryResultDefinitionContext<PojoReference, E2, SearchProjectionFactoryContext<PojoReference, E2>> search(
+			LoadingContextBuilder<PojoReference, E2> loadingContextBuilder) {
 		return getDelegate().search( sessionContext, loadingContextBuilder );
 	}
 
@@ -74,15 +74,15 @@ class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O>
 	}
 
 	@Override
-	public SearchProjectionFactoryContext<PojoReference, O> projection() {
+	public SearchProjectionFactoryContext<PojoReference, E2> projection() {
 		return getDelegate().projection();
 	}
 
-	private MappedIndexSearchScope<PojoReference, O> getDelegate() {
+	private MappedIndexSearchScope<PojoReference, E2> getDelegate() {
 		AbstractPojoMappingContextImplementor mappingContext = sessionContext.getMappingContext();
 		if ( delegate == null ) {
 			Iterator<PojoIndexedTypeManager<?, ? extends E, ?>> iterator = targetedTypeManagers.iterator();
-			MappedIndexSearchScopeBuilder<PojoReference, O> builder = iterator.next().createSearchScopeBuilder(
+			MappedIndexSearchScopeBuilder<PojoReference, E2> builder = iterator.next().createSearchScopeBuilder(
 					mappingContext
 			);
 			while ( iterator.hasNext() ) {

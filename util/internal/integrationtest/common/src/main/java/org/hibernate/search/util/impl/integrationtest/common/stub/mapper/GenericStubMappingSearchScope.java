@@ -19,21 +19,21 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionCon
  * A wrapper around {@link MappedIndexSearchScope} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
  */
-public class GenericStubMappingSearchScope<R, O> {
+public class GenericStubMappingSearchScope<R, E> {
 
-	private final MappedIndexSearchScope<R, O> delegate;
+	private final MappedIndexSearchScope<R, E> delegate;
 
-	GenericStubMappingSearchScope(MappedIndexSearchScope<R, O> delegate) {
+	GenericStubMappingSearchScope(MappedIndexSearchScope<R, E> delegate) {
 		this.delegate = delegate;
 	}
 
-	public SearchQueryResultDefinitionContext<R, O, ?> query(LoadingContext<R, O> loadingContext) {
+	public SearchQueryResultDefinitionContext<R, E, ?> query(LoadingContext<R, E> loadingContext) {
 		return query( new StubSessionContext(), loadingContext );
 	}
 
-	public SearchQueryResultDefinitionContext<R, O, ?> query(StubSessionContext sessionContext,
-			LoadingContext<R, O> loadingContext) {
-		LoadingContextBuilder<R, O> loadingContextBuilder = () -> loadingContext;
+	public SearchQueryResultDefinitionContext<R, E, ?> query(StubSessionContext sessionContext,
+			LoadingContext<R, E> loadingContext) {
+		LoadingContextBuilder<R, E> loadingContextBuilder = () -> loadingContext;
 		return delegate.search( sessionContext, loadingContextBuilder );
 	}
 
@@ -45,7 +45,7 @@ public class GenericStubMappingSearchScope<R, O> {
 		return delegate.sort();
 	}
 
-	public SearchProjectionFactoryContext<R, O> projection() {
+	public SearchProjectionFactoryContext<R, E> projection() {
 		return delegate.projection();
 	}
 }

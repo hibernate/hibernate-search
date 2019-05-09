@@ -19,24 +19,24 @@ import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-public final class DefaultSearchQueryResultDefinitionContext<R, O, C>
-		extends AbstractSearchQueryResultDefinitionContext<R, O, SearchProjectionFactoryContext<R, O>, C> {
+public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
+		extends AbstractSearchQueryResultDefinitionContext<R, E, SearchProjectionFactoryContext<R, E>, C> {
 
 	private final IndexSearchScope<C> indexSearchScope;
 	private final SessionContextImplementor sessionContext;
-	private final LoadingContextBuilder<R, O> loadingContextBuilder;
+	private final LoadingContextBuilder<R, E> loadingContextBuilder;
 
 	public DefaultSearchQueryResultDefinitionContext(IndexSearchScope<C> indexSearchScope,
 			SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, O> loadingContextBuilder) {
+			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		this.indexSearchScope = indexSearchScope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
 	@Override
-	public SearchQueryResultContext<?, O, ?> asEntity() {
-		SearchQueryBuilder<O, C> builder = indexSearchScope.getSearchQueryBuilderFactory()
+	public SearchQueryResultContext<?, E, ?> asEntity() {
+		SearchQueryBuilder<E, C> builder = indexSearchScope.getSearchQueryBuilderFactory()
 				.asEntity( sessionContext, loadingContextBuilder );
 		return new DefaultSearchQueryContext<>( indexSearchScope, builder );
 	}
@@ -50,8 +50,8 @@ public final class DefaultSearchQueryResultDefinitionContext<R, O, C>
 
 	@Override
 	public <P> SearchQueryResultContext<?, P, ?> asProjection(
-			Function<? super SearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
-		SearchProjectionFactoryContext<R, O> factoryContext = createDefaultProjectionFactoryContext();
+			Function<? super SearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
+		SearchProjectionFactoryContext<R, E> factoryContext = createDefaultProjectionFactoryContext();
 		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();
 		return asProjection( projection );
 	}
@@ -81,7 +81,7 @@ public final class DefaultSearchQueryResultDefinitionContext<R, O, C>
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, O> getLoadingContextBuilder() {
+	protected LoadingContextBuilder<R, E> getLoadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 }

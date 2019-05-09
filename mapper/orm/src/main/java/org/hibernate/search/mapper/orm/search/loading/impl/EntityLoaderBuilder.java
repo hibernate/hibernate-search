@@ -9,25 +9,24 @@ package org.hibernate.search.mapper.orm.search.loading.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-public class EntityLoaderBuilder<O> {
+public class EntityLoaderBuilder<E> {
 
 	private final Session session;
-	private final Set<Class<? extends O>> concreteIndexedClasses;
+	private final Set<Class<? extends E>> concreteIndexedClasses;
 
-	public EntityLoaderBuilder(Session session, Set<Class<? extends O>> concreteIndexedClasses) {
+	public EntityLoaderBuilder(Session session, Set<Class<? extends E>> concreteIndexedClasses) {
 		this.session = session;
 		this.concreteIndexedClasses = concreteIndexedClasses;
 	}
 
-	public EntityLoader<PojoReference, O> build(MutableEntityLoadingOptions mutableLoadingOptions) {
+	public EntityLoader<PojoReference, E> build(MutableEntityLoadingOptions mutableLoadingOptions) {
 		if ( concreteIndexedClasses.size() == 1 ) {
-			Class<? extends O> concreteIndexedType = concreteIndexedClasses.iterator().next();
+			Class<? extends E> concreteIndexedType = concreteIndexedClasses.iterator().next();
 			return buildForSingleType( mutableLoadingOptions, concreteIndexedType );
 		}
 		else {
@@ -35,22 +34,22 @@ public class EntityLoaderBuilder<O> {
 		}
 	}
 
-	private HibernateOrmComposableEntityLoader<PojoReference, O> buildForSingleType(
-			MutableEntityLoadingOptions mutableLoadingOptions, Class<? extends O> concreteIndexedType) {
+	private HibernateOrmComposableEntityLoader<PojoReference, E> buildForSingleType(
+			MutableEntityLoadingOptions mutableLoadingOptions, Class<? extends E> concreteIndexedType) {
 		// TODO Add support for entities whose document ID is not the entity ID (natural ID, or other)
 		// TODO Add support for other types of database retrieval and object lookup? See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.EntityLoaderBuilder#getObjectInitializer
 		return new HibernateOrmSingleTypeByIdEntityLoader<>( session, concreteIndexedType, mutableLoadingOptions );
 	}
 
-	private EntityLoader<PojoReference, O> buildForMultipleTypes(MutableEntityLoadingOptions mutableLoadingOptions) {
+	private EntityLoader<PojoReference, E> buildForMultipleTypes(MutableEntityLoadingOptions mutableLoadingOptions) {
 		/*
 		 * TODO Group together entity types from a same hierarchy, so as to optimize loads
 		 * (one query per entity hierarchy, and not one query per index).
 		 */
-		Map<Class<? extends O>, HibernateOrmComposableEntityLoader<PojoReference, ? extends O>> delegateByConcreteType =
+		Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends E>> delegateByConcreteType =
 				new HashMap<>( concreteIndexedClasses.size() );
-		for ( Class<? extends O> concreteIndexedClass : concreteIndexedClasses ) {
-			HibernateOrmComposableEntityLoader<PojoReference, O> delegate =
+		for ( Class<? extends E> concreteIndexedClass : concreteIndexedClasses ) {
+			HibernateOrmComposableEntityLoader<PojoReference, E> delegate =
 					buildForSingleType( mutableLoadingOptions, concreteIndexedClass );
 			delegateByConcreteType.put( concreteIndexedClass, delegate );
 		}

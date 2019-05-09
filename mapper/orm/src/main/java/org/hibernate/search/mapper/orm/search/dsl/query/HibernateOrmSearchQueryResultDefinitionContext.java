@@ -11,11 +11,11 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-public interface HibernateOrmSearchQueryResultDefinitionContext<O>
+public interface HibernateOrmSearchQueryResultDefinitionContext<E>
 		extends SearchQueryResultDefinitionContext<
 				PojoReference,
-				O,
-				SearchProjectionFactoryContext<PojoReference, O>
+				E,
+				SearchProjectionFactoryContext<PojoReference, E>
 				> {
 
 	/**
@@ -25,6 +25,6 @@ public interface HibernateOrmSearchQueryResultDefinitionContext<O>
 	 * @return {@code this} for method chaining.
 	 * @see Query#setFetchSize(int)
 	 */
-	HibernateOrmSearchQueryResultDefinitionContext<O> fetchSize(int fetchSize);
+	HibernateOrmSearchQueryResultDefinitionContext<E> fetchSize(int fetchSize);
 
 }

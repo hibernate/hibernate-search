@@ -23,12 +23,12 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
  * @param <T> The type of extended search factory contexts. Should generally extend
  * {@link SearchProjectionFactoryContext}.
  * @param <R> The type of references in the original {@link SearchProjectionFactoryContext}.
- * @param <O> The type of entities in the original {@link SearchProjectionFactoryContext}.
+ * @param <E> The type of entities in the original {@link SearchProjectionFactoryContext}.
  *
  * @see SearchProjectionFactoryContext#extension(SearchProjectionFactoryContextExtension)
  * @see DelegatingSearchProjectionFactoryContext
  */
-public interface SearchProjectionFactoryContextExtension<T, R, O> {
+public interface SearchProjectionFactoryContextExtension<T, R, E> {
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
@@ -40,7 +40,7 @@ public interface SearchProjectionFactoryContextExtension<T, R, O> {
 	 * @return An optional containing the extended search projection factory context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchProjectionFactoryContext<R, O> original,
+	Optional<T> extendOptional(SearchProjectionFactoryContext<R, E> original,
 			SearchProjectionBuilderFactory factory);
 
 }

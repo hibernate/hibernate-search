@@ -16,16 +16,16 @@ import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-class HibernateOrmSingleTypeByIdEntityLoader<O> implements HibernateOrmComposableEntityLoader<PojoReference, O> {
+class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<PojoReference, E> {
 	private final Session session;
-	private final Class<? extends O> entityType;
+	private final Class<? extends E> entityType;
 	private final MutableEntityLoadingOptions loadingOptions;
 
-	private MultiIdentifierLoadAccess<? extends O> multiAccess;
+	private MultiIdentifierLoadAccess<? extends E> multiAccess;
 
 	public HibernateOrmSingleTypeByIdEntityLoader(
 			Session session,
-			Class<? extends O> entityType,
+			Class<? extends E> entityType,
 			MutableEntityLoadingOptions loadingOptions) {
 		this.session = session;
 		this.entityType = entityType;
@@ -33,25 +33,25 @@ class HibernateOrmSingleTypeByIdEntityLoader<O> implements HibernateOrmComposabl
 	}
 
 	@Override
-	public List<? extends O> loadBlocking(List<PojoReference> references) {
+	public List<? extends E> loadBlocking(List<PojoReference> references) {
 		return loadEntities( references );
 	}
 
 	@Override
-	public void loadBlocking(List<PojoReference> references, Map<? super PojoReference, ? super O> objectsByReference) {
-		List<? extends O> loadedObjects = loadEntities( references );
+	public void loadBlocking(List<PojoReference> references, Map<? super PojoReference, ? super E> objectsByReference) {
+		List<? extends E> loadedObjects = loadEntities( references );
 		Iterator<PojoReference> referencesIterator = references.iterator();
-		Iterator<? extends O> loadedObjectIterator = loadedObjects.iterator();
+		Iterator<? extends E> loadedObjectIterator = loadedObjects.iterator();
 		while ( referencesIterator.hasNext() ) {
 			PojoReference reference = referencesIterator.next();
-			O loadedObject = loadedObjectIterator.next();
+			E loadedObject = loadedObjectIterator.next();
 			if ( loadedObject != null ) {
 				objectsByReference.put( reference, loadedObject );
 			}
 		}
 	}
 
-	private List<? extends O> loadEntities(List<PojoReference> references) {
+	private List<? extends E> loadEntities(List<PojoReference> references) {
 		List<Serializable> ids = new ArrayList<>( references.size() );
 		for ( PojoReference reference : references ) {
 			ids.add( (Serializable) reference.getId() );
@@ -60,7 +60,7 @@ class HibernateOrmSingleTypeByIdEntityLoader<O> implements HibernateOrmComposabl
 		return getMultiAccess().multiLoad( ids );
 	}
 
-	private MultiIdentifierLoadAccess<? extends O> getMultiAccess() {
+	private MultiIdentifierLoadAccess<? extends E> getMultiAccess() {
 		if ( multiAccess == null ) {
 			multiAccess = session.byMultipleIds( entityType );
 		}

@@ -18,22 +18,22 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 /**
  * @param <E> A common supertype of the indexed types included in this scope.
- * @param <O> The type of entities, i.e. the type of hits returned by
+ * @param <E2> The type of loaded entities, i.e. the type of hits returned by
  * {@link SearchQueryResultDefinitionContext#asEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
  */
-public interface PojoSearchScopeDelegate<E, O> {
+public interface PojoSearchScopeDelegate<E, E2> {
 	Set<Class<? extends E>> getIncludedIndexedTypes();
 
 	PojoReference toPojoReference(DocumentReference documentReference);
 
-	SearchQueryResultDefinitionContext<PojoReference, O, SearchProjectionFactoryContext<PojoReference, O>> search(
-			LoadingContextBuilder<PojoReference, O> loadingContextBuilder);
+	SearchQueryResultDefinitionContext<PojoReference, E2, SearchProjectionFactoryContext<PojoReference, E2>> search(
+			LoadingContextBuilder<PojoReference, E2> loadingContextBuilder);
 
 	SearchPredicateFactoryContext predicate();
 
 	SearchSortContainerContext sort();
 
-	SearchProjectionFactoryContext<PojoReference, O> projection();
+	SearchProjectionFactoryContext<PojoReference, E2> projection();
 
 }

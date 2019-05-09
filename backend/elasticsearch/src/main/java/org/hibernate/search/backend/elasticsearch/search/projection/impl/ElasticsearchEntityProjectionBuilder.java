@@ -10,16 +10,16 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 
 
-class ElasticsearchEntityProjectionBuilder<O> implements EntityProjectionBuilder<O> {
+class ElasticsearchEntityProjectionBuilder<E> implements EntityProjectionBuilder<E> {
 
-	private final ElasticsearchEntityProjection<O> projection;
+	private final ElasticsearchEntityProjection<E> projection;
 
 	ElasticsearchEntityProjectionBuilder(DocumentReferenceExtractorHelper helper) {
 		this.projection = new ElasticsearchEntityProjection<>( helper );
 	}
 
 	@Override
-	public SearchProjection<O> build() {
+	public SearchProjection<E> build() {
 		return projection;
 	}
 }

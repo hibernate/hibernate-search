@@ -12,13 +12,13 @@ import org.hibernate.search.engine.search.DocumentReference;
 /**
  * The result of the loading of the entities by the {@link ProjectionHitMapper}.
  *
- * @param <O> The type of entities.
+ * @param <E> The type of entities.
  */
-public interface LoadingResult<O> {
+public interface LoadingResult<E> {
 
 	/**
 	 * @param key The key that was previously returned by {@link ProjectionHitMapper#planLoading(DocumentReference)}.
 	 * @return The loaded entity corresponding to the key.
 	 */
-	O getLoaded(Object key);
+	E getLoaded(Object key);
 }

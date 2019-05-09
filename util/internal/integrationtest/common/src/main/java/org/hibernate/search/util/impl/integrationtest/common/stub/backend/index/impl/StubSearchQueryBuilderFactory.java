@@ -35,8 +35,8 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <O> SearchQueryBuilder<O, StubQueryElementCollector> asEntity(SessionContextImplementor sessionContext,
-			LoadingContextBuilder<?, O> loadingContextBuilder) {
+	public <E> SearchQueryBuilder<E, StubQueryElementCollector> asEntity(SessionContextImplementor sessionContext,
+			LoadingContextBuilder<?, E> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.OBJECTS,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),

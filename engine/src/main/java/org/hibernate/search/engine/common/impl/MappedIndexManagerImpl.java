@@ -47,7 +47,7 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public <R, O> MappedIndexSearchScopeBuilder<R, O> createSearchScopeBuilder(MappingContextImplementor mappingContext) {
+	public <R, E> MappedIndexSearchScopeBuilder<R, E> createSearchScopeBuilder(MappingContextImplementor mappingContext) {
 		return new MappedIndexSearchScopeBuilderImpl<>(
 				implementor, mappingContext
 		);

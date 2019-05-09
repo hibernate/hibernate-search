@@ -45,14 +45,14 @@ public final class StubMapperUtils {
 	 * @param objectLoaderMock The EasyMock mock for the entity loader.
 	 * @param hitMappingDefinition A definition of the reference -> entity mapping.
 	 * @param <R> The reference type.
-	 * @param <O> The entity type.
+	 * @param <E> The entity type.
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static <R, O> void expectHitMapping(
-			LoadingContext<R, O> loadingContextMock,
+	public static <R, E> void expectHitMapping(
+			LoadingContext<R, E> loadingContextMock,
 			Function<DocumentReference, R> referenceTransformerMock,
-			EntityLoader<R, O> objectLoaderMock,
-			Consumer<HitMappingDefinitionContext<R, O>> hitMappingDefinition) {
+			EntityLoader<R, E> objectLoaderMock,
+			Consumer<HitMappingDefinitionContext<R, E>> hitMappingDefinition) {
 		/*
 		 * We expect getProjectionHitMapper to be called *every time* a load is performed,
 		 * so that the mapper can check its state (session is open in ORM, for example).
@@ -63,7 +63,7 @@ public final class StubMapperUtils {
 						objectLoaderMock
 				) );
 
-		HitMappingDefinitionContext<R, O> context = new HitMappingDefinitionContext<>();
+		HitMappingDefinitionContext<R, E> context = new HitMappingDefinitionContext<>();
 		hitMappingDefinition.accept( context );
 
 		for ( Map.Entry<DocumentReference, List<R>> entry : context.referenceMap.entrySet() ) {
@@ -77,24 +77,24 @@ public final class StubMapperUtils {
 				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) )
 		) )
 				.andAnswer(
-						// We need to cast to a raw type to conform to List<? extends O>
+						// We need to cast to a raw type to conform to List<? extends E>
 						() -> (List) ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
 						.map( context.loadingMap::get )
 						.collect( Collectors.toList() )
 				);
 	}
 
-	public static class HitMappingDefinitionContext<R, O> {
+	public static class HitMappingDefinitionContext<R, E> {
 		private final Map<DocumentReference, List<R>> referenceMap = new HashMap<>();
-		private final Map<R, O> loadingMap = new HashMap<>();
+		private final Map<R, E> loadingMap = new HashMap<>();
 
-		public HitMappingDefinitionContext<R, O> reference(DocumentReference documentReference, R transformedReference) {
+		public HitMappingDefinitionContext<R, E> reference(DocumentReference documentReference, R transformedReference) {
 			referenceMap.computeIfAbsent( documentReference, ignored -> new ArrayList<>() )
 					.add( transformedReference );
 			return this;
 		}
 
-		public HitMappingDefinitionContext<R, O> load(DocumentReference documentReference, R transformedReference, O loadedObject) {
+		public HitMappingDefinitionContext<R, E> load(DocumentReference documentReference, R transformedReference, E loadedObject) {
 			// For each load, the backend must first transform the reference
 			reference( documentReference, transformedReference );
 			// Then it will need to trigger loading

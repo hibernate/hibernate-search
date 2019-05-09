@@ -37,7 +37,7 @@ public class SearchProjectionBackendContext {
 	}
 
 	@SuppressWarnings("unchecked")
-	<O> ElasticsearchEntityProjectionBuilder<O> getEntityProjectionBuilder() {
+	<E> ElasticsearchEntityProjectionBuilder<E> getEntityProjectionBuilder() {
 		return objectProjectionBuilder;
 	}
 

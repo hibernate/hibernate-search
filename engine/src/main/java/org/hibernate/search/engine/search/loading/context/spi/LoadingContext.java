@@ -12,11 +12,11 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
  * An execution context for queries,
  * providing components allowing to load data from an external source (relational database, ...).
  *
- * @param <R> The type of object references.
- * @param <O> The type of loaded objects.
+ * @param <R> The type of entity references.
+ * @param <E> The type of loaded entities.
  */
-public interface LoadingContext<R, O> {
+public interface LoadingContext<R, E> {
 
-	ProjectionHitMapper<R, O> getProjectionHitMapper();
+	ProjectionHitMapper<R, E> getProjectionHitMapper();
 
 }

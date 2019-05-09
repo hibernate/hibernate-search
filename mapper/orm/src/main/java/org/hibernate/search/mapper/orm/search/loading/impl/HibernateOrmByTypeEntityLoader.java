@@ -18,13 +18,13 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class HibernateOrmByTypeEntityLoader<O, T> implements EntityLoader<PojoReference, T> {
+public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<PojoReference, T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<Class<? extends O>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType;
+	private final Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType;
 
-	public HibernateOrmByTypeEntityLoader(Map<Class<? extends O>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType) {
+	public HibernateOrmByTypeEntityLoader(Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType) {
 		this.delegatesByConcreteType = delegatesByConcreteType;
 	}
 

@@ -28,13 +28,13 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  * @param <R> The reference type.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
- * @param <O> The entity type.
+ * @param <E> The entity type.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  *
  * @see SearchQueryResultDefinitionContext#extension(SearchQueryContextExtension)
  * @see AbstractSearchQueryContext
  */
-public interface SearchQueryContextExtension<T, R, O> {
+public interface SearchQueryContextExtension<T, R, E> {
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
@@ -48,9 +48,9 @@ public interface SearchQueryContextExtension<T, R, O> {
 	 * @return An optional containing the extended search query context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchQueryResultDefinitionContext<R, O, ?> original,
+	Optional<T> extendOptional(SearchQueryResultDefinitionContext<R, E, ?> original,
 			IndexSearchScope<?> indexSearchScope,
 			SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, O> loadingContextBuilder);
+			LoadingContextBuilder<R, E> loadingContextBuilder);
 
 }
