@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchEntityProjection<O> implements ElasticsearchSearchProjection<Object, O> {
+public class ElasticsearchEntityProjection<E> implements ElasticsearchSearchProjection<Object, E> {
 
 	private final DocumentReferenceExtractorHelper helper;
 
@@ -32,9 +32,9 @@ public class ElasticsearchEntityProjection<O> implements ElasticsearchSearchProj
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public O transform(LoadingResult<?> loadingResult, Object extractedData,
+	public E transform(LoadingResult<?> loadingResult, Object extractedData,
 			SearchProjectionTransformContext context) {
-		return (O) loadingResult.getLoaded( extractedData );
+		return (E) loadingResult.getLoaded( extractedData );
 	}
 
 	@Override

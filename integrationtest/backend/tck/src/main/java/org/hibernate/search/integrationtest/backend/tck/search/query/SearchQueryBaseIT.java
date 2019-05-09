@@ -186,11 +186,11 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class SupportedQueryDslExtension<R, O> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, O> {
+	private static class SupportedQueryDslExtension<R, E> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, E> {
 		@Override
-		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<R, O, ?> original,
+		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<R, E, ?> original,
 				IndexSearchScope<?> indexSearchScope, SessionContextImplementor sessionContext,
-				LoadingContextBuilder<R, O> loadingContextBuilder) {
+				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( indexSearchScope ).isNotNull();
 			Assertions.assertThat( sessionContext ).isNotNull();
@@ -199,11 +199,11 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class UnSupportedQueryDslExtension<R, O> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, O> {
+	private static class UnSupportedQueryDslExtension<R, E> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, E> {
 		@Override
-		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<R, O, ?> original,
+		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<R, E, ?> original,
 				IndexSearchScope<?> indexSearchScope, SessionContextImplementor sessionContext,
-				LoadingContextBuilder<R, O> loadingContextBuilder) {
+				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( indexSearchScope ).isNotNull();
 			Assertions.assertThat( sessionContext ).isNotNull();

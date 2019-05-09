@@ -13,10 +13,10 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTermina
  * A DSL context allowing to create a projection, with some Elasticsearch-specific methods.
  *
  * @param <R> The type of references.
- * @param <O> The type of entities.
+ * @param <E> The type of entities.
  * @see SearchProjectionFactoryContext
  */
-public interface ElasticsearchSearchProjectionFactoryContext<R, O> extends SearchProjectionFactoryContext<R, O> {
+public interface ElasticsearchSearchProjectionFactoryContext<R, E> extends SearchProjectionFactoryContext<R, E> {
 
 	/**
 	 * Project to a string representing the JSON document as stored in Elasticsearch.

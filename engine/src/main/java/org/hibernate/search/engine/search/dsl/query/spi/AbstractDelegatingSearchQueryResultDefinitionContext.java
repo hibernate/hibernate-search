@@ -16,17 +16,17 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 
-public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, O>
-		implements SearchQueryResultDefinitionContext<R, O, SearchProjectionFactoryContext<R, O>> {
+public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, E>
+		implements SearchQueryResultDefinitionContext<R, E, SearchProjectionFactoryContext<R, E>> {
 
-	private final SearchQueryResultDefinitionContext<R, O, ?> delegate;
+	private final SearchQueryResultDefinitionContext<R, E, ?> delegate;
 
-	public AbstractDelegatingSearchQueryResultDefinitionContext(SearchQueryResultDefinitionContext<R, O, ?> delegate) {
+	public AbstractDelegatingSearchQueryResultDefinitionContext(SearchQueryResultDefinitionContext<R, E, ?> delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public SearchQueryResultContext<?, O, ?> asEntity() {
+	public SearchQueryResultContext<?, E, ?> asEntity() {
 		return delegate.asEntity();
 	}
 
@@ -37,7 +37,7 @@ public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, O>
 
 	@Override
 	public <P> SearchQueryResultContext<?, P, ?> asProjection(
-			Function<? super SearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
+			Function<? super SearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
 		return delegate.asProjection( projectionContributor );
 	}
 
@@ -53,7 +53,7 @@ public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, O>
 	}
 
 	@Override
-	public <T> T extension(SearchQueryContextExtension<T, R, O> extension) {
+	public <T> T extension(SearchQueryContextExtension<T, R, E> extension) {
 		return delegate.extension( extension );
 	}
 }

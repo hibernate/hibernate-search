@@ -9,6 +9,6 @@ package org.hibernate.search.engine.search.dsl.projection;
 /**
  * The context used when starting to define an entity projection.
  */
-public interface EntityProjectionContext<O> extends SearchProjectionTerminalContext<O> {
+public interface EntityProjectionContext<E> extends SearchProjectionTerminalContext<E> {
 
 }

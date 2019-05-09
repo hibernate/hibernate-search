@@ -6,6 +6,6 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-public interface EntityProjectionBuilder<O> extends SearchProjectionBuilder<O> {
+public interface EntityProjectionBuilder<E> extends SearchProjectionBuilder<E> {
 
 }

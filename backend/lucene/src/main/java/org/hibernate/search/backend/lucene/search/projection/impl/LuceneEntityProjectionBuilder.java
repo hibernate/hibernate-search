@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 
 
-public class LuceneEntityProjectionBuilder<O> implements EntityProjectionBuilder<O> {
+public class LuceneEntityProjectionBuilder<E> implements EntityProjectionBuilder<E> {
 
 	@SuppressWarnings("rawtypes")
 	private static final LuceneEntityProjectionBuilder INSTANCE = new LuceneEntityProjectionBuilder();
@@ -24,7 +24,7 @@ public class LuceneEntityProjectionBuilder<O> implements EntityProjectionBuilder
 	}
 
 	@Override
-	public SearchProjection<O> build() {
+	public SearchProjection<E> build() {
 		return LuceneEntityProjection.get();
 	}
 }

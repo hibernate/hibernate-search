@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContain
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
-class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O> {
+class MappedIndexSearchScopeImpl<C, R, E> implements MappedIndexSearchScope<R, E> {
 
 	private final IndexSearchScope<C> delegate;
 
@@ -37,9 +37,9 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public SearchQueryResultDefinitionContext<R, O, SearchProjectionFactoryContext<R, O>> search(
+	public SearchQueryResultDefinitionContext<R, E, SearchProjectionFactoryContext<R, E>> search(
 			SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, O> loadingContextBuilder) {
+			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		return new DefaultSearchQueryResultDefinitionContext<>( delegate, sessionContext, loadingContextBuilder );
 	}
 
@@ -54,7 +54,7 @@ class MappedIndexSearchScopeImpl<C, R, O> implements MappedIndexSearchScope<R, O
 	}
 
 	@Override
-	public SearchProjectionFactoryContext<R, O> projection() {
+	public SearchProjectionFactoryContext<R, E> projection() {
 		return new DefaultSearchProjectionFactoryContext<>( delegate.getSearchProjectionFactory() );
 	}
 }

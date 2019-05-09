@@ -19,23 +19,23 @@ import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingO
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
-public class SearchScopeImpl<O> implements SearchScope<O> {
+public class SearchScopeImpl<E> implements SearchScope<E> {
 
-	private final PojoSearchScopeDelegate<O, O> delegate;
+	private final PojoSearchScopeDelegate<E, E> delegate;
 	private final SessionImplementor sessionImplementor;
 
-	public SearchScopeImpl(PojoSearchScopeDelegate<O, O> delegate,
+	public SearchScopeImpl(PojoSearchScopeDelegate<E, E> delegate,
 			SessionImplementor sessionImplementor) {
 		this.delegate = delegate;
 		this.sessionImplementor = sessionImplementor;
 	}
 
 	@Override
-	public HibernateOrmSearchQueryResultDefinitionContext<O> search() {
-		EntityLoaderBuilder<O> entityLoaderBuilder =
+	public HibernateOrmSearchQueryResultDefinitionContext<E> search() {
+		EntityLoaderBuilder<E> entityLoaderBuilder =
 				new EntityLoaderBuilder<>( sessionImplementor, delegate.getIncludedIndexedTypes() );
 		MutableEntityLoadingOptions loadingOptions = new MutableEntityLoadingOptions();
-		HibernateOrmLoadingContext.Builder<O> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
+		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
 				sessionImplementor, delegate, entityLoaderBuilder, loadingOptions
 		);
 		return new HibernateOrmSearchQueryResultDefinitionContextImpl<>(
@@ -55,7 +55,7 @@ public class SearchScopeImpl<O> implements SearchScope<O> {
 	}
 
 	@Override
-	public SearchProjectionFactoryContext<PojoReference, O> projection() {
+	public SearchProjectionFactoryContext<PojoReference, E> projection() {
 		return delegate.projection();
 	}
 }

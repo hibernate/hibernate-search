@@ -25,9 +25,9 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
  * allowing to build search-related objects (query, predicate, ...)
  * taking into account the relevant indexes and their metadata (underlying technology, field types, ...).
  *
- * @param <T> A supertype of all types in this scope.
+ * @param <E> A supertype of all types in this scope.
  */
-public interface SearchScope<T> {
+public interface SearchScope<E> {
 
 	/**
 	 * Initiate the building of a search query.
@@ -38,7 +38,7 @@ public interface SearchScope<T> {
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see HibernateOrmSearchQueryResultDefinitionContext
 	 */
-	HibernateOrmSearchQueryResultDefinitionContext<T> search();
+	HibernateOrmSearchQueryResultDefinitionContext<E> search();
 
 	/**
 	 * Initiate the building of a search predicate.
@@ -89,6 +89,6 @@ public interface SearchScope<T> {
 	 * and ultimately {@link SearchProjectionTerminalContext#toProjection() get the resulting projection}.
 	 * @see SearchProjectionFactoryContext
 	 */
-	SearchProjectionFactoryContext<PojoReference, T> projection();
+	SearchProjectionFactoryContext<PojoReference, E> projection();
 
 }

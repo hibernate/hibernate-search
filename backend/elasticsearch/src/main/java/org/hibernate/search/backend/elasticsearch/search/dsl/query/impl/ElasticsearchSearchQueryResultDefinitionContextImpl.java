@@ -22,30 +22,30 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTermina
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
-public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, O>
+public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 		extends AbstractSearchQueryResultDefinitionContext<
 				R,
-				O,
-				ElasticsearchSearchProjectionFactoryContext<R, O>,
+				E,
+				ElasticsearchSearchProjectionFactoryContext<R, E>,
 				ElasticsearchSearchQueryElementCollector
 		>
-		implements ElasticsearchSearchQueryResultDefinitionContext<R, O> {
+		implements ElasticsearchSearchQueryResultDefinitionContext<R, E> {
 
 	private final ElasticsearchIndexSearchScope indexSearchScope;
 	private final SessionContextImplementor sessionContext;
-	private final LoadingContextBuilder<R, O> loadingContextBuilder;
+	private final LoadingContextBuilder<R, E> loadingContextBuilder;
 
 	public ElasticsearchSearchQueryResultDefinitionContextImpl(ElasticsearchIndexSearchScope indexSearchScope,
 			SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, O> loadingContextBuilder) {
+			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		this.indexSearchScope = indexSearchScope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
 	@Override
-	public ElasticsearchSearchQueryResultContext<O> asEntity() {
-		ElasticsearchSearchQueryBuilder<O> builder = indexSearchScope.getSearchQueryBuilderFactory()
+	public ElasticsearchSearchQueryResultContext<E> asEntity() {
+		ElasticsearchSearchQueryBuilder<E> builder = indexSearchScope.getSearchQueryBuilderFactory()
 				.asEntity( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
@@ -59,8 +59,8 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, O>
 
 	@Override
 	public <P> ElasticsearchSearchQueryResultContext<P> asProjection(
-			Function<? super ElasticsearchSearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
-		ElasticsearchSearchProjectionFactoryContext<R, O> factoryContext =
+			Function<? super ElasticsearchSearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
+		ElasticsearchSearchProjectionFactoryContext<R, E> factoryContext =
 				createDefaultProjectionFactoryContext().extension( ElasticsearchExtension.get() );
 		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();
 		return asProjection( projection );
@@ -91,7 +91,7 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, O>
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, O> getLoadingContextBuilder() {
+	protected LoadingContextBuilder<R, E> getLoadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 

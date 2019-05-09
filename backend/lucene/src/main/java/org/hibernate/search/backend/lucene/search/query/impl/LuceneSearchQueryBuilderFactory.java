@@ -40,8 +40,8 @@ public class LuceneSearchQueryBuilderFactory
 	}
 
 	@Override
-	public <O> LuceneSearchQueryBuilder<O> asEntity(
-			SessionContextImplementor sessionContext, LoadingContextBuilder<?, O> loadingContextBuilder) {
+	public <E> LuceneSearchQueryBuilder<E> asEntity(
+			SessionContextImplementor sessionContext, LoadingContextBuilder<?, E> loadingContextBuilder) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, LuceneEntityProjection.get() );
 	}
 

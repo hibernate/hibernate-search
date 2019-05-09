@@ -30,7 +30,7 @@ public interface MappedIndexManager<D extends DocumentElement> {
 
 	IndexWorkExecutor createWorkExecutor();
 
-	<R, O> MappedIndexSearchScopeBuilder<R, O> createSearchScopeBuilder(MappingContextImplementor mappingContext);
+	<R, E> MappedIndexSearchScopeBuilder<R, E> createSearchScopeBuilder(MappingContextImplementor mappingContext);
 
 	void addTo(MappedIndexSearchScopeBuilder<?, ?> builder);
 }

@@ -12,13 +12,13 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchProjectionFactoryContext;
 
-public class ElasticsearchSearchProjectionFactoryContextImpl<R, O>
-		extends DelegatingSearchProjectionFactoryContext<R, O>
-		implements ElasticsearchSearchProjectionFactoryContext<R, O> {
+public class ElasticsearchSearchProjectionFactoryContextImpl<R, E>
+		extends DelegatingSearchProjectionFactoryContext<R, E>
+		implements ElasticsearchSearchProjectionFactoryContext<R, E> {
 
 	private final ElasticsearchSearchProjectionBuilderFactory factory;
 
-	public ElasticsearchSearchProjectionFactoryContextImpl(SearchProjectionFactoryContext<R, O> delegate,
+	public ElasticsearchSearchProjectionFactoryContextImpl(SearchProjectionFactoryContext<R, E> delegate,
 			ElasticsearchSearchProjectionBuilderFactory factory) {
 		super( delegate );
 		this.factory = factory;

@@ -68,7 +68,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	}
 
 	@Override
-	public <O> EntityProjectionBuilder<O> entity() {
+	public <E> EntityProjectionBuilder<E> entity() {
 		return LuceneEntityProjectionBuilder.get();
 	}
 

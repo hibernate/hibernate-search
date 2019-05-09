@@ -15,13 +15,13 @@ import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchPro
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
 
-public class LuceneSearchProjectionFactoryContextImpl<R, O>
-		extends DelegatingSearchProjectionFactoryContext<R, O>
-		implements LuceneSearchProjectionFactoryContext<R, O> {
+public class LuceneSearchProjectionFactoryContextImpl<R, E>
+		extends DelegatingSearchProjectionFactoryContext<R, E>
+		implements LuceneSearchProjectionFactoryContext<R, E> {
 
 	private final LuceneSearchProjectionBuilderFactory factory;
 
-	public LuceneSearchProjectionFactoryContextImpl(SearchProjectionFactoryContext<R, O> delegate,
+	public LuceneSearchProjectionFactoryContextImpl(SearchProjectionFactoryContext<R, E> delegate,
 			LuceneSearchProjectionBuilderFactory factory) {
 		super( delegate );
 		this.factory = factory;

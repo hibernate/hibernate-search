@@ -15,22 +15,22 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
-public class SearchProjectionFactoryExtensionContextImpl<P, R, O> implements SearchProjectionFactoryExtensionContext<P, R, O> {
+public class SearchProjectionFactoryExtensionContextImpl<P, R, E> implements SearchProjectionFactoryExtensionContext<P, R, E> {
 
-	private final SearchProjectionFactoryContext<R, O> parent;
+	private final SearchProjectionFactoryContext<R, E> parent;
 	private final SearchProjectionBuilderFactory factory;
 
 	private final DslExtensionState<SearchProjectionTerminalContext<P>> state = new DslExtensionState<>();
 
-	SearchProjectionFactoryExtensionContextImpl(SearchProjectionFactoryContext<R, O> parent,
+	SearchProjectionFactoryExtensionContextImpl(SearchProjectionFactoryContext<R, E> parent,
 			SearchProjectionBuilderFactory factory) {
 		this.parent = parent;
 		this.factory = factory;
 	}
 
 	@Override
-	public <T> SearchProjectionFactoryExtensionContext<P, R, O> ifSupported(
-			SearchProjectionFactoryContextExtension<T, R, O> extension,
+	public <T> SearchProjectionFactoryExtensionContext<P, R, E> ifSupported(
+			SearchProjectionFactoryContextExtension<T, R, E> extension,
 			Function<T, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent, factory ), projectionContributor );
 		return this;
@@ -38,7 +38,7 @@ public class SearchProjectionFactoryExtensionContextImpl<P, R, O> implements Sea
 
 	@Override
 	public SearchProjectionTerminalContext<P> orElse(
-			Function<SearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
+			Function<SearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
 		return state.orElse( parent, projectionContributor );
 	}
 

@@ -14,18 +14,18 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 
-public interface LuceneSearchQueryResultDefinitionContext<R, O>
-		extends SearchQueryResultDefinitionContext<R, O, LuceneSearchProjectionFactoryContext<R, O>> {
+public interface LuceneSearchQueryResultDefinitionContext<R, E>
+		extends SearchQueryResultDefinitionContext<R, E, LuceneSearchProjectionFactoryContext<R, E>> {
 
 	@Override
-	LuceneSearchQueryResultContext<O> asEntity();
+	LuceneSearchQueryResultContext<E> asEntity();
 
 	@Override
 	LuceneSearchQueryResultContext<R> asReference();
 
 	@Override
 	<P> LuceneSearchQueryResultContext<P> asProjection(
-			Function<? super LuceneSearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
+			Function<? super LuceneSearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
 
 	@Override
 	<P> LuceneSearchQueryResultContext<P> asProjection(SearchProjection<P> projection);

@@ -60,25 +60,25 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <R> The reference type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( LuceneExtension.get() }.
- * @param <O> entity type for projections.
+ * @param <E> entity type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( LuceneExtension.get() }.
  */
-public final class LuceneExtension<T, R, O>
-		implements SearchQueryContextExtension<LuceneSearchQueryResultDefinitionContext<R, O>, R, O>,
+public final class LuceneExtension<T, R, E>
+		implements SearchQueryContextExtension<LuceneSearchQueryResultDefinitionContext<R, E>, R, E>,
 		SearchQueryExtension<LuceneSearchQuery<T>, T>,
 		SearchPredicateFactoryContextExtension<LuceneSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<LuceneSearchSortContainerContext>,
-		SearchProjectionFactoryContextExtension<LuceneSearchProjectionFactoryContext<R, O>, R, O>,
+		SearchProjectionFactoryContextExtension<LuceneSearchProjectionFactoryContext<R, E>, R, E>,
 		IndexFieldTypeFactoryContextExtension<LuceneIndexFieldTypeFactoryContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final LuceneExtension<Object, Object, Object> INSTANCE = new LuceneExtension<>();
 
-	@SuppressWarnings("unchecked") // The instance works for any T, R and O
-	public static <Q, R, O> LuceneExtension<Q, R, O> get() {
-		return (LuceneExtension<Q, R, O>) INSTANCE;
+	@SuppressWarnings("unchecked") // The instance works for any T, R and E
+	public static <Q, R, E> LuceneExtension<Q, R, E> get() {
+		return (LuceneExtension<Q, R, E>) INSTANCE;
 	}
 
 	private LuceneExtension() {
@@ -89,11 +89,11 @@ public final class LuceneExtension<T, R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchQueryResultDefinitionContext<R, O>> extendOptional(
-			SearchQueryResultDefinitionContext<R, O, ?> original,
+	public Optional<LuceneSearchQueryResultDefinitionContext<R, E>> extendOptional(
+			SearchQueryResultDefinitionContext<R, E, ?> original,
 			IndexSearchScope<?> indexSearchScope,
 			SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, O> loadingContextBuilder) {
+			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		if ( indexSearchScope instanceof LuceneIndexSearchScope ) {
 			return Optional.of( new LuceneSearchQueryResultDefinitionContextImpl<>(
 					(LuceneIndexSearchScope) indexSearchScope, sessionContext, loadingContextBuilder
@@ -153,8 +153,8 @@ public final class LuceneExtension<T, R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchProjectionFactoryContext<R, O>> extendOptional(
-			SearchProjectionFactoryContext<R, O> original, SearchProjectionBuilderFactory factory) {
+	public Optional<LuceneSearchProjectionFactoryContext<R, E>> extendOptional(
+			SearchProjectionFactoryContext<R, E> original, SearchProjectionBuilderFactory factory) {
 		if ( factory instanceof LuceneSearchProjectionBuilderFactory ) {
 			return Optional.of( new LuceneSearchProjectionFactoryContextImpl<>(
 					original, (LuceneSearchProjectionBuilderFactory) factory

@@ -14,18 +14,18 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 
-public interface ElasticsearchSearchQueryResultDefinitionContext<R, O>
-		extends SearchQueryResultDefinitionContext<R, O, ElasticsearchSearchProjectionFactoryContext<R, O>> {
+public interface ElasticsearchSearchQueryResultDefinitionContext<R, E>
+		extends SearchQueryResultDefinitionContext<R, E, ElasticsearchSearchProjectionFactoryContext<R, E>> {
 
 	@Override
-	ElasticsearchSearchQueryResultContext<O> asEntity();
+	ElasticsearchSearchQueryResultContext<E> asEntity();
 
 	@Override
 	ElasticsearchSearchQueryResultContext<R> asReference();
 
 	@Override
 	<P> ElasticsearchSearchQueryResultContext<P> asProjection(
-			Function<? super ElasticsearchSearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
+			Function<? super ElasticsearchSearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
 
 	@Override
 	<P> ElasticsearchSearchQueryResultContext<P> asProjection(SearchProjection<P> projection);

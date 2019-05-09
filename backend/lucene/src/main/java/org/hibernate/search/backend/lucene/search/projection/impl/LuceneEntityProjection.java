@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocument
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class LuceneEntityProjection<O> implements LuceneSearchProjection<Object, O> {
+public class LuceneEntityProjection<E> implements LuceneSearchProjection<Object, E> {
 
 	@SuppressWarnings("rawtypes")
 	private static final LuceneEntityProjection INSTANCE = new LuceneEntityProjection();
@@ -44,9 +44,9 @@ public class LuceneEntityProjection<O> implements LuceneSearchProjection<Object,
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public O transform(LoadingResult<?> loadingResult, Object extractedData,
+	public E transform(LoadingResult<?> loadingResult, Object extractedData,
 			SearchProjectionTransformContext context) {
-		return (O) loadingResult.getLoaded( extractedData );
+		return (E) loadingResult.getLoaded( extractedData );
 	}
 
 	@Override

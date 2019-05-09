@@ -15,12 +15,12 @@ import org.hibernate.search.util.common.SearchException;
  * to a {@link SearchProjectionFactoryContext}.
  *
  * @param <R> The type of references in the parent {@link SearchProjectionFactoryContext}.
- * @param <O> The type of entities in the parent {@link SearchProjectionFactoryContext}.
+ * @param <E> The type of entities in the parent {@link SearchProjectionFactoryContext}.
  * @param <P> The resulting projection type.
  *
  * @see SearchProjectionFactoryContext#extension()
  */
-public interface SearchProjectionFactoryExtensionContext<P, R, O> {
+public interface SearchProjectionFactoryExtensionContext<P, R, E> {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
@@ -38,8 +38,8 @@ public interface SearchProjectionFactoryExtensionContext<P, R, O> {
 	 * @param <T> The type of the extended context.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchProjectionFactoryExtensionContext<P, R, O> ifSupported(
-			SearchProjectionFactoryContextExtension<T, R, O> extension,
+	<T> SearchProjectionFactoryExtensionContext<P, R, E> ifSupported(
+			SearchProjectionFactoryContextExtension<T, R, E> extension,
 			Function<T, ? extends SearchProjectionTerminalContext<P>> projectionContributor
 	);
 
@@ -54,7 +54,7 @@ public interface SearchProjectionFactoryExtensionContext<P, R, O> {
 	 * Should generally be a lambda expression.
 	 * @return The created projection.
 	 */
-	SearchProjectionTerminalContext<P> orElse(Function<SearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
+	SearchProjectionTerminalContext<P> orElse(Function<SearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryContextExtension, Function)}

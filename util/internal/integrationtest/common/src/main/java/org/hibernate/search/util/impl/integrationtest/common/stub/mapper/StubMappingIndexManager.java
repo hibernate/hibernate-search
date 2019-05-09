@@ -78,8 +78,8 @@ public class StubMappingIndexManager {
 	/**
 	 * @return A search target scoped to this index and the given other indexes.
 	 */
-	public <R, O> GenericStubMappingSearchScope<R, O> createGenericSearchScope(StubMappingIndexManager... others) {
-		MappedIndexSearchScopeBuilder<R, O> builder =
+	public <R, E> GenericStubMappingSearchScope<R, E> createGenericSearchScope(StubMappingIndexManager... others) {
+		MappedIndexSearchScopeBuilder<R, E> builder =
 				indexManager.createSearchScopeBuilder( new StubMappingContext() );
 		for ( StubMappingIndexManager other : others ) {
 			other.indexManager.addTo( builder );

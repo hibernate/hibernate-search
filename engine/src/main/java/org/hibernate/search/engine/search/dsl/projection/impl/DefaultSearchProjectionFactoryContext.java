@@ -29,7 +29,7 @@ import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.impl.Contracts;
 
 
-public class DefaultSearchProjectionFactoryContext<R, O> implements SearchProjectionFactoryContext<R, O> {
+public class DefaultSearchProjectionFactoryContext<R, E> implements SearchProjectionFactoryContext<R, E> {
 
 	private final SearchProjectionBuilderFactory factory;
 
@@ -60,7 +60,7 @@ public class DefaultSearchProjectionFactoryContext<R, O> implements SearchProjec
 	}
 
 	@Override
-	public EntityProjectionContext<O> entity() {
+	public EntityProjectionContext<E> entity() {
 		return new EntityProjectionContextImpl<>( factory );
 	}
 
@@ -115,14 +115,14 @@ public class DefaultSearchProjectionFactoryContext<R, O> implements SearchProjec
 	}
 
 	@Override
-	public <T> T extension(SearchProjectionFactoryContextExtension<T, R, O> extension) {
+	public <T> T extension(SearchProjectionFactoryContextExtension<T, R, E> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, factory )
 		);
 	}
 
 	@Override
-	public <T> SearchProjectionFactoryExtensionContext<T, R, O> extension() {
+	public <T> SearchProjectionFactoryExtensionContext<T, R, E> extension() {
 		return new SearchProjectionFactoryExtensionContextImpl<>( this, factory );
 	}
 }

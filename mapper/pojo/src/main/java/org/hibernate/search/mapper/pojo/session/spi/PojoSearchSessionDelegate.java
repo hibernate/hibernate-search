@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 
 public interface PojoSearchSessionDelegate {
 
-	<E, O> PojoSearchScopeDelegate<E, O> createPojoSearchScope(Collection<? extends Class<? extends E>> targetedTypes);
+	<E, E2> PojoSearchScopeDelegate<E, E2> createPojoSearchScope(Collection<? extends Class<? extends E>> targetedTypes);
 
 	PojoWorkPlan createWorkPlan(DocumentRefreshStrategy refreshStrategy);
 

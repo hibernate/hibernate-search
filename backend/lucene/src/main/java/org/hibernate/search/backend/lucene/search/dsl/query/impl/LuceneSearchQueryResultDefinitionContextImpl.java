@@ -22,30 +22,30 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTermina
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
-public class LuceneSearchQueryResultDefinitionContextImpl<R, O>
+public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 		extends AbstractSearchQueryResultDefinitionContext<
 				R,
-				O,
-				LuceneSearchProjectionFactoryContext<R, O>,
+				E,
+				LuceneSearchProjectionFactoryContext<R, E>,
 				LuceneSearchQueryElementCollector
 		>
-		implements LuceneSearchQueryResultDefinitionContext<R, O> {
+		implements LuceneSearchQueryResultDefinitionContext<R, E> {
 
 	private final LuceneIndexSearchScope indexSearchScope;
 	private final SessionContextImplementor sessionContext;
-	private final LoadingContextBuilder<R, O> loadingContextBuilder;
+	private final LoadingContextBuilder<R, E> loadingContextBuilder;
 
 	public LuceneSearchQueryResultDefinitionContextImpl(LuceneIndexSearchScope indexSearchScope,
 			SessionContextImplementor sessionContext,
-			LoadingContextBuilder<R, O> loadingContextBuilder) {
+			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		this.indexSearchScope = indexSearchScope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
 	@Override
-	public LuceneSearchQueryResultContext<O> asEntity() {
-		LuceneSearchQueryBuilder<O> builder = indexSearchScope.getSearchQueryBuilderFactory()
+	public LuceneSearchQueryResultContext<E> asEntity() {
+		LuceneSearchQueryBuilder<E> builder = indexSearchScope.getSearchQueryBuilderFactory()
 				.asEntity( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
@@ -59,8 +59,8 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, O>
 
 	@Override
 	public <P> LuceneSearchQueryResultContext<P> asProjection(
-			Function<? super LuceneSearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
-		LuceneSearchProjectionFactoryContext<R, O> factoryContext =
+			Function<? super LuceneSearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
+		LuceneSearchProjectionFactoryContext<R, E> factoryContext =
 				createDefaultProjectionFactoryContext().extension( LuceneExtension.get() );
 		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();
 		return asProjection( projection );
@@ -91,7 +91,7 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, O>
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, O> getLoadingContextBuilder() {
+	protected LoadingContextBuilder<R, E> getLoadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 

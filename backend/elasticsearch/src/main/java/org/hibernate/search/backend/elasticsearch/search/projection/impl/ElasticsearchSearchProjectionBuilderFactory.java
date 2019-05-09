@@ -69,7 +69,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public <O> EntityProjectionBuilder<O> entity() {
+	public <E> EntityProjectionBuilder<E> entity() {
 		return searchProjectionBackendContext.getEntityProjectionBuilder();
 	}
 

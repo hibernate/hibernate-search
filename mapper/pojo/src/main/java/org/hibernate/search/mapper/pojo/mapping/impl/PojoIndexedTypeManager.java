@@ -135,7 +135,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	<R, O> MappedIndexSearchScopeBuilder<R, O> createSearchScopeBuilder(MappingContextImplementor mappingContext) {
+	<R, E2> MappedIndexSearchScopeBuilder<R, E2> createSearchScopeBuilder(MappingContextImplementor mappingContext) {
 		return indexManager.createSearchScopeBuilder( mappingContext );
 	}
 

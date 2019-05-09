@@ -16,9 +16,9 @@ import org.hibernate.search.engine.search.loading.spi.EntityLoader;
  * <p>
  * See {@link HibernateOrmByTypeEntityLoader} for uses.
  * @param <R>
- * @param <O>
+ * @param <E>
  */
-interface HibernateOrmComposableEntityLoader<R, O> extends EntityLoader<R, O> {
+interface HibernateOrmComposableEntityLoader<R, E> extends EntityLoader<R, E> {
 
 	/**
 	 * For each reference in the given list,
@@ -31,6 +31,6 @@ interface HibernateOrmComposableEntityLoader<R, O> extends EntityLoader<R, O> {
 	 * @param objectsByReference A map with references as keys and objects as values.
 	 * Initial values are undefined and the loader must not rely on them.
 	 */
-	void loadBlocking(List<R> references, Map<? super R, ? super O> objectsByReference);
+	void loadBlocking(List<R> references, Map<? super R, ? super E> objectsByReference);
 
 }

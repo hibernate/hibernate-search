@@ -11,10 +11,10 @@ import org.hibernate.search.engine.search.DocumentReference;
 /**
  * Contract binding result hits and the mapper.
  *
- * @param <R> The type of object references.
- * @param <O> The type of entities.
+ * @param <R> The type of entity references.
+ * @param <E> The type of entities.
  */
-public interface ProjectionHitMapper<R, O> {
+public interface ProjectionHitMapper<R, E> {
 
 	/**
 	 * Convert a document reference to the reference specific to the mapper.
@@ -37,6 +37,6 @@ public interface ProjectionHitMapper<R, O> {
 	 *
 	 * @return The loaded entities.
 	 */
-	LoadingResult<O> loadBlocking();
+	LoadingResult<E> loadBlocking();
 
 }
