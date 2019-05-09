@@ -11,14 +11,14 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 public class StubLoadingContext implements LoadingContext<DocumentReference, DocumentReference> {
 	private final ProjectionHitMapper<DocumentReference, DocumentReference> projectionHitMapper;
 
 	StubLoadingContext() {
-		this.projectionHitMapper = new DefaultProjectionHitMapper<>( Function.identity(), ObjectLoader.identity() );
+		this.projectionHitMapper = new DefaultProjectionHitMapper<>( Function.identity(), EntityLoader.identity() );
 	}
 
 	@Override

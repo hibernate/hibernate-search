@@ -14,8 +14,8 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
-import org.hibernate.search.mapper.orm.search.loading.impl.ObjectLoaderBuilder;
+import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
+import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -28,11 +28,11 @@ public final class HibernateOrmLoadingContext<O> implements LoadingContext<PojoR
 
 	private final ProjectionHitMapper<PojoReference, O> projectionHitMapper;
 
-	private final MutableObjectLoadingOptions loadingOptions;
+	private final MutableEntityLoadingOptions loadingOptions;
 
 	private HibernateOrmLoadingContext(SessionImplementor sessionImplementor,
 			ProjectionHitMapper<PojoReference, O> projectionHitMapper,
-			MutableObjectLoadingOptions loadingOptions) {
+			MutableEntityLoadingOptions loadingOptions) {
 		this.sessionImplementor = sessionImplementor;
 		this.projectionHitMapper = projectionHitMapper;
 		this.loadingOptions = loadingOptions;
@@ -54,23 +54,23 @@ public final class HibernateOrmLoadingContext<O> implements LoadingContext<PojoR
 		return sessionImplementor;
 	}
 
-	public MutableObjectLoadingOptions getLoadingOptions() {
+	public MutableEntityLoadingOptions getLoadingOptions() {
 		return loadingOptions;
 	}
 
 	public static final class Builder<O> implements LoadingContextBuilder<PojoReference, O> {
 		private final SessionImplementor sessionImplementor;
 		private final PojoSearchScopeDelegate<?, ?> scopeDelegate;
-		private final ObjectLoaderBuilder<O> objectLoaderBuilder;
-		private final MutableObjectLoadingOptions loadingOptions;
+		private final EntityLoaderBuilder<O> entityLoaderBuilder;
+		private final MutableEntityLoadingOptions loadingOptions;
 
 		public Builder(SessionImplementor sessionImplementor,
 				PojoSearchScopeDelegate<?, ?> scopeDelegate,
-				ObjectLoaderBuilder<O> objectLoaderBuilder,
-				MutableObjectLoadingOptions loadingOptions) {
+				EntityLoaderBuilder<O> entityLoaderBuilder,
+				MutableEntityLoadingOptions loadingOptions) {
 			this.sessionImplementor = sessionImplementor;
 			this.scopeDelegate = scopeDelegate;
-			this.objectLoaderBuilder = objectLoaderBuilder;
+			this.entityLoaderBuilder = entityLoaderBuilder;
 			this.loadingOptions = loadingOptions;
 		}
 
@@ -78,7 +78,7 @@ public final class HibernateOrmLoadingContext<O> implements LoadingContext<PojoR
 		public LoadingContext<PojoReference, O> build() {
 			ProjectionHitMapper<PojoReference, O> projectionHitMapper = new DefaultProjectionHitMapper<>(
 					scopeDelegate::toPojoReference,
-					objectLoaderBuilder.build( loadingOptions )
+					entityLoaderBuilder.build( loadingOptions )
 			);
 			return new HibernateOrmLoadingContext<>( sessionImplementor, projectionHitMapper, loadingOptions );
 		}

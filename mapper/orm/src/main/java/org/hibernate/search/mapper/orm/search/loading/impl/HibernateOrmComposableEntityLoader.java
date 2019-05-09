@@ -9,16 +9,16 @@ package org.hibernate.search.mapper.orm.search.loading.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 
 /**
- * An {@link ObjectLoader} that can be easily composed with others object loaders.
+ * An {@link EntityLoader} that can be easily composed with others entity loaders.
  * <p>
- * See {@link HibernateOrmByTypeObjectLoader} for uses.
+ * See {@link HibernateOrmByTypeEntityLoader} for uses.
  * @param <R>
  * @param <O>
  */
-interface HibernateOrmComposableObjectLoader<R, O> extends ObjectLoader<R, O> {
+interface HibernateOrmComposableEntityLoader<R, O> extends EntityLoader<R, O> {
 
 	/**
 	 * For each reference in the given list,

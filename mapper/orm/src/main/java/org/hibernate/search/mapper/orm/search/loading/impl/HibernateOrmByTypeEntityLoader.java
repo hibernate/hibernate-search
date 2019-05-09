@@ -15,36 +15,36 @@ import java.util.Map;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class HibernateOrmByTypeObjectLoader<O, T> implements ObjectLoader<PojoReference, T> {
+public class HibernateOrmByTypeEntityLoader<O, T> implements EntityLoader<PojoReference, T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<Class<? extends O>, HibernateOrmComposableObjectLoader<PojoReference, ? extends T>> delegatesByConcreteType;
+	private final Map<Class<? extends O>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType;
 
-	public HibernateOrmByTypeObjectLoader(Map<Class<? extends O>, HibernateOrmComposableObjectLoader<PojoReference, ? extends T>> delegatesByConcreteType) {
+	public HibernateOrmByTypeEntityLoader(Map<Class<? extends O>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType) {
 		this.delegatesByConcreteType = delegatesByConcreteType;
 	}
 
 	@Override
 	public List<T> loadBlocking(List<PojoReference> references) {
 		LinkedHashMap<PojoReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
-		Map<HibernateOrmComposableObjectLoader<PojoReference, ? extends T>, List<PojoReference>> referencesByDelegate = new HashMap<>();
+		Map<HibernateOrmComposableEntityLoader<PojoReference, ? extends T>, List<PojoReference>> referencesByDelegate = new HashMap<>();
 
 		// Split references by delegate (by entity type)
 		for ( PojoReference reference : references ) {
 			objectsByReference.put( reference, null );
-			HibernateOrmComposableObjectLoader<PojoReference, ? extends T> delegate = getDelegate( reference.getType() );
+			HibernateOrmComposableEntityLoader<PojoReference, ? extends T> delegate = getDelegate( reference.getType() );
 			referencesByDelegate.computeIfAbsent( delegate, ignored -> new ArrayList<>() )
 					.add( reference );
 		}
 
 		// Load all references
-		for ( Map.Entry<HibernateOrmComposableObjectLoader<PojoReference, ? extends T>, List<PojoReference>> entry :
+		for ( Map.Entry<HibernateOrmComposableEntityLoader<PojoReference, ? extends T>, List<PojoReference>> entry :
 				referencesByDelegate.entrySet() ) {
-			HibernateOrmComposableObjectLoader<PojoReference, ? extends T> delegate = entry.getKey();
+			HibernateOrmComposableEntityLoader<PojoReference, ? extends T> delegate = entry.getKey();
 			List<PojoReference> referencesForDelegate = entry.getValue();
 			delegate.loadBlocking( referencesForDelegate, objectsByReference );
 		}
@@ -56,15 +56,15 @@ public class HibernateOrmByTypeObjectLoader<O, T> implements ObjectLoader<PojoRe
 			/*
 			 * TODO remove null values? We used to do it in Search 5...
 			 * Note that if we do, we have to change the javadoc
-			 * for this method and also change the other ObjectLoader implementations.
+			 * for this method and also change the other EntityLoader implementations.
 			 */
 			result.add( value );
 		}
 		return result;
 	}
 
-	private HibernateOrmComposableObjectLoader<PojoReference, ? extends T> getDelegate(Class<?> entityType) {
-		HibernateOrmComposableObjectLoader<PojoReference, ? extends T> delegate = delegatesByConcreteType.get( entityType );
+	private HibernateOrmComposableEntityLoader<PojoReference, ? extends T> getDelegate(Class<?> entityType) {
+		HibernateOrmComposableEntityLoader<PojoReference, ? extends T> delegate = delegatesByConcreteType.get( entityType );
 		if ( delegate == null ) {
 			throw log.unexpectedSearchHitType( entityType, delegatesByConcreteType.keySet() );
 		}

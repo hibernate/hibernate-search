@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils;
 
 import org.easymock.EasyMock;
@@ -42,7 +42,7 @@ public final class StubMapperUtils {
 	/**
 	 * @param loadingContextMock The EasyMock mock for the loading context.
 	 * @param referenceTransformerMock The EasyMock mock for the reference transformer.
-	 * @param objectLoaderMock The EasyMock mock for the object loader.
+	 * @param objectLoaderMock The EasyMock mock for the entity loader.
 	 * @param hitMappingDefinition A definition of the reference -> entity mapping.
 	 * @param <R> The reference type.
 	 * @param <O> The entity type.
@@ -51,7 +51,7 @@ public final class StubMapperUtils {
 	public static <R, O> void expectHitMapping(
 			LoadingContext<R, O> loadingContextMock,
 			Function<DocumentReference, R> referenceTransformerMock,
-			ObjectLoader<R, O> objectLoaderMock,
+			EntityLoader<R, O> objectLoaderMock,
 			Consumer<HitMappingDefinitionContext<R, O>> hitMappingDefinition) {
 		/*
 		 * We expect getProjectionHitMapper to be called *every time* a load is performed,

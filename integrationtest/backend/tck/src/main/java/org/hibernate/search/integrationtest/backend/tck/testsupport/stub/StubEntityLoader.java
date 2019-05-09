@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.stub;
 
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 
 /**
  * The only purpose of this class is to avoid unchecked cast warnings when creating mocks.
  */
-public interface StubObjectLoader
-		extends ObjectLoader<StubTransformedReference, StubLoadedObject> {
+public interface StubEntityLoader
+		extends EntityLoader<StubTransformedReference, StubLoadedObject> {
 }

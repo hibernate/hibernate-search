@@ -119,7 +119,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	/**
 	 * Make sure the indexes are updated right after the hibernate flush,
-	 * avoiding object loading during a flush. Not needed during transactions.
+	 * avoiding entity loading during a flush. Not needed during transactions.
 	 */
 	@Override
 	public void onFlush(FlushEvent event) {

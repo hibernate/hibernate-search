@@ -14,7 +14,7 @@ import java.util.List;
  * @param <R> The expected reference type (input)
  * @param <O> The resulting entity type (output)
  */
-public interface ObjectLoader<R, O> {
+public interface EntityLoader<R, O> {
 
 	/**
 	 * Loads the entities corresponding to the given references, blocking the current thread while doing so.
@@ -25,8 +25,8 @@ public interface ObjectLoader<R, O> {
 	 */
 	List<O> loadBlocking(List<R> references);
 
-	static <T> ObjectLoader<T, T> identity() {
-		return IdentityObjectLoader.get();
+	static <T> EntityLoader<T, T> identity() {
+		return IdentityEntityLoader.get();
 	}
 
 }
