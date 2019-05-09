@@ -6,6 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
-public interface StubCompositeSearchProjection<T> extends StubSearchProjection<T> {
+public interface StubCompositeSearchProjection<P> extends StubSearchProjection<P> {
 
 }

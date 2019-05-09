@@ -25,11 +25,11 @@ public interface SearchQueryBuilderFactory<C> {
 	<E> SearchQueryBuilder<E, C> asEntity(SessionContextImplementor sessionContext,
 			LoadingContextBuilder<?, E> loadingContextBuilder);
 
-	<T> SearchQueryBuilder<T, C> asReference(SessionContextImplementor sessionContext,
-			LoadingContextBuilder<T, ?> loadingContextBuilder);
+	<R> SearchQueryBuilder<R, C> asReference(SessionContextImplementor sessionContext,
+			LoadingContextBuilder<R, ?> loadingContextBuilder);
 
-	<T> SearchQueryBuilder<T, C> asProjection(SessionContextImplementor sessionContext,
-			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<T> projection);
+	<P> SearchQueryBuilder<P, C> asProjection(SessionContextImplementor sessionContext,
+			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
 	SearchQueryBuilder<List<?>, C> asProjections(SessionContextImplementor sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<?>... projections);

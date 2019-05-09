@@ -23,7 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchFieldProjection<F, T> implements ElasticsearchSearchProjection<F, T> {
+class ElasticsearchFieldProjection<F, V> implements ElasticsearchSearchProjection<F, V> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
@@ -31,11 +31,11 @@ class ElasticsearchFieldProjection<F, T> implements ElasticsearchSearchProjectio
 	private final String absoluteFieldPath;
 	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
 
-	private final FromDocumentFieldValueConverter<? super F, T> converter;
+	private final FromDocumentFieldValueConverter<? super F, V> converter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	ElasticsearchFieldProjection(String absoluteFieldPath,
-			FromDocumentFieldValueConverter<? super F, T> converter,
+			FromDocumentFieldValueConverter<? super F, V> converter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.path( absoluteFieldPath );
@@ -65,7 +65,7 @@ class ElasticsearchFieldProjection<F, T> implements ElasticsearchSearchProjectio
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, F extractedData, SearchProjectionTransformContext context) {
+	public V transform(LoadingResult<?> loadingResult, F extractedData, SearchProjectionTransformContext context) {
 		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
 		return converter.convert( extractedData, convertContext );
 	}

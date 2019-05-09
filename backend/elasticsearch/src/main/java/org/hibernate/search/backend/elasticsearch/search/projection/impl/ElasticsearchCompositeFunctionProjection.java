@@ -13,14 +13,14 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchCompositeFunctionProjection<E, P, T> implements ElasticsearchCompositeProjection<E, T> {
+public class ElasticsearchCompositeFunctionProjection<E, P1, P> implements ElasticsearchCompositeProjection<E, P> {
 
-	private final Function<P, T> transformer;
+	private final Function<P1, P> transformer;
 
-	private final ElasticsearchSearchProjection<E, P> projection;
+	private final ElasticsearchSearchProjection<E, P1> projection;
 
-	public ElasticsearchCompositeFunctionProjection(Function<P, T> transformer,
-			ElasticsearchSearchProjection<E, P> projection) {
+	public ElasticsearchCompositeFunctionProjection(Function<P1, P> transformer,
+			ElasticsearchSearchProjection<E, P1> projection) {
 		this.transformer = transformer;
 		this.projection = projection;
 	}
@@ -38,7 +38,7 @@ public class ElasticsearchCompositeFunctionProjection<E, P, T> implements Elasti
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, E extractedData, SearchProjectionTransformContext context) {
+	public P transform(LoadingResult<?> loadingResult, E extractedData, SearchProjectionTransformContext context) {
 		return transformer.apply( projection.transform( loadingResult, extractedData, context ) );
 	}
 

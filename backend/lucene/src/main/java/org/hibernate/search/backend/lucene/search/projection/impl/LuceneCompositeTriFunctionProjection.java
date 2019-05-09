@@ -16,9 +16,9 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.function.TriFunction;
 
-public class LuceneCompositeTriFunctionProjection<P1, P2, P3, T> implements LuceneCompositeProjection<Object[], T> {
+public class LuceneCompositeTriFunctionProjection<P1, P2, P3, P> implements LuceneCompositeProjection<Object[], P> {
 
-	private final TriFunction<P1, P2, P3, T> transformer;
+	private final TriFunction<P1, P2, P3, P> transformer;
 
 	private final LuceneSearchProjection<?, P1> projection1;
 
@@ -26,7 +26,7 @@ public class LuceneCompositeTriFunctionProjection<P1, P2, P3, T> implements Luce
 
 	private final LuceneSearchProjection<?, P3> projection3;
 
-	public LuceneCompositeTriFunctionProjection(TriFunction<P1, P2, P3, T> transformer,
+	public LuceneCompositeTriFunctionProjection(TriFunction<P1, P2, P3, P> transformer,
 			LuceneSearchProjection<?, P1> projection1, LuceneSearchProjection<?, P2> projection2,
 			LuceneSearchProjection<?, P3> projection3) {
 		this.transformer = transformer;
@@ -60,7 +60,7 @@ public class LuceneCompositeTriFunctionProjection<P1, P2, P3, T> implements Luce
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object[] extractedData,
+	public P transform(LoadingResult<?> loadingResult, Object[] extractedData,
 			SearchProjectionTransformContext context) {
 		return transformer.apply(
 				transformUnsafe( projection1, loadingResult, extractedData[0], context ),

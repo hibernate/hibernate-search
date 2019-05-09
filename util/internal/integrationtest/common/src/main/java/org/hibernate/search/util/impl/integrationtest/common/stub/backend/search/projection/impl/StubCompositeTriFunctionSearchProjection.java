@@ -13,9 +13,9 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.function.TriFunction;
 
-public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, T> implements StubCompositeSearchProjection<T> {
+public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, P> implements StubCompositeSearchProjection<P> {
 
-	private final TriFunction<P1, P2, P3, T> transformer;
+	private final TriFunction<P1, P2, P3, P> transformer;
 
 	private final StubSearchProjection<P1> projection1;
 
@@ -23,7 +23,7 @@ public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, T> implements 
 
 	private final StubSearchProjection<P3> projection3;
 
-	public StubCompositeTriFunctionSearchProjection(TriFunction<P1, P2, P3, T> transformer,
+	public StubCompositeTriFunctionSearchProjection(TriFunction<P1, P2, P3, P> transformer,
 			StubSearchProjection<P1> projection1, StubSearchProjection<P2> projection2,
 			StubSearchProjection<P3> projection3) {
 		this.transformer = transformer;
@@ -45,7 +45,7 @@ public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, T> implements 
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public P transform(LoadingResult<?> loadingResult, Object extractedData) {
 		Object[] extractedElements = (Object[]) extractedData;
 
 		return transformer.apply(

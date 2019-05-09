@@ -12,7 +12,7 @@ package org.hibernate.search.engine.search;
  * Implementations of this interface are provided to users by Hibernate Search. Users must not try to implement this
  * interface.
  *
- * @param <T> The type of the element returned by the projection.
+ * @param <P> The type of the element returned by the projection.
  */
-public interface SearchProjection<T> {
+public interface SearchProjection<P> {
 }

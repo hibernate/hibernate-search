@@ -13,15 +13,15 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class StubCompositeBiFunctionSearchProjection<P1, P2, T> implements StubCompositeSearchProjection<T> {
+public class StubCompositeBiFunctionSearchProjection<P1, P2, P> implements StubCompositeSearchProjection<P> {
 
-	private final BiFunction<P1, P2, T> transformer;
+	private final BiFunction<P1, P2, P> transformer;
 
 	private final StubSearchProjection<P1> projection1;
 
 	private final StubSearchProjection<P2> projection2;
 
-	public StubCompositeBiFunctionSearchProjection(BiFunction<P1, P2, T> transformer,
+	public StubCompositeBiFunctionSearchProjection(BiFunction<P1, P2, P> transformer,
 			StubSearchProjection<P1> projection1, StubSearchProjection<P2> projection2) {
 		this.transformer = transformer;
 		this.projection1 = projection1;
@@ -40,7 +40,7 @@ public class StubCompositeBiFunctionSearchProjection<P1, P2, T> implements StubC
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public P transform(LoadingResult<?> loadingResult, Object extractedData) {
 		Object[] extractedElements = (Object[]) extractedData;
 
 		return transformer.apply(

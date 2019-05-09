@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public interface LuceneSearchProjection<E, T> extends SearchProjection<T>, LuceneCollectorProvider {
+public interface LuceneSearchProjection<E, P> extends SearchProjection<P>, LuceneCollectorProvider {
 
 	/**
 	 * Contributes to the list of fields extracted from the Lucene document. Some fields might require the extraction of
@@ -50,7 +50,7 @@ public interface LuceneSearchProjection<E, T> extends SearchProjection<T>, Lucen
 	 * @param context An execution context for the transforming.
 	 * @return The final result considered as a hit.
 	 */
-	T transform(LoadingResult<?> loadingResult, E extractedData,
+	P transform(LoadingResult<?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context);
 
 	/**

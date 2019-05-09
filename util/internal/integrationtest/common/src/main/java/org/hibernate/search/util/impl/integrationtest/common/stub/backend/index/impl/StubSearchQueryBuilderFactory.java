@@ -46,8 +46,8 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asReference(SessionContextImplementor sessionContext,
-			LoadingContextBuilder<T, ?> loadingContextBuilder) {
+	public <R> SearchQueryBuilder<R, StubQueryElementCollector> asReference(SessionContextImplementor sessionContext,
+			LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.REFERENCES,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
@@ -57,13 +57,13 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asProjection(SessionContextImplementor sessionContext,
-			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<T> projection) {
+	public <P> SearchQueryBuilder<P, StubQueryElementCollector> asProjection(SessionContextImplementor sessionContext,
+			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
 				loadingContextBuilder,
-				(StubSearchProjection<T>) projection
+				(StubSearchProjection<P>) projection
 		);
 	}
 

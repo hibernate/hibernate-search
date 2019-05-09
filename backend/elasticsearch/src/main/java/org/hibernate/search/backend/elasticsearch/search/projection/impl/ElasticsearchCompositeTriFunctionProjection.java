@@ -14,10 +14,10 @@ import org.hibernate.search.util.common.function.TriFunction;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchCompositeTriFunctionProjection<P1, P2, P3, T> implements
-		ElasticsearchCompositeProjection<Object[], T> {
+public class ElasticsearchCompositeTriFunctionProjection<P1, P2, P3, P> implements
+		ElasticsearchCompositeProjection<Object[], P> {
 
-	private final TriFunction<P1, P2, P3, T> transformer;
+	private final TriFunction<P1, P2, P3, P> transformer;
 
 	private final ElasticsearchSearchProjection<?, P1> projection1;
 
@@ -25,7 +25,7 @@ public class ElasticsearchCompositeTriFunctionProjection<P1, P2, P3, T> implemen
 
 	private final ElasticsearchSearchProjection<?, P3> projection3;
 
-	public ElasticsearchCompositeTriFunctionProjection(TriFunction<P1, P2, P3, T> transformer,
+	public ElasticsearchCompositeTriFunctionProjection(TriFunction<P1, P2, P3, P> transformer,
 			ElasticsearchSearchProjection<?, P1> projection1, ElasticsearchSearchProjection<?, P2> projection2,
 			ElasticsearchSearchProjection<?, P3> projection3) {
 		this.transformer = transformer;
@@ -53,7 +53,7 @@ public class ElasticsearchCompositeTriFunctionProjection<P1, P2, P3, T> implemen
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object[] extractedData,
+	public P transform(LoadingResult<?> loadingResult, Object[] extractedData,
 			SearchProjectionTransformContext context) {
 		return transformer.apply(
 				transformUnsafe( projection1, loadingResult, extractedData[0], context ),

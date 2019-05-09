@@ -11,10 +11,10 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public interface StubSearchProjection<T> extends SearchProjection<T> {
+public interface StubSearchProjection<P> extends SearchProjection<P> {
 
 	Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
 			FromDocumentFieldValueConvertContext context);
 
-	T transform(LoadingResult<?> loadingResult, Object extractedData);
+	P transform(LoadingResult<?> loadingResult, Object extractedData);
 }

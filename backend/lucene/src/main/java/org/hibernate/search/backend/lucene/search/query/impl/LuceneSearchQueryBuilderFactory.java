@@ -46,15 +46,15 @@ public class LuceneSearchQueryBuilderFactory
 	}
 
 	@Override
-	public <T> LuceneSearchQueryBuilder<T> asReference(
-			SessionContextImplementor sessionContext, LoadingContextBuilder<T, ?> loadingContextBuilder) {
+	public <R> LuceneSearchQueryBuilder<R> asReference(
+			SessionContextImplementor sessionContext, LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, LuceneReferenceProjection.get() );
 	}
 
 	@Override
-	public <T> LuceneSearchQueryBuilder<T> asProjection(
+	public <P> LuceneSearchQueryBuilder<P> asProjection(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
-			SearchProjection<T> projection) {
+			SearchProjection<P> projection) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder,
 				searchProjectionFactory.toImplementation( projection ) );
 	}

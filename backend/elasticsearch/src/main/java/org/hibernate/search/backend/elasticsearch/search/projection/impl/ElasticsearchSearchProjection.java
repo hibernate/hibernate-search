@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public interface ElasticsearchSearchProjection<E, T> extends SearchProjection<T> {
+public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P> {
 
 	/**
 	 * Contribute to the request, making sure that the requirements for this projection are met.
@@ -51,7 +51,7 @@ public interface ElasticsearchSearchProjection<E, T> extends SearchProjection<T>
 	 * @param context An execution context for the transforming.
 	 * @return The final result considered as a hit.
 	 */
-	T transform(LoadingResult<?> loadingResult, E extractedData, SearchProjectionTransformContext context);
+	P transform(LoadingResult<?> loadingResult, E extractedData, SearchProjectionTransformContext context);
 
 	/**
 	 * Transform the extracted data and cast it to the right type.

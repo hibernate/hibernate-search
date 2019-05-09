@@ -48,8 +48,8 @@ public class ElasticsearchSearchQueryBuilderFactory
 	}
 
 	@Override
-	public <T> ElasticsearchSearchQueryBuilder<T> asReference(
-			SessionContextImplementor sessionContext, LoadingContextBuilder<T, ?> loadingContextBuilder) {
+	public <R> ElasticsearchSearchQueryBuilder<R> asReference(
+			SessionContextImplementor sessionContext, LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
 				new ElasticsearchReferenceProjection<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
@@ -57,9 +57,9 @@ public class ElasticsearchSearchQueryBuilderFactory
 	}
 
 	@Override
-	public <T> ElasticsearchSearchQueryBuilder<T> asProjection(
+	public <P> ElasticsearchSearchQueryBuilder<P> asProjection(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
-			SearchProjection<T> projection) {
+			SearchProjection<P> projection) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
 				searchProjectionFactory.toImplementation( projection )
