@@ -213,7 +213,7 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	public <F> IndexFieldTypeTerminalContext<F> asNative(Class<F> indexFieldType,
 			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		return new LuceneFieldIndexFieldTypeContext<>(
+		return new LuceneNativeIndexFieldTypeContext<>(
 				indexFieldType, fieldContributor, fieldValueExtractor
 		);
 	}

@@ -19,14 +19,14 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 /**
  * @author Guillaume Smet
  */
-class LuceneFieldIndexFieldTypeContext<F>
+class LuceneNativeIndexFieldTypeContext<F>
 		implements IndexFieldTypeTerminalContext<F> {
 
 	private final FromDocumentFieldValueConverter<? super F, F> indexToProjectionConverter;
 	private final LuceneFieldContributor<F> fieldContributor;
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
-	LuceneFieldIndexFieldTypeContext(Class<F> fieldType,
+	LuceneNativeIndexFieldTypeContext(Class<F> fieldType,
 			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		this.indexToProjectionConverter = new PassThroughFromDocumentFieldValueConverter<>( fieldType );
 		this.fieldContributor = fieldContributor;
