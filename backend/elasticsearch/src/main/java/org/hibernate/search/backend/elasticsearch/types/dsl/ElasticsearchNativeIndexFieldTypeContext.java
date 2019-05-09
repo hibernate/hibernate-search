@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 
-public interface ElasticsearchJsonStringIndexFieldTypeContext<S extends ElasticsearchJsonStringIndexFieldTypeContext<? extends S>>
+public interface ElasticsearchNativeIndexFieldTypeContext<S extends ElasticsearchNativeIndexFieldTypeContext<? extends S>>
 		extends IndexFieldTypeConverterContext<S, String>, IndexFieldTypeTerminalContext<String> {
 
 }

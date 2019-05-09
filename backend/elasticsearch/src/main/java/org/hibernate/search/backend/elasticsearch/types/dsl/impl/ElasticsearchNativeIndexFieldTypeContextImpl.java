@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchJsonStringFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchJsonStringIndexFieldTypeContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
@@ -23,20 +23,20 @@ import com.google.gson.Gson;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-class ElasticsearchJsonStringIndexFieldTypeContextImpl
-		extends AbstractElasticsearchIndexFieldTypeConverterContext<ElasticsearchJsonStringIndexFieldTypeContextImpl, String>
-		implements ElasticsearchJsonStringIndexFieldTypeContext<ElasticsearchJsonStringIndexFieldTypeContextImpl> {
+class ElasticsearchNativeIndexFieldTypeContextImpl
+		extends AbstractElasticsearchIndexFieldTypeConverterContext<ElasticsearchNativeIndexFieldTypeContextImpl, String>
+		implements ElasticsearchNativeIndexFieldTypeContext<ElasticsearchNativeIndexFieldTypeContextImpl> {
 
 	private final String mappingJsonString;
 
-	ElasticsearchJsonStringIndexFieldTypeContextImpl(ElasticsearchIndexFieldTypeBuildContext buildContext,
+	ElasticsearchNativeIndexFieldTypeContextImpl(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			String mappingJsonString) {
 		super( buildContext, String.class );
 		this.mappingJsonString = mappingJsonString;
 	}
 
 	@Override
-	protected ElasticsearchJsonStringIndexFieldTypeContextImpl thisAsS() {
+	protected ElasticsearchNativeIndexFieldTypeContextImpl thisAsS() {
 		return this;
 	}
 

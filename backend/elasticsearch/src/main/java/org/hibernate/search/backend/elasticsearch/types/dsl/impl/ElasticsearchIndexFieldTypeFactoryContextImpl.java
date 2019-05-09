@@ -20,7 +20,7 @@ import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchJsonStringIndexFieldTypeContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
@@ -212,8 +212,8 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	}
 
 	@Override
-	public ElasticsearchJsonStringIndexFieldTypeContext<?> asNative(String mappingJsonString) {
-		return new ElasticsearchJsonStringIndexFieldTypeContextImpl( this, mappingJsonString );
+	public ElasticsearchNativeIndexFieldTypeContext<?> asNative(String mappingJsonString) {
+		return new ElasticsearchNativeIndexFieldTypeContextImpl( this, mappingJsonString );
 	}
 
 	@Override

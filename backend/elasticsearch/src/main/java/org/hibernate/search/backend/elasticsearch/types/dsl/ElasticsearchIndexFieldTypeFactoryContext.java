@@ -36,6 +36,6 @@ public interface ElasticsearchIndexFieldTypeFactoryContext extends IndexFieldTyp
 	 * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html">the Elasticsearch documentation</a>.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	ElasticsearchJsonStringIndexFieldTypeContext<?> asNative(String mappingJsonString);
+	ElasticsearchNativeIndexFieldTypeContext<?> asNative(String mappingJsonString);
 
 }
