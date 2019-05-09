@@ -14,17 +14,17 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 
-final class HibernateOrmSearchQueryAdapterExtension<T> implements
-		SearchQueryExtension<HibernateOrmSearchQueryAdapter<T>, T> {
+final class HibernateOrmSearchQueryAdapterExtension<H> implements
+		SearchQueryExtension<HibernateOrmSearchQueryAdapter<H>, H> {
 	private static final HibernateOrmSearchQueryAdapterExtension<Object> INSTANCE = new HibernateOrmSearchQueryAdapterExtension<>();
 
-	@SuppressWarnings("unchecked") // The instance works for any T
-	static <T> HibernateOrmSearchQueryAdapterExtension<T> get() {
-		return (HibernateOrmSearchQueryAdapterExtension<T>) INSTANCE;
+	@SuppressWarnings("unchecked") // The instance works for any H
+	static <H> HibernateOrmSearchQueryAdapterExtension<H> get() {
+		return (HibernateOrmSearchQueryAdapterExtension<H>) INSTANCE;
 	}
 
 	@Override
-	public Optional<HibernateOrmSearchQueryAdapter<T>> extendOptional(SearchQuery<T> original, LoadingContext<?, ?> loadingContext) {
+	public Optional<HibernateOrmSearchQueryAdapter<H>> extendOptional(SearchQuery<H> original, LoadingContext<?, ?> loadingContext) {
 		if ( loadingContext instanceof HibernateOrmLoadingContext ) {
 			HibernateOrmLoadingContext<?> castedLoadingContext = (HibernateOrmLoadingContext<?>) loadingContext;
 			return Optional.of( new HibernateOrmSearchQueryAdapter<>(

@@ -20,11 +20,11 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
  * and pass it to another API.
  *
  * @param <Q> The type of search queries wrappers created by this extension.
- * @param <T> The type of hits in the query to be wrapped.
+ * @param <H> The type of hits in the query to be wrapped.
  *
  * @see org.hibernate.search.engine.search.query.SearchQuery#extension(SearchQueryExtension)
  */
-public interface SearchQueryExtension<Q, T> {
+public interface SearchQueryExtension<Q, H> {
 
 	/**
 	 * Attempt to extend a given query, returning an empty {@link Optional} in case of failure.
@@ -36,6 +36,6 @@ public interface SearchQueryExtension<Q, T> {
 	 * @return An optional containing the extended search query ({@link Q}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<Q> extendOptional(SearchQuery<T> original, LoadingContext<?, ?> loadingContext);
+	Optional<Q> extendOptional(SearchQuery<H> original, LoadingContext<?, ?> loadingContext);
 
 }

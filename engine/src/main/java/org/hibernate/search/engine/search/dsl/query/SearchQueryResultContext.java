@@ -16,12 +16,12 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
  * The context used when building a query, after the search result type has been defined.
  *
  * @param <N> The type of the next context, returned after a predicate is defined.
- * @param <T> The type of hits for the created query.
+ * @param <H> The type of hits for the created query.
  * @param <PC> The type of contexts used to create predicates in {@link #predicate(Function)}.
  */
 public interface SearchQueryResultContext<
-		N extends SearchQueryContext<? extends N, T, ?>,
-		T,
+		N extends SearchQueryContext<? extends N, H, ?>,
+		H,
 		PC extends SearchPredicateFactoryContext
 		> {
 

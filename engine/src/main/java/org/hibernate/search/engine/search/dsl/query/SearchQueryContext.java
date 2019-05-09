@@ -18,12 +18,12 @@ import org.hibernate.search.engine.search.query.SearchQuery;
  * The context used when building a query, after the search predicate has been defined.
  *
  * @param <S> The type actually exposed to the user for this context (may be a subtype of SearchQueryContext, with more exposed methods).
- * @param <T> The type of hits for the created query.
+ * @param <H> The type of hits for the created query.
  * @param <SC> The type of contexts used to create sorts in {@link #sort(Consumer)}.
  */
 public interface SearchQueryContext<
-		S extends SearchQueryContext<? extends S, T, SC>,
-		T,
+		S extends SearchQueryContext<? extends S, H, SC>,
+		H,
 		SC extends SearchSortContainerContext
 		> {
 
@@ -35,6 +35,6 @@ public interface SearchQueryContext<
 
 	S sort(Consumer<? super SC> sortContributor);
 
-	SearchQuery<T> toQuery();
+	SearchQuery<H> toQuery();
 
 }

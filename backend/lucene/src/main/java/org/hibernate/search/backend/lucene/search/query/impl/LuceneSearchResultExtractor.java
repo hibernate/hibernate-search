@@ -13,9 +13,9 @@ import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 
-public interface LuceneSearchResultExtractor<T> {
+public interface LuceneSearchResultExtractor<H> {
 
-	LuceneLoadableSearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
+	LuceneLoadableSearchResult<H> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
 			SearchProjectionExtractContext projectionExecutionContext) throws IOException;
 
 }

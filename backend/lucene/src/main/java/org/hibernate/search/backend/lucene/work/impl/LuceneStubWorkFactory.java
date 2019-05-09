@@ -59,7 +59,7 @@ public class LuceneStubWorkFactory implements LuceneWorkFactory {
 	}
 
 	@Override
-	public <T> LuceneExecuteQueryWork<T> search(LuceneSearcher<T> luceneSearcher) {
+	public <H> LuceneExecuteQueryWork<H> search(LuceneSearcher<H> luceneSearcher) {
 		return new LuceneExecuteQueryWork<>( luceneSearcher );
 	}
 }

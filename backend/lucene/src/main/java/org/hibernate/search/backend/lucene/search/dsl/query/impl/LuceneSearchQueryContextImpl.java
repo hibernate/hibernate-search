@@ -19,31 +19,31 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-class LuceneSearchQueryContextImpl<T>
+class LuceneSearchQueryContextImpl<H>
 		extends AbstractSearchQueryContext<
-		LuceneSearchQueryContext<T>,
-		T,
+		LuceneSearchQueryContext<H>,
+		H,
 		LuceneSearchPredicateFactoryContext,
 		LuceneSearchSortContainerContext,
 		LuceneSearchQueryElementCollector
 		>
-		implements LuceneSearchQueryResultContext<T>, LuceneSearchQueryContext<T> {
+		implements LuceneSearchQueryResultContext<H>, LuceneSearchQueryContext<H> {
 
-	private final LuceneSearchQueryBuilder<T> searchQueryBuilder;
+	private final LuceneSearchQueryBuilder<H> searchQueryBuilder;
 
 	LuceneSearchQueryContextImpl(LuceneIndexSearchScope indexSearchScope,
-			LuceneSearchQueryBuilder<T> searchQueryBuilder) {
+			LuceneSearchQueryBuilder<H> searchQueryBuilder) {
 		super( indexSearchScope, searchQueryBuilder );
 		this.searchQueryBuilder = searchQueryBuilder;
 	}
 
 	@Override
-	public LuceneSearchQuery<T> toQuery() {
+	public LuceneSearchQuery<H> toQuery() {
 		return searchQueryBuilder.build();
 	}
 
 	@Override
-	protected LuceneSearchQueryContextImpl<T> thisAsS() {
+	protected LuceneSearchQueryContextImpl<H> thisAsS() {
 		return this;
 	}
 

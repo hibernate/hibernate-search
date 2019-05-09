@@ -8,5 +8,5 @@ package org.hibernate.search.backend.lucene.search.query;
 
 import org.hibernate.search.engine.search.query.ExtendedSearchQuery;
 
-public interface LuceneSearchQuery<T> extends ExtendedSearchQuery<T, LuceneSearchResult<T>> {
+public interface LuceneSearchQuery<H> extends ExtendedSearchQuery<H, LuceneSearchResult<H>> {
 }

@@ -27,19 +27,19 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 public abstract class AbstractSearchQueryContext<
-		S extends SearchQueryContext<S, T, SC>,
-		T,
+		S extends SearchQueryContext<S, H, SC>,
+		H,
 		PC extends SearchPredicateFactoryContext,
 		SC extends SearchSortContainerContext,
 		C
 		>
-		implements SearchQueryResultContext<S, T, PC>, SearchQueryContext<S, T, SC> {
+		implements SearchQueryResultContext<S, H, PC>, SearchQueryContext<S, H, SC> {
 
 	private final IndexSearchScope<C> indexSearchScope;
-	private final SearchQueryBuilder<T, C> searchQueryBuilder;
+	private final SearchQueryBuilder<H, C> searchQueryBuilder;
 
 	public AbstractSearchQueryContext(IndexSearchScope<C> indexSearchScope,
-			SearchQueryBuilder<T, C> searchQueryBuilder) {
+			SearchQueryBuilder<H, C> searchQueryBuilder) {
 		this.indexSearchScope = indexSearchScope;
 		this.searchQueryBuilder = searchQueryBuilder;
 	}
@@ -87,7 +87,7 @@ public abstract class AbstractSearchQueryContext<
 	}
 
 	@Override
-	public SearchQuery<T> toQuery() {
+	public SearchQuery<H> toQuery() {
 		return searchQueryBuilder.build();
 	}
 

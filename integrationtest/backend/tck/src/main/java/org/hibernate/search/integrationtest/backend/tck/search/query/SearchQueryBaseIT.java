@@ -154,21 +154,21 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class QueryWrapper<T> {
-		private final SearchQuery<T> query;
+	private static class QueryWrapper<H> {
+		private final SearchQuery<H> query;
 
-		private QueryWrapper(SearchQuery<T> query) {
+		private QueryWrapper(SearchQuery<H> query) {
 			this.query = query;
 		}
 
-		public SearchResult<T> extendedFetch() {
+		public SearchResult<H> extendedFetch() {
 			return query.fetch();
 		}
 	}
 
-	private static class SupportedQueryExtension<T> implements SearchQueryExtension<QueryWrapper<T>, T> {
+	private static class SupportedQueryExtension<H> implements SearchQueryExtension<QueryWrapper<H>, H> {
 		@Override
-		public Optional<QueryWrapper<T>> extendOptional(SearchQuery<T> original,
+		public Optional<QueryWrapper<H>> extendOptional(SearchQuery<H> original,
 				LoadingContext<?, ?> loadingContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( loadingContext ).isNotNull().isInstanceOf( StubLoadingContext.class );
@@ -176,9 +176,9 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class UnSupportedQueryExtension<T> implements SearchQueryExtension<QueryWrapper<T>, T> {
+	private static class UnSupportedQueryExtension<H> implements SearchQueryExtension<QueryWrapper<H>, H> {
 		@Override
-		public Optional<QueryWrapper<T>> extendOptional(SearchQuery<T> original,
+		public Optional<QueryWrapper<H>> extendOptional(SearchQuery<H> original,
 				LoadingContext<?, ?> loadingContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( loadingContext ).isNotNull().isInstanceOf( StubLoadingContext.class );

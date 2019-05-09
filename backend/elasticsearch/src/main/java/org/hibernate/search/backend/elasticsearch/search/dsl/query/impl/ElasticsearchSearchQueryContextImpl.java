@@ -19,31 +19,31 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-class ElasticsearchSearchQueryContextImpl<T>
+class ElasticsearchSearchQueryContextImpl<H>
 		extends AbstractSearchQueryContext<
-				ElasticsearchSearchQueryContext<T>,
-				T,
+				ElasticsearchSearchQueryContext<H>,
+				H,
 				ElasticsearchSearchPredicateFactoryContext,
 				ElasticsearchSearchSortContainerContext,
 				ElasticsearchSearchQueryElementCollector
 		>
-		implements ElasticsearchSearchQueryResultContext<T>, ElasticsearchSearchQueryContext<T> {
+		implements ElasticsearchSearchQueryResultContext<H>, ElasticsearchSearchQueryContext<H> {
 
-	private final ElasticsearchSearchQueryBuilder<T> searchQueryBuilder;
+	private final ElasticsearchSearchQueryBuilder<H> searchQueryBuilder;
 
 	ElasticsearchSearchQueryContextImpl(ElasticsearchIndexSearchScope indexSearchScope,
-			ElasticsearchSearchQueryBuilder<T> searchQueryBuilder) {
+			ElasticsearchSearchQueryBuilder<H> searchQueryBuilder) {
 		super( indexSearchScope, searchQueryBuilder );
 		this.searchQueryBuilder = searchQueryBuilder;
 	}
 
 	@Override
-	public ElasticsearchSearchQuery<T> toQuery() {
+	public ElasticsearchSearchQuery<H> toQuery() {
 		return searchQueryBuilder.build();
 	}
 
 	@Override
-	protected ElasticsearchSearchQueryContextImpl<T> thisAsS() {
+	protected ElasticsearchSearchQueryContextImpl<H> thisAsS() {
 		return this;
 	}
 

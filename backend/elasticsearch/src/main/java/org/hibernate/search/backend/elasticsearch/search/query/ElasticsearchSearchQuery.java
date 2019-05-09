@@ -8,5 +8,5 @@ package org.hibernate.search.backend.elasticsearch.search.query;
 
 import org.hibernate.search.engine.search.query.ExtendedSearchQuery;
 
-public interface ElasticsearchSearchQuery<T> extends ExtendedSearchQuery<T, ElasticsearchSearchResult<T>> {
+public interface ElasticsearchSearchQuery<H> extends ExtendedSearchQuery<H, ElasticsearchSearchResult<H>> {
 }

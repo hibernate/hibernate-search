@@ -10,10 +10,10 @@ package org.hibernate.search.engine.search.query;
  * A base interface for subtypes of {@link SearchQuery} allowing to
  * easily override the result type for all relevant methods.
  *
- * @param <T> The type of query hits.
+ * @param <H> The type of query hits.
  * @param <R> The result type (extending {@link SearchResult}).
  */
-public interface ExtendedSearchQuery<T, R extends SearchResult<T>> extends SearchQuery<T> {
+public interface ExtendedSearchQuery<H, R extends SearchResult<H>> extends SearchQuery<H> {
 
 	@Override
 	R fetch();

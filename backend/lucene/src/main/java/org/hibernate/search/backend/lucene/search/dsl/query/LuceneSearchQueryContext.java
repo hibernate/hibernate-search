@@ -10,10 +10,10 @@ import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortConta
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 
-public interface LuceneSearchQueryContext<T>
-		extends SearchQueryContext<LuceneSearchQueryContext<T>, T, LuceneSearchSortContainerContext> {
+public interface LuceneSearchQueryContext<H>
+		extends SearchQueryContext<LuceneSearchQueryContext<H>, H, LuceneSearchSortContainerContext> {
 
 	@Override
-	LuceneSearchQuery<T> toQuery();
+	LuceneSearchQuery<H> toQuery();
 
 }

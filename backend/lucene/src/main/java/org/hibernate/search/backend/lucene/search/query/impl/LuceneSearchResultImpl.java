@@ -11,9 +11,9 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 
-class LuceneSearchResultImpl<T> extends SimpleSearchResult<T>
-		implements LuceneSearchResult<T> {
-	LuceneSearchResultImpl(long hitCount, List<T> hits) {
+class LuceneSearchResultImpl<H> extends SimpleSearchResult<H>
+		implements LuceneSearchResult<H> {
+	LuceneSearchResultImpl(long hitCount, List<H> hits) {
 		super( hitCount, hits );
 	}
 }

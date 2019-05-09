@@ -27,17 +27,17 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
  * <p>
  * <strong>WARNING:</strong> this class is not thread-safe.
  *
- * @param <T> The type of hits in the search result.
+ * @param <H> The type of hits in the search result.
  */
-public class ElasticsearchLoadableSearchResult<T> {
+public class ElasticsearchLoadableSearchResult<H> {
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
-	private final ElasticsearchSearchProjection<?, T> rootProjection;
+	private final ElasticsearchSearchProjection<?, H> rootProjection;
 
 	private final long hitCount;
 	private List<Object> extractedData;
 
 	ElasticsearchLoadableSearchResult(ProjectionHitMapper<?, ?> projectionHitMapper,
-			ElasticsearchSearchProjection<?, T> rootProjection,
+			ElasticsearchSearchProjection<?, H> rootProjection,
 			long hitCount, List<Object> extractedData) {
 		this.projectionHitMapper = projectionHitMapper;
 		this.rootProjection = rootProjection;
@@ -45,19 +45,19 @@ public class ElasticsearchLoadableSearchResult<T> {
 		this.extractedData = extractedData;
 	}
 
-	ElasticsearchSearchResult<T> loadBlocking(SessionContextImplementor sessionContext) {
+	ElasticsearchSearchResult<H> loadBlocking(SessionContextImplementor sessionContext) {
 		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( sessionContext );
 
 		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking();
 
 		for ( int i = 0; i < extractedData.size(); i++ ) {
-			T transformed = transformUnsafe( rootProjection, loadingResult, extractedData.get( i ), transformContext );
+			H transformed = transformUnsafe( rootProjection, loadingResult, extractedData.get( i ), transformContext );
 			extractedData.set( i, transformed );
 		}
 
-		// The cast is safe, since all elements extend T and we make the list unmodifiable
+		// The cast is safe, since all elements extend H and we make the list unmodifiable
 		@SuppressWarnings("unchecked")
-		List<T> loadedHits = Collections.unmodifiableList( (List<? extends T>) extractedData );
+		List<H> loadedHits = Collections.unmodifiableList( (List<? extends H>) extractedData );
 
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
 		extractedData = null;

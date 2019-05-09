@@ -18,19 +18,19 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
-final class StubSearchQuery<T> extends AbstractSearchQuery<T, SearchResult<T>>
-		implements SearchQuery<T> {
+final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
+		implements SearchQuery<H> {
 
 	private final StubBackend backend;
 	private final List<String> indexNames;
 	private final StubSearchWork.Builder workBuilder;
 	private final FromDocumentFieldValueConvertContext convertContext;
 	private final LoadingContext<?, ?> loadingContext;
-	private final StubSearchProjection<T> rootProjection;
+	private final StubSearchProjection<H> rootProjection;
 
 	StubSearchQuery(StubBackend backend, List<String> indexNames, StubSearchWork.Builder workBuilder,
 			FromDocumentFieldValueConvertContext convertContext,
-			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
+			LoadingContext<?, ?> loadingContext, StubSearchProjection<H> rootProjection) {
 		this.backend = backend;
 		this.indexNames = indexNames;
 		this.workBuilder = workBuilder;
@@ -45,14 +45,14 @@ final class StubSearchQuery<T> extends AbstractSearchQuery<T, SearchResult<T>>
 	}
 
 	@Override
-	public <Q> Q extension(SearchQueryExtension<Q, T> extension) {
+	public <Q> Q extension(SearchQueryExtension<Q, H> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, loadingContext )
 		);
 	}
 
 	@Override
-	public SearchResult<T> fetch(Long limit, Long offset) {
+	public SearchResult<H> fetch(Long limit, Long offset) {
 		workBuilder.limit( limit ).offset( offset );
 		return backend.getBehavior().executeSearchWork(
 				indexNames, workBuilder.build(), convertContext, loadingContext, rootProjection

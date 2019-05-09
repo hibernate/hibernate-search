@@ -9,9 +9,9 @@ package org.hibernate.search.engine.search.query;
 import java.util.List;
 
 /**
- * @param <T> The type of results.
+ * @param <H> The type of hits.
  */
-public interface SearchResult<T> {
+public interface SearchResult<H> {
 
 	/**
 	 * @return The total number of matching entities, ignoring pagination settings.
@@ -21,6 +21,6 @@ public interface SearchResult<T> {
 	/**
 	 * @return The hits as a {@link List} containing one element for each matched entity.
 	 */
-	List<T> getHits();
+	List<H> getHits();
 
 }

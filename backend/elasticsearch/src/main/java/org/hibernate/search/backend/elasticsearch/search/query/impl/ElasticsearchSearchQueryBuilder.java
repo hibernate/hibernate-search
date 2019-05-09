@@ -26,8 +26,8 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class ElasticsearchSearchQueryBuilder<T>
-		implements SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> {
+public class ElasticsearchSearchQueryBuilder<H>
+		implements SearchQueryBuilder<H, ElasticsearchSearchQueryElementCollector> {
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
@@ -40,7 +40,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 
 	private final ElasticsearchSearchQueryElementCollector elementCollector;
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
-	private final ElasticsearchSearchProjection<?, T> rootProjection;
+	private final ElasticsearchSearchProjection<?, H> rootProjection;
 
 	ElasticsearchSearchQueryBuilder(
 			ElasticsearchWorkBuilderFactory workFactory,
@@ -50,7 +50,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
-			ElasticsearchSearchProjection<?, T> rootProjection) {
+			ElasticsearchSearchProjection<?, H> rootProjection) {
 		this.workFactory = workFactory;
 		this.searchResultExtractorFactory = searchResultExtractorFactory;
 		this.queryOrchestrator = queryOrchestrator;
@@ -76,7 +76,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 	}
 
 	@Override
-	public ElasticsearchSearchQuery<T> build() {
+	public ElasticsearchSearchQuery<H> build() {
 		JsonObject payload = new JsonObject();
 
 		JsonObject jsonQuery = getJsonQuery();
@@ -96,7 +96,7 @@ public class ElasticsearchSearchQueryBuilder<T>
 
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
-		ElasticsearchSearchResultExtractor<T> searchResultExtractor =
+		ElasticsearchSearchResultExtractor<H> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(
 						loadingContext,
 						rootProjection, searchProjectionExecutionContext

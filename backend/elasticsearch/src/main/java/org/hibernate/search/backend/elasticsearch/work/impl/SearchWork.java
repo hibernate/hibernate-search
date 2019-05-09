@@ -26,13 +26,13 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class SearchWork<T> extends AbstractSimpleElasticsearchWork<ElasticsearchLoadableSearchResult<T>> {
+public class SearchWork<H> extends AbstractSimpleElasticsearchWork<ElasticsearchLoadableSearchResult<H>> {
 
 	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
-	private final ElasticsearchSearchResultExtractor<T> resultExtractor;
+	private final ElasticsearchSearchResultExtractor<H> resultExtractor;
 
-	protected SearchWork(Builder<T> builder) {
+	protected SearchWork(Builder<H> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
 	}
@@ -48,14 +48,14 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 	}
 
 	@Override
-	protected ElasticsearchLoadableSearchResult<T> generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected ElasticsearchLoadableSearchResult<H> generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.getBody();
 		return resultExtractor.extract( body );
 	}
 
-	public static class Builder<T>
-			extends AbstractBuilder<Builder<T>>
-			implements SearchWorkBuilder<T> {
+	public static class Builder<H>
+			extends AbstractBuilder<Builder<H>>
+			implements SearchWorkBuilder<H> {
 
 		public static <T> Builder<T> forElasticsearch6AndBelow(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
 			// No "track_total_hits": this parameter does not exist in ES6 and below, and total hits are always tracked
@@ -68,7 +68,7 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		private final JsonObject payload;
-		private final ElasticsearchSearchResultExtractor<T> resultExtractor;
+		private final ElasticsearchSearchResultExtractor<H> resultExtractor;
 		private final Boolean trackTotalHits;
 		private final Set<URLEncodedString> indexes = new HashSet<>();
 
@@ -78,7 +78,7 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		private String scrollTimeout;
 		private Set<String> routingKeys;
 
-		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor, Boolean trackTotalHits) {
+		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<H> resultExtractor, Boolean trackTotalHits) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.payload = payload;
 			this.resultExtractor = resultExtractor;
@@ -86,27 +86,27 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		@Override
-		public Builder<T> indexes(Collection<URLEncodedString> indexNames) {
+		public Builder<H> indexes(Collection<URLEncodedString> indexNames) {
 			indexes.addAll( indexNames );
 			return this;
 		}
 
 		@Override
-		public Builder<T> paging(Long limit, Long offset) {
+		public Builder<H> paging(Long limit, Long offset) {
 			this.from = offset;
 			this.size = limit;
 			return this;
 		}
 
 		@Override
-		public Builder<T> scrolling(long scrollSize, String scrollTimeout) {
+		public Builder<H> scrolling(long scrollSize, String scrollTimeout) {
 			this.scrollSize = scrollSize;
 			this.scrollTimeout = scrollTimeout;
 			return this;
 		}
 
 		@Override
-		public SearchWorkBuilder<T> routingKeys(Set<String> routingKeys) {
+		public SearchWorkBuilder<H> routingKeys(Set<String> routingKeys) {
 			this.routingKeys = routingKeys;
 			return this;
 		}
@@ -144,7 +144,7 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		@Override
-		public SearchWork<T> build() {
+		public SearchWork<H> build() {
 			return new SearchWork<>( this );
 		}
 	}

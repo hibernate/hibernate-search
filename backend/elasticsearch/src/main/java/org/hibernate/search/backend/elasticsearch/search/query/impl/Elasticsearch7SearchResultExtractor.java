@@ -22,7 +22,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-class Elasticsearch7SearchResultExtractor<T> implements ElasticsearchSearchResultExtractor<T> {
+class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResultExtractor<H> {
 
 	protected static final JsonObjectAccessor HITS_ACCESSOR =
 			JsonAccessor.root().property( "hits" ).asObject();
@@ -34,13 +34,13 @@ class Elasticsearch7SearchResultExtractor<T> implements ElasticsearchSearchResul
 			HITS_ACCESSOR.property( "total" ).property( "value" ).asLong();
 
 	private final LoadingContext<?, ?> loadingContext;
-	private final ElasticsearchSearchProjection<?, T> rootProjection;
+	private final ElasticsearchSearchProjection<?, H> rootProjection;
 
 	private final SearchProjectionExtractContext searchProjectionExecutionContext;
 
 	Elasticsearch7SearchResultExtractor(
 			LoadingContext<?, ?> loadingContext,
-			ElasticsearchSearchProjection<?, T> rootProjection,
+			ElasticsearchSearchProjection<?, H> rootProjection,
 			SearchProjectionExtractContext searchProjectionExecutionContext) {
 		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
@@ -48,7 +48,7 @@ class Elasticsearch7SearchResultExtractor<T> implements ElasticsearchSearchResul
 	}
 
 	@Override
-	public ElasticsearchLoadableSearchResult<T> extract(JsonObject responseBody) {
+	public ElasticsearchLoadableSearchResult<H> extract(JsonObject responseBody) {
 		ProjectionHitMapper<?, ?> hitMapper = loadingContext.getProjectionHitMapper();
 
 		long hitCount = extractHitCount( responseBody );

@@ -83,9 +83,9 @@ public class ElasticsearchSearchQueryBuilderFactory
 		return new ElasticsearchCompositeListProjection<>( Function.identity(), children );
 	}
 
-	private <T> ElasticsearchSearchQueryBuilder<T> createSearchQueryBuilder(
+	private <H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
-			ElasticsearchSearchProjection<?, T> rootProjection) {
+			ElasticsearchSearchProjection<?, H> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
 				scopeModel.getElasticsearchIndexNames(),
 				sessionContext,
