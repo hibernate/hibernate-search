@@ -14,10 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.OneToMany;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
+import org.hibernate.mapping.Selectable;
+import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
@@ -159,6 +162,22 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			 */
 			if ( !collector.hasSeen( componentClass ) ) {
 				collectPropertyDelegates( collector, componentClass, componentValue.getPropertyIterator() );
+			}
+		}
+		else if ( value instanceof SimpleValue ) {
+			collectScaleContributor( collector, javaClass, property, value );
+		}
+	}
+
+	private void collectScaleContributor(PropertyDelegatesCollector collector, Class<?> javaClass, Property property, Value value) {
+		Iterator<Selectable> ci = value.getColumnIterator();
+		while ( ci.hasNext() ) {
+			Selectable selectable = ci.next();
+			if ( selectable instanceof Column ) {
+				int scale = ( (Column) selectable ).getScale();
+				HibernateOrmJpaColumnScaleContributor scaleContributor = new HibernateOrmJpaColumnScaleContributor(
+						property.getName(), getExtractorPath( value ), scale );
+				collector.collect( javaClass, scaleContributor );
 			}
 		}
 	}

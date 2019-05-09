@@ -13,8 +13,13 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContr
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuildContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoValueAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 public class PojoTypeAdditionalMetadataProvider {
 
@@ -35,6 +40,15 @@ public class PojoTypeAdditionalMetadataProvider {
 		return cache.computeIfAbsent( typeModel, this::createTypeAdditionalMetadata );
 	}
 
+	public PojoValueAdditionalMetadata get(BoundPojoModelPathValueNode<?, ?, ?> valueNode) {
+		BoundPojoModelPathPropertyNode<?, ?> propertyNode = valueNode.getParent();
+		BoundPojoModelPathTypeNode<?> typeNode = propertyNode.getParent();
+		PojoTypeModel<?> typeModel = typeNode.getTypeModel();
+		return get( typeModel.getRawType() )
+				.getPropertyAdditionalMetadata( propertyNode.getPropertyModel().getName() )
+				.getValueAdditionalMetadata( valueNode.getExtractorPath() );
+	}
+
 	private PojoTypeAdditionalMetadata createTypeAdditionalMetadata(PojoRawTypeModel<?> typeModel) {
 		PojoTypeAdditionalMetadataBuilder builder = new PojoTypeAdditionalMetadataBuilder(
 				markerBuildContext, failureCollector, typeModel
@@ -42,5 +56,4 @@ public class PojoTypeAdditionalMetadataProvider {
 		modelContributorProvider.forEach( typeModel, c -> c.contributeAdditionalMetadata( builder ) );
 		return builder.build();
 	}
-
 }

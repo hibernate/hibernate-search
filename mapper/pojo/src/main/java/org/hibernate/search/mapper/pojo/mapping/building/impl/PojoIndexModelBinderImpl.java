@@ -256,6 +256,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
 			BridgeBuilder<? extends ValueBridge<?, ?>> builder,
 			String relativeFieldName, FieldModelContributor contributor) {
+		Integer decimalScale = typeAdditionalMetadataProvider.get( modelPath ).getDecimalScale();
+		if ( decimalScale != null ) {
+			contributor.defaultDecimalScale( decimalScale );
+		}
+
 		PojoGenericTypeModel<V> valueTypeModel = modelPath.getTypeModel();
 
 		BridgeBuilder<? extends ValueBridge<?, ?>> defaultedBuilder = builder;
@@ -353,7 +358,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		);
 
 		// Then give the mapping a chance to override some of the model (add storage, ...)
-		contributor.contribute( fieldTypeContext, new FieldModelContributorBridgeContextImpl<>( bridge, fieldTypeContext ) );
+		contributor.contribute( fieldTypeContext, new FieldModelContributorIndirectContextImpl<>( bridge, fieldTypeContext ) );
 
 		IndexSchemaFieldContext<?, ? extends IndexFieldReference<? super F>> fieldContext =
 				schemaElement.field( relativeFieldName, fieldTypeContext );
