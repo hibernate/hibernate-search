@@ -21,4 +21,5 @@ public interface PojoAdditionalMetadataCollectorValueNode extends PojoAdditional
 
 	void derivedFrom(Set<PojoModelPathValueNode> path);
 
+	void decimalScale(int decimalScale);
 }

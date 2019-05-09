@@ -28,6 +28,7 @@ class PojoValueAdditionalMetadataBuilder implements PojoAdditionalMetadataCollec
 	private boolean associationEmbedded = false;
 	private Optional<ReindexOnUpdate> reindexOnUpdate = Optional.empty();
 	private Set<PojoModelPathValueNode> derivedFrom = Collections.emptySet();
+	private Integer decimalScale;
 
 	PojoValueAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder, String propertyName,
 			ContainerExtractorPath extractorPath) {
@@ -63,9 +64,14 @@ class PojoValueAdditionalMetadataBuilder implements PojoAdditionalMetadataCollec
 		this.derivedFrom = derivedFrom;
 	}
 
+	@Override
+	public void decimalScale(int decimalScale) {
+		this.decimalScale = decimalScale;
+	}
+
 	PojoValueAdditionalMetadata build() {
 		return new PojoValueAdditionalMetadata(
-				inverseSidePath, associationEmbedded, reindexOnUpdate, derivedFrom
+				inverseSidePath, associationEmbedded, reindexOnUpdate, derivedFrom, decimalScale
 		);
 	}
 }

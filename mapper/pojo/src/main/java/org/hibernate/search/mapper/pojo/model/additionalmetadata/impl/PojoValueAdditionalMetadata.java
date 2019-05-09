@@ -16,20 +16,22 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 public class PojoValueAdditionalMetadata {
 
 	public static final PojoValueAdditionalMetadata EMPTY = new PojoValueAdditionalMetadata(
-			null, false, Optional.empty(), Collections.emptySet()
+			null, false, Optional.empty(), Collections.emptySet(), null
 	);
 
 	private final PojoModelPathValueNode inverseSidePath;
 	private final boolean associationEmbedded;
 	private final Optional<ReindexOnUpdate> reindexOnUpdate;
 	private final Set<PojoModelPathValueNode> derivedFrom;
+	private final Integer decimalScale;
 
 	public PojoValueAdditionalMetadata(PojoModelPathValueNode inverseSidePath, boolean associationEmbedded,
-			Optional<ReindexOnUpdate> reindexOnUpdate, Set<PojoModelPathValueNode> derivedFrom) {
+			Optional<ReindexOnUpdate> reindexOnUpdate, Set<PojoModelPathValueNode> derivedFrom, Integer decimalScale) {
 		this.inverseSidePath = inverseSidePath;
 		this.associationEmbedded = associationEmbedded;
 		this.reindexOnUpdate = reindexOnUpdate;
 		this.derivedFrom = derivedFrom;
+		this.decimalScale = decimalScale;
 	}
 
 	public Optional<PojoModelPathValueNode> getInverseSidePath() {
@@ -46,5 +48,9 @@ public class PojoValueAdditionalMetadata {
 
 	public Set<PojoModelPathValueNode> getDerivedFrom() {
 		return derivedFrom;
+	}
+
+	public Integer getDecimalScale() {
+		return decimalScale;
 	}
 }

@@ -10,6 +10,13 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeConte
 
 public interface FieldModelContributor {
 
-	void contribute(StandardIndexFieldTypeContext<?, ?> fieldTypeContext, FieldModelContributorBridgeContext bridgeContext);
+	/**
+	 * Add a default decimal scale value if no decimal scale value has been set on it.
+	 *
+	 * @param defaultScale value to add
+	 */
+	void defaultDecimalScale(int defaultScale);
+
+	void contribute(StandardIndexFieldTypeContext<?, ?> fieldTypeContext, FieldModelContributorIndirectContext bridgeContext);
 
 }

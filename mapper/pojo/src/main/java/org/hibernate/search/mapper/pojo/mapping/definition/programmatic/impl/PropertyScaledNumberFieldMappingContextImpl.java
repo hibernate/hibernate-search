@@ -32,7 +32,7 @@ public class PropertyScaledNumberFieldMappingContextImpl
 
 	@Override
 	public PropertyScaledNumberFieldMappingContext decimalScale(int decimalScale) {
-		fieldModelContributor.add( (c, b) -> c.decimalScale( decimalScale ) );
+		fieldModelContributor.add( (c, b) -> b.decimalScale( decimalScale ) );
 		return thisAsS();
 	}
 
