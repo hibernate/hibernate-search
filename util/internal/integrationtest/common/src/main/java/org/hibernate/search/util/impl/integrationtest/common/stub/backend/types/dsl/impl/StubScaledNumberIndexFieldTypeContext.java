@@ -9,13 +9,15 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types
 import java.math.BigDecimal;
 
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 
 public class StubScaledNumberIndexFieldTypeContext
 		extends AbstractStubStandardIndexFieldTypeContext<StubScaledNumberIndexFieldTypeContext, BigDecimal>
 		implements ScaledNumberIndexFieldTypeContext<StubScaledNumberIndexFieldTypeContext> {
 
-	StubScaledNumberIndexFieldTypeContext() {
+	public StubScaledNumberIndexFieldTypeContext(IndexFieldTypeDefaultsProvider defaultsProvider) {
 		super( BigDecimal.class );
+		setDefaults( defaultsProvider );
 	}
 
 	@Override
@@ -27,5 +29,12 @@ public class StubScaledNumberIndexFieldTypeContext
 	public StubScaledNumberIndexFieldTypeContext decimalScale(int decimalScale) {
 		modifiers.add( b -> b.decimalScale( decimalScale ) );
 		return this;
+	}
+
+	private void setDefaults(IndexFieldTypeDefaultsProvider defaultsProvider) {
+		Integer decimalScale = defaultsProvider.getDecimalScale();
+		if ( decimalScale != null ) {
+			modifiers.add( b -> b.defaultDecimalScale( decimalScale ) );
+		}
 	}
 }

@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class JpaColumnScaleMappingIT {
+public class DefaultDecimalScaleMappingIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -34,12 +34,12 @@ public class JpaColumnScaleMappingIT {
 	@Test
 	public void mapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "scaled", BigDecimal.class, f -> f.decimalScale( 7 ) )
-				.field( "unscaled", BigDecimal.class, f -> f.decimalScale( 0 ) )
-				.field( "defaultScaled", BigDecimal.class, f -> f.decimalScale( 2 ) )
-				.field( "hsearch", BigDecimal.class, f -> f.decimalScale( 7 ) )
+				.field( "scaled", BigDecimal.class, f -> f.defaultDecimalScale( 7 ) )
+				.field( "unscaled", BigDecimal.class, f -> f.defaultDecimalScale( 0 ) )
+				.field( "defaultScaled", BigDecimal.class, f -> f.defaultDecimalScale( 2 ) )
+				.field( "hsearch", BigDecimal.class, f -> f.defaultDecimalScale( 2 ).decimalScale( 7 ) )
 				.field( "notDecimal", Integer.class )
-				.field( "general", BigDecimal.class, f -> f.decimalScale( 3 ) )
+				.field( "general", BigDecimal.class, f -> f.defaultDecimalScale( 3 ) )
 		);
 
 		ormSetupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
