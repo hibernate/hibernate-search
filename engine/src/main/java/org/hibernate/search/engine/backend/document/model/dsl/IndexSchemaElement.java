@@ -27,7 +27,7 @@ public interface IndexSchemaElement {
 	 * @param <F> The type of values held by the field.
 	 * @return A context allowing to get the reference to that new field.
 	 */
-	<F> IndexSchemaFieldTerminalContext<IndexFieldReference<F>> field(
+	<F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(
 			String relativeFieldName, IndexFieldType<F> type);
 
 	/**
@@ -38,7 +38,7 @@ public interface IndexSchemaElement {
 	 * @param <F> The type of values held by the field.
 	 * @return A context allowing to get the reference to that new field.
 	 */
-	default <F> IndexSchemaFieldTerminalContext<IndexFieldReference<F>> field(
+	default <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(
 			String relativeFieldName, IndexFieldTypeTerminalContext<F> terminalContext) {
 		return field( relativeFieldName, terminalContext.toIndexFieldType() );
 	}
@@ -55,7 +55,7 @@ public interface IndexSchemaElement {
 	 * @param <F> The type of accessors for the new field.
 	 * @return A context allowing to get the reference to that new field.
 	 */
-	<F> IndexSchemaFieldTerminalContext<IndexFieldReference<F>> field(String relativeFieldName,
+	<F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(String relativeFieldName,
 			Function<? super IndexFieldTypeFactoryContext, ? extends IndexFieldTypeTerminalContext<F>> typeContributor);
 
 	/**

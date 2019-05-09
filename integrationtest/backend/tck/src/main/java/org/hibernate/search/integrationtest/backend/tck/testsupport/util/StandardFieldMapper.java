@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 
@@ -55,21 +56,40 @@ public final class StandardFieldMapper<F, M> {
 		return map( parent, name, ignored -> { } );
 	}
 
+	public M mapMultiValued(IndexSchemaElement parent, String name) {
+		return mapMultiValued( parent, name, ignored -> { } );
+	}
+
 	@SafeVarargs
 	public final M map(IndexSchemaElement parent, String name,
 			Consumer<? super StandardIndexFieldTypeContext<?, F>>... additionalConfigurations) {
-		IndexFieldReference<F> reference = parent.field(
-				name,
-				f -> {
-					StandardIndexFieldTypeContext<?, F> context = initialConfiguration.apply( f );
-					configurationAdjustment.accept( context );
-					for ( Consumer<? super StandardIndexFieldTypeContext<?, F>> additionalConfiguration : additionalConfigurations ) {
-						additionalConfiguration.accept( context );
-					}
-					return context;
-				}
-		)
-				.toReference();
+		return map( parent, name, false, additionalConfigurations );
+	}
+
+	@SafeVarargs
+	public final M mapMultiValued(IndexSchemaElement parent, String name,
+			Consumer<? super StandardIndexFieldTypeContext<?, F>>... additionalConfigurations) {
+		return map( parent, name, true, additionalConfigurations );
+	}
+
+	private M map(IndexSchemaElement parent, String name, boolean multiValued,
+			Consumer<? super StandardIndexFieldTypeContext<?, F>>... additionalConfigurations) {
+		IndexSchemaFieldContext<?, IndexFieldReference<F>> fieldContext = parent
+				.field(
+						name,
+						f -> {
+							StandardIndexFieldTypeContext<?, F> typeContext = initialConfiguration.apply( f );
+							configurationAdjustment.accept( typeContext );
+							for ( Consumer<? super StandardIndexFieldTypeContext<?, F>> additionalConfiguration : additionalConfigurations ) {
+								additionalConfiguration.accept( typeContext );
+							}
+							return typeContext;
+						}
+				);
+		if ( multiValued ) {
+			fieldContext.multiValued();
+		}
+		IndexFieldReference<F> reference = fieldContext.toReference();
 		return resultFunction.apply( reference, name );
 	}
 

@@ -124,6 +124,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return this;
 		}
 
+		public Builder multiValued(boolean multiValued) {
+			attribute( "multiValued", multiValued );
+			return this;
+		}
+
 		public Builder analyzerName(String analyzerName) {
 			attribute( "analyzerName", analyzerName );
 			return this;

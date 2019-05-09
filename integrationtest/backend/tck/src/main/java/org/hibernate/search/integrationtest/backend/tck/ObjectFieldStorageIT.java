@@ -338,9 +338,11 @@ public class ObjectFieldStorageIT {
 
 		IndexMapping(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
-			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED )
+					.multiValued();
 			flattenedObject = new ObjectMapping( flattenedObjectField );
-			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+					.multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}
@@ -354,13 +356,17 @@ public class ObjectFieldStorageIT {
 
 		ObjectMapping(IndexSchemaObjectField objectField) {
 			self = objectField.toReference();
-			string = objectField.field( "string", f -> f.asString() ).toReference();
+			string = objectField.field( "string", f -> f.asString() )
+					.multiValued()
+					.toReference();
 			string_analyzed = objectField.field(
 					"string_analyzed",
 					f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
 					.toReference();
-			integer = objectField.field( "integer", f -> f.asInteger() ).toReference();
+			integer = objectField.field( "integer", f -> f.asInteger() )
+					.multiValued()
+					.toReference();
 			localDate = objectField.field( "localDate", f -> f.asLocalDate() ).toReference();
 		}
 	}

@@ -45,6 +45,11 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
+	public void multiValued() {
+		// FIXME HSEARCH-3324 store and use this information
+	}
+
+	@Override
 	public IndexObjectFieldReference toReference() {
 		if ( reference != null ) {
 			throw log.cannotCreateReferenceMultipleTimes( getEventContext() );

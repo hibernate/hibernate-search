@@ -278,9 +278,11 @@ public class DocumentElementIT {
 		IndexMapping(IndexBindingContext ctx) {
 			super( ctx.getSchemaElement() );
 			IndexSchemaElement root = ctx.getSchemaElement();
-			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED )
+					.multiValued();
 			flattenedObject = new FirstLevelObjectMapping( flattenedObjectField );
-			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+					.multiValued();
 			nestedObject = new FirstLevelObjectMapping( nestedObjectField );
 
 			// Simulate an embedded context which excludes every subfield
@@ -309,9 +311,11 @@ public class DocumentElementIT {
 		FirstLevelObjectMapping(IndexSchemaElement objectField, IndexObjectFieldReference objectFieldReference) {
 			super( objectField );
 			self = objectFieldReference;
-			IndexSchemaObjectField flattenedObjectField = objectField.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattenedObjectField = objectField.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED )
+					.multiValued();
 			flattenedObject = new SecondLevelObjectMapping( flattenedObjectField );
-			IndexSchemaObjectField nestedObjectField = objectField.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObjectField = objectField.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+					.multiValued();
 			nestedObject = new SecondLevelObjectMapping( nestedObjectField );
 		}
 	}

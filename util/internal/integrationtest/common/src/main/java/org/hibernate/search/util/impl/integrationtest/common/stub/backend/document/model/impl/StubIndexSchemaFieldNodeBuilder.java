@@ -7,11 +7,12 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIndexFieldReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
-class StubIndexSchemaFieldNodeBuilder<F> implements IndexSchemaFieldTerminalContext<IndexFieldReference<F>> {
+class StubIndexSchemaFieldNodeBuilder<F>
+		implements IndexSchemaFieldContext<StubIndexSchemaFieldNodeBuilder<F>, IndexFieldReference<F>> {
 
 	private final StubIndexSchemaNode.Builder builder;
 	private final boolean included;
@@ -21,6 +22,12 @@ class StubIndexSchemaFieldNodeBuilder<F> implements IndexSchemaFieldTerminalCont
 	StubIndexSchemaFieldNodeBuilder(StubIndexSchemaNode.Builder builder, boolean included) {
 		this.builder = builder;
 		this.included = included;
+	}
+
+	@Override
+	public StubIndexSchemaFieldNodeBuilder<F> multiValued() {
+		builder.multiValued( true );
+		return this;
 	}
 
 	@Override

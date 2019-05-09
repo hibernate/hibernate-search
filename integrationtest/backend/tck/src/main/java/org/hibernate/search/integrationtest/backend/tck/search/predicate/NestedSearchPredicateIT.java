@@ -360,7 +360,8 @@ public class NestedSearchPredicateIT {
 		final ObjectMapping nestedObject;
 
 		IndexMapping(IndexSchemaElement root) {
-			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+					.multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}
@@ -376,7 +377,8 @@ public class NestedSearchPredicateIT {
 			IndexSchemaObjectField nestedObjectField = objectField.objectField(
 					"nestedObject",
 					ObjectFieldStorage.NESTED
-			);
+			)
+					.multiValued();
 			nestedObject = new SecondLevelObjectMapping( nestedObjectField );
 		}
 	}
@@ -389,7 +391,7 @@ public class NestedSearchPredicateIT {
 		SecondLevelObjectMapping(IndexSchemaObjectField objectField) {
 			self = objectField.toReference();
 			field1 = objectField.field( "field1", f -> f.asString() ).toReference();
-			field2 = objectField.field( "field2", f -> f.asString() ).toReference();
+			field2 = objectField.field( "field2", f -> f.asString() ).multiValued().toReference();
 		}
 	}
 }

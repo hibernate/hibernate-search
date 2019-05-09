@@ -615,7 +615,7 @@ public class MultiTenancyIT {
 			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) )
 					.toReference();
 			IndexSchemaObjectField nestedObjectField =
-					root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+					root.objectField( "nestedObject", ObjectFieldStorage.NESTED ).multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}

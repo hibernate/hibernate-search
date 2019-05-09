@@ -367,9 +367,11 @@ public class SmokeIT {
 			integer = root.field( "integer", f -> f.asInteger() ).toReference();
 			localDate = root.field( "localDate", f -> f.asLocalDate() ).toReference();
 			geoPoint = root.field( "geoPoint", f -> f.asGeoPoint() ).toReference();
-			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED )
+					.multiValued();
 			flattenedObject = new ObjectMapping( flattenedObjectField );
-			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+					.multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}

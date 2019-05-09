@@ -66,6 +66,7 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 		valueFieldReference = context.getIndexSchemaElement().field(
 				fieldName, f -> f.asString()
 		)
+				.multiValued()
 				.toReference();
 	}
 

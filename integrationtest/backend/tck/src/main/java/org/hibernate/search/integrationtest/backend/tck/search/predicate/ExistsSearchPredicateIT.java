@@ -558,7 +558,8 @@ public class ExistsSearchPredicateIT {
 
 		ObjectMapping(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
 			this.relativeFieldName = relativeFieldName;
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage )
+					.multiValued();
 			self = objectField.toReference();
 			mapByTypeFields(
 					objectField, "byType_", ignored -> { },

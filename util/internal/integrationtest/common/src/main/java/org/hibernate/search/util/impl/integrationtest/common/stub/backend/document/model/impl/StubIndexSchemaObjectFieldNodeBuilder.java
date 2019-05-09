@@ -34,6 +34,11 @@ class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	@Override
+	public void multiValued() {
+		builder.multiValued( true );
+	}
+
+	@Override
 	public IndexObjectFieldReference toReference() {
 		if ( reference == null ) {
 			reference = new StubIndexObjectFieldReference(

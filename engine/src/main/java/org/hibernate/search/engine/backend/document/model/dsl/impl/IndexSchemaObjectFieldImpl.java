@@ -21,6 +21,12 @@ class IndexSchemaObjectFieldImpl extends IndexSchemaElementImpl<IndexSchemaObjec
 	}
 
 	@Override
+	public IndexSchemaObjectField multiValued() {
+		objectNodeBuilder.multiValued();
+		return this;
+	}
+
+	@Override
 	public IndexObjectFieldReference toReference() {
 		return objectNodeBuilder.toReference();
 	}

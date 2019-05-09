@@ -860,7 +860,7 @@ public class SimpleQueryStringSearchPredicateIT {
 			analyzedStringField3 = MainFieldModel.mapper(
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
-					.map( root, "analyzedString3" );
+					.mapMultiValued( root, "analyzedString3" );
 			analyzedStringFieldWithDslConverter = MainFieldModel.mapper(
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 							.dslConverter( ValueWrapper.toIndexFieldConverter() )

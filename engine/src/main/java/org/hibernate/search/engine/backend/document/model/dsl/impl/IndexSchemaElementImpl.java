@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -48,7 +48,7 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	}
 
 	@Override
-	public <F> IndexSchemaFieldTerminalContext<IndexFieldReference<F>> field(
+	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(
 			String relativeFieldName, IndexFieldType<F> type) {
 		checkRelativeFieldName( relativeFieldName );
 		return nestingContext.nest(
@@ -61,7 +61,7 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	}
 
 	@Override
-	public <F> IndexSchemaFieldTerminalContext<IndexFieldReference<F>> field(String relativeFieldName,
+	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(String relativeFieldName,
 			Function<? super IndexFieldTypeFactoryContext, ? extends IndexFieldTypeTerminalContext<F>> typeContributor) {
 		return field( relativeFieldName, typeContributor.apply( typeFactoryContext ) );
 	}
