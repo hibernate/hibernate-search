@@ -183,7 +183,7 @@
         <version.javax.persistence>2.2</version.javax.persistence>
 
         <version.org.apache.lucene>5.5.5</version.org.apache.lucene>
-        <version.feature-pack.org.apache.lucene>5.5.5.hibernate05</version.feature-pack.org.apache.lucene>
+        <version.feature-pack.org.apache.lucene>5.5.5.hibernate06</version.feature-pack.org.apache.lucene>
 
         <version.org.apache.tika>1.4</version.org.apache.tika>
         <version.org.apache.pdfbox>1.8.1</version.org.apache.pdfbox>
@@ -221,11 +221,11 @@
         <!-- When updating the following versions you will likely need to update the
              matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
         <version.org.elasticsearch.client>5.6.8</version.org.elasticsearch.client>
-        <version.feature-pack.org.elasticsearch.client>5.6.8.hibernate01</version.feature-pack.org.elasticsearch.client>
+        <version.feature-pack.org.elasticsearch.client>5.6.8.hibernate02</version.feature-pack.org.elasticsearch.client>
         <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
-        <version.feature-pack.com.google.code.gson>2.8.5.hibernate01</version.feature-pack.com.google.code.gson>
+        <version.feature-pack.com.google.code.gson>2.8.5.hibernate02</version.feature-pack.com.google.code.gson>
         <version.uk.co.lucasweb.aws-v4-signer-java>1.3</version.uk.co.lucasweb.aws-v4-signer-java>
-        <version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>1.3.0.hibernate03</version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>
+        <version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>1.3.0.hibernate04</version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>
 
         <!-- JSR 352 -->
         <version.javax.batch>1.0</version.javax.batch>
