@@ -21,9 +21,9 @@ import org.hibernate.search.util.common.SearchException;
  * @param <R> The type of references, i.e. the type of hits returned by
  * {@link #asReference() reference queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#reference() reference projections}.
- * @param <O> The type of loaded objects, i.e. the type of hits returned by
+ * @param <O> The type of entities, i.e. the type of hits returned by
  * {@link #asEntity() entity queries},
- * or the type of objects returned for {@link SearchProjectionFactoryContext#object() loaded object projections}.
+ * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
  * @param <PC> The type of contexts used to create projections in {@link #asProjection(Function)}.
  */
 public interface SearchQueryResultDefinitionContext<R, O, PC extends SearchProjectionFactoryContext<R, O>> {

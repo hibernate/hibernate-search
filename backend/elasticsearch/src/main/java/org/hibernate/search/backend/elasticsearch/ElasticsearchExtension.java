@@ -59,7 +59,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <R> The reference type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
- * @param <O> The loaded object type for projections.
+ * @param <O> The entity type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
  */

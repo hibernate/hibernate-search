@@ -16,7 +16,7 @@ import org.apache.lucene.search.Explanation;
  * A DSL context allowing to create a projection, with some Lucene-specific methods.
  *
  * @param <R> The type of references.
- * @param <O> The type of loaded objects.
+ * @param <O> The type of entities.
  * @see SearchProjectionFactoryContext
  */
 public interface LuceneSearchProjectionFactoryContext<R, O> extends SearchProjectionFactoryContext<R, O> {

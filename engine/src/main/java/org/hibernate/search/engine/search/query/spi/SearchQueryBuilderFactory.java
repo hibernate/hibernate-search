@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  */
 public interface SearchQueryBuilderFactory<C> {
 
-	<O> SearchQueryBuilder<O, C> asObject(SessionContextImplementor sessionContext,
+	<O> SearchQueryBuilder<O, C> asEntity(SessionContextImplementor sessionContext,
 			LoadingContextBuilder<?, O> loadingContextBuilder);
 
 	<T> SearchQueryBuilder<T, C> asReference(SessionContextImplementor sessionContext,

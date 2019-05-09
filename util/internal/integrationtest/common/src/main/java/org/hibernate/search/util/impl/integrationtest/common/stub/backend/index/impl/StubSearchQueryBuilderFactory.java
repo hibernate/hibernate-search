@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubCompositeListSearchProjection;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubObjectSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubEntitySearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubReferenceSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
@@ -35,13 +35,13 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <O> SearchQueryBuilder<O, StubQueryElementCollector> asObject(SessionContextImplementor sessionContext,
+	public <O> SearchQueryBuilder<O, StubQueryElementCollector> asEntity(SessionContextImplementor sessionContext,
 			LoadingContextBuilder<?, O> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.OBJECTS,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
 				loadingContextBuilder,
-				StubObjectSearchProjection.get()
+				StubEntitySearchProjection.get()
 		);
 	}
 

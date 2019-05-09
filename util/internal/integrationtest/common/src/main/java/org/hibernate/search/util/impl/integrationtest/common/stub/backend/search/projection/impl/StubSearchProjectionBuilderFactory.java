@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuil
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ObjectProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
@@ -60,11 +60,11 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <O> ObjectProjectionBuilder<O> object() {
-		return new ObjectProjectionBuilder<O>() {
+	public <O> EntityProjectionBuilder<O> entity() {
+		return new EntityProjectionBuilder<O>() {
 			@Override
 			public SearchProjection<O> build() {
-				return StubObjectSearchProjection.get();
+				return StubEntitySearchProjection.get();
 			}
 		};
 	}

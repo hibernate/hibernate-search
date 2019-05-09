@@ -43,9 +43,9 @@ public final class StubMapperUtils {
 	 * @param loadingContextMock The EasyMock mock for the loading context.
 	 * @param referenceTransformerMock The EasyMock mock for the reference transformer.
 	 * @param objectLoaderMock The EasyMock mock for the object loader.
-	 * @param hitMappingDefinition A definition of the reference -> loaded object mapping.
+	 * @param hitMappingDefinition A definition of the reference -> entity mapping.
 	 * @param <R> The reference type.
-	 * @param <O> The loaded object type.
+	 * @param <O> The entity type.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <R, O> void expectHitMapping(

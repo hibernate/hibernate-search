@@ -21,8 +21,8 @@ import org.hibernate.search.util.common.function.TriFunction;
  * A context allowing to create a projection.
  *
  * @param <R> The type of references, i.e. the type of objects returned for {@link #reference() reference projections}.
- * @param <O> The type of loaded objects, i.e. the type of objects returned for
- * {@link #object() object projections}.
+ * @param <O> The type of entities, i.e. the type of objects returned for
+ * {@link #entity() entity projections}.
  */
 public interface SearchProjectionFactoryContext<R, O> {
 
@@ -37,23 +37,22 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * Project to a reference to the match.
 	 * <p>
 	 * The actual type of the reference depends on the mapper used to create the query:
-	 * a POJO mapper may return a class/identifier couple, for example.
+	 * the ORM mapper will return a class/identifier pair, for example.
 	 *
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	ReferenceProjectionContext<R> reference();
 
 	/**
-	 * Project to an object representing the match.
+	 * Project to an entity representing the match.
 	 * <p>
-	 * The actual type of the object depends on the entry point
-	 * for your query: an {@link org.hibernate.search.engine.backend.index.IndexManager}
-	 * will return a Java representation of the document,
-	 * but a mapper may return a Java representation of the mapped object.
+	 * The actual type of the entity depends on the mapper used to create the query
+	 * and on the indexes targeted by your query:
+	 * the ORM mapper will return a managed entity loaded from the database, for example.
 	 *
 	 * @return A context allowing to define the projection more precisely.
 	 */
-	ObjectProjectionContext<O> object();
+	EntityProjectionContext<O> entity();
 
 	/**
 	 * Project to the value of a field in the indexed document.

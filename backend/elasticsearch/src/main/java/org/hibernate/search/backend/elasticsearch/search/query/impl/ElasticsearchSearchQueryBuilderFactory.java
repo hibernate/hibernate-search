@@ -13,7 +13,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchCompositeListProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchObjectProjection;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchEntityProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchReferenceProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
@@ -39,11 +39,11 @@ public class ElasticsearchSearchQueryBuilderFactory
 	}
 
 	@Override
-	public <O> ElasticsearchSearchQueryBuilder<O> asObject(
+	public <O> ElasticsearchSearchQueryBuilder<O> asEntity(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, O> loadingContextBuilder) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
-				new ElasticsearchObjectProjection<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
+				new ElasticsearchEntityProjection<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
 		);
 	}
 

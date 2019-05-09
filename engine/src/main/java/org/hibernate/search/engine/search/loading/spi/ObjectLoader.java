@@ -12,7 +12,7 @@ import java.util.List;
  * Loads objects into memory using a reference and implementation-specific context.
  *
  * @param <R> The expected reference type (input)
- * @param <O> The resulting object type (output)
+ * @param <O> The resulting entity type (output)
  */
 public interface ObjectLoader<R, O> {
 
@@ -20,7 +20,7 @@ public interface ObjectLoader<R, O> {
 	 * Loads the entities corresponding to the given references, blocking the current thread while doing so.
 	 *
 	 * @param references A list of references to the objects to load.
-	 * @return A list of loaded objects, in the same order the references were given.
+	 * @return A list of entities, in the same order the references were given.
 	 * {@code null} is inserted when an object is not found.
 	 */
 	List<O> loadBlocking(List<R> references);

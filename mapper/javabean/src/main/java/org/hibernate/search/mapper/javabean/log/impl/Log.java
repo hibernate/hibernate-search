@@ -46,7 +46,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 5,
 			value = "The JavaBean mapper cannot load entities,"
 					+ " but there was an attempt to load the entity corresponding to document '%1$s'."
-					+ " There is probably an object projection in the query definition: it should be removed."
+					+ " There is probably an entity projection in the query definition: it should be removed."
 	)
 	SearchException cannotLoadEntity(DocumentReference reference);
 }

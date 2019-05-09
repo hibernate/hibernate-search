@@ -7,28 +7,28 @@
 package org.hibernate.search.engine.search.dsl.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.ObjectProjectionContext;
-import org.hibernate.search.engine.search.projection.spi.ObjectProjectionBuilder;
+import org.hibernate.search.engine.search.dsl.projection.EntityProjectionContext;
+import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
-public class ObjectProjectionContextImpl<O> implements ObjectProjectionContext<O> {
+public class EntityProjectionContextImpl<O> implements EntityProjectionContext<O> {
 
-	private final ObjectProjectionBuilder<O> objectProjectionBuilder;
+	private final EntityProjectionBuilder<O> entityProjectionBuilder;
 
-	ObjectProjectionContextImpl(SearchProjectionBuilderFactory factory) {
-		this.objectProjectionBuilder = factory.object();
+	EntityProjectionContextImpl(SearchProjectionBuilderFactory factory) {
+		this.entityProjectionBuilder = factory.entity();
 	}
 
 	@Override
 	/*
-	 * The backend has no control over the type of loaded objects.
+	 * The backend has no control over the type of entities.
 	 * This cast is only safe because we make sure to only use SearchProjectionFactoryContext
 	 * with generic type arguments that are consistent with the type of object loaders.
 	 * See comments in MappedIndexSearchScope.
 	 */
 	public SearchProjection<O> toProjection() {
-		return objectProjectionBuilder.build();
+		return entityProjectionBuilder.build();
 	}
 
 }

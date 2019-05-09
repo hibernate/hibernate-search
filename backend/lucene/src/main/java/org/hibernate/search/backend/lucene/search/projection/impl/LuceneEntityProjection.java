@@ -13,17 +13,17 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocument
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class LuceneObjectProjection<O> implements LuceneSearchProjection<Object, O> {
+public class LuceneEntityProjection<O> implements LuceneSearchProjection<Object, O> {
 
 	@SuppressWarnings("rawtypes")
-	private static final LuceneObjectProjection INSTANCE = new LuceneObjectProjection();
+	private static final LuceneEntityProjection INSTANCE = new LuceneEntityProjection();
 
 	@SuppressWarnings("unchecked")
-	public static <T> LuceneObjectProjection<T> get() {
+	public static <T> LuceneEntityProjection<T> get() {
 		return INSTANCE;
 	}
 
-	private LuceneObjectProjection() {
+	private LuceneEntityProjection() {
 	}
 
 	@Override

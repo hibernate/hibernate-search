@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.DocumentReference;
  * Contract binding result hits and the mapper.
  *
  * @param <R> The type of object references.
- * @param <O> The type of loaded objects.
+ * @param <O> The type of entities.
  */
 public interface ProjectionHitMapper<R, O> {
 

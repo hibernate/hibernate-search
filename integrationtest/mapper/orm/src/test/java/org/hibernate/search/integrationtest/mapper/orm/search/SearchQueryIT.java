@@ -211,7 +211,7 @@ public class SearchQueryIT {
 									Book_Author_Score::new,
 									f.composite(
 											Book_Author::new,
-											f.object().toProjection(),
+											f.entity().toProjection(),
 											f.field( "author", String.class ).toProjection()
 									).toProjection(),
 									f.score().toProjection()
@@ -259,7 +259,7 @@ public class SearchQueryIT {
 									Book_Author_Score::new,
 									f.composite(
 											Book_Author::new,
-											f.object(),
+											f.entity(),
 											f.field( "author", String.class )
 									),
 									f.score()

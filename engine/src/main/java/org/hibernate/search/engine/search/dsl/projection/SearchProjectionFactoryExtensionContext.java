@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.SearchException;
  * to a {@link SearchProjectionFactoryContext}.
  *
  * @param <R> The type of references in the parent {@link SearchProjectionFactoryContext}.
- * @param <O> The type of loaded objects in the parent {@link SearchProjectionFactoryContext}.
+ * @param <O> The type of entities in the parent {@link SearchProjectionFactoryContext}.
  * @param <P> The resulting projection type.
  *
  * @see SearchProjectionFactoryContext#extension()
