@@ -60,20 +60,20 @@ public class DocumentElementIT {
 	}
 
 	/**
-	 * Test that DocumentElement.add does not throw any exception when passing a non-null value.
+	 * Test that DocumentElement.addValue does not throw any exception when passing a non-null value.
 	 */
 	@Test
-	public void add_nonNull() {
+	public void addValue_nonNull() {
 		executeAdd( "1", document -> {
 			setNonNullValues( indexMapping, document );
 		} );
 	}
 
 	/**
-	 * Test that DocumentElement.add does not throw any exception when passing a null value.
+	 * Test that DocumentElement.addValue does not throw any exception when passing a null value.
 	 */
 	@Test
-	public void add_null() {
+	public void addValue_null() {
 		executeAdd( "1", document -> {
 			setNullValues( indexMapping, document );
 		} );
@@ -81,7 +81,7 @@ public class DocumentElementIT {
 
 	/**
 	 * Test that DocumentElement.addObject does not throw any exception,
-	 * add that DocumentElement.add does not throw an exception for returned objects.
+	 * add that DocumentElement.addValue does not throw an exception for returned objects.
 	 */
 	@Test
 	public void addObject() {
@@ -135,10 +135,10 @@ public class DocumentElementIT {
 	}
 
 	/**
-	 * Test that DocumentElement.add does not throw any exception when passing a reference to an excluded field.
+	 * Test that DocumentElement.addValue does not throw any exception when passing a reference to an excluded field.
 	 */
 	@Test
-	public void add_excludedFields() {
+	public void addValue_excludedFields() {
 		executeAdd( "1", document -> {
 			DocumentElement excludingObject = document.addObject( indexMapping.excludingObject.self );
 			setNonNullValues( indexMapping.excludingObject, excludingObject );
