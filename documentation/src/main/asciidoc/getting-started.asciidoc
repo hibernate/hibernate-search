@@ -298,7 +298,7 @@ The predicate is created using a factory `f` passed as an argument to the lambda
 <7> Retrieve the total number of matching entities.
 <8> Retrieve matching entities.
 <9> In case you're not interested in the whole result, but only in the hits,
-you can also call `getResultList()` on the query directly.
+you can also call `fetchHits()` on the query directly.
 ====
 
 If for some reason you don't want to use lambdas, you can use an alternative, object-based syntax,
@@ -322,7 +322,7 @@ The predicate is created using the same search scope as the query.
 <8> Retrieve the total number of matching entities.
 <9> Retrieve matching entities.
 <10> In case you're not interested in the whole result, but only in the hits,
-you can also call `getResultList()` on the query directly.
+you can also call `fetchHits()` on the query directly.
 ====
 
 It is possible to get just the result size, using `getResultSize()` method.
