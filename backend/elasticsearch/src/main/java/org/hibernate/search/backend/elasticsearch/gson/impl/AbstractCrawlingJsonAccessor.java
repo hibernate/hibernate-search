@@ -30,12 +30,18 @@ abstract class AbstractCrawlingJsonAccessor<P extends JsonElement> extends Abstr
 	protected JsonCompositeAccessor<P> getParentAccessor() {
 		return (JsonCompositeAccessor<P>) super.getParentAccessor();
 	}
+
 	@Override
 	public Optional<JsonElement> get(JsonObject root) throws UnexpectedJsonElementTypeException {
 		return getParentAccessor().get( root ).map( this::doGet );
 	}
 
 	protected abstract JsonElement doGet(P parent);
+
+	@Override
+	public boolean hasExplicitValue(JsonObject root) {
+		return getParentAccessor().get( root ).map( this::doGet ).isPresent();
+	}
 
 	@Override
 	public void set(JsonObject root, JsonElement newValue) throws UnexpectedJsonElementTypeException {

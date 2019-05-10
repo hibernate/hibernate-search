@@ -36,6 +36,21 @@ public interface JsonAccessor<T> {
 	Optional<T> get(JsonObject root) throws UnexpectedJsonElementTypeException;
 
 	/**
+	 * Detects whether the element this accessor points to for the given {@code root} has an explicit value.
+	 * <p>
+	 * This method is slightly different from {@code get(root).isPresent()} in that it will return true
+	 * if the current value is {@link JsonNull#INSTANCE}, as it is considered as an explicit value.
+	 * Also, it will work fine if the leaf value has the wrong type (array of objects instead of object, for example).
+	 *
+	 * @param root The root to be accessed.
+	 * @return {@code true} if there is an explicit value (be it {@link JsonNull#INSTANCE} or a non-null value),
+	 * {@code false} otherwise.
+	 * @throws UnexpectedJsonElementTypeException If an element in the path has unexpected type,
+	 * preventing access to the element this accessor points to.
+	 */
+	boolean hasExplicitValue(JsonObject root);
+
+	/**
 	 * Set the given value on the element this accessor points to for the given {@code root}.
 	 *
 	 * @param root The root to be accessed.

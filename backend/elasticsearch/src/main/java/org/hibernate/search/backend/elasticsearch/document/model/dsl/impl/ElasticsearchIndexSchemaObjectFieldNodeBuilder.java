@@ -35,6 +35,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	private final String absoluteFieldPath;
 	private final String relativeFieldName;
 	private final ObjectFieldStorage storage;
+	private boolean multiValued = false;
 
 	private ElasticsearchIndexObjectFieldReference reference;
 
@@ -56,7 +57,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 	@Override
 	public void multiValued() {
-		// FIXME HSEARCH-3324 store and use this information
+		this.multiValued = true;
 	}
 
 	@Override
@@ -77,7 +78,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 		}
 
 		ElasticsearchIndexSchemaObjectNode fieldNode =
-				new ElasticsearchIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage );
+				new ElasticsearchIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage, multiValued );
 		collector.collect( absoluteFieldPath, fieldNode );
 
 		reference.enable( fieldNode );

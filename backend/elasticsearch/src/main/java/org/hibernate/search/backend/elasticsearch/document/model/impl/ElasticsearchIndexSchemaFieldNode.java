@@ -18,6 +18,10 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final ElasticsearchIndexSchemaObjectNode parent;
 
+	private final String absolutePath;
+
+	private final boolean multiValued;
+
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private final ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory;
@@ -26,20 +30,34 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory;
 
-	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent,
+	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
+			boolean multiValued,
 			ElasticsearchFieldCodec<F> codec,
 			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory,
 			ElasticsearchFieldSortBuilderFactory sortBuilderFactory,
 			ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory) {
 		this.parent = parent;
+		this.absolutePath = parent.getAbsolutePath( relativeFieldName );
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
+		this.multiValued = multiValued;
 	}
 
 	public ElasticsearchIndexSchemaObjectNode getParent() {
 		return parent;
+	}
+
+	public String getAbsolutePath() {
+		return absolutePath;
+	}
+
+	/**
+	 * @return {@code true} if this node is multi-valued in its parent object.
+	 */
+	public boolean isMultiValued() {
+		return multiValued;
 	}
 
 	public ElasticsearchFieldCodec<F> getCodec() {

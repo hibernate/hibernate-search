@@ -38,9 +38,11 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 
 	public ElasticsearchIndexSchemaFieldNode<F> addField(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode, AbstractTypeMapping parentMapping,
-			String relativeFieldName) {
+			String relativeFieldName, boolean multiValued) {
 		ElasticsearchIndexSchemaFieldNode<F> schemaNode = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode,
+				relativeFieldName,
+				multiValued,
 				codec,
 				predicateBuilderFactory,
 				sortBuilderFactory,

@@ -38,4 +38,8 @@ public class ElasticsearchIndexObjectFieldReference implements IndexObjectFieldR
 	void addTo(JsonObject parent, JsonObject value) {
 		relativeAccessor.add( parent, value );
 	}
+
+	boolean hasValueIn(JsonObject parent) {
+		return relativeAccessor.hasExplicitValue( parent );
+	}
 }

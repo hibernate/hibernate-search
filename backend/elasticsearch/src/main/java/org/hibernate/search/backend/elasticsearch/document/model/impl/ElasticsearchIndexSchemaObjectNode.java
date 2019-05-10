@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 public class ElasticsearchIndexSchemaObjectNode {
 
 	private static final ElasticsearchIndexSchemaObjectNode ROOT =
-			new ElasticsearchIndexSchemaObjectNode( null, null, null );
+			new ElasticsearchIndexSchemaObjectNode( null, null, null, false );
 
 	public static ElasticsearchIndexSchemaObjectNode root() {
 		return ROOT;
@@ -26,11 +26,15 @@ public class ElasticsearchIndexSchemaObjectNode {
 
 	private final ObjectFieldStorage storage;
 
+	private final boolean multiValued;
+
 	public ElasticsearchIndexSchemaObjectNode(ElasticsearchIndexSchemaObjectNode parent, String absolutePath,
-			ObjectFieldStorage storage) {
+			ObjectFieldStorage storage,
+			boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
-		this.storage = storage;
+		this.storage = ObjectFieldStorage.DEFAULT.equals( storage ) ? ObjectFieldStorage.FLATTENED : storage;
+		this.multiValued = multiValued;
 	}
 
 	@Override
@@ -52,5 +56,12 @@ public class ElasticsearchIndexSchemaObjectNode {
 
 	public ObjectFieldStorage getStorage() {
 		return storage;
+	}
+
+	/**
+	 * @return {@code true} if this node is multi-valued in its parent object.
+	 */
+	public boolean isMultiValued() {
+		return multiValued;
 	}
 }

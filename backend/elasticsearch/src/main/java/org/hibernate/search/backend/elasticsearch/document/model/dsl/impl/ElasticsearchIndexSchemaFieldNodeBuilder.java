@@ -37,6 +37,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 	private final String relativeFieldName;
 	private final String absoluteFieldPath;
 	private final ElasticsearchIndexFieldType<F> type;
+	private boolean multiValued = false;
 
 	private ElasticsearchIndexFieldReference<F> reference;
 
@@ -56,7 +57,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 
 	@Override
 	public ElasticsearchIndexSchemaFieldNodeBuilder<F> multiValued() {
-		// FIXME HSEARCH-3324 store and use this information
+		this.multiValued = true;
 		return this;
 	}
 
@@ -78,7 +79,9 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 
-		ElasticsearchIndexSchemaFieldNode<F> fieldNode = type.addField( collector, parentNode, parentMapping, relativeFieldName );
+		ElasticsearchIndexSchemaFieldNode<F> fieldNode = type.addField(
+				collector, parentNode, parentMapping, relativeFieldName, multiValued
+		);
 		reference.enable( fieldNode );
 	}
 

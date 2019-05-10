@@ -494,4 +494,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 62, value = "Index-null-as option is not supported on analyzed field. Trying to define the analyzer: '%1$s' together with index null as: '%2$s'.")
 	SearchException cannotUseIndexNullAsAndAnalyzer(String analyzerName, String indexNullAs, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 63,
+			value = "Multiple values were added to single-valued field '%1$s'."
+					+ " Declare the field as multi-valued in order to allow this."
+	)
+	SearchException multipleValuesForSingleValuedField(String absolutePath);
 }

@@ -49,6 +49,9 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 		ElasticsearchIndexSchemaFieldNode<F> fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
 		checkTreeConsistency( fieldSchemaNode.getParent() );
+		if ( !fieldSchemaNode.isMultiValued() && elasticsearchFieldReference.hasValueIn( content ) ) {
+			throw log.multipleValuesForSingleValuedField( fieldSchemaNode.getAbsolutePath() );
+		}
 
 		elasticsearchFieldReference.addTo( content, value );
 	}
@@ -62,6 +65,9 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 		ElasticsearchIndexSchemaObjectNode fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
 		checkTreeConsistency( fieldSchemaNode.getParent() );
+		if ( !fieldSchemaNode.isMultiValued() && elasticsearchFieldReference.hasValueIn( content ) ) {
+			throw log.multipleValuesForSingleValuedField( fieldSchemaNode.getAbsolutePath() );
+		}
 
 		JsonObject jsonObject = new JsonObject();
 		elasticsearchFieldReference.addTo( content, jsonObject );
@@ -78,6 +84,9 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 		ElasticsearchIndexSchemaObjectNode fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
 		checkTreeConsistency( fieldSchemaNode.getParent() );
+		if ( !fieldSchemaNode.isMultiValued() && elasticsearchFieldReference.hasValueIn( content ) ) {
+			throw log.multipleValuesForSingleValuedField( fieldSchemaNode.getAbsolutePath() );
+		}
 
 		elasticsearchFieldReference.addTo( content, null );
 	}

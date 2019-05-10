@@ -31,6 +31,12 @@ class RootJsonAccessor implements JsonCompositeAccessor<JsonElement> {
 		return Optional.of( requireRoot( root ) );
 	}
 
+	@Override
+	public boolean hasExplicitValue(JsonObject root) {
+		requireRoot( root );
+		return true;
+	}
+
 	private JsonObject requireRoot(JsonObject root) {
 		if ( root == null ) {
 			throw new AssertionFailure( "A null root was encountered" );
