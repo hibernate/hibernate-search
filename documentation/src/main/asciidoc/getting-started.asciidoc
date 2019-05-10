@@ -325,7 +325,7 @@ The predicate is created using the same search scope as the query.
 you can also call `fetchHits()` on the query directly.
 ====
 
-It is possible to get just the result size, using `getResultSize()` method.
+It is possible to get just the result size, using `fetchTotalHitCount()` method.
 
 .Using Hibernate Search to count the indexes
 ====
