@@ -26,7 +26,7 @@ import org.apache.lucene.document.Document;
 /**
  * @author Guillaume Smet
  */
-public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
+abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -36,7 +36,7 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 
 	private List<LuceneNestedObjectDocumentBuilder> nestedObjectDocumentBuilders;
 
-	protected AbstractLuceneDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode) {
+	AbstractLuceneDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode) {
 		this.schemaNode = schemaNode;
 	}
 

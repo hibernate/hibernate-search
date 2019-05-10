@@ -7,14 +7,11 @@
 package org.hibernate.search.backend.lucene.document.impl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
-import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -22,23 +19,10 @@ import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrateg
 /**
  * @author Guillaume Smet
  */
-public class LuceneRootDocumentBuilder extends AbstractLuceneDocumentBuilder {
-
-	private final Document rootDocument = new Document();
-	private final Set<String> fieldNames = new HashSet<>();
+public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumentBuilder {
 
 	public LuceneRootDocumentBuilder() {
 		super( LuceneIndexSchemaObjectNode.root() );
-	}
-
-	@Override
-	public void addField(IndexableField field) {
-		rootDocument.add( field );
-	}
-
-	@Override
-	public void addFieldName(String absoluteFieldPath) {
-		fieldNames.add( absoluteFieldPath );
 	}
 
 	public LuceneIndexEntry build(String indexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String id) {
@@ -46,20 +30,14 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneDocumentBuilder {
 	}
 
 	private List<Document> assembleDocuments(String indexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String id) {
-		rootDocument.add( new StringField( LuceneFields.typeFieldName(), LuceneFields.TYPE_MAIN_DOCUMENT, Store.YES ) );
-		rootDocument.add( new StringField( LuceneFields.indexFieldName(), indexName, Store.YES ) );
-		rootDocument.add( new StringField( LuceneFields.idFieldName(), id, Store.YES ) );
-
-		for ( String fieldName : fieldNames ) {
-			rootDocument.add( new StringField( LuceneFields.fieldNamesFieldName(), fieldName, Store.NO ) );
-		}
-
-		multiTenancyStrategy.contributeToIndexedDocument( rootDocument, tenantId );
+		document.add( new StringField( LuceneFields.typeFieldName(), LuceneFields.TYPE_MAIN_DOCUMENT, Store.YES ) );
+		document.add( new StringField( LuceneFields.indexFieldName(), indexName, Store.YES ) );
+		document.add( new StringField( LuceneFields.idFieldName(), id, Store.YES ) );
 
 		// all the ancestors of a subdocument must be added after it
 		List<Document> documents = new ArrayList<>();
-		contribute( indexName, multiTenancyStrategy, tenantId, id, rootDocument, documents );
-		documents.add( rootDocument );
+		contribute( indexName, multiTenancyStrategy, tenantId, id, document, documents );
+		documents.add( document );
 
 		return documents;
 	}
