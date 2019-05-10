@@ -36,9 +36,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test the behavior of implementations of {@link DocumentElement}.
+ * Test the basic behavior of implementations of {@link DocumentElement}.
  */
-public class DocumentElementIT {
+public class DocumentElementBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
