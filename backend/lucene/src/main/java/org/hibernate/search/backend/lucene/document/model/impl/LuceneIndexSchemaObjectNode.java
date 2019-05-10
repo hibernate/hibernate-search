@@ -14,7 +14,8 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
  */
 public class LuceneIndexSchemaObjectNode {
 
-	private static final LuceneIndexSchemaObjectNode ROOT = new LuceneIndexSchemaObjectNode( null, null, null );
+	private static final LuceneIndexSchemaObjectNode ROOT =
+			new LuceneIndexSchemaObjectNode( null, null, null, false );
 
 	public static LuceneIndexSchemaObjectNode root() {
 		return ROOT;
@@ -26,11 +27,14 @@ public class LuceneIndexSchemaObjectNode {
 
 	private final ObjectFieldStorage storage;
 
+	private final boolean multiValued;
+
 	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String absolutePath,
-			ObjectFieldStorage storage) {
+			ObjectFieldStorage storage, boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
 		this.storage = storage;
+		this.multiValued = multiValued;
 	}
 
 	public LuceneIndexSchemaObjectNode getParent() {
@@ -49,8 +53,15 @@ public class LuceneIndexSchemaObjectNode {
 		return storage;
 	}
 
+	/**
+	 * @return {@code true} if this node is multi-valued in its parent object.
+	 */
+	public boolean isMultiValued() {
+		return multiValued;
+	}
+
 	@Override
-		public String toString() {
-			return getClass().getSimpleName() + "[absolutePath=" + absolutePath + ", storage=" + storage + "]";
+	public String toString() {
+		return getClass().getSimpleName() + "[absolutePath=" + absolutePath + ", storage=" + storage + "]";
 	}
 }

@@ -30,6 +30,8 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final String absoluteFieldPath;
 
+	private final boolean multiValued;
+
 	private final LuceneFieldCodec<F> codec;
 
 	private final LuceneFieldPredicateBuilderFactory predicateBuilderFactory;
@@ -39,6 +41,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
 
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName,
+			boolean multiValued,
 			LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
@@ -46,6 +49,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = parent.getAbsolutePath( relativeFieldName );
+		this.multiValued = multiValued;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
@@ -58,6 +62,13 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	public String getAbsoluteFieldPath() {
 		return absoluteFieldPath;
+	}
+
+	/**
+	 * @return {@code true} if this node is multi-valued in its parent object.
+	 */
+	public boolean isMultiValued() {
+		return multiValued;
 	}
 
 	public LuceneFieldPredicateBuilderFactory getPredicateBuilderFactory() {

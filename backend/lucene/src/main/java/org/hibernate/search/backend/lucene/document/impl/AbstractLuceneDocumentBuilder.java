@@ -49,6 +49,9 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 		LuceneIndexSchemaFieldNode<F> fieldSchemaNode = luceneFieldReference.getSchemaNode();
 		checkTreeConsistency( fieldSchemaNode.getParent() );
+		if ( !fieldSchemaNode.isMultiValued() ) {
+			checkNoValueYetForSingleValued( fieldSchemaNode.getAbsoluteFieldPath() );
+		}
 
 		fieldSchemaNode.getCodec().encode( this, fieldSchemaNode.getAbsoluteFieldPath(), value );
 	}
@@ -62,6 +65,9 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 		LuceneIndexSchemaObjectNode fieldSchemaNode = luceneFieldReference.getSchemaNode();
 		checkTreeConsistency( fieldSchemaNode.getParent() );
+		if ( !fieldSchemaNode.isMultiValued() ) {
+			checkNoValueYetForSingleValued( fieldSchemaNode.getAbsolutePath() );
+		}
 
 		switch ( luceneFieldReference.getStorage() ) {
 			case NESTED:
@@ -78,8 +84,21 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 	@Override
 	public void addNullObject(IndexObjectFieldReference fieldReference) {
-		// we ignore the null objects
+		LuceneIndexObjectFieldReference luceneFieldReference = (LuceneIndexObjectFieldReference) fieldReference;
+		if ( !luceneFieldReference.isEnabled() ) {
+			return;
+		}
+
+		LuceneIndexSchemaObjectNode fieldSchemaNode = luceneFieldReference.getSchemaNode();
+		checkTreeConsistency( fieldSchemaNode.getParent() );
+		if ( !fieldSchemaNode.isMultiValued() ) {
+			checkNoValueYetForSingleValued( fieldSchemaNode.getAbsolutePath() );
+		}
+
+		// We do not add any value for null objects
 	}
+
+	abstract void checkNoValueYetForSingleValued(String absoluteFieldPath);
 
 	private void addNestedObjectDocumentBuilder(LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder) {
 		if ( nestedObjectDocumentBuilders == null ) {

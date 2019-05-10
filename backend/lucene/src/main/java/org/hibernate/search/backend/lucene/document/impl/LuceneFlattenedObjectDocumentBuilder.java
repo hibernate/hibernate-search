@@ -6,7 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.document.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexableField;
 
@@ -15,7 +21,11 @@ import org.apache.lucene.index.IndexableField;
  */
 class LuceneFlattenedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final AbstractLuceneDocumentBuilder parent;
+
+	private final Set<String> encounteredFields = new HashSet<>();
 
 	LuceneFlattenedObjectDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode, AbstractLuceneDocumentBuilder parent) {
 		super( schemaNode );
@@ -30,5 +40,13 @@ class LuceneFlattenedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder
 	@Override
 	public void addFieldName(String absoluteFieldPath) {
 		parent.addFieldName( absoluteFieldPath );
+	}
+
+	@Override
+	void checkNoValueYetForSingleValued(String absoluteFieldPath) {
+		boolean firstEncounter = encounteredFields.add( absoluteFieldPath );
+		if ( !firstEncounter ) {
+			throw log.multipleValuesForSingleValuedField( absoluteFieldPath );
+		}
 	}
 }

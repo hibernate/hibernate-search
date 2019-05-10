@@ -28,6 +28,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
 	private final String absoluteFieldPath;
 	private final ObjectFieldStorage storage;
+	private boolean multiValued = false;
 
 	private LuceneIndexObjectFieldReference reference;
 
@@ -46,7 +47,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	@Override
 	public void multiValued() {
-		// FIXME HSEARCH-3324 store and use this information
+		this.multiValued = true;
 	}
 
 	@Override
@@ -64,7 +65,9 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 
-		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage );
+		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode(
+				parentNode, absoluteFieldPath, storage, multiValued
+		);
 		collector.collectObjectNode( absoluteFieldPath, node );
 
 		reference.enable( node );

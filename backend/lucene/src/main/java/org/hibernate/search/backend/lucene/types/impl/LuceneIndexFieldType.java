@@ -24,7 +24,8 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
 	private final Analyzer analyzerOrNormalizer;
 
-	public LuceneIndexFieldType(LuceneFieldCodec<F> codec,
+	public LuceneIndexFieldType(
+			LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
 			LuceneFieldProjectionBuilderFactory projectionBuilderFactory) {
@@ -44,10 +45,11 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 	}
 
 	public LuceneIndexSchemaFieldNode<F> addField(LuceneIndexSchemaNodeCollector collector,
-			LuceneIndexSchemaObjectNode parentNode, String relativeFieldName) {
+			LuceneIndexSchemaObjectNode parentNode, String relativeFieldName, boolean multiValued) {
 		LuceneIndexSchemaFieldNode<F> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				relativeFieldName,
+				multiValued,
 				codec,
 				predicateBuilderFactory,
 				sortBuilderFactory,

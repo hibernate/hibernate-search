@@ -32,6 +32,7 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 	private final String relativeFieldName;
 	private final String absoluteFieldPath;
 	private final LuceneIndexFieldType<F> type;
+	private boolean multiValued = false;
 
 	private LuceneIndexFieldReference<F> reference;
 
@@ -51,7 +52,7 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 
 	@Override
 	public LuceneIndexSchemaFieldNodeBuilder<F> multiValued() {
-		// FIXME HSEARCH-3324 store and use this information
+		this.multiValued = true;
 		return this;
 	}
 
@@ -69,7 +70,9 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
-		LuceneIndexSchemaFieldNode<F> fieldNode = type.addField( collector, parentNode, relativeFieldName );
+		LuceneIndexSchemaFieldNode<F> fieldNode = type.addField(
+				collector, parentNode, relativeFieldName, multiValued
+		);
 		reference.enable( fieldNode );
 	}
 
