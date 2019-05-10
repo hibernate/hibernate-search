@@ -11,6 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -823,6 +824,68 @@ public class TypeBridgeBaseIT {
 		CustomEnum(String stringProperty) {
 			this.stringProperty = stringProperty;
 		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3324")
+	public void multiValuedField() {
+		class Contained {
+			String string;
+			List<String> list;
+			public String getString() {
+				return string;
+			}
+			public List<String> getList() {
+				return list;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Contained contained;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded
+			public Contained getContained() {
+				return contained;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "contained", b2 -> b2
+						.field( "stringFromBridge", String.class )
+						.field( "listFromBridge", String.class, b3 -> b3.multiValued( true ) )
+				)
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+				b -> b.programmaticMapping().type( Contained.class )
+						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+							@Override
+							public void bind(TypeBridgeBindingContext context) {
+								context.getDependencies().useRootOnly();
+								// Single-valued field
+								context.getIndexSchemaElement()
+										.field( "stringFromBridge", f -> f.asString() )
+										.toReference();
+								// Multi-valued field
+								context.getIndexSchemaElement()
+										.field( "listFromBridge", f -> f.asString() )
+										.multiValued()
+										.toReference();
+							}
+
+							@Override
+							public void write(DocumentElement target, Object bridgedElement,
+									TypeBridgeWriteContext context) {
+								throw new UnsupportedOperationException( "This should not be called" );
+							}
+						} ) )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test

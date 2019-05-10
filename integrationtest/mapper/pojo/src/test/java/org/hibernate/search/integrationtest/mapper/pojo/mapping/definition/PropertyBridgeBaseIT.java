@@ -61,7 +61,6 @@ public class PropertyBridgeBaseIT {
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
-
 	/**
 	 * Basic test checking that a "normal" custom property bridge will work as expected
 	 * when relying on accessors.
@@ -923,6 +922,66 @@ public class PropertyBridgeBaseIT {
 		}
 		backendMock.verifyExpectationsMet();
 	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3324")
+	public void multiValuedField() {
+		class Contained {
+			String string;
+			List<String> list;
+			public String getString() {
+				return string;
+			}
+			public List<String> getList() {
+				return list;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Contained contained;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public Contained getContained() {
+				return contained;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "stringFromBridge", String.class )
+				.field( "listFromBridge", String.class, b2 -> b2.multiValued( true ) )
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
+						.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+							@Override
+							public void bind(PropertyBridgeBindingContext context) {
+								context.getDependencies().useRootOnly();
+								// Single-valued field
+								context.getIndexSchemaElement()
+										.field( "stringFromBridge", f -> f.asString() )
+										.toReference();
+								// Multi-valued field
+								context.getIndexSchemaElement()
+										.field( "listFromBridge", f -> f.asString() )
+										.multiValued()
+										.toReference();
+							}
+
+							@Override
+							public void write(DocumentElement target, Object bridgedElement,
+									PropertyBridgeWriteContext context) {
+								throw new UnsupportedOperationException( "This should not be called" );
+							}
+						} ) )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
 
 	@Test
 	public void mapping_error_missingBridgeReference() {

@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import static org.junit.Assert.assertEquals;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -125,6 +127,120 @@ public class IndexedEmbeddedBaseIT {
 								.field( "level2Property", "level2Value" )
 						)
 				)
+		);
+	}
+
+	/**
+	 * Check that setting a dotless prefix in @IndexedEmbedded on a multi-valued property
+	 * results in *direct* children being automatically marked as multi-valued.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3324")
+	public void prefix_multiValued() {
+		class IndexedEmbeddedLevel2 {
+			String level2Property;
+			@GenericField
+			public String getLevel2Property() {
+				return level2Property;
+			}
+		}
+		class IndexedEmbeddedLevel1 {
+			IndexedEmbeddedLevel2 level2NoDotInPrefix = new IndexedEmbeddedLevel2();
+			IndexedEmbeddedLevel2 level2OneDotInPrefix = new IndexedEmbeddedLevel2();
+			IndexedEmbeddedLevel2 level2TwoDotsInPrefix = new IndexedEmbeddedLevel2();
+			String level1Property;
+			@GenericField
+			public String getLevel1Property() {
+				return level1Property;
+			}
+			@IndexedEmbedded(prefix = "level2NoDotInPrefix_")
+			public IndexedEmbeddedLevel2 getLevel2NoDotInPrefix() {
+				return level2NoDotInPrefix;
+			}
+			@IndexedEmbedded(prefix = "level2OneDotInPrefix.")
+			public IndexedEmbeddedLevel2 getLevel2OneDotInPrefix() {
+				return level2OneDotInPrefix;
+			}
+			@IndexedEmbedded(prefix = "level2TwoDotsInPrefix.level3.")
+			public IndexedEmbeddedLevel2 getLevel2TwoDotsInPrefix() {
+				return level2TwoDotsInPrefix;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			List<IndexedEmbeddedLevel1> level1 = new ArrayList<>();
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded(prefix = "level1_")
+			public List<IndexedEmbeddedLevel1> getLevel1() {
+				return level1;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "level1_level1Property", String.class, b2 -> b2.multiValued( true ) )
+				.field( "level1_level2NoDotInPrefix_level2Property", String.class, b2 -> b2.multiValued( true ) )
+				.objectField( "level1_level2OneDotInPrefix", ObjectFieldStorage.DEFAULT, b2 -> b2
+						.multiValued( true )
+						// Not a direct child of level1: should be single-valued
+						.field( "level2Property", String.class )
+				)
+				.objectField( "level1_level2TwoDotsInPrefix", ObjectFieldStorage.DEFAULT, b2 -> b2
+						.multiValued( true )
+						// Not a direct child of level1: should be single-valued
+						.objectField( "level3", ObjectFieldStorage.DEFAULT, b3 -> b3
+								// Not a direct child of level1: should be single-valued
+								.field( "level2Property", String.class )
+						)
+				)
+		);
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
+				.setup();
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					IndexedEmbeddedLevel1 level1_1 = new IndexedEmbeddedLevel1();
+					level1_1.level1Property = "1";
+					level1_1.level2NoDotInPrefix.level2Property = "1";
+					level1_1.level2OneDotInPrefix.level2Property = "1";
+					level1_1.level2TwoDotsInPrefix.level2Property = "1";
+					entity.level1.add( level1_1 );
+					IndexedEmbeddedLevel1 level1_2 = new IndexedEmbeddedLevel1();
+					level1_2.level1Property = "2";
+					level1_2.level2NoDotInPrefix.level2Property = "2";
+					level1_2.level2OneDotInPrefix.level2Property = "2";
+					level1_2.level2TwoDotsInPrefix.level2Property = "2";
+					entity.level1.add( level1_2 );
+					return entity;
+				},
+				document -> document
+						.field( "level1_level1Property", "1", "2" )
+						.field( "level1_level2NoDotInPrefix_level2Property", "1", "2" )
+						.objectField( "level1_level2OneDotInPrefix", b2 -> b2
+								.field( "level2Property", "1" )
+						)
+						.objectField( "level1_level2OneDotInPrefix", b2 -> b2
+								.field( "level2Property", "2" )
+						)
+						.objectField( "level1_level2TwoDotsInPrefix", b2 -> b2
+								.objectField( "level3", b3 -> b3
+										.field( "level2Property", "1" )
+								)
+						)
+						.objectField( "level1_level2TwoDotsInPrefix", b2 -> b2
+								.objectField( "level3", b3 -> b3
+										.field( "level2Property", "2" )
+								)
+						)
 		);
 	}
 
