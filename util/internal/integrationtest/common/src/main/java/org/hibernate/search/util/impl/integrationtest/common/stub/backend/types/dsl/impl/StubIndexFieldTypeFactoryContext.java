@@ -27,7 +27,11 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryContext {
 
-	private IndexFieldTypeDefaultsProvider defaultsProvider;
+	private final IndexFieldTypeDefaultsProvider defaultsProvider;
+
+	public StubIndexFieldTypeFactoryContext(IndexFieldTypeDefaultsProvider defaultsProvider) {
+		this.defaultsProvider = defaultsProvider;
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -141,9 +145,5 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	@Override
 	public ScaledNumberIndexFieldTypeContext<?> asBigDecimal() {
 		return new StubScaledNumberIndexFieldTypeContext( defaultsProvider );
-	}
-
-	public void setDefaultsProvider(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		this.defaultsProvider = defaultsProvider;
 	}
 }

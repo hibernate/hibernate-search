@@ -12,7 +12,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDef
 
 public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder {
 
-	IndexFieldTypeFactoryContext getTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider);
+	IndexFieldTypeFactoryContext createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider);
 
 	/**
 	 * Inform the model collector that documents will always be provided along

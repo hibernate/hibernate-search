@@ -49,14 +49,14 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext getTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		return indexSchemaRootNodeBuilder.getTypeFactory( defaultsProvider );
+	public IndexFieldTypeFactoryContext createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
+		return indexSchemaRootNodeBuilder.createTypeFactory( defaultsProvider );
 	}
 
 	@Override
 	public IndexSchemaElement getSchemaElement() {
 		return new IndexSchemaElementImpl<>(
-				getTypeFactory(),
+				createTypeFactory(),
 				indexSchemaObjectNodeBuilder,
 				nestingContext,
 				isParentMultivaluedAndWithoutObjectField()
@@ -66,7 +66,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 	@Override
 	public IndexSchemaElement getSchemaElement(IndexSchemaContributionListener listener) {
 		return new IndexSchemaElementImpl<>(
-				getTypeFactory(),
+				createTypeFactory(),
 				indexSchemaObjectNodeBuilder,
 				new NotifyingNestingContext( nestingContext, listener ),
 				isParentMultivaluedAndWithoutObjectField()

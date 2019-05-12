@@ -44,8 +44,9 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public LuceneIndexFieldTypeFactoryContext getTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		// TODO handle defaultsProvider instance for the current request
+	public LuceneIndexFieldTypeFactoryContext createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
+		// TODO handle defaultsProvider instance for the current request,
+		// creating a new instance of typeFactory
 		return typeFactory;
 	}
 

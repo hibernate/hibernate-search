@@ -179,7 +179,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			bridgeHolder.get().bind( new TypeBridgeBindingContextImpl(
 					pojoModelRootElement,
 					pojoDependencyContext,
-					bindingContext.getTypeFactory(),
+					bindingContext.createTypeFactory(),
 					bindingContext.getSchemaElement( listener )
 			) );
 
@@ -224,7 +224,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			bridgeHolder.get().bind( new PropertyBridgeBindingContextImpl(
 					pojoModelRootElement,
 					pojoDependencyContext,
-					bindingContext.getTypeFactory(),
+					bindingContext.createTypeFactory(),
 					bindingContext.getSchemaElement( listener )
 			) );
 
@@ -285,7 +285,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			 */
 			@SuppressWarnings({"unchecked", "rawtypes"})
 			BoundValueBridge<V, ?> boundValueBridge = bindValueBridge(
-					bindingContext.getTypeFactory( defaultsProvider ),
+					bindingContext.createTypeFactory( defaultsProvider ),
 					schemaElement, valueTypeModel, multiValued,
 					(BeanHolder<? extends ValueBridge>) bridgeHolder,
 					relativeFieldName, contributor

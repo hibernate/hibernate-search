@@ -52,8 +52,9 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public ElasticsearchIndexFieldTypeFactoryContext getTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		// TODO handle defaultsProvider instance for the current request
+	public ElasticsearchIndexFieldTypeFactoryContext createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
+		// TODO handle defaultsProvider instance for the current request,
+		// creating a new instance of typeFactory
 		return typeFactory;
 	}
 

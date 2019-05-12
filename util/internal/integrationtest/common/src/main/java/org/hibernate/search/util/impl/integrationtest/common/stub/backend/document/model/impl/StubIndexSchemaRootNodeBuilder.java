@@ -20,7 +20,6 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 		implements IndexSchemaRootNodeBuilder {
 
 	private final StubBackendBehavior backendBehavior;
-	private final StubIndexFieldTypeFactoryContext typeFactoryContext = new StubIndexFieldTypeFactoryContext();
 	private final String indexName;
 
 	public StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName) {
@@ -35,10 +34,8 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext getTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		// set defaultsProvider instance for the current request
-		typeFactoryContext.setDefaultsProvider( defaultsProvider );
-		return typeFactoryContext;
+	public IndexFieldTypeFactoryContext createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
+		return new StubIndexFieldTypeFactoryContext( defaultsProvider );
 	}
 
 	@Override

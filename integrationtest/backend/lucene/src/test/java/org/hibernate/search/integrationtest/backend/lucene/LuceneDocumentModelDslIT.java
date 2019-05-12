@@ -30,7 +30,7 @@ public class LuceneDocumentModelDslIT {
 		SubTest.expectException(
 				"Referencing an unknown analyzer",
 				() -> setup( ctx -> {
-					ctx.getTypeFactory().asString()
+					ctx.createTypeFactory().asString()
 							.analyzer( "someNameThatIsClearlyNotAssignedToADefinition" );
 				} )
 		)
@@ -47,7 +47,7 @@ public class LuceneDocumentModelDslIT {
 		SubTest.expectException(
 				"Referencing an unknown analyzer",
 				() -> setup( ctx -> {
-					ctx.getTypeFactory().asString()
+					ctx.createTypeFactory().asString()
 							.normalizer( "someNameThatIsClearlyNotAssignedToADefinition" );
 				} )
 		)
