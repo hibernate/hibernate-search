@@ -419,12 +419,6 @@
         <pax-exam.jvm.args.jacoco></pax-exam.jvm.args.jacoco>
         <pax-exam.jvm.args>${pax-exam.jvm.args.java-version} ${pax-exam.jvm.args.jacoco}</pax-exam.jvm.args>
 
-        <!--
-            The path to a single merged JaCoCo coverage file including all of the coverage data for all modules.
-            This file is mainly necessary for Sonar, see Sonar configuration below for an explanation.
-         -->
-        <jacoco.mergedExecFilePath>${rootProject.directory}/target/jacoco-merged.exec</jacoco.mergedExecFilePath>
-
         <!-- Elasticsearch tests properties -->
 
         <test.elasticsearch.java_home>${java.home}</test.elasticsearch.java_home>
@@ -448,14 +442,14 @@
             This requires to use a single destination file for ITs, because:
              - Integration tests cover code from other modules.
              - The Sonar plugin computes coverage when inspecting each module,
-               and by default only takes into account JaCoCo coverage files from the inspected module.
+               and by default only takes into account JaCoCo coverage reports from the inspected module.
                Thus it ignores some relevant ITs by default.
-             - Even when configured, the Sonar plugin only accept an *explicit* list of JaCoCo coverage files
+             - Even when configured, the Sonar plugin only accept an *explicit* list of JaCoCo coverage reports
                (no wildcards).
-               Thus we cannot easily configure the Sonar plugin to inspect JaCoCo coverage files from other modules,
-               unless we somehow aggregate all of the coverage data into a single, shared JaCoCo coverage file.
-            The chosen solution was to make the "reports" module invoke jacoco's "merge" goal
-            to merge the coverage files into a single file, and configure sonar to only inspect that file.
+               Thus we cannot easily configure the Sonar plugin to inspect JaCoCo coverage reports from other modules,
+               unless we somehow aggregate all of the coverage data into a single, shared JaCoCo coverage report.
+            The chosen solution was to make the "reports" module invoke jacoco's "report-aggregate" goal
+            to create a single aggregate report, and configure sonar to only inspect that file.
 
             Useful resources to understand what is going on (caution, not everything is up-to-date):
              - https://docs.sonarqube.org/display/SONAR/Analysis+Parameters
@@ -464,9 +458,10 @@
              - http://javamemento.blogspot.fr/2016/02/sonar-jacoco-maven-multi-module.html
              - https://github.com/SonarSource/sonar-scanning-examples/blob/master/sonarqube-scanner-maven/pom.xml
              - https://stackoverflow.com/a/49528226/6692043
-             - https://www.eclemma.org/jacoco/trunk/doc/merge-mojo.html
+             - https://www.eclemma.org/jacoco/trunk/doc/report-aggregate-mojo.html
+             - Not relevant anymore, but we used to merge *.exec files: https://www.eclemma.org/jacoco/trunk/doc/merge-mojo.html
          -->
-        <sonar.jacoco.reportPaths>${jacoco.mergedExecFilePath}</sonar.jacoco.reportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>${rootProject.directory}/reports/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <!--
             Exclude build code and integration tests defined in the main source (utils, Showcases, Backend TCK)
             from coverage computation.

@@ -145,24 +145,6 @@
                                     <goal>report-aggregate</goal>
                                 </goals>
                             </execution>
-                            <execution>
-                                <id>jacoco-create-merged-exec-file</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>merge</goal>
-                                </goals>
-                                <configuration>
-                                    <fileSets>
-                                        <fileSet>
-                                            <directory>${rootProject.directory}</directory>
-                                            <includes>
-                                                <include>**/target/jacoco*.exec</include>
-                                            </includes>
-                                        </fileSet>
-                                    </fileSets>
-                                    <destFile>${jacoco.mergedExecFilePath}</destFile>
-                                </configuration>
-                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
