@@ -6,12 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -20,13 +25,26 @@ import com.google.gson.JsonObject;
  */
 public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> {
 
-	protected ExplainWork(Builder builder) {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =
+			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
+
+	private final URLEncodedString indexName;
+	private final URLEncodedString id;
+
+	private ExplainWork(Builder builder) {
 		super( builder );
+		this.indexName = builder.indexName;
+		this.id = builder.id;
 	}
 
 	@Override
 	protected ExplainResult generateResult(ElasticsearchWorkExecutionContext context,
 			ElasticsearchResponse response) {
+		if ( response.getStatusCode() == 404 ) {
+			throw log.explainUnkownDocument( indexName, id );
+		}
 		JsonObject body = response.getBody();
 		return new ExplainResultImpl( body );
 	}
@@ -39,6 +57,8 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 		private final URLEncodedString id;
 		private final JsonObject payload;
 
+		private Set<String> routingKeys;
+
 		public static Builder forElasticsearch67AndBelow(URLEncodedString indexName, URLEncodedString typeName,
 				URLEncodedString id, JsonObject payload) {
 			return new Builder( indexName, typeName, id, payload );
@@ -50,11 +70,17 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 		}
 
 		private Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( null, SUCCESS_ASSESSOR );
 			this.indexName = indexName;
 			this.typeName = typeName;
 			this.id = id;
 			this.payload = payload;
+		}
+
+		@Override
+		public Builder routingKeys(Set<String> routingKeys) {
+			this.routingKeys = routingKeys;
+			return this;
 		}
 
 		@Override
@@ -66,6 +92,11 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 					.pathComponent( id )
 					.pathComponent( Paths._EXPLAIN )
 					.body( payload );
+
+			if ( !routingKeys.isEmpty() ) {
+				builder.multiValuedParam( "routing", routingKeys );
+			}
+
 			return builder.build();
 		}
 
@@ -79,7 +110,7 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 
 		private final JsonObject jsonObject;
 
-		public ExplainResultImpl(JsonObject jsonObject) {
+		private ExplainResultImpl(JsonObject jsonObject) {
 			super();
 			this.jsonObject = jsonObject;
 		}

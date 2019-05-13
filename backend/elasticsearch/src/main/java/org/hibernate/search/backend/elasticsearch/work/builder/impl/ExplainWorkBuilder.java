@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
 
@@ -13,5 +15,7 @@ import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult
  * @author Yoann Rodiere
  */
 public interface ExplainWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<ExplainResult>> {
+
+	ExplainWorkBuilder routingKeys(Set<String> routingKeys);
 
 }

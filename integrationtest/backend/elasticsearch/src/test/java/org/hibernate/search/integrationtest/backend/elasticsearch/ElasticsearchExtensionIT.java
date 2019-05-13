@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
@@ -39,6 +40,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -48,6 +50,7 @@ import org.junit.rules.ExpectedException;
 
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.HamcrestCondition;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -59,6 +62,7 @@ public class ElasticsearchExtensionIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
+	private static final String OTHER_INDEX_NAME = "OtherIndexName";
 
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
@@ -74,8 +78,11 @@ public class ElasticsearchExtensionIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private SearchIntegration integration;
+
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
+
+	private StubMappingIndexManager otherIndexManager;
 
 	@Before
 	public void setup() {
@@ -84,6 +91,11 @@ public class ElasticsearchExtensionIT {
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
+				)
+				.withIndex(
+						OTHER_INDEX_NAME,
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.otherIndexManager = indexManager
 				)
 				.setup();
 
@@ -160,6 +172,117 @@ public class ElasticsearchExtensionIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class );
+	}
+
+	@Test
+	public void query_explain_singleIndex() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
+				.asReference()
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		// Matching document
+		Assertions.assertThat( query.explain( FIRST_ID ) )
+				.contains( "\"description\":" )
+				.contains( "\"details\":" );
+
+		// Non-matching document
+		Assertions.assertThat( query.explain( FIFTH_ID ) )
+				.contains( "\"description\":" )
+				.contains( "\"details\":" );
+	}
+
+	@Test
+	public void query_explain_singleIndex_invalidId() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
+				.asReference()
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		// Non-existing document
+		SubTest.expectException(
+				() -> query.explain( "InvalidId" )
+		)
+				.assertThrown()
+				.has( new HamcrestCondition<>(
+						ExceptionMatcherBuilder.isException( SearchException.class )
+								.causedBy( SearchException.class )
+								.withMessage(
+										"Document with id 'InvalidId' does not exist in index '"
+												+ ElasticsearchIndexNameNormalizer.normalize( INDEX_NAME ) + "'"
+								)
+								.withMessage( "its match cannot be explained" )
+								.build()
+				) );
+	}
+
+	@Test
+	public void query_explain_multipleIndexes() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+
+		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
+				.asReference()
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		// Matching document
+		Assertions.assertThat( query.explain( INDEX_NAME, FIRST_ID ) )
+				.contains( "\"description\":" )
+				.contains( "\"details\":" );
+
+		// Non-matching document
+		Assertions.assertThat( query.explain( INDEX_NAME, FIFTH_ID ) )
+				.contains( "\"description\":" )
+				.contains( "\"details\":" );
+	}
+
+	@Test
+	public void query_explain_multipleIndexes_missingIndexName() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+
+		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
+				.asReference()
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		SubTest.expectException(
+				() -> query.explain( FIRST_ID )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple indexes" )
+				.hasMessageContaining(
+						"pass one of [" +
+						ElasticsearchIndexNameNormalizer.normalize( INDEX_NAME )
+						+ ", " + ElasticsearchIndexNameNormalizer.normalize( OTHER_INDEX_NAME )
+						+ "]"
+				);
+	}
+
+	@Test
+	public void query_explain_multipleIndexes_invalidIndexName() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+
+		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
+				.asReference()
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		SubTest.expectException(
+				() -> query.explain( "NotAnIndexName", FIRST_ID )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"index name 'notanindexname' is not among the indexes targeted by this query: ["
+						+ ElasticsearchIndexNameNormalizer.normalize( INDEX_NAME )
+						+ ", " + ElasticsearchIndexNameNormalizer.normalize( OTHER_INDEX_NAME )
+						+ "]"
+				);
 	}
 
 	@Test

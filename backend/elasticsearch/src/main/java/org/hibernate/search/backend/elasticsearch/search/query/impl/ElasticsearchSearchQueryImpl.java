@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
@@ -18,12 +21,15 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
+import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -33,6 +39,8 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, ElasticsearchSearchResult<H>>
 		implements ElasticsearchSearchQuery<H> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * ES default limit for (limit + offset); any search query beyond that limit will be rejected.
@@ -117,6 +125,34 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		return queryOrchestrator.submit( work ).join();
 	}
 
+	@Override
+	public String explain(String id) {
+		Contracts.assertNotNull( id, "id" );
+
+		Set<URLEncodedString> targetedIndexNames = searchContext.getIndexNames();
+		if ( targetedIndexNames.size() != 1 ) {
+			throw log.explainRequiresIndexName( targetedIndexNames );
+		}
+
+		return doExplain( targetedIndexNames.iterator().next(), id );
+	}
+
+	@Override
+	public String explain(String indexName, String id) {
+		Contracts.assertNotNull( indexName, "indexName" );
+		Contracts.assertNotNull( id, "id" );
+
+		Set<URLEncodedString> targetedIndexNames = searchContext.getIndexNames();
+		URLEncodedString encodedIndexName = URLEncodedString.fromString(
+				ElasticsearchIndexNameNormalizer.normalize( indexName )
+		);
+		if ( !targetedIndexNames.contains( encodedIndexName ) ) {
+			throw log.explainRequiresIndexTargetedByQuery( targetedIndexNames, encodedIndexName );
+		}
+
+		return doExplain( encodedIndexName, id );
+	}
+
 	private Long defaultedLimit(Long limit, Long offset) {
 		/*
 		 * If the user has given a 'size' value, take it as is, let ES itself complain if it's too high;
@@ -133,5 +169,18 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			}
 			return maxLimitThatElasticsearchWillAccept;
 		}
+	}
+
+	private String doExplain(URLEncodedString encodedIndexName, String id) {
+		URLEncodedString elasticsearchId = URLEncodedString.fromString(
+				searchContext.toElasticsearchId( sessionContext.getTenantIdentifier(), id )
+		);
+
+		ElasticsearchWork<ExplainResult> work = workFactory.explain( encodedIndexName, elasticsearchId, payload )
+				.routingKeys( routingKeys )
+				.build();
+
+		ExplainResult explainResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
+		return searchContext.getUserFacingGson().toJson( explainResult.getJsonObject() );
 	}
 }

@@ -11,6 +11,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -19,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManage
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -500,4 +502,17 @@ public interface Log extends BasicLogger {
 					+ " Declare the field as multi-valued in order to allow this."
 	)
 	SearchException multipleValuesForSingleValuedField(String absolutePath);
+
+	@Message(id = ID_OFFSET_3 + 64,
+			value = "explain(String id) cannot be used when the query targets multiple indexes."
+					+ " Use explain(String indexName, String id) and pass one of %1$s as the index name." )
+	SearchException explainRequiresIndexName(Set<URLEncodedString> targetedIndexNames);
+
+	@Message(id = ID_OFFSET_3 + 65,
+			value = "The given index name '%2$s' is not among the indexes targeted by this query: %1$s." )
+	SearchException explainRequiresIndexTargetedByQuery(Set<URLEncodedString> targetedIndexNames, URLEncodedString encodedIndexName);
+
+	@Message(id = ID_OFFSET_3 + 66,
+			value = "Document with id '%2$s' does not exist in index '%1$s' and thus its match cannot be explained." )
+	SearchException explainUnkownDocument(URLEncodedString indexName, URLEncodedString d);
 }
