@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.util.Set;
 
-import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
@@ -33,8 +32,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
-	private final Set<String> indexNames;
-	private final Set<ReaderProvider> readerProviders;
+	private final LuceneSearchContext searchContext;
 	private final SessionContextImplementor sessionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final Query luceneQuery;
@@ -43,15 +41,14 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final LuceneSearchResultExtractor<H> searchResultExtractor;
 
 	LuceneSearchQueryImpl(LuceneQueryWorkOrchestrator queryOrchestrator,
-			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
+			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Query luceneQuery, Sort luceneSort,
 			LuceneCollectorProvider luceneCollectorProvider, LuceneSearchResultExtractor<H> searchResultExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
-		this.indexNames = indexNames;
-		this.readerProviders = readerProviders;
+		this.searchContext = searchContext;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.luceneQuery = luceneQuery;
@@ -81,8 +78,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	public LuceneSearchResult<H> fetch(Long limit, Long offset) {
 		LuceneQueryWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
 				new LuceneSearcher<>(
-						indexNames,
-						readerProviders,
+						searchContext,
 						luceneQuery, luceneSort,
 						offset, limit,
 						luceneCollectorProvider, searchResultExtractor
@@ -103,8 +99,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	public long fetchTotalHitCount() {
 		LuceneQueryWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
 				new LuceneSearcher<>(
-						indexNames,
-						readerProviders,
+						searchContext,
 						luceneQuery, luceneSort,
 						0L, 0L,
 						// do not add any TopDocs collector

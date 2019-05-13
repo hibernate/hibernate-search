@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -75,19 +74,21 @@ public class SearchBackendContext {
 		return searchProjectionBackendContext;
 	}
 
-	ElasticsearchSearchContext createSearchContext(MappingContextImplementor mappingContext) {
-		return new ElasticsearchSearchContext( mappingContext, userFacingGson, multiTenancyStrategy );
+	ElasticsearchSearchContext createSearchContext(MappingContextImplementor mappingContext,
+			ElasticsearchSearchScopeModel scopeModel) {
+		return new ElasticsearchSearchContext( mappingContext, userFacingGson, multiTenancyStrategy, scopeModel );
 	}
 
 	<H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
-			Set<URLEncodedString> indexNames,
+			ElasticsearchSearchContext searchContext,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 		return new ElasticsearchSearchQueryBuilder<>(
-				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(), orchestrator, multiTenancyStrategy,
-				indexNames, sessionContext, loadingContextBuilder, rootProjection
+				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(),
+				orchestrator, multiTenancyStrategy,
+				searchContext, sessionContext, loadingContextBuilder, rootProjection
 		);
 	}
 

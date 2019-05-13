@@ -28,7 +28,9 @@ public class ElasticsearchIndexSearchScope
 			MappingContextImplementor mappingContext,
 			SearchBackendContext searchBackendContext,
 			ElasticsearchSearchScopeModel model) {
-		ElasticsearchSearchContext searchContext = searchBackendContext.createSearchContext( mappingContext );
+		ElasticsearchSearchContext searchContext = searchBackendContext.createSearchContext(
+				mappingContext, model
+		);
 		this.model = model;
 		this.searchPredicateFactory = new ElasticsearchSearchPredicateBuilderFactoryImpl( searchContext, model );
 		this.searchSortFactory = new ElasticsearchSearchSortBuilderFactoryImpl( searchContext, model );
@@ -36,8 +38,10 @@ public class ElasticsearchIndexSearchScope
 				searchBackendContext.getSearchProjectionBackendContext(),
 				model
 		);
-		this.searchQueryFactory = new ElasticsearchSearchQueryBuilderFactory( searchBackendContext, model,
-				this.searchProjectionFactory );
+		this.searchQueryFactory = new ElasticsearchSearchQueryBuilderFactory(
+				searchBackendContext, searchContext,
+				this.searchProjectionFactory
+		);
 	}
 
 	@Override

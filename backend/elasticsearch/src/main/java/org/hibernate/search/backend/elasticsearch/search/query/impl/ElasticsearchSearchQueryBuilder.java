@@ -11,11 +11,11 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -34,7 +34,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
-	private final Set<URLEncodedString> indexNames;
+	private final ElasticsearchSearchContext searchContext;
 	private final SessionContextImplementor sessionContext;
 	private final Set<String> routingKeys;
 
@@ -47,7 +47,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			MultiTenancyStrategy multiTenancyStrategy,
-			Set<URLEncodedString> indexNames,
+			ElasticsearchSearchContext searchContext,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {
@@ -56,7 +56,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		this.queryOrchestrator = queryOrchestrator;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
-		this.indexNames = indexNames;
+		this.searchContext = searchContext;
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
@@ -104,7 +104,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 		return new ElasticsearchSearchQueryImpl<>(
 				workFactory, queryOrchestrator,
-				indexNames, sessionContext, loadingContext, routingKeys,
+				searchContext, sessionContext, loadingContext, routingKeys,
 				payload,
 				searchResultExtractor
 		);

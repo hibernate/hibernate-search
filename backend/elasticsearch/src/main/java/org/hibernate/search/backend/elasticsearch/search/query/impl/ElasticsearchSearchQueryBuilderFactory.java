@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchCompositeListProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchEntityProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchReferenceProjection;
@@ -27,14 +27,14 @@ public class ElasticsearchSearchQueryBuilderFactory
 
 	private final SearchBackendContext searchBackendContext;
 
-	private final ElasticsearchSearchScopeModel scopeModel;
+	private final ElasticsearchSearchContext searchContext;
 
 	private final ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory;
 
-	ElasticsearchSearchQueryBuilderFactory(SearchBackendContext searchBackendContext, ElasticsearchSearchScopeModel scopeModel,
+	ElasticsearchSearchQueryBuilderFactory(SearchBackendContext searchBackendContext, ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
-		this.scopeModel = scopeModel;
+		this.searchContext = searchContext;
 		this.searchProjectionFactory = searchProjectionFactory;
 	}
 
@@ -87,7 +87,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
-				scopeModel.getElasticsearchIndexNames(),
+				searchContext,
 				sessionContext,
 				loadingContextBuilder, rootProjection
 		);

@@ -10,9 +10,11 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -46,12 +48,15 @@ public class SearchBackendContext {
 		return eventContext;
 	}
 
-	public LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
-		return analysisDefinitionRegistry;
+	LuceneSearchContext createSearchContext(MappingContextImplementor mappingContext,
+			LuceneSearchScopeModel scopeModel) {
+		return new LuceneSearchContext(
+				mappingContext, analysisDefinitionRegistry, multiTenancyStrategy, scopeModel
+		);
 	}
 
 	<H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
-			LuceneSearchScopeModel scopeModel,
+			LuceneSearchContext searchContext,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
@@ -63,8 +68,7 @@ public class SearchBackendContext {
 		return new LuceneSearchQueryBuilder<>(
 				workFactory,
 				orchestrator,
-				multiTenancyStrategy,
-				scopeModel,
+				searchContext,
 				sessionContext,
 				storedFieldFilterBuilder.build(),
 				loadingContextBuilder,

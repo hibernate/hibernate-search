@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,9 +36,10 @@ public class ElasticsearchSearchScopeModel {
 		this.hibernateSearchIndexNames = indexModels.stream()
 				.map( ElasticsearchIndexModel::getHibernateSearchIndexName )
 				.collect( Collectors.toSet() );
+		// Use LinkedHashSet to ensure stable order when generating requests
 		this.elasticsearchIndexNames = indexModels.stream()
 				.map( ElasticsearchIndexModel::getElasticsearchIndexName )
-				.collect( Collectors.toSet() );
+				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 	}
 
 	public Set<String> getHibernateSearchIndexNames() {

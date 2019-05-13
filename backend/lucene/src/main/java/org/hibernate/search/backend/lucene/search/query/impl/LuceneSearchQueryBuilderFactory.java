@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneCompositeListProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
@@ -27,15 +27,15 @@ public class LuceneSearchQueryBuilderFactory
 
 	private final SearchBackendContext searchBackendContext;
 
-	private final LuceneSearchScopeModel scopeModel;
+	private final LuceneSearchContext searchContext;
 
 	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 
 	LuceneSearchQueryBuilderFactory(SearchBackendContext searchBackendContext,
-			LuceneSearchScopeModel scopeModel,
+			LuceneSearchContext searchContext,
 			LuceneSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
-		this.scopeModel = scopeModel;
+		this.searchContext = searchContext;
 		this.searchProjectionFactory = searchProjectionFactory;
 	}
 
@@ -80,7 +80,7 @@ public class LuceneSearchQueryBuilderFactory
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
-				scopeModel, sessionContext, loadingContextBuilder, rootProjection
+				searchContext, sessionContext, loadingContextBuilder, rootProjection
 		);
 	}
 }

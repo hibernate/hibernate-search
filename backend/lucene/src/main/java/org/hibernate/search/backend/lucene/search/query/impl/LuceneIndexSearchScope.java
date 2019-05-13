@@ -30,12 +30,12 @@ public class LuceneIndexSearchScope
 	public LuceneIndexSearchScope(SearchBackendContext searchBackendContext,
 			MappingContextImplementor mappingContext,
 			LuceneSearchScopeModel model) {
-		LuceneSearchContext searchContext = new LuceneSearchContext( mappingContext, searchBackendContext.getAnalysisDefinitionRegistry() );
+		LuceneSearchContext searchContext = searchBackendContext.createSearchContext( mappingContext, model );
 		this.model = model;
 		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchContext, model );
 		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( searchContext, model );
 		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( model );
-		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( searchBackendContext, model, this.searchProjectionFactory );
+		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( searchBackendContext, searchContext, this.searchProjectionFactory );
 	}
 
 	@Override

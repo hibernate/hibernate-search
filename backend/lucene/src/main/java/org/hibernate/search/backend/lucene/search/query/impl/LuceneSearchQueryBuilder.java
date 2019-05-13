@@ -8,12 +8,11 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
-import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
@@ -26,9 +25,8 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 
 	private final LuceneWorkFactory workFactory;
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
-	private final MultiTenancyStrategy multiTenancyStrategy;
 
-	private final LuceneSearchScopeModel scopeModel;
+	private final LuceneSearchContext searchContext;
 	private final SessionContextImplementor sessionContext;
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
@@ -39,17 +37,15 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 	LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
 			LuceneQueryWorkOrchestrator queryOrchestrator,
-			MultiTenancyStrategy multiTenancyStrategy,
-			LuceneSearchScopeModel scopeModel,
+			LuceneSearchContext searchContext,
 			SessionContextImplementor sessionContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
-		this.multiTenancyStrategy = multiTenancyStrategy;
 
-		this.scopeModel = scopeModel;
+		this.searchContext = searchContext;
 		this.sessionContext = sessionContext;
 
 		this.elementCollector = new LuceneSearchQueryElementCollector();
@@ -83,9 +79,10 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 
 		return new LuceneSearchQueryImpl<>(
 				queryOrchestrator, workFactory,
-				scopeModel.getIndexNames(), scopeModel.getReaderProviders(),
+				searchContext,
 				sessionContext,
-				loadingContext, multiTenancyStrategy.decorateLuceneQuery( luceneQueryBuilder.build(), sessionContext.getTenantIdentifier() ),
+				loadingContext,
+				searchContext.decorateLuceneQuery( luceneQueryBuilder.build(), sessionContext.getTenantIdentifier() ),
 				elementCollector.toLuceneSort(),
 				rootProjection, searchResultExtractor
 		);

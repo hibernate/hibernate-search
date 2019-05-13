@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -38,16 +39,15 @@ public class LuceneSearcher<H> implements AutoCloseable {
 	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final LuceneSearchResultExtractor<H> searchResultExtractor;
 
-	public LuceneSearcher(Set<String> indexNames,
-			Set<ReaderProvider> readerProviders,
+	public LuceneSearcher(LuceneSearchContext searchContext,
 			Query luceneQuery,
 			Sort luceneSort,
 			Long offset,
 			Long limit,
 			LuceneCollectorProvider luceneCollectorProvider,
 			LuceneSearchResultExtractor<H> searchResultExtractor) {
-		this.indexNames = indexNames;
-		this.indexSearcher = new IndexSearcher( MultiReaderFactory.openReader( indexNames, readerProviders ) );
+		this.indexNames = searchContext.getIndexNames();
+		this.indexSearcher = new IndexSearcher( MultiReaderFactory.openReader( indexNames, searchContext.getReaderProviders() ) );
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
 		this.offset = offset == null ? 0L : offset;

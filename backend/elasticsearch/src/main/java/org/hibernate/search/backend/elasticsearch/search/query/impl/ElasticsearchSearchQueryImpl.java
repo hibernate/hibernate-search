@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -40,7 +41,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
-	private final Set<URLEncodedString> indexNames;
+	private final ElasticsearchSearchContext searchContext;
 	private final SessionContextImplementor sessionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
@@ -49,14 +50,14 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
-			Set<URLEncodedString> indexNames,
+			ElasticsearchSearchContext searchContext,
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<H> searchResultExtractor) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
-		this.indexNames = indexNames;
+		this.searchContext = searchContext;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.routingKeys = routingKeys;
@@ -85,9 +86,10 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public ElasticsearchSearchResult<H> fetch(Long limit, Long offset) {
 		// TODO restore scrolling support. See HSEARCH-3323
 		ElasticsearchWork<ElasticsearchLoadableSearchResult<H>> work = workFactory.search( payload, searchResultExtractor )
-				.indexes( indexNames )
+				.indexes( searchContext.getIndexNames() )
 				.paging( defaultedLimit( limit, offset ), offset )
-				.routingKeys( routingKeys ).build();
+				.routingKeys( routingKeys )
+				.build();
 
 		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) )
 				/*
@@ -108,7 +110,10 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			filteredPayload.add( "query", querySubTree.get() );
 		}
 
-		ElasticsearchWork<Long> work = workFactory.count( indexNames ).query( filteredPayload ).routingKeys( routingKeys ).build();
+		ElasticsearchWork<Long> work = workFactory.count( searchContext.getIndexNames() )
+				.query( filteredPayload )
+				.routingKeys( routingKeys )
+				.build();
 		return queryOrchestrator.submit( work ).join();
 	}
 
