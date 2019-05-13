@@ -271,7 +271,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						propertyMetadataBuilder.getResultReference(),
 						fieldPath, Store.YES, index, termVector
 						)
@@ -361,7 +361,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				reflectionManager.toClass( member.getType() ) );
 
 		DocumentFieldMetadata.Builder idMetadataBuilder = new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						propertyMetadataBuilder.getResultReference(),
 						fieldPath,
 						Store.YES,
@@ -469,7 +469,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						propertyMetadataBuilder.getResultReference(),
 						fieldPath,
 						Store.YES,
@@ -744,7 +744,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						BackReference.<PropertyMetadata>empty(), // Class bridge, there's no related property
 						fieldPath, store, index, termVector
 				)
@@ -798,7 +798,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						propertyMetadataBuilder.getResultReference(),
 						fieldPath, store, index, termVector
 				)
@@ -849,7 +849,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						BackReference.<PropertyMetadata>empty(), // Class-level spatial annotation, there's no related property
 						fieldPath, store, index, termVector
 				)
@@ -1326,7 +1326,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		// also numeric values don't need to be analyzed and norms are omitted (see also org.apache.lucene.document.LongField)
 		if ( isNumericField( numericFieldAnnotation, fieldBridge ) ) {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
-					typeMetadataBuilder.getResultReference(),
+					typeMetadataBuilder,
 					propertyMetadataBuilder.getResultReference(),
 					fieldPath,
 					store,
@@ -1342,7 +1342,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		else {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
-					typeMetadataBuilder.getResultReference(),
+					typeMetadataBuilder,
 					propertyMetadataBuilder.getResultReference(),
 					fieldPath,
 					store,
