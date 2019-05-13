@@ -29,6 +29,7 @@ import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.Numer
  */
 @SuppressWarnings("deprecation")
 public class DocumentFieldMetadata {
+	private final Class<?> sourceTypeIdentifier;
 	private final BackReference<TypeMetadata> sourceType;
 	private final BackReference<PropertyMetadata> sourceProperty;
 
@@ -57,6 +58,7 @@ public class DocumentFieldMetadata {
 	private final Map<String, BridgeDefinedField> bridgeDefinedFields;
 
 	private DocumentFieldMetadata(Builder builder) {
+		this.sourceTypeIdentifier = builder.sourceTypeIdentifier;
 		this.sourceType = builder.sourceType;
 		this.sourceProperty = builder.sourceProperty;
 
@@ -76,6 +78,14 @@ public class DocumentFieldMetadata {
 		this.numericEncodingType = builder.numericEncodingType;
 		this.facetMetadata = Collections.unmodifiableSet( builder.facetMetadata );
 		this.bridgeDefinedFields = Collections.unmodifiableMap( builder.bridgeDefinedFields );
+	}
+
+
+	/**
+	 * @return Equivalent to {@code getSourceType().getType()}, but can be called during metadata building.
+	 */
+	Class<?> getSourceTypeIdentifier() {
+		return sourceTypeIdentifier;
 	}
 
 	/**
@@ -200,6 +210,7 @@ public class DocumentFieldMetadata {
 		protected final BackReference<DocumentFieldMetadata> resultReference = new BackReference<>();
 
 		// required parameters
+		private final Class<?> sourceTypeIdentifier;
 		private final BackReference<TypeMetadata> sourceType;
 		private final BackReference<PropertyMetadata> sourceProperty;
 		private final DocumentFieldPath path;
@@ -221,13 +232,20 @@ public class DocumentFieldMetadata {
 		private NullMarkerCodec nullMarkerCodec = NotEncodingCodec.SINGLETON;
 		private final Map<String, BridgeDefinedField> bridgeDefinedFields;
 
-		public Builder(BackReference<TypeMetadata> sourceType,
+		public Builder(TypeMetadata.Builder typeMetadataBuilder,
 				BackReference<PropertyMetadata> sourceProperty,
 				DocumentFieldPath path,
 				Store store,
 				Field.Index index,
 				Field.TermVector termVector) {
-			this.sourceType = sourceType;
+			if ( typeMetadataBuilder != null ) {
+				this.sourceTypeIdentifier = typeMetadataBuilder.getIndexedType();
+				this.sourceType = typeMetadataBuilder.getResultReference();
+			}
+			else {
+				this.sourceTypeIdentifier = null;
+				this.sourceType = BackReference.<TypeMetadata>empty();
+			}
 			this.sourceProperty = sourceProperty;
 			this.path = path;
 			this.store = store;
