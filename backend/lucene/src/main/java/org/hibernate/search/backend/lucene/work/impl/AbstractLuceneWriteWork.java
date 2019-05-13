@@ -12,13 +12,13 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 /**
  * @author Guillaume Smet
  */
-public abstract class AbstractLuceneWork<T> implements LuceneIndexWork<T> {
+public abstract class AbstractLuceneWriteWork<T> implements LuceneWriteWork<T> {
 
 	protected final String workType;
 
 	protected final String indexName;
 
-	public AbstractLuceneWork(String workType, String indexName) {
+	public AbstractLuceneWriteWork(String workType, String indexName) {
 		this.workType = workType;
 		this.indexName = indexName;
 	}

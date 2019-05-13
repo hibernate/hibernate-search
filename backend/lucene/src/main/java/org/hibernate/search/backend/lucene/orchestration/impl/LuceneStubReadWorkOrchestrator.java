@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
-import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -20,12 +20,12 @@ import org.hibernate.search.util.common.impl.Throwables;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class LuceneStubQueryWorkOrchestrator implements LuceneQueryWorkOrchestrator {
+public class LuceneStubReadWorkOrchestrator implements LuceneReadWorkOrchestrator {
 
 	// Protected by synchronization on updates
 	private CompletableFuture<?> latestFuture = CompletableFuture.completedFuture( null );
 
-	public LuceneStubQueryWorkOrchestrator() {
+	public LuceneStubReadWorkOrchestrator() {
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class LuceneStubQueryWorkOrchestrator implements LuceneQueryWorkOrchestra
 
 	@Override
 	public synchronized <T> CompletableFuture<T> submit(Set<String> indexNames, Set<ReaderProvider> readerProviders,
-			LuceneQueryWork<T> work) {
+			LuceneReadWork<T> work) {
 		CompletableFuture<T> future = latestFuture.thenCompose( Futures.safeComposer(
 				ignored -> {
 					LuceneStubQueryWorkExecutionContext context =

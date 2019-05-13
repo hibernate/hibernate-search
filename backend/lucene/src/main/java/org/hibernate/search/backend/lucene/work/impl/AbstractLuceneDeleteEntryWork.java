@@ -18,7 +18,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public abstract class AbstractLuceneDeleteEntryWork extends AbstractLuceneWork<Long> {
+public abstract class AbstractLuceneDeleteEntryWork extends AbstractLuceneWriteWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -33,7 +33,7 @@ public abstract class AbstractLuceneDeleteEntryWork extends AbstractLuceneWork<L
 	}
 
 	@Override
-	public CompletableFuture<Long> execute(LuceneIndexWorkExecutionContext context) {
+	public CompletableFuture<Long> execute(LuceneWriteWorkExecutionContext context) {
 		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
 		return Futures.create( () -> CompletableFuture.completedFuture( deleteDocuments( context.getIndexWriter() ) ) );
 	}

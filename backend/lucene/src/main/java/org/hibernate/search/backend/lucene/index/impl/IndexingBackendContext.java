@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -51,7 +51,7 @@ public class IndexingBackendContext {
 	}
 
 	IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(
-			LuceneIndexWorkOrchestrator orchestrator,
+			LuceneWriteWorkOrchestrator orchestrator,
 			String indexName, SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
@@ -60,7 +60,7 @@ public class IndexingBackendContext {
 	}
 
 	IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
-			LuceneIndexWorkOrchestrator orchestrator,
+			LuceneWriteWorkOrchestrator orchestrator,
 			String indexName, SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
@@ -68,7 +68,7 @@ public class IndexingBackendContext {
 				indexName, sessionContext );
 	}
 
-	public IndexWorkExecutor createWorkExecutor(LuceneIndexWorkOrchestrator orchestrator, String indexName) {
+	IndexWorkExecutor createWorkExecutor(LuceneWriteWorkOrchestrator orchestrator, String indexName) {
 		return new LuceneIndexWorkExecutor( workFactory, multiTenancyStrategy, orchestrator, indexName, eventContext );
 	}
 }

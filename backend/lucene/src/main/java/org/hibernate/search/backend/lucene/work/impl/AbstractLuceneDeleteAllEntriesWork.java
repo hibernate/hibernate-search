@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexWriter;
 
-public abstract class AbstractLuceneDeleteAllEntriesWork extends AbstractLuceneWork<Long> {
+public abstract class AbstractLuceneDeleteAllEntriesWork extends AbstractLuceneWriteWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -28,7 +28,7 @@ public abstract class AbstractLuceneDeleteAllEntriesWork extends AbstractLuceneW
 	}
 
 	@Override
-	public CompletableFuture<Long> execute(LuceneIndexWorkExecutionContext context) {
+	public CompletableFuture<Long> execute(LuceneWriteWorkExecutionContext context) {
 		return Futures.create( () -> CompletableFuture.completedFuture( deleteDocuments( context.getIndexWriter() ) ) );
 	}
 

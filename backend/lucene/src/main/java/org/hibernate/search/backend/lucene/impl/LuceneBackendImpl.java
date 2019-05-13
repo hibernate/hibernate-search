@@ -21,8 +21,8 @@ import org.hibernate.search.backend.lucene.index.impl.IndexingBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubQueryWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -47,7 +47,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-	private final LuceneQueryWorkOrchestrator queryOrchestrator;
+	private final LuceneReadWorkOrchestrator queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final EventContext eventContext;
@@ -62,7 +62,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 
-		this.queryOrchestrator = new LuceneStubQueryWorkOrchestrator();
+		this.queryOrchestrator = new LuceneStubReadWorkOrchestrator();
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		this.eventContext = EventContexts.fromBackendName( name );
@@ -126,7 +126,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( LuceneQueryWorkOrchestrator::close, queryOrchestrator );
+			closer.push( LuceneReadWorkOrchestrator::close, queryOrchestrator );
 		}
 	}
 

@@ -18,16 +18,16 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneFlushIndexWork extends AbstractLuceneWork<Void> {
+public class LuceneFlushWork extends AbstractLuceneWriteWork<Void> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public LuceneFlushIndexWork(String indexName) {
+	public LuceneFlushWork(String indexName) {
 		super( "flushIndex", indexName );
 	}
 
 	@Override
-	public CompletableFuture<Void> execute(LuceneIndexWorkExecutionContext context) {
+	public CompletableFuture<Void> execute(LuceneWriteWorkExecutionContext context) {
 		return Futures.create( () -> CompletableFuture.completedFuture( null ).thenRun( () -> flushIndex( context.getIndexWriter() ) ) );
 	}
 

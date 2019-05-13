@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
-import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 
 /**
  * @author Guillaume Smet
  */
-public interface LuceneQueryWorkOrchestrator extends AutoCloseable {
+public interface LuceneWriteWorkOrchestrator extends AutoCloseable {
 
-	<T> CompletableFuture<T> submit(Set<String> indexNames, Set<ReaderProvider> readerProviders,
-			LuceneQueryWork<T> work);
+	<T> CompletableFuture<T> submit(LuceneWriteWork<T> work);
+
+	CompletableFuture<?> submit(List<LuceneWriteWork<?>> work);
 
 	@Override
 	default void close() {

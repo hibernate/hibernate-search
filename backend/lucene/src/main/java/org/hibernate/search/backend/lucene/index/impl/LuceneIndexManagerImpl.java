@@ -21,8 +21,8 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuild
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubIndexWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -52,8 +52,8 @@ class LuceneIndexManagerImpl
 	private final String indexName;
 	private final LuceneIndexModel model;
 
-	private final LuceneIndexWorkOrchestrator serialOrchestrator;
-	private final LuceneIndexWorkOrchestrator parallelOrchestrator;
+	private final LuceneWriteWorkOrchestrator serialOrchestrator;
+	private final LuceneWriteWorkOrchestrator parallelOrchestrator;
 	private final IndexWriter indexWriter;
 
 	LuceneIndexManagerImpl(IndexingBackendContext indexingBackendContext,
@@ -66,8 +66,8 @@ class LuceneIndexManagerImpl
 		this.indexName = indexName;
 		this.model = model;
 
-		this.serialOrchestrator = new LuceneStubIndexWorkOrchestrator( indexWriter );
-		this.parallelOrchestrator = new LuceneStubIndexWorkOrchestrator( indexWriter );
+		this.serialOrchestrator = new LuceneStubWriteWorkOrchestrator( indexWriter );
+		this.parallelOrchestrator = new LuceneStubWriteWorkOrchestrator( indexWriter );
 		this.indexWriter = indexWriter;
 	}
 
@@ -126,8 +126,8 @@ class LuceneIndexManagerImpl
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( LuceneIndexWorkOrchestrator::close, serialOrchestrator );
-			closer.push( LuceneIndexWorkOrchestrator::close, parallelOrchestrator );
+			closer.push( LuceneWriteWorkOrchestrator::close, serialOrchestrator );
+			closer.push( LuceneWriteWorkOrchestrator::close, parallelOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
 			closer.push( IndexWriter::close, indexWriter );
 			closer.push( LuceneIndexModel::close, model );

@@ -18,16 +18,16 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneOptimizeIndexWork extends AbstractLuceneWork<Long> {
+public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public LuceneOptimizeIndexWork(String indexName) {
+	public LuceneOptimizeWork(String indexName) {
 		super( "optimizeIndex", indexName );
 	}
 
 	@Override
-	public CompletableFuture<Long> execute(LuceneIndexWorkExecutionContext context) {
+	public CompletableFuture<Long> execute(LuceneWriteWorkExecutionContext context) {
 		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
 		return Futures.create( () -> commitIndex( context.getIndexWriter() ) );
 	}

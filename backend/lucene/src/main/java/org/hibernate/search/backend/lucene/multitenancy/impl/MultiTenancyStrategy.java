@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneDeleteAllEntriesWork;
 import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneDeleteEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneUpdateEntryWork;
-import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
@@ -53,32 +53,32 @@ public interface MultiTenancyStrategy {
 	void checkTenantId(String tenantId, EventContext backendContext);
 
 	/**
-	 * Creates the according update {@link LuceneIndexWork}.
+	 * Creates the according update {@link LuceneWriteWork}.
 	 *
 	 * @param indexName The index name.
 	 * @param tenantId The tenant id.
 	 * @param id The document id.
 	 * @param indexEntry The index entry.
-	 * @return The update {@link LuceneIndexWork}.
+	 * @return The update {@link LuceneWriteWork}.
 	 */
 	AbstractLuceneUpdateEntryWork createUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry);
 
 	/**
-	 * Creates the according delete {@link LuceneIndexWork}.
+	 * Creates the according delete {@link LuceneWriteWork}.
 	 *
 	 * @param indexName The index name.
 	 * @param tenantId The tenant id.
 	 * @param id The document id.
-	 * @return The delete {@link LuceneIndexWork}.
+	 * @return The delete {@link LuceneWriteWork}.
 	 */
 	AbstractLuceneDeleteEntryWork createDeleteEntryLuceneWork(String indexName, String tenantId, String id);
 
 	/**
-	 * Creates the according delete {@link LuceneIndexWork}, for deleting all documents.
+	 * Creates the according delete {@link LuceneWriteWork}, for deleting all documents.
 	 *
 	 * @param indexName The index name.
 	 * @param tenantId The tenant id.
-	 * @return The delete {@link LuceneIndexWork}.
+	 * @return The delete {@link LuceneWriteWork}.
 	 */
 	AbstractLuceneDeleteAllEntriesWork createDeleteAllEntriesLuceneWork(String indexName, String tenantId);
 }

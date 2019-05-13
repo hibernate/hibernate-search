@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * @author Guillaume Smet
  */
-public interface LuceneQueryWork<T> {
+public interface LuceneReadWork<T> {
 
 	CompletableFuture<T> execute(LuceneQueryWorkExecutionContext context);
 

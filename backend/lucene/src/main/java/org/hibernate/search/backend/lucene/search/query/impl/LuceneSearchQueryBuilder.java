@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, LuceneSearchQueryElementCollector> {
 
 	private final LuceneWorkFactory workFactory;
-	private final LuceneQueryWorkOrchestrator queryOrchestrator;
+	private final LuceneReadWorkOrchestrator queryOrchestrator;
 
 	private final LuceneSearchContext searchContext;
 	private final SessionContextImplementor sessionContext;
@@ -36,7 +36,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 
 	LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
-			LuceneQueryWorkOrchestrator queryOrchestrator,
+			LuceneReadWorkOrchestrator queryOrchestrator,
 			LuceneSearchContext searchContext,
 			SessionContextImplementor sessionContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,

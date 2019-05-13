@@ -11,7 +11,7 @@ import org.apache.lucene.index.IndexWriter;
 /**
  * @author Guillaume Smet
  */
-public interface LuceneIndexWorkExecutionContext {
+public interface LuceneWriteWorkExecutionContext {
 
 	IndexWriter getIndexWriter();
 }

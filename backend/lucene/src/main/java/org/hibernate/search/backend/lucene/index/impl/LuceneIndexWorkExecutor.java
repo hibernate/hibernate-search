@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -18,11 +18,11 @@ class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 
 	private final LuceneWorkFactory factory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final LuceneIndexWorkOrchestrator orchestrator;
+	private final LuceneWriteWorkOrchestrator orchestrator;
 	private final String indexName;
 	private final EventContext eventContext;
 
-	LuceneIndexWorkExecutor(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy, LuceneIndexWorkOrchestrator orchestrator, String indexName,
+	LuceneIndexWorkExecutor(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy, LuceneWriteWorkOrchestrator orchestrator, String indexName,
 			EventContext eventContext) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;

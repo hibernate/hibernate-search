@@ -7,12 +7,12 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
-import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -31,7 +31,7 @@ import org.apache.lucene.search.Sort;
 public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearchResult<H>>
 		implements LuceneSearchQuery<H> {
 
-	private final LuceneQueryWorkOrchestrator queryOrchestrator;
+	private final LuceneReadWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSearchContext searchContext;
 	private final SessionContextImplementor sessionContext;
@@ -41,7 +41,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final LuceneSearchResultExtractor<H> searchResultExtractor;
 
-	LuceneSearchQueryImpl(LuceneQueryWorkOrchestrator queryOrchestrator,
+	LuceneSearchQueryImpl(LuceneReadWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
@@ -77,7 +77,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public LuceneSearchResult<H> fetch(Long limit, Long offset) {
-		LuceneQueryWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
+		LuceneReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
 				searchContext.getIndexNames(), luceneQuery, luceneSort,
 				offset, limit,
 				luceneCollectorProvider, searchResultExtractor
@@ -97,7 +97,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public long fetchTotalHitCount() {
-		LuceneQueryWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
+		LuceneReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
 				searchContext.getIndexNames(), luceneQuery, luceneSort,
 				0L, 0L,
 				// do not add any TopDocs collector

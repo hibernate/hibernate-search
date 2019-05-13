@@ -21,22 +21,22 @@ import org.apache.lucene.search.Sort;
  */
 public interface LuceneWorkFactory {
 
-	LuceneIndexWork<?> add(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry);
+	LuceneWriteWork<?> add(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry);
 
-	LuceneIndexWork<?> update(String indexName, String tenantId, String id, String routingKey,
+	LuceneWriteWork<?> update(String indexName, String tenantId, String id, String routingKey,
 			LuceneIndexEntry indexEntry);
 
-	LuceneIndexWork<?> delete(String indexName, String tenantId, String id, String routingKey);
+	LuceneWriteWork<?> delete(String indexName, String tenantId, String id, String routingKey);
 
-	LuceneIndexWork<?> deleteAll(String indexName, String tenantId);
+	LuceneWriteWork<?> deleteAll(String indexName, String tenantId);
 
-	LuceneIndexWork<?> commit(String indexName);
+	LuceneWriteWork<?> commit(String indexName);
 
-	LuceneIndexWork<?> flush(String indexName);
+	LuceneWriteWork<?> flush(String indexName);
 
-	LuceneIndexWork<?> optimize(String indexName);
+	LuceneWriteWork<?> optimize(String indexName);
 
-	<H> LuceneQueryWork<LuceneLoadableSearchResult<H>> search(
+	<H> LuceneReadWork<LuceneLoadableSearchResult<H>> search(
 			Set<String> indexNames, Query luceneQuery, Sort luceneSort,
 			Long offset, Long limit,
 			LuceneCollectorProvider luceneCollectorProvider,
