@@ -6,8 +6,15 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneLoadableSearchResult;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchResultExtractor;
+
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
 
 /**
  * @author Guillaume Smet
@@ -29,5 +36,9 @@ public interface LuceneWorkFactory {
 
 	LuceneIndexWork<?> optimize(String indexName);
 
-	<H> LuceneExecuteQueryWork<H> search(LuceneSearcher<H> luceneSearcher);
+	<H> LuceneQueryWork<LuceneLoadableSearchResult<H>> search(
+			Set<String> indexNames, Query luceneQuery, Sort luceneSort,
+			Long offset, Long limit,
+			LuceneCollectorProvider luceneCollectorProvider,
+			LuceneSearchResultExtractor<H> searchResultExtractor);
 }

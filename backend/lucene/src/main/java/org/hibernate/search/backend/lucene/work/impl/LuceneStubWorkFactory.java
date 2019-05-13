@@ -6,9 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneLoadableSearchResult;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchResultExtractor;
+
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
 
 
 /**
@@ -59,7 +66,15 @@ public class LuceneStubWorkFactory implements LuceneWorkFactory {
 	}
 
 	@Override
-	public <H> LuceneExecuteQueryWork<H> search(LuceneSearcher<H> luceneSearcher) {
-		return new LuceneExecuteQueryWork<>( luceneSearcher );
+	public <H> LuceneQueryWork<LuceneLoadableSearchResult<H>> search(Set<String> indexNames, Query luceneQuery, Sort luceneSort,
+			Long offset, Long limit,
+			LuceneCollectorProvider luceneCollectorProvider,
+			LuceneSearchResultExtractor<H> searchResultExtractor) {
+		return new LuceneSearchWork<>(
+				indexNames, luceneQuery, luceneSort,
+				offset, limit,
+				luceneCollectorProvider,
+				searchResultExtractor
+		);
 	}
 }

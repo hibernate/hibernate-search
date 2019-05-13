@@ -78,14 +78,13 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	@Override
 	public LuceneSearchResult<H> fetch(Long limit, Long offset) {
 		LuceneQueryWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
-				new LuceneSearcher<>(
-						searchContext,
-						luceneQuery, luceneSort,
-						offset, limit,
-						luceneCollectorProvider, searchResultExtractor
-				)
+				searchContext.getIndexNames(), luceneQuery, luceneSort,
+				offset, limit,
+				luceneCollectorProvider, searchResultExtractor
 		);
-		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) )
+		return Futures.unwrappedExceptionJoin(
+				queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
+		)
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async processing, we will have to add a loadAsync method here,
@@ -99,15 +98,15 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	@Override
 	public long fetchTotalHitCount() {
 		LuceneQueryWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
-				new LuceneSearcher<>(
-						searchContext,
-						luceneQuery, luceneSort,
-						0L, 0L,
-						// do not add any TopDocs collector
-						( luceneCollectorBuilder -> { } ),
-						searchResultExtractor
-				)
+				searchContext.getIndexNames(), luceneQuery, luceneSort,
+				0L, 0L,
+				// do not add any TopDocs collector
+				( luceneCollectorBuilder -> { } ),
+				searchResultExtractor
 		);
-		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) ).getHitCount();
+		return Futures.unwrappedExceptionJoin(
+				queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
+		)
+				.getHitCount();
 	}
 }

@@ -6,8 +6,17 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
+import org.hibernate.search.util.common.reporting.EventContext;
+
+import org.apache.lucene.index.IndexReader;
+
 /**
  * @author Guillaume Smet
  */
 public interface LuceneQueryWorkExecutionContext {
+
+	IndexReader getIndexReader();
+
+	EventContext getEventContext();
+
 }

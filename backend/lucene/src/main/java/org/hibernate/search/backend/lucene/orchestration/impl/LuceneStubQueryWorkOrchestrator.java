@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.impl.Throwables;
 
 
 /**
@@ -19,13 +22,10 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 public class LuceneStubQueryWorkOrchestrator implements LuceneQueryWorkOrchestrator {
 
-	private final LuceneStubQueryWorkExecutionContext context;
-
 	// Protected by synchronization on updates
 	private CompletableFuture<?> latestFuture = CompletableFuture.completedFuture( null );
 
 	public LuceneStubQueryWorkOrchestrator() {
-		this.context = new LuceneStubQueryWorkExecutionContext();
 	}
 
 	@Override
@@ -34,25 +34,36 @@ public class LuceneStubQueryWorkOrchestrator implements LuceneQueryWorkOrchestra
 	}
 
 	@Override
-	public synchronized <T> CompletableFuture<T> submit(LuceneQueryWork<T> work) {
+	public synchronized <T> CompletableFuture<T> submit(Set<String> indexNames, Set<ReaderProvider> readerProviders,
+			LuceneQueryWork<T> work) {
 		CompletableFuture<T> future = latestFuture.thenCompose( Futures.safeComposer(
-				ignored -> work.execute( context )
+				ignored -> {
+					LuceneStubQueryWorkExecutionContext context =
+							new LuceneStubQueryWorkExecutionContext( indexNames, readerProviders );
+					try {
+						CompletableFuture<T> workFuture = work.execute( context );
+						// Always close the execution context after the work is executed, regardless of errors
+						return workFuture.handle( Futures.handler( (result, throwable) -> {
+							if ( result != null ) {
+								context.close();
+								return result;
+							}
+							else {
+								new SuppressingCloser( throwable )
+										.push( context );
+								throw Throwables.expectRuntimeException( throwable );
+							}
+						} ) );
+					}
+					catch (Throwable t) {
+						new SuppressingCloser( t ).push( context );
+						throw t;
+					}
+				}
 		) );
 		// Ignore errors from this work in future works and during close(): error handling is the client's responsibility.
 		latestFuture = future.exceptionally( ignore -> null );
 		return future;
 	}
 
-	@Override
-	public synchronized CompletableFuture<?> submit(List<LuceneQueryWork<?>> works) {
-		CompletableFuture<?> future = latestFuture;
-		for ( LuceneQueryWork<?> work : works ) {
-			future = future.thenCompose( Futures.safeComposer(
-					ignored -> work.execute( context )
-			) );
-		}
-		// Ignore errors from this work in future works and during close(): error handling is the client's responsibility.
-		latestFuture = future.exceptionally( ignore -> null );
-		return future;
-	}
 }
