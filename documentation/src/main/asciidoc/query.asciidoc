@@ -1782,7 +1782,8 @@ this particular field value occurs within the original query results. Parameters
 Parameter `orderedBy` allows to specify in which order the created facets will be returned. The
 default is `FacetSortOrder.COUNT_DESC`, but you can also sort on the field value. Parameter
 `includeZeroCount` determines whether facets with a count of 0 will be included in the result (by
-default they are not) and `maxFacetCount` allows to limit the maximum amount of facets returned.
+default they are not) and `maxFacetCount` allows to limit the maximum amount of facets returned
+(by default 100 facets are returned).
 
 [NOTE]
 ====
