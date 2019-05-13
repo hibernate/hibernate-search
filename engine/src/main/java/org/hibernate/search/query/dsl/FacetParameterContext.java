@@ -8,6 +8,7 @@
 package org.hibernate.search.query.dsl;
 
 import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
@@ -31,7 +32,7 @@ public interface FacetParameterContext extends FacetTermination {
 	 * Limits the maximum numbers of facets to the specified number.
 	 *
 	 * @param maxFacetCount the maximum number of facets to include in the response. A negative value means that
-	 * all facets will be included
+	 * {@value FacetingRequest#DEFAULT_MAX_FACET_COUNT} facets will be included
 	 * @return a {@code FacetParameterContext} to continue building the facet request
 	 */
 	FacetParameterContext maxFacetCount(int maxFacetCount);

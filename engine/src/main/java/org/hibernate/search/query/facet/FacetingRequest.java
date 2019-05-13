@@ -12,6 +12,12 @@ package org.hibernate.search.query.facet;
  * @author Hardy Ferentschik
  */
 public interface FacetingRequest {
+
+	/**
+	 * The default maximum number of facets when {@link #getMaxNumberOfFacets()} is negative.
+	 */
+	int DEFAULT_MAX_FACET_COUNT = 100;
+
 	/**
 	 * @return the name of this faceting request. The faceting name can be an arbitrary string.
 	 */
