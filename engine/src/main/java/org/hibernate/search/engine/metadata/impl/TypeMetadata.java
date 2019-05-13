@@ -444,7 +444,7 @@ public class TypeMetadata {
 					PropertyMetadata sourceProperty = documentFieldMetadata.getSourceProperty();
 					String sourceTypeName = sourceProperty != null
 							? sourceProperty.getPropertyAccessor().getDeclaringClass().getName()
-							: documentFieldMetadata.getSourceType().getType().getName();
+							: documentFieldMetadata.getSourceTypeIdentifier().getName();
 					log.inconsistentFieldConfiguration( sourceTypeName, name );
 				}
 			}
