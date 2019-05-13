@@ -19,6 +19,7 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.util.common.impl.Futures;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -84,7 +85,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 						luceneCollectorProvider, searchResultExtractor
 				)
 		);
-		return queryOrchestrator.submit( work ).join()
+		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) )
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async processing, we will have to add a loadAsync method here,
@@ -107,6 +108,6 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 						searchResultExtractor
 				)
 		);
-		return queryOrchestrator.submit( work ).join().getHitCount();
+		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) ).getHitCount();
 	}
 }
