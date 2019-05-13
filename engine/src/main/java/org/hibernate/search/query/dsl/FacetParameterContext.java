@@ -31,7 +31,7 @@ public interface FacetParameterContext extends FacetTermination {
 	 * Limits the maximum numbers of facets to the specified number.
 	 *
 	 * @param maxFacetCount the maximum number of facets to include in the response. A negative value means that
-	 * all facets will be included
+	 * {@link org.hibernate.search.query.facet.FacetingRequest#DEFAULT_MAX_FACET_COUNT} facets will be included
 	 * @return a {@code FacetParameterContext} to continue building the facet request
 	 */
 	FacetParameterContext maxFacetCount(int maxFacetCount);
