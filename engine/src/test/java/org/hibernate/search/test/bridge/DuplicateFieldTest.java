@@ -6,16 +6,23 @@
  */
 package org.hibernate.search.test.bridge;
 
+import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchIntegratorResource;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.apache.lucene.document.Document;
 
 public class DuplicateFieldTest {
 
@@ -41,6 +48,23 @@ public class DuplicateFieldTest {
 		integratorResource.create( cfg );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3562") // This used to fail because some metadata was accessed before it was created
+	public void shouldWarnButNotFailOnTwoFieldDefinitionsWithSameNameButDifferentIndexSettingFromClassBridges() {
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
+		cfg.addClass( SampleWithTwoFieldDefinitionsWithSameNameButDifferentIndexSettingFromClassBridge.class );
+
+		logged.expectMessage(
+				"HSEARCH000120",
+				"There are multiple properties indexed against the same field name '"
+						+ SampleWithTwoFieldDefinitionsWithSameNameButDifferentIndexSettingFromClassBridge.class.getName() + ".theField'",
+				"with different indexing settings",
+				"The behaviour is undefined"
+		);
+
+		integratorResource.create( cfg );
+	}
+
 	@Indexed
 	static class SampleWithTwoFieldDefinitionsWithSameNameButDifferentIndexSetting {
 
@@ -52,5 +76,33 @@ public class DuplicateFieldTest {
 
 		@Field(name = "theField", index = Index.NO)
 		String otherProperty;
+	}
+
+	@Indexed
+	@ClassBridge(name = "theField", impl = MyBridge.class)
+	@ClassBridge(name = "theField", impl = MyBridge.class, index = Index.NO)
+	static class SampleWithTwoFieldDefinitionsWithSameNameButDifferentIndexSettingFromClassBridge {
+
+		@DocumentId
+		long id;
+
+		String someProperty;
+
+		String otherProperty;
+	}
+
+	public static class MyBridge implements MetadataProvidingFieldBridge {
+		public MyBridge() {
+		}
+
+		@Override
+		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+			// Nothing to do
+		}
+
+		@Override
+		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+			throw new UnsupportedOperationException( "This should not be called" );
+		}
 	}
 }
