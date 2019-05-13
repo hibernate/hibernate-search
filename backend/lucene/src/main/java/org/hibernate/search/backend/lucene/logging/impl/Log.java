@@ -11,6 +11,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
@@ -437,4 +438,17 @@ public interface Log extends BasicLogger {
 					+ " Declare the field as multi-valued in order to allow this."
 	)
 	SearchException multipleValuesForSingleValuedField(String absoluteFieldPath);
+
+	@Message(id = ID_OFFSET_2 + 75,
+			value = "explain(String id) cannot be used when the query targets multiple indexes."
+					+ " Use explain(String indexName, String id) and pass one of %1$s as the index name." )
+	SearchException explainRequiresIndexName(Set<String> targetedIndexNames);
+
+	@Message(id = ID_OFFSET_2 + 76,
+			value = "The given index name '%2$s' is not among the indexes targeted by this query: %1$s." )
+	SearchException explainRequiresIndexTargetedByQuery(Set<String> targetedIndexNames, String indexName);
+
+	@Message(id = ID_OFFSET_2 + 77,
+			value = "Document with id '%2$s' does not exist in index '%1$s' and thus its match cannot be explained." )
+	SearchException explainUnkownDocument(String indexName, String d);
 }

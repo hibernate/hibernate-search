@@ -73,6 +73,7 @@ public class LuceneExtensionIT {
 
 	private static final String BACKEND_NAME = "myLuceneBackend";
 	private static final String INDEX_NAME = "IndexName";
+	private static final String OTHER_INDEX_NAME = "OtherIndexName";
 
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
@@ -87,8 +88,11 @@ public class LuceneExtensionIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private SearchIntegration integration;
+
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
+
+	private StubMappingIndexManager otherIndexManager;
 
 	@Before
 	public void setup() {
@@ -97,6 +101,11 @@ public class LuceneExtensionIT {
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
+				)
+				.withIndex(
+						OTHER_INDEX_NAME,
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.otherIndexManager = indexManager
 				)
 				.setup();
 
@@ -173,6 +182,106 @@ public class LuceneExtensionIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class );
+	}
+
+	@Test
+	public void query_explain_singleIndex() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
+				.asReference()
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		// Matching document
+		Assertions.assertThat( query.explain( FIRST_ID ) )
+				.extracting( Object::toString ).first().asString()
+				.contains( LuceneFields.idFieldName() );
+
+		// Non-matching document
+		Assertions.assertThat( query.explain( FIFTH_ID ) )
+				.extracting( Object::toString ).first().asString()
+				.contains( LuceneFields.idFieldName() );
+	}
+
+	@Test
+	public void query_explain_singleIndex_invalidId() {
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+
+		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
+				.asReference()
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		// Non-existing document
+		SubTest.expectException(
+				() -> query.explain( "InvalidId" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Document with id 'InvalidId' does not exist in index '" + INDEX_NAME + "'"
+				);
+	}
+
+	@Test
+	public void query_explain_multipleIndexes() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+
+		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
+				.asReference()
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		// Matching document
+		Assertions.assertThat( query.explain( INDEX_NAME, FIRST_ID ) )
+				.extracting( Object::toString ).first().asString()
+				.contains( LuceneFields.idFieldName() );
+
+		// Non-matching document
+		Assertions.assertThat( query.explain( INDEX_NAME, FIFTH_ID ) )
+				.extracting( Object::toString ).first().asString()
+				.contains( LuceneFields.idFieldName() );
+	}
+
+	@Test
+	public void query_explain_multipleIndexes_missingIndexName() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+
+		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
+				.asReference()
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		SubTest.expectException(
+				() -> query.explain( FIRST_ID )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple indexes" )
+				.hasMessageContaining(
+						"pass one of [" + INDEX_NAME + ", " + OTHER_INDEX_NAME + "]"
+				);
+	}
+
+	@Test
+	public void query_explain_multipleIndexes_invalidIndexName() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+
+		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
+				.asReference()
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		SubTest.expectException(
+				() -> query.explain( "NotAnIndexName", FIRST_ID )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"index name 'NotAnIndexName' is not among the indexes targeted by this query: ["
+								+ INDEX_NAME + ", " + OTHER_INDEX_NAME + "]"
+				);
 	}
 
 	@Test
@@ -534,8 +643,9 @@ public class LuceneExtensionIT {
 
 		List<Explanation> result = query.fetch().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
-		Assertions.assertThat( result.get( 0 ) ).isInstanceOf( Explanation.class );
-		Assertions.assertThat( result.get( 0 ).toString() )
+		Assertions.assertThat( result.get( 0 ) )
+				.isInstanceOf( Explanation.class )
+				.extracting( Object::toString ).first().asString()
 				.contains( LuceneFields.idFieldName() );
 	}
 

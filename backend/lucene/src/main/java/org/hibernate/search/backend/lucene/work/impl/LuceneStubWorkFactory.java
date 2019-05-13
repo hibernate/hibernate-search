@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchResultE
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.Explanation;
 
 
 /**
@@ -75,6 +76,15 @@ public class LuceneStubWorkFactory implements LuceneWorkFactory {
 				offset, limit,
 				luceneCollectorProvider,
 				searchResultExtractor
+		);
+	}
+
+	@Override
+	public LuceneReadWork<Explanation> explain(Set<String> indexNames, Query luceneQuery,
+			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentQuery) {
+		return new LuceneExplainWork(
+				indexNames, luceneQuery,
+				explainedDocumentIndexName, explainedDocumentId, explainedDocumentQuery
 		);
 	}
 }

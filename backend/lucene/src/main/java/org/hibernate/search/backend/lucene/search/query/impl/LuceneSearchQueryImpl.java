@@ -6,12 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Set;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
@@ -19,10 +23,17 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.TermQuery;
 
 
 /**
@@ -30,6 +41,8 @@ import org.apache.lucene.search.Sort;
  */
 public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearchResult<H>>
 		implements LuceneSearchQuery<H> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneReadWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
@@ -108,5 +121,47 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 				queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
 		)
 				.getHitCount();
+	}
+
+	@Override
+	public Explanation explain(String id) {
+		Contracts.assertNotNull( id, "id" );
+
+		Set<String> targetedIndexNames = searchContext.getIndexNames();
+		if ( targetedIndexNames.size() != 1 ) {
+			throw log.explainRequiresIndexName( targetedIndexNames );
+		}
+
+		return doExplain( targetedIndexNames.iterator().next(), id );
+	}
+
+	@Override
+	public Explanation explain(String indexName, String id) {
+		Contracts.assertNotNull( indexName, "indexName" );
+		Contracts.assertNotNull( id, "id" );
+
+		Set<String> targetedIndexNames = searchContext.getIndexNames();
+		if ( !targetedIndexNames.contains( indexName ) ) {
+			throw log.explainRequiresIndexTargetedByQuery( targetedIndexNames, indexName );
+		}
+
+		return doExplain( indexName, id );
+	}
+
+	private Explanation doExplain(String indexName, String id) {
+		Query explainedDocumentQuery = new BooleanQuery.Builder()
+				.add( new TermQuery( new Term( LuceneFields.indexFieldName(), indexName ) ), BooleanClause.Occur.MUST )
+				.add( new TermQuery( new Term( LuceneFields.idFieldName(), id ) ), BooleanClause.Occur.MUST )
+				.build();
+		explainedDocumentQuery = searchContext.decorateLuceneQuery(
+				explainedDocumentQuery, sessionContext.getTenantIdentifier()
+		);
+
+		LuceneReadWork<Explanation> work = workFactory.explain(
+				searchContext.getIndexNames(), luceneQuery, indexName, id, explainedDocumentQuery
+		);
+		return Futures.unwrappedExceptionJoin(
+				queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
+		);
 	}
 }

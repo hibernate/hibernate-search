@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchResultE
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.Explanation;
 
 /**
  * @author Guillaume Smet
@@ -41,4 +42,7 @@ public interface LuceneWorkFactory {
 			Long offset, Long limit,
 			LuceneCollectorProvider luceneCollectorProvider,
 			LuceneSearchResultExtractor<H> searchResultExtractor);
+
+	LuceneReadWork<Explanation> explain(Set<String> indexNames, Query luceneQuery,
+			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentQuery);
 }
