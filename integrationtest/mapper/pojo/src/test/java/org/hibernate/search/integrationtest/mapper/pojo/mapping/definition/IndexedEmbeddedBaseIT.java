@@ -18,6 +18,9 @@ import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappin
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -422,12 +425,23 @@ public class IndexedEmbeddedBaseIT {
 	 * Check that bridges whose contributed fields are all filtered out are never applied.
 	 */
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3212")
+	@TestForIssue(jiraKey = { "HSEARCH-3212", "HSEARCH-3213" })
 	public void includePaths_excludesBridges() {
+		StaticCounters.Key getLongitudeKey = StaticCounters.createKey();
+		StaticCounters.Key getLatitudeKey = StaticCounters.createKey();
+
 		class IndexedEmbeddedLevel1 {
 			String level1Property;
 			public String getLevel1Property() {
 				return level1Property;
+			}
+			public Double getLongitude() {
+				StaticCounters.get().increment( getLongitudeKey );
+				return null;
+			}
+			public Double getLatitude() {
+				StaticCounters.get().increment( getLatitudeKey );
+				return null;
 			}
 		}
 		class IndexedEntity {
@@ -447,7 +461,6 @@ public class IndexedEmbeddedBaseIT {
 		}
 
 		StartupStubBridge.CounterKeys filteredOutBridgeCounterKeys = StartupStubBridge.createKeys();
-
 		BridgeBuilder<StartupStubBridge> filteredOutBridgeBuilder =
 				c -> StartupStubBridge.create( filteredOutBridgeCounterKeys );
 
@@ -468,6 +481,9 @@ public class IndexedEmbeddedBaseIT {
 											.includePaths( "level1IncludedField" );
 					b.programmaticMapping().type( IndexedEmbeddedLevel1.class )
 							.bridge( filteredOutBridgeBuilder )
+							.bridge( new GeoPointBridge.Builder().fieldName( "location" ) )
+							.property( "latitude" ).marker( new LatitudeMarker.Builder() )
+							.property( "longitude" ).marker( new LongitudeMarker.Builder() )
 							.property( "level1Property" )
 									.bridge( filteredOutBridgeBuilder )
 									.genericField( "level1IncludedField" )
@@ -480,6 +496,8 @@ public class IndexedEmbeddedBaseIT {
 		/*
 		 * All the bridges that were filtered out should have been instantiated,
 		 * but then immediately closed.
+		 * We can't check the GeoPoint bridge here, because it doesn't use static counters
+		 * like our stub bridges, but we will check it isn't executed below.
 		 */
 		assertEquals( 3, counters.get( filteredOutBridgeCounterKeys.instance ) );
 		assertEquals( 0, counters.get( filteredOutBridgeCounterKeys.instance )
@@ -497,6 +515,8 @@ public class IndexedEmbeddedBaseIT {
 
 		// The bridges that were filtered out should not have been used.
 		assertEquals( 0, counters.get( filteredOutBridgeCounterKeys.runtimeUse ) );
+		assertEquals( 0, counters.get( getLatitudeKey ) );
+		assertEquals( 0, counters.get( getLongitudeKey ) );
 	}
 
 	private <E> void doTestEmbeddedRuntime(JavaBeanMapping mapping,
