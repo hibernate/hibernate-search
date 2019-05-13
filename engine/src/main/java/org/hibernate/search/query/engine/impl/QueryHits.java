@@ -72,7 +72,6 @@ public class QueryHits {
 	private static final Log log = LoggerFactory.make();
 
 	private static final int DEFAULT_TOP_DOC_RETRIEVAL_SIZE = 100;
-	private static final int DEFAULT_FACET_RETRIEVAL_SIZE = 100;
 
 
 	private final LazyQueryState searcher;
@@ -396,7 +395,8 @@ public class QueryHits {
 			termValues = findAllTermsForField( facetMetadata.getSourceField().getAbsoluteName(), searcher.getIndexReader() );
 		}
 
-		int maxFacetCount = facetRequest.getMaxNumberOfFacets() < 0 ? DEFAULT_FACET_RETRIEVAL_SIZE : facetRequest.getMaxNumberOfFacets();
+		int maxFacetCount = facetRequest.getMaxNumberOfFacets() < 0 ? FacetingRequest.DEFAULT_MAX_FACET_COUNT
+				: facetRequest.getMaxNumberOfFacets();
 		final FacetResult facetResult;
 		try {
 			// This might return null!
