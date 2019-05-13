@@ -61,7 +61,7 @@ public class TikaBridgeTest {
 		testDocument = new Document();
 		DocumentFieldMetadata fieldMetadata =
 				new DocumentFieldMetadata.Builder(
-						new BackReference<>(),
+						null,
 						new BackReference<>(), null,
 						new DocumentFieldPath( "", "" ), // No field path
 						Store.YES, Field.Index.ANALYZED, Field.TermVector.NO
