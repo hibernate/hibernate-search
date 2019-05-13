@@ -300,7 +300,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 						fieldPath, Store.YES, index, termVector
 						)
@@ -383,7 +383,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				reflectionManager.toClass( member.getType() ) );
 
 		DocumentFieldMetadata.Builder idMetadataBuilder = new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 						fieldPath,
 						Store.YES,
@@ -491,7 +491,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 						fieldPath,
 						Store.YES,
@@ -765,7 +765,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						// Class bridge, there's no related property
 						BackReference.<PropertyMetadata>empty(),
 						null,
@@ -823,7 +823,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 						fieldPath, store, index, termVector
 				)
@@ -874,7 +874,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder =
 				new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						BackReference.<PropertyMetadata>empty(), null, // Class-level spatial annotation, there's no related property
 						fieldPath, store, index, termVector
 				)
@@ -1362,7 +1362,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		DocumentFieldMetadata.Builder fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
-						typeMetadataBuilder.getResultReference(),
+						typeMetadataBuilder,
 						propertyMetadataBuilder.getResultReference(), propertyMetadataBuilder,
 						fieldPath,
 						store,
