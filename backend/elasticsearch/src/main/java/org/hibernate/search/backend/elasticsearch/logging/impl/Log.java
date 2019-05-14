@@ -49,7 +49,6 @@ import com.google.gson.JsonObject;
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.BACKEND_ES_ID_RANGE_MIN, max = MessageConstants.BACKEND_ES_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5 (engine module)
-		@ValidIdRange(min = 49, max = 49),
 		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5 (engine module).
 })
 public interface Log extends BasicLogger {
@@ -61,10 +60,6 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 (engine module) here
-	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET_1 + 49,
-			value = "'%s' was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
-	void interruptedWhileWaitingForIndexActivity(String name, @Cause InterruptedException e);
 
 	// -----------------------------------
 	// Pre-existing messages from Search 5 (ES module)
@@ -502,4 +497,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 66,
 			value = "Document with id '%2$s' does not exist in index '%1$s' and thus its match cannot be explained." )
 	SearchException explainUnkownDocument(URLEncodedString indexName, URLEncodedString d);
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET_3 + 67,
+			value = "'%s' was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
+	void interruptedWhileWaitingForIndexActivity(String name, @Cause InterruptedException e);
 }

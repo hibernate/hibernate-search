@@ -13,4 +13,6 @@ public interface LuceneWriteWork<T> {
 
 	T execute(LuceneWriteWorkExecutionContext context);
 
+	Object getInfo();
+
 }

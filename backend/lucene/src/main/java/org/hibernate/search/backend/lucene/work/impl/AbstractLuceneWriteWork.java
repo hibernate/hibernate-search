@@ -23,6 +23,12 @@ public abstract class AbstractLuceneWriteWork<T> implements LuceneWriteWork<T> {
 		this.indexName = indexName;
 	}
 
+	@Override
+	public Object getInfo() {
+		// TODO extract immutable work relevant info. We need to think about it. See HSEARCH-3110.
+		return this;
+	}
+
 	protected final EventContext getEventContext() {
 		return EventContexts.fromIndexName( indexName );
 	}

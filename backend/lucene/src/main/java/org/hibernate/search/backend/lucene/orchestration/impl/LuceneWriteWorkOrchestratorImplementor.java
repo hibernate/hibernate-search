@@ -13,4 +13,13 @@ public interface LuceneWriteWorkOrchestratorImplementor extends AutoCloseable, L
 	@Override
 	default void close() {
 	}
+
+	/**
+	 * Start any resource necessary to operate the orchestrator at runtime.
+	 * <p>
+	 * Called by the owner of this orchestrator once after bootstrap,
+	 * before any other method is called.
+	 */
+	void start();
+
 }

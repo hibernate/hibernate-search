@@ -6,15 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.index.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
@@ -48,11 +45,6 @@ class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<Lucen
 		documentContributor.contribute( builder );
 		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
 
-		List<LuceneWriteWork<?>> works = new ArrayList<>();
-		works.add( factory.add( indexName, tenantId, id, routingKey, indexEntry ) );
-		// FIXME remove this explicit commit
-		works.add( factory.commit( indexName ) );
-
-		return orchestrator.submit( works );
+		return orchestrator.submit( factory.add( indexName, tenantId, id, routingKey, indexEntry ) );
 	}
 }

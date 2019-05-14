@@ -9,14 +9,11 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWorkExecutionContext;
 
-/**
- * @author Guillaume Smet
- */
-public class LuceneStubWriteWorkExecutionContext implements LuceneWriteWorkExecutionContext {
+class LuceneWriteWorkExecutionContextImpl implements LuceneWriteWorkExecutionContext {
 
 	private final IndexWriter indexWriter;
 
-	public LuceneStubWriteWorkExecutionContext(IndexWriter indexWriter) {
+	LuceneWriteWorkExecutionContextImpl(IndexWriter indexWriter) {
 		this.indexWriter = indexWriter;
 	}
 
