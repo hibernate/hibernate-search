@@ -6,13 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Provides access to various orchestrators.
@@ -97,8 +94,6 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	private static final int SERIAL_MAX_CHANGESETS_PER_BATCH = 10 * MAX_BULK_SIZE;
 	private static final int PARALLEL_MAX_CHANGESETS_PER_BATCH = 20 * MAX_BULK_SIZE;
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private final ElasticsearchLink link;
 	private final ErrorHandler errorHandler;
 
@@ -126,16 +121,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 
 	@Override
 	public void close() {
-		try {
-			rootParallelOrchestrator.awaitCompletion();
-		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw log.interruptedWhileWaitingForRequestCompletion( e );
-		}
-		finally {
-			rootParallelOrchestrator.close();
-		}
+		rootParallelOrchestrator.close();
 	}
 
 	public void start() {
