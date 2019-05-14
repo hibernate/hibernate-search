@@ -7,9 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 /**
- * An {@link ElasticsearchWorkOrchestrator} that is designed to be shared among multiple threads.
+ * An extension of {@link ElasticsearchWorkOrchestrator} exposing methods to control its lifecycle.
  */
-public interface ElasticsearchSharedWorkOrchestrator extends ElasticsearchWorkOrchestrator {
+public interface ElasticsearchWorkOrchestratorImplementor extends AutoCloseable, ElasticsearchWorkOrchestrator {
+
+	@Override
+	void close();
 
 	/**
 	 * Start any resource necessary to operate the orchestrator at runtime.

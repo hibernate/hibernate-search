@@ -19,8 +19,7 @@ import org.hibernate.search.backend.elasticsearch.index.admin.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSharedWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -75,8 +74,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private final URLEncodedString elasticsearchIndexName;
 	private final ElasticsearchIndexModel model;
 
-	private final ElasticsearchSharedWorkOrchestrator serialOrchestrator;
-	private final ElasticsearchSharedWorkOrchestrator parallelOrchestrator;
+	private final ElasticsearchWorkOrchestratorImplementor serialOrchestrator;
+	private final ElasticsearchWorkOrchestratorImplementor parallelOrchestrator;
 
 	private final ElasticsearchIndexAdministrationClient administrationClient;
 
@@ -121,8 +120,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchWorkOrchestrator::close, serialOrchestrator );
-			closer.push( ElasticsearchWorkOrchestrator::close, parallelOrchestrator );
+			closer.push( ElasticsearchWorkOrchestratorImplementor::close, serialOrchestrator );
+			closer.push( ElasticsearchWorkOrchestratorImplementor::close, parallelOrchestrator );
 			closer.push( strategy -> strategy.onStop( administrationClient ), lifecycleStrategy );
 		}
 		catch (IOException e) {
