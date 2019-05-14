@@ -9,6 +9,7 @@
 == Mapping
 
 // TODO maybe explain what we mean by "mapping"?
+// TODO explain what an "entity" is and what it implies
 
 [[concepts-analysis]]
 == Analysis
