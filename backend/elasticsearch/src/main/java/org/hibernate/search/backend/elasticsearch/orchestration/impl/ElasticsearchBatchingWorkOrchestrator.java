@@ -167,14 +167,6 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	}
 
 	@Override
-	public void awaitCompletion() throws InterruptedException {
-		int phaseBeforeUnarrivedPartiesCheck = phaser.getPhase();
-		if ( phaser.getUnarrivedParties() > 0 ) {
-			phaser.awaitAdvanceInterruptibly( phaseBeforeUnarrivedPartiesCheck );
-		}
-	}
-
-	@Override
 	protected void doClose() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchBatchingWorkOrchestrator::awaitCompletionBeforeClose, this );
@@ -187,7 +179,10 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 
 	private void awaitCompletionBeforeClose() {
 		try {
-			awaitCompletion();
+			int phaseBeforeUnarrivedPartiesCheck = phaser.getPhase();
+			if ( phaser.getUnarrivedParties() > 0 ) {
+				phaser.awaitAdvanceInterruptibly( phaseBeforeUnarrivedPartiesCheck );
+			}
 		}
 		catch (InterruptedException e) {
 			log.interruptedWhileWaitingForIndexActivity( getName(), e );
@@ -291,11 +286,6 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 		@Override
 		protected void doSubmit(Changeset changeset) {
 			ElasticsearchBatchingWorkOrchestrator.this.submit( changeset );
-		}
-
-		@Override
-		public void awaitCompletion() throws InterruptedException {
-			ElasticsearchBatchingWorkOrchestrator.this.awaitCompletion();
 		}
 
 		@Override
