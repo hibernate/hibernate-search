@@ -56,8 +56,6 @@ class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
 
 		collect( factory.add( indexName, tenantId, id, routingKey, indexEntry ) );
-		// FIXME remove this explicit commit
-		collect( factory.commit( indexName ) );
 	}
 
 	@Override
@@ -71,8 +69,6 @@ class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
 
 		collect( factory.update( indexName, tenantId, id, routingKey, indexEntry ) );
-		// FIXME remove this explicit commit
-		collect( factory.commit( indexName ) );
 	}
 
 	@Override
@@ -81,8 +77,6 @@ class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 		String routingKey = referenceProvider.getRoutingKey();
 
 		collect( factory.delete( indexName, tenantId, id, routingKey ) );
-		// FIXME remove this explicit commit
-		collect( factory.commit( indexName ) );
 	}
 
 	@Override

@@ -22,7 +22,6 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuild
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -52,8 +51,7 @@ class LuceneIndexManagerImpl
 	private final String indexName;
 	private final LuceneIndexModel model;
 
-	private final LuceneWriteWorkOrchestratorImplementor serialOrchestrator;
-	private final LuceneWriteWorkOrchestratorImplementor parallelOrchestrator;
+	private final LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
 	private final IndexWriter indexWriter;
 
 	LuceneIndexManagerImpl(IndexingBackendContext indexingBackendContext,
@@ -66,8 +64,9 @@ class LuceneIndexManagerImpl
 		this.indexName = indexName;
 		this.model = model;
 
-		this.serialOrchestrator = new LuceneStubWriteWorkOrchestrator( indexWriter );
-		this.parallelOrchestrator = new LuceneStubWriteWorkOrchestrator( indexWriter );
+		this.writeOrchestrator = indexingBackendContext.createOrchestrator(
+				indexName, indexWriter
+		);
 		this.indexWriter = indexWriter;
 	}
 
@@ -77,24 +76,24 @@ class LuceneIndexManagerImpl
 
 	@Override
 	public void start(IndexManagerStartContext context) {
-		// TODO HSEARCH-3528 start thread(s) and allocate resources specific to this index manager here
+		writeOrchestrator.start();
 	}
 
 	@Override
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext,
 			DocumentRefreshStrategy refreshStrategy) {
 		// refreshStrategy is ignored because refreshes don't make sense here: changes are visible immediately.
-		return indexingBackendContext.createWorkPlan( serialOrchestrator, indexName, sessionContext );
+		return indexingBackendContext.createWorkPlan( writeOrchestrator, indexName, sessionContext );
 	}
 
 	@Override
 	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createDocumentWorkExecutor( parallelOrchestrator, indexName, sessionContext );
+		return indexingBackendContext.createDocumentWorkExecutor( writeOrchestrator, indexName, sessionContext );
 	}
 
 	@Override
 	public IndexWorkExecutor createWorkExecutor() {
-		return indexingBackendContext.createWorkExecutor( parallelOrchestrator, indexName );
+		return indexingBackendContext.createWorkExecutor( writeOrchestrator, indexName );
 	}
 
 	@Override
@@ -126,8 +125,7 @@ class LuceneIndexManagerImpl
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( LuceneWriteWorkOrchestratorImplementor::close, serialOrchestrator );
-			closer.push( LuceneWriteWorkOrchestratorImplementor::close, parallelOrchestrator );
+			closer.push( LuceneWriteWorkOrchestratorImplementor::close, writeOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
 			closer.push( IndexWriter::close, indexWriter );
 			closer.push( LuceneIndexModel::close, model );

@@ -57,11 +57,6 @@ public class LuceneStubWorkFactory implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneWriteWork<?> commit(String indexName) {
-		return new LuceneCommitWork( indexName );
-	}
-
-	@Override
 	public LuceneWriteWork<?> optimize(String indexName) {
 		return new LuceneOptimizeWork( indexName );
 	}

@@ -31,8 +31,6 @@ public interface LuceneWorkFactory {
 
 	LuceneWriteWork<?> deleteAll(String indexName, String tenantId);
 
-	LuceneWriteWork<?> commit(String indexName);
-
 	LuceneWriteWork<?> flush(String indexName);
 
 	LuceneWriteWork<?> optimize(String indexName);

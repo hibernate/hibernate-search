@@ -8,6 +8,9 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
 
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -15,9 +18,12 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuild
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 
 public class IndexingBackendContext {
@@ -26,15 +32,18 @@ public class IndexingBackendContext {
 	private final DirectoryProvider directoryProvider;
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final ErrorHandler errorHandler;
 
 	public IndexingBackendContext(EventContext eventContext,
 			DirectoryProvider directoryProvider,
 			LuceneWorkFactory workFactory,
-			MultiTenancyStrategy multiTenancyStrategy) {
+			MultiTenancyStrategy multiTenancyStrategy,
+			ErrorHandler errorHandler) {
 		this.eventContext = eventContext;
 		this.directoryProvider = directoryProvider;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.workFactory = workFactory;
+		this.errorHandler = errorHandler;
 	}
 
 	@Override
@@ -57,6 +66,14 @@ public class IndexingBackendContext {
 
 		return new LuceneIndexWorkPlan( workFactory, multiTenancyStrategy, orchestrator,
 				indexName, sessionContext );
+	}
+
+	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, IndexWriter indexWriter) {
+		return new LuceneBatchingWriteWorkOrchestrator(
+				"Lucene write work orchestrator for index " + indexName,
+				new LuceneWriteWorkProcessor( EventContexts.fromIndexName( indexName ), indexWriter, errorHandler ),
+				errorHandler
+		);
 	}
 
 	IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(

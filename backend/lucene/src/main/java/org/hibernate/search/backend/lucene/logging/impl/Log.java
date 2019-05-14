@@ -45,6 +45,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = MessageConstants.BACKEND_LUCENE_ID_RANGE_MIN, max = MessageConstants.BACKEND_LUCENE_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5
 		@ValidIdRange(min = 35, max = 35),
+		@ValidIdRange(min = 49, max = 49),
 		@ValidIdRange(min = 55, max = 55),
 		@ValidIdRange(min = 75, max = 75),
 		@ValidIdRange(min = 114, max = 114),
@@ -74,6 +75,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 35,
 			value = "Could not close resource.")
 	void couldNotCloseResource(@Cause Exception e);
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET_1 + 49,
+			value = "'%s' was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
+	void interruptedWhileWaitingForIndexActivity(String name, @Cause InterruptedException e);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_1 + 55,
