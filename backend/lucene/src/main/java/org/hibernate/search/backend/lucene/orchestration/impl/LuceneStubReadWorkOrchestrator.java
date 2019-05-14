@@ -13,7 +13,6 @@ import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.impl.Throwables;
 
 
 /**
@@ -40,24 +39,25 @@ public class LuceneStubReadWorkOrchestrator implements LuceneReadWorkOrchestrato
 				ignored -> {
 					LuceneStubReadWorkExecutionContext context =
 							new LuceneStubReadWorkExecutionContext( indexNames, readerProviders );
+					Throwable throwable = null;
 					try {
-						CompletableFuture<T> workFuture = work.execute( context );
-						// Always close the execution context after the work is executed, regardless of errors
-						return workFuture.handle( Futures.handler( (result, throwable) -> {
-							if ( result != null ) {
-								context.close();
-								return result;
-							}
-							else {
-								new SuppressingCloser( throwable )
-										.push( context );
-								throw Throwables.expectRuntimeException( throwable );
-							}
-						} ) );
+						// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexReader
+						return new CompletableFuture<>( work.execute( context ) );
 					}
 					catch (Throwable t) {
-						new SuppressingCloser( t ).push( context );
+						// Just remember something went wrong
+						throwable = t;
 						throw t;
+					}
+					finally {
+						if ( throwable == null ) {
+							context.close();
+						}
+						else {
+							// Take care not to erase the main error if closing the context fails: use addSuppressed() instead
+							new SuppressingCloser( throwable )
+									.push( context );
+						}
 					}
 				}
 		) );

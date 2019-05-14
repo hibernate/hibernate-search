@@ -8,11 +8,9 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.CompletableFuture;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -27,15 +25,11 @@ public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Long> {
 	}
 
 	@Override
-	public CompletableFuture<Long> execute(LuceneWriteWorkExecutionContext context) {
-		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
-		return Futures.create( () -> commitIndex( context.getIndexWriter() ) );
-	}
-
-	private CompletableFuture<Long> commitIndex(IndexWriter indexWriter) {
+	public Long execute(LuceneWriteWorkExecutionContext context) {
+		IndexWriter indexWriter = context.getIndexWriter();
 		try {
 			indexWriter.forceMerge( 1 );
-			return CompletableFuture.completedFuture( indexWriter.commit() );
+			return indexWriter.commit();
 		}
 		catch (IOException e) {
 			throw log.unableToCommitIndex( getEventContext(), e );
