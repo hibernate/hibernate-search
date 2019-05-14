@@ -283,4 +283,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 61, value = "Multiple hits when a single hit was expected: got %1$s hits.")
 	SearchException nonSingleHit(long totalHitCount);
+
+	@Message(id = ID_OFFSET_2 + 62,
+			value = "The thread was interrupted while a workset was being submitted to '%1$s'."
+					+ " The workset has been discarded." )
+	SearchException threadInterruptedWhileSubmittingWorkset(String orchestratorName);
+
+	@Message(id = ID_OFFSET_2 + 63,
+			value = "A workset was submitted after shutdown was requested to '%1$s'."
+					+ " The workset has been discarded." )
+	SearchException orchestratorShutDownBeforeSubmittingWorkset(String orchestratorName);
 }

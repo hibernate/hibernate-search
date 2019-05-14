@@ -73,7 +73,7 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	 * @param name The name of the child orchestrator when reporting errors
 	 */
 	public ElasticsearchWorkOrchestratorImplementor createChild(String name) {
-		return new ChildOrchestrator( name );
+		return new ElasticsearchChildBatchingWorkOrchestrator( name );
 	}
 
 	@Override
@@ -99,10 +99,10 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 		}
 	}
 
-	private class ChildOrchestrator extends AbstractElasticsearchWorkOrchestrator
+	private class ElasticsearchChildBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
 			implements ElasticsearchWorkOrchestratorImplementor {
 
-		protected ChildOrchestrator(String name) {
+		protected ElasticsearchChildBatchingWorkOrchestrator(String name) {
 			super( name );
 		}
 

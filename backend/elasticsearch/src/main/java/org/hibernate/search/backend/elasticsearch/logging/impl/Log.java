@@ -225,16 +225,6 @@ public interface Log extends BasicLogger {
 			value = "Elasticsearch response indicates a failure." )
 	SearchException elasticsearchResponseIndicatesFailure();
 
-	@Message(id = ID_OFFSET_2 + 91,
-			value = "The thread was interrupted while a workset was being submitted to '%1$s'."
-					+ " The workset has been discarded." )
-	SearchException threadInterruptedWhileSubmittingWorkset(String orchestratorName);
-
-	@Message(id = ID_OFFSET_2 + 92,
-			value = "A workset was submitted after Hibernate Search shutdown was requested to '%1$s'."
-					+ " The workset has been discarded." )
-	SearchException orchestratorShutDownBeforeSubmittingWorkset(String orchestratorName);
-
 	@LogMessage(level = Level.TRACE)
 	@Message(id = ID_OFFSET_2 + 93,
 			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s and %d objects in payload in %dms."
