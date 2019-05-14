@@ -182,8 +182,8 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier) {
 		return new ElasticsearchDefaultWorkSequenceBuilder(
 				contextSupplier,
-				() -> new DefaultContextualErrorHandler( errorHandler )
-				);
+				errorHandler::createContextualHandler
+		);
 	}
 
 	private ElasticsearchWorkBulker createBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder, int minBulkSize) {

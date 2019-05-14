@@ -24,4 +24,8 @@ public interface ErrorHandler {
 	 */
 	void handleException(String errorMsg, Throwable exception);
 
+	default ContextualErrorHandler createContextualHandler() {
+		return new DefaultContextualErrorHandler( this );
+	}
+
 }
