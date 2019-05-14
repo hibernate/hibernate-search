@@ -7,8 +7,9 @@
 package org.hibernate.search.engine.search.dsl.query.impl;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryContextImplementor;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -21,12 +22,8 @@ final class DefaultSearchQueryContext<T, C>
 						SearchSortContainerContext,
 						C
 				>
-		implements SearchQueryContextImplementor<
-				DefaultSearchQueryContext<T, C>,
-				T,
-				SearchPredicateFactoryContext,
-				SearchSortContainerContext
-				> {
+		implements SearchQueryResultContext<DefaultSearchQueryContext<T, C>, T, SearchPredicateFactoryContext>,
+				SearchQueryContext<DefaultSearchQueryContext<T, C>, T, SearchSortContainerContext> {
 
 	DefaultSearchQueryContext(IndexSearchScope<C> indexSearchScope, SearchQueryBuilder<T, C> searchQueryBuilder) {
 		super( indexSearchScope, searchQueryBuilder );
