@@ -55,13 +55,13 @@ class ElasticsearchSerialChangesetsWorkOrchestrationStrategy implements Elastics
 	}
 
 	@Override
-	public CompletableFuture<Void> executeSubmitted() {
+	public CompletableFuture<Void> endBatch() {
 		aggregator.finalizeBulkWork();
 		return future;
 	}
 
 	@Override
-	public void reset() {
+	public void beginBatch() {
 		aggregator.reset();
 	}
 
