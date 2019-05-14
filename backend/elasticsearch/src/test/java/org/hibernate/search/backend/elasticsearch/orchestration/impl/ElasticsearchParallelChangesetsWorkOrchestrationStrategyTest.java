@@ -84,11 +84,6 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		assertThat( futureAll ).isPending();
 		sequenceFuture.complete( null );
 		assertThat( futureAll ).isSuccessful( (Void) null );
-
-		resetAll();
-		replayAll();
-		strategy.close();
-		verifyAll();
 	}
 
 	@Test
@@ -142,11 +137,6 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		assertThat( futureAll ).isPending();
 		sequence1Future.complete( null );
 		assertThat( futureAll ).isSuccessful( (Void) null );
-
-		resetAll();
-		replayAll();
-		strategy.close();
-		verifyAll();
 	}
 
 	@Test
@@ -207,11 +197,6 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		sequence1Future.complete( null );
 		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
-
-		resetAll();
-		replayAll();
-		strategy.close();
-		verifyAll();
 	}
 
 	@Test
@@ -260,11 +245,6 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		sequence1Future.complete( null );
 		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
-
-		resetAll();
-		replayAll();
-		strategy.close();
-		verifyAll();
 	}
 
 	@Test
@@ -330,11 +310,6 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		sequence1Future.complete( null );
 		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
-
-		resetAll();
-		replayAll();
-		strategy.close();
-		verifyAll();
 	}
 
 	private <T> ElasticsearchWork<T> work(int index) {

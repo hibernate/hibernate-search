@@ -82,11 +82,6 @@ public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends 
 		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequenceFuture );
-
-		resetAll();
-		replayAll();
-		strategy.close();
-		verifyAll();
 	}
 
 	@Test
@@ -136,11 +131,6 @@ public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends 
 		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
-
-		resetAll();
-		replayAll();
-		strategy.close();
-		verifyAll();
 	}
 
 	@Test
@@ -189,11 +179,6 @@ public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends 
 		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
-
-		resetAll();
-		replayAll();
-		strategy.close();
-		verifyAll();
 	}
 
 	@Test
@@ -236,11 +221,6 @@ public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends 
 		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence1Future );
-
-		resetAll();
-		replayAll();
-		strategy.close();
-		verifyAll();
 	}
 
 	@Test
@@ -294,11 +274,6 @@ public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends 
 		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
-
-		resetAll();
-		replayAll();
-		strategy.close();
-		verifyAll();
 	}
 
 	private ElasticsearchWork<?> work(int index) {

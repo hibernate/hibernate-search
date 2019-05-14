@@ -20,11 +20,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
  * <p>
  * Depending on the implementation, works may be executed serially, or in parallel.
  */
-interface ElasticsearchWorkOrchestrationStrategy extends AutoCloseable {
-
-	@Override
-	default void close() {
-	}
+interface ElasticsearchWorkOrchestrationStrategy {
 
 	<T> CompletableFuture<T> submit(ElasticsearchWork<T> work);
 
