@@ -174,8 +174,6 @@ Those generic APIs are mostly implemented in the engine.
 The implementation itself relies on lower-level, less "user-focused" SPIs implemented by backends,
 such as `SearchPredicateFactory` or `FieldSortBuilder`.
 
-Note that the APIs implemented by the engine include ways for the mapper to wrap the resulting search query
-(`SearchQueryWrappingDefinitionResultContext#asWrappedQuery`).
 Also, the SPIs implemented by backends allow mappers to inject a "loading context" (see `SearchQueryBuilderFactory.asEntity`)
 that will essentially transform document references into the entity that was initially indexed.
 
