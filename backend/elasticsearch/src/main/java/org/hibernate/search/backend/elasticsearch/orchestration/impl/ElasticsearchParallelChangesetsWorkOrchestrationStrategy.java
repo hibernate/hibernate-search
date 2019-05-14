@@ -55,7 +55,7 @@ class ElasticsearchParallelChangesetsWorkOrchestrationStrategy implements Elasti
 	}
 
 	@Override
-	public CompletableFuture<Void> executeSubmitted() {
+	public CompletableFuture<Void> endBatch() {
 		CompletableFuture<Void> future =
 				CompletableFuture.allOf( sequenceFutures.toArray( new CompletableFuture<?>[0] ) );
 		sequenceFutures.clear();
@@ -64,7 +64,7 @@ class ElasticsearchParallelChangesetsWorkOrchestrationStrategy implements Elasti
 	}
 
 	@Override
-	public void reset() {
+	public void beginBatch() {
 		aggregator.reset();
 		sequenceFutures.clear();
 	}

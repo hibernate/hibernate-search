@@ -10,31 +10,21 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 
 /**
  * An thread-unsafe component responsible for accumulating works to be executed,
  * then executing them according to an implementation-specific orchestration scheme.
  * <p>
  * Works are added through the {@link #submit(ElasticsearchWork)} or {@link #submit(List)} methods,
- * and executed through the {@link #executeSubmitted()} method.
+ * and executed through the {@link #endBatch()} method.
  * <p>
  * Depending on the implementation, works may be executed serially, or in parallel.
  */
-interface ElasticsearchWorkOrchestrationStrategy {
+interface ElasticsearchWorkOrchestrationStrategy extends BatchingExecutor.Processor {
 
 	<T> CompletableFuture<T> submit(ElasticsearchWork<T> work);
 
 	CompletableFuture<?> submit(List<ElasticsearchWork<?>> work);
-
-	/**
-	 * Ensure all works submitted since the last call to {@link #reset()} will
-	 * actually be executed.
-	 *
-	 * @return A future completing when all works submitted since the last call to {@link #reset()}
-	 * have completed.
-	 */
-	CompletableFuture<?> executeSubmitted();
-
-	void reset();
 
 }

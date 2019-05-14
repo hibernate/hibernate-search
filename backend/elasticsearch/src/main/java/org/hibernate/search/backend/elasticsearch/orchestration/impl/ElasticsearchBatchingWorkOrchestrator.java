@@ -7,19 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.Executors;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -39,23 +31,7 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchWorkOrchestrationStrategy strategy;
-	private final ErrorHandler errorHandler;
-	private final int changesetsPerBatch;
-
-	private final BlockingQueue<Changeset> changesetQueue;
-	private final List<Changeset> changesetBuffer;
-	private final AtomicBoolean processingScheduled;
-
-	private ExecutorService executor;
-
-	private final Phaser phaser = new Phaser() {
-		@Override
-		protected boolean onAdvance(int phase, int registeredParties) {
-			// This phaser never terminates on its own, allowing re-use
-			return false;
-		}
-	};
+	private final BatchingExecutor<ElasticsearchChangeset, ElasticsearchWorkOrchestrationStrategy> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
@@ -66,23 +42,22 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	 * @param fair if {@code true} changesets are always submitted to the
 	 * delegate in FIFO order, if {@code false} changesets submitted
 	 * when the internal queue is full may be submitted out of order.
+	 * @param errorHandler An error handler to report failures of the background thread.
 	 */
 	public ElasticsearchBatchingWorkOrchestrator(
 			String name, ElasticsearchWorkOrchestrationStrategy strategy,
 			int maxChangesetsPerBatch, boolean fair,
 			ErrorHandler errorHandler) {
 		super( name );
-		this.strategy = strategy;
-		this.errorHandler = errorHandler;
-		this.changesetsPerBatch = maxChangesetsPerBatch;
-		changesetQueue = new ArrayBlockingQueue<>( maxChangesetsPerBatch, fair );
-		changesetBuffer = new ArrayList<>( maxChangesetsPerBatch );
-		processingScheduled = new AtomicBoolean( false );
+		this.executor = new BatchingExecutor<>(
+				name, strategy, maxChangesetsPerBatch, fair,
+				errorHandler
+		);
 	}
 
 	@Override
 	public void start() {
-		executor = Executors.newFixedThreadPool( 1, getName() );
+		executor.start();
 	}
 
 	/**
@@ -102,172 +77,25 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	}
 
 	@Override
-	protected void doSubmit(Changeset changeset) throws InterruptedException {
-		changesetQueue.put( changeset );
-		ensureProcessingScheduled();
-	}
-
-	private void ensureProcessingScheduled() {
-		// Set up worker if needed
-		if ( !processingScheduled.get() ) {
-			/*
-			 * Register to the phaser exactly here:
-			 *  * registering after scheduling would mean running the risk
-			 *  of finishing the work processing before we even registered to the phaser,
-			 *  likely resulting in an exception when de-registering from the phaser;
-			 *  * registering after compareAndSet would mean running the risk
-			 *  of another thread calling this method just after we called compareAndSet,
-			 *  then moving on to a call to awaitCompletion() before we had the chance to
-			 *  register to the phaser. This other thread would thus believe that the submitted
-			 *  work was executed while in fact it wasn't.
-			 */
-			phaser.register();
-			try {
-				if ( processingScheduled.compareAndSet( false, true ) ) {
-					try {
-						executor.submit( this::processBatch );
-					}
-					catch (Throwable e) {
-						/*
-						 * Make sure a failure to submit the processing task
-						 * doesn't leave other threads waiting indefinitely
-						 */
-						try {
-							processingScheduled.set( false );
-						}
-						catch (Throwable e2) {
-							e.addSuppressed( e2 );
-						}
-						throw e;
-					}
-				}
-				else {
-					/*
-					 * Corner case: another thread submitted a processing task
-					 * just after we registered the phaser.
-					 * Cancel our own registration.
-					 */
-					phaser.arriveAndDeregister();
-				}
-			}
-			catch (Throwable e) {
-				/*
-				 * Make sure a failure to submit the processing task
-				 * doesn't leave other threads waiting indefinitely
-				 */
-				try {
-					phaser.arriveAndDeregister();
-				}
-				catch (Throwable e2) {
-					e.addSuppressed( e2 );
-				}
-				throw e;
-			}
-		}
+	protected void doSubmit(ElasticsearchChangeset changeset) throws InterruptedException {
+		executor.submit( changeset );
 	}
 
 	@Override
 	protected void doClose() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchBatchingWorkOrchestrator::awaitCompletionBeforeClose, this );
-			closer.push( ExecutorService::shutdownNow, executor );
-			//It's possible that a task was successfully scheduled but had no chance to run,
-			//so we need to release waiting threads:
-			closer.push( Phaser::forceTermination, phaser );
+			closer.push( BatchingExecutor::stop, executor );
 		}
 	}
 
 	private void awaitCompletionBeforeClose() {
 		try {
-			int phaseBeforeUnarrivedPartiesCheck = phaser.getPhase();
-			if ( phaser.getUnarrivedParties() > 0 ) {
-				phaser.awaitAdvanceInterruptibly( phaseBeforeUnarrivedPartiesCheck );
-			}
+			executor.awaitCompletion();
 		}
 		catch (InterruptedException e) {
 			log.interruptedWhileWaitingForIndexActivity( getName(), e );
 			Thread.currentThread().interrupt();
-		}
-	}
-
-	/**
-	 * Takes a batch of changesets from the queue and processes them.
-	 */
-	private void processBatch() {
-		try {
-			CompletableFuture<?> future;
-			try {
-				synchronized (strategy) {
-					strategy.reset();
-					changesetBuffer.clear();
-
-					changesetQueue.drainTo( changesetBuffer, changesetsPerBatch );
-
-					for ( Changeset changeset : changesetBuffer ) {
-						try {
-							changeset.submitTo( strategy );
-						}
-						catch (Throwable e) {
-							changeset.getFuture().completeExceptionally( e );
-							throw e;
-						}
-					}
-
-					// Nothing more to do, executeSubmitted and terminate
-					future = strategy.executeSubmitted();
-				}
-			}
-			finally {
-				try {
-					/*
-					 * Allow processing to be scheduled immediately,
-					 * even if we didn't finish executing yet (see the join below).
-					 * This won't lead to concurrent processing,
-					 * since there's only one thread in the pool,
-					 * but it will make sure the processing delay runs from one
-					 * queue drain to the next, instead of from one batch to
-					 * the next, allowing higher throughput when batches take more
-					 * than 100ms to process.
-					 */
-					processingScheduled.set( false );
-
-					/*
-					 * Just in case changesets were added to the queue between
-					 * when we drained the queue and the resetting of
-					 * processingScheduled above.
-					 * This must be executed before we arrive at the phaser to ensure that
-					 * threads calling submit(), then awaitCompletion() will not be unblocked
-					 * before we called ensureProcessingScheduled() below.
-					 */
-					if ( !changesetQueue.isEmpty() ) {
-						ensureProcessingScheduled();
-					}
-				}
-				catch (Throwable e) {
-					errorHandler.handleException(
-							"Error while ensuring the next submitted asynchronous Elasticsearch works will be processed",
-							e );
-				}
-			}
-
-			// Note: timeout is handled by the client, so this "join" will not last forever
-			future.join();
-		}
-		catch (Throwable e) {
-			errorHandler.handleException( "Error while processing Elasticsearch works", e );
-		}
-		finally {
-			/*
-			 * Regardless of the outcome (exception or not),
-			 * arrive at the phaser after all the works completed.
-			 * Note that all works have a timeout, so this will be executed eventually.
-			 *
-			 * Also note this must be executed *after* the finally block above,
-			 * so we are sure we won't arrive at the phaser before ensuring we're not
-			 * in a situation where no processing is scheduled even though
-			 * the queue is not empty.
-			 */
-			phaser.arriveAndDeregister();
 		}
 	}
 
@@ -284,12 +112,16 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 		}
 
 		@Override
-		protected void doSubmit(Changeset changeset) {
+		protected void doSubmit(ElasticsearchChangeset changeset) {
 			ElasticsearchBatchingWorkOrchestrator.this.submit( changeset );
 		}
 
 		@Override
 		protected void doClose() {
+			/*
+			 * TODO HSEARCH-3576 this will wait for *all* tasks to finish, including tasks from other children.
+			 *  We should do better, see BatchingExecutor.awaitCompletion.
+			 */
 			ElasticsearchBatchingWorkOrchestrator.this.awaitCompletionBeforeClose();
 		}
 	}

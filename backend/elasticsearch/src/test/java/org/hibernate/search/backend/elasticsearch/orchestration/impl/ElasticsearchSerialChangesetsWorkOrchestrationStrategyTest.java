@@ -79,7 +79,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
+		CompletableFuture<Void> futureAll = strategy.endBatch();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequenceFuture );
 	}
@@ -128,7 +128,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
+		CompletableFuture<Void> futureAll = strategy.endBatch();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
 	}
@@ -176,7 +176,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
+		CompletableFuture<Void> futureAll = strategy.endBatch();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
 	}
@@ -218,7 +218,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
+		CompletableFuture<Void> futureAll = strategy.endBatch();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence1Future );
 	}
@@ -271,7 +271,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
+		CompletableFuture<Void> futureAll = strategy.endBatch();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
 	}
