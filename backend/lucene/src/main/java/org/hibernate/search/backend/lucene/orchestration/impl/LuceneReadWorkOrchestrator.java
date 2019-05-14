@@ -15,12 +15,9 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 /**
  * @author Guillaume Smet
  */
-public interface LuceneReadWorkOrchestrator extends AutoCloseable {
+public interface LuceneReadWorkOrchestrator {
 
 	<T> CompletableFuture<T> submit(Set<String> indexNames, Set<ReaderProvider> readerProviders,
 			LuceneReadWork<T> work);
 
-	@Override
-	default void close() {
-	}
 }

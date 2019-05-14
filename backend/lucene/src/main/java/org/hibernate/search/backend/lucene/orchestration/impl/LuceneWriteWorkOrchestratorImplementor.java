@@ -6,18 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
-
 /**
  * @author Guillaume Smet
  */
-public interface LuceneWriteWorkOrchestrator {
-
-	<T> CompletableFuture<T> submit(LuceneWriteWork<T> work);
-
-	CompletableFuture<?> submit(List<LuceneWriteWork<?>> work);
-
+public interface LuceneWriteWorkOrchestratorImplementor extends AutoCloseable, LuceneWriteWorkOrchestrator {
+	@Override
+	default void close() {
+	}
 }

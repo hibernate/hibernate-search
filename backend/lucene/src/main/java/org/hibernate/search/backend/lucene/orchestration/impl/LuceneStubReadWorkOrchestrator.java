@@ -19,7 +19,7 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class LuceneStubReadWorkOrchestrator implements LuceneReadWorkOrchestrator {
+public class LuceneStubReadWorkOrchestrator implements LuceneReadWorkOrchestratorImplementor {
 
 	// Protected by synchronization on updates
 	private CompletableFuture<?> latestFuture = CompletableFuture.completedFuture( null );

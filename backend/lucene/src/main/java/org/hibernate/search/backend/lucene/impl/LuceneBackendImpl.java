@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryContextImpl;
 import org.hibernate.search.engine.backend.Backend;
@@ -21,7 +22,6 @@ import org.hibernate.search.backend.lucene.index.impl.IndexingBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
@@ -47,7 +47,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-	private final LuceneReadWorkOrchestrator queryOrchestrator;
+	private final LuceneReadWorkOrchestratorImplementor queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final EventContext eventContext;
@@ -126,7 +126,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( LuceneReadWorkOrchestrator::close, queryOrchestrator );
+			closer.push( LuceneReadWorkOrchestratorImplementor::close, queryOrchestrator );
 		}
 	}
 

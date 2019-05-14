@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class LuceneStubWriteWorkOrchestrator implements LuceneWriteWorkOrchestrator {
+public class LuceneStubWriteWorkOrchestrator implements LuceneWriteWorkOrchestratorImplementor {
 
 	private final LuceneStubWriteWorkExecutionContext context;
 
