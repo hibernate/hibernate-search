@@ -24,13 +24,13 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAgg
  *
  * @author Yoann Rodiere
  */
-class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchAccumulatingWorkOrchestrator {
+class ElasticsearchSerialChangesetsWorkOrchestrationStrategy implements ElasticsearchWorkOrchestrationStrategy {
 
 	private final BulkAndSequenceAggregator aggregator;
 
 	private CompletableFuture<Void> future = CompletableFuture.completedFuture( null );
 
-	public ElasticsearchSerialChangesetsWorkOrchestrator(ElasticsearchWorkSequenceBuilder sequenceBuilder,
+	public ElasticsearchSerialChangesetsWorkOrchestrationStrategy(ElasticsearchWorkSequenceBuilder sequenceBuilder,
 			ElasticsearchWorkBulker bulker) {
 		this.aggregator = new BulkAndSequenceAggregator( sequenceBuilder, bulker );
 	}
