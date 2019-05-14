@@ -19,13 +19,13 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * An abstract base for {@link ElasticsearchSharedWorkOrchestrator} implementations,
+ * An abstract base for {@link ElasticsearchWorkOrchestratorImplementor} implementations,
  * implementing a thread-safe shutdown.
  *
  * @author Yoann Rodiere
  */
-abstract class AbstractElasticsearchSharedWorkOrchestrator
-		implements ElasticsearchSharedWorkOrchestrator, AutoCloseable {
+abstract class AbstractElasticsearchWorkOrchestrator
+		implements ElasticsearchWorkOrchestratorImplementor, AutoCloseable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -34,7 +34,7 @@ abstract class AbstractElasticsearchSharedWorkOrchestrator
 	private boolean open = true; // Guarded by shutdownLock
 	private final ReadWriteLock shutdownLock = new ReentrantReadWriteLock();
 
-	protected AbstractElasticsearchSharedWorkOrchestrator(String name) {
+	protected AbstractElasticsearchWorkOrchestrator(String name) {
 		this.name = name;
 	}
 

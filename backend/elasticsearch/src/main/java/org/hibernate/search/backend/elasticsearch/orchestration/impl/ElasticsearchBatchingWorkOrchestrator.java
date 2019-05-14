@@ -34,8 +34,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Yoann Rodiere
  */
-class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchSharedWorkOrchestrator
-		implements ElasticsearchSharedWorkOrchestrator, AutoCloseable {
+class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
+		implements ElasticsearchWorkOrchestratorImplementor, AutoCloseable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -67,7 +67,7 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchS
 	 * delegate in FIFO order, if {@code false} changesets submitted
 	 * when the internal queue is full may be submitted out of order.
 	 */
-	public ElasticsearchBatchingSharedWorkOrchestrator(
+	public ElasticsearchBatchingWorkOrchestrator(
 			String name, ElasticsearchWorkOrchestrationStrategy strategy,
 			int maxChangesetsPerBatch, boolean fair,
 			ErrorHandler errorHandler) {
@@ -97,7 +97,7 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchS
 	 *
 	 * @param name The name of the child orchestrator when reporting errors
 	 */
-	public ElasticsearchSharedWorkOrchestrator createChild(String name) {
+	public ElasticsearchWorkOrchestratorImplementor createChild(String name) {
 		return new ChildOrchestrator( name );
 	}
 
@@ -177,7 +177,7 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchS
 	@Override
 	protected void doClose() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchBatchingSharedWorkOrchestrator::awaitCompletionBeforeClose, this );
+			closer.push( ElasticsearchBatchingWorkOrchestrator::awaitCompletionBeforeClose, this );
 			closer.push( ExecutorService::shutdownNow, executor );
 			//It's possible that a task was successfully scheduled but had no chance to run,
 			//so we need to release waiting threads:
@@ -276,8 +276,8 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchS
 		}
 	}
 
-	private class ChildOrchestrator extends AbstractElasticsearchSharedWorkOrchestrator
-			implements ElasticsearchSharedWorkOrchestrator {
+	private class ChildOrchestrator extends AbstractElasticsearchWorkOrchestrator
+			implements ElasticsearchWorkOrchestratorImplementor {
 
 		protected ChildOrchestrator(String name) {
 			super( name );
@@ -290,17 +290,17 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchS
 
 		@Override
 		protected void doSubmit(Changeset changeset) {
-			ElasticsearchBatchingSharedWorkOrchestrator.this.submit( changeset );
+			ElasticsearchBatchingWorkOrchestrator.this.submit( changeset );
 		}
 
 		@Override
 		public void awaitCompletion() throws InterruptedException {
-			ElasticsearchBatchingSharedWorkOrchestrator.this.awaitCompletion();
+			ElasticsearchBatchingWorkOrchestrator.this.awaitCompletion();
 		}
 
 		@Override
 		protected void doClose() {
-			ElasticsearchBatchingSharedWorkOrchestrator.this.awaitCompletionBeforeClose();
+			ElasticsearchBatchingWorkOrchestrator.this.awaitCompletionBeforeClose();
 		}
 	}
 

@@ -102,7 +102,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	private final ElasticsearchLink link;
 	private final ErrorHandler errorHandler;
 
-	private final ElasticsearchBatchingSharedWorkOrchestrator rootParallelOrchestrator;
+	private final ElasticsearchBatchingWorkOrchestrator rootParallelOrchestrator;
 
 	public ElasticsearchWorkOrchestratorProvider(String rootParallelOrchestratorName,
 			ElasticsearchLink link,
@@ -146,7 +146,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	 * @return The root parallel orchestrator. Useful to execute operations after an index manager was closed,
 	 * such as index dropping.
 	 */
-	public ElasticsearchBatchingSharedWorkOrchestrator getRootParallelOrchestrator() {
+	public ElasticsearchBatchingWorkOrchestrator getRootParallelOrchestrator() {
 		return rootParallelOrchestrator;
 	}
 
@@ -154,7 +154,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	 * @param name The name of the orchestrator to create.
 	 * @return A <a href="#serial-orchestrators">serial orchestrator</a>.
 	 */
-	public ElasticsearchSharedWorkOrchestrator createSerialOrchestrator(String name) {
+	public ElasticsearchWorkOrchestratorImplementor createSerialOrchestrator(String name) {
 		ElasticsearchWorkOrchestrationStrategy strategy = createSerialOrchestrationStrategy();
 
 		return createBatchingSharedOrchestrator(
@@ -169,14 +169,14 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	 * @param name The name of the orchestrator to create.
 	 * @return A <a href="#parallel-orchestrators">parallel orchestrator</a>.
 	 */
-	public ElasticsearchSharedWorkOrchestrator createParallelOrchestrator(String name) {
+	public ElasticsearchWorkOrchestratorImplementor createParallelOrchestrator(String name) {
 		return rootParallelOrchestrator.createChild( name );
 	}
 
-	private ElasticsearchBatchingSharedWorkOrchestrator createBatchingSharedOrchestrator(
+	private ElasticsearchBatchingWorkOrchestrator createBatchingSharedOrchestrator(
 			String name, ElasticsearchWorkOrchestrationStrategy strategy,
 			int maxChangesetsPerBatch, boolean fair) {
-		return new ElasticsearchBatchingSharedWorkOrchestrator(
+		return new ElasticsearchBatchingWorkOrchestrator(
 				name, strategy, maxChangesetsPerBatch, fair, errorHandler
 		);
 	}
