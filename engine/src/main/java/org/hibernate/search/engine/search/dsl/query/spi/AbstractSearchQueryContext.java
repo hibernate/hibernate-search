@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
@@ -32,7 +33,7 @@ public abstract class AbstractSearchQueryContext<
 		SC extends SearchSortContainerContext,
 		C
 		>
-		implements SearchQueryContextImplementor<S, T, PC, SC> {
+		implements SearchQueryResultContext<S, T, PC>, SearchQueryContext<S, T, SC> {
 
 	private final IndexSearchScope<C> indexSearchScope;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
