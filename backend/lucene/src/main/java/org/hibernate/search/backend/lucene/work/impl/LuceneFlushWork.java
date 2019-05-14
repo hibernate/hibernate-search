@@ -8,11 +8,9 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.CompletableFuture;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -27,13 +25,11 @@ public class LuceneFlushWork extends AbstractLuceneWriteWork<Void> {
 	}
 
 	@Override
-	public CompletableFuture<Void> execute(LuceneWriteWorkExecutionContext context) {
-		return Futures.create( () -> CompletableFuture.completedFuture( null ).thenRun( () -> flushIndex( context.getIndexWriter() ) ) );
-	}
-
-	private void flushIndex(IndexWriter indexWriter) {
+	public Void execute(LuceneWriteWorkExecutionContext context) {
+		IndexWriter indexWriter = context.getIndexWriter();
 		try {
 			indexWriter.flush();
+			return null;
 		}
 		catch (IOException e) {
 			throw log.unableToFlushIndex( getEventContext(), e );

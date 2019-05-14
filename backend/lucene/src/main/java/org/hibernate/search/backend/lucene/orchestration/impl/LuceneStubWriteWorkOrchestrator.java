@@ -11,7 +11,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
-import org.hibernate.search.util.common.impl.Futures;
 
 
 /**
@@ -36,9 +35,10 @@ public class LuceneStubWriteWorkOrchestrator implements LuceneWriteWorkOrchestra
 
 	@Override
 	public synchronized <T> CompletableFuture<T> submit(LuceneWriteWork<T> work) {
-		CompletableFuture<T> future = latestFuture.thenCompose( Futures.safeComposer(
+		CompletableFuture<T> future = latestFuture.thenApply(
+				// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
 				ignored -> work.execute( context )
-		) );
+		);
 		// Ignore errors from this work in future works and during close(): error handling is the client's responsibility.
 		latestFuture = future.exceptionally( ignore -> null );
 		return future;
@@ -48,9 +48,10 @@ public class LuceneStubWriteWorkOrchestrator implements LuceneWriteWorkOrchestra
 	public synchronized CompletableFuture<?> submit(List<LuceneWriteWork<?>> works) {
 		CompletableFuture<?> future = latestFuture;
 		for ( LuceneWriteWork<?> work : works ) {
-			future = future.thenCompose( Futures.safeComposer(
+			future = future.thenApply(
+					// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
 					ignored -> work.execute( context )
-			) );
+			);
 		}
 		// Ignore errors from this work in future works and during close(): error handling is the client's responsibility.
 		latestFuture = future.exceptionally( ignore -> null );

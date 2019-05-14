@@ -9,10 +9,8 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Explanation;
@@ -42,12 +40,7 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 	}
 
 	@Override
-	public CompletableFuture<Explanation> execute(LuceneReadWorkExecutionContext context) {
-		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexReader
-		return Futures.create( () -> CompletableFuture.completedFuture( explain( context ) ) );
-	}
-
-	private Explanation explain(LuceneReadWorkExecutionContext context) {
+	public Explanation execute(LuceneReadWorkExecutionContext context) {
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 

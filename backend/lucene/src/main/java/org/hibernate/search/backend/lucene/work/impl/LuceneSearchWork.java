@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
@@ -18,7 +17,6 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneLoadableSearchResult;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchResultExtractor;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexReader;
@@ -61,12 +59,7 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 	}
 
 	@Override
-	public CompletableFuture<LuceneLoadableSearchResult<H>> execute(LuceneReadWorkExecutionContext context) {
-		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexReader
-		return Futures.create( () -> CompletableFuture.completedFuture( executeQuery( context ) ) );
-	}
-
-	private LuceneLoadableSearchResult<H> executeQuery(LuceneReadWorkExecutionContext context) {
+	public LuceneLoadableSearchResult<H> execute(LuceneReadWorkExecutionContext context) {
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 

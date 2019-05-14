@@ -8,12 +8,10 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.CompletableFuture;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -37,12 +35,8 @@ public abstract class AbstractLuceneUpdateEntryWork extends AbstractLuceneWriteW
 	}
 
 	@Override
-	public CompletableFuture<Long> execute(LuceneWriteWorkExecutionContext context) {
-		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
-		return Futures.create( () -> CompletableFuture.completedFuture( updateEntry( context.getIndexWriter() ) ) );
-	}
-
-	private long updateEntry(IndexWriter indexWriter) {
+	public Long execute(LuceneWriteWorkExecutionContext context) {
+		IndexWriter indexWriter = context.getIndexWriter();
 		try {
 			return doUpdateEntry( indexWriter, tenantId, id, indexEntry );
 		}

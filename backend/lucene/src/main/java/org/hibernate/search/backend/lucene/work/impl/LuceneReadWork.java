@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import java.util.concurrent.CompletableFuture;
-
 /**
  * @author Guillaume Smet
  */
 public interface LuceneReadWork<T> {
 
-	CompletableFuture<T> execute(LuceneReadWorkExecutionContext context);
+	T execute(LuceneReadWorkExecutionContext context);
 
 }
