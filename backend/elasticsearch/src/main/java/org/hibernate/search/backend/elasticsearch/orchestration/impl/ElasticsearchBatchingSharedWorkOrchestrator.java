@@ -39,7 +39,7 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchS
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchAccumulatingWorkOrchestrator delegate;
+	private final ElasticsearchWorkOrchestrationStrategy strategy;
 	private final ErrorHandler errorHandler;
 	private final int changesetsPerBatch;
 
@@ -59,20 +59,20 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchS
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
+	 * @param strategy An orchestration strategy to use in the background thread.
 	 * @param maxChangesetsPerBatch The maximum number of changesets to
 	 * process in a single batch. Higher values mean lesser chance of transport
 	 * thread starvation, but higher heap consumption.
 	 * @param fair if {@code true} changesets are always submitted to the
 	 * delegate in FIFO order, if {@code false} changesets submitted
 	 * when the internal queue is full may be submitted out of order.
-	 * @param delegate A delegate orchestrator. May not be thread-safe.
 	 */
 	public ElasticsearchBatchingSharedWorkOrchestrator(
-			String name, int maxChangesetsPerBatch, boolean fair,
-			ElasticsearchAccumulatingWorkOrchestrator delegate,
+			String name, ElasticsearchWorkOrchestrationStrategy strategy,
+			int maxChangesetsPerBatch, boolean fair,
 			ErrorHandler errorHandler) {
 		super( name );
-		this.delegate = delegate;
+		this.strategy = strategy;
 		this.errorHandler = errorHandler;
 		this.changesetsPerBatch = maxChangesetsPerBatch;
 		changesetQueue = new ArrayBlockingQueue<>( maxChangesetsPerBatch, fair );
@@ -202,15 +202,15 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchS
 		try {
 			CompletableFuture<?> future;
 			try {
-				synchronized ( delegate ) {
-					delegate.reset();
+				synchronized (strategy) {
+					strategy.reset();
 					changesetBuffer.clear();
 
 					changesetQueue.drainTo( changesetBuffer, changesetsPerBatch );
 
 					for ( Changeset changeset : changesetBuffer ) {
 						try {
-							changeset.submitTo( delegate );
+							changeset.submitTo( strategy );
 						}
 						catch (Throwable e) {
 							changeset.getFuture().completeExceptionally( e );
@@ -219,7 +219,7 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchS
 					}
 
 					// Nothing more to do, executeSubmitted and terminate
-					future = delegate.executeSubmitted();
+					future = strategy.executeSubmitted();
 				}
 			}
 			finally {

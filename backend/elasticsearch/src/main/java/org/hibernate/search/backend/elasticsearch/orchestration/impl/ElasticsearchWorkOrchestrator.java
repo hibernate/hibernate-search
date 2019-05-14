@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
 /**
- * @author Yoann Rodiere
+ * A thread-safe component responsible for ordering and planning the execution of works.
  */
 public interface ElasticsearchWorkOrchestrator extends AutoCloseable {
 

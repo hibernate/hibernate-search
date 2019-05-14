@@ -29,7 +29,7 @@ import org.easymock.IAnswer;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockSupport {
+public class ElasticsearchSerialChangesetsWorkOrchestrationStrategyTest extends EasyMockSupport {
 
 	/**
 	 * @return A value that should not matter, because it should not be used.
@@ -56,8 +56,8 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialChangesetsWorkOrchestrator orchestrator =
-				new ElasticsearchSerialChangesetsWorkOrchestrator( sequenceBuilderMock, bulkerMock );
+		ElasticsearchSerialChangesetsWorkOrchestrationStrategy strategy =
+				new ElasticsearchSerialChangesetsWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -72,20 +72,20 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
 		replayAll();
-		CompletableFuture<Void> returnedSequenceFuture = orchestrator.submit( changeset1 );
+		CompletableFuture<Void> returnedSequenceFuture = strategy.submit( changeset1 );
 		verifyAll();
 		assertThat( returnedSequenceFuture ).isSameAs( sequenceFuture );
 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
+		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequenceFuture );
 
 		resetAll();
 		replayAll();
-		orchestrator.close();
+		strategy.close();
 		verifyAll();
 	}
 
@@ -101,8 +101,8 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialChangesetsWorkOrchestrator orchestrator =
-				new ElasticsearchSerialChangesetsWorkOrchestrator( sequenceBuilderMock, bulkerMock );
+		ElasticsearchSerialChangesetsWorkOrchestrationStrategy strategy =
+				new ElasticsearchSerialChangesetsWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -114,7 +114,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = orchestrator.submit( changeset1 );
+		CompletableFuture<Void> returnedSequence1Future = strategy.submit( changeset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
@@ -126,20 +126,20 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence2Future = orchestrator.submit( changeset2 );
+		CompletableFuture<Void> returnedSequence2Future = strategy.submit( changeset2 );
 		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
+		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
 
 		resetAll();
 		replayAll();
-		orchestrator.close();
+		strategy.close();
 		verifyAll();
 	}
 
@@ -155,8 +155,8 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialChangesetsWorkOrchestrator orchestrator =
-				new ElasticsearchSerialChangesetsWorkOrchestrator( sequenceBuilderMock, bulkerMock );
+		ElasticsearchSerialChangesetsWorkOrchestrationStrategy strategy =
+				new ElasticsearchSerialChangesetsWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -167,7 +167,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = orchestrator.submit( changeset1 );
+		CompletableFuture<Void> returnedSequence1Future = strategy.submit( changeset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
@@ -179,20 +179,20 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence2Future = orchestrator.submit( changeset2 );
+		CompletableFuture<Void> returnedSequence2Future = strategy.submit( changeset2 );
 		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
+		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
 
 		resetAll();
 		replayAll();
-		orchestrator.close();
+		strategy.close();
 		verifyAll();
 	}
 
@@ -206,8 +206,8 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialChangesetsWorkOrchestrator orchestrator =
-				new ElasticsearchSerialChangesetsWorkOrchestrator( sequenceBuilderMock, bulkerMock );
+		ElasticsearchSerialChangesetsWorkOrchestrationStrategy strategy =
+				new ElasticsearchSerialChangesetsWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -226,20 +226,20 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = orchestrator.submit( changeset1 );
+		CompletableFuture<Void> returnedSequence1Future = strategy.submit( changeset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
+		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence1Future );
 
 		resetAll();
 		replayAll();
-		orchestrator.close();
+		strategy.close();
 		verifyAll();
 	}
 
@@ -255,8 +255,8 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialChangesetsWorkOrchestrator orchestrator =
-				new ElasticsearchSerialChangesetsWorkOrchestrator( sequenceBuilderMock, bulkerMock );
+		ElasticsearchSerialChangesetsWorkOrchestrationStrategy strategy =
+				new ElasticsearchSerialChangesetsWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -267,7 +267,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = orchestrator.submit( changeset1 );
+		CompletableFuture<Void> returnedSequence1Future = strategy.submit( changeset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
@@ -284,20 +284,20 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence2Future = orchestrator.submit( changeset2 );
+		CompletableFuture<Void> returnedSequence2Future = strategy.submit( changeset2 );
 		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
+		CompletableFuture<Void> futureAll = strategy.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
 
 		resetAll();
 		replayAll();
-		orchestrator.close();
+		strategy.close();
 		verifyAll();
 	}
 

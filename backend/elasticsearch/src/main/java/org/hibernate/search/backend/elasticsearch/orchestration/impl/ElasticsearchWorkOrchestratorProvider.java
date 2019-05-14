@@ -118,9 +118,9 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 		 */
 		this.rootParallelOrchestrator = createBatchingSharedOrchestrator(
 				rootParallelOrchestratorName,
+				createParallelOrchestrationStrategy(),
 				PARALLEL_MAX_CHANGESETS_PER_BATCH,
-				false, // Do not care about ordering when queuing changesets
-				createThreadUnsafeParallelOrchestrator()
+				false // Do not care about ordering when queuing changesets
 		);
 	}
 
@@ -155,15 +155,14 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	 * @return A <a href="#serial-orchestrators">serial orchestrator</a>.
 	 */
 	public ElasticsearchSharedWorkOrchestrator createSerialOrchestrator(String name) {
-		ElasticsearchAccumulatingWorkOrchestrator delegate =
-				createThreadUnsafeSerialOrchestrator();
+		ElasticsearchWorkOrchestrationStrategy strategy = createSerialOrchestrationStrategy();
 
 		return createBatchingSharedOrchestrator(
 				name,
+				strategy,
 				SERIAL_MAX_CHANGESETS_PER_BATCH,
-				true /* enqueue changesets in the exact order they were submitted */,
-				delegate
-				);
+				true /* enqueue changesets in the exact order they were submitted */
+		);
 	}
 
 	/**
@@ -175,22 +174,23 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	}
 
 	private ElasticsearchBatchingSharedWorkOrchestrator createBatchingSharedOrchestrator(
-			String name, int maxChangesetsPerBatch, boolean fair,
-			ElasticsearchAccumulatingWorkOrchestrator delegate) {
-		return new ElasticsearchBatchingSharedWorkOrchestrator( name, maxChangesetsPerBatch, fair,
-				delegate, errorHandler );
+			String name, ElasticsearchWorkOrchestrationStrategy strategy,
+			int maxChangesetsPerBatch, boolean fair) {
+		return new ElasticsearchBatchingSharedWorkOrchestrator(
+				name, strategy, maxChangesetsPerBatch, fair, errorHandler
+		);
 	}
 
-	private ElasticsearchAccumulatingWorkOrchestrator createThreadUnsafeSerialOrchestrator() {
+	private ElasticsearchWorkOrchestrationStrategy createSerialOrchestrationStrategy() {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( this::createRefreshingWorkExecutionContext );
 		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, SERIAL_MIN_BULK_SIZE );
-		return new ElasticsearchSerialChangesetsWorkOrchestrator( sequenceBuilder, bulker );
+		return new ElasticsearchSerialChangesetsWorkOrchestrationStrategy( sequenceBuilder, bulker );
 	}
 
-	private ElasticsearchAccumulatingWorkOrchestrator createThreadUnsafeParallelOrchestrator() {
+	private ElasticsearchWorkOrchestrationStrategy createParallelOrchestrationStrategy() {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( this::createRefreshingWorkExecutionContext );
 		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, PARALLEL_MIN_BULK_SIZE );
-		return new ElasticsearchParallelChangesetsWorkOrchestrator( sequenceBuilder, bulker );
+		return new ElasticsearchParallelChangesetsWorkOrchestrationStrategy( sequenceBuilder, bulker );
 	}
 
 	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier) {
