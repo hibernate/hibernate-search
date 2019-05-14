@@ -4,16 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.orchestration.impl;
+package org.hibernate.search.engine.common.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.newCapture;
-
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.engine.common.spi.ErrorContext;
-import org.hibernate.search.engine.common.spi.ErrorHandler;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,16 +16,9 @@ import org.junit.Test;
 import org.easymock.Capture;
 import org.easymock.EasyMockSupport;
 
-/**
- * @author Yoann Rodiere
- */
 public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 
 	private ErrorHandler errorHandlerMock;
-
-	private ElasticsearchWork<?> work1;
-	private ElasticsearchWork<?> work2;
-	private ElasticsearchWork<?> work3;
 
 	private Object workInfo1;
 	private Object workInfo2;
@@ -39,10 +27,6 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 	@Before
 	public void initMocks() {
 		errorHandlerMock = createStrictMock( ErrorHandler.class );
-
-		work1 = work( 1 );
-		work2 = work( 2 );
-		work3 = work( 3 );
 
 		workInfo1 = workInfo( 1 );
 		workInfo2 = workInfo( 2 );
@@ -61,13 +45,10 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 		Throwable throwable = new Throwable();
 
 		resetAll();
-		expect( work1.getInfo() ).andReturn( workInfo1 );
-		expect( work2.getInfo() ).andReturn( workInfo2 );
-		expect( work3.getInfo() ).andReturn( workInfo3 );
 		replayAll();
-		handler.markAsFailed( work1, throwable );
-		handler.markAsSkipped( work2 );
-		handler.markAsSkipped( work3 );
+		handler.markAsFailed( workInfo1, throwable );
+		handler.markAsSkipped( workInfo2 );
+		handler.markAsSkipped( workInfo3 );
 		verifyAll();
 
 		resetAll();
@@ -106,13 +87,10 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 		Throwable throwable = new Throwable();
 
 		resetAll();
-		expect( work1.getInfo() ).andReturn( workInfo1 );
-		expect( work2.getInfo() ).andReturn( workInfo2 );
-		expect( work3.getInfo() ).andReturn( workInfo3 );
 		replayAll();
-		handler.markAsSkipped( work1 );
-		handler.markAsSkipped( work2 );
-		handler.markAsSkipped( work3 );
+		handler.markAsSkipped( workInfo1 );
+		handler.markAsSkipped( workInfo2 );
+		handler.markAsSkipped( workInfo3 );
 		verifyAll();
 
 		resetAll();
@@ -144,13 +122,10 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 		Throwable throwable2 = new Throwable();
 
 		resetAll();
-		expect( work1.getInfo() ).andReturn( workInfo1 );
-		expect( work2.getInfo() ).andReturn( workInfo2 );
-		expect( work3.getInfo() ).andReturn( workInfo3 );
 		replayAll();
-		handler.markAsFailed( work1, throwable1 );
-		handler.markAsFailed( work2, throwable2 );
-		handler.markAsSkipped( work3 );
+		handler.markAsFailed( workInfo1, throwable1 );
+		handler.markAsFailed( workInfo2, throwable2 );
+		handler.markAsSkipped( workInfo3 );
 		verifyAll();
 
 		resetAll();
@@ -178,13 +153,10 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 		Throwable throwable2 = new Throwable();
 
 		resetAll();
-		expect( work1.getInfo() ).andReturn( workInfo1 );
-		expect( work2.getInfo() ).andReturn( workInfo2 );
-		expect( work3.getInfo() ).andReturn( workInfo3 );
 		replayAll();
-		handler.markAsFailed( work1, throwable1 );
-		handler.markAsSkipped( work2 );
-		handler.markAsSkipped( work3 );
+		handler.markAsFailed( workInfo1, throwable1 );
+		handler.markAsSkipped( workInfo2 );
+		handler.markAsSkipped( workInfo3 );
 		verifyAll();
 
 		resetAll();
@@ -202,11 +174,6 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
 		assertThat( errorContext.getOperationAtFault() ).isSameAs( workInfo1 );
 		assertThat( errorContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
-	}
-
-	private ElasticsearchWork<?> work(int index) {
-		ElasticsearchWork<?> mock = createMock( "work" + index, ElasticsearchWork.class );
-		return mock;
 	}
 
 	private Object workInfo(int index) {
