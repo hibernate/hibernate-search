@@ -14,23 +14,23 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAggregator;
 
 /**
- * Aggregates works from changesets into a single sequence,
+ * Aggregates works from worksets into a single sequence,
  * respecting the order they were submitted.
  * <p>
- * Two changesets or works submitted to this orchestrator will never run in parallel,
+ * Two worksets or works submitted to this orchestrator will never run in parallel,
  * even if a reset() occurred between the two submissions.
  * <p>
  * This class is mutable and not thread-safe.
  *
  * @author Yoann Rodiere
  */
-class ElasticsearchSerialChangesetsWorkOrchestrationStrategy implements ElasticsearchWorkOrchestrationStrategy {
+class ElasticsearchSerialWorkOrchestrationStrategy implements ElasticsearchWorkOrchestrationStrategy {
 
 	private final BulkAndSequenceAggregator aggregator;
 
 	private CompletableFuture<Void> future = CompletableFuture.completedFuture( null );
 
-	public ElasticsearchSerialChangesetsWorkOrchestrationStrategy(ElasticsearchWorkSequenceBuilder sequenceBuilder,
+	public ElasticsearchSerialWorkOrchestrationStrategy(ElasticsearchWorkSequenceBuilder sequenceBuilder,
 			ElasticsearchWorkBulker bulker) {
 		this.aggregator = new BulkAndSequenceAggregator( sequenceBuilder, bulker );
 	}

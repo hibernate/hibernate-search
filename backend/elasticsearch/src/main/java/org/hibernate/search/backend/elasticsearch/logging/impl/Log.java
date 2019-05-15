@@ -226,14 +226,14 @@ public interface Log extends BasicLogger {
 	SearchException elasticsearchResponseIndicatesFailure();
 
 	@Message(id = ID_OFFSET_2 + 91,
-			value = "The thread was interrupted while a changeset was being submitted to '%1$s'."
-					+ " The changeset has been discarded." )
-	SearchException threadInterruptedWhileSubmittingChangeset(String orchestratorName);
+			value = "The thread was interrupted while a workset was being submitted to '%1$s'."
+					+ " The workset has been discarded." )
+	SearchException threadInterruptedWhileSubmittingWorkset(String orchestratorName);
 
 	@Message(id = ID_OFFSET_2 + 92,
-			value = "A changeset was submitted after Hibernate Search shutdown was requested to '%1$s'."
-					+ " The changeset has been discarded." )
-	SearchException orchestratorShutDownBeforeSubmittingChangeset(String orchestratorName);
+			value = "A workset was submitted after Hibernate Search shutdown was requested to '%1$s'."
+					+ " The workset has been discarded." )
+	SearchException orchestratorShutDownBeforeSubmittingWorkset(String orchestratorName);
 
 	@LogMessage(level = Level.TRACE)
 	@Message(id = ID_OFFSET_2 + 93,
@@ -450,7 +450,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 50, value = "Failed to shut down the Elasticsearch index manager with name '%1$s'.")
 	SearchException failedToShutdownIndexManager(String indexName, @Cause Exception cause, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_3 + 51, value = "The operation was skipped due to the failure of a previous work in the same changeset.")
+	@Message(id = ID_OFFSET_3 + 51, value = "The operation was skipped due to the failure of a previous work in the same workset.")
 	SearchException elasticsearchSkippedBecauseOfPreviousWork(@Cause Throwable skippingCause);
 
 	@Message(id = ID_OFFSET_3 + 52, value = "Invalid index lifecycle strategy name: '%1$s'."

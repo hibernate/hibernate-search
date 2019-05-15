@@ -29,7 +29,7 @@ import org.easymock.IAnswer;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extends EasyMockSupport {
+public class ElasticsearchParallelWorkOrchestrationStrategyTest extends EasyMockSupport {
 
 	/**
 	 * @return A value that should not matter, because it should not be used.
@@ -51,13 +51,13 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 	public void simple() {
 		ElasticsearchWork<?> work1 = work( 1 );
 		BulkableElasticsearchWork<?> work2 = bulkableWork( 2 );
-		List<ElasticsearchWork<?>> changeset1 = Arrays.asList( work1, work2 );
+		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1, work2 );
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchParallelChangesetsWorkOrchestrationStrategy strategy =
-				new ElasticsearchParallelChangesetsWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
+		ElasticsearchParallelWorkOrchestrationStrategy strategy =
+				new ElasticsearchParallelWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -72,7 +72,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
 		replayAll();
-		CompletableFuture<Void> returnedSequenceFuture = strategy.submit( changeset1 );
+		CompletableFuture<Void> returnedSequenceFuture = strategy.submit( workset1 );
 		verifyAll();
 		assertThat( returnedSequenceFuture ).isSameAs( sequenceFuture );
 
@@ -87,19 +87,19 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 	}
 
 	@Test
-	public void parallelSequenceBetweenChangeset() {
+	public void parallelSequenceBetweenWorkset() {
 		ElasticsearchWork<?> work1 = work( 1 );
-		List<ElasticsearchWork<?>> changeset1 = Arrays.asList( work1 );
+		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1 );
 
 		BulkableElasticsearchWork<?> work2 = bulkableWork( 2 );
-		List<ElasticsearchWork<?>> changeset2 = Arrays.asList( work2 );
+		List<ElasticsearchWork<?>> workset2 = Arrays.asList( work2 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchParallelChangesetsWorkOrchestrationStrategy strategy =
-				new ElasticsearchParallelChangesetsWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
+		ElasticsearchParallelWorkOrchestrationStrategy strategy =
+				new ElasticsearchParallelWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -111,7 +111,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = strategy.submit( changeset1 );
+		CompletableFuture<Void> returnedSequence1Future = strategy.submit( workset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
@@ -123,7 +123,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence2Future = strategy.submit( changeset2 );
+		CompletableFuture<Void> returnedSequence2Future = strategy.submit( workset2 );
 		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
@@ -142,17 +142,17 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 	@Test
 	public void reuseBulkAcrossSequences() {
 		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
-		List<ElasticsearchWork<?>> changeset1 = Arrays.asList( work1 );
+		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1 );
 
 		BulkableElasticsearchWork<?> work2 = bulkableWork( 2 );
-		List<ElasticsearchWork<?>> changeset2 = Arrays.asList( work2 );
+		List<ElasticsearchWork<?>> workset2 = Arrays.asList( work2 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchParallelChangesetsWorkOrchestrationStrategy strategy =
-				new ElasticsearchParallelChangesetsWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
+		ElasticsearchParallelWorkOrchestrationStrategy strategy =
+				new ElasticsearchParallelWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -163,7 +163,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = strategy.submit( changeset1 );
+		CompletableFuture<Void> returnedSequence1Future = strategy.submit( workset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
@@ -175,7 +175,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence2Future = strategy.submit( changeset2 );
+		CompletableFuture<Void> returnedSequence2Future = strategy.submit( workset2 );
 		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
@@ -200,17 +200,17 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 	}
 
 	@Test
-	public void newBulkIfNonBulkable_sameChangeset() {
+	public void newBulkIfNonBulkable_sameWorkset() {
 		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
 		ElasticsearchWork<?> work2 = work( 2 );
 		BulkableElasticsearchWork<?> work3 = bulkableWork( 3 );
-		List<ElasticsearchWork<?>> changeset1 = Arrays.asList( work1, work2, work3 );
+		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1, work2, work3 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchParallelChangesetsWorkOrchestrationStrategy strategy =
-				new ElasticsearchParallelChangesetsWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
+		ElasticsearchParallelWorkOrchestrationStrategy strategy =
+				new ElasticsearchParallelWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -229,7 +229,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = strategy.submit( changeset1 );
+		CompletableFuture<Void> returnedSequence1Future = strategy.submit( workset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
@@ -248,19 +248,19 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 	}
 
 	@Test
-	public void newBulkIfNonBulkable_differentChangesets() {
+	public void newBulkIfNonBulkable_differentWorksets() {
 		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
-		List<ElasticsearchWork<?>> changeset1 = Arrays.asList( work1 );
+		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1 );
 		ElasticsearchWork<?> work2 = work( 2 );
 		BulkableElasticsearchWork<?> work3 = bulkableWork( 3 );
-		List<ElasticsearchWork<?>> changeset2 = Arrays.asList( work2, work3 );
+		List<ElasticsearchWork<?>> workset2 = Arrays.asList( work2, work3 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchParallelChangesetsWorkOrchestrationStrategy strategy =
-				new ElasticsearchParallelChangesetsWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
+		ElasticsearchParallelWorkOrchestrationStrategy strategy =
+				new ElasticsearchParallelWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -271,7 +271,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = strategy.submit( changeset1 );
+		CompletableFuture<Void> returnedSequence1Future = strategy.submit( workset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
@@ -288,7 +288,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestrationStrategyTest extend
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence2Future = strategy.submit( changeset2 );
+		CompletableFuture<Void> returnedSequence2Future = strategy.submit( workset2 );
 		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 

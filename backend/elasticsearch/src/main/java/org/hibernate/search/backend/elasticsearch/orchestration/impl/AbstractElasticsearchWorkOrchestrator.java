@@ -46,14 +46,14 @@ abstract class AbstractElasticsearchWorkOrchestrator
 	@Override
 	public CompletableFuture<?> submit(List<ElasticsearchWork<?>> works) {
 		CompletableFuture<Object> future = new CompletableFuture<>();
-		submit( new ElasticsearchMultipleWorkChangeset( works, future ) );
+		submit( new ElasticsearchMultipleWorkSet( works, future ) );
 		return future;
 	}
 
 	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new ElasticsearchSingleWorkChangeset<>( work, future ) );
+		submit( new ElasticsearchSingleWorkSet<>( work, future ) );
 		return future;
 	}
 
@@ -72,39 +72,39 @@ abstract class AbstractElasticsearchWorkOrchestrator
 		}
 	}
 
-	protected abstract void doSubmit(ElasticsearchChangeset changeset) throws InterruptedException;
+	protected abstract void doSubmit(ElasticsearchWorkSet workSet) throws InterruptedException;
 
 	protected abstract void doClose();
 
-	void submit(ElasticsearchChangeset changeset) {
+	void submit(ElasticsearchWorkSet workSet) {
 		if ( !shutdownLock.readLock().tryLock() ) {
 			// The orchestrator is shutting down: abort.
-			throw log.orchestratorShutDownBeforeSubmittingChangeset( name );
+			throw log.orchestratorShutDownBeforeSubmittingWorkset( name );
 		}
 		try {
 			if ( !open ) {
 				// The orchestrator has shut down: abort.
-				throw log.orchestratorShutDownBeforeSubmittingChangeset( name );
+				throw log.orchestratorShutDownBeforeSubmittingWorkset( name );
 			}
-			doSubmit( changeset );
+			doSubmit( workSet );
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			throw log.threadInterruptedWhileSubmittingChangeset( name );
+			throw log.threadInterruptedWhileSubmittingWorkset( name );
 		}
 		finally {
 			shutdownLock.readLock().unlock();
 		}
 	}
 
-	interface ElasticsearchChangeset extends BatchingExecutor.Task<ElasticsearchWorkOrchestrationStrategy> {
+	interface ElasticsearchWorkSet extends BatchingExecutor.Task<ElasticsearchWorkOrchestrationStrategy> {
 	}
 
-	static class ElasticsearchMultipleWorkChangeset implements ElasticsearchChangeset {
+	static class ElasticsearchMultipleWorkSet implements ElasticsearchWorkSet {
 		private final List<ElasticsearchWork<?>> works;
 		private final CompletableFuture<Object> future;
 
-		ElasticsearchMultipleWorkChangeset(List<ElasticsearchWork<?>> works, CompletableFuture<Object> future) {
+		ElasticsearchMultipleWorkSet(List<ElasticsearchWork<?>> works, CompletableFuture<Object> future) {
 			this.works = new ArrayList<>( works );
 			this.future = future;
 		}
@@ -120,11 +120,11 @@ abstract class AbstractElasticsearchWorkOrchestrator
 		}
 	}
 
-	static class ElasticsearchSingleWorkChangeset<T> implements ElasticsearchChangeset {
+	static class ElasticsearchSingleWorkSet<T> implements ElasticsearchWorkSet {
 		private final ElasticsearchWork<T> work;
 		private final CompletableFuture<T> future;
 
-		ElasticsearchSingleWorkChangeset(ElasticsearchWork<T> work, CompletableFuture<T> future) {
+		ElasticsearchSingleWorkSet(ElasticsearchWork<T> work, CompletableFuture<T> future) {
 			this.work = work;
 			this.future = future;
 		}

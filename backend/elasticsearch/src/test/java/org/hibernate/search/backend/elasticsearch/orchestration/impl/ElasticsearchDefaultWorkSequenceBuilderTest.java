@@ -443,7 +443,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		// Subsequent works that haven't been executed must get a specific exception
 		assertThat( work2FutureFromSequenceBuilder ).isFailed(
 				ExceptionMatcherBuilder.isException( SearchException.class )
-						.withMessage( "operation was skipped due to the failure of a previous work in the same changeset" )
+						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
 						.causedBy( exception ).build()
 		);
 		// But the sequence future must wait for the refresh to happen
@@ -719,7 +719,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work3FutureFromSequenceBuilder ).isPending(); // Still pending, waiting for refresh
 		assertThat( work4FutureFromSequenceBuilder ).isFailed(
 				ExceptionMatcherBuilder.isException( SearchException.class )
-						.withMessage( "operation was skipped due to the failure of a previous work in the same changeset" )
+						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
 						.causedBy( exception ).build()
 		);
 		assertThat( sequenceFuture ).isPending();
@@ -930,7 +930,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work3FutureFromSequenceBuilder ).isPending(); // Still waiting for the refresh
 		assertThat( work4FutureFromSequenceBuilder ).isFailed(
 				ExceptionMatcherBuilder.isException( SearchException.class )
-						.withMessage( "operation was skipped due to the failure of a previous work in the same changeset" )
+						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
 						.causedBy( exception ).build()
 		);
 		assertThat( sequenceFuture ).isPending();
