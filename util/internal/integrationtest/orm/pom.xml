@@ -24,6 +24,13 @@
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <!-- Bytebuddy is already imported by Hibernate ORM with a different version -->
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
