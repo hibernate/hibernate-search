@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
@@ -17,7 +16,6 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
  */
 public interface LuceneReadWorkOrchestrator {
 
-	<T> CompletableFuture<T> submit(Set<String> indexNames, Set<ReaderProvider> readerProviders,
-			LuceneReadWork<T> work);
+	<T> T submit(Set<String> indexNames, Set<ReaderProvider> readerProviders, LuceneReadWork<T> work);
 
 }
