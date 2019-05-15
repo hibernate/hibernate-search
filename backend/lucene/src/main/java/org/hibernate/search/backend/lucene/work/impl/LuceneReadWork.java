@@ -13,6 +13,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface LuceneReadWork<T> {
 
-	CompletableFuture<T> execute(LuceneQueryWorkExecutionContext context);
+	CompletableFuture<T> execute(LuceneReadWorkExecutionContext context);
 
 }

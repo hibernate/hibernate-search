@@ -42,12 +42,12 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 	}
 
 	@Override
-	public CompletableFuture<Explanation> execute(LuceneQueryWorkExecutionContext context) {
+	public CompletableFuture<Explanation> execute(LuceneReadWorkExecutionContext context) {
 		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexReader
 		return Futures.create( () -> CompletableFuture.completedFuture( explain( context ) ) );
 	}
 
-	private Explanation explain(LuceneQueryWorkExecutionContext context) {
+	private Explanation explain(LuceneReadWorkExecutionContext context) {
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 
