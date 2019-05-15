@@ -10,14 +10,18 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 
 /**
  * @author Guillaume Smet
  */
 public interface LuceneWriteWorkOrchestrator {
 
-	<T> CompletableFuture<T> submit(LuceneWriteWork<T> work);
+	<T> CompletableFuture<T> submit(LuceneWriteWork<T> work,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	CompletableFuture<?> submit(List<LuceneWriteWork<?>> work);
+	CompletableFuture<?> submit(List<LuceneWriteWork<?>> work,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 }

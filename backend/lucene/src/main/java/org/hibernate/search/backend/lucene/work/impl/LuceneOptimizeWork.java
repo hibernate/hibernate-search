@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Long> {
+public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Void> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -25,14 +25,14 @@ public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Long> {
 	}
 
 	@Override
-	public Long execute(LuceneWriteWorkExecutionContext context) {
+	public Void execute(LuceneWriteWorkExecutionContext context) {
 		IndexWriter indexWriter = context.getIndexWriter();
 		try {
 			indexWriter.forceMerge( 1 );
-			return indexWriter.commit();
+			return null;
 		}
 		catch (IOException e) {
-			throw log.unableToCommitIndex( getEventContext(), e );
+			throw log.unableToOptimizeIndex( getEventContext(), e );
 		}
 	}
 

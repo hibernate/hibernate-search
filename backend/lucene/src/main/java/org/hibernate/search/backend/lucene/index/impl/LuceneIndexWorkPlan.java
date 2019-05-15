@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
@@ -32,17 +34,22 @@ class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 	private final LuceneWriteWorkOrchestrator orchestrator;
 	private final String indexName;
 	private final String tenantId;
+	private final DocumentCommitStrategy commitStrategy;
+	private final DocumentRefreshStrategy refreshStrategy;
 
 	private final List<LuceneWriteWork<?>> works = new ArrayList<>();
 
 	LuceneIndexWorkPlan(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			LuceneWriteWorkOrchestrator orchestrator,
-			String indexName, SessionContextImplementor sessionContext) {
+			String indexName, SessionContextImplementor sessionContext,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexName;
 		this.tenantId = sessionContext.getTenantIdentifier();
+		this.commitStrategy = commitStrategy;
+		this.refreshStrategy = refreshStrategy;
 	}
 
 	@Override
@@ -87,7 +94,7 @@ class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 	@Override
 	public CompletableFuture<?> execute() {
 		try {
-			return orchestrator.submit( works );
+			return orchestrator.submit( works, commitStrategy, refreshStrategy );
 		}
 		finally {
 			works.clear();

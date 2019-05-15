@@ -457,4 +457,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 77,
 			value = "Document with id '%2$s' does not exist in index '%1$s' and thus its match cannot be explained." )
 	SearchException explainUnkownDocument(String indexName, String d);
+
+	@Message(id = ID_OFFSET_2 + 78,
+			value = "Unable to optimize.")
+	SearchException unableToOptimizeIndex(@Param EventContext context, @Cause Exception e);
 }

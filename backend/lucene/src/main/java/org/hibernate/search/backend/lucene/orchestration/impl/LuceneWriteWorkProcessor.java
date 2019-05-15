@@ -12,6 +12,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.common.spi.ContextualErrorHandler;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
@@ -33,8 +35,11 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.Processor {
 	private final LuceneWriteWorkExecutionContextImpl context;
 	private final ErrorHandler errorHandler;
 
+	private boolean hasUncommittedWorks;
+
 	private Throwable workSetFailure;
 	private ContextualErrorHandler workSetContextualErrorHandler;
+	private boolean workSetForcesCommit;
 
 	public LuceneWriteWorkProcessor(EventContext indexEventContext, IndexWriter indexWriter, ErrorHandler errorHandler) {
 		this.indexEventContext = indexEventContext;
@@ -49,19 +54,29 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.Processor {
 
 	@Override
 	public CompletableFuture<?> endBatch() {
-		// FIXME move the commit here when works do not require immediate commit? (e.g. mass indexing)
+		try {
+			commitIfNecessary();
+		}
+		catch (RuntimeException e) {
+			errorHandler.handleException( e.getMessage(), e );
+		}
 		// Everything was already executed, so just return a completed future.
 		return CompletableFuture.completedFuture( null );
 	}
 
-	void beforeWorkSet() {
+	void beforeWorkSet(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		workSetFailure = null;
 		workSetContextualErrorHandler = null;
+		workSetForcesCommit = DocumentCommitStrategy.FORCE.equals( commitStrategy )
+				// We need to commit in order to make the changes visible
+				// TODO HSEARCH-3117 this may not be true with the NRT implementation from Search 5
+				|| DocumentRefreshStrategy.FORCE.equals( refreshStrategy );
 	}
 
 	<T> T submit(LuceneWriteWork<T> work) {
 		if ( workSetFailure == null ) {
 			try {
+				hasUncommittedWorks = true;
 				return work.execute( context );
 			}
 			catch (RuntimeException e) {
@@ -79,10 +94,9 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.Processor {
 	}
 
 	<T> void afterWorkSet(CompletableFuture<T> future, T resultIfSuccess) {
-		IndexWriter indexWriter = context.getIndexWriter();
-		if ( workSetFailure == null ) {
+		if ( workSetFailure == null && workSetForcesCommit ) {
 			try {
-				doCommit( indexWriter );
+				commitIfNecessary();
 			}
 			catch (RuntimeException e) {
 				workSetFailure = e;
@@ -101,15 +115,18 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.Processor {
 		}
 	}
 
-	private void doCommit(IndexWriter indexWriter) {
-		try {
-			// TODO HSEARCH-3117 restore the commit policy feature to allow scheduled commits?
-			indexWriter.commit();
+	private void commitIfNecessary() {
+		if ( hasUncommittedWorks ) {
+			IndexWriter indexWriter = context.getIndexWriter();
+			try {
+				// TODO HSEARCH-3117 restore the commit policy feature to allow scheduled commits?
+				hasUncommittedWorks = false;
+				indexWriter.commit();
+			}
+			catch (RuntimeException | IOException e) {
+				throw log.unableToCommitIndex( indexEventContext, e );
+			}
 		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToCommitIndex( indexEventContext, e );
-		}
-
 	}
 
 	private ContextualErrorHandler getWorkSetContextualErrorHandler() {
