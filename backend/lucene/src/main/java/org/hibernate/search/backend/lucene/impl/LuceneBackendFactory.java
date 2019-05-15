@@ -25,7 +25,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.work.impl.LuceneStubWorkFactory;
+import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactoryImpl;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -95,7 +95,7 @@ public class LuceneBackendFactory implements BackendFactory {
 		return new LuceneBackendImpl(
 				name,
 				directoryProvider,
-				new LuceneStubWorkFactory( multiTenancyStrategy ),
+				new LuceneWorkFactoryImpl( multiTenancyStrategy ),
 				analysisDefinitionRegistry,
 				multiTenancyStrategy
 		);
