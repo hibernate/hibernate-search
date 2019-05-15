@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.session.spi;
 
 import java.util.Collection;
 
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
@@ -17,8 +18,8 @@ public interface PojoSearchSessionDelegate {
 
 	<E, E2> PojoSearchScopeDelegate<E, E2> createPojoSearchScope(Collection<? extends Class<? extends E>> targetedTypes);
 
-	PojoWorkPlan createWorkPlan(DocumentRefreshStrategy refreshStrategy);
+	PojoWorkPlan createWorkPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoSessionWorkExecutor createSessionWorkExecutor();
+	PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy);
 
 }

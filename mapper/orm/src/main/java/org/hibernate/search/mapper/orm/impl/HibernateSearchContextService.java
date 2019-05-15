@@ -123,7 +123,10 @@ public class HibernateSearchContextService implements Service, AutoCloseable {
 			if ( workPlan == null ) {
 				AutomaticIndexingSynchronizationStrategy synchronizationStrategy =
 						searchSession.getAutomaticIndexingSynchronizationStrategy();
-				workPlan = searchSession.createWorkPlan( synchronizationStrategy.getDocumentRefreshStrategy() );
+				workPlan = searchSession.createWorkPlan(
+						synchronizationStrategy.getDocumentCommitStrategy(),
+						synchronizationStrategy.getDocumentRefreshStrategy()
+				);
 				workPlanPerTransaction.put( transactionIdentifier, workPlan );
 				Synchronization txSync = createTransactionWorkQueueSynchronization(
 						workPlan, workPlanPerTransaction, transactionIdentifier, synchronizationStrategy

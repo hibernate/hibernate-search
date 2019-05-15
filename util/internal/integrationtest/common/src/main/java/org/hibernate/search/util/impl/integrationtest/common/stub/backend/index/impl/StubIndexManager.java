@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
@@ -70,13 +71,14 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 
 	@Override
 	public IndexWorkPlan<StubDocumentElement> createWorkPlan(SessionContextImplementor context,
-			DocumentRefreshStrategy refreshStrategy) {
-		return new StubIndexWorkPlan( this, context, refreshStrategy );
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return new StubIndexWorkPlan( this, context, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public IndexDocumentWorkExecutor<StubDocumentElement> createDocumentWorkExecutor(SessionContextImplementor context) {
-		return new StubIndexDocumentWorkExecutor( this, context );
+	public IndexDocumentWorkExecutor<StubDocumentElement> createDocumentWorkExecutor(SessionContextImplementor context,
+			DocumentCommitStrategy commitStrategy) {
+		return new StubIndexDocumentWorkExecutor( this, context, commitStrategy );
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
@@ -22,6 +23,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 	private final StubIndexManager indexManager;
 	private final SessionContextImplementor sessionContext;
+	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
 	private final List<StubIndexWork> works = new ArrayList<>();
@@ -29,9 +31,10 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 	private int preparedIndex = 0;
 
 	StubIndexWorkPlan(StubIndexManager indexManager, SessionContextImplementor sessionContext,
-			DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.sessionContext = sessionContext;
 		this.indexManager = indexManager;
+		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
 	}
 
@@ -44,6 +47,7 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 		StubDocumentElement documentElement = new StubDocumentElement( documentBuilder );
 		documentContributor.contribute( documentElement );
 		builder.document( documentBuilder.build() );
+		builder.commit( commitStrategy );
 		builder.refresh( refreshStrategy );
 		addWork( builder.build() );
 	}
@@ -57,6 +61,7 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 		StubDocumentElement documentElement = new StubDocumentElement( documentBuilder );
 		documentContributor.contribute( documentElement );
 		builder.document( documentBuilder.build() );
+		builder.commit( commitStrategy );
 		builder.refresh( refreshStrategy );
 		addWork( builder.build() );
 	}
@@ -65,6 +70,7 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 	public void delete(DocumentReferenceProvider documentReferenceProvider) {
 		StubIndexWork.Builder builder = StubIndexWork.builder( StubIndexWork.Type.DELETE );
 		populate( builder, documentReferenceProvider );
+		builder.commit( commitStrategy );
 		builder.refresh( refreshStrategy );
 		addWork( builder.build() );
 	}

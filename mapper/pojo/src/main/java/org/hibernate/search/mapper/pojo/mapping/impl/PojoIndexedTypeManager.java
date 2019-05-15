@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
@@ -81,8 +82,13 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
 
-	public PojoTypeDocumentWorkExecutor<I, E, D> createDocumentWorkExecutor(AbstractPojoSessionContextImplementor sessionContext) {
-		return new PojoTypeDocumentWorkExecutor<>( this, sessionContext, indexManager.createDocumentWorkExecutor( sessionContext ) );
+	public PojoTypeDocumentWorkExecutor<I, E, D> createDocumentWorkExecutor(
+			AbstractPojoSessionContextImplementor sessionContext,
+			DocumentCommitStrategy commitStrategy) {
+		return new PojoTypeDocumentWorkExecutor<>(
+				this, sessionContext,
+				indexManager.createDocumentWorkExecutor( sessionContext, commitStrategy )
+		);
 	}
 
 	public IndexWorkExecutor createWorkExecutor() {
@@ -129,9 +135,10 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 	}
 
 	PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext,
-			DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new PojoIndexedTypeWorkPlan<>(
-				this, sessionContext, indexManager.createWorkPlan( sessionContext, refreshStrategy )
+				this, sessionContext,
+				indexManager.createWorkPlan( sessionContext, commitStrategy, refreshStrategy )
 		);
 	}
 

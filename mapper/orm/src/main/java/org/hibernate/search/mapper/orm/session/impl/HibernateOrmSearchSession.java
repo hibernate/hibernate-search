@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -86,13 +87,13 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public PojoWorkPlan createWorkPlan(DocumentRefreshStrategy refreshStrategy) {
-		return getDelegate().createWorkPlan( refreshStrategy );
+	public PojoWorkPlan createWorkPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return getDelegate().createWorkPlan( commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public PojoSessionWorkExecutor createSessionWorkExecutor() {
-		return getDelegate().createSessionWorkExecutor();
+	public PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy) {
+		return getDelegate().createSessionWorkExecutor( commitStrategy );
 	}
 
 	@Override

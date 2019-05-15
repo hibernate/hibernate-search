@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
@@ -32,13 +33,15 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext, DocumentRefreshStrategy refreshStrategy) {
-		return implementor.createWorkPlan( sessionContext, refreshStrategy );
+	public IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return implementor.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
-		return implementor.createDocumentWorkExecutor( sessionContext );
+	public IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext,
+			DocumentCommitStrategy commitStrategy) {
+		return implementor.createDocumentWorkExecutor( sessionContext, commitStrategy );
 	}
 
 	@Override

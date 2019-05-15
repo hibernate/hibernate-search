@@ -14,6 +14,7 @@ import javax.persistence.Table;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingStrategyName;
@@ -73,7 +74,9 @@ public class BasicMassIndexingIT {
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
-			backendMock.expectWorksAnyOrder( Book.INDEX, DocumentRefreshStrategy.NONE )
+			backendMock.expectWorksAnyOrder(
+					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+			)
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
 							.field( "author", AUTHOR_1 )

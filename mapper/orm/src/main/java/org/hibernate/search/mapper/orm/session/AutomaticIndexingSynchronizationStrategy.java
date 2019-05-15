@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.session;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.impl.Futures;
 
@@ -19,6 +20,8 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 public interface AutomaticIndexingSynchronizationStrategy {
 
+	DocumentCommitStrategy getDocumentCommitStrategy();
+
 	DocumentRefreshStrategy getDocumentRefreshStrategy();
 
 	void handleFuture(CompletableFuture<?> future);
@@ -29,6 +32,11 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	 */
 	static AutomaticIndexingSynchronizationStrategy queued() {
 		return new AutomaticIndexingSynchronizationStrategy() {
+			@Override
+			public DocumentCommitStrategy getDocumentCommitStrategy() {
+				return DocumentCommitStrategy.NONE;
+			}
+
 			@Override
 			public DocumentRefreshStrategy getDocumentRefreshStrategy() {
 				return DocumentRefreshStrategy.NONE;
@@ -48,6 +56,11 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	static AutomaticIndexingSynchronizationStrategy committed() {
 		return new AutomaticIndexingSynchronizationStrategy() {
 			@Override
+			public DocumentCommitStrategy getDocumentCommitStrategy() {
+				return DocumentCommitStrategy.FORCE;
+			}
+
+			@Override
 			public DocumentRefreshStrategy getDocumentRefreshStrategy() {
 				return DocumentRefreshStrategy.NONE;
 			}
@@ -65,6 +78,11 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	 */
 	static AutomaticIndexingSynchronizationStrategy searchable() {
 		return new AutomaticIndexingSynchronizationStrategy() {
+			@Override
+			public DocumentCommitStrategy getDocumentCommitStrategy() {
+				return DocumentCommitStrategy.FORCE;
+			}
+
 			@Override
 			public DocumentRefreshStrategy getDocumentRefreshStrategy() {
 				return DocumentRefreshStrategy.FORCE;

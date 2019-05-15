@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -57,7 +58,8 @@ public class IndexDocumentWorkExecutorIT {
 
 	@Test
 	public void checkAllDocumentsAreSearchable() {
-		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor = indexManager.createDocumentWorkExecutor();
+		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor =
+				indexManager.createDocumentWorkExecutor( DocumentCommitStrategy.NONE );
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
 

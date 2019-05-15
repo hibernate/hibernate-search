@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
@@ -81,13 +82,15 @@ class LuceneIndexManagerImpl
 
 	@Override
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext,
-			DocumentRefreshStrategy refreshStrategy) {
-		// refreshStrategy is ignored because refreshes don't make sense here: changes are visible immediately.
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		// FIXME take the commit strategy and refresh strategy into account
 		return indexingBackendContext.createWorkPlan( writeOrchestrator, indexName, sessionContext );
 	}
 
 	@Override
-	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
+	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
+			SessionContextImplementor sessionContext, DocumentCommitStrategy commitStrategy) {
+		// FIXME take the commit strategy into account
 		return indexingBackendContext.createDocumentWorkExecutor( writeOrchestrator, indexName, sessionContext );
 	}
 

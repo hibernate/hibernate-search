@@ -22,6 +22,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
@@ -135,7 +136,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	@Override
 	public IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(SessionContextImplementor sessionContext,
-			DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
 		return indexingBackendContext.createWorkPlan(
 				serialOrchestrator,
 				elasticsearchIndexName,
@@ -145,8 +147,12 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createDocumentWorkExecutor( parallelOrchestrator, elasticsearchIndexName, sessionContext );
+	public IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(
+			SessionContextImplementor sessionContext, DocumentCommitStrategy commitStrategy) {
+		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
+		return indexingBackendContext.createDocumentWorkExecutor(
+				parallelOrchestrator, elasticsearchIndexName, sessionContext
+		);
 	}
 
 	@Override
