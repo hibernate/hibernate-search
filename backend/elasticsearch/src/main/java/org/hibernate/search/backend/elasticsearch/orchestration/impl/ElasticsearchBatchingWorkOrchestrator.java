@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An orchestrator sharing context across multiple threads,
- * allowing to batch together changesets from different threads,
+ * allowing to batch together worksets from different threads,
  * and thus to produce bigger bulk works.
  * <p>
  * More precisely, the submitted works are sent to a queue which is processed periodically
@@ -31,26 +31,26 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final BatchingExecutor<ElasticsearchChangeset, ElasticsearchWorkOrchestrationStrategy> executor;
+	private final BatchingExecutor<ElasticsearchWorkSet, ElasticsearchWorkOrchestrationStrategy> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
 	 * @param strategy An orchestration strategy to use in the background thread.
-	 * @param maxChangesetsPerBatch The maximum number of changesets to
+	 * @param maxWorksetsPerBatch The maximum number of worksets to
 	 * process in a single batch. Higher values mean lesser chance of transport
 	 * thread starvation, but higher heap consumption.
-	 * @param fair if {@code true} changesets are always submitted to the
-	 * delegate in FIFO order, if {@code false} changesets submitted
+	 * @param fair if {@code true} worksets are always submitted to the
+	 * delegate in FIFO order, if {@code false} worksets submitted
 	 * when the internal queue is full may be submitted out of order.
 	 * @param errorHandler An error handler to report failures of the background thread.
 	 */
 	public ElasticsearchBatchingWorkOrchestrator(
 			String name, ElasticsearchWorkOrchestrationStrategy strategy,
-			int maxChangesetsPerBatch, boolean fair,
+			int maxWorksetsPerBatch, boolean fair,
 			ErrorHandler errorHandler) {
 		super( name );
 		this.executor = new BatchingExecutor<>(
-				name, strategy, maxChangesetsPerBatch, fair,
+				name, strategy, maxWorksetsPerBatch, fair,
 				errorHandler
 		);
 	}
@@ -77,8 +77,8 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	}
 
 	@Override
-	protected void doSubmit(ElasticsearchChangeset changeset) throws InterruptedException {
-		executor.submit( changeset );
+	protected void doSubmit(ElasticsearchWorkSet workSet) throws InterruptedException {
+		executor.submit( workSet );
 	}
 
 	@Override
@@ -112,8 +112,8 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 		}
 
 		@Override
-		protected void doSubmit(ElasticsearchChangeset changeset) {
-			ElasticsearchBatchingWorkOrchestrator.this.submit( changeset );
+		protected void doSubmit(ElasticsearchWorkSet workSet) {
+			ElasticsearchBatchingWorkOrchestrator.this.submit( workSet );
 		}
 
 		@Override
