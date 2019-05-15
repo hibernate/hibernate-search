@@ -38,8 +38,8 @@ public class LuceneStubReadWorkOrchestrator implements LuceneReadWorkOrchestrato
 			LuceneReadWork<T> work) {
 		CompletableFuture<T> future = latestFuture.thenCompose( Futures.safeComposer(
 				ignored -> {
-					LuceneStubQueryWorkExecutionContext context =
-							new LuceneStubQueryWorkExecutionContext( indexNames, readerProviders );
+					LuceneStubReadWorkExecutionContext context =
+							new LuceneStubReadWorkExecutionContext( indexNames, readerProviders );
 					try {
 						CompletableFuture<T> workFuture = work.execute( context );
 						// Always close the execution context after the work is executed, regardless of errors

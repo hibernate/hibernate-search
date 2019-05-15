@@ -10,18 +10,18 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.search.reader.impl.MultiReaderFactory;
-import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWorkExecutionContext;
+import org.hibernate.search.backend.lucene.work.impl.LuceneReadWorkExecutionContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.IndexReader;
 
-class LuceneStubQueryWorkExecutionContext implements AutoCloseable, LuceneQueryWorkExecutionContext {
+class LuceneStubReadWorkExecutionContext implements AutoCloseable, LuceneReadWorkExecutionContext {
 
 	private final Set<String> indexNames;
 	private final IndexReader indexReader;
 
-	LuceneStubQueryWorkExecutionContext(Set<String> indexNames, Set<ReaderProvider> readerProviders) {
+	LuceneStubReadWorkExecutionContext(Set<String> indexNames, Set<ReaderProvider> readerProviders) {
 		this.indexNames = indexNames;
 		this.indexReader = MultiReaderFactory.openReader( indexNames, readerProviders );
 	}

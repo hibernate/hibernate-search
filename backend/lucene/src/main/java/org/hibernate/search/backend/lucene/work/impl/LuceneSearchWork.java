@@ -61,12 +61,12 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 	}
 
 	@Override
-	public CompletableFuture<LuceneLoadableSearchResult<H>> execute(LuceneQueryWorkExecutionContext context) {
+	public CompletableFuture<LuceneLoadableSearchResult<H>> execute(LuceneReadWorkExecutionContext context) {
 		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexReader
 		return Futures.create( () -> CompletableFuture.completedFuture( executeQuery( context ) ) );
 	}
 
-	private LuceneLoadableSearchResult<H> executeQuery(LuceneQueryWorkExecutionContext context) {
+	private LuceneLoadableSearchResult<H> executeQuery(LuceneReadWorkExecutionContext context) {
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 
@@ -91,7 +91,7 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 		}
 	}
 
-	private int getMaxDocs(LuceneQueryWorkExecutionContext context) {
+	private int getMaxDocs(LuceneReadWorkExecutionContext context) {
 		IndexReader reader = context.getIndexReader();
 		// FIXME this is very naive for now, we will probably need to implement some scrolling in the collector
 		// as it is done in Search 5.

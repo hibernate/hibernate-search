@@ -13,7 +13,7 @@ import org.apache.lucene.index.IndexReader;
 /**
  * @author Guillaume Smet
  */
-public interface LuceneQueryWorkExecutionContext {
+public interface LuceneReadWorkExecutionContext {
 
 	IndexReader getIndexReader();
 
