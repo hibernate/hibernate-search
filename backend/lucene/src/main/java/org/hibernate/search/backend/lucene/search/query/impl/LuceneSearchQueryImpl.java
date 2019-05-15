@@ -24,7 +24,6 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.Term;
@@ -95,9 +94,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 				offset, limit,
 				luceneCollectorProvider, searchResultExtractor
 		);
-		return Futures.unwrappedExceptionJoin(
-				queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
-		)
+		return queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async processing, we will have to add a loadAsync method here,
@@ -117,9 +114,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 				( luceneCollectorBuilder -> { } ),
 				searchResultExtractor
 		);
-		return Futures.unwrappedExceptionJoin(
-				queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
-		)
+		return queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
 				.getHitCount();
 	}
 
@@ -160,8 +155,6 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		LuceneReadWork<Explanation> work = workFactory.explain(
 				searchContext.getIndexNames(), luceneQuery, indexName, id, explainedDocumentQuery
 		);
-		return Futures.unwrappedExceptionJoin(
-				queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
-		);
+		return queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work );
 	}
 }
