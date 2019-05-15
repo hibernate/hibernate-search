@@ -26,6 +26,7 @@ import org.hibernate.search.backend.elasticsearch.types.format.impl.Elasticsearc
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -44,12 +45,15 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	private final EventContext eventContext;
 	private final Gson userFacingGson;
 	private final ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider;
+	private final IndexFieldTypeDefaultsProvider typeDefaultsProvider;
 
 	public ElasticsearchIndexFieldTypeFactoryContextImpl(EventContext eventContext, Gson userFacingGson,
-			ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider) {
+			ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider,
+			IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
 		this.eventContext = eventContext;
 		this.userFacingGson = userFacingGson;
 		this.defaultFieldFormatProvider = defaultFieldFormatProvider;
+		this.typeDefaultsProvider = typeDefaultsProvider;
 	}
 
 	@Override
@@ -218,8 +222,7 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 
 	@Override
 	public ScaledNumberIndexFieldTypeContext<?> asBigDecimal() {
-		// TODO implement within current issue
-		return null;
+		return new ElasticsearchBigDecimalIndexFieldTypeContext( this, typeDefaultsProvider );
 	}
 
 	@Override

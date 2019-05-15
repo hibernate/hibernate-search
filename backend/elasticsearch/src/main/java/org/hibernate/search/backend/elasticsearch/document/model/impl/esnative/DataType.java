@@ -48,6 +48,8 @@ public enum DataType {
 	@SerializedName("boolean")
 	BOOLEAN,
 	@SerializedName("geo_point")
-	GEO_POINT
+	GEO_POINT,
+	@SerializedName("scaled_float")
+	SCALED_FLOAT
 
 }

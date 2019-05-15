@@ -19,6 +19,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.R
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
@@ -30,19 +31,18 @@ import org.hibernate.search.util.common.reporting.EventContext;
 public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder {
 
+	private final ElasticsearchIndexFieldTypeFactoryContextProvider typeFactoryContextProvider;
 	private final EventContext indexEventContext;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final ElasticsearchIndexFieldTypeFactoryContext typeFactory;
 
 	private RoutingType routing = null;
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
-	public ElasticsearchIndexSchemaRootNodeBuilder(EventContext indexEventContext,
-			MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchIndexFieldTypeFactoryContext typeFactory) {
+	public ElasticsearchIndexSchemaRootNodeBuilder(ElasticsearchIndexFieldTypeFactoryContextProvider typeFactoryContextProvider,
+			EventContext indexEventContext, MultiTenancyStrategy multiTenancyStrategy) {
+		this.typeFactoryContextProvider = typeFactoryContextProvider;
 		this.indexEventContext = indexEventContext;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.typeFactory = typeFactory;
 	}
 
 	@Override
@@ -53,9 +53,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 
 	@Override
 	public ElasticsearchIndexFieldTypeFactoryContext createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		// TODO handle defaultsProvider instance for the current request,
-		// creating a new instance of typeFactory
-		return typeFactory;
+		return typeFactoryContextProvider.create( indexEventContext, defaultsProvider );
 	}
 
 	@Override

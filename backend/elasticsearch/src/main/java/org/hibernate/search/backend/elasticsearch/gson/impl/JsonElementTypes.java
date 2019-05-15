@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.gson.impl;
 
+import java.math.BigDecimal;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -218,6 +220,18 @@ public final class JsonElementTypes {
 		@Override
 		public String toString() {
 			return JsonPrimitive.class.getSimpleName() + "(Short)";
+		}
+	};
+
+	public static final JsonElementType<BigDecimal> BIG_DECIMAL = new JsonNumberType<BigDecimal>() {
+		@Override
+		protected BigDecimal nullUnsafeFromNumber(JsonPrimitive primitive) {
+			return primitive.getAsBigDecimal();
+		}
+
+		@Override
+		public String toString() {
+			return JsonPrimitive.class.getSimpleName() + "(BigDecimal)";
 		}
 	};
 

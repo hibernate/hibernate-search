@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import static org.jboss.logging.Logger.Level.WARN;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -502,4 +503,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 67,
 			value = "'%s' was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
 	void interruptedWhileWaitingForIndexActivity(String name, @Cause InterruptedException e);
+
+	@Message(id = ID_OFFSET_3 + 68, value = "Impossible to detect a decimal scale to use for this field."
+			+ " If the value is bridged, set '.asBigDecimal().decimalScale( int )' in the bind, else verify your mapping.")
+	SearchException nullDecimalScale(@Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET_3 + 69, value = "The value '%1$s' is too large to be indexed.")
+	SearchException bigDecimalTooLarge(BigDecimal value);
 }

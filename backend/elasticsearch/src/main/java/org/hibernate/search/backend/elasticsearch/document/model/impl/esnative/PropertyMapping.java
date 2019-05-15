@@ -82,6 +82,9 @@ public class PropertyMapping extends AbstractTypeMapping {
 	 */
 	private List<String> format;
 
+	@SerializedName("scaling_factor")
+	private Double scalingFactor;
+
 	public DataType getType() {
 		return type;
 	}
@@ -171,5 +174,13 @@ public class PropertyMapping extends AbstractTypeMapping {
 
 	public void setNormalizer(String normalizer) {
 		this.normalizer = normalizer;
+	}
+
+	public Double getScalingFactor() {
+		return scalingFactor;
+	}
+
+	public void setScalingFactor(Double scalingFactor) {
+		this.scalingFactor = scalingFactor;
 	}
 }

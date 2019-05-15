@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl;
 
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
@@ -16,6 +17,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
  */
 public interface ElasticsearchIndexFieldTypeFactoryContextProvider {
 
-	ElasticsearchIndexFieldTypeFactoryContext create(EventContext eventContext);
+	ElasticsearchIndexFieldTypeFactoryContext create(EventContext eventContext, IndexFieldTypeDefaultsProvider defaultsProvider);
 
 }

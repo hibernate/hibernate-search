@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchIndexFieldTypeFactoryContextImpl;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.Elasticsearch6DefaultFieldFormatProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
@@ -25,7 +26,7 @@ public class Elasticsearch6IndexFieldTypeFactoryContextProvider
 	}
 
 	@Override
-	public ElasticsearchIndexFieldTypeFactoryContext create(EventContext eventContext) {
-		return new ElasticsearchIndexFieldTypeFactoryContextImpl( eventContext, userFacingGson, defaultFieldFormatProvider );
+	public ElasticsearchIndexFieldTypeFactoryContext create(EventContext eventContext, IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
+		return new ElasticsearchIndexFieldTypeFactoryContextImpl( eventContext, userFacingGson, defaultFieldFormatProvider, typeDefaultsProvider );
 	}
 }

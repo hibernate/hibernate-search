@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.index.settings.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
-import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
@@ -173,14 +172,11 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 
-		ElasticsearchIndexFieldTypeFactoryContext typeFactoryContext =
-				typeFactoryContextProvider.create( indexEventContext );
-
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
 				new ElasticsearchIndexSchemaRootNodeBuilder(
+						typeFactoryContextProvider,
 						indexEventContext,
-						multiTenancyStrategy,
-						typeFactoryContext
+						multiTenancyStrategy
 				);
 
 		ElasticsearchIndexSettingsBuilder settingsBuilder =
