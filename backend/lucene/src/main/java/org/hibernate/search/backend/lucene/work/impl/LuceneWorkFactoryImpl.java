@@ -22,11 +22,11 @@ import org.apache.lucene.search.Explanation;
 /**
  * @author Guillaume Smet
  */
-public class LuceneStubWorkFactory implements LuceneWorkFactory {
+public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
-	public LuceneStubWorkFactory(MultiTenancyStrategy multiTenancyStrategy) {
+	public LuceneWorkFactoryImpl(MultiTenancyStrategy multiTenancyStrategy) {
 		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
