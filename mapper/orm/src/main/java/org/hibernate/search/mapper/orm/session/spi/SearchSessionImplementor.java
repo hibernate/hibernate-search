@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.session.spi;
 
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -18,14 +19,15 @@ public interface SearchSessionImplementor extends AutoCloseable, SearchSession {
 	void close();
 
 	/**
+	 * @param commitStrategy The commit strategy to use for every affected index.
 	 * @param refreshStrategy The refresh strategy to use for every affected index.
 	 * @return A new work plan for this session, maintaining its state (list of works) independently from the session.
 	 * Calling {@link PojoWorkPlan#execute()} is required to actually execute works,
 	 * the session will <strong>not</strong> do it automatically upon closing.
 	 */
-	PojoWorkPlan createWorkPlan(DocumentRefreshStrategy refreshStrategy);
+	PojoWorkPlan createWorkPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoSessionWorkExecutor createSessionWorkExecutor();
+	PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy);
 
 	AutomaticIndexingSynchronizationStrategy getAutomaticIndexingSynchronizationStrategy();
 

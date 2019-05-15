@@ -18,6 +18,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
@@ -52,31 +53,34 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	@Test
 	public void queued() throws InterruptedException, ExecutionException, TimeoutException {
 		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.QUEUED );
-		testAsynchronous( sessionFactory, DocumentRefreshStrategy.NONE );
+		testAsynchronous( sessionFactory, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 	}
 
 	@Test
 	public void committed_default() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( null );
-		testSynchronous( sessionFactory, DocumentRefreshStrategy.NONE );
+		testSynchronous( sessionFactory, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 	}
 
 	@Test
 	public void committed_explicit() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.COMMITTED );
-		testSynchronous( sessionFactory, DocumentRefreshStrategy.NONE );
+		testSynchronous( sessionFactory, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 	}
 
 	@Test
 	public void searchable() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE );
-		testSynchronous( sessionFactory, DocumentRefreshStrategy.FORCE );
+		testSynchronous( sessionFactory, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
 	}
 
 	@Test
 	public void override_committedToSearchable() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.COMMITTED );
-		testSynchronous( sessionFactory, AutomaticIndexingSynchronizationStrategy.searchable(), DocumentRefreshStrategy.FORCE );
+		testSynchronous(
+				sessionFactory, AutomaticIndexingSynchronizationStrategy.searchable(),
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE
+		);
 	}
 
 	@Test
@@ -89,6 +93,11 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		CompletableFuture<?> transactionFuture = runTransactionInDifferentThread(
 				sessionFactory,
 				new AutomaticIndexingSynchronizationStrategy() {
+					@Override
+					public DocumentCommitStrategy getDocumentCommitStrategy() {
+						return DocumentCommitStrategy.FORCE;
+					}
+
 					@Override
 					public DocumentRefreshStrategy getDocumentRefreshStrategy() {
 						return DocumentRefreshStrategy.FORCE;
@@ -113,7 +122,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 						}
 					}
 				},
-				DocumentRefreshStrategy.FORCE,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE,
 				workFuture,
 				/*
 				 * With this synchronization strategy, the transaction will unblock the thread
@@ -133,13 +142,15 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	private void testSynchronous(SessionFactory sessionFactory,
+			DocumentCommitStrategy expectedCommitStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy)
 			throws InterruptedException, ExecutionException, TimeoutException {
-		testSynchronous( sessionFactory, null, expectedRefreshStrategy );
+		testSynchronous( sessionFactory, null, expectedCommitStrategy, expectedRefreshStrategy );
 	}
 
 	private void testSynchronous(SessionFactory sessionFactory,
 			AutomaticIndexingSynchronizationStrategy customStrategy,
+			DocumentCommitStrategy expectedCommitStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		CompletableFuture<?> workFuture = new CompletableFuture<>();
@@ -147,7 +158,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		CompletableFuture<?> transactionFuture = runTransactionInDifferentThread(
 				sessionFactory,
 				customStrategy,
-				expectedRefreshStrategy,
+				expectedCommitStrategy, expectedRefreshStrategy,
 				workFuture,
 				/*
 				 * With this synchronization strategy, the transaction may NOT unblock the thread
@@ -171,6 +182,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	private void testAsynchronous(SessionFactory sessionFactory,
+			DocumentCommitStrategy expectedCommitStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		CompletableFuture<?> workFuture = new CompletableFuture<>();
@@ -178,7 +190,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		CompletableFuture<?> transactionFuture = runTransactionInDifferentThread(
 				sessionFactory,
 				null,
-				expectedRefreshStrategy,
+				expectedCommitStrategy, expectedRefreshStrategy,
 				workFuture,
 				/*
 				 * With this synchronization strategy, the transaction will unblock the thread
@@ -200,6 +212,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	 */
 	private CompletableFuture<?> runTransactionInDifferentThread(SessionFactory sessionFactory,
 			AutomaticIndexingSynchronizationStrategy customStrategy,
+			DocumentCommitStrategy expectedCommitStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy,
 			CompletableFuture<?> workFuture,
 			Runnable afterTransactionAssertion)
@@ -216,7 +229,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 				session.persist( entity1 );
 
-				backendMock.expectWorks( IndexedEntity.INDEX, expectedRefreshStrategy )
+				backendMock.expectWorks( IndexedEntity.INDEX, expectedCommitStrategy, expectedRefreshStrategy )
 						.add( "1", b -> b
 								.field( "indexedField", entity1.getIndexedField() )
 						)

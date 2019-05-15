@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
@@ -28,13 +29,17 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final AbstractPojoSessionContextImplementor sessionContext;
 	private final PojoRuntimeIntrospector introspector;
+	private final DocumentCommitStrategy commitStrategy;
 
 	private final Map<Class<?>, PojoTypeDocumentWorkExecutor<?, ?, ?>> typeExecutors = new HashMap<>();
 
-	public PojoSessionWorkExecutorImpl(PojoIndexedTypeManagerContainer indexedTypeManagers, AbstractPojoSessionContextImplementor sessionContext) {
+	public PojoSessionWorkExecutorImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
+			AbstractPojoSessionContextImplementor sessionContext,
+			DocumentCommitStrategy commitStrategy) {
 		this.indexedTypeManagers = indexedTypeManagers;
 		this.sessionContext = sessionContext;
 		this.introspector = sessionContext.getRuntimeIntrospector();
+		this.commitStrategy = commitStrategy;
 	}
 
 	@Override
@@ -60,6 +65,6 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 			throw log.notDirectlyIndexedType( clazz );
 		}
 
-		return exactClass.get().createDocumentWorkExecutor( sessionContext );
+		return exactClass.get().createDocumentWorkExecutor( sessionContext, commitStrategy );
 	}
 }

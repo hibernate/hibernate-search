@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
@@ -31,6 +32,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
 	private final AbstractPojoSessionContextImplementor sessionContext;
 	private final PojoRuntimeIntrospector introspector;
+	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
 	// Use a LinkedHashMap for deterministic iteration
@@ -40,11 +42,13 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	PojoWorkPlanImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers,
 			AbstractPojoSessionContextImplementor sessionContext,
+			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
 		this.indexedTypeManagers = indexedTypeManagers;
 		this.containedTypeManagers = containedTypeManagers;
 		this.sessionContext = sessionContext;
 		this.introspector = sessionContext.getRuntimeIntrospector();
+		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
 	}
 
@@ -144,7 +148,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 				indexedTypeManagers.getByExactClass( clazz );
 		if ( indexedTypeManagerOptional.isPresent() ) {
 			PojoIndexedTypeWorkPlan<?, ?, ?> delegate = indexedTypeManagerOptional.get()
-					.createWorkPlan( sessionContext, refreshStrategy );
+					.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );
 			indexedTypeDelegates.put( clazz, delegate );
 			return delegate;
 		}
@@ -170,7 +174,8 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
 				indexedTypeManagers.getByExactClass( clazz );
 		if ( indexedTypeManagerOptional.isPresent() ) {
-			delegate = indexedTypeManagerOptional.get().createWorkPlan( sessionContext, refreshStrategy );
+			delegate = indexedTypeManagerOptional.get()
+					.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );
 			indexedTypeDelegates.put( clazz, delegate );
 			return delegate;
 		}

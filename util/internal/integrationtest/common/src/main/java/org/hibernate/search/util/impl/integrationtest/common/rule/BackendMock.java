@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -109,18 +110,30 @@ public class BackendMock implements TestRule {
 	}
 
 	public WorkCallListContext expectWorks(String indexName) {
-		// Default to no refresh, which is what the mapper should use by default
-		return expectWorks( indexName, DocumentRefreshStrategy.NONE );
+		// Default to force commit and no refresh, which is what the mapper should use by default
+		return expectWorks( indexName, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 	}
 
-	public WorkCallListContext expectWorks(String indexName, DocumentRefreshStrategy refreshStrategyForDocumentWorks) {
+	public WorkCallListContext expectWorks(String indexName,
+			DocumentCommitStrategy commitStrategyForDocumentWorks,
+			DocumentRefreshStrategy refreshStrategyForDocumentWorks) {
 		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( indexName );
-		return new WorkCallListContext( indexName, refreshStrategyForDocumentWorks, callQueue::expectInOrder );
+		return new WorkCallListContext(
+				indexName,
+				commitStrategyForDocumentWorks, refreshStrategyForDocumentWorks,
+				callQueue::expectInOrder
+		);
 	}
 
-	public WorkCallListContext expectWorksAnyOrder(String indexName, DocumentRefreshStrategy refreshStrategyForDocumentWorks) {
+	public WorkCallListContext expectWorksAnyOrder(String indexName,
+			DocumentCommitStrategy commitStrategyForDocumentWorks,
+			DocumentRefreshStrategy refreshStrategyForDocumentWorks) {
 		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( indexName );
-		return new WorkCallListContext( indexName, refreshStrategyForDocumentWorks, callQueue::expectOutOfOrder );
+		return new WorkCallListContext(
+				indexName,
+				commitStrategyForDocumentWorks, refreshStrategyForDocumentWorks,
+				callQueue::expectOutOfOrder
+		);
 	}
 
 	public BackendMock expectSearchReferences(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
@@ -160,13 +173,17 @@ public class BackendMock implements TestRule {
 
 	public class WorkCallListContext {
 		private final String indexName;
+		private final DocumentCommitStrategy commitStrategyForDocumentWorks;
 		private final DocumentRefreshStrategy refreshStrategyForDocumentWorks;
 		private final Consumer<IndexWorkCall> expectationConsumer;
 		private final List<StubIndexWork> works = new ArrayList<>();
 
-		private WorkCallListContext(String indexName, DocumentRefreshStrategy refreshStrategyForDocumentWorks,
+		private WorkCallListContext(String indexName,
+				DocumentCommitStrategy commitStrategyForDocumentWorks,
+				DocumentRefreshStrategy refreshStrategyForDocumentWorks,
 				Consumer<IndexWorkCall> expectationConsumer) {
 			this.indexName = indexName;
+			this.commitStrategyForDocumentWorks = commitStrategyForDocumentWorks;
 			this.refreshStrategyForDocumentWorks = refreshStrategyForDocumentWorks;
 			this.expectationConsumer = expectationConsumer;
 		}
@@ -211,6 +228,7 @@ public class BackendMock implements TestRule {
 				Consumer<StubIndexWork.Builder> contributor) {
 			StubIndexWork.Builder builder = StubIndexWork.builder( type );
 			contributor.accept( builder );
+			builder.commit( commitStrategyForDocumentWorks );
 			builder.refresh( refreshStrategyForDocumentWorks );
 			return work( builder.build() );
 		}

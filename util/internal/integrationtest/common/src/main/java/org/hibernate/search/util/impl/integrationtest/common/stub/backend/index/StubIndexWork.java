@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index;
 
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 
@@ -23,6 +24,7 @@ public final class StubIndexWork {
 	private final String tenantIdentifier;
 	private final String identifier;
 	private final String routingKey;
+	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 	private final StubDocumentNode document;
 
@@ -31,6 +33,7 @@ public final class StubIndexWork {
 		this.tenantIdentifier = builder.tenantIdentifier;
 		this.identifier = builder.identifier;
 		this.routingKey = builder.routingKey;
+		this.commitStrategy = builder.commitStrategy;
 		this.refreshStrategy = builder.refreshStrategy;
 		this.document = builder.document;
 	}
@@ -51,6 +54,10 @@ public final class StubIndexWork {
 		return routingKey;
 	}
 
+	public DocumentCommitStrategy getCommitStrategy() {
+		return commitStrategy;
+	}
+
 	public DocumentRefreshStrategy getRefreshStrategy() {
 		return refreshStrategy;
 	}
@@ -66,6 +73,7 @@ public final class StubIndexWork {
 				+ ", tenantIdentifier=" + tenantIdentifier
 				+ ", identifier=" + identifier
 				+ ", routingKey=" + routingKey
+				+ ", commitStrategy=" + commitStrategy
 				+ ", refreshStrategy=" + refreshStrategy
 				+ ", document=" + document
 				+ "]";
@@ -77,6 +85,7 @@ public final class StubIndexWork {
 		private String tenantIdentifier;
 		private String identifier;
 		private String routingKey;
+		private DocumentCommitStrategy commitStrategy;
 		private DocumentRefreshStrategy refreshStrategy;
 		private StubDocumentNode document;
 
@@ -96,6 +105,11 @@ public final class StubIndexWork {
 
 		public Builder routingKey(String routingKey) {
 			this.routingKey = routingKey;
+			return this;
+		}
+
+		public Builder commit(DocumentCommitStrategy commitStrategy) {
+			this.commitStrategy = commitStrategy;
 			return this;
 		}
 

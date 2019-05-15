@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -115,7 +116,8 @@ public class IndexWorkExecutorIT {
 	}
 
 	private void createBookIndexes(StubSessionContext sessionContext) {
-		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor = indexManager.createDocumentWorkExecutor( sessionContext );
+		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor =
+				indexManager.createDocumentWorkExecutor( sessionContext, DocumentCommitStrategy.NONE );
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {

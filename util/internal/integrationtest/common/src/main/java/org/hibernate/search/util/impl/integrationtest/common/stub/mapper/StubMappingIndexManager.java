@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
@@ -34,20 +35,26 @@ public class StubMappingIndexManager {
 	}
 
 	public IndexWorkPlan<? extends DocumentElement> createWorkPlan(StubSessionContext sessionContext) {
-		return indexManager.createWorkPlan( sessionContext, DocumentRefreshStrategy.FORCE );
+		/*
+		 * Use the same defaults as in the ORM mapper for the commit strategy,
+		 * but force refreshes because it's more convenient for tests.
+		 */
+		return indexManager.createWorkPlan( sessionContext, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
 	}
 
 	public IndexWorkPlan<? extends DocumentElement> createWorkPlan(StubSessionContext sessionContext,
-			DocumentRefreshStrategy refreshStrategy) {
-		return indexManager.createWorkPlan( sessionContext, refreshStrategy );
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return indexManager.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );
 	}
 
-	public IndexDocumentWorkExecutor<? extends DocumentElement> createDocumentWorkExecutor() {
-		return createDocumentWorkExecutor( new StubSessionContext() );
+	public IndexDocumentWorkExecutor<? extends DocumentElement> createDocumentWorkExecutor(
+			DocumentCommitStrategy commitStrategy) {
+		return createDocumentWorkExecutor( new StubSessionContext(), commitStrategy );
 	}
 
-	public IndexDocumentWorkExecutor<? extends DocumentElement> createDocumentWorkExecutor(StubSessionContext sessionContext) {
-		return indexManager.createDocumentWorkExecutor( sessionContext );
+	public IndexDocumentWorkExecutor<? extends DocumentElement> createDocumentWorkExecutor(
+			StubSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
+		return indexManager.createDocumentWorkExecutor( sessionContext, commitStrategy );
 	}
 
 	public IndexWorkExecutor createWorkExecutor() {
