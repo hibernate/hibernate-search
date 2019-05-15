@@ -13,6 +13,8 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuild
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
@@ -25,15 +27,18 @@ class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<Lucen
 	private final LuceneWriteWorkOrchestrator orchestrator;
 	private final String indexName;
 	private final String tenantId;
+	private final DocumentCommitStrategy commitStrategy;
 
 	LuceneIndexDocumentWorkExecutor(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			LuceneWriteWorkOrchestrator orchestrator,
-			String indexName, SessionContextImplementor sessionContext) {
+			String indexName, SessionContextImplementor sessionContext,
+			DocumentCommitStrategy commitStrategy) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexName;
 		this.tenantId = sessionContext.getTenantIdentifier();
+		this.commitStrategy = commitStrategy;
 	}
 
 	@Override
@@ -45,6 +50,10 @@ class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<Lucen
 		documentContributor.contribute( builder );
 		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
 
-		return orchestrator.submit( factory.add( indexName, tenantId, id, routingKey, indexEntry ) );
+		return orchestrator.submit(
+				factory.add( indexName, tenantId, id, routingKey, indexEntry ),
+				commitStrategy,
+				DocumentRefreshStrategy.NONE
+		);
 	}
 }

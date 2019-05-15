@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -33,17 +35,29 @@ class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 
 	@Override
 	public CompletableFuture<?> optimize() {
-		return orchestrator.submit( factory.optimize( indexName ) );
+		return orchestrator.submit(
+				factory.optimize( indexName ),
+				DocumentCommitStrategy.FORCE,
+				DocumentRefreshStrategy.NONE
+		);
 	}
 
 	@Override
 	public CompletableFuture<?> purge(String tenantId) {
 		multiTenancyStrategy.checkTenantId( tenantId, eventContext );
-		return orchestrator.submit( factory.deleteAll( indexName, tenantId ) );
+		return orchestrator.submit(
+				factory.deleteAll( indexName, tenantId ),
+				DocumentCommitStrategy.FORCE,
+				DocumentRefreshStrategy.NONE
+		);
 	}
 
 	@Override
 	public CompletableFuture<?> flush() {
-		return orchestrator.submit( factory.flush( indexName ) );
+		return orchestrator.submit(
+				factory.flush( indexName ),
+				DocumentCommitStrategy.FORCE,
+				DocumentRefreshStrategy.NONE
+		);
 	}
 }

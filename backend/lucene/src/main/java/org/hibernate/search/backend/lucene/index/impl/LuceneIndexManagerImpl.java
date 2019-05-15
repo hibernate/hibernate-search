@@ -83,15 +83,19 @@ class LuceneIndexManagerImpl
 	@Override
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		// FIXME take the commit strategy and refresh strategy into account
-		return indexingBackendContext.createWorkPlan( writeOrchestrator, indexName, sessionContext );
+		return indexingBackendContext.createWorkPlan(
+				writeOrchestrator, indexName, sessionContext,
+				commitStrategy, refreshStrategy
+		);
 	}
 
 	@Override
 	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
 			SessionContextImplementor sessionContext, DocumentCommitStrategy commitStrategy) {
-		// FIXME take the commit strategy into account
-		return indexingBackendContext.createDocumentWorkExecutor( writeOrchestrator, indexName, sessionContext );
+		return indexingBackendContext.createDocumentWorkExecutor(
+				writeOrchestrator, indexName, sessionContext,
+				commitStrategy
+		);
 	}
 
 	@Override

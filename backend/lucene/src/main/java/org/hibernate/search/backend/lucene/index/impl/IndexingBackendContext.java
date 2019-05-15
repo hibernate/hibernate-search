@@ -11,6 +11,8 @@ import java.io.IOException;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -61,11 +63,15 @@ public class IndexingBackendContext {
 
 	IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(
 			LuceneWriteWorkOrchestrator orchestrator,
-			String indexName, SessionContextImplementor sessionContext) {
+			String indexName, SessionContextImplementor sessionContext,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new LuceneIndexWorkPlan( workFactory, multiTenancyStrategy, orchestrator,
-				indexName, sessionContext );
+		return new LuceneIndexWorkPlan(
+				workFactory, multiTenancyStrategy, orchestrator,
+				indexName, sessionContext,
+				commitStrategy, refreshStrategy
+		);
 	}
 
 	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, IndexWriter indexWriter) {
@@ -78,11 +84,15 @@ public class IndexingBackendContext {
 
 	IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
 			LuceneWriteWorkOrchestrator orchestrator,
-			String indexName, SessionContextImplementor sessionContext) {
+			String indexName, SessionContextImplementor sessionContext,
+			DocumentCommitStrategy commitStrategy) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new LuceneIndexDocumentWorkExecutor( workFactory, multiTenancyStrategy, orchestrator,
-				indexName, sessionContext );
+		return new LuceneIndexDocumentWorkExecutor(
+				workFactory, multiTenancyStrategy, orchestrator,
+				indexName, sessionContext,
+				commitStrategy
+		);
 	}
 
 	IndexWorkExecutor createWorkExecutor(LuceneWriteWorkOrchestrator orchestrator, String indexName) {

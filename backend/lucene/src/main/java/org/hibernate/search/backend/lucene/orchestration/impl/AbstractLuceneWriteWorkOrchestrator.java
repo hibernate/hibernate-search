@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
+import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 
@@ -26,16 +28,18 @@ abstract class AbstractLuceneWriteWorkOrchestrator
 	}
 
 	@Override
-	public CompletableFuture<?> submit(List<LuceneWriteWork<?>> works) {
+	public CompletableFuture<?> submit(List<LuceneWriteWork<?>> works,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		CompletableFuture<Object> future = new CompletableFuture<>();
-		submit( new LuceneMultipleWorkSet( works, future ) );
+		submit( new LuceneMultipleWorkSet( works, future, commitStrategy, refreshStrategy ) );
 		return future;
 	}
 
 	@Override
-	public <T> CompletableFuture<T> submit(LuceneWriteWork<T> work) {
+	public <T> CompletableFuture<T> submit(LuceneWriteWork<T> work,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new LuceneSingleWorkSet<>( work, future ) );
+		submit( new LuceneSingleWorkSet<>( work, future, commitStrategy, refreshStrategy ) );
 		return future;
 	}
 
@@ -45,15 +49,20 @@ abstract class AbstractLuceneWriteWorkOrchestrator
 	static class LuceneMultipleWorkSet implements LuceneWorkSet {
 		private final List<LuceneWriteWork<?>> works;
 		private final CompletableFuture<Object> future;
+		private final DocumentCommitStrategy commitStrategy;
+		private final DocumentRefreshStrategy refreshStrategy;
 
-		LuceneMultipleWorkSet(List<LuceneWriteWork<?>> works, CompletableFuture<Object> future) {
+		LuceneMultipleWorkSet(List<LuceneWriteWork<?>> works, CompletableFuture<Object> future,
+				DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 			this.works = new ArrayList<>( works );
 			this.future = future;
+			this.commitStrategy = commitStrategy;
+			this.refreshStrategy = refreshStrategy;
 		}
 
 		@Override
 		public void submitTo(LuceneWriteWorkProcessor processor) {
-			processor.beforeWorkSet();
+			processor.beforeWorkSet( commitStrategy, refreshStrategy );
 			for ( LuceneWriteWork<?> work : works ) {
 				processor.submit( work );
 			}
@@ -69,15 +78,20 @@ abstract class AbstractLuceneWriteWorkOrchestrator
 	static class LuceneSingleWorkSet<T> implements LuceneWorkSet {
 		private final LuceneWriteWork<T> work;
 		private final CompletableFuture<T> future;
+		private final DocumentCommitStrategy commitStrategy;
+		private final DocumentRefreshStrategy refreshStrategy;
 
-		LuceneSingleWorkSet(LuceneWriteWork<T> work, CompletableFuture<T> future) {
+		LuceneSingleWorkSet(LuceneWriteWork<T> work, CompletableFuture<T> future,
+				DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 			this.work = work;
 			this.future = future;
+			this.commitStrategy = commitStrategy;
+			this.refreshStrategy = refreshStrategy;
 		}
 
 		@Override
 		public void submitTo(LuceneWriteWorkProcessor processor) {
-			processor.beforeWorkSet();
+			processor.beforeWorkSet( commitStrategy, refreshStrategy );
 			T result = processor.submit( work );
 			processor.afterWorkSet( future, result );
 		}
