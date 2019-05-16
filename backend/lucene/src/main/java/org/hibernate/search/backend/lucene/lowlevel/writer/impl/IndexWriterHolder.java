@@ -37,30 +37,20 @@ class IndexWriterHolder {
 	private final ErrorHandler errorHandler;
 
 	/* TODO HSEARCH-3117 re-allow to configure index writers
+	private final Similarity similarity;
+	private final LuceneIndexingParameters luceneParameters;
 	private final ParameterSet indexParameters;
 	 */
-
-	// variable state:
 
 	/**
 	 * Current open IndexWriter, or null when closed.
 	 */
-	private final AtomicReference<IndexWriter> writer = new AtomicReference<IndexWriter>();
+	private final AtomicReference<IndexWriter> writer = new AtomicReference<>();
 
 	/**
 	 * Protects from multiple initialization attempts of IndexWriter
 	 */
 	private final ReentrantLock writerInitializationLock = new ReentrantLock();
-
-	/**
-	 * The Similarity strategy needs to be applied on each new IndexWriter
-	 */
-	/* TODO HSEARCH-3117 re-allow to configure index writers
-	private final Similarity similarity;
-
-	private final LuceneIndexingParameters luceneParameters;
-	 */
-
 
 	IndexWriterHolder(String indexName, Directory directory, ErrorHandler errorHandler) {
 		this.indexName = indexName;
@@ -123,7 +113,7 @@ class IndexWriterHolder {
 		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO make it possible to configure a different policy?
 		indexWriterConfig.setMergePolicy( newMergePolicy );
 		 */
-		MergeScheduler mergeScheduler = new ConcurrentMergeScheduler( this.errorHandler, this.indexName );
+		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler( this.errorHandler, this.indexName );
 		indexWriterConfig.setMergeScheduler( mergeScheduler );
 		return new IndexWriter( directory, indexWriterConfig );
 	}
