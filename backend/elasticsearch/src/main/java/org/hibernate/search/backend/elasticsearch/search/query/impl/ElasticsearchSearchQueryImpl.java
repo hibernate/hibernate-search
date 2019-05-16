@@ -45,7 +45,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	/**
 	 * ES default limit for (limit + offset); any search query beyond that limit will be rejected.
 	 */
-	private static final long MAX_RESULT_WINDOW_SIZE = 10000;
+	private static final int MAX_RESULT_WINDOW_SIZE = 10000;
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
@@ -91,7 +91,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public ElasticsearchSearchResult<H> fetch(Long limit, Long offset) {
+	public ElasticsearchSearchResult<H> fetch(Integer limit, Integer offset) {
 		// TODO restore scrolling support. See HSEARCH-3323
 		ElasticsearchWork<ElasticsearchLoadableSearchResult<H>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( searchContext.getIndexNames() )
@@ -153,7 +153,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		return doExplain( encodedIndexName, id );
 	}
 
-	private Long defaultedLimit(Long limit, Long offset) {
+	private Integer defaultedLimit(Integer limit, Integer offset) {
 		/*
 		 * If the user has given a 'size' value, take it as is, let ES itself complain if it's too high;
 		 * if no value is given, take as much as possible, as by default only 10 rows would be returned.
@@ -163,7 +163,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 		else {
 			// Elasticsearch has a default limit of 10, which is not what we want.
-			long maxLimitThatElasticsearchWillAccept = MAX_RESULT_WINDOW_SIZE;
+			int maxLimitThatElasticsearchWillAccept = MAX_RESULT_WINDOW_SIZE;
 			if ( offset != null ) {
 				maxLimitThatElasticsearchWillAccept -= offset;
 			}

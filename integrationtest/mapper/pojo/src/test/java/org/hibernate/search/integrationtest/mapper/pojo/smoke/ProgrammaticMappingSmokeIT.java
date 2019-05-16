@@ -425,8 +425,8 @@ public class ProgrammaticMappingSmokeIT {
 			backendMock.expectSearchReferences(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
 					b -> b
-							.offset( 3L )
-							.limit( 2L ),
+							.offset( 3 )
+							.limit( 2 ),
 					StubSearchWorkBehavior.of(
 							6L,
 							reference( IndexedEntity.INDEX, "0" ),
@@ -460,8 +460,8 @@ public class ProgrammaticMappingSmokeIT {
 			backendMock.expectSearchProjection(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
 					b -> b
-							.offset( 3L )
-							.limit( 2L ),
+							.offset( 3 )
+							.limit( 2 ),
 					StubSearchWorkBehavior.of(
 							2L,
 							"text1",

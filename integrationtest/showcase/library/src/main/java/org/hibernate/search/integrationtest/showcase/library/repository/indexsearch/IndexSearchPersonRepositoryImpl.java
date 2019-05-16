@@ -22,22 +22,22 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 	private EntityManager entityManager;
 
 	@Override
-	public List<Person> listTopBorrowers(long limit, long offset) {
+	public List<Person> listTopBorrowers(int limit, int offset) {
 		return listTopBorrowers( "account.borrowals.totalCount", limit, offset );
 	}
 
 	@Override
-	public List<Person> listTopShortTermBorrowers(long limit, long offset) {
+	public List<Person> listTopShortTermBorrowers(int limit, int offset) {
 		return listTopBorrowers( "account.borrowals.shortTermCount", limit, offset );
 	}
 
 	@Override
-	public List<Person> listTopLongTermBorrowers(long limit, long offset) {
+	public List<Person> listTopLongTermBorrowers(int limit, int offset) {
 		return listTopBorrowers( "account.borrowals.longTermCount", limit, offset );
 	}
 
 	@Override
-	public List<Person> searchPerson(String terms, long limit, long offset) {
+	public List<Person> searchPerson(String terms, int limit, int offset) {
 		if ( terms == null || terms.isEmpty() ) {
 			return Collections.emptyList();
 		}
@@ -54,7 +54,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 		return query.fetchHits( limit, offset );
 	}
 
-	private List<Person> listTopBorrowers(String borrowalsCountField, long limit, long offset) {
+	private List<Person> listTopBorrowers(String borrowalsCountField, int limit, int offset) {
 		SearchQuery<Person> query = Search.getSearchSession( entityManager ).search( Person.class )
 				.asEntity()
 				.predicate( f -> f.matchAll() )

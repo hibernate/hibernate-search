@@ -68,7 +68,7 @@ public class LuceneStubWorkFactory implements LuceneWorkFactory {
 
 	@Override
 	public <H> LuceneReadWork<LuceneLoadableSearchResult<H>> search(Set<String> indexNames, Query luceneQuery, Sort luceneSort,
-			Long offset, Long limit,
+			Integer offset, Integer limit,
 			LuceneCollectorProvider luceneCollectorProvider,
 			LuceneSearchResultExtractor<H> searchResultExtractor) {
 		return new LuceneSearchWork<>(

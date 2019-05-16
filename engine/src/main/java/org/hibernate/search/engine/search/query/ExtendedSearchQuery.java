@@ -19,13 +19,7 @@ public interface ExtendedSearchQuery<H, R extends SearchResult<H>> extends Searc
 	R fetch();
 
 	@Override
-	R fetch(Long limit);
-
-	@Override
 	R fetch(Integer limit);
-
-	@Override
-	R fetch(Long limit, Long offset);
 
 	@Override
 	R fetch(Integer limit, Integer offset);

@@ -38,8 +38,8 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 
-	private final long offset;
-	private final Long limit;
+	private final int offset;
+	private final Integer limit;
 
 	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final LuceneSearchResultExtractor<H> searchResultExtractor;
@@ -47,14 +47,14 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 	LuceneSearchWork(Set<String> indexNames,
 			Query luceneQuery,
 			Sort luceneSort,
-			Long offset,
-			Long limit,
+			Integer offset,
+			Integer limit,
 			LuceneCollectorProvider luceneCollectorProvider,
 			LuceneSearchResultExtractor<H> searchResultExtractor) {
 		this.indexNames = indexNames;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
-		this.offset = offset == null ? 0L : offset;
+		this.offset = offset == null ? 0 : offset;
 		this.limit = limit;
 		this.luceneCollectorProvider = luceneCollectorProvider;
 		this.searchResultExtractor = searchResultExtractor;

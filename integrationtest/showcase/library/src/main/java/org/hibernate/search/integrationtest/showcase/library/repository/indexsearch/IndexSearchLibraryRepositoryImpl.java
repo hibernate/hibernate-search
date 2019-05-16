@@ -22,7 +22,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 	private EntityManager entityManager;
 
 	@Override
-	public List<Library> search(String terms, long limit, long offset) {
+	public List<Library> search(String terms, int limit, int offset) {
 		if ( terms == null || terms.isEmpty() ) {
 			return Collections.emptyList();
 		}

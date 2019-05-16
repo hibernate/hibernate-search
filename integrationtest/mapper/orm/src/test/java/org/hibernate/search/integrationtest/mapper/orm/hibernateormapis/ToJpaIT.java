@@ -226,8 +226,8 @@ public class ToJpaIT {
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
 					b -> b
-							.offset( 3L )
-							.limit( 2L ),
+							.offset( 3 )
+							.limit( 2 ),
 					StubSearchWorkBehavior.empty()
 			);
 			query.getResultList();

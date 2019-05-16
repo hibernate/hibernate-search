@@ -72,9 +72,9 @@ public class SearchWork<H> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		private final Boolean trackTotalHits;
 		private final Set<URLEncodedString> indexes = new HashSet<>();
 
-		private Long from;
-		private Long size;
-		private Long scrollSize;
+		private Integer from;
+		private Integer size;
+		private Integer scrollSize;
 		private String scrollTimeout;
 		private Set<String> routingKeys;
 
@@ -92,14 +92,14 @@ public class SearchWork<H> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		@Override
-		public Builder<H> paging(Long limit, Long offset) {
+		public Builder<H> paging(Integer limit, Integer offset) {
 			this.from = offset;
 			this.size = limit;
 			return this;
 		}
 
 		@Override
-		public Builder<H> scrolling(long scrollSize, String scrollTimeout) {
+		public Builder<H> scrolling(int scrollSize, String scrollTimeout) {
 			this.scrollSize = scrollSize;
 			this.scrollTimeout = scrollTimeout;
 			return this;

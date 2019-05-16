@@ -32,56 +32,36 @@ public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implemen
 
 	@Override
 	public R fetch() {
-		return fetch( (Long) null, null );
-	}
-
-	@Override
-	public R fetch(Long limit) {
-		return fetch( limit, null );
+		return fetch( null, null );
 	}
 
 	@Override
 	public R fetch(Integer limit) {
-		return fetch( limit == null ? null : limit.longValue(), null );
+		return fetch( limit, null );
 	}
 
 	@Override
-	public abstract R fetch(Long limit, Long offset);
-
-	@Override
-	public R fetch(Integer limit, Integer offset) {
-		return fetch( limit == null ? null : (long) limit, offset == null ? null : (long) offset );
-	}
+	public abstract R fetch(Integer limit, Integer offset);
 
 	@Override
 	public List<H> fetchHits() {
-		return fetchHits( (Long) null, null );
-	}
-
-	@Override
-	public List<H> fetchHits(Long limit) {
-		return fetchHits( limit, null );
+		return fetchHits( null, null );
 	}
 
 	@Override
 	public List<H> fetchHits(Integer limit) {
-		return fetchHits( limit == null ? null : limit.longValue(), null );
-	}
-
-	@Override
-	public List<H> fetchHits(Long limit, Long offset) {
-		return fetch( limit, offset ).getHits();
+		return fetchHits( limit, null );
 	}
 
 	@Override
 	public List<H> fetchHits(Integer limit, Integer offset) {
-		return fetchHits( limit == null ? null : (long) limit, offset == null ? null : (long) offset );
+		return fetch( limit, offset ).getHits();
 	}
 
 	@Override
 	public Optional<H> fetchSingleHit() {
 		// We don't need to fetch more than two elements to detect a problem
-		R result = fetch( 2L );
+		R result = fetch( 2 );
 		List<H> hits = result.getHits();
 		int fetchedHitCount = result.getHits().size();
 		if ( fetchedHitCount == 0 ) {
