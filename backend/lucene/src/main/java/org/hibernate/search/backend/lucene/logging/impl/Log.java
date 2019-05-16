@@ -50,10 +50,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 52, max = 52),
 		@ValidIdRange(min = 55, max = 55),
 		@ValidIdRange(min = 75, max = 75),
-		@ValidIdRange(min = 76, max = 76),
-		@ValidIdRange(min = 77, max = 77),
 		@ValidIdRange(min = 114, max = 114),
-		@ValidIdRange(min = 117, max = 117),
 		@ValidIdRange(min = 118, max = 118),
 		@ValidIdRange(min = 225, max = 225),
 		@ValidIdRange(min = 228, max = 228),
@@ -103,21 +100,9 @@ public interface Log extends BasicLogger {
 			value = "Configuration setting '%1$s' was not specified: using LATEST (currently '%2$s'). %3$s")
 	void recommendConfiguringLuceneVersion(String key, Version latest, @FormatWith(EventContextFormatter.class) EventContext context);
 
-	@Message(id = ID_OFFSET_1 + 76,
-			value = "Could not open Lucene index: index data is corrupted. index name: '%1$s'")
-	SearchException cantOpenCorruptedIndex(@Cause CorruptIndexException e, String indexName);
-
-	@Message(id = ID_OFFSET_1 + 77,
-			value = "An IOException happened while accessing the Lucene index '%1$s'")
-	SearchException ioExceptionOnIndex(@Cause IOException e, String indexName);
-
 	@Message(id = ID_OFFSET_1 + 114,
 			value = "Could not load resource: '%1$s'")
 	SearchException unableToLoadResource(String fileName);
-
-	@Message(id = ID_OFFSET_1 + 117,
-			value = "IOException on the IndexWriter")
-	String ioExceptionOnIndexWriter();
 
 	@Message(id = ID_OFFSET_1 + 118,
 			value = "Exception during index Merge operation")
