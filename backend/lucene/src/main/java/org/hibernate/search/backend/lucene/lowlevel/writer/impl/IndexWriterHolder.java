@@ -17,7 +17,7 @@ import org.hibernate.search.engine.common.spi.ErrorContextBuilder;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
@@ -34,6 +34,7 @@ class IndexWriterHolder {
 
 	private final String indexName;
 	private final Directory directory;
+	private final Analyzer analyzer;
 	private final ErrorHandler errorHandler;
 
 	/* TODO HSEARCH-3117 re-allow to configure index writers
@@ -52,10 +53,11 @@ class IndexWriterHolder {
 	 */
 	private final ReentrantLock writerInitializationLock = new ReentrantLock();
 
-	IndexWriterHolder(String indexName, Directory directory, ErrorHandler errorHandler) {
+	IndexWriterHolder(String indexName, Directory directory, Analyzer analyzer, ErrorHandler errorHandler) {
 		this.indexName = indexName;
 		// TODO HSEARCH-3440 use our own SPI instead of a directory directly
 		this.directory = directory;
+		this.analyzer = analyzer;
 		this.errorHandler = errorHandler;
 		/* TODO HSEARCH-3117 re-allow to configure index writers
 		this.luceneParameters = indexManager.getIndexingParameters();
@@ -119,11 +121,7 @@ class IndexWriterHolder {
 	}
 
 	private IndexWriterConfig createWriterConfig() {
-		/* FIXME see how to configure analyzers, is a mutable one really necessary?
-		final ConcurrentlyMutableAnalyzer globalAnalyzer = new ConcurrentlyMutableAnalyzer( new SimpleAnalyzer() );
-		final IndexWriterConfig writerConfig = new IndexWriterConfig( globalAnalyzer );
-		 */
-		IndexWriterConfig writerConfig = new IndexWriterConfig( new SimpleAnalyzer() );
+		IndexWriterConfig writerConfig = new IndexWriterConfig( analyzer );
 		/* TODO HSEARCH-3117 re-allow to configure index writers
 		luceneParameters.applyToWriter( writerConfig );
 		if ( similarity != null ) {
