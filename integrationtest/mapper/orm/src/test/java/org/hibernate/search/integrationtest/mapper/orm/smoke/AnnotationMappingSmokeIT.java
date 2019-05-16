@@ -310,8 +310,8 @@ public class AnnotationMappingSmokeIT {
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
 					b -> b
-							.offset( 3L )
-							.limit( 2L ),
+							.offset( 3 )
+							.limit( 2 ),
 					StubSearchWorkBehavior.of(
 							6L,
 							reference( IndexedEntity.INDEX, "0" ),
@@ -319,7 +319,7 @@ public class AnnotationMappingSmokeIT {
 					)
 			);
 
-			List<ParentIndexedEntity> result = query.fetchHits( 2L, 3L );
+			List<ParentIndexedEntity> result = query.fetchHits( 2, 3 );
 			backendMock.verifyExpectationsMet();
 			Assertions.assertThat( result )
 					.containsExactly(

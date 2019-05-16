@@ -39,7 +39,7 @@ public interface LuceneWorkFactory {
 
 	<H> LuceneReadWork<LuceneLoadableSearchResult<H>> search(
 			Set<String> indexNames, Query luceneQuery, Sort luceneSort,
-			Long offset, Long limit,
+			Integer offset, Integer limit,
 			LuceneCollectorProvider luceneCollectorProvider,
 			LuceneSearchResultExtractor<H> searchResultExtractor);
 

@@ -89,7 +89,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	}
 
 	@Override
-	public LuceneSearchResult<H> fetch(Long limit, Long offset) {
+	public LuceneSearchResult<H> fetch(Integer limit, Integer offset) {
 		LuceneReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
 				searchContext.getIndexNames(), luceneQuery, luceneSort,
 				offset, limit,
@@ -112,7 +112,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	public long fetchTotalHitCount() {
 		LuceneReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
 				searchContext.getIndexNames(), luceneQuery, luceneSort,
-				0L, 0L,
+				0, 0,
 				// do not add any TopDocs collector
 				( luceneCollectorBuilder -> { } ),
 				searchResultExtractor

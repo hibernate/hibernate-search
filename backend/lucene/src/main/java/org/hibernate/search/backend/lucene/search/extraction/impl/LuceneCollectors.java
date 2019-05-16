@@ -47,15 +47,15 @@ public class LuceneCollectors {
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
 	}
 
-	public void collect(IndexSearcher indexSearcher, Query luceneQuery, long offset, Long limit) throws IOException {
+	public void collect(IndexSearcher indexSearcher, Query luceneQuery, int offset, Integer limit) throws IOException {
 		indexSearcher.search( luceneQuery, compositeCollector );
 
 		if ( topDocsCollector != null ) {
 			if ( limit == null ) {
-				topDocs = topDocsCollector.topDocs( (int) offset );
+				topDocs = topDocsCollector.topDocs( offset );
 			}
 			else {
-				topDocs = topDocsCollector.topDocs( (int) offset, limit.intValue() );
+				topDocs = topDocsCollector.topDocs( offset, limit );
 			}
 
 			if ( requireFieldDocRescoring ) {

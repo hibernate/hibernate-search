@@ -24,8 +24,8 @@ public class StubSearchWork {
 
 	private final ResultType resultType;
 	private final List<String> routingKeys;
-	private final Long offset;
-	private final Long limit;
+	private final Integer offset;
+	private final Integer limit;
 
 	private StubSearchWork(Builder builder) {
 		this.resultType = builder.resultType;
@@ -42,11 +42,11 @@ public class StubSearchWork {
 		return routingKeys;
 	}
 
-	public Long getOffset() {
+	public Integer getOffset() {
 		return offset;
 	}
 
-	public Long getLimit() {
+	public Integer getLimit() {
 		return limit;
 	}
 
@@ -63,8 +63,8 @@ public class StubSearchWork {
 
 		private final ResultType resultType;
 		private final List<String> routingKeys = new ArrayList<>();
-		private Long offset;
-		private Long limit;
+		private Integer offset;
+		private Integer limit;
 
 		private Builder(ResultType resultType) {
 			this.resultType = resultType;
@@ -75,12 +75,12 @@ public class StubSearchWork {
 			return this;
 		}
 
-		public Builder offset(Long offset) {
+		public Builder offset(Integer offset) {
 			this.offset = offset;
 			return this;
 		}
 
-		public Builder limit(Long limit) {
+		public Builder limit(Integer limit) {
 			this.limit = limit;
 			return this;
 		}

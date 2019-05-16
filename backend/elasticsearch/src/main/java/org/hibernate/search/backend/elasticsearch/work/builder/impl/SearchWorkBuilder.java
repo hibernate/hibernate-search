@@ -20,9 +20,9 @@ public interface SearchWorkBuilder<T> extends ElasticsearchWorkBuilder<Elasticse
 
 	SearchWorkBuilder<T> indexes(Collection<URLEncodedString> indexNames);
 
-	SearchWorkBuilder<T> paging(Long limit, Long offset);
+	SearchWorkBuilder<T> paging(Integer limit, Integer offset);
 
-	SearchWorkBuilder<T> scrolling(long scrollSize, String scrollTimeout);
+	SearchWorkBuilder<T> scrolling(int scrollSize, String scrollTimeout);
 
 	SearchWorkBuilder<T> routingKeys(Set<String> routingKeys);
 

@@ -11,5 +11,5 @@ import java.util.List;
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
 
 public interface IndexSearchLibraryRepository {
-	List<Library> search(String terms, long limit, long offset);
+	List<Library> search(String terms, int limit, int offset);
 }

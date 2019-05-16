@@ -37,30 +37,7 @@ public interface SearchQuery<H> {
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
-	SearchResult<H> fetch(Long limit);
-
-	/**
-	 * Execute the query and return the {@link SearchResult}.
-	 *
-	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
-	 * @return The {@link SearchResult}.
-	 * @throws SearchException If something goes wrong while executing the query.
-	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
-	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
-	 */
 	SearchResult<H> fetch(Integer limit);
-
-	/**
-	 * Execute the query and return the {@link SearchResult}.
-	 *
-	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
-	 * @param offset The number of hits to skip before adding the hits to the {@link SearchResult}. {@code null} means no offset.
-	 * @return The {@link SearchResult}.
-	 * @throws SearchException If something goes wrong while executing the query.
-	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
-	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
-	 */
-	SearchResult<H> fetch(Long limit, Long offset);
 
 	/**
 	 * Execute the query and return the {@link SearchResult}.
@@ -93,30 +70,7 @@ public interface SearchQuery<H> {
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
-	List<H> fetchHits(Long limit);
-
-	/**
-	 * Execute the query and return the hits as a {@link List}.
-	 *
-	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
-	 * @return The query hits.
-	 * @throws SearchException If something goes wrong while executing the query.
-	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
-	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
-	 */
 	List<H> fetchHits(Integer limit);
-
-	/**
-	 * Execute the query and return the hits as a {@link List}.
-	 *
-	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
-	 * @param offset The number of hits to skip. {@code null} means no offset.
-	 * @return The query hits.
-	 * @throws SearchException If something goes wrong while executing the query.
-	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
-	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
-	 */
-	List<H> fetchHits(Long limit, Long offset);
 
 	/**
 	 * Execute the query and return the hits as a {@link List}.

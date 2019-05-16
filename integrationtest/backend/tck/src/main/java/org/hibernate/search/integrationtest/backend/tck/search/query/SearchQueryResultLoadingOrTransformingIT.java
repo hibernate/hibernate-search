@@ -399,11 +399,11 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.toQuery();
 
 		// Using an offset/limit should not affect later counts
-		query.fetch( 1L, 1L );
+		query.fetch( 1, 1 );
 
 		assertEquals( 2L, query.fetchTotalHitCount() );
 
-		query.fetch( 1L, 0L );
+		query.fetch( 1, 0 );
 
 		assertEquals( 2L, query.fetchTotalHitCount() );
 	}

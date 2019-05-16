@@ -12,11 +12,11 @@ import org.hibernate.search.integrationtest.showcase.library.model.Person;
 
 public interface IndexSearchPersonRepository {
 
-	List<Person> listTopBorrowers(long limit, long offset);
+	List<Person> listTopBorrowers(int limit, int offset);
 
-	List<Person> listTopShortTermBorrowers(long limit, long offset);
+	List<Person> listTopShortTermBorrowers(int limit, int offset);
 
-	List<Person> listTopLongTermBorrowers(long limit, long offset);
+	List<Person> listTopLongTermBorrowers(int limit, int offset);
 
-	List<Person> searchPerson(String terms, long limit, long offset);
+	List<Person> searchPerson(String terms, int limit, int offset);
 }
