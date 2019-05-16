@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -14,6 +13,7 @@ import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.common.impl.SearchThreadFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.index.ConcurrentMergeScheduler;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.MergePolicy;
 import org.apache.lucene.store.Directory;
@@ -28,14 +28,14 @@ import org.apache.lucene.util.ThreadInterruptedException;
  * @author Sanne Grinovero
  */
 //TODO think about using an Executor instead of starting Threads directly
-public class ConcurrentMergeScheduler extends org.apache.lucene.index.ConcurrentMergeScheduler {
+class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ErrorHandler errorHandler;
 	private final String indexName;
 
-	public ConcurrentMergeScheduler(ErrorHandler errorHandler, String indexName) {
+	HibernateSearchConcurrentMergeScheduler(ErrorHandler errorHandler, String indexName) {
 		this.errorHandler = errorHandler;
 		this.indexName = indexName;
 	}
@@ -49,12 +49,12 @@ public class ConcurrentMergeScheduler extends org.apache.lucene.index.Concurrent
 			Thread.currentThread().interrupt();
 		}
 		catch (Exception ex) {
-			errorHandler.handleException( log.exceptionDuringIndexMergeOperation() , ex );
+			errorHandler.handleException( log.exceptionDuringIndexMergeOperation(), ex );
 		}
 	}
 
 	@Override
-	protected synchronized MergeThread getMergeThread(IndexWriter writer, MergePolicy.OneMerge merge) throws IOException {
+	protected synchronized MergeThread getMergeThread(IndexWriter writer, MergePolicy.OneMerge merge) {
 		final MergeThread thread = new MergeThread( writer, merge );
 		thread.setDaemon( true );
 		thread.setName(
