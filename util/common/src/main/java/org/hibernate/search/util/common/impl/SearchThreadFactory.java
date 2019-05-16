@@ -15,6 +15,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SearchThreadFactory implements ThreadFactory {
 	private static final String THREAD_GROUP_PREFIX = "Hibernate Search: ";
 
+	private static String createNamePrefix(String groupName) {
+		return THREAD_GROUP_PREFIX + groupName + " - ";
+	}
+
+	public static String createName(String groupName, int threadNumber) {
+		return createNamePrefix( groupName ) + threadNumber;
+	}
+
 	final ThreadGroup group;
 	final AtomicInteger threadNumber = new AtomicInteger( 1 );
 	final String namePrefix;
@@ -22,7 +30,7 @@ public class SearchThreadFactory implements ThreadFactory {
 	public SearchThreadFactory(String groupname) {
 		SecurityManager s = System.getSecurityManager();
 		group = ( s != null ) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-		namePrefix = THREAD_GROUP_PREFIX + groupname + "-";
+		namePrefix = createNamePrefix( groupname );
 	}
 
 	@Override

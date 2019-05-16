@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.util.common.impl.SearchThreadFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexWriter;
@@ -19,7 +20,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.ThreadInterruptedException;
 
 /**
- * We customize Lucene's ConcurrentMergeScheduler to route eventual exceptions to our configurable error handler.
+ * We customize Lucene's ConcurrentMergeScheduler to route eventual exceptions to our configurable error handler
+ * and override the name of merge threads.
  *
  * @see ErrorHandler
  * @since 3.3
@@ -51,15 +53,16 @@ public class ConcurrentMergeScheduler extends org.apache.lucene.index.Concurrent
 		}
 	}
 
-	/*
-	 * Overrides method to customize the thread Name
-	 * @see org.apache.lucene.index.ConcurrentMergeScheduler#getMergeThread(org.apache.lucene.index.IndexWriter, org.apache.lucene.index.MergePolicy.OneMerge)
-	 */
 	@Override
 	protected synchronized MergeThread getMergeThread(IndexWriter writer, MergePolicy.OneMerge merge) throws IOException {
 		final MergeThread thread = new MergeThread( writer, merge );
 		thread.setDaemon( true );
-		thread.setName( "Lucene Merge Thread #" + mergeThreadCount++ + " for index " + indexName );
+		thread.setName(
+				SearchThreadFactory.createName(
+						"Lucene Merge Thread for index " + indexName,
+						mergeThreadCount++
+				)
+		);
 		return thread;
 	}
 
