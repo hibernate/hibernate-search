@@ -28,8 +28,6 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static final Class<Document<?>> DOCUMENT_CLASS = (Class<Document<?>>) (Class) Document.class;
 
-	private static final int MAX_RESULT = 10000;
-
 	@Autowired
 	private EntityManager entityManager;
 
@@ -41,7 +39,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				.predicate( p -> p.matchAll() )
 				.toQuery();
 
-		return query.fetchHits( MAX_RESULT, 0 );
+		return query.fetchHits();
 	}
 
 	@Override
