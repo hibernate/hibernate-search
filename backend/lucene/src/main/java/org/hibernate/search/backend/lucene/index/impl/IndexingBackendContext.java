@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
 
+import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;

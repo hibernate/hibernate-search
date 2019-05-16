@@ -20,8 +20,9 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.InitialLucene
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyName;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.directory.impl.MMapDirectoryProvider;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategy;

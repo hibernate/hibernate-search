@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
-import org.hibernate.search.backend.lucene.search.reader.impl.MultiReaderFactory;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.MultiReaderFactory;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWorkExecutionContext;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
