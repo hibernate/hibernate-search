@@ -49,6 +49,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 55, max = 55),
 		@ValidIdRange(min = 75, max = 75),
 		@ValidIdRange(min = 114, max = 114),
+		@ValidIdRange(min = 225, max = 225),
 		@ValidIdRange(min = 228, max = 228),
 		@ValidIdRange(min = 284, max = 284),
 		@ValidIdRange(min = 320, max = 320),
@@ -94,6 +95,14 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 114,
 			value = "Could not load resource: '%1$s'")
 	SearchException unableToLoadResource(String fileName);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = ID_OFFSET_1 + 225,
+			value = "An index locking error occurred during initialization of Directory '%s'."
+					+ " This might indicate a concurrent initialization;"
+					+ " If you experience errors on this index you might need to remove the lock, or rebuild the index."
+	)
+	void lockingFailureDuringInitialization(String directoryDescription);
 
 	@Message(id = ID_OFFSET_1 + 228,
 			value = "Value '%1$ss' is not in a valid format to express a Lucene version: %2$s" )
