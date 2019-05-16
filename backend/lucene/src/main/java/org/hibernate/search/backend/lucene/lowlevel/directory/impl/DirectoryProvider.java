@@ -10,10 +10,10 @@ import java.io.IOException;
 
 import org.apache.lucene.store.Directory;
 
-// TODO make this an SPI, provide multiple implementations
+// TODO HSEARCH-3440 make this an SPI, provide multiple implementations
 public interface DirectoryProvider {
 
-	// TODO return an SPI type so that people can easily add behavior to the close() method
+	// TODO HSEARCH-3440 return an SPI type so that people can easily add behavior to the close() method
 	// (could be useful if they started a thread pool when creating the directory for instance)
 	/**
 	 * Create a {@link Directory} for a given name, allocating internal resources (filesystem directories, ...)
