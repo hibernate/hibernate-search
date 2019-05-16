@@ -133,6 +133,12 @@ public class SearchQueryFetchIT {
 						builder.doc( INDEX_NAME, docId( i ) );
 					}
 				} );
+
+		// Fetch beyond the total hit count
+		query = matchAllQuery();
+		assertThat( query.fetch( null, DOCUMENT_COUNT + 1 ) ).fromQuery( query )
+				.hasTotalHitCount( DOCUMENT_COUNT )
+				.hasNoHits();
 	}
 
 	@Test
@@ -198,6 +204,11 @@ public class SearchQueryFetchIT {
 						builder.doc( INDEX_NAME, docId( i ) );
 					}
 				} );
+
+		// Fetch beyond the total hit count
+		query = matchAllQuery();
+		assertThat( query.fetchHits( null, DOCUMENT_COUNT + 1 ) ).fromQuery( query )
+				.isEmpty();
 	}
 
 	@Test
