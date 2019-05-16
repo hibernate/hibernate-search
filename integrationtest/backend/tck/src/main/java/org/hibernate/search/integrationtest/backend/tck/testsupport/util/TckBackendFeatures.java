@@ -23,4 +23,8 @@ public class TckBackendFeatures {
 	public boolean geoPointIndexNullAs() {
 		return true;
 	}
+
+	public boolean worksFineWithStrictAboveRangedQueriesOnDecimalScaledField() {
+		return true;
+	}
 }

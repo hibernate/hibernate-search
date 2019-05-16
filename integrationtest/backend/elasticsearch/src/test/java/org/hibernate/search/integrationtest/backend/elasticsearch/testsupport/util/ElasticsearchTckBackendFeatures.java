@@ -23,4 +23,9 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean geoPointIndexNullAs() {
 		return dialect.isGeoPointIndexNullAsPossible();
 	}
+
+	@Override
+	public boolean worksFineWithStrictAboveRangedQueriesOnDecimalScaledField() {
+		return dialect.worksFineWithStrictGraterThanRangedQueriesOnScaledFloatField();
+	}
 }

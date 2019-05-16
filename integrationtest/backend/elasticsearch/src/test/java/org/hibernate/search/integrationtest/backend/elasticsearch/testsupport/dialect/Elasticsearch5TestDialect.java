@@ -52,4 +52,9 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 	public boolean isGeoPointIndexNullAsPossible() {
 		return false;
 	}
+
+	@Override
+	public boolean worksFineWithStrictGraterThanRangedQueriesOnScaledFloatField() {
+		return false;
+	}
 }

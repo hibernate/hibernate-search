@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -31,12 +32,14 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.test.SubTest;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -165,6 +168,10 @@ public class RangeSearchPredicateIT {
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 			// explicit exclusion
+			Assume.assumeTrue(
+					"Skip the subsequent test if the current backend does not support exact-above-ranged-queries among a decimal-scaled-field",
+					!BigDecimal.class.equals( fieldModel.javaType ) || TckConfiguration.get().getBackendFeatures().worksFineWithStrictAboveRangedQueriesOnDecimalScaledField()
+			);
 
 			query = scope.query()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).excludeLimit() )
@@ -1119,7 +1126,7 @@ public class RangeSearchPredicateIT {
 			RangePredicateExpectations<F> expectations = typeDescriptor.getRangePredicateExpectations().get();
 			return StandardFieldMapper.of(
 					typeDescriptor::configure,
-					(reference, name) -> new ByTypeFieldModel<>( reference, name, expectations )
+					(reference, name) -> new ByTypeFieldModel<>( reference, name, expectations, typeDescriptor.getJavaType() )
 			);
 		}
 
@@ -1131,14 +1138,17 @@ public class RangeSearchPredicateIT {
 		final F predicateLowerBound;
 		final F predicateUpperBound;
 
+		final Class<F> javaType;
+
 		private ByTypeFieldModel(IndexFieldReference<F> reference, String relativeFieldName,
-				RangePredicateExpectations<F> expectations) {
+				RangePredicateExpectations<F> expectations, Class<F> javaType) {
 			this.relativeFieldName = relativeFieldName;
 			this.document1Value = new ValueModel<>( reference, expectations.getDocument1Value() );
 			this.document2Value = new ValueModel<>( reference, expectations.getDocument2Value() );
 			this.document3Value = new ValueModel<>( reference, expectations.getDocument3Value() );
 			this.predicateLowerBound = expectations.getBetweenDocument1And2Value();
 			this.predicateUpperBound = expectations.getBetweenDocument2And3Value();
+			this.javaType = javaType;
 		}
 	}
 

@@ -59,4 +59,8 @@ public interface ElasticsearchTestDialect {
 	static String getClusterVersion() {
 		return System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" );
 	}
+
+	default boolean worksFineWithStrictGraterThanRangedQueriesOnScaledFloatField() {
+		return true;
+	}
 }
