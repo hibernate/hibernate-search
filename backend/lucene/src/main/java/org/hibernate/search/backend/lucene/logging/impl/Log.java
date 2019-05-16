@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.logging.impl;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -492,5 +491,8 @@ public interface Log extends BasicLogger {
 	SearchException nullDecimalScale(@Param EventContext eventContext);
 
 	@Message(id = ID_OFFSET_2 + 81, value = "The value '%1$s' is too large to be indexed.")
-	SearchException bigDecimalTooLarge(BigDecimal value);
+	SearchException scaledNumberTooLarge(Number value);
+
+	@Message(id = ID_OFFSET_2 + 82, value = "Positive decimal scale ['%1$s'] is not allowed for BigInteger fields, since a BigInteger value cannot have any decimal digits.")
+	SearchException invalidDecimalScale(Integer decimalScale, @Param EventContext eventContext);
 }

@@ -227,8 +227,7 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 
 	@Override
 	public ScaledNumberIndexFieldTypeContext<?, BigInteger> asBigInteger() {
-		// TODO implemented in the next commit
-		return null;
+		return new LuceneBigIntegerIndexFieldTypeContext( this, typeDefaultsProvider );
 	}
 
 	@Override

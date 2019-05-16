@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
@@ -18,44 +19,44 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericFieldCodec<BigDecimal, Long> {
+public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericFieldCodec<BigInteger, Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final int decimalScale;
 
-	public LuceneBigDecimalFieldCodec(boolean projectable, boolean sortable, BigDecimal indexNullAsValue, int decimalScale) {
+	public LuceneBigIntegerFieldCodec(boolean projectable, boolean sortable, BigInteger indexNullAsValue, int decimalScale) {
 		super( projectable, sortable, indexNullAsValue );
 		this.decimalScale = decimalScale;
 	}
 
 	@Override
-	void validate(BigDecimal value) {
-		if ( value.compareTo( BigDecimal.valueOf( Long.MAX_VALUE, decimalScale ) ) > 0 ) {
+	void validate(BigInteger value) {
+		if ( new BigDecimal( value ).compareTo( BigDecimal.valueOf( Long.MAX_VALUE, decimalScale ) ) > 0 ) {
 			throw log.scaledNumberTooLarge( value );
 		}
 	}
 
 	@Override
-	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, BigDecimal value,
+	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, BigInteger value,
 			Long encodedValue) {
 		// storing field as String for projections
 		documentBuilder.addField( new StoredField( absoluteFieldPath, value.toString() ) );
 	}
 
 	@Override
-	public BigDecimal decode(Document document, String absoluteFieldPath) {
+	public BigInteger decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
 			return null;
 		}
 
-		return new BigDecimal( field.stringValue() );
+		return new BigInteger( field.stringValue() );
 	}
 
 	@Override
-	public Long encode(BigDecimal value) {
+	public Long encode(BigInteger value) {
 		return unscale( value );
 	}
 
@@ -73,12 +74,12 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 			return false;
 		}
 
-		LuceneBigDecimalFieldCodec other = (LuceneBigDecimalFieldCodec) obj;
+		LuceneBigIntegerFieldCodec other = (LuceneBigIntegerFieldCodec) obj;
 		return decimalScale == other.decimalScale;
 	}
 
-	private Long unscale(BigDecimal value) {
+	private Long unscale(BigInteger value) {
 		// See tck.DecimalScaleIT#roundingMode
-		return value.setScale( decimalScale, RoundingMode.HALF_UP ).unscaledValue().longValue();
+		return new BigDecimal( value ).setScale( decimalScale, RoundingMode.HALF_UP ).unscaledValue().longValue();
 	}
 }

@@ -49,9 +49,8 @@ public abstract class FieldTypeDescriptor<F> {
 					new OffsetDateTimeFieldTypeDescriptor(),
 					new OffsetTimeFieldTypeDescriptor(),
 					new GeoPointFieldTypeDescriptor(),
-					new BigDecimalFieldTypeDescriptor()
-					// TODO: unlock the tests when the type is supported on Lucene backend too
-					// new BigIntegerFieldTypeDescriptor()
+					new BigDecimalFieldTypeDescriptor(),
+					new BigIntegerFieldTypeDescriptor()
 			) );
 		}
 		return all;
