@@ -10,12 +10,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
+
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryContextImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
@@ -28,14 +31,14 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		implements IndexSchemaRootNodeBuilder, IndexSchemaBuildContext {
 
 	private final EventContext indexEventContext;
-	private final LuceneIndexFieldTypeFactoryContext typeFactory;
+	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	public LuceneIndexSchemaRootNodeBuilder(EventContext indexEventContext,
-			LuceneIndexFieldTypeFactoryContext typeFactory) {
+			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		this.indexEventContext = indexEventContext;
-		this.typeFactory = typeFactory;
+		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 	}
 
 	@Override
@@ -45,9 +48,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	@Override
 	public LuceneIndexFieldTypeFactoryContext createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		// TODO handle defaultsProvider instance for the current request,
-		// creating a new instance of typeFactory
-		return typeFactory;
+		return new LuceneIndexFieldTypeFactoryContextImpl( indexEventContext, analysisDefinitionRegistry, defaultsProvider );
 	}
 
 	@Override

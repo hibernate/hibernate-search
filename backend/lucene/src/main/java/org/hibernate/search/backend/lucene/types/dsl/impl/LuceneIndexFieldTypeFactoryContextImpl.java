@@ -28,6 +28,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalConte
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -43,11 +44,13 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 
 	private final EventContext eventContext;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	private final IndexFieldTypeDefaultsProvider typeDefaultsProvider;
 
 	public LuceneIndexFieldTypeFactoryContextImpl(EventContext eventContext,
-			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
+			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
 		this.eventContext = eventContext;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
+		this.typeDefaultsProvider = typeDefaultsProvider;
 	}
 
 	@Override
@@ -216,8 +219,7 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 
 	@Override
 	public ScaledNumberIndexFieldTypeContext<?> asBigDecimal() {
-		// TODO implement within current issue
-		return null;
+		return new LuceneBigDecimalIndexFieldTypeContext( this, typeDefaultsProvider );
 	}
 
 	@Override

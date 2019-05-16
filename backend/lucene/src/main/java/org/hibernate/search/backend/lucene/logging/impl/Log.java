@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.logging.impl;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -485,4 +486,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 79,
 			value = "Unable to clean up after write errors.")
 	SearchException unableToCleanUpAfterError(@Param EventContext context, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_2 + 80, value = "Impossible to detect a decimal scale to use for this field."
+			+ " If the value is bridged, set '.asBigDecimal().decimalScale( int )' in the bind, else verify your mapping.")
+	SearchException nullDecimalScale(@Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET_2 + 81, value = "The value '%1$s' is too large to be indexed.")
+	SearchException bigDecimalTooLarge(BigDecimal value);
 }

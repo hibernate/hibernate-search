@@ -38,6 +38,8 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 			return;
 		}
 
+		validate( value );
+
 		E encodedValue = encode( value );
 
 		if ( projectable ) {
@@ -79,6 +81,10 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 		AbstractLuceneNumericFieldCodec<?, ?> other = (AbstractLuceneNumericFieldCodec<?, ?>) obj;
 
 		return projectable == other.projectable && sortable == other.sortable;
+	}
+
+	void validate(F value) {
+		// default no-op
 	}
 
 	public abstract LuceneNumericDomain<E> getDomain();
