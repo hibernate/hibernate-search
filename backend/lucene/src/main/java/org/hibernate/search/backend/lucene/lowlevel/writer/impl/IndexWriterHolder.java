@@ -12,13 +12,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.common.spi.ErrorContext;
-import org.hibernate.search.engine.common.spi.ErrorContextBuilder;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -69,27 +66,18 @@ class IndexWriterHolder {
 	/**
 	 * Gets the IndexWriter, opening one if needed.
 	 *
-	 * @param errorContextBuilder might contain some context useful to provide when handling IOExceptions.
-	 * Is an optional parameter.
 	 * @return a new IndexWriter or one already open.
 	 */
-	public IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder) {
+	public IndexWriter getIndexWriter() throws IOException {
 		IndexWriter indexWriter = writer.get();
 		if ( indexWriter == null ) {
 			writerInitializationLock.lock();
 			try {
 				indexWriter = writer.get();
 				if ( indexWriter == null ) {
-					try {
-						indexWriter = createNewIndexWriter();
-						log.trace( "IndexWriter opened" );
-						writer.set( indexWriter );
-					}
-					catch (IOException ioe) {
-						indexWriter = null;
-						writer.set( null );
-						handleIOException( ioe, errorContextBuilder );
-					}
+					indexWriter = createNewIndexWriter();
+					log.trace( "IndexWriter opened" );
+					writer.set( indexWriter );
 				}
 			}
 			finally {
@@ -97,10 +85,6 @@ class IndexWriterHolder {
 			}
 		}
 		return indexWriter;
-	}
-
-	public IndexWriter getIndexWriter() {
-		return getIndexWriter( null );
 	}
 
 	/**
@@ -134,33 +118,19 @@ class IndexWriterHolder {
 
 	/**
 	 * Commits changes to a previously opened IndexWriter.
-	 *
-	 * @param errorContextBuilder use it to handle exceptions, as it might contain a reference to the work performed before the commit
 	 */
-	public void commitIndexWriter(ErrorContextBuilder errorContextBuilder) {
+	public void commitIndexWriter() throws IOException {
 		IndexWriter indexWriter = writer.get();
 		if ( indexWriter != null ) {
-			try {
-				indexWriter.commit();
-				log.trace( "Index changes committed." );
-			}
-			catch (IOException ioe) {
-				handleIOException( ioe, errorContextBuilder );
-			}
+			indexWriter.commit();
+			log.trace( "Index changes committed." );
 		}
-	}
-
-	/**
-	 * @see #commitIndexWriter(ErrorContextBuilder)
-	 */
-	public void commitIndexWriter() {
-		commitIndexWriter( null );
 	}
 
 	/**
 	 * Closes a previously opened IndexWriter.
 	 */
-	public void closeIndexWriter() {
+	public void closeIndexWriter() throws IOException {
 		final IndexWriter toClose = writer.getAndSet( null );
 		if ( toClose != null ) {
 			try {
@@ -169,7 +139,7 @@ class IndexWriterHolder {
 			}
 			catch (IOException ioe) {
 				forceLockRelease();
-				handleIOException( ioe, null );
+				throw ioe;
 			}
 		}
 	}
@@ -177,7 +147,7 @@ class IndexWriterHolder {
 	/**
 	 * Forces release of Directory lock. Should be used only to cleanup as error recovery.
 	 */
-	public void forceLockRelease() {
+	public void forceLockRelease() throws IOException {
 		log.forcingReleaseIndexWriterLock();
 		writerInitializationLock.lock();
 		try {
@@ -186,9 +156,6 @@ class IndexWriterHolder {
 				indexWriter.close();
 				log.trace( "IndexWriter closed" );
 			}
-		}
-		catch (IOException ioe) {
-			handleIOException( ioe, null );
 		}
 		finally {
 			writerInitializationLock.unlock();
@@ -201,59 +168,22 @@ class IndexWriterHolder {
 	 * @param applyDeletes Applying deletes is expensive, say no if you can deal with stale hits during queries
 	 * @return a new NRT IndexReader if an IndexWriter is available, or <code>null</code> otherwise
 	 */
-	public DirectoryReader openNRTIndexReader(boolean applyDeletes) {
+	public DirectoryReader openNRTIndexReader(boolean applyDeletes) throws IOException {
 		final IndexWriter indexWriter = writer.get();
-		try {
-			if ( indexWriter != null ) {
-				// TODO HSEARCH-3117 should parameter writeAllDeletes take the same value as applyDeletes?
-				return DirectoryReader.open( indexWriter, applyDeletes, applyDeletes );
-			}
-			else {
-				return null;
-			}
+		if ( indexWriter != null ) {
+			// TODO HSEARCH-3117 should parameter writeAllDeletes take the same value as applyDeletes?
+			return DirectoryReader.open( indexWriter, applyDeletes, applyDeletes );
 		}
-		// following exceptions should be propagated as the IndexReader is needed by
-		// the main thread
-		catch (CorruptIndexException cie) {
-			throw log.cantOpenCorruptedIndex( cie, indexName );
-		}
-		catch (IOException ioe) {
-			throw log.ioExceptionOnIndex( ioe, indexName );
+		else {
+			return null;
 		}
 	}
 
 	/**
 	 * Opens an IndexReader from the DirectoryProvider (not using the IndexWriter)
 	 */
-	public DirectoryReader openDirectoryIndexReader() {
-		try {
-			return DirectoryReader.open( directory );
-		}
-		// following exceptions should be propagated as the IndexReader is needed by
-		// the main thread
-		catch (CorruptIndexException cie) {
-			throw log.cantOpenCorruptedIndex( cie, indexName );
-		}
-		catch (IOException ioe) {
-			throw log.ioExceptionOnIndex( ioe, indexName );
-		}
+	public DirectoryReader openDirectoryIndexReader() throws IOException {
+		return DirectoryReader.open( directory );
 	}
 
-	/**
-	 * @param ioe The exception to handle
-	 * @param errorContextBuilder Might be used to enqueue useful information about the lost operations, or be null
-	 */
-	private void handleIOException(IOException ioe, ErrorContextBuilder errorContextBuilder) {
-		if ( log.isTraceEnabled() ) {
-			log.trace( "going to handle IOException", ioe );
-		}
-		final ErrorContext errorContext;
-		if ( errorContextBuilder != null ) {
-			errorContext = errorContextBuilder.errorThatOccurred( ioe ).createErrorContext();
-			this.errorHandler.handle( errorContext );
-		}
-		else {
-			errorHandler.handleException( log.ioExceptionOnIndexWriter(), ioe );
-		}
-	}
 }
