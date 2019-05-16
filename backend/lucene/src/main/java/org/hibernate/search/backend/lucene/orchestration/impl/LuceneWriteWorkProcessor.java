@@ -60,6 +60,12 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.Processor {
 			commitIfNecessary();
 		}
 		catch (RuntimeException e) {
+			try {
+				cleanUpAfterError();
+			}
+			catch (RuntimeException e2) {
+				e.addSuppressed( e2 );
+			}
 			errorHandler.handleException( e.getMessage(), e );
 		}
 		// Everything was already executed, so just return a completed future.
@@ -106,10 +112,13 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.Processor {
 			}
 		}
 		if ( workSetFailure != null ) {
+			try {
+				cleanUpAfterError();
+			}
+			catch (RuntimeException e) {
+				workSetFailure.addSuppressed( e );
+			}
 			future.completeExceptionally( workSetFailure );
-			// FIXME close the index writer in case of error?
-			//  this will require an IndexWriterHolder
-			//  see org.hibernate.search.backend.impl.lucene.IndexWriterHolder.forceLockRelease
 			getWorkSetContextualErrorHandler().handle();
 		}
 		else {
@@ -127,6 +136,20 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.Processor {
 			catch (RuntimeException | IOException e) {
 				throw log.unableToCommitIndex( indexEventContext, e );
 			}
+		}
+	}
+
+	private void cleanUpAfterError() {
+		try {
+			hasUncommittedWorks = false;
+			/*
+			 * Note this will close the index writer,
+			 * which with the default settings will trigger a commit.
+			 */
+			indexWriterHolder.forceLockRelease();
+		}
+		catch (RuntimeException | IOException e) {
+			throw log.unableToCleanUpAfterError( indexEventContext, e );
 		}
 	}
 

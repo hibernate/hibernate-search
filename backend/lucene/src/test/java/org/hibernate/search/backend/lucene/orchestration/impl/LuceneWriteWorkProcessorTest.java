@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -152,6 +153,58 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 		verifyAll();
 	}
 
+
+	@Test
+	public void error_workExecuteAndForceLockRelease() throws IOException {
+		resetAll();
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		// Execute a workset where one work fails
+		RuntimeException workException = new RuntimeException( "Some message" );
+		testWorkSetBeginning( 2, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+		testFailingWork( workException );
+		testSkippedWorks( 4 );
+
+		// When ending the workset, forceLockRelease fails...
+		RuntimeException forceLockReleaseException = new RuntimeException( "Some other message" );
+		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
+		Object workSetResult = new Object();
+		resetAll();
+		indexWriterHolderMock.forceLockRelease();
+		expectLastCall().andThrow( forceLockReleaseException );
+		contextualErrorHandlerMock.handle();
+		replayAll();
+		processor.afterWorkSet( workSetFuture, workSetResult );
+		verifyAll();
+
+		FutureAssert.assertThat( workSetFuture ).isFailed( workException );
+		assertThat( workException.getSuppressed() )
+				.hasSize( 1 )
+				.satisfies(
+						suppressed -> assertThat( suppressed[0] )
+								.hasMessageContaining( "Unable to clean up" )
+								.hasMessageContaining( INDEX_NAME )
+								.hasCause( forceLockReleaseException )
+				);
+
+		// Subsequent worksets must be executed regardless of previous failures in the same batch
+		testSuccessfulWorkSet(
+				3,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
+				false
+		);
+
+		// A work may have failed, but there were still successful changes, before and after the failure: these must be committed
+		resetAll();
+		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
+		expect( indexWriterMock.commit() ).andReturn( 1L );
+		replayAll();
+		processor.endBatch();
+		verifyAll();
+	}
+
 	@Test
 	public void error_workSetCommit() throws IOException {
 		resetAll();
@@ -181,6 +234,7 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 		resetAll();
 		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
 		expect( indexWriterMock.commit() ).andThrow( commitException );
+		indexWriterHolderMock.forceLockRelease();
 		expect( errorHandlerMock.createContextualHandler() ).andReturn( contextualErrorHandlerMock );
 		contextualErrorHandlerMock.addThrowable( capture( exceptionCapture ) );
 		contextualErrorHandlerMock.handle();
@@ -194,6 +248,70 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 				.hasMessageContaining( "Unable to commit" )
 				.hasMessageContaining( INDEX_NAME )
 				.hasCause( commitException );
+
+		FutureAssert.assertThat( workSetFuture ).isFailed( exceptionCapture.getValue() );
+
+		resetAll();
+		replayAll();
+		processor.endBatch();
+		verifyAll();
+	}
+
+	@Test
+	public void error_workSetCommitAndForceLockRelease() throws IOException {
+		resetAll();
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		testSuccessfulWorkSet(
+				4,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
+				false
+		);
+
+		// Start a new workset
+		testWorkSetBeginning(
+				6,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
+		);
+
+		// Fail upon workset commit AND forceLockRelease...
+
+		RuntimeException commitException = new RuntimeException( "Some message" );
+		RuntimeException forceLockReleaseException = new RuntimeException( "Some other message" );
+
+		Capture<Throwable> exceptionCapture = Capture.newInstance();
+		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
+		Object workSetResult = new Object();
+		resetAll();
+		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
+		expect( indexWriterMock.commit() ).andThrow( commitException );
+		indexWriterHolderMock.forceLockRelease();
+		expectLastCall().andThrow( forceLockReleaseException );
+		expect( errorHandlerMock.createContextualHandler() ).andReturn( contextualErrorHandlerMock );
+		contextualErrorHandlerMock.addThrowable( capture( exceptionCapture ) );
+		contextualErrorHandlerMock.handle();
+		// We don't expect any commit when a workset fails
+		replayAll();
+		processor.afterWorkSet( workSetFuture, workSetResult );
+		verifyAll();
+
+		assertThat( exceptionCapture.getValue() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unable to commit" )
+				.hasMessageContaining( INDEX_NAME )
+				.hasCause( commitException );
+
+		assertThat( exceptionCapture.getValue().getSuppressed() )
+				.hasSize( 1 )
+				.satisfies(
+						suppressed -> assertThat( suppressed[0] )
+								.hasMessageContaining( "Unable to clean up" )
+								.hasMessageContaining( INDEX_NAME )
+								.hasCause( forceLockReleaseException )
+				);
+
 
 		FutureAssert.assertThat( workSetFuture ).isFailed( exceptionCapture.getValue() );
 
@@ -231,6 +349,7 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 		resetAll();
 		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
 		expect( indexWriterMock.commit() ).andThrow( commitException );
+		indexWriterHolderMock.forceLockRelease();
 		errorHandlerMock.handleException( capture( stringCapture ), capture( exceptionCapture ) );
 		replayAll();
 		processor.endBatch();
@@ -244,7 +363,61 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 
 		assertThat( stringCapture.getValue() )
 				.isEqualTo( exceptionCapture.getValue().getMessage() );
+	}
 
+	@Test
+	public void error_batchCommitAndForceLockRelease() throws IOException {
+		RuntimeException commitException = new RuntimeException( "Some message" );
+		RuntimeException forceLockReleaseException = new RuntimeException( "Some other message" );
+
+		resetAll();
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		// Execute worksets
+		testSuccessfulWorkSet(
+				4,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
+				false
+		);
+		testSuccessfulWorkSet(
+				6,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
+				false
+		);
+
+		// Fail upon batch commit AND forceLockRelease...
+
+		Capture<String> stringCapture = Capture.newInstance();
+		Capture<Throwable> exceptionCapture = Capture.newInstance();
+		resetAll();
+		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
+		expect( indexWriterMock.commit() ).andThrow( commitException );
+		indexWriterHolderMock.forceLockRelease();
+		expectLastCall().andThrow( forceLockReleaseException );
+		errorHandlerMock.handleException( capture( stringCapture ), capture( exceptionCapture ) );
+		replayAll();
+		processor.endBatch();
+		verifyAll();
+
+		assertThat( exceptionCapture.getValue() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unable to commit" )
+				.hasMessageContaining( INDEX_NAME )
+				.hasCause( commitException );
+
+		assertThat( exceptionCapture.getValue().getSuppressed() )
+				.hasSize( 1 )
+				.satisfies(
+						suppressed -> assertThat( suppressed[0] )
+								.hasMessageContaining( "Unable to clean up" )
+								.hasMessageContaining( INDEX_NAME )
+								.hasCause( forceLockReleaseException )
+				);
+
+		assertThat( stringCapture.getValue() )
+				.isEqualTo( exceptionCapture.getValue().getMessage() );
 	}
 
 	private void testSuccessfulWorkSet(int workCount,
@@ -323,8 +496,8 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
 		Object workSetResult = new Object();
 		resetAll();
+		indexWriterHolderMock.forceLockRelease();
 		contextualErrorHandlerMock.handle();
-		// We don't expect any commit when a workset fails
 		replayAll();
 		processor.afterWorkSet( workSetFuture, workSetResult );
 		verifyAll();
