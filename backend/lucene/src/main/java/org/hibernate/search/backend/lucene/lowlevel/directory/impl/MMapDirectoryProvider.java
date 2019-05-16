@@ -7,20 +7,16 @@
 package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.MMapDirectory;
 
 public class MMapDirectoryProvider implements DirectoryProvider {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private final EventContext backendContext;
 
 	private final Path rootDirectory;
@@ -40,24 +36,17 @@ public class MMapDirectoryProvider implements DirectoryProvider {
 
 	@Override
 	public Directory createDirectory(String indexName) throws IOException {
+		EventContext indexContext = backendContext.append( EventContexts.fromIndexName( indexName ) );
 		Path directoryPath = rootDirectory.resolve( indexName );
-		initializeIndexDirectory( directoryPath );
-		return new MMapDirectory( directoryPath );
-	}
-
-	private void initializeIndexDirectory(Path indexDirectory) {
-		if ( Files.exists( indexDirectory ) ) {
-			if ( !Files.isDirectory( indexDirectory ) || !Files.isWritable( indexDirectory ) ) {
-				throw log.localDirectoryIndexRootDirectoryNotWritableDirectory( indexDirectory, backendContext );
-			}
+		DirectoryHelper.makeSanityCheckedFilesystemDirectory( directoryPath, indexContext );
+		Directory directory = new MMapDirectory( directoryPath );
+		try {
+			DirectoryHelper.initializeIndexIfNeeded( directory, indexContext );
 		}
-		else {
-			try {
-				Files.createDirectories( indexDirectory );
-			}
-			catch (Exception e) {
-				throw log.unableToCreateIndexRootDirectoryForLocalDirectoryBackend( indexDirectory, backendContext, e );
-			}
+		catch (IOException | RuntimeException e) {
+			new SuppressingCloser( e ).push( directory );
+			throw e;
 		}
+		return directory;
 	}
 }
