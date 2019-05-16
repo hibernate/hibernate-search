@@ -310,14 +310,6 @@ public class SearchQueryFetchIT {
 				.toQuery();
 	}
 
-	private DocumentReference[] references(int first, int afterLast) {
-		List<DocumentReference> references = new ArrayList<>();
-		for ( int i = first; i < afterLast; i++ ) {
-			references.add( reference( INDEX_NAME, docId( i ) ) );
-		}
-		return references.toArray( new DocumentReference[0] );
-	}
-
 	private void initData() {
 		IndexDocumentWorkExecutor<? extends DocumentElement> executor = indexManager.createDocumentWorkExecutor();
 		List<CompletableFuture<?>> futures = new ArrayList<>();
@@ -350,14 +342,6 @@ public class SearchQueryFetchIT {
 		IndexMapping(IndexSchemaElement root) {
 			integer = root.field( "integer", f -> f.asInteger().sortable( Sortable.YES ) )
 					.toReference();
-		}
-	}
-
-	private static class QueryWrapper {
-		private final SearchQuery<?> query;
-
-		private QueryWrapper(SearchQuery<?> query) {
-			this.query = query;
 		}
 	}
 }
