@@ -8,15 +8,15 @@ package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Properties;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -33,7 +33,7 @@ import org.apache.lucene.store.SleepingLockWrapper;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public class DirectoryHelper {
+class DirectoryHelper {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -46,52 +46,39 @@ public class DirectoryHelper {
 	 * @param directory the Directory to initialize
 	 * @throws SearchException in case of lock acquisition timeouts, IOException, or if a corrupt index is found
 	 */
-	public static void initializeIndexIfNeeded(Directory directory) {
-		SimpleAnalyzer analyzer = new SimpleAnalyzer();
+	public static void initializeIndexIfNeeded(Directory directory, EventContext eventContext) throws IOException {
+		if ( DirectoryReader.indexExists( directory ) ) {
+			return;
+		}
+
 		try {
-			if ( ! DirectoryReader.indexExists( directory ) ) {
-				try {
-					IndexWriterConfig iwriterConfig = new IndexWriterConfig( analyzer ).setOpenMode( OpenMode.CREATE_OR_APPEND );
-					//Needs to have a timeout higher than zero to prevent race conditions over (network) RPCs
-					//for distributed indexes (Infinispan but probably also NFS and similar)
-					SleepingLockWrapper delayedDirectory = new SleepingLockWrapper( directory, 2000, 20 );
-					IndexWriter iw = new IndexWriter( delayedDirectory, iwriterConfig );
-					iw.close();
-				}
-				catch (LockObtainFailedException lofe) {
-					log.lockingFailureDuringInitialization( directory.toString() );
-				}
-			}
+			IndexWriterConfig iwriterConfig = new IndexWriterConfig( AnalyzerConstants.KEYWORD_ANALYZER )
+					.setOpenMode( OpenMode.CREATE_OR_APPEND );
+			//Needs to have a timeout higher than zero to prevent race conditions over (network) RPCs
+			//for distributed indexes (Infinispan but probably also NFS and similar)
+			SleepingLockWrapper delayedDirectory = new SleepingLockWrapper( directory, 2000, 20 );
+			IndexWriter iw = new IndexWriter( delayedDirectory, iwriterConfig );
+			iw.close();
 		}
-		catch (IOException e) {
-			throw new SearchException( "Could not initialize index", e );
-		}
-		finally {
-			analyzer.close();
+		catch (LockObtainFailedException lofe) {
+			log.lockingFailureDuringInitialization( directory.toString() );
 		}
 	}
 
-	/**
-	 * Verify the index directory exists and is writable,
-	 * or creates it if not existing.
-	 *
-	 * @param annotatedIndexName The index name declared on the @Indexed annotation
-	 * @param properties The properties may override the indexname.
-	 * @param verifyIsWritable Verify the directory is writable
-	 * @return the Path representing the Index Directory
-	 * @throws SearchException if any.
-	 */
-	public static Path getVerifiedIndexPath(String annotatedIndexName, Properties properties, boolean verifyIsWritable) {
-		/* FIXME adapt this to Search 6
-		String indexBase = properties.getProperty( Environment.INDEX_BASE_PROP_NAME, "." );
-		String indexName = properties.getProperty( Environment.INDEX_NAME_PROP_NAME, annotatedIndexName );
-		Path baseIndexDir = FileSystems.getDefault().getPath( indexBase );
-		DirectoryProviderHelper.makeSanityCheckedDirectory( baseIndexDir, indexName, verifyIsWritable );
-		Path indexDir = baseIndexDir.resolve( indexName );
-		DirectoryProviderHelper.makeSanityCheckedDirectory( indexDir, indexName, verifyIsWritable );
-		return indexDir;
-		 */
-		return null;
+	public static void makeSanityCheckedFilesystemDirectory(Path indexDirectory, EventContext eventContext) {
+		if ( Files.exists( indexDirectory ) ) {
+			if ( !Files.isDirectory( indexDirectory ) || !Files.isWritable( indexDirectory ) ) {
+				throw log.localDirectoryIndexRootDirectoryNotWritableDirectory( indexDirectory, eventContext );
+			}
+		}
+		else {
+			try {
+				Files.createDirectories( indexDirectory );
+			}
+			catch (Exception e) {
+				throw log.unableToCreateIndexRootDirectoryForLocalDirectoryBackend( indexDirectory, eventContext, e );
+			}
+		}
 	}
 
 }
