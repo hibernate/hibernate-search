@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
-import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryContextImpl;
