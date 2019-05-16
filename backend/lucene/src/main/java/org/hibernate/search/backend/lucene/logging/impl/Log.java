@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
@@ -225,8 +224,8 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixLuceneSearchSortWithOtherSorts(SearchSort sort);
 
 	@Message(id = ID_OFFSET_2 + 15,
-			value = "Unable to create the IndexWriter.")
-	SearchException unableToCreateIndexWriter(@Param EventContext context, @Cause Exception e);
+			value = "Unable to create the index directory.")
+	SearchException unableToCreateIndexDirectory(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 16, value = "Unable to index entry '%2$s' with tenant identifier '%1$s'.")
 	SearchException unableToIndexEntry(String tenantId, String id,

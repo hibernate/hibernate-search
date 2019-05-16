@@ -36,8 +36,8 @@ public class LuceneAddEntryWork extends AbstractLuceneWriteWork<Long> {
 
 	@Override
 	public Long execute(LuceneWriteWorkExecutionContext context) {
-		IndexWriter indexWriter = context.getIndexWriter();
 		try {
+			IndexWriter indexWriter = context.getIndexWriter();
 			return indexWriter.addDocuments( indexEntry );
 		}
 		catch (IOException e) {

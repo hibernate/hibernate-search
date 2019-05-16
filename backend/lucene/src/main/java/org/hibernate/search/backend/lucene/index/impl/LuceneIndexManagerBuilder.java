@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterHolder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
@@ -21,8 +22,6 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 
 /**
@@ -61,36 +60,38 @@ public class LuceneIndexManagerBuilder implements IndexManagerBuilder<LuceneRoot
 	@Override
 	public LuceneIndexManagerImpl build() {
 		LuceneIndexModel model = null;
-		IndexWriter indexWriter = null;
+		IndexWriterHolder indexWriterHolder = null;
 		try {
 			model = schemaRootNodeBuilder.build( indexName );
-			indexWriter = createIndexWriter( model );
+			indexWriterHolder = createIndexWriterHolder( model );
 			return new LuceneIndexManagerImpl(
-					indexingBackendContext, searchBackendContext, indexName, model, indexWriter
+					indexingBackendContext, searchBackendContext, indexName, model, indexWriterHolder
 			);
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( model )
-					.push( indexWriter );
+					.push( IndexWriterHolder::closeIndexWriter, indexWriterHolder );
 			throw e;
 		}
 	}
 
-	private IndexWriter createIndexWriter(LuceneIndexModel model) {
-		IndexWriterConfig indexWriterConfig = new IndexWriterConfig( model.getScopedAnalyzer() );
+	private IndexWriterHolder createIndexWriterHolder(LuceneIndexModel model) {
+		Directory directory;
 		try {
-			Directory directory = indexingBackendContext.createDirectory( indexName );
-			try {
-				return new IndexWriter( directory, indexWriterConfig );
-			}
-			catch (RuntimeException e) {
-				new SuppressingCloser( e ).push( directory );
-				throw e;
-			}
+			directory = indexingBackendContext.createDirectory( indexName );
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToCreateIndexWriter( getEventContext(), e );
+			throw log.unableToCreateIndexDirectory( getEventContext(), e );
+		}
+		try {
+			return indexingBackendContext.createIndexWriterHolder(
+					model.getIndexName(), directory, model.getScopedAnalyzer()
+			);
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e ).push( directory );
+			throw e;
 		}
 	}
 

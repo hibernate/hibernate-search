@@ -26,7 +26,7 @@ import org.apache.lucene.store.Directory;
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
-class IndexWriterHolder {
+public class IndexWriterHolder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String indexName;
@@ -50,7 +50,7 @@ class IndexWriterHolder {
 	 */
 	private final ReentrantLock writerInitializationLock = new ReentrantLock();
 
-	IndexWriterHolder(String indexName, Directory directory, Analyzer analyzer, ErrorHandler errorHandler) {
+	public IndexWriterHolder(String indexName, Directory directory, Analyzer analyzer, ErrorHandler errorHandler) {
 		this.indexName = indexName;
 		// TODO HSEARCH-3440 use our own SPI instead of a directory directly
 		this.directory = directory;
@@ -114,17 +114,6 @@ class IndexWriterHolder {
 		 */
 		writerConfig.setOpenMode( OpenMode.CREATE_OR_APPEND );
 		return writerConfig;
-	}
-
-	/**
-	 * Commits changes to a previously opened IndexWriter.
-	 */
-	public void commitIndexWriter() throws IOException {
-		IndexWriter indexWriter = writer.get();
-		if ( indexWriter != null ) {
-			indexWriter.commit();
-			log.trace( "Index changes committed." );
-		}
 	}
 
 	/**

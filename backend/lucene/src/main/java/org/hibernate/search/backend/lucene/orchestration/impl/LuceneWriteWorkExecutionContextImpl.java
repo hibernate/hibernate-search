@@ -6,19 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
+import java.io.IOException;
+
 import org.apache.lucene.index.IndexWriter;
+
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterHolder;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWorkExecutionContext;
 
 class LuceneWriteWorkExecutionContextImpl implements LuceneWriteWorkExecutionContext {
 
-	private final IndexWriter indexWriter;
+	private final IndexWriterHolder indexWriterHolder;
 
-	LuceneWriteWorkExecutionContextImpl(IndexWriter indexWriter) {
-		this.indexWriter = indexWriter;
+	LuceneWriteWorkExecutionContextImpl(IndexWriterHolder indexWriterHolder) {
+		this.indexWriterHolder = indexWriterHolder;
 	}
 
 	@Override
-	public IndexWriter getIndexWriter() {
-		return indexWriter;
+	public IndexWriter getIndexWriter() throws IOException {
+		return indexWriterHolder.getIndexWriter();
 	}
 }

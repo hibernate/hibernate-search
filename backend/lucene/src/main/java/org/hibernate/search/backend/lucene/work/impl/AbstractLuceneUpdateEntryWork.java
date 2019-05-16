@@ -36,8 +36,8 @@ public abstract class AbstractLuceneUpdateEntryWork extends AbstractLuceneWriteW
 
 	@Override
 	public Long execute(LuceneWriteWorkExecutionContext context) {
-		IndexWriter indexWriter = context.getIndexWriter();
 		try {
+			IndexWriter indexWriter = context.getIndexWriter();
 			return doUpdateEntry( indexWriter, tenantId, id, indexEntry );
 		}
 		catch (IOException e) {

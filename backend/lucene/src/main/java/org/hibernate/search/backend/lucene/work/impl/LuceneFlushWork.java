@@ -26,8 +26,8 @@ public class LuceneFlushWork extends AbstractLuceneWriteWork<Void> {
 
 	@Override
 	public Void execute(LuceneWriteWorkExecutionContext context) {
-		IndexWriter indexWriter = context.getIndexWriter();
 		try {
+			IndexWriter indexWriter = context.getIndexWriter();
 			indexWriter.flush();
 			return null;
 		}
