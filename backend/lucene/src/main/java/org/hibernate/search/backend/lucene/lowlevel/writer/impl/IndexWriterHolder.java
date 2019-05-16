@@ -13,7 +13,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.DirectoryReader;
@@ -32,6 +34,7 @@ public class IndexWriterHolder {
 	private final String indexName;
 	private final Directory directory;
 	private final Analyzer analyzer;
+	private final EventContext indexEventContext;
 	private final ErrorHandler errorHandler;
 
 	/* TODO HSEARCH-3117 re-allow to configure index writers
@@ -55,6 +58,7 @@ public class IndexWriterHolder {
 		// TODO HSEARCH-3440 use our own SPI instead of a directory directly
 		this.directory = directory;
 		this.analyzer = analyzer;
+		this.indexEventContext = EventContexts.fromIndexName( indexName );
 		this.errorHandler = errorHandler;
 		/* TODO HSEARCH-3117 re-allow to configure index writers
 		this.luceneParameters = indexManager.getIndexingParameters();
@@ -137,7 +141,12 @@ public class IndexWriterHolder {
 	 * Forces release of Directory lock. Should be used only to cleanup as error recovery.
 	 */
 	public void forceLockRelease() throws IOException {
-		log.forcingReleaseIndexWriterLock();
+		log.forcingReleaseIndexWriterLock( indexEventContext );
+		/*
+		 * Acquire the lock so that we're sure no writer will be created for the directory before we close the current one.
+		 * This means in particular that write locks to the directory will be released,
+		 * at least for a short period of time.
+		 */
 		writerInitializationLock.lock();
 		try {
 			IndexWriter indexWriter = writer.getAndSet( null );
