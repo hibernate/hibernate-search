@@ -481,4 +481,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 78,
 			value = "Unable to optimize.")
 	SearchException unableToOptimizeIndex(@Param EventContext context, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_2 + 79,
+			value = "Unable to clean up after write errors.")
+	SearchException unableToCleanUpAfterError(@Param EventContext context, @Cause Exception e);
 }
