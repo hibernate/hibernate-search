@@ -32,8 +32,8 @@ public abstract class AbstractLuceneDeleteEntryWork extends AbstractLuceneWriteW
 
 	@Override
 	public Long execute(LuceneWriteWorkExecutionContext context) {
-		IndexWriter indexWriter = context.getIndexWriter();
 		try {
+			IndexWriter indexWriter = context.getIndexWriter();
 			return doDeleteDocuments( indexWriter, tenantId, id );
 		}
 		catch (IOException e) {

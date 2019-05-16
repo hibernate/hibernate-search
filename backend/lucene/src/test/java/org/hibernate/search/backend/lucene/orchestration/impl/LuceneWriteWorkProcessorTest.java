@@ -13,6 +13,7 @@ import static org.easymock.EasyMock.expect;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterHolder;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWorkExecutionContext;
 import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
@@ -39,11 +40,12 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 
 	private EventContext indexEventContext = EventContexts.fromIndexName( INDEX_NAME );
 	private IndexWriter indexWriterMock = PowerMock.createStrictMock( IndexWriter.class );
+	private IndexWriterHolder indexWriterHolderMock = PowerMock.createStrictMock( IndexWriterHolder.class );
 	private ErrorHandler errorHandlerMock = createStrictMock( ErrorHandler.class );
 	private ContextualErrorHandler contextualErrorHandlerMock = createMock( ContextualErrorHandler.class );
 
 	private LuceneWriteWorkProcessor processor =
-			new LuceneWriteWorkProcessor( indexEventContext, indexWriterMock, errorHandlerMock );
+			new LuceneWriteWorkProcessor( indexEventContext, indexWriterHolderMock, errorHandlerMock );
 
 	@Test
 	public void simple() throws IOException {
@@ -62,6 +64,7 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 
 		resetAll();
 		// There was no commit in the last workset, there must be one here
+		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
 		expect( indexWriterMock.commit() ).andReturn( 1L );
 		replayAll();
 		processor.endBatch();
@@ -109,6 +112,7 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 
 		// A work may have failed, but there were still successful changes, before and after the failure: these must be committed
 		resetAll();
+		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
 		expect( indexWriterMock.commit() ).andReturn( 1L );
 		replayAll();
 		processor.endBatch();
@@ -141,6 +145,7 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 
 		// A work may have failed, but there still were successful changes, before and after the failure: these must be committed
 		resetAll();
+		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
 		expect( indexWriterMock.commit() ).andReturn( 1L );
 		replayAll();
 		processor.endBatch();
@@ -174,6 +179,7 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
 		Object workSetResult = new Object();
 		resetAll();
+		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
 		expect( indexWriterMock.commit() ).andThrow( commitException );
 		expect( errorHandlerMock.createContextualHandler() ).andReturn( contextualErrorHandlerMock );
 		contextualErrorHandlerMock.addThrowable( capture( exceptionCapture ) );
@@ -223,6 +229,7 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 		Capture<String> stringCapture = Capture.newInstance();
 		Capture<Throwable> exceptionCapture = Capture.newInstance();
 		resetAll();
+		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
 		expect( indexWriterMock.commit() ).andThrow( commitException );
 		errorHandlerMock.handleException( capture( stringCapture ), capture( exceptionCapture ) );
 		replayAll();
@@ -249,6 +256,7 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 		Object workSetResult = new Object();
 		resetAll();
 		if ( expectCommit ) {
+			expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
 			expect( indexWriterMock.commit() ).andReturn( 1L );
 		}
 		replayAll();
@@ -292,6 +300,7 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 			replayAll();
 			assertThat( processor.submit( work ) ).isEqualTo( workResult );
 			verifyAll();
+
 			testContext( contextCapture.getValue() );
 		}
 	}
@@ -323,8 +332,11 @@ public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
 	}
 
 	private void testContext(LuceneWriteWorkExecutionContext context) throws IOException {
-		assertThat( context )
-				.returns( indexWriterMock, LuceneWriteWorkExecutionContext::getIndexWriter );
+		resetAll();
+		expect( indexWriterHolderMock.getIndexWriter() ).andReturn( indexWriterMock );
+		replayAll();
+		assertThat( context.getIndexWriter() ).isSameAs( indexWriterMock );
+		verifyAll();
 	}
 
 	private <T> LuceneWriteWork<T> work(String name) {

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterHolder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -32,9 +33,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
 
 
 /**
@@ -53,12 +52,12 @@ class LuceneIndexManagerImpl
 	private final LuceneIndexModel model;
 
 	private final LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
-	private final IndexWriter indexWriter;
+	private final IndexWriterHolder indexWriterHolder;
 
 	LuceneIndexManagerImpl(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String indexName, LuceneIndexModel model,
-			IndexWriter indexWriter) {
+			IndexWriterHolder indexWriterHolder) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 
@@ -66,9 +65,9 @@ class LuceneIndexManagerImpl
 		this.model = model;
 
 		this.writeOrchestrator = indexingBackendContext.createOrchestrator(
-				indexName, indexWriter
+				indexName, indexWriterHolder
 		);
-		this.indexWriter = indexWriter;
+		this.indexWriterHolder = indexWriterHolder;
 	}
 
 	LuceneIndexModel getModel() {
@@ -134,7 +133,7 @@ class LuceneIndexManagerImpl
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( LuceneWriteWorkOrchestratorImplementor::close, writeOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
-			closer.push( IndexWriter::close, indexWriter );
+			closer.push( IndexWriterHolder::closeIndexWriter, indexWriterHolder );
 			closer.push( LuceneIndexModel::close, model );
 		}
 		catch (IOException | RuntimeException e) {
@@ -149,7 +148,7 @@ class LuceneIndexManagerImpl
 	@Override
 	public IndexReader openIndexReader() {
 		try {
-			return DirectoryReader.open( indexWriter );
+			return indexWriterHolder.openDirectoryIndexReader();
 		}
 		catch (IOException e) {
 			throw log.unableToCreateIndexReader( getBackendAndIndexEventContext(), e );

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
+import java.io.IOException;
+
 import org.apache.lucene.index.IndexWriter;
 
 /**
@@ -13,5 +15,5 @@ import org.apache.lucene.index.IndexWriter;
  */
 public interface LuceneWriteWorkExecutionContext {
 
-	IndexWriter getIndexWriter();
+	IndexWriter getIndexWriter() throws IOException;
 }

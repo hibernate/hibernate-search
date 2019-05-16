@@ -26,8 +26,8 @@ public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Void> {
 
 	@Override
 	public Void execute(LuceneWriteWorkExecutionContext context) {
-		IndexWriter indexWriter = context.getIndexWriter();
 		try {
+			IndexWriter indexWriter = context.getIndexWriter();
 			indexWriter.forceMerge( 1 );
 			return null;
 		}
