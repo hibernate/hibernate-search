@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
@@ -46,9 +47,14 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		// Exceptions for legacy messages from Search 5
 		@ValidIdRange(min = 35, max = 35),
 		@ValidIdRange(min = 49, max = 49),
+		@ValidIdRange(min = 52, max = 52),
 		@ValidIdRange(min = 55, max = 55),
 		@ValidIdRange(min = 75, max = 75),
+		@ValidIdRange(min = 76, max = 76),
+		@ValidIdRange(min = 77, max = 77),
 		@ValidIdRange(min = 114, max = 114),
+		@ValidIdRange(min = 117, max = 117),
+		@ValidIdRange(min = 118, max = 118),
 		@ValidIdRange(min = 225, max = 225),
 		@ValidIdRange(min = 228, max = 228),
 		@ValidIdRange(min = 284, max = 284),
@@ -82,6 +88,11 @@ public interface Log extends BasicLogger {
 			value = "'%s' was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
 	void interruptedWhileWaitingForIndexActivity(String name, @Cause InterruptedException e);
 
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET_1 + 52,
+			value = "Going to force release of the IndexWriter lock")
+	void forcingReleaseIndexWriterLock();
+
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_1 + 55,
 			value = "Unable to close the index reader. %1$s")
@@ -92,9 +103,25 @@ public interface Log extends BasicLogger {
 			value = "Configuration setting '%1$s' was not specified: using LATEST (currently '%2$s'). %3$s")
 	void recommendConfiguringLuceneVersion(String key, Version latest, @FormatWith(EventContextFormatter.class) EventContext context);
 
+	@Message(id = ID_OFFSET_1 + 76,
+			value = "Could not open Lucene index: index data is corrupted. index name: '%1$s'")
+	SearchException cantOpenCorruptedIndex(@Cause CorruptIndexException e, String indexName);
+
+	@Message(id = ID_OFFSET_1 + 77,
+			value = "An IOException happened while accessing the Lucene index '%1$s'")
+	SearchException ioExceptionOnIndex(@Cause IOException e, String indexName);
+
 	@Message(id = ID_OFFSET_1 + 114,
 			value = "Could not load resource: '%1$s'")
 	SearchException unableToLoadResource(String fileName);
+
+	@Message(id = ID_OFFSET_1 + 117,
+			value = "IOException on the IndexWriter")
+	String ioExceptionOnIndexWriter();
+
+	@Message(id = ID_OFFSET_1 + 118,
+			value = "Exception during index Merge operation")
+	String exceptionDuringIndexMergeOperation();
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_1 + 225,
