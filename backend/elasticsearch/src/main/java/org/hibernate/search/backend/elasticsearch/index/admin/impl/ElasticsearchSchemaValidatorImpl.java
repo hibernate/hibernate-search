@@ -198,6 +198,11 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 				expectedAnalysis.getNormalizers(), actualAnalysis == null ? null : actualAnalysis.getNormalizers() );
 	}
 
+	private <T> void validateEqualWithoutDefault(ValidationErrorCollector errorCollector, String attributeName,
+			T expectedValue, T actualValue) {
+		validateEqualWithDefault( errorCollector, attributeName, expectedValue, actualValue, null );
+	}
+
 	/*
 	 * Validate that two values are equal, using a given default value when null is encountered on either value.
 	 * Useful to take into account the fact that Elasticsearch has default values for attributes.
@@ -329,7 +334,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 		switch ( type ) {
 			case TEXT:
 			case KEYWORD:
-				validateEqualWithDefault( errorCollector, attributeName, expectedValue, actualValue, null );
+				validateEqualWithoutDefault( errorCollector, attributeName, expectedValue, actualValue );
 				break;
 			case DOUBLE:
 				if ( areNumbers( expectedValue, actualValue ) ) {
@@ -360,7 +365,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 			case OBJECT:
 			case GEO_POINT:
 			default:
-				validateEqualWithDefault( errorCollector, attributeName, expectedValue, actualValue, null );
+				validateEqualWithoutDefault( errorCollector, attributeName, expectedValue, actualValue );
 				break;
 		}
 	}
@@ -538,6 +543,8 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 					? DEFAULT_DATE_FORMAT : Collections.emptyList();
 			validateFormatWithDefault( errorCollector, "format", expectedMapping.getFormat(), actualMapping.getFormat(), formatDefault );
 
+			validateEqualWithoutDefault( errorCollector, "scaling_factor", expectedMapping.getScalingFactor(), actualMapping.getScalingFactor() );
+
 			validateIndexOptions( errorCollector, expectedMapping, actualMapping );
 
 			Boolean expectedStore = expectedMapping.getStore();
@@ -582,7 +589,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 
 	private void validateAnalyzerOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
 		validateEqualWithDefault( errorCollector, "analyzer", expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), "default" );
-		validateEqualWithDefault( errorCollector, "normalizer", expectedMapping.getNormalizer(), actualMapping.getNormalizer(), null );
+		validateEqualWithoutDefault( errorCollector, "normalizer", expectedMapping.getNormalizer(), actualMapping.getNormalizer() );
 	}
 
 	private class NormalizerDefinitionValidator extends AnalysisDefinitionValidator<NormalizerDefinition> {

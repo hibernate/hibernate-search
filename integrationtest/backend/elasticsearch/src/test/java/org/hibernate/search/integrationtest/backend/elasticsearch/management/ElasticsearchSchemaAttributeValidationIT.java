@@ -810,6 +810,62 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	}
 
 	@Test
+	public void attribute_scaling_factor_valid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'scaled_float',"
+									+ "'scaling_factor': 100"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asBigDecimal().decimalScale( 2 ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void attribute_scaling_factor_invalid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'scaled_float',"
+									+ "'scaling_factor': 2"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		SubTest.expectException( () -> validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asBigDecimal().decimalScale( 2 ) ).toReference();
+						}
+				)
+				.setup() )
+				.assertThrown()
+				.isInstanceOf( Exception.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.indexFieldContext( "myField" )
+						.failure( "Invalid value for attribute 'scaling_factor'. Expected '100.0', actual is '2.0'" )
+						.build() );
+	}
+
+	@Test
 	public void attribute_normalizer_missing() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
