@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class LuceneBigDecimalIndexFieldTypeContext
 		extends AbstractLuceneStandardIndexFieldTypeContext<LuceneBigDecimalIndexFieldTypeContext, BigDecimal>
-		implements ScaledNumberIndexFieldTypeContext<LuceneBigDecimalIndexFieldTypeContext> {
+		implements ScaledNumberIndexFieldTypeContext<LuceneBigDecimalIndexFieldTypeContext, BigDecimal> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

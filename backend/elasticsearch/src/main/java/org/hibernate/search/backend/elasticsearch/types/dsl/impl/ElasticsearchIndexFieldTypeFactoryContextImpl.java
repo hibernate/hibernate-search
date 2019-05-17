@@ -221,7 +221,7 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	}
 
 	@Override
-	public ScaledNumberIndexFieldTypeContext<?> asBigDecimal() {
+	public ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal() {
 		return new ElasticsearchBigDecimalIndexFieldTypeContext( this, typeDefaultsProvider );
 	}
 

@@ -218,7 +218,7 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	}
 
 	@Override
-	public ScaledNumberIndexFieldTypeContext<?> asBigDecimal() {
+	public ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal() {
 		return new LuceneBigDecimalIndexFieldTypeContext( this, typeDefaultsProvider );
 	}
 

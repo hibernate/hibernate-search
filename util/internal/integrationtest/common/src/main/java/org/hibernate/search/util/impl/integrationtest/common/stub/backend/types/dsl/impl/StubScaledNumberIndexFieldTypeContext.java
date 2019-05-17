@@ -13,7 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDef
 
 public class StubScaledNumberIndexFieldTypeContext
 		extends AbstractStubStandardIndexFieldTypeContext<StubScaledNumberIndexFieldTypeContext, BigDecimal>
-		implements ScaledNumberIndexFieldTypeContext<StubScaledNumberIndexFieldTypeContext> {
+		implements ScaledNumberIndexFieldTypeContext<StubScaledNumberIndexFieldTypeContext, BigDecimal> {
 
 	public StubScaledNumberIndexFieldTypeContext(IndexFieldTypeDefaultsProvider defaultsProvider) {
 		super( BigDecimal.class );

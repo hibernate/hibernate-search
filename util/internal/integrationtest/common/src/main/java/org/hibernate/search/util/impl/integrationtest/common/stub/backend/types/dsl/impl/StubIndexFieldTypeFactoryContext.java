@@ -143,7 +143,7 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	}
 
 	@Override
-	public ScaledNumberIndexFieldTypeContext<?> asBigDecimal() {
+	public ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal() {
 		return new StubScaledNumberIndexFieldTypeContext( defaultsProvider );
 	}
 }

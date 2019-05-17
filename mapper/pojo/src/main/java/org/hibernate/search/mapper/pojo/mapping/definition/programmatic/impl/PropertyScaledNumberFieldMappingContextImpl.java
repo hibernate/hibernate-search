@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PropertyScaledNumberFieldMappingContextImpl
-		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyScaledNumberFieldMappingContext, ScaledNumberIndexFieldTypeContext<?>>
+		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyScaledNumberFieldMappingContext, ScaledNumberIndexFieldTypeContext<?, ?>>
 		implements PropertyScaledNumberFieldMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -36,10 +36,10 @@ public class PropertyScaledNumberFieldMappingContextImpl
 		return thisAsS();
 	}
 
-	private static ScaledNumberIndexFieldTypeContext<?> convertFieldTypedContext(
+	private static ScaledNumberIndexFieldTypeContext<?, ?> convertFieldTypedContext(
 			StandardIndexFieldTypeContext<?,?> context) {
 		if ( context instanceof ScaledNumberIndexFieldTypeContext ) {
-			return (ScaledNumberIndexFieldTypeContext<?>) context;
+			return (ScaledNumberIndexFieldTypeContext<?, ?>) context;
 		}
 		else {
 			throw log.invalidFieldEncodingForScaledNumberFieldMapping(

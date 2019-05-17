@@ -27,7 +27,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class ElasticsearchBigDecimalIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchBigDecimalIndexFieldTypeContext, BigDecimal>
-		implements ScaledNumberIndexFieldTypeContext<ElasticsearchBigDecimalIndexFieldTypeContext> {
+		implements ScaledNumberIndexFieldTypeContext<ElasticsearchBigDecimalIndexFieldTypeContext, BigDecimal> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

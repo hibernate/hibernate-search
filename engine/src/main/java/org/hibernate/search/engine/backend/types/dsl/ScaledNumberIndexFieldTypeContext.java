@@ -6,13 +6,12 @@
  */
 package org.hibernate.search.engine.backend.types.dsl;
 
-import java.math.BigDecimal;
-
 /**
- * @param <S> The type of this context.
+ * @param <S> The concrete type of this context.
+ * @param <F> The type of field values.
  */
-public interface ScaledNumberIndexFieldTypeContext<S extends ScaledNumberIndexFieldTypeContext<? extends S>>
-		extends StandardIndexFieldTypeContext<S, BigDecimal> {
+public interface ScaledNumberIndexFieldTypeContext<S extends ScaledNumberIndexFieldTypeContext<? extends S, F>, F>
+		extends StandardIndexFieldTypeContext<S, F> {
 
 	S decimalScale(int decimalScale);
 
