@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -116,8 +117,10 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 		else if ( BigDecimal.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asBigDecimal();
 		}
+		else if ( BigInteger.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asBigInteger();
+		}
 		else {
-			// TODO implement other types
 			throw log.cannotGuessFieldType( inputType, getEventContext() );
 		}
 	}
@@ -220,6 +223,12 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	@Override
 	public ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal() {
 		return new LuceneBigDecimalIndexFieldTypeContext( this, typeDefaultsProvider );
+	}
+
+	@Override
+	public ScaledNumberIndexFieldTypeContext<?, BigInteger> asBigInteger() {
+		// TODO implemented in the next commit
+		return null;
 	}
 
 	@Override

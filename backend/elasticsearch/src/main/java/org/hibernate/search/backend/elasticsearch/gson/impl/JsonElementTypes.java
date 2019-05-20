@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.gson.impl;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -232,6 +233,23 @@ public final class JsonElementTypes {
 		@Override
 		public String toString() {
 			return JsonPrimitive.class.getSimpleName() + "(BigDecimal)";
+		}
+	};
+
+	public static final JsonElementType<BigInteger> BIG_INTEGER = new JsonNumberType<BigInteger>() {
+		@Override
+		protected BigInteger nullUnsafeFromNumber(JsonPrimitive primitive) {
+			return primitive.getAsBigInteger();
+		}
+
+		@Override
+		public String toString() {
+			return JsonPrimitive.class.getSimpleName() + "(BigInteger)";
+		}
+
+		@Override
+		protected boolean nullUnsafeIsInstance(JsonElement element) {
+			return element.isJsonPrimitive();
 		}
 	};
 

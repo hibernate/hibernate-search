@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +42,9 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 		}
 		else if ( BigDecimal.class.isAssignableFrom( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asBigDecimal();
+		}
+		else if ( BigInteger.class.isAssignableFrom( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asBigInteger();
 		}
 		else {
 			return new StubGenericIndexFieldTypeContext<>( inputType );
@@ -144,6 +148,11 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 
 	@Override
 	public ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal() {
-		return new StubScaledNumberIndexFieldTypeContext( defaultsProvider );
+		return new StubScaledNumberIndexFieldTypeContext<>( BigDecimal.class, defaultsProvider );
+	}
+
+	@Override
+	public ScaledNumberIndexFieldTypeContext<?, BigInteger> asBigInteger() {
+		return new StubScaledNumberIndexFieldTypeContext<>( BigInteger.class, defaultsProvider );
 	}
 }

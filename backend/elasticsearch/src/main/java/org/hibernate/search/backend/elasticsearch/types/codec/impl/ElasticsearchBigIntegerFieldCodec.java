@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -17,23 +18,23 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchBigDecimalFieldCodec implements ElasticsearchFieldCodec<BigDecimal> {
+public class ElasticsearchBigIntegerFieldCodec implements ElasticsearchFieldCodec<BigInteger> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BigDecimal scalingFactor;
 
-	public ElasticsearchBigDecimalFieldCodec(BigDecimal scalingFactor) {
+	public ElasticsearchBigIntegerFieldCodec(BigDecimal scalingFactor) {
 		this.scalingFactor = scalingFactor;
 	}
 
 	@Override
-	public JsonElement encode(BigDecimal value) {
+	public JsonElement encode(BigInteger value) {
 		if ( value == null ) {
 			return JsonNull.INSTANCE;
 		}
 
-		if ( value.multiply( scalingFactor ).compareTo( BigDecimal.valueOf( Long.MAX_VALUE ) ) > 0 ) {
+		if ( new BigDecimal( value ).multiply( scalingFactor ).compareTo( BigDecimal.valueOf( Long.MAX_VALUE ) ) > 0 ) {
 			throw log.scaledNumberTooLarge( value );
 		}
 
@@ -41,12 +42,12 @@ public class ElasticsearchBigDecimalFieldCodec implements ElasticsearchFieldCode
 	}
 
 	@Override
-	public BigDecimal decode(JsonElement element) {
+	public BigInteger decode(JsonElement element) {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}
 
-		return JsonElementTypes.BIG_DECIMAL.fromElement( element );
+		return JsonElementTypes.BIG_INTEGER.fromElement( element );
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class ElasticsearchBigDecimalFieldCodec implements ElasticsearchFieldCode
 			return false;
 		}
 
-		ElasticsearchBigDecimalFieldCodec other = (ElasticsearchBigDecimalFieldCodec) obj;
+		ElasticsearchBigIntegerFieldCodec other = (ElasticsearchBigIntegerFieldCodec) obj;
 		// comparing only their numeric values, they can have different scales
 		return scalingFactor.compareTo( other.scalingFactor ) == 0;
 	}

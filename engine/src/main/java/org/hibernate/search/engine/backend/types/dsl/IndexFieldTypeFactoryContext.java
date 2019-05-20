@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.types.dsl;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -68,7 +69,7 @@ public interface IndexFieldTypeFactoryContext {
 
 	ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal();
 
-	// TODO HSEARCH-3487 add asBigInteger() method here
+	ScaledNumberIndexFieldTypeContext<?, BigInteger> asBigInteger();
 
 	default <T> T extension(IndexFieldTypeFactoryContextExtension<T> extension) {
 		return extension.extendOrFail( this );

@@ -6,17 +6,15 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
-import java.math.BigDecimal;
-
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 
-public class StubScaledNumberIndexFieldTypeContext
-		extends AbstractStubStandardIndexFieldTypeContext<StubScaledNumberIndexFieldTypeContext, BigDecimal>
-		implements ScaledNumberIndexFieldTypeContext<StubScaledNumberIndexFieldTypeContext, BigDecimal> {
+public class StubScaledNumberIndexFieldTypeContext<F extends Number>
+		extends AbstractStubStandardIndexFieldTypeContext<StubScaledNumberIndexFieldTypeContext<F>, F>
+		implements ScaledNumberIndexFieldTypeContext<StubScaledNumberIndexFieldTypeContext<F>, F> {
 
-	public StubScaledNumberIndexFieldTypeContext(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		super( BigDecimal.class );
+	public StubScaledNumberIndexFieldTypeContext(Class<F> fieldType, IndexFieldTypeDefaultsProvider defaultsProvider) {
+		super( fieldType );
 		setDefaults( defaultsProvider );
 	}
 

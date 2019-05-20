@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -119,8 +120,10 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		else if ( BigDecimal.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asBigDecimal();
 		}
+		else if ( BigInteger.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asBigInteger();
+		}
 		else {
-			// TODO implement other types
 			throw log.cannotGuessFieldType( inputType, getEventContext() );
 		}
 	}
@@ -223,6 +226,11 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	@Override
 	public ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal() {
 		return new ElasticsearchBigDecimalIndexFieldTypeContext( this, typeDefaultsProvider );
+	}
+
+	@Override
+	public ScaledNumberIndexFieldTypeContext<?, BigInteger> asBigInteger() {
+		return new ElasticsearchBigIntegerIndexFieldTypeContext( this, typeDefaultsProvider );
 	}
 
 	@Override
