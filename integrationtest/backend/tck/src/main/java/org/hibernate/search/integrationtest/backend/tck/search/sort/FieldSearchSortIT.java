@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -69,6 +70,7 @@ public class FieldSearchSortIT {
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
 	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
+	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME = "IndexWithIncompatibleDecimalScale";
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -77,6 +79,7 @@ public class FieldSearchSortIT {
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
+	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 = "incompatible_decimal_scale_1";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -94,6 +97,9 @@ public class FieldSearchSortIT {
 	private StubMappingIndexManager rawFieldCompatibleIndexManager;
 
 	private StubMappingIndexManager incompatibleIndexManager;
+
+	private IncompatibleDecimalScaleIndexMapping incompatibleDecimalScaleIndexMapping;
+	private StubMappingIndexManager incompatibleDecimalScaleIndexManager;
 
 	@Before
 	public void setup() {
@@ -117,6 +123,11 @@ public class FieldSearchSortIT {
 						INCOMPATIBLE_INDEX_NAME,
 						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleIndexManager = indexManager
+				)
+				.withIndex(
+						INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME,
+						ctx -> this.incompatibleDecimalScaleIndexMapping = new IncompatibleDecimalScaleIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.incompatibleDecimalScaleIndexManager = indexManager
 				)
 				.setup();
 
@@ -546,6 +557,25 @@ public class FieldSearchSortIT {
 		}
 	}
 
+	@Test
+	public void multiIndex_incompatibleDecimalScale() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleDecimalScaleIndexManager );
+		String fieldPath = indexMapping.scaledBigDecimal.relativeFieldName;
+
+		SubTest.expectException(
+				() -> {
+					simpleQuery( b -> b.byField( fieldPath ), scope );
+				}
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting types to build a sort" )
+				.hasMessageContaining( "'scaledBigDecimal'" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME )
+				) );
+	}
+
 	private boolean isJavaTimeType(Class<?> type) {
 		final Class<?>[] javaTimeTypes = { LocalDate.class, LocalDateTime.class, LocalTime.class, ZonedDateTime.class, Year.class, YearMonth.class, MonthDay.class,
 				OffsetDateTime.class, OffsetTime.class, ZoneOffset.class, ZoneId.class, Period.class, Duration.class, Instant.class
@@ -573,6 +603,8 @@ public class FieldSearchSortIT {
 			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
 			indexMapping.nestedObject.unsupportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
+
+			indexMapping.scaledBigDecimal.document2Value.write( document );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
@@ -591,6 +623,8 @@ public class FieldSearchSortIT {
 			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
 			indexMapping.nestedObject.unsupportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
+
+			indexMapping.scaledBigDecimal.document1Value.write( document );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
@@ -609,6 +643,8 @@ public class FieldSearchSortIT {
 			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
 			indexMapping.nestedObject.unsupportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
+
+			indexMapping.scaledBigDecimal.document3Value.write( document );
 		} );
 		workPlan.add( referenceProvider( EMPTY ), document -> { } );
 		workPlan.execute().join();
@@ -626,6 +662,12 @@ public class FieldSearchSortIT {
 		} );
 		workPlan.execute().join();
 
+		workPlan = incompatibleDecimalScaleIndexManager.createWorkPlan();
+		workPlan.add( referenceProvider( INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 ), document -> {
+			incompatibleDecimalScaleIndexMapping.scaledBigDecimal.document1Value.write( document );
+		} );
+		workPlan.execute().join();
+
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.predicate( f -> f.matchAll() )
@@ -639,6 +681,11 @@ public class FieldSearchSortIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+		query = incompatibleDecimalScaleIndexManager.createSearchScope().query()
+				.asReference()
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
@@ -665,11 +712,13 @@ public class FieldSearchSortIT {
 		final List<ByTypeFieldModel<?>> unsupportedFieldModels = new ArrayList<>();
 		final List<ByTypeFieldModel<?>> supportedNonSortableFieldModels = new ArrayList<>();
 
-		final MainFieldModel identicalForFirstTwo;
-		final MainFieldModel identicalForLastTwo;
+		final MainFieldModel<String> identicalForFirstTwo;
+		final MainFieldModel<String> identicalForLastTwo;
 
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
+
+		final MainFieldModel<BigDecimal> scaledBigDecimal;
 
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
@@ -711,6 +760,11 @@ public class FieldSearchSortIT {
 
 			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
 			nestedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.NESTED );
+			scaledBigDecimal = MainFieldModel.mapper(
+					c -> c.asBigDecimal().decimalScale( 3 ),
+					new BigDecimal( "739.739" ), BigDecimal.ONE, BigDecimal.TEN
+			)
+					.map( root, "scaledBigDecimal" );
 		}
 	}
 
@@ -776,6 +830,22 @@ public class FieldSearchSortIT {
 		}
 	}
 
+	private static class IncompatibleDecimalScaleIndexMapping {
+		final MainFieldModel<BigDecimal> scaledBigDecimal;
+
+		/*
+		 * Unlike IndexMapping#scaledBigDecimal,
+		 * we're using here a different decimal scale for the field.
+		 */
+		IncompatibleDecimalScaleIndexMapping(IndexSchemaElement root) {
+			scaledBigDecimal = MainFieldModel.mapper(
+					c -> c.asBigDecimal().decimalScale( 7 ),
+					new BigDecimal( "739.739" ), BigDecimal.ONE, BigDecimal.TEN
+			)
+					.map( root, "scaledBigDecimal" );
+		}
+	}
+
 	private static class ValueModel<F> {
 		private final IndexFieldReference<F> reference;
 		final F indexedValue;
@@ -790,28 +860,32 @@ public class FieldSearchSortIT {
 		}
 	}
 
-	private static class MainFieldModel {
-		static StandardFieldMapper<String, MainFieldModel> mapper(
+	private static class MainFieldModel<T> {
+		static StandardFieldMapper<String, MainFieldModel<String>> mapper(
 				String document1Value, String document2Value, String document3Value) {
+			return mapper( c -> c.asString(), document1Value, document2Value, document3Value );
+		}
+
+		static <LT> StandardFieldMapper<LT, MainFieldModel<LT>> mapper(
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, LT>> configuration,
+				LT document1Value, LT document2Value, LT document3Value) {
 			return StandardFieldMapper.of(
-					f -> f.asString(),
-					(reference, name) -> new MainFieldModel(
-							reference, name, document1Value, document2Value, document3Value
-					)
+					configuration,
+					(reference, name) -> new MainFieldModel<>( reference, name, document1Value, document2Value, document3Value )
 			);
 		}
 
 		final String relativeFieldName;
-		final ValueModel<String> document1Value;
-		final ValueModel<String> document2Value;
-		final ValueModel<String> document3Value;
+		final ValueModel<T> document1Value;
+		final ValueModel<T> document2Value;
+		final ValueModel<T> document3Value;
 
-		private MainFieldModel(IndexFieldReference<String> reference, String relativeFieldName,
-				String document1Value, String document2Value, String document3Value) {
+		private MainFieldModel(IndexFieldReference<T> reference, String relativeFieldName,
+				T document1Value, T document2Value, T document3Value) {
 			this.relativeFieldName = relativeFieldName;
 			this.document1Value = new ValueModel<>( reference, document1Value );
-			this.document2Value = new ValueModel<>( reference, document2Value );
 			this.document3Value = new ValueModel<>( reference, document3Value );
+			this.document2Value = new ValueModel<>( reference, document2Value );
 		}
 	}
 
