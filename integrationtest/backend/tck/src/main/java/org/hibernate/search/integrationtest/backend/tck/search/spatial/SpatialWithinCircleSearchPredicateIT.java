@@ -37,7 +37,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI, 1_500 )
@@ -48,7 +47,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_HOTEL_DE_VILLE, 500 )
@@ -59,7 +57,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1_500 )
@@ -70,7 +67,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1.5, DistanceUnit.KILOMETERS )
@@ -81,7 +77,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI, 1.5, DistanceUnit.KILOMETERS )
@@ -115,7 +110,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						// Base score: less than 2
 						.should( f.spatial().within()
@@ -135,7 +129,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						// Base score boosted 42x: more than 2
 						.should( f.spatial().within()
@@ -160,7 +153,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						// Base score boosted 0.123x: less than 2
 						.should( f.spatial().within()
@@ -181,7 +173,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						// Base score boosted 39x: more than 2
 						.should( f.spatial().within()
@@ -207,7 +198,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						// Base score boosted 0.123*4=0.492x: less than 2
 						.should( f.spatial().within()
@@ -228,7 +218,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						// Base score boosted 39*7*4=273x: more than 2
 						.should( f.spatial().within()
@@ -254,7 +243,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						// Base score boosted 0.123x: less than 2
 						.should( f.spatial().within()
@@ -275,7 +263,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						// Base score boosted 39x: more than 2
 						.should( f.spatial().within()
@@ -303,7 +290,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		// onField(...).orField(...)
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
 						.circle( METRO_GARIBALDI, 400 )
@@ -314,7 +300,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
 						.circle( METRO_HOTEL_DE_VILLE_1, 500 )
@@ -327,7 +312,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		// onField().orFields(...)
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_HOTEL_DE_VILLE, 500 )
@@ -338,7 +322,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_GARIBALDI_1, 1_500 )
@@ -349,7 +332,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_GARIBALDI_2, 400 )
@@ -362,7 +344,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		// onFields(...)
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onFields( "geoPoint", "geoPoint_2" )
 						.circle( METRO_GARIBALDI, 400 )
@@ -373,7 +354,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onFields( "geoPoint", "geoPoint_2" )
 						.circle( METRO_HOTEL_DE_VILLE_2, 500 )

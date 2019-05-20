@@ -348,7 +348,6 @@ public class CompositeSearchProjectionIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )

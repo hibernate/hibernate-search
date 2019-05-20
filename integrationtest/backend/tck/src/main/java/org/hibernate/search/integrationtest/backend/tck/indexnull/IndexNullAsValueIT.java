@@ -59,7 +59,6 @@ public class IndexNullAsValueIT {
 			Object valueToMatch = fieldModel.indexNullAsValue.indexedValue;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
 					.toQuery();
 
@@ -77,7 +76,6 @@ public class IndexNullAsValueIT {
 
 		setUp();
 		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPointField" ).circle( GeoPoint.of( 0.0, 0.0 ), 1 ) )
 				.toQuery();
 

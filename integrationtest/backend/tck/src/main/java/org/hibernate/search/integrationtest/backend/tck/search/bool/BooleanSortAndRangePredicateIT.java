@@ -78,7 +78,6 @@ public class BooleanSortAndRangePredicateIT {
 	private SearchQuery<DocumentReference> sortQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
 				.toQuery();
@@ -87,7 +86,6 @@ public class BooleanSortAndRangePredicateIT {
 	private SearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactoryContext, SearchPredicateTerminalContext> rangePredicate) {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
-				.asReference()
 				.predicate( rangePredicate )
 				.toQuery();
 	}
@@ -133,7 +131,6 @@ public class BooleanSortAndRangePredicateIT {
 	public void rangeFromToSortByFieldQuery() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.range().onField( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.TRUE ) )
 				.sort( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() )
 				.toQuery();
@@ -200,7 +197,6 @@ public class BooleanSortAndRangePredicateIT {
 	private void checkAllDocumentsAreSearchable() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 

@@ -128,7 +128,6 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
@@ -147,7 +146,6 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringFieldWithDslConverter.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
@@ -162,7 +160,6 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
 				.toQuery();
 
@@ -176,7 +173,6 @@ public class PhraseSearchPredicateIT {
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( fieldModel.relativeFieldName ).matching( "" ) )
 				.toQuery();
 
@@ -190,7 +186,6 @@ public class PhraseSearchPredicateIT {
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				// Use stopwords, which should be removed by the analysis
 				.predicate( f -> f.phrase().onField( fieldModel.relativeFieldName ).matching( "the a" ) )
 				.toQuery();
@@ -207,7 +202,6 @@ public class PhraseSearchPredicateIT {
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( whitespaceAnalyzedField ).matching( "ONCE UPON" ) )
 				.toQuery();
 
@@ -215,7 +209,6 @@ public class PhraseSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( whitespaceLowercaseAnalyzedField ).matching( "ONCE UPON" ) )
 				.toQuery();
 
@@ -223,7 +216,6 @@ public class PhraseSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( whitespaceAnalyzedField ).matching( "ONCE UPON" )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
@@ -238,7 +230,6 @@ public class PhraseSearchPredicateIT {
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 
 		SubTest.expectException( () -> scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( whitespaceAnalyzedField ).matching( "ONCE UPON" )
 						// we don't have any analyzer with that name
 						.analyzer( "this_name_does_actually_not_exist" ) )
@@ -255,7 +246,6 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( "quick fox" ) )
 				.toQuery();
 
@@ -265,7 +255,6 @@ public class PhraseSearchPredicateIT {
 		// ignoring the analyzer means that the parameter of match predicate will not be tokenized
 		// so it will not match any token
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( "quick fox" ).skipAnalysis() )
 				.toQuery();
 
@@ -274,7 +263,6 @@ public class PhraseSearchPredicateIT {
 
 		// to have a match with the skipAnalysis option enabled, we have to pass the parameter as a token is
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( "fox" ).skipAnalysis() )
 				.toQuery();
 
@@ -325,7 +313,7 @@ public class PhraseSearchPredicateIT {
 	public void slop() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		Function<Integer, SearchQuery<DocumentReference>> createQuery = slop -> scope.query().asReference()
+		Function<Integer, SearchQuery<DocumentReference>> createQuery = slop -> scope.query()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ).withSlop( slop ) )
 				.toQuery();
 
@@ -369,7 +357,6 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase()
 						.onField( absoluteFieldPath1 ).boostedTo( 42 )
 						.orField( absoluteFieldPath2 )
@@ -382,7 +369,6 @@ public class PhraseSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase()
 						.onField( absoluteFieldPath1 )
 						.orField( absoluteFieldPath2 ).boostedTo( 42 )
@@ -402,7 +388,6 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.phrase().onField( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
@@ -419,7 +404,6 @@ public class PhraseSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.phrase().onField( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
@@ -443,7 +427,6 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.phrase().onField( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
@@ -461,7 +444,6 @@ public class PhraseSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.phrase().onField( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
@@ -489,7 +471,7 @@ public class PhraseSearchPredicateIT {
 
 		// onField(...)
 
-		createQuery = phrase -> scope.query().asReference()
+		createQuery = phrase -> scope.query()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath1 )
 						.matching( phrase )
 				)
@@ -504,7 +486,7 @@ public class PhraseSearchPredicateIT {
 
 		// onField(...).orField(...)
 
-		createQuery = phrase -> scope.query().asReference()
+		createQuery = phrase -> scope.query()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath1 )
 						.orField( absoluteFieldPath2 )
 						.matching( phrase )
@@ -521,7 +503,6 @@ public class PhraseSearchPredicateIT {
 		// onField().orFields(...)
 
 		createQuery = phrase -> scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath1 )
 						.orFields( absoluteFieldPath2, absoluteFieldPath3 )
 						.matching( phrase )
@@ -538,7 +519,6 @@ public class PhraseSearchPredicateIT {
 		// onFields(...)
 
 		createQuery = phrase -> scope.query()
-				.asReference()
 				.predicate( f -> f.phrase()
 						.onFields( absoluteFieldPath1, absoluteFieldPath2 )
 						.matching( phrase )
@@ -633,7 +613,6 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
@@ -649,7 +628,6 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
@@ -666,7 +644,7 @@ public class PhraseSearchPredicateIT {
 
 		SubTest.expectException(
 				() -> {
-					scope.query().asReference()
+					scope.query()
 							.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
 							.toQuery();
 				}
@@ -686,7 +664,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = scope.query().asReference()
+		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
@@ -702,7 +680,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = scope.query().asReference()
+		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM )
 						.skipAnalysis() )
 				.toQuery();
@@ -767,23 +745,19 @@ public class PhraseSearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
 		query = compatibleIndexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = incompatibleAnalyzerIndexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );

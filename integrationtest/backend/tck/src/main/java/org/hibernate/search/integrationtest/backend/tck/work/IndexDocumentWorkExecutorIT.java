@@ -71,7 +71,6 @@ public class IndexDocumentWorkExecutorIT {
 		workExecutor.flush().join();
 
 		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 

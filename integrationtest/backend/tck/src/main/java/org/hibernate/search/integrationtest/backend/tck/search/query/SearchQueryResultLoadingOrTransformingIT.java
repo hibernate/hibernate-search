@@ -140,7 +140,6 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
@@ -426,21 +425,18 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
 		assertEquals( 2L, query.fetchTotalHitCount() );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
 				.toQuery();
 
 		assertEquals( 1L, query.fetchTotalHitCount() );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
@@ -536,7 +532,6 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )

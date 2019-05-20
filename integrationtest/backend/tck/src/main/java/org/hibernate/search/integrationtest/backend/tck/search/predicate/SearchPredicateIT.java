@@ -71,7 +71,6 @@ public class SearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
@@ -86,7 +85,6 @@ public class SearchPredicateIT {
 		SearchPredicate predicate = scope.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( predicate )
 				.toQuery();
 
@@ -99,7 +97,6 @@ public class SearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
@@ -127,7 +124,6 @@ public class SearchPredicateIT {
 		Assertions.assertThat( cache ).hasValue( null );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( cachingPredicateProducer.apply( scope.predicate() ) )
 				.toQuery();
 
@@ -137,7 +133,6 @@ public class SearchPredicateIT {
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
 		query = scope.query()
-				.asReference()
 				.predicate( cachingPredicateProducer.apply( scope.predicate() ) )
 				.toQuery();
 
@@ -165,7 +160,6 @@ public class SearchPredicateIT {
 		Assertions.assertThat( cache ).hasValue( null );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool().must( cachingPredicateProducer.apply( f ) ) )
 				.toQuery();
 
@@ -175,7 +169,6 @@ public class SearchPredicateIT {
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( cachingPredicateProducer.apply( f ) )
 						.should( f.match().onField( "string" ).matching( STRING_2 ) )
@@ -193,7 +186,6 @@ public class SearchPredicateIT {
 
 		// Mandatory extension, supported
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.extension( new SupportedExtension() )
 						.extendedPredicate( "string", STRING_1 )
 				)
@@ -210,7 +202,6 @@ public class SearchPredicateIT {
 
 		// Conditional extensions with orElse - two, both supported
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.extension()
 						// FIXME find some way to forbid using the context passed to the consumers twice... ?
 						.ifSupported(
@@ -229,7 +220,6 @@ public class SearchPredicateIT {
 
 		// Conditional extensions with orElse - two, second supported
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
@@ -249,7 +239,6 @@ public class SearchPredicateIT {
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
@@ -283,7 +272,6 @@ public class SearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY );

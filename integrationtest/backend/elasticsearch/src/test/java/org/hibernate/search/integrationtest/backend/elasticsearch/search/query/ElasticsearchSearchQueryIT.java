@@ -89,7 +89,6 @@ public class ElasticsearchSearchQueryIT {
 		String routingKey = "someRoutingKey";
 
 		SearchQuery<?> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.routing( routingKey )
 				.toQuery();

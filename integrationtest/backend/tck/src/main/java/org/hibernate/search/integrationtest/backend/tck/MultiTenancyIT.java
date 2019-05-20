@@ -180,7 +180,6 @@ public class MultiTenancyIT {
 
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant2SessionContext )
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
@@ -220,7 +219,6 @@ public class MultiTenancyIT {
 		} );
 
 		query = scope.query( tenant1SessionContext )
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
@@ -233,7 +231,6 @@ public class MultiTenancyIT {
 
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> checkQuery = scope.query( tenant2SessionContext )
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( checkQuery )
@@ -368,7 +365,6 @@ public class MultiTenancyIT {
 
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant1SessionContext )
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
@@ -458,7 +454,6 @@ public class MultiTenancyIT {
 
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query( new StubSessionContext() )
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
@@ -562,7 +557,6 @@ public class MultiTenancyIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant1SessionContext )
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
@@ -583,7 +577,6 @@ public class MultiTenancyIT {
 		} );
 
 		query = scope.query( tenant2SessionContext )
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )

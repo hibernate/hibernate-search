@@ -152,7 +152,6 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> genericQuery = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
@@ -182,7 +181,6 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.asReference()
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
@@ -202,7 +200,6 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.asReference()
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
@@ -228,7 +225,6 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.asReference()
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
@@ -248,7 +244,6 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.asReference()
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
@@ -271,7 +266,6 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.asReference()
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
@@ -293,7 +287,6 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
 								.fromJson( "{'match': {'string': 'text 1'}}" )
@@ -355,7 +348,6 @@ public class ElasticsearchExtensionIT {
 				.toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( booleanPredicate )
 				.toQuery();
 		assertThat( query )
@@ -368,7 +360,6 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
@@ -388,7 +379,6 @@ public class ElasticsearchExtensionIT {
 		);
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
@@ -427,7 +417,6 @@ public class ElasticsearchExtensionIT {
 				.toSort();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
 				.toQuery();
@@ -449,7 +438,6 @@ public class ElasticsearchExtensionIT {
 				.toSort();
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
 				.toQuery();
@@ -649,7 +637,6 @@ public class ElasticsearchExtensionIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder(

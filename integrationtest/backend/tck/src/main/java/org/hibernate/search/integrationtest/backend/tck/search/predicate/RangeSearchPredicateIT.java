@@ -106,7 +106,6 @@ public class RangeSearchPredicateIT {
 			Object lowerValueToMatch = fieldModel.predicateLowerBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ) )
 					.toQuery();
 
@@ -124,7 +123,6 @@ public class RangeSearchPredicateIT {
 			Object lowerValueToMatch = new ValueWrapper<>( fieldModel.predicateLowerBound );
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ) )
 					.toQuery();
 
@@ -141,7 +139,6 @@ public class RangeSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( fieldModel.predicateLowerBound, DslConverter.DISABLED ) )
 					.toQuery();
 
@@ -161,7 +158,6 @@ public class RangeSearchPredicateIT {
 			// Default is inclusion
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ) )
 					.toQuery();
 
@@ -171,7 +167,6 @@ public class RangeSearchPredicateIT {
 			// explicit exclusion
 
 			query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).excludeLimit() )
 					.toQuery();
 
@@ -189,7 +184,6 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
 					.toQuery();
 
@@ -207,7 +201,6 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = new ValueWrapper<>( fieldModel.predicateUpperBound );
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
 					.toQuery();
 
@@ -224,7 +217,6 @@ public class RangeSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( fieldModel.predicateUpperBound, DslConverter.DISABLED ) )
 					.toQuery();
 
@@ -244,7 +236,6 @@ public class RangeSearchPredicateIT {
 			// Default is inclusion
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
 					.toQuery();
 
@@ -254,7 +245,6 @@ public class RangeSearchPredicateIT {
 			// explicit exclusion
 
 			query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).excludeLimit() )
 					.toQuery();
 
@@ -273,7 +263,6 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ) )
 					.toQuery();
 
@@ -292,7 +281,6 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = new ValueWrapper<>( fieldModel.predicateUpperBound );
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ) )
 					.toQuery();
 
@@ -309,7 +297,6 @@ public class RangeSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( fieldModel.predicateLowerBound, DslConverter.DISABLED )
 							.to( fieldModel.predicateUpperBound, DslConverter.DISABLED ) )
@@ -333,7 +320,6 @@ public class RangeSearchPredicateIT {
 			// Default is inclusion
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( value1ToMatch ).to( value2ToMatch ) )
 					.toQuery();
 
@@ -343,7 +329,6 @@ public class RangeSearchPredicateIT {
 			// explicit exclusion for the from clause
 
 			query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( value1ToMatch ).excludeLimit()
 							.to( value2ToMatch )
@@ -356,7 +341,6 @@ public class RangeSearchPredicateIT {
 			// explicit exclusion for the to clause
 
 			query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( value1ToMatch )
 							.to( value2ToMatch ).excludeLimit()
@@ -369,7 +353,6 @@ public class RangeSearchPredicateIT {
 			// explicit exclusion for both clauses
 
 			query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( value1ToMatch ).excludeLimit()
 							.to( value3ToMatch ).excludeLimit()
@@ -406,7 +389,6 @@ public class RangeSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.range().onField( indexMapping.string1Field.relativeFieldName )
 								.above( indexMapping.string1Field.document3Value.indexedValue )
@@ -422,7 +404,6 @@ public class RangeSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.range().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
 								.above( indexMapping.string1Field.document3Value.indexedValue )
@@ -443,7 +424,6 @@ public class RangeSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.range().onField( indexMapping.string1Field.relativeFieldName )
 								.above( indexMapping.string1Field.document3Value.indexedValue )
@@ -460,7 +440,6 @@ public class RangeSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.range().onField( indexMapping.string1Field.relativeFieldName )
 								.above( indexMapping.string1Field.document3Value.indexedValue )
@@ -482,7 +461,6 @@ public class RangeSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						// 2 * 3 => boost x6
 						.should( f.range().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 3 )
@@ -502,7 +480,6 @@ public class RangeSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						// 39 * 0.5 => boost x19.5
 						.should( f.range().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 0.5f )
@@ -527,7 +504,6 @@ public class RangeSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.range().onField( indexMapping.string1Field.relativeFieldName )
 								.orField( indexMapping.string2Field.relativeFieldName )
@@ -547,7 +523,6 @@ public class RangeSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.range().onField( indexMapping.string1Field.relativeFieldName )
 								.orField( indexMapping.string2Field.relativeFieldName )
@@ -574,7 +549,6 @@ public class RangeSearchPredicateIT {
 		// onField(...).orField(...)
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.below( indexMapping.string1Field.document1Value.indexedValue )
@@ -585,7 +559,6 @@ public class RangeSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.above( indexMapping.string2Field.document3Value.indexedValue )
@@ -598,7 +571,6 @@ public class RangeSearchPredicateIT {
 		// onField().orFields(...)
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.below( indexMapping.string1Field.document1Value.indexedValue )
@@ -609,7 +581,6 @@ public class RangeSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.from( "d" ).to( "e" )
@@ -620,7 +591,6 @@ public class RangeSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.above( indexMapping.string3Field.document3Value.indexedValue )
@@ -633,7 +603,6 @@ public class RangeSearchPredicateIT {
 		// onFields(...)
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.range().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.below( indexMapping.string1Field.document1Value.indexedValue )
 				)
@@ -643,7 +612,6 @@ public class RangeSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.range().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.above( indexMapping.string2Field.document3Value.indexedValue )
 				)
@@ -656,7 +624,6 @@ public class RangeSearchPredicateIT {
 	@Test
 	public void multiField_withDslConverter_dslConverterEnabled() {
 		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.range().onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
 						.orField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
 						.below( new ValueWrapper<>( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue ) )
@@ -669,7 +636,6 @@ public class RangeSearchPredicateIT {
 	@Test
 	public void multiFields_withDslConverter_dslConverterDisabled() {
 		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.range().onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
 						.orField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
 						.below( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue, DslConverter.DISABLED )
@@ -838,7 +804,6 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
 					.toQuery();
 
@@ -881,7 +846,6 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch, DslConverter.DISABLED ) )
 					.toQuery();
 
@@ -983,17 +947,14 @@ public class RangeSearchPredicateIT {
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 		query = compatibleIndexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );

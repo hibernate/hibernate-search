@@ -121,7 +121,6 @@ public class ObjectFieldStorageIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "flattenedObject.string" ).matching( MATCHING_STRING ) )
 						.must( f.match().onField( "flattenedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ) )
@@ -134,7 +133,6 @@ public class ObjectFieldStorageIT {
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
 								.must( f.match().onField( "nestedObject.string" ).matching( MATCHING_STRING ) )
@@ -154,7 +152,6 @@ public class ObjectFieldStorageIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.range().onField( "flattenedObject.string" )
 								.from( MATCHING_STRING ).to( MATCHING_STRING )
@@ -172,7 +169,6 @@ public class ObjectFieldStorageIT {
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
 								.must( f.range().onField( "nestedObject.string" )
@@ -321,7 +317,6 @@ public class ObjectFieldStorageIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )

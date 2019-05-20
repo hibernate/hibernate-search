@@ -70,7 +70,6 @@ public class SearchQueryBaseIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
 				.toQuery();
 
@@ -83,7 +82,7 @@ public class SearchQueryBaseIT {
 
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		SearchQuery<DocumentReference> query = scope.query().asReference()
+		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
@@ -139,7 +138,6 @@ public class SearchQueryBaseIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		SearchResultAssert.assertThat( query ).hasTotalHitCount( documentCount );

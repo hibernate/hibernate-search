@@ -61,7 +61,6 @@ public class MatchAllSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
@@ -74,7 +73,6 @@ public class MatchAllSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll().except( c2 -> c2.match().onField( "string" ).matching( STRING_1 ) ) )
 				.toQuery();
 
@@ -83,7 +81,6 @@ public class MatchAllSearchPredicateIT {
 
 		SearchPredicate searchPredicate = scope.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll().except( searchPredicate ) )
 				.toQuery();
 		assertThat( query )
@@ -95,7 +92,6 @@ public class MatchAllSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll()
 						.except( f.match().onField( "string" ).matching( STRING_1 ) )
 						.except( f.match().onField( "string" ).matching( STRING_2 ) )
@@ -109,7 +105,6 @@ public class MatchAllSearchPredicateIT {
 		SearchPredicate searchPredicate2 = scope.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ) )
 				.toQuery();
 
@@ -134,7 +129,6 @@ public class MatchAllSearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );

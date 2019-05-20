@@ -116,7 +116,6 @@ public class SearchMultiIndexIT {
 		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
@@ -131,7 +130,6 @@ public class SearchMultiIndexIT {
 		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "sortField" ).asc() )
 				.toQuery();
@@ -143,7 +141,6 @@ public class SearchMultiIndexIT {
 		} );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "sortField" ).desc() )
 				.toQuery();
@@ -177,7 +174,6 @@ public class SearchMultiIndexIT {
 
 		// Predicate
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
 				.toQuery();
 
@@ -320,7 +316,6 @@ public class SearchMultiIndexIT {
 
 		StubMappingSearchScope scope = indexManager_1_1.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
@@ -339,7 +334,6 @@ public class SearchMultiIndexIT {
 
 		scope = indexManager_1_2.createSearchScope();
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
@@ -359,7 +353,6 @@ public class SearchMultiIndexIT {
 
 		scope = indexManager_2_1.createSearchScope();
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_2_1, DOCUMENT_2_1_1, DOCUMENT_2_1_2 );

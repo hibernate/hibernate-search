@@ -47,7 +47,6 @@ public class LuceneBoolSearchPredicateIT {
 		SubTest.expectException(
 				"bool() predicate with a minimumShouldMatch constraint providing an out-of-bounds value",
 				() -> scope.query()
-						.asReference()
 						.predicate( f -> f.bool()
 								.minimumShouldMatchNumber( 3 )
 								.should( f.match().onField( "fieldName" ).matching( "blablabla" ) )

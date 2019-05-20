@@ -243,7 +243,6 @@ public class AnalysisCustomIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.match().onField( indexMapping.field.relativeFieldName ).matching( valueToMatch ) )
 				.toQuery();
 
@@ -295,7 +294,6 @@ public class AnalysisCustomIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )

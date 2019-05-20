@@ -129,7 +129,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	public void simpleQueryString() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
@@ -157,14 +157,14 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		SearchQuery<DocumentReference> query;
 
-		query = scope.query().asReference()
+		query = scope.query()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath )
 						.matching( TERM_1 + " " + TERM_2 ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
-		query = scope.query().asReference()
+		query = scope.query()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath )
 						.matching( TERM_1 + " " + TERM_2 )
 						.withAndAsDefaultOperator() )
@@ -184,7 +184,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringFieldWithDslConverter.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_1 ) )
 				.toQuery();
 
@@ -200,7 +199,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( fieldModel.relativeFieldName ).matching( "" ) )
 				.toQuery();
 
@@ -216,7 +214,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( fieldModel.relativeFieldName ).matching( "   " ) )
 				.toQuery();
 
@@ -230,7 +227,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				// Use stopwords, which should be removed by the analysis
 				.predicate( f -> f.simpleQueryString().onField( fieldModel.relativeFieldName ).matching( "the a" ) )
 				.toQuery();
@@ -247,7 +243,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( whitespaceAnalyzedField ).matching( "HERE | PANDA" ) )
 				.toQuery();
 
@@ -255,7 +250,6 @@ public class SimpleQueryStringSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( whitespaceLowercaseAnalyzedField ).matching( "HERE | PANDA" ) )
 				.toQuery();
 
@@ -263,7 +257,6 @@ public class SimpleQueryStringSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( whitespaceAnalyzedField ).matching( "HERE | PANDA" )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
@@ -278,7 +271,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 
 		SubTest.expectException( () -> scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( whitespaceAnalyzedField ).matching( "HERE | PANDA" )
 						// we don't have any analyzer with that name
 						.analyzer( "this_name_does_actually_not_exist" ) )
@@ -295,7 +287,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "HERE | PANDA" ) )
 				.toQuery();
 
@@ -305,7 +296,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		// ignoring the analyzer means that the parameter of match predicate will not be tokenized
 		// so it will not match any token
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "HERE | PANDA" ).skipAnalysis() )
 				.toQuery();
 
@@ -314,7 +304,6 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		// to have a match with the skipAnalysis option enabled, we have to pass the parameter as a token is
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( "here" ).skipAnalysis() )
 				.toQuery();
 
@@ -368,7 +357,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	public void phrase() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
@@ -398,7 +387,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 		SearchQuery<DocumentReference> query;
 
-		query = scope.query().asReference()
+		query = scope.query()
 				.predicate( f -> f.simpleQueryString()
 						.onField( absoluteFieldPath1 ).boostedTo( 5f )
 						.orField( absoluteFieldPath2 )
@@ -409,7 +398,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
 
-		query = scope.query().asReference()
+		query = scope.query()
 				.predicate( f -> f.simpleQueryString()
 						.onField( absoluteFieldPath1 )
 						.orField( absoluteFieldPath2 ).boostedTo( 5f )
@@ -428,7 +417,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.simpleQueryString().onField( absoluteFieldPath1 )
 								.matching( TERM_3 )
@@ -445,7 +433,6 @@ public class SimpleQueryStringSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.simpleQueryString().onField( absoluteFieldPath1 )
 								.matching( TERM_3 )
@@ -469,7 +456,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.simpleQueryString().onField( absoluteFieldPath1 )
 								.matching( TERM_3 )
@@ -487,7 +473,6 @@ public class SimpleQueryStringSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.simpleQueryString().onField( absoluteFieldPath1 )
 								.matching( TERM_3 )
@@ -511,7 +496,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	public void fuzzy() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
@@ -544,7 +529,7 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		// onField(...)
 
-		createQuery = query -> scope.query().asReference()
+		createQuery = query -> scope.query()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath1 )
 						.matching( query )
 				)
@@ -559,7 +544,7 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		// onField(...).orField(...)
 
-		createQuery = query -> scope.query().asReference()
+		createQuery = query -> scope.query()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath1 )
 						.orField( absoluteFieldPath2 )
 						.matching( query )
@@ -576,7 +561,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		// onField().orFields(...)
 
 		createQuery = query -> scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath1 )
 						.orFields( absoluteFieldPath2, absoluteFieldPath3 )
 						.matching( query )
@@ -593,7 +577,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		// onFields(...)
 
 		createQuery = query -> scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onFields( absoluteFieldPath1, absoluteFieldPath2 )
 						.matching( query )
 				)
@@ -660,7 +643,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_1 ) )
 				.toQuery();
 
@@ -676,7 +658,6 @@ public class SimpleQueryStringSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_1 ) )
 				.toQuery();
 
@@ -693,7 +674,7 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		SubTest.expectException(
 				() -> {
-					scope.query().asReference()
+					scope.query()
 							.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_5 ) )
 							.toQuery();
 				}
@@ -713,7 +694,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = scope.query().asReference()
+		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_5 )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
@@ -729,7 +710,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = scope.query().asReference()
+		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( TERM_5 )
 						.skipAnalysis() )
 				.toQuery();
@@ -793,23 +774,19 @@ public class SimpleQueryStringSearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
 		query = compatibleIndexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = incompatibleAnalyzerIndexManager.createSearchScope().query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );

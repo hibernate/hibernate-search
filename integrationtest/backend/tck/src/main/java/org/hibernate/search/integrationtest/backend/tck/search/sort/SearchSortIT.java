@@ -89,7 +89,6 @@ public class SearchSortIT {
 	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
 				.toQuery();
@@ -130,7 +129,6 @@ public class SearchSortIT {
 				.match().onField( "string_analyzed_forScore" ).matching( "hooray" ).toPredicate();
 
 		query = scope.query()
-				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore() )
 				.toQuery();
@@ -138,7 +136,6 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore().desc() )
 				.toQuery();
@@ -146,7 +143,6 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore().asc() )
 				.toQuery();
@@ -164,7 +160,6 @@ public class SearchSortIT {
 				.toSort();
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortAsc )
 				.toQuery();
@@ -172,7 +167,6 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sortAsc ) )
 				.toQuery();
@@ -184,7 +178,6 @@ public class SearchSortIT {
 				.toSort();
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortDesc )
 				.toQuery();
@@ -192,7 +185,6 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sortDesc ) )
 				.toQuery();
@@ -474,7 +466,6 @@ public class SearchSortIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );

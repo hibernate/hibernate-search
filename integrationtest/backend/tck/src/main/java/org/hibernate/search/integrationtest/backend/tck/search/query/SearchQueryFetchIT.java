@@ -263,7 +263,6 @@ public class SearchQueryFetchIT {
 	private SearchQueryContext<?, DocumentReference, ?> matchAllQuery() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "integer" ).asc() );
 	}
@@ -271,7 +270,6 @@ public class SearchQueryFetchIT {
 	private SearchQueryContext<?, DocumentReference, ?> matchFirstHalfQuery() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
-				.asReference()
 				.predicate( f -> f.range().onField( "integer" ).below( DOCUMENT_COUNT / 2 ).excludeLimit() )
 				.sort( c -> c.byField( "integer" ).asc() );
 	}
@@ -279,14 +277,12 @@ public class SearchQueryFetchIT {
 	private SearchQueryContext<?, DocumentReference, ?> matchOneQuery(int id) {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
-				.asReference()
 				.predicate( f -> f.match().onField( "integer" ).matching( id ) );
 	}
 
 	private SearchQueryContext<?, DocumentReference, ?> matchNoneQuery() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		return scope.query()
-				.asReference()
 				.predicate( f -> f.match().onField( "integer" ).matching( DOCUMENT_COUNT + 2 ) );
 	}
 
@@ -306,7 +302,6 @@ public class SearchQueryFetchIT {
 		// Check that all documents are searchable
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasTotalHitCount( DOCUMENT_COUNT );
