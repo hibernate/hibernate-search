@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTermina
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * The context used when building a query, after the search result type has been defined.
+ * The context used when building a query, before the search result type has been defined.
  *
  * @param <R> The type of references, i.e. the type of hits returned by
  * {@link #asReference() reference queries},
