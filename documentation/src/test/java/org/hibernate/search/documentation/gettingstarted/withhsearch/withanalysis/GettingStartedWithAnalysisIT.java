@@ -13,7 +13,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -79,15 +78,13 @@ public class GettingStartedWithAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			SearchQuery<Book> query = searchSession.search( Book.class )
+			SearchResult<Book> result = searchSession.search( Book.class )
 					.asEntity()
 					.predicate( factory -> factory.match()
 							.onFields( "title", "authors.name" )
 							.matching( "refactor" )
 					)
-					.toQuery();
-
-			SearchResult<Book> result = query.fetch();
+					.fetch();
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching[]
 
@@ -100,14 +97,13 @@ public class GettingStartedWithAnalysisIT {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			for ( String term : new String[] { "Refactor", "refactors", "refactored", "refactoring" } ) {
-				SearchQuery<Book> query = searchSession.search( Book.class )
+				SearchResult<Book> result = searchSession.search( Book.class )
 						.asEntity()
 						.predicate( factory -> factory.match()
 								.onFields( "title", "authors.name" )
 								.matching( term )
 						)
-						.toQuery();
-				SearchResult<Book> result = query.fetch();
+						.fetch();
 				assertThat( result.getHits() ).as( "Result of searching for '" + term + "'" )
 						.extracting( "id" )
 						.containsExactlyInAnyOrder( bookIdHolder.get() );

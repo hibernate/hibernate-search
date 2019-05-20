@@ -81,7 +81,6 @@ public class HibernateOrmAutomaticIndexingIT {
 
 			List<Book> result = searchSession.search( Book.class ).asEntity()
 					.predicate( f -> f.match().onField( "title" ).matching( "2nd edition" ) )
-					.toQuery()
 					.fetchHits(); // <5>
 			// end::automatic-indexing-synchronization-strategy-override[]
 

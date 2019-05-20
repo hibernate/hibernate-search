@@ -15,7 +15,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -105,24 +104,37 @@ public class GettingStartedWithoutAnalysisIT {
 
 			SearchScope<Book> scope = searchSession.scope( Book.class ); // <2>
 
-			SearchQuery<Book> query = scope.search() // <3>
+			SearchResult<Book> result = scope.search() // <3>
 					.asEntity() // <4>
 					.predicate( scope.predicate().match() // <5>
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 							.toPredicate()
 					)
-					.toQuery(); // <6>
+					.fetch(); // <6>
 
-			SearchResult<Book> result = query.fetch(); // <7>
-			long totalHitCount = result.getTotalHitCount(); // <8>
-			List<Book> hits = result.getHits(); // <9>
+			long totalHitCount = result.getTotalHitCount(); // <7>
+			List<Book> hits = result.getHits(); // <8>
 
-			List<Book> hits2 = query.fetchHits(); // <10>
+			List<Book> hits2 =
+					/* ... same DSL calls as above... */
+			// end::searching-objects[]
+					scope.search()
+					.asEntity()
+					.predicate( scope.predicate().match()
+							.onFields( "title", "authors.name" )
+							.matching( "Refactoring: Improving the Design of Existing Code" )
+							.toPredicate()
+					)
+			// tag::searching-objects[]
+					.fetchHits(); // <9>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-objects[]
 
-			assertThat( result.getHits() ).extracting( "id" )
+			assertThat( totalHitCount ).isEqualTo( 1 );
+			assertThat( hits ).extracting( "id" )
+					.containsExactlyInAnyOrder( bookIdHolder.get() );
+			assertThat( hits2 ).extracting( "id" )
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
@@ -131,23 +143,35 @@ public class GettingStartedWithoutAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
 
-			SearchQuery<Book> query = searchSession.search( Book.class ) // <2>
+			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
 					.asEntity() // <3>
 					.predicate( f -> f.match() // <4>
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
-					.toQuery(); // <5>
+					.fetch(); // <5>
 
-			SearchResult<Book> result = query.fetch(); // <6>
-			long totalHitCount = result.getTotalHitCount(); // <7>
-			List<Book> hits = result.getHits(); // <8>
+			long totalHitCount = result.getTotalHitCount(); // <6>
+			List<Book> hits = result.getHits(); // <7>
 
-			List<Book> hits2 = query.fetchHits(); // <9>
+			List<Book> hits2 =
+					/* ... same DSL calls as above... */
+			// end::searching-lambdas[]
+					searchSession.search( Book.class )
+							.asEntity()
+							.predicate( f -> f.match()
+									.onFields( "title", "authors.name" )
+									.matching( "Refactoring: Improving the Design of Existing Code" )
+							)
+			// tag::searching-lambdas[]
+					.fetchHits(); // <8>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-lambdas[]
 
-			assertThat( result.getHits() ).extracting( "id" )
+			assertThat( totalHitCount ).isEqualTo( 1 );
+			assertThat( hits ).extracting( "id" )
+					.containsExactlyInAnyOrder( bookIdHolder.get() );
+			assertThat( hits2 ).extracting( "id" )
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
@@ -156,19 +180,17 @@ public class GettingStartedWithoutAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			SearchQuery<Book> query = searchSession.search( Book.class )
+			long totalHitCount = searchSession.search( Book.class )
 					.asEntity()
 					.predicate( f -> f.match()
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
-					.toQuery();
-
-			long resultSize = query.fetchTotalHitCount(); // <1>
+					.fetchTotalHitCount(); // <1>
 			// Not shown: commit the transaction and close the entity manager
 			// end::counting[]
 
-			assertEquals( 1L, resultSize );
+			assertEquals( 1L, totalHitCount );
 		} );
 	}
 

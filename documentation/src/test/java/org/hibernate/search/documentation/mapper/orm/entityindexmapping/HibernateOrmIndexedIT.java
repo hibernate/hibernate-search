@@ -66,18 +66,16 @@ public class HibernateOrmIndexedIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			SearchQuery<Author> authorQuery = searchSession.search( Author.class )
+			List<Author> authorResult = searchSession.search( Author.class )
 					.asEntity()
 					.predicate( f -> f.matchAll() )
-					.toQuery();
-			List<Author> bookResult = authorQuery.fetchHits();
-			assertThat( bookResult ).hasSize( 1 );
+					.fetchHits();
+			assertThat( authorResult ).hasSize( 1 );
 
-			SearchQuery<User> userQuery = searchSession.search( User.class )
+			List<User> userResult = searchSession.search( User.class )
 					.asEntity()
 					.predicate( f -> f.matchAll() )
-					.toQuery();
-			List<User> userResult = userQuery.fetchHits();
+					.fetchHits();
 			assertThat( userResult ).hasSize( 1 );
 		} );
 	}

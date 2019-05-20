@@ -293,12 +293,11 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 but other options are available.
 <4> Define that only documents matching the given predicate should be returned.
 The predicate is created using a factory `f` passed as an argument to the lambda expression.
-<5> Build the query.
-<6> Execute the query and fetch the results.
-<7> Retrieve the total number of matching entities.
-<8> Retrieve matching entities.
-<9> In case you're not interested in the whole result, but only in the hits,
-you can also call `fetchHits()` on the query directly.
+<5> Build the query and fetch the results.
+<6> Retrieve the total number of matching entities.
+<7> Retrieve matching entities.
+<8> In case you're not interested in the whole result, but only in the hits,
+you can also call `fetchHits()` directly.
 ====
 
 If for some reason you don't want to use lambdas, you can use an alternative, object-based syntax,
@@ -317,23 +316,22 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 but other options are available.
 <5> Define that only documents matching the given predicate should be returned.
 The predicate is created using the same search scope as the query.
-<6> Build the query.
-<7> Execute the query and fetch the results.
-<8> Retrieve the total number of matching entities.
-<9> Retrieve matching entities.
-<10> In case you're not interested in the whole result, but only in the hits,
-you can also call `fetchHits()` on the query directly.
+<6> Build the query and fetch the results.
+<7> Retrieve the total number of matching entities.
+<8> Retrieve matching entities.
+<9> In case you're not interested in the whole result, but only in the hits,
+you can also call `fetchHits()` directly.
 ====
 
-It is possible to get just the result size, using `fetchTotalHitCount()` method.
+It is possible to get just the total hit count, using `fetchTotalHitCount()` method.
 
-.Using Hibernate Search to count the indexes
+.Using Hibernate Search to count the matches
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=counting]
 ----
-<1> Fetch the result size.
+<1> Fetch the total hit count.
 ====
 
 [[getting-started-analysis]]

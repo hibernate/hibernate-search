@@ -21,7 +21,6 @@ import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -72,14 +71,12 @@ public class DslConverterIT {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			// tag::dsl-converter-enabled[]
-			SearchQuery<AuthenticationEvent> query = searchSession.search( AuthenticationEvent.class )
+			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
 					.asEntity()
 					.predicate( f -> f.match().onField( "outcome" )
 							.matching( AuthenticationOutcome.INVALID_PASSWORD ) )
-					.toQuery();
+					.fetchHits();
 			// end::dsl-converter-enabled[]
-
-			List<AuthenticationEvent> result = query.fetchHits();
 
 			assertThat( result )
 					.extracting( "id" )
@@ -93,14 +90,12 @@ public class DslConverterIT {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			// tag::dsl-converter-disabled[]
-			SearchQuery<AuthenticationEvent> query = searchSession.search( AuthenticationEvent.class )
+			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
 					.asEntity()
 					.predicate( f -> f.match().onField( "outcome" )
 							.matching( "Invalid password", DslConverter.DISABLED ) )
-					.toQuery();
+					.fetchHits();
 			// end::dsl-converter-disabled[]
-
-			List<AuthenticationEvent> result = query.fetchHits();
 
 			assertThat( result )
 					.extracting( "id" )

@@ -16,7 +16,6 @@ import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -74,7 +73,7 @@ public class HibernateOrmSimpleMappingIT {
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			SearchQuery<Book> query = scope.search()
+			List<Book> result = scope.search()
 					.asEntity()
 					.predicate( scope.predicate().matchAll().toPredicate() )
 					.sort(
@@ -83,9 +82,7 @@ public class HibernateOrmSimpleMappingIT {
 							.then().byField( "title_sort" )
 							.toSort()
 					)
-					.toQuery();
-
-			List<Book> result = query.fetchHits();
+					.fetchHits();
 			// end::sort-simple-objects[]
 
 			assertThat( result )
@@ -97,15 +94,13 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::sort-simple-lambdas[]
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			SearchQuery<Book> query = searchSession.search( Book.class ) // <1>
+			List<Book> result = searchSession.search( Book.class ) // <1>
 					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.byField( "pageCount" ).desc() // <2>
 							.then().byField( "title_sort" )
 					)
-					.toQuery();
-
-			List<Book> result = query.fetchHits(); // <3>
+					.fetchHits(); // <3>
 			// end::sort-simple-lambdas[]
 
 			assertThat( result )
@@ -122,12 +117,10 @@ public class HibernateOrmSimpleMappingIT {
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			SearchQuery<String> query = scope.search()
+			List<String> result = scope.search()
 					.asProjection( scope.projection().field( "title", String.class ).toProjection() )
 					.predicate( scope.predicate().matchAll().toPredicate() )
-					.toQuery();
-
-			List<String> result = query.fetchHits();
+					.fetchHits();
 			// end::projection-simple-objects[]
 
 			assertThat( result )
@@ -138,12 +131,10 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::projection-simple-lambdas[]
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			SearchQuery<String> query = searchSession.search( Book.class ) // <1>
+			List<String> result = searchSession.search( Book.class ) // <1>
 					.asProjection( f -> f.field( "title", String.class ) ) // <2>
 					.predicate( f -> f.matchAll() )
-					.toQuery();
-
-			List<String> result = query.fetchHits(); // <3>
+					.fetchHits(); // <3>
 			// end::projection-simple-lambdas[]
 
 			assertThat( result )
@@ -157,16 +148,14 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::projection-advanced[]
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			SearchQuery<MyEntityAndScoreBean<Book>> query = searchSession.search( Book.class )
+			List<MyEntityAndScoreBean<Book>> result = searchSession.search( Book.class )
 					.asProjection( f -> f.composite(
 							MyEntityAndScoreBean::new,
 							f.entity(),
 							f.score()
 					) )
 					.predicate( f -> f.matchAll() )
-					.toQuery();
-
-			List<MyEntityAndScoreBean<Book>> result = query.fetchHits();
+					.fetchHits();
 			// end::projection-advanced[]
 
 			assertThat( result )

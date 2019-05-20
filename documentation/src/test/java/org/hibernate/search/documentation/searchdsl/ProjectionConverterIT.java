@@ -24,7 +24,6 @@ import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -72,13 +71,11 @@ public class ProjectionConverterIT {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			// tag::projection-converter-enabled[]
-			SearchQuery<OrderStatus> query = searchSession.search( Order.class )
+			List<OrderStatus> result = searchSession.search( Order.class )
 					.asProjection( f -> f.field( "status", OrderStatus.class ) )
 					.predicate( f -> f.matchAll() )
-					.toQuery();
+					.fetchHits();
 			// end::projection-converter-enabled[]
-
-			List<OrderStatus> result = query.fetchHits();
 
 			assertThat( result )
 					.containsExactlyInAnyOrder( OrderStatus.values() );
@@ -91,13 +88,11 @@ public class ProjectionConverterIT {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			// tag::projection-converter-disabled[]
-			SearchQuery<String> query = searchSession.search( Order.class )
+			List<String> result = searchSession.search( Order.class )
 					.asProjection( f -> f.field( "status", String.class, ProjectionConverter.DISABLED ) )
 					.predicate( f -> f.matchAll() )
-					.toQuery();
+					.fetchHits();
 			// end::projection-converter-disabled[]
-
-			List<String> result = query.fetchHits();
 
 			assertThat( result )
 					.containsExactlyInAnyOrder(
