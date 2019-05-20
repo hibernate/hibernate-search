@@ -30,10 +30,11 @@ public enum BuiltinContainerExtractor {
 	OPTIONAL_LONG( OptionalLongValueExtractor.class ),
 	OPTIONAL_VALUE( OptionalValueExtractor.class ),
 
-	/*
-	 * Indicates that the container extractor should be selected automatically based on the type of the container.
-	 */
-	AUTOMATIC( null );
+	/**
+	 * Used as a default value in annotations.
+	 * @deprecated Should not be used explicitly. This only exists for default annotation values.
+ 	 */
+	UNDEFINED( null );
 
 	private final Class<? extends ContainerExtractor> type;
 
