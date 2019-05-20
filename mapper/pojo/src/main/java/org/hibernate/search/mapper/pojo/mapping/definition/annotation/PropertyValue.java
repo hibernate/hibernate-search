@@ -19,12 +19,15 @@ public @interface PropertyValue {
 	String propertyName();
 
 	/**
-	 * @return An array of reference to container value extractor implementation classes,
-	 * which will be applied to the property when getting the value.
-	 * By default, Hibernate Search will try to apply a set of extractors for common types
-	 * ({@link Iterable}, {@link java.util.Collection}, {@link java.util.Optional}, ...).
-	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
+	 * @return A definition of container extractors to be applied to the property,
+	 * allowing the binding of a value bridge to container elements.
+	 * This is useful when the property is of container type,
+	 * for example a {@code Map<TypeA, TypeB>}:
+	 * defining the extraction as {@code @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))}
+	 * allows referencing map keys instead of map values.
+	 * By default, Hibernate Search will try to apply a set of extractors for common container types.
+	 * @see ContainerExtraction
 	 */
-	ContainerExtractorRef[] extractors() default @ContainerExtractorRef;
+	ContainerExtraction extraction() default @ContainerExtraction;
 
 }

@@ -71,18 +71,15 @@ public @interface IndexingDependency {
 	ObjectPath[] derivedFrom() default {};
 
 	/**
-	 * @return An array of references to container value extractor implementation classes,
-	 * allowing to precisely define which value this annotation is referring to.
-	 * For instance, on a property of type {@code Map<EntityA, EntityB>},
-	 * {@code @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO, extractors = @ContainerExtractor(type = MapKeyExtractor.class))}
-	 * would mean "do not reindex the entity when map keys (of type EntityA) change",
-	 * while {@code @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO, extractors = @ContainerExtractor(type = MapValueExtractor.class))}
-	 * would mean "do not reindex the entity when map values (of type EntityB) change".
-	 * By default, Hibernate Search will try to apply a set of extractors for common types
-	 * ({@link Iterable}, {@link java.util.Collection}, {@link java.util.Optional}, ...)
-	 * and use the first one that works.
-	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
+	 * @return A definition of container extractors to be applied to the property,
+	 * allowing the definition of the indexing dependencies for container elements.
+	 * This is useful when the property is of container type,
+	 * for example a {@code Map<TypeA, TypeB>}:
+	 * defining the extraction as {@code @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))}
+	 * allows referencing map keys instead of map values.
+	 * By default, Hibernate Search will try to apply a set of extractors for common container types.
+	 * @see ContainerExtraction
 	 */
-	ContainerExtractorRef[] extractors() default @ContainerExtractorRef;
+	ContainerExtraction extraction() default @ContainerExtraction;
 
 }

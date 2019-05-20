@@ -289,7 +289,7 @@ If that is all you need, then no extra configuration is necessary.
 If your container is a custom one, or you need a different behavior than the default
 (extract keys instead of values from a `Map`, for example),
 then you will need to set a custom extractor chain on the `@*Field` annotation.
-All `@*Field` annotations expose an `extractor` attribute to that end.
+All `@*Field` annotations expose an `extraction` attribute to that end.
 See <<mapper-orm-containerextractor>> for more information on available extractors and custom extractors.
 2. Otherwise, you will have to rely on a custom component, called a bridge, to extract data from your type.
 See <<mapper-orm-bridge>> for more information on custom bridges.

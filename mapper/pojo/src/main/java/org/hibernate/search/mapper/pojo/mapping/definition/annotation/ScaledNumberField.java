@@ -56,10 +56,12 @@ public @interface ScaledNumberField {
 	ValueBridgeRef valueBridge() default @ValueBridgeRef;
 
 	/**
-	 * @return An array of reference to container value extractor implementation classes.
-	 * @see GenericField#extractors()
+	 * @return A definition of container extractors to be applied to the property
+	 * allowing the binding of a value bridge to container elements.
+	 * By default, Hibernate Search will try to apply a set of extractors for common container types.
+	 * @see GenericField#extraction()
 	 */
-	ContainerExtractorRef[] extractors() default @ContainerExtractorRef;
+	ContainerExtraction extraction() default @ContainerExtraction;
 
 	@Documented
 	@Target({ ElementType.METHOD, ElementType.FIELD })

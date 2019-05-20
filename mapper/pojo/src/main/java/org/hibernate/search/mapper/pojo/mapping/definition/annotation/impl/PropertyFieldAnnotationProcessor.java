@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
@@ -52,7 +52,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 		fieldContext.valueBridge( builder );
 
 		ContainerExtractorPath extractorPath =
-				helper.getExtractorPath( getExtractors( annotation ) );
+				helper.getExtractorPath( getExtraction( annotation ) );
 		fieldContext.withExtractors( extractorPath );
 
 		Projectable projectable = getProjectable( annotation );
@@ -70,5 +70,5 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 
 	abstract ValueBridgeRef getValueBridge(A annotation);
 
-	abstract ContainerExtractorRef[] getExtractors(A annotation);
+	abstract ContainerExtraction getExtraction(A annotation);
 }
