@@ -12,7 +12,6 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.integrationtest.showcase.library.model.Person;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.engine.search.query.SearchQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,26 +41,22 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 			return Collections.emptyList();
 		}
 
-		SearchQuery<Person> query = Search.getSearchSession( entityManager ).search( Person.class )
+		return Search.getSearchSession( entityManager ).search( Person.class )
 				.asEntity()
 				.predicate( f -> f.match().onFields( "firstName", "lastName" ).matching( terms ) )
 				.sort( c -> {
 					c.byField( "lastName_sort" );
 					c.byField( "firstName_sort" );
 				} )
-				.toQuery();
-
-		return query.fetchHits( limit, offset );
+				.fetchHits( limit, offset );
 	}
 
 	private List<Person> listTopBorrowers(String borrowalsCountField, int limit, int offset) {
-		SearchQuery<Person> query = Search.getSearchSession( entityManager ).search( Person.class )
+		return Search.getSearchSession( entityManager ).search( Person.class )
 				.asEntity()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( borrowalsCountField ).desc() )
-				.toQuery();
-
-		return query.fetchHits( limit, offset );
+				.fetchHits( limit, offset );
 	}
 
 }

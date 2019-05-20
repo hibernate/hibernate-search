@@ -12,7 +12,6 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.engine.search.query.SearchQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,7 +25,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 		if ( terms == null || terms.isEmpty() ) {
 			return Collections.emptyList();
 		}
-		SearchQuery<Library> query = Search.getSearchSession( entityManager )
+		return Search.getSearchSession( entityManager )
 				.search( Library.class )
 				.asEntity()
 				.predicate( f -> f.match().onField( "name" ).matching( terms ) )
@@ -34,8 +33,6 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 					c.byField( "collectionSize" ).desc();
 					c.byField( "name_sort" );
 				} )
-				.toQuery();
-
-		return query.fetchHits( limit, offset );
+				.fetchHits( limit, offset );
 	}
 }
