@@ -7,13 +7,21 @@
 package org.hibernate.search.engine.search.query;
 
 /**
- * A base interface for subtypes of {@link SearchQuery} allowing to
+ * A base interface for subtypes of {@link SearchFetchable} allowing to
  * easily override the result type for all relevant methods.
  *
  * @param <H> The type of query hits.
  * @param <R> The result type (extending {@link SearchResult}).
  */
-public interface ExtendedSearchQuery<H, R extends SearchResult<H>>
-		extends SearchQuery<H>, ExtendedSearchFetchable<H, R> {
+public interface ExtendedSearchFetchable<H, R extends SearchResult<H>> extends SearchFetchable<H> {
+
+	@Override
+	R fetch();
+
+	@Override
+	R fetch(Integer limit);
+
+	@Override
+	R fetch(Integer limit, Integer offset);
 
 }

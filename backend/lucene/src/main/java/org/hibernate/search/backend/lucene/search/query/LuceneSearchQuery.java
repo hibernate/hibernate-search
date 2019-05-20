@@ -10,7 +10,8 @@ import org.hibernate.search.engine.search.query.ExtendedSearchQuery;
 
 import org.apache.lucene.search.Explanation;
 
-public interface LuceneSearchQuery<H> extends ExtendedSearchQuery<H, LuceneSearchResult<H>> {
+public interface LuceneSearchQuery<H>
+		extends ExtendedSearchQuery<H, LuceneSearchResult<H>>, LuceneSearchFetchable<H> {
 
 	/**
 	 * Explain score computation of this query for the document with the given id.
