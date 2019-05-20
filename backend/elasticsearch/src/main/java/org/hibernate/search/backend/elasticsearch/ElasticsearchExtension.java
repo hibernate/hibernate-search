@@ -76,8 +76,8 @@ public final class ElasticsearchExtension<H, R, E>
 	private static final ElasticsearchExtension<Object, Object, Object> INSTANCE = new ElasticsearchExtension<>();
 
 	@SuppressWarnings("unchecked") // The instance works for any H, R and E
-	public static <Q, R, E> ElasticsearchExtension<Q, R, E> get() {
-		return (ElasticsearchExtension<Q, R, E>) INSTANCE;
+	public static <H, R, E> ElasticsearchExtension<H, R, E> get() {
+		return (ElasticsearchExtension<H, R, E>) INSTANCE;
 	}
 
 	private ElasticsearchExtension() {
