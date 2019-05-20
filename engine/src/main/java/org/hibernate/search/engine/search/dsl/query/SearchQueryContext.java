@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.query.SearchFetchable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 
 /**
@@ -25,7 +26,8 @@ public interface SearchQueryContext<
 		S extends SearchQueryContext<? extends S, H, SC>,
 		H,
 		SC extends SearchSortContainerContext
-		> {
+		>
+		extends SearchFetchable<H> {
 
 	S routing(String routingKey);
 

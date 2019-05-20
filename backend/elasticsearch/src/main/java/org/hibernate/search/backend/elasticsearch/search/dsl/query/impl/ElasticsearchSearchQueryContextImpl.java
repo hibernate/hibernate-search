@@ -13,16 +13,18 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.query.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchIndexSearchScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 class ElasticsearchSearchQueryContextImpl<H>
-		extends AbstractSearchQueryContext<
+		extends AbstractExtendedSearchQueryContext<
 				ElasticsearchSearchQueryContext<H>,
 				H,
+				ElasticsearchSearchResult<H>,
 				ElasticsearchSearchPredicateFactoryContext,
 				ElasticsearchSearchSortContainerContext,
 				ElasticsearchSearchQueryElementCollector

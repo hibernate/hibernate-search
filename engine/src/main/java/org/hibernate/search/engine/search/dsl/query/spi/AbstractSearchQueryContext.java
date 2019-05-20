@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.search.dsl.query.spi;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -23,6 +25,7 @@ import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
@@ -89,6 +92,46 @@ public abstract class AbstractSearchQueryContext<
 	@Override
 	public SearchQuery<H> toQuery() {
 		return searchQueryBuilder.build();
+	}
+
+	@Override
+	public SearchResult<H> fetch() {
+		return toQuery().fetch();
+	}
+
+	@Override
+	public SearchResult<H> fetch(Integer limit) {
+		return toQuery().fetch( limit );
+	}
+
+	@Override
+	public SearchResult<H> fetch(Integer limit, Integer offset) {
+		return toQuery().fetch( limit, offset );
+	}
+
+	@Override
+	public List<H> fetchHits() {
+		return toQuery().fetchHits();
+	}
+
+	@Override
+	public List<H> fetchHits(Integer limit) {
+		return toQuery().fetchHits( limit );
+	}
+
+	@Override
+	public List<H> fetchHits(Integer limit, Integer offset) {
+		return toQuery().fetchHits( limit, offset );
+	}
+
+	@Override
+	public Optional<H> fetchSingleHit() {
+		return toQuery().fetchSingleHit();
+	}
+
+	@Override
+	public long fetchTotalHitCount() {
+		return toQuery().fetchTotalHitCount();
 	}
 
 	private <B> void contribute(SearchPredicateBuilderFactory<? super C, B> factory, SearchPredicate predicate) {
