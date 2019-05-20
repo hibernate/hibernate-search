@@ -10,23 +10,29 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchIndexSearchScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 		extends AbstractSearchQueryResultDefinitionContext<
+				ElasticsearchSearchQueryContext<E>,
 				R,
 				E,
 				ElasticsearchSearchProjectionFactoryContext<R, E>,
+				ElasticsearchSearchPredicateFactoryContext,
 				ElasticsearchSearchQueryElementCollector
 		>
 		implements ElasticsearchSearchQueryResultDefinitionContext<R, E> {
@@ -78,6 +84,17 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 		ElasticsearchSearchQueryBuilder<List<?>> builder = indexSearchScope.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, loadingContextBuilder, projections );
 		return createSearchQueryContext( builder );
+	}
+
+	@Override
+	public ElasticsearchSearchQueryContext<E> predicate(SearchPredicate predicate) {
+		return asEntity().predicate( predicate );
+	}
+
+	@Override
+	public ElasticsearchSearchQueryContext<E> predicate(
+			Function<? super ElasticsearchSearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor) {
+		return asEntity().predicate( predicateContributor );
 	}
 
 	@Override

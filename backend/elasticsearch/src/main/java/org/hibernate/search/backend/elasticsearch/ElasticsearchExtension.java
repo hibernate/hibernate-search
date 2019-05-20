@@ -89,7 +89,7 @@ public final class ElasticsearchExtension<H, R, E>
 	 */
 	@Override
 	public Optional<ElasticsearchSearchQueryResultDefinitionContext<R, E>> extendOptional(
-			SearchQueryResultDefinitionContext<R, E, ?> original,
+			SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
 			IndexSearchScope<?> indexSearchScope,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {

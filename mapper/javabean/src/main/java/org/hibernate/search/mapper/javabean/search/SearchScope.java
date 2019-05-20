@@ -36,7 +36,7 @@ public interface SearchScope {
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see SearchQueryResultDefinitionContext
 	 */
-	SearchQueryResultDefinitionContext<PojoReference, ?, ?> search();
+	SearchQueryResultDefinitionContext<?, PojoReference, ?, ?, ?> search();
 
 	/**
 	 * Initiate the building of a search predicate.

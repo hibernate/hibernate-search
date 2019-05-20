@@ -18,7 +18,7 @@ public class HibernateOrmSearchQueryResultDefinitionContextImpl<E>
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	public HibernateOrmSearchQueryResultDefinitionContextImpl(
-			SearchQueryResultDefinitionContext<PojoReference, E, ?> delegate,
+			SearchQueryResultDefinitionContext<?, PojoReference, E, ?, ?> delegate,
 			MutableEntityLoadingOptions loadingOptions) {
 		super( delegate );
 		this.loadingOptions = loadingOptions;

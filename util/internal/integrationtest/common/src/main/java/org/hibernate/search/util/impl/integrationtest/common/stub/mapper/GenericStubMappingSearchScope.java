@@ -27,11 +27,11 @@ public class GenericStubMappingSearchScope<R, E> {
 		this.delegate = delegate;
 	}
 
-	public SearchQueryResultDefinitionContext<R, E, ?> query(LoadingContext<R, E> loadingContext) {
+	public SearchQueryResultDefinitionContext<?, R, E, ?, ?> query(LoadingContext<R, E> loadingContext) {
 		return query( new StubSessionContext(), loadingContext );
 	}
 
-	public SearchQueryResultDefinitionContext<R, E, ?> query(StubSessionContext sessionContext,
+	public SearchQueryResultDefinitionContext<?, R, E, ?, ?> query(StubSessionContext sessionContext,
 			LoadingContext<R, E> loadingContext) {
 		LoadingContextBuilder<R, E> loadingContextBuilder = () -> loadingContext;
 		return delegate.search( sessionContext, loadingContextBuilder );

@@ -17,12 +17,12 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
  *
  * @param <N> The type of the next context, returned after a predicate is defined.
  * @param <H> The type of hits for the created query.
- * @param <PC> The type of contexts used to create predicates in {@link #predicate(Function)}.
+ * @param <PDC> The type of contexts used to create predicates in {@link #predicate(Function)}.
  */
 public interface SearchQueryResultContext<
 		N extends SearchQueryContext<? extends N, H, ?>,
 		H,
-		PC extends SearchPredicateFactoryContext
+		PDC extends SearchPredicateFactoryContext
 		> {
 
 	/**
@@ -39,6 +39,6 @@ public interface SearchQueryResultContext<
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to define the query further.
 	 */
-	N predicate(Function<? super PC, SearchPredicateTerminalContext> predicateContributor);
+	N predicate(Function<? super PDC, SearchPredicateTerminalContext> predicateContributor);
 
 }

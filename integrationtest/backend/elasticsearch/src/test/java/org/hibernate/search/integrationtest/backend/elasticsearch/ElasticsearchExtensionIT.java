@@ -142,6 +142,9 @@ public class ElasticsearchExtensionIT {
 				scope.query().extension( ElasticsearchExtension.get() ).asProjection( projection );
 		ElasticsearchSearchQueryResultContext<List<?>> asProjectionsContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asProjections( projection, projection );
+		ElasticsearchSearchQueryContext<DocumentReference> defaultResultContext =
+				scope.query().extension( ElasticsearchExtension.get() )
+						.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
 	}
 
 	@Test

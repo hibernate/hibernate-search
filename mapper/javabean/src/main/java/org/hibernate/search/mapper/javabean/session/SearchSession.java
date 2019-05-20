@@ -34,7 +34,7 @@ public interface SearchSession extends AutoCloseable {
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see SearchQueryResultDefinitionContext
 	 */
-	default SearchQueryResultDefinitionContext<PojoReference, ?, ?> search(Class<?> type) {
+	default SearchQueryResultDefinitionContext<?, PojoReference, ?, ?, ?> search(Class<?> type) {
 		return scope( type ).search();
 	}
 
@@ -48,7 +48,7 @@ public interface SearchSession extends AutoCloseable {
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see SearchQueryResultDefinitionContext
 	 */
-	default SearchQueryResultDefinitionContext<PojoReference, ?, ?> search(Collection<? extends Class<?>> types) {
+	default SearchQueryResultDefinitionContext<?, PojoReference, ?, ?, ?> search(Collection<? extends Class<?>> types) {
 		return scope( types ).search();
 	}
 

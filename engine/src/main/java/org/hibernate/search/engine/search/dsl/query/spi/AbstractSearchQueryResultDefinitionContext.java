@@ -8,15 +8,24 @@ package org.hibernate.search.engine.search.dsl.query.spi;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
-public abstract class AbstractSearchQueryResultDefinitionContext<R, E, PC extends SearchProjectionFactoryContext<R, E>, C>
-		implements SearchQueryResultDefinitionContext<R, E, PC> {
+public abstract class AbstractSearchQueryResultDefinitionContext<
+				N extends SearchQueryContext<? extends N, E, ?>,
+				R,
+				E,
+				PJC extends SearchProjectionFactoryContext<R, E>,
+				PDC extends SearchPredicateFactoryContext,
+				C
+		>
+		implements SearchQueryResultDefinitionContext<N, R, E, PJC, PDC> {
 
 	@Override
 	public <T> T extension(SearchQueryContextExtension<T, R, E> extension) {

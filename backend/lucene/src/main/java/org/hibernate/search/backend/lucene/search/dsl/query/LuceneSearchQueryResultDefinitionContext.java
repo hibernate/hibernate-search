@@ -9,13 +9,21 @@ package org.hibernate.search.backend.lucene.search.dsl.query;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 
 public interface LuceneSearchQueryResultDefinitionContext<R, E>
-		extends SearchQueryResultDefinitionContext<R, E, LuceneSearchProjectionFactoryContext<R, E>> {
+		extends SearchQueryResultDefinitionContext<
+				LuceneSearchQueryContext<E>,
+				R,
+				E,
+				LuceneSearchProjectionFactoryContext<R, E>,
+				LuceneSearchPredicateFactoryContext
+		>,
+		LuceneSearchQueryResultContext<E> {
 
 	@Override
 	LuceneSearchQueryResultContext<E> asEntity();

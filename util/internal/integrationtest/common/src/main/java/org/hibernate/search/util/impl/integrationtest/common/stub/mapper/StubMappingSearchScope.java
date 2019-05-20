@@ -23,11 +23,11 @@ public class StubMappingSearchScope extends GenericStubMappingSearchScope<Docume
 		super( delegate );
 	}
 
-	public SearchQueryResultDefinitionContext<DocumentReference, DocumentReference, ?> query() {
+	public SearchQueryResultDefinitionContext<?, DocumentReference, DocumentReference, ?, ?> query() {
 		return query( new StubLoadingContext() );
 	}
 
-	public SearchQueryResultDefinitionContext<DocumentReference, DocumentReference, ?> query(
+	public SearchQueryResultDefinitionContext<?, DocumentReference, DocumentReference, ?, ?> query(
 			StubSessionContext sessionContext) {
 		return query( sessionContext, new StubLoadingContext() );
 	}

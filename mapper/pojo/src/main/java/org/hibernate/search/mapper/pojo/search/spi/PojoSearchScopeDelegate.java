@@ -27,7 +27,7 @@ public interface PojoSearchScopeDelegate<E, E2> {
 
 	PojoReference toPojoReference(DocumentReference documentReference);
 
-	SearchQueryResultDefinitionContext<PojoReference, E2, SearchProjectionFactoryContext<PojoReference, E2>> search(
+	SearchQueryResultDefinitionContext<?, PojoReference, E2, SearchProjectionFactoryContext<PojoReference, E2>, ?> search(
 			LoadingContextBuilder<PojoReference, E2> loadingContextBuilder);
 
 	SearchPredicateFactoryContext predicate();

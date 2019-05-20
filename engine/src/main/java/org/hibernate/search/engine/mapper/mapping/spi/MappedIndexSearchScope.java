@@ -29,7 +29,7 @@ public interface MappedIndexSearchScope<R, E> {
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> with any T.
 	 */
-	SearchQueryResultDefinitionContext<R, E, SearchProjectionFactoryContext<R, E>> search(
+	SearchQueryResultDefinitionContext<?, R, E, SearchProjectionFactoryContext<R, E>, ?> search(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder);
 

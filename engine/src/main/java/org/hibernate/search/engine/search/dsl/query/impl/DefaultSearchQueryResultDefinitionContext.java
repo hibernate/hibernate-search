@@ -10,9 +10,13 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
@@ -20,7 +24,14 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
-		extends AbstractSearchQueryResultDefinitionContext<R, E, SearchProjectionFactoryContext<R, E>, C> {
+		extends AbstractSearchQueryResultDefinitionContext<
+				SearchQueryContext<?, E, ?>,
+				R,
+				E,
+				SearchProjectionFactoryContext<R, E>,
+				SearchPredicateFactoryContext,
+				C
+		> {
 
 	private final IndexSearchScope<C> indexSearchScope;
 	private final SessionContextImplementor sessionContext;
@@ -68,6 +79,17 @@ public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
 		SearchQueryBuilder<List<?>, C> builder = indexSearchScope.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, loadingContextBuilder, projections );
 		return new DefaultSearchQueryContext<>( indexSearchScope, builder );
+	}
+
+	@Override
+	public SearchQueryContext<?, E, ?> predicate(
+			Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor) {
+		return asEntity().predicate( predicateContributor );
+	}
+
+	@Override
+	public SearchQueryContext<?, E, ?> predicate(SearchPredicate predicate) {
+		return asEntity().predicate( predicate );
 	}
 
 	@Override

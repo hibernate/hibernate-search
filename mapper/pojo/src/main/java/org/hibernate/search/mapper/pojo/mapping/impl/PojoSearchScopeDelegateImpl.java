@@ -58,7 +58,7 @@ class PojoSearchScopeDelegateImpl<E, E2> implements PojoSearchScopeDelegate<E, E
 	}
 
 	@Override
-	public SearchQueryResultDefinitionContext<PojoReference, E2, SearchProjectionFactoryContext<PojoReference, E2>> search(
+	public SearchQueryResultDefinitionContext<?, PojoReference, E2, SearchProjectionFactoryContext<PojoReference, E2>, ?> search(
 			LoadingContextBuilder<PojoReference, E2> loadingContextBuilder) {
 		return getDelegate().search( sessionContext, loadingContextBuilder );
 	}

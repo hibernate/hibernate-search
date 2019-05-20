@@ -152,6 +152,9 @@ public class LuceneExtensionIT {
 				scope.query().extension( LuceneExtension.get() ).asProjection( projection );
 		LuceneSearchQueryResultContext<List<?>> asProjectionsContext =
 				scope.query().extension( LuceneExtension.get() ).asProjections( projection, projection );
+		LuceneSearchQueryContext<DocumentReference> defaultResultContext =
+				scope.query().extension( LuceneExtension.get() )
+						.predicate( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
 	}
 
 	@Test

@@ -24,7 +24,7 @@ public class SearchScopeImpl implements SearchScope {
 	}
 
 	@Override
-	public SearchQueryResultDefinitionContext<PojoReference, ?, ?> search() {
+	public SearchQueryResultDefinitionContext<?, PojoReference, ?, ?, ?> search() {
 		return delegate.search( new JavaBeanLoadingContext.Builder( delegate ) );
 	}
 

@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.util.common.SearchException;
@@ -18,15 +20,27 @@ import org.hibernate.search.util.common.SearchException;
 /**
  * The context used when building a query, before the search result type has been defined.
  *
+ * @param <N> The next context if no type of hits is explicitly selected,
+ * i.e. if {@link #predicate(SearchPredicate)} or {@link #predicate(Function)} is called directly
+ * without calling {@link #asEntity()}, or {@link #asReference()}, {@link #asProjection(SearchProjection)}
+ * or a similar method.
  * @param <R> The type of references, i.e. the type of hits returned by
  * {@link #asReference() reference queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#reference() reference projections}.
  * @param <E> The type of entities, i.e. the type of hits returned by
  * {@link #asEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
- * @param <PC> The type of contexts used to create projections in {@link #asProjection(Function)}.
+ * @param <PJC> The type of contexts used to create projections in {@link #asProjection(Function)}.
+ * @param <PDC> The type of contexts used to create predicates in {@link #predicate(Function)}.
  */
-public interface SearchQueryResultDefinitionContext<R, E, PC extends SearchProjectionFactoryContext<R, E>> {
+public interface SearchQueryResultDefinitionContext<
+				N extends SearchQueryContext<? extends N, E, ?>,
+				R,
+				E,
+				PJC extends SearchProjectionFactoryContext<R, E>,
+				PDC extends SearchPredicateFactoryContext
+		>
+		extends SearchQueryResultContext<N, E, PDC> {
 
 	/**
 	 * Define the query results as the entity was originally indexed, loaded from an external source (database, ...).
@@ -55,7 +69,7 @@ public interface SearchQueryResultDefinitionContext<R, E, PC extends SearchProje
 	 * @see SearchQueryResultContext
 	 */
 	<P> SearchQueryResultContext<?, P, ?> asProjection(
-			Function<? super PC, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
+			Function<? super PJC, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
 
 	/**
 	 * Define the query results as one projection for each matching document.

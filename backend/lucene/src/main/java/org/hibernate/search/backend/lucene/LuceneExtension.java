@@ -90,7 +90,7 @@ public final class LuceneExtension<H, R, E>
 	 */
 	@Override
 	public Optional<LuceneSearchQueryResultDefinitionContext<R, E>> extendOptional(
-			SearchQueryResultDefinitionContext<R, E, ?> original,
+			SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
 			IndexSearchScope<?> indexSearchScope,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {

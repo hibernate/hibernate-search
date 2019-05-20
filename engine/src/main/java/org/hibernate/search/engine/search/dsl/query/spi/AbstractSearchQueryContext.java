@@ -32,11 +32,11 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 public abstract class AbstractSearchQueryContext<
 		S extends SearchQueryContext<S, H, SC>,
 		H,
-		PC extends SearchPredicateFactoryContext,
+		PDC extends SearchPredicateFactoryContext,
 		SC extends SearchSortContainerContext,
 		C
 		>
-		implements SearchQueryResultContext<S, H, PC>, SearchQueryContext<S, H, SC> {
+		implements SearchQueryResultContext<S, H, PDC>, SearchQueryContext<S, H, SC> {
 
 	private final IndexSearchScope<C> indexSearchScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;
@@ -55,7 +55,7 @@ public abstract class AbstractSearchQueryContext<
 	}
 
 	@Override
-	public S predicate(Function<? super PC, SearchPredicateTerminalContext> predicateContributor) {
+	public S predicate(Function<? super PDC, SearchPredicateTerminalContext> predicateContributor) {
 		SearchPredicateBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchPredicateBuilderFactory();
 		SearchPredicateFactoryContext factoryContext = new DefaultSearchPredicateFactoryContext<>( factory );
 		SearchPredicate predicate = predicateContributor.apply( extendPredicateContext( factoryContext ) ).toPredicate();
@@ -158,7 +158,7 @@ public abstract class AbstractSearchQueryContext<
 
 	protected abstract S thisAsS();
 
-	protected abstract PC extendPredicateContext(SearchPredicateFactoryContext predicateFactoryContext);
+	protected abstract PDC extendPredicateContext(SearchPredicateFactoryContext predicateFactoryContext);
 
 	protected abstract SC extendSortContext(SearchSortContainerContext sortContainerContext);
 }

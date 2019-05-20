@@ -48,7 +48,7 @@ public interface SearchQueryContextExtension<T, R, E> {
 	 * @return An optional containing the extended search query context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchQueryResultDefinitionContext<R, E, ?> original,
+	Optional<T> extendOptional(SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
 			IndexSearchScope<?> indexSearchScope,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder);

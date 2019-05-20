@@ -15,14 +15,14 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 public abstract class AbstractExtendedSearchQueryContext<
-		S extends SearchQueryContext<S, H, SC>,
-		H,
-		R extends SearchResult<H>,
-		PC extends SearchPredicateFactoryContext,
-		SC extends SearchSortContainerContext,
-		C
+				S extends SearchQueryContext<S, H, SC>,
+				H,
+				R extends SearchResult<H>,
+				PDC extends SearchPredicateFactoryContext,
+				SC extends SearchSortContainerContext,
+				C
 		>
-		extends AbstractSearchQueryContext<S, H, PC, SC, C> {
+		extends AbstractSearchQueryContext<S, H, PDC, SC, C> {
 
 	public AbstractExtendedSearchQueryContext(IndexSearchScope<C> indexSearchScope,
 			SearchQueryBuilder<H, C> searchQueryBuilder) {

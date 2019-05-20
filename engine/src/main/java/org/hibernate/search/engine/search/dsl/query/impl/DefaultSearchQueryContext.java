@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 final class DefaultSearchQueryContext<H, C>
 		extends AbstractSearchQueryContext<
 						DefaultSearchQueryContext<H, C>,
-		H,
+						H,
 						SearchPredicateFactoryContext,
 						SearchSortContainerContext,
 						C

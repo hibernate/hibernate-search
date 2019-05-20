@@ -188,7 +188,7 @@ public class SearchQueryBaseIT {
 
 	private static class SupportedQueryDslExtension<R, E> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, E> {
 		@Override
-		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<R, E, ?> original,
+		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
 				IndexSearchScope<?> indexSearchScope, SessionContextImplementor sessionContext,
 				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
@@ -201,7 +201,7 @@ public class SearchQueryBaseIT {
 
 	private static class UnSupportedQueryDslExtension<R, E> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, E> {
 		@Override
-		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<R, E, ?> original,
+		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
 				IndexSearchScope<?> indexSearchScope, SessionContextImplementor sessionContext,
 				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();

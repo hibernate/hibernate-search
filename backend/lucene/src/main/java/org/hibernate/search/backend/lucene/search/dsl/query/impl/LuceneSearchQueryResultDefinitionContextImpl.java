@@ -10,23 +10,29 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
+import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultDefinitionContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneIndexSearchScope;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 		extends AbstractSearchQueryResultDefinitionContext<
+				LuceneSearchQueryContext<E>,
 				R,
 				E,
 				LuceneSearchProjectionFactoryContext<R, E>,
+				LuceneSearchPredicateFactoryContext,
 				LuceneSearchQueryElementCollector
 		>
 		implements LuceneSearchQueryResultDefinitionContext<R, E> {
@@ -78,6 +84,17 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 		LuceneSearchQueryBuilder<List<?>> builder = indexSearchScope.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, loadingContextBuilder, projections );
 		return createSearchQueryContext( builder );
+	}
+
+	@Override
+	public LuceneSearchQueryContext<E> predicate(SearchPredicate predicate) {
+		return asEntity().predicate( predicate );
+	}
+
+	@Override
+	public LuceneSearchQueryContext<E> predicate(
+			Function<? super LuceneSearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor) {
+		return asEntity().predicate( predicateContributor );
 	}
 
 	@Override

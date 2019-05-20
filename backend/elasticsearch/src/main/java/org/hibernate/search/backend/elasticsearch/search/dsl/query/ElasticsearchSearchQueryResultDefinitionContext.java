@@ -9,13 +9,21 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.query;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 
 public interface ElasticsearchSearchQueryResultDefinitionContext<R, E>
-		extends SearchQueryResultDefinitionContext<R, E, ElasticsearchSearchProjectionFactoryContext<R, E>> {
+		extends SearchQueryResultDefinitionContext<
+				ElasticsearchSearchQueryContext<E>,
+				R,
+				E,
+				ElasticsearchSearchProjectionFactoryContext<R, E>,
+				ElasticsearchSearchPredicateFactoryContext
+		>,
+		ElasticsearchSearchQueryResultContext<E> {
 
 	@Override
 	ElasticsearchSearchQueryResultContext<E> asEntity();

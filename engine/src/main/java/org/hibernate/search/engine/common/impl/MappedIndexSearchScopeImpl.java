@@ -37,7 +37,7 @@ class MappedIndexSearchScopeImpl<C, R, E> implements MappedIndexSearchScope<R, E
 	}
 
 	@Override
-	public SearchQueryResultDefinitionContext<R, E, SearchProjectionFactoryContext<R, E>> search(
+	public SearchQueryResultDefinitionContext<?, R, E, SearchProjectionFactoryContext<R, E>, ?> search(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		return new DefaultSearchQueryResultDefinitionContext<>( delegate, sessionContext, loadingContextBuilder );
