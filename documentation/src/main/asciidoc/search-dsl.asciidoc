@@ -254,3 +254,12 @@ or skip analysis completely with `.skipAnalysis()`.
 
 See <<search-dsl-predicate>> for more information about how to create predicates
 and about the available options.
+
+=== Incompatible decimal scale
+
+Incompatible decimal scales are only a problem when the query is performed on scaled number fields among different indexes.
+
+Such queries requires that the fields involved not only have the same encoded type (for instance both as `BigDecimal`),
+but they must have the same decimal scale.
+
+For scaled number fields and decimal scale attribute see <<mapper-orm-directfieldmapping-annotations-scalednumberfield, here>>.

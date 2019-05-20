@@ -226,7 +226,7 @@ On the other hand, this limitation allows keyword fields to be <<mapper-orm-dire
 Keyword fields may be assigned a `normalizer`, referenced by its name.
 See <<concepts-analysis>> for more details about normalizers and full-text analysis.
 
-`@ScaledNumberField`::
+[[mapper-orm-directfieldmapping-annotations-scalednumberfield]] `@ScaledNumberField`::
 A numeric field with arbitrary scale and fixed precision.
 Only works for `java.math.BigDecimal` fields.
 +
