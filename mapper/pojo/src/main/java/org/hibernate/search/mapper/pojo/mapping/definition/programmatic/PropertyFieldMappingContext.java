@@ -41,20 +41,37 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 	 */
 	S valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder);
 
+	/**
+	 * @param extractorClass The type of container extractor to use.
+	 * @return {@code this}, for method chaining.
+	 */
 	@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 	default S withExtractor(
 			Class<? extends ContainerExtractor> extractorClass) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );
 	}
 
-	default S withExtractor(BuiltinContainerExtractor mapKey) {
-		return withExtractor( mapKey.getType() );
+	/**
+	 * @param extractorType The type of container extractor to use.
+	 * @return {@code this}, for method chaining.
+	 */
+	default S withExtractor(BuiltinContainerExtractor extractorType) {
+		return withExtractor( extractorType.getType() );
 	}
 
+	/**
+	 * Indicate that no container extractors should be applied,
+	 * not even the default ones.
+	 * @return {@code this}, for method chaining.
+	 */
 	default S withoutExtractors() {
 		return withExtractors( ContainerExtractorPath.noExtractors() );
 	}
 
+	/**
+	 * @param extractorPath A {@link ContainerExtractorPath}.
+	 * @return {@code this}, for method chaining.
+	 */
 	S withExtractors(ContainerExtractorPath extractorPath);
 
 }

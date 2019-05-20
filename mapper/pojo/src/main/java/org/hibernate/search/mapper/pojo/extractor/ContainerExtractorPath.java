@@ -45,14 +45,24 @@ public class ContainerExtractorPath {
 			false, Collections.emptyList()
 	);
 
+	/**
+	 * @return A path that will apply the default extractor(s) based on the property type.
+	 */
 	public static ContainerExtractorPath defaultExtractors() {
 		return DEFAULT;
 	}
 
+	/**
+	 * @return A path that will not apply any container extractor.
+	 */
 	public static ContainerExtractorPath noExtractors() {
 		return NONE;
 	}
 
+	/**
+	 * @param extractorClass A container extractor referenced by its type.
+	 * @return A path that will apply the referenced container extractor.
+	 */
 	public static ContainerExtractorPath explicitExtractor(
 			Class<? extends ContainerExtractor> extractorClass) {
 		return new ContainerExtractorPath(
@@ -61,10 +71,18 @@ public class ContainerExtractorPath {
 		);
 	}
 
-	public static ContainerExtractorPath explicitExtractor(BuiltinContainerExtractor extractor) {
-		return explicitExtractor( extractor.getType() );
+	/**
+	 * @param extractorType A container extractor referenced by its type.
+	 * @return A path that will apply the referenced container extractor.
+	 */
+	public static ContainerExtractorPath explicitExtractor(BuiltinContainerExtractor extractorType) {
+		return explicitExtractor( extractorType.getType() );
 	}
 
+	/**
+	 * @param extractorClasses A list of container extractors referenced by their type.
+	 * @return A path that will apply the referenced container extractors in order.
+	 */
 	public static ContainerExtractorPath explicitExtractors(
 			List<? extends Class<? extends ContainerExtractor>> extractorClasses) {
 		if ( extractorClasses.isEmpty() ) {
