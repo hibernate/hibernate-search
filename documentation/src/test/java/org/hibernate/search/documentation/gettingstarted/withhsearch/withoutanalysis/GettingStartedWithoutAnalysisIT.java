@@ -105,29 +105,27 @@ public class GettingStartedWithoutAnalysisIT {
 			SearchScope<Book> scope = searchSession.scope( Book.class ); // <2>
 
 			SearchResult<Book> result = scope.search() // <3>
-					.asEntity() // <4>
-					.predicate( scope.predicate().match() // <5>
+					.predicate( scope.predicate().match() // <4>
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 							.toPredicate()
 					)
-					.fetch(); // <6>
+					.fetch(); // <5>
 
-			long totalHitCount = result.getTotalHitCount(); // <7>
-			List<Book> hits = result.getHits(); // <8>
+			long totalHitCount = result.getTotalHitCount(); // <6>
+			List<Book> hits = result.getHits(); // <7>
 
 			List<Book> hits2 =
 					/* ... same DSL calls as above... */
 			// end::searching-objects[]
 					scope.search()
-					.asEntity()
 					.predicate( scope.predicate().match()
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 							.toPredicate()
 					)
 			// tag::searching-objects[]
-					.fetchHits(); // <9>
+					.fetchHits(); // <8>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-objects[]
 
@@ -144,27 +142,25 @@ public class GettingStartedWithoutAnalysisIT {
 			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
 
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
-					.asEntity() // <3>
-					.predicate( f -> f.match() // <4>
+					.predicate( f -> f.match() // <3>
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
-					.fetch(); // <5>
+					.fetch(); // <4>
 
-			long totalHitCount = result.getTotalHitCount(); // <6>
-			List<Book> hits = result.getHits(); // <7>
+			long totalHitCount = result.getTotalHitCount(); // <5>
+			List<Book> hits = result.getHits(); // <6>
 
 			List<Book> hits2 =
 					/* ... same DSL calls as above... */
 			// end::searching-lambdas[]
 					searchSession.search( Book.class )
-							.asEntity()
 							.predicate( f -> f.match()
 									.onFields( "title", "authors.name" )
 									.matching( "Refactoring: Improving the Design of Existing Code" )
 							)
 			// tag::searching-lambdas[]
-					.fetchHits(); // <8>
+					.fetchHits(); // <7>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-lambdas[]
 
@@ -181,7 +177,6 @@ public class GettingStartedWithoutAnalysisIT {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			long totalHitCount = searchSession.search( Book.class )
-					.asEntity()
 					.predicate( f -> f.match()
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )

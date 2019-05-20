@@ -79,7 +79,7 @@ public class HibernateOrmAutomaticIndexingIT {
 				entityManager.getTransaction().rollback();
 			}
 
-			List<Book> result = searchSession.search( Book.class ).asEntity()
+			List<Book> result = searchSession.search( Book.class )
 					.predicate( f -> f.match().onField( "title" ).matching( "2nd edition" ) )
 					.fetchHits(); // <5>
 			// end::automatic-indexing-synchronization-strategy-override[]

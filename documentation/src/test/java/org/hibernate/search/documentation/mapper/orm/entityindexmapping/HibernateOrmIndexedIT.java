@@ -67,13 +67,11 @@ public class HibernateOrmIndexedIT {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			List<Author> authorResult = searchSession.search( Author.class )
-					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.fetchHits();
 			assertThat( authorResult ).hasSize( 1 );
 
 			List<User> userResult = searchSession.search( User.class )
-					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.fetchHits();
 			assertThat( userResult ).hasSize( 1 );
@@ -91,7 +89,6 @@ public class HibernateOrmIndexedIT {
 					SearchQuery<Object> query = searchSession.search(
 									Arrays.asList( Author.class, User.class )
 							)
-							.asEntity()
 							.predicate( f -> f.matchAll() )
 							.toQuery();
 					// end::cross-backend-search[]

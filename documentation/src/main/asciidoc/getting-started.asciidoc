@@ -289,14 +289,12 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ----
 <1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Initiate a search query on the index mapped to the `Book` entity.
-<3> Define the results expected from the query; here we expect managed Hibernate ORM entities,
-but other options are available.
-<4> Define that only documents matching the given predicate should be returned.
+<3> Define that only documents matching the given predicate should be returned.
 The predicate is created using a factory `f` passed as an argument to the lambda expression.
-<5> Build the query and fetch the results.
-<6> Retrieve the total number of matching entities.
-<7> Retrieve matching entities.
-<8> In case you're not interested in the whole result, but only in the hits,
+<4> Build the query and fetch the results.
+<5> Retrieve the total number of matching entities.
+<6> Retrieve matching entities.
+<7> In case you're not interested in the whole result, but only in the hits,
 you can also call `fetchHits()` directly.
 ====
 
@@ -312,14 +310,12 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 <1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Create a "search scope", representing the indexed types that will be queried.
 <3> Initiate a search query targeting the search scope.
-<4> Define the results expected from the query; here we expect managed Hibernate ORM entities,
-but other options are available.
-<5> Define that only documents matching the given predicate should be returned.
+<4> Define that only documents matching the given predicate should be returned.
 The predicate is created using the same search scope as the query.
-<6> Build the query and fetch the results.
-<7> Retrieve the total number of matching entities.
-<8> Retrieve matching entities.
-<9> In case you're not interested in the whole result, but only in the hits,
+<5> Build the query and fetch the results.
+<6> Retrieve the total number of matching entities.
+<7> Retrieve matching entities.
+<8> In case you're not interested in the whole result, but only in the hits,
 you can also call `fetchHits()` directly.
 ====
 
@@ -333,6 +329,10 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ----
 <1> Fetch the total hit count.
 ====
+
+Note that, while the examples above retrieved hits as managed entities,
+it is just one of the possible hit types.
+See <<mapper-orm-query-concept, the section about Search Queries>> for more information.
 
 [[getting-started-analysis]]
 == Analysis

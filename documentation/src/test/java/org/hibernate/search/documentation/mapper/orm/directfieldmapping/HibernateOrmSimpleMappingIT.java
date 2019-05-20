@@ -74,7 +74,6 @@ public class HibernateOrmSimpleMappingIT {
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			List<Book> result = scope.search()
-					.asEntity()
 					.predicate( scope.predicate().matchAll().toPredicate() )
 					.sort(
 							scope.sort()
@@ -95,7 +94,6 @@ public class HibernateOrmSimpleMappingIT {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			List<Book> result = searchSession.search( Book.class ) // <1>
-					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.byField( "pageCount" ).desc() // <2>
 							.then().byField( "title_sort" )
