@@ -28,6 +28,7 @@ import javax.persistence.Transient;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -285,7 +286,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
-				extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
+				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
 		)
 		private Map<ContainedEntity, String> containedIndexedEmbedded = new LinkedHashMap<>();
 
@@ -309,11 +310,11 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
-				extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
+				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
 		)
 		@IndexingDependency(
 				reindexOnUpdate = ReindexOnUpdate.NO,
-				extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
+				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
 		)
 		private Map<ContainedEntity, String> containedIndexedEmbeddedNoReindexOnUpdate = new LinkedHashMap<>();
 
@@ -391,14 +392,14 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				@ObjectPath({
 						@PropertyValue(
 								propertyName = "containedUsedInCrossEntityDerivedProperty",
-								extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
+								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
 						),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField1")
 				}),
 				@ObjectPath({
 						@PropertyValue(
 								propertyName = "containedUsedInCrossEntityDerivedProperty",
-								extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
+								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
 						),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField2")
 				})
@@ -439,7 +440,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				inversePath = @ObjectPath(
 						@PropertyValue(
 								propertyName = "containedIndexedEmbedded",
-								extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
+								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
 						)
 				)
 		)
@@ -463,7 +464,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				inversePath = @ObjectPath(
 						@PropertyValue(
 								propertyName = "containedIndexedEmbeddedNoReindexOnUpdate",
-								extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
+								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
 						)
 				)
 		)
@@ -478,7 +479,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				inversePath = @ObjectPath(
 						@PropertyValue(
 								propertyName = "containedUsedInCrossEntityDerivedProperty",
-								extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
+								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
 						)
 				)
 		)

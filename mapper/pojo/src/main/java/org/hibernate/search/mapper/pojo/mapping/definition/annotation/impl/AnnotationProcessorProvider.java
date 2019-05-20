@@ -33,7 +33,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -125,7 +125,7 @@ class AnnotationProcessorProvider {
 		void doProcess(PropertyMappingContext mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				AssociationInverseSide annotation) {
-			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
+			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
 
 			Optional<PojoModelPathValueNode> inversePathOptional =
 					helper.getPojoModelPathValueNode( annotation.inversePath() );
@@ -152,7 +152,7 @@ class AnnotationProcessorProvider {
 		void doProcess(PropertyMappingContext mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				IndexingDependency annotation) {
-			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
+			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
 
 			ReindexOnUpdate reindexOnUpdate = annotation.reindexOnUpdate();
 
@@ -285,8 +285,8 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ContainerExtractorRef[] getExtractors(GenericField annotation) {
-			return annotation.extractors();
+		ContainerExtraction getExtraction(GenericField annotation) {
+			return annotation.extraction();
 		}
 	}
 
@@ -318,8 +318,8 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ContainerExtractorRef[] getExtractors(FullTextField annotation) {
-			return annotation.extractors();
+		ContainerExtraction getExtraction(FullTextField annotation) {
+			return annotation.extraction();
 		}
 	}
 
@@ -365,8 +365,8 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ContainerExtractorRef[] getExtractors(KeywordField annotation) {
-			return annotation.extractors();
+		ContainerExtraction getExtraction(KeywordField annotation) {
+			return annotation.extraction();
 		}
 	}
 
@@ -412,8 +412,8 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ContainerExtractorRef[] getExtractors(ScaledNumberField annotation) {
-			return annotation.extractors();
+		ContainerExtraction getExtraction(ScaledNumberField annotation) {
+			return annotation.extraction();
 		}
 	}
 
@@ -451,7 +451,7 @@ class AnnotationProcessorProvider {
 				cleanedUpIncludePaths = Collections.emptySet();
 			}
 
-			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
+			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
 
 			mappingContext.indexedEmbedded()
 					.withExtractors( extractorPath )

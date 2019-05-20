@@ -31,6 +31,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdenti
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -706,7 +707,7 @@ public class AnnotationMappingSmokeIT {
 		)
 		@GenericField(
 				name = "embeddedMapKeys",
-				extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)
+				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
 		)
 		public Map<String, List<IndexedEntity>> getEmbeddedMap() {
 			return embeddedMap;

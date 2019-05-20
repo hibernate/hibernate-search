@@ -39,6 +39,8 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtract;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeRef;
@@ -48,6 +50,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridg
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class AnnotationProcessorHelper {
@@ -69,41 +72,32 @@ class AnnotationProcessorHelper {
 		PojoModelPath.Builder inversePathBuilder = PojoModelPath.builder();
 		for ( PropertyValue element : inversePathElements ) {
 			String inversePropertyName = element.propertyName();
-			ContainerExtractorPath inverseExtractorPath = getExtractorPath(
-					element.extractors()
-			);
+			ContainerExtractorPath inverseExtractorPath = getExtractorPath( element.extraction() );
 			inversePathBuilder.property( inversePropertyName ).value( inverseExtractorPath );
 		}
 		return Optional.ofNullable( inversePathBuilder.toValuePathOrNull() );
 	}
 
-	ContainerExtractorPath getExtractorPath(ContainerExtractorRef[] extractors) {
-		if ( extractors.length == 0 ) {
-			return ContainerExtractorPath.noExtractors();
-		}
-		else if ( extractors.length == 1 && ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( extractors[0].type() ) &&
-				BuiltinContainerExtractor.AUTOMATIC.equals( extractors[0].value() ) ) {
-			return ContainerExtractorPath.defaultExtractors();
-		}
-		else {
-			@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
-			List<Class<? extends ContainerExtractor>> explicitExtractorClasses = new ArrayList<>();
-			for ( ContainerExtractorRef extractor : extractors ) {
-				checkContainerExtractor( extractor );
-				if ( ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( extractor.type() ) ) {
-					if ( BuiltinContainerExtractor.AUTOMATIC.equals( extractor.value() ) ) {
-						// We know we're in a multi-extractor chain, because the above else if branch wasn't executed
-						// Using the default extractors in a multi-extractor chain is not yet supported (see HSEARCH-3463)
-						throw log.cannotUseDefaultExtractorsInMultiExtractorChain();
-					}
-					explicitExtractorClasses.add( extractor.value().getType() );
+	ContainerExtractorPath getExtractorPath(ContainerExtraction extraction) {
+		ContainerExtract extract = extraction.extract();
+		ContainerExtractorRef[] extractors = extraction.value();
+		switch ( extract ) {
+			case NO:
+				if ( extractors.length != 0 ) {
+					throw log.cannotReferenceExtractorsWhenExtractionDisabled();
+				}
+				return ContainerExtractorPath.noExtractors();
+			case DEFAULT:
+				if ( extractors.length == 0 ) {
+					return ContainerExtractorPath.defaultExtractors();
 				}
 				else {
-					explicitExtractorClasses.add( extractor.type() );
+					return toExtractorPath( extractors );
 				}
-			}
-
-			return ContainerExtractorPath.explicitExtractors( explicitExtractorClasses );
+			default:
+				throw new AssertionFailure(
+					"Unexpected " + ContainerExtract.class.getSimpleName() + " value: " + extract
+				);
 		}
 	}
 
@@ -305,6 +299,34 @@ class AnnotationProcessorHelper {
 			Class<? extends T> defaultedType = cleanedUpType == null ? expectedType : cleanedUpType;
 			return Optional.of( BeanReference.of( defaultedType, cleanedUpName ) );
 		}
+	}
+
+	private ContainerExtractorPath toExtractorPath(ContainerExtractorRef[] extractors) {
+		// FIXME: remove this special case and BuiltinContainerExtractor.AUTOMATIC, they don't make sense now that we expose @ContainerExtraction.extract
+		if ( extractors.length == 1 && ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( extractors[0].type() ) &&
+				BuiltinContainerExtractor.AUTOMATIC.equals( extractors[0].value() ) ) {
+			return ContainerExtractorPath.defaultExtractors();
+		}
+
+		@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
+				List<Class<? extends ContainerExtractor>> explicitExtractorClasses = new ArrayList<>();
+		for ( ContainerExtractorRef extractor : extractors ) {
+			checkContainerExtractor( extractor );
+			if ( ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( extractor.type() ) ) {
+				if ( BuiltinContainerExtractor.AUTOMATIC.equals( extractor.value() ) ) {
+					// FIXME: remove this special case and BuiltinContainerExtractor.AUTOMATIC, they don't make sense now that we expose @ContainerExtraction.extract
+					// We know we're in a multi-extractor chain, because the above else if branch wasn't executed
+					// Using the default extractors in a multi-extractor chain is not yet supported (see HSEARCH-3463)
+					throw log.cannotUseDefaultExtractorsInMultiExtractorChain();
+				}
+				explicitExtractorClasses.add( extractor.value().getType() );
+			}
+			else {
+				explicitExtractorClasses.add( extractor.type() );
+			}
+		}
+
+		return ContainerExtractorPath.explicitExtractors( explicitExtractorClasses );
 	}
 
 	private static void checkContainerExtractor(ContainerExtractorRef extractor) {

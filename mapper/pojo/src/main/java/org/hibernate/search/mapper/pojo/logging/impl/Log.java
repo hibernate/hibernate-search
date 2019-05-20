@@ -407,4 +407,11 @@ public interface Log extends BasicLogger {
 	)
 	SearchException invalidFieldEncodingForScaledNumberFieldMapping(StandardIndexFieldTypeContext<?, ?> context,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
+
+	@Message(id = ID_OFFSET_2 + 52,
+			value = "Extractors cannot be defined explicitly when extract = ContainerExtract.NO."
+					+ " Either leave 'extract' to its default value to define extractors explicitly"
+					+ " or leave the 'extractor' list to its default, empty value to disable extraction."
+	)
+	SearchException cannotReferenceExtractorsWhenExtractionDisabled();
 }

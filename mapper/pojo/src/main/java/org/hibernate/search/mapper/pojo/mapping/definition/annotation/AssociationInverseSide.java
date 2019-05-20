@@ -26,19 +26,16 @@ import java.lang.annotation.Target;
 public @interface AssociationInverseSide {
 
 	/**
-	 * @return An array of reference to container value extractor implementation classes,
-	 * allowing to precisely define which association the inverse side is being defined for.
-	 * For instance, on a property of type {@code Map<EntityA, EntityB>},
-	 * {@code @AssociationInverseSide(extractors = @ContainerExtractor(type = MapKeyExtractor.class))}
-	 * would define the inverse side of the association for the map keys (of type EntityA),
-	 * while {@code @AssociationInverseSide(extractors = @ContainerExtractor(type = MapValueExtractor.class))}
-	 * would define the inverse side of the association for the map values (of type EntityB).
-	 * By default, Hibernate Search will try to apply a set of extractors for common types
-	 * ({@link Iterable}, {@link java.util.Collection}, {@link java.util.Optional}, ...)
-	 * 	 * and use the first one that works.
-	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
+	 * @return A definition of container extractors to be applied to the property,
+	 * allowing the definition of the inverse side of an association modeled by container elements.
+	 * This is useful when the property is of container type,
+	 * for example a {@code Map<EntityA, EntityB>}:
+	 * defining the extraction as {@code @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))}
+	 * allows referring to the association modeled by the map keys instead of the one modeled by the map values.
+	 * By default, Hibernate Search will try to apply a set of extractors for common container types.
+	 * @see ContainerExtraction
 	 */
-	ContainerExtractorRef[] extractors() default @ContainerExtractorRef;
+	ContainerExtraction extraction() default @ContainerExtraction;
 
 	/**
 	 * @return The path to the targeted entity on the inverse side of the association.

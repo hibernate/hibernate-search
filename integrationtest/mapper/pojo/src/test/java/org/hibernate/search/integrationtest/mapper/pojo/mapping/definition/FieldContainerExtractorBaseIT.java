@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtract;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -47,7 +49,7 @@ public class FieldContainerExtractorBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@GenericField(extractors = @ContainerExtractorRef(type = RawContainerExtractor.class))
+			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(type = RawContainerExtractor.class)))
 			public Integer getId() {
 				return id;
 			}
@@ -87,7 +89,7 @@ public class FieldContainerExtractorBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@GenericField(extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_VALUE))
+			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_VALUE)))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}
@@ -118,7 +120,10 @@ public class FieldContainerExtractorBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@GenericField(extractors = { @ContainerExtractorRef( BuiltinContainerExtractor.MAP_VALUE ), @ContainerExtractorRef( BuiltinContainerExtractor.AUTOMATIC ) })
+			@GenericField(extraction = @ContainerExtraction({
+					@ContainerExtractorRef( BuiltinContainerExtractor.MAP_VALUE ),
+					@ContainerExtractorRef( BuiltinContainerExtractor.AUTOMATIC )
+			}))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}
@@ -150,7 +155,9 @@ public class FieldContainerExtractorBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@GenericField(extractors = @ContainerExtractorRef(value = BuiltinContainerExtractor.MAP_VALUE, type = RawContainerExtractor.class))
+			@GenericField(extraction = @ContainerExtraction(
+					@ContainerExtractorRef(value = BuiltinContainerExtractor.MAP_VALUE, type = RawContainerExtractor.class)
+			))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}
@@ -166,6 +173,42 @@ public class FieldContainerExtractorBaseIT {
 						.annotationContextAnyParameters( GenericField.class )
 						.failure( "Annotation @ContainerExtractorRef references both built-in extractor (using 'MAP_VALUE') and an explicit type (using '" +
 								RawContainerExtractor.class.getName() + "'). Only one of those can be defined, not both." )
+						.build()
+				);
+	}
+
+	@Test
+	public void invalidContainerExtractorWithExtractNo() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			List<Integer> numbers;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(extraction = @ContainerExtraction(
+					extract = ContainerExtract.NO,
+					value = @ContainerExtractorRef(value = BuiltinContainerExtractor.MAP_VALUE)
+			))
+			public List<Integer> getNumbers() {
+				return numbers;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".numbers" )
+						.annotationContextAnyParameters( GenericField.class )
+						.failure(
+								"Extractors cannot be defined explicitly when extract = ContainerExtract.NO.",
+								"Either leave 'extract' to its default value to define extractors explicitly",
+								"or leave the 'extractor' list to its default, empty value to disable extraction"
+						)
 						.build()
 				);
 	}
