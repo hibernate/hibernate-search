@@ -111,41 +111,6 @@ public class FieldContainerExtractorBaseIT {
 	}
 
 	@Test
-	public void cannotUseAutomaticContainerExtractorInMultiExtractorChain() {
-		@Indexed
-		class IndexedEntity {
-			Integer id;
-			List<Integer> numbers;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@GenericField(extraction = @ContainerExtraction({
-					@ContainerExtractorRef( BuiltinContainerExtractor.MAP_VALUE ),
-					@ContainerExtractorRef( BuiltinContainerExtractor.AUTOMATIC )
-			}))
-			public List<Integer> getNumbers() {
-				return numbers;
-			}
-		}
-		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
-		)
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".numbers" )
-						.annotationContextAnyParameters( GenericField.class )
-						.failure(
-								"A chain of multiple container extractors cannot include the default extractors.",
-								" Either use only the default extractors, or explicitly reference every single extractor to be applied instead"
-						)
-						.build()
-				);
-	}
-
-	@Test
 	public void invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType() {
 		@Indexed
 		class IndexedEntity {
@@ -173,6 +138,41 @@ public class FieldContainerExtractorBaseIT {
 						.annotationContextAnyParameters( GenericField.class )
 						.failure( "Annotation @ContainerExtractorRef references both built-in extractor (using 'MAP_VALUE') and an explicit type (using '" +
 								RawContainerExtractor.class.getName() + "'). Only one of those can be defined, not both." )
+						.build()
+				);
+	}
+
+	@Test
+	public void emptyContainerExtractorReference() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			List<Integer> numbers;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(extraction = @ContainerExtraction(
+					@ContainerExtractorRef()
+			))
+			public List<Integer> getNumbers() {
+				return numbers;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".numbers" )
+						.annotationContextAnyParameters( GenericField.class )
+						.failure(
+								"Annotation @ContainerExtractorRef is empty",
+								"The annotation must define either the built-in extractor (using 'value')",
+								"or an explicit type (using 'type')"
+						)
 						.build()
 				);
 	}

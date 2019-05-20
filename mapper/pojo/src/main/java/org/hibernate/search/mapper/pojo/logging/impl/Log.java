@@ -28,8 +28,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
-import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.EnumFormatter;
+import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ToStringTreeAppendableMultilineFormatter;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.TypeFormatter;
@@ -414,4 +414,11 @@ public interface Log extends BasicLogger {
 					+ " or leave the 'extractor' list to its default, empty value to disable extraction."
 	)
 	SearchException cannotReferenceExtractorsWhenExtractionDisabled();
+
+	@Message(id = ID_OFFSET_2 + 52,
+			value = "Annotation @ContainerExtractorRef is empty."
+					+ " The annotation must define either the built-in extractor (using 'value') "
+					+ " or an explicit type (using 'type')."
+	)
+	SearchException emptyContainerExtractorRef();
 }

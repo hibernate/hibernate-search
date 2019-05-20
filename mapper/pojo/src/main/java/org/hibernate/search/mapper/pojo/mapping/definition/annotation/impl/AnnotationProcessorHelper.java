@@ -301,39 +301,36 @@ class AnnotationProcessorHelper {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private ContainerExtractorPath toExtractorPath(ContainerExtractorRef[] extractors) {
-		// FIXME: remove this special case and BuiltinContainerExtractor.AUTOMATIC, they don't make sense now that we expose @ContainerExtraction.extract
-		if ( extractors.length == 1 && ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( extractors[0].type() ) &&
-				BuiltinContainerExtractor.AUTOMATIC.equals( extractors[0].value() ) ) {
-			return ContainerExtractorPath.defaultExtractors();
-		}
-
 		@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 				List<Class<? extends ContainerExtractor>> explicitExtractorClasses = new ArrayList<>();
 		for ( ContainerExtractorRef extractor : extractors ) {
-			checkContainerExtractor( extractor );
-			if ( ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( extractor.type() ) ) {
-				if ( BuiltinContainerExtractor.AUTOMATIC.equals( extractor.value() ) ) {
-					// FIXME: remove this special case and BuiltinContainerExtractor.AUTOMATIC, they don't make sense now that we expose @ContainerExtraction.extract
-					// We know we're in a multi-extractor chain, because the above else if branch wasn't executed
-					// Using the default extractors in a multi-extractor chain is not yet supported (see HSEARCH-3463)
-					throw log.cannotUseDefaultExtractorsInMultiExtractorChain();
-				}
-				explicitExtractorClasses.add( extractor.value().getType() );
+			BuiltinContainerExtractor builtin = extractor.value();
+			if ( BuiltinContainerExtractor.UNDEFINED.equals( builtin ) ) {
+				builtin = null;
+			}
+			Class<? extends ContainerExtractor> explicit = extractor.type();
+			if ( ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( explicit ) ) {
+				explicit = null;
+			}
+
+			if ( builtin != null && explicit != null ) {
+				throw log.invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType(
+						builtin, explicit
+				);
+			}
+			else if ( builtin != null ) {
+				explicitExtractorClasses.add( builtin.getType() );
+			}
+			else if ( explicit != null ) {
+				explicitExtractorClasses.add( explicit );
 			}
 			else {
-				explicitExtractorClasses.add( extractor.type() );
+				throw log.emptyContainerExtractorRef();
 			}
 		}
 
 		return ContainerExtractorPath.explicitExtractors( explicitExtractorClasses );
-	}
-
-	private static void checkContainerExtractor(ContainerExtractorRef extractor) {
-		boolean isBuiltinDefault = BuiltinContainerExtractor.AUTOMATIC.equals( extractor.value() );
-		boolean isExplicitDefault = ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( extractor.type() );
-		if ( !isBuiltinDefault && !isExplicitDefault ) {
-			throw log.invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType( extractor.value(), extractor.type() );
-		}
 	}
 }
