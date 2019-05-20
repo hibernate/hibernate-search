@@ -34,7 +34,6 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	public List<Book> findAllIndexed() {
 		return Search.getSearchSession( entityManager )
 				.search( Book.class )
-				.asEntity()
 				.predicate( p -> p.matchAll() )
 				.fetchHits();
 	}
@@ -46,7 +45,6 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		}
 
 		return Search.getSearchSession( entityManager ).search( Book.class )
-				.asEntity()
 				// onRawField option allows to bypass the bridge in the DSL
 				.predicate( f -> f.match().onField( "isbn" ).matching( isbnAsString, DslConverter.DISABLED ) )
 				.fetchSingleHit();
@@ -55,7 +53,6 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	@Override
 	public List<Book> searchByMedium(String terms, BookMedium medium, int limit, int offset) {
 		return Search.getSearchSession( entityManager ).search( Book.class )
-				.asEntity()
 				.predicate( f -> f.bool( b -> {
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
@@ -78,7 +75,6 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 			List<LibraryServiceOption> libraryServices,
 			int limit, int offset) {
 		return Search.getSearchSession( entityManager ).search( DOCUMENT_CLASS )
-				.asEntity()
 				.predicate( f -> f.bool( b -> {
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {

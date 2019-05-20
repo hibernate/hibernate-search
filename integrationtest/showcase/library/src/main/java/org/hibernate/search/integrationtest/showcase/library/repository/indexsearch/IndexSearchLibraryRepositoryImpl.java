@@ -27,7 +27,6 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 		}
 		return Search.getSearchSession( entityManager )
 				.search( Library.class )
-				.asEntity()
 				.predicate( f -> f.match().onField( "name" ).matching( terms ) )
 				.sort( c -> {
 					c.byField( "collectionSize" ).desc();
