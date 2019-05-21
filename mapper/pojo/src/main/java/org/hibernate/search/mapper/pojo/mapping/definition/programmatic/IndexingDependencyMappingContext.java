@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 public interface IndexingDependencyMappingContext extends PropertyMappingContext {
@@ -24,14 +23,6 @@ public interface IndexingDependencyMappingContext extends PropertyMappingContext
 	 */
 	default IndexingDependencyMappingContext withExtractor(String extractorName) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
-	}
-
-	/**
-	 * @param extractorType The type of container extractor to use.
-	 * @return {@code this}, for method chaining.
-	 */
-	default IndexingDependencyMappingContext withExtractor(BuiltinContainerExtractor extractorType) {
-		return withExtractor( extractorType.getName() );
 	}
 
 	/**

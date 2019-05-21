@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -311,7 +311,7 @@ public class PropertyBridgeBaseIT {
 									public void bind(PropertyBridgeBindingContext context) {
 										context.getDependencies()
 												.use(
-														ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractor.COLLECTION ),
+														ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
 														"stringProperty"
 												);
 									}
@@ -571,7 +571,7 @@ public class PropertyBridgeBaseIT {
 									public void bind(PropertyBridgeBindingContext context) {
 										context.getDependencies()
 												.fromOtherEntity(
-														ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractor.COLLECTION ),
+														ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
 														PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
 														PojoModelPath.parse( "parent" )
 												);

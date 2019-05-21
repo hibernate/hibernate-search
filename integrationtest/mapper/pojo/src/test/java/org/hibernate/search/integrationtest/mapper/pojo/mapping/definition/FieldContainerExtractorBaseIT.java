@@ -15,7 +15,6 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtract;
@@ -60,7 +59,7 @@ public class FieldContainerExtractorBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(name = MyContainerExtractor.NAME)))
+			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(MyContainerExtractor.NAME)))
 			public MyContainer<String> getText() {
 				return text;
 			}
@@ -117,7 +116,7 @@ public class FieldContainerExtractorBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(name = "some-undefined-name")))
+			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef("some-undefined-name")))
 			public Integer getId() {
 				return id;
 			}
@@ -146,7 +145,7 @@ public class FieldContainerExtractorBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(name = RawContainerExtractor.NAME)))
+			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(RawContainerExtractor.NAME)))
 			public Integer getId() {
 				return id;
 			}
@@ -191,7 +190,7 @@ public class FieldContainerExtractorBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_VALUE)))
+			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_VALUE)))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}
@@ -214,77 +213,6 @@ public class FieldContainerExtractorBaseIT {
 	}
 
 	@Test
-	public void invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType() {
-		@Indexed
-		class IndexedEntity {
-			Integer id;
-			List<Integer> numbers;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@GenericField(extraction = @ContainerExtraction(
-					@ContainerExtractorRef(value = BuiltinContainerExtractor.MAP_VALUE, name = RawContainerExtractor.NAME)
-			))
-			public List<Integer> getNumbers() {
-				return numbers;
-			}
-		}
-		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock )
-						.withConfiguration( builder -> {
-							builder.containerExtractors().define( RawContainerExtractor.NAME, RawContainerExtractor.class );
-						} )
-						.setup( IndexedEntity.class )
-		)
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".numbers" )
-						.annotationContextAnyParameters( GenericField.class )
-						.failure( "Annotation @ContainerExtractorRef references both built-in extractor (using 'MAP_VALUE') and an explicit type (using '" +
-								RawContainerExtractor.class.getName() + "'). Only one of those can be defined, not both." )
-						.build()
-				);
-	}
-
-	@Test
-	public void emptyContainerExtractorReference() {
-		@Indexed
-		class IndexedEntity {
-			Integer id;
-			List<Integer> numbers;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@GenericField(extraction = @ContainerExtraction(
-					@ContainerExtractorRef()
-			))
-			public List<Integer> getNumbers() {
-				return numbers;
-			}
-		}
-		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
-		)
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".numbers" )
-						.annotationContextAnyParameters( GenericField.class )
-						.failure(
-								"Annotation @ContainerExtractorRef is empty",
-								"The annotation must define either the built-in extractor (using 'value')",
-								"or an explicit type (using 'type')"
-						)
-						.build()
-				);
-	}
-
-	@Test
 	public void invalidContainerExtractorWithExtractNo() {
 		@Indexed
 		class IndexedEntity {
@@ -296,7 +224,7 @@ public class FieldContainerExtractorBaseIT {
 			}
 			@GenericField(extraction = @ContainerExtraction(
 					extract = ContainerExtract.NO,
-					value = @ContainerExtractorRef(value = BuiltinContainerExtractor.MAP_VALUE)
+					value = @ContainerExtractorRef(value = BuiltinContainerExtractors.MAP_VALUE)
 			))
 			public List<Integer> getNumbers() {
 				return numbers;

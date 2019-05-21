@@ -37,7 +37,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
@@ -380,7 +380,7 @@ public class ProgrammaticMappingSmokeIT {
 									.prefix( "embeddedList.otherPrefix_" )
 									.includePaths( "embedded.prefix_customBridgeOnClass.text" )
 					.property( "embeddedMap" )
-							.genericField( "embeddedMapKeys" ).withExtractor( BuiltinContainerExtractor.MAP_KEY )
+							.genericField( "embeddedMapKeys" ).withExtractor( BuiltinContainerExtractors.MAP_KEY )
 							.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 		}
 	}

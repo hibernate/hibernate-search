@@ -11,7 +11,6 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 
 /**
  * @param <S> The "self" type, i.e. the type to return from methods.
@@ -47,14 +46,6 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 	 */
 	default S withExtractor(String extractorName) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
-	}
-
-	/**
-	 * @param extractorType The type of container extractor to use.
-	 * @return {@code this}, for method chaining.
-	 */
-	default S withExtractor(BuiltinContainerExtractor extractorType) {
-		return withExtractor( extractorType.getName() );
 	}
 
 	/**

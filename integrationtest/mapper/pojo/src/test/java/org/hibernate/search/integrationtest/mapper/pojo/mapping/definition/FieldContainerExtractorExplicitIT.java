@@ -20,7 +20,7 @@ import java.util.SortedSet;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
@@ -62,7 +62,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 				return id;
 			}
 
-			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY)))
+			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY)))
 			public Map<String, String> getMyProperty() {
 				return myProperty;
 			}
@@ -97,8 +97,8 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 			}
 
 			@GenericField(extraction = @ContainerExtraction({
-					@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY),
-					@ContainerExtractorRef(BuiltinContainerExtractor.ITERABLE)
+					@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY),
+					@ContainerExtractorRef(BuiltinContainerExtractors.ITERABLE)
 			}))
 			public Map<List<String>, String> getMyProperty() {
 				return myProperty;
@@ -167,7 +167,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.ARRAY)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.ARRAY)))
 				public String[] getMyProperty() {
 					return myProperty;
 				}
@@ -192,7 +192,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.ITERABLE)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.ITERABLE)))
 				public Iterable<String> getMyProperty() {
 					return myProperty;
 				}
@@ -217,7 +217,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.ITERABLE)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.ITERABLE)))
 				public Collection<String> getMyProperty() {
 					return myProperty;
 				}
@@ -242,7 +242,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.ITERABLE)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.ITERABLE)))
 				public List<String> getMyProperty() {
 					return myProperty;
 				}
@@ -267,7 +267,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.ITERABLE)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.ITERABLE)))
 				public Set<String> getMyProperty() {
 					return myProperty;
 				}
@@ -292,7 +292,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.ITERABLE)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.ITERABLE)))
 				public SortedSet<String> getMyProperty() {
 					return myProperty;
 				}
@@ -317,7 +317,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_VALUE)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_VALUE)))
 				public Map<String, String> getMyProperty() {
 					return myProperty;
 				}
@@ -342,7 +342,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_VALUE)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_VALUE)))
 				public SortedMap<String, String> getMyProperty() {
 					return myProperty;
 				}
@@ -368,8 +368,8 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 				}
 
 				@GenericField(extraction = @ContainerExtraction({
-						@ContainerExtractorRef(BuiltinContainerExtractor.MAP_VALUE),
-						@ContainerExtractorRef(BuiltinContainerExtractor.ITERABLE)
+						@ContainerExtractorRef(BuiltinContainerExtractors.MAP_VALUE),
+						@ContainerExtractorRef(BuiltinContainerExtractors.ITERABLE)
 				}))
 				public Map<String, List<String>> getMyProperty() {
 					return myProperty;
@@ -395,7 +395,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.OPTIONAL_VALUE)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.OPTIONAL)))
 				public Optional<String> getMyProperty() {
 					return myProperty;
 				}
@@ -420,7 +420,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.OPTIONAL_DOUBLE)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.OPTIONAL_DOUBLE)))
 				public OptionalDouble getMyProperty() {
 					return myProperty;
 				}
@@ -445,7 +445,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.OPTIONAL_INT)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.OPTIONAL_INT)))
 				public OptionalInt getMyProperty() {
 					return myProperty;
 				}
@@ -470,7 +470,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.OPTIONAL_LONG)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.OPTIONAL_LONG)))
 				public OptionalLong getMyProperty() {
 					return myProperty;
 				}
@@ -497,7 +497,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 
 				@GenericField(
 						valueBridge = @ValueBridgeRef(type = PrefixedStringBridge.class),
-						extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.ITERABLE))
+						extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.ITERABLE))
 				)
 				public List<String> getMyProperty() {
 					return myProperty;
@@ -523,7 +523,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 					return id;
 				}
 
-				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.ITERABLE)))
+				@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.ITERABLE)))
 				public List<MyEnum> getMyProperty() {
 					return myProperty;
 				}

@@ -11,7 +11,6 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 
 public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingContext {
 
@@ -34,14 +33,6 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 	 */
 	default PropertyIndexedEmbeddedMappingContext withExtractor(String extractorName) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
-	}
-
-	/**
-	 * @param extractorType The type of container extractor to use.
-	 * @return {@code this}, for method chaining.
-	 */
-	default PropertyIndexedEmbeddedMappingContext withExtractor(BuiltinContainerExtractor extractorType) {
-		return withExtractor( extractorType.getName() );
 	}
 
 	/**

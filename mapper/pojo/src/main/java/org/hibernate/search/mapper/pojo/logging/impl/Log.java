@@ -17,7 +17,6 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
@@ -28,7 +27,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
-import org.hibernate.search.util.common.logging.impl.EnumFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ToStringTreeAppendableMultilineFormatter;
 import org.hibernate.search.util.common.SearchException;
@@ -343,14 +341,6 @@ public interface Log extends BasicLogger {
 	)
 	SearchException cannotUseDefaultExtractorsInMultiExtractorChain();
 
-	@Message(id = ID_OFFSET_2 + 42,
-			value = "Annotation @ContainerExtractorRef references both built-in extractor (using '%1$s') and an explicit name (using '%2$s')."
-			+ " Only one of those can be defined, not both."
-	)
-	SearchException invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitName(
-			@FormatWith(EnumFormatter.class) BuiltinContainerExtractor value,
-			String name);
-
 	@Message(id = ID_OFFSET_2 + 43, value = "Error creating URL from String '%1$s'.")
 	SearchException malformedURL(String value, @Cause MalformedURLException e);
 
@@ -415,13 +405,6 @@ public interface Log extends BasicLogger {
 					+ " or leave the 'extractor' list to its default, empty value to disable extraction."
 	)
 	SearchException cannotReferenceExtractorsWhenExtractionDisabled();
-
-	@Message(id = ID_OFFSET_2 + 52,
-			value = "Annotation @ContainerExtractorRef is empty."
-					+ " The annotation must define either the built-in extractor (using 'value') "
-					+ " or an explicit type (using 'type')."
-	)
-	SearchException emptyContainerExtractorRef();
 
 	@Message(id = ID_OFFSET_2 + 53,
 			value = "Cannot resolve container extractor name '%1$s'."

@@ -36,7 +36,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
@@ -300,33 +299,10 @@ class AnnotationProcessorHelper {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	private ContainerExtractorPath toExtractorPath(ContainerExtractorRef[] extractors) {
 		List<String> explicitExtractorNames = new ArrayList<>();
 		for ( ContainerExtractorRef extractor : extractors ) {
-			BuiltinContainerExtractor builtin = extractor.value();
-			if ( BuiltinContainerExtractor.UNDEFINED.equals( builtin ) ) {
-				builtin = null;
-			}
-			String explicit = extractor.name();
-			if ( explicit.isEmpty() ) {
-				explicit = null;
-			}
-
-			if ( builtin != null && explicit != null ) {
-				throw log.invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitName(
-						builtin, explicit
-				);
-			}
-			else if ( builtin != null ) {
-				explicitExtractorNames.add( builtin.getName() );
-			}
-			else if ( explicit != null ) {
-				explicitExtractorNames.add( explicit );
-			}
-			else {
-				throw log.emptyContainerExtractorRef();
-			}
+			explicitExtractorNames.add( extractor.value() );
 		}
 
 		return ContainerExtractorPath.explicitExtractors( explicitExtractorNames );

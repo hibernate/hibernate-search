@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -170,22 +169,7 @@ public abstract class PojoModelPath {
 		/**
 		 * Append to the path a value extraction using the given container extractor.
 		 * <p>
-		 * Multiple {@link #value(BuiltinContainerExtractor)} or {@link #value(String)}
-		 * calls can be chained to apply multiple extractors.
-		 *
-		 * @param extractor The container extractor to apply, as a {@link BuiltinContainerExtractor}.
-		 * @return {@code this}, for method chaining.
-		 * @throws org.hibernate.search.util.common.SearchException If no property name was previously given.
-		 */
-		public Builder value(BuiltinContainerExtractor extractor) {
-			return value( extractor.getName() );
-		}
-
-		/**
-		 * Append to the path a value extraction using the given container extractor.
-		 * <p>
-		 * Multiple {@link #value(BuiltinContainerExtractor)} or {@link #value(String)}
-		 * calls can be chained to apply multiple extractors.
+		 * Multiple {@link #value(String)} calls can be chained to apply multiple extractors.
 		 *
 		 * @param extractorName The name of the container extractor to apply.
 		 * @return {@code this}, for method chaining.

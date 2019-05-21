@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
-
 /**
  * ContainerExtractorPath represents a list of container extractors to be applied to a property.
  * <p>
@@ -68,14 +66,6 @@ public class ContainerExtractorPath {
 				false,
 				Collections.singletonList( extractorName )
 		);
-	}
-
-	/**
-	 * @param extractorType A container extractor referenced by its type.
-	 * @return A path that will apply the referenced container extractor.
-	 */
-	public static ContainerExtractorPath explicitExtractor(BuiltinContainerExtractor extractorType) {
-		return explicitExtractor( extractorType.getName() );
 	}
 
 	/**
