@@ -14,19 +14,26 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
+import org.hibernate.boot.registry.BootstrapServiceRegistry;
+import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.boot.registry.classloading.internal.TcclLookupPrecedence;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.service.ServiceRegistry;
 
 public final class SimpleSessionFactoryBuilder {
-	private final StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
+	private final List<Consumer<BootstrapServiceRegistryBuilder>> bootstrapServiceRegistryBuilderContributors = new ArrayList<>();
+	private final List<Consumer<StandardServiceRegistryBuilder>> serviceRegistryBuilderContributors = new ArrayList<>();
 	private final List<Consumer<MetadataSources>> metadataSourcesContributors = new ArrayList<>();
 	private final List<Consumer<SessionFactoryBuilder>> sessionFactoryBuilderContributors = new ArrayList<>();
 
+	public SimpleSessionFactoryBuilder setTcclLookupPrecedence(TcclLookupPrecedence tcclLookupPrecedence) {
+		return onBootstraServiceRegistryBuilder( builder -> builder.applyTcclLookupPrecedence( tcclLookupPrecedence ) );
+	}
+
 	public SimpleSessionFactoryBuilder setProperty(String key, Object value) {
-		registryBuilder.applySetting( key, value );
-		return this;
+		return onServiceRegistryBuilder( builder -> builder.applySetting( key, value ) );
 	}
 
 	public SimpleSessionFactoryBuilder addAnnotatedClass(Class<?> clazz) {
@@ -41,8 +48,13 @@ public final class SimpleSessionFactoryBuilder {
 		return onMetadataSources( sources -> classes.forEach( sources::addAnnotatedClass ) );
 	}
 
+	public SimpleSessionFactoryBuilder onBootstraServiceRegistryBuilder(Consumer<BootstrapServiceRegistryBuilder> contributor) {
+		bootstrapServiceRegistryBuilderContributors.add( contributor );
+		return this;
+	}
+
 	public SimpleSessionFactoryBuilder onServiceRegistryBuilder(Consumer<StandardServiceRegistryBuilder> contributor) {
-		contributor.accept( registryBuilder );
+		serviceRegistryBuilderContributors.add( contributor );
 		return this;
 	}
 
@@ -57,11 +69,18 @@ public final class SimpleSessionFactoryBuilder {
 	}
 
 	public SessionFactory build() {
+		BootstrapServiceRegistry bootstrapServiceRegistry = null;
 		ServiceRegistry serviceRegistry = null;
 		MetadataSources metadataSources;
 		SessionFactoryBuilder sessionFactoryBuilder;
 
 		try {
+			BootstrapServiceRegistryBuilder bootstrapServiceRegistryBuilder = new BootstrapServiceRegistryBuilder();
+			bootstrapServiceRegistryBuilderContributors.forEach( c -> c.accept( bootstrapServiceRegistryBuilder ) );
+			bootstrapServiceRegistry = bootstrapServiceRegistryBuilder.build();
+
+			StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder( bootstrapServiceRegistry );
+			serviceRegistryBuilderContributors.forEach( c -> c.accept( registryBuilder ) );
 			serviceRegistry = registryBuilder.build();
 
 			metadataSources = new MetadataSources( serviceRegistry );
@@ -74,7 +93,9 @@ public final class SimpleSessionFactoryBuilder {
 			return sessionFactoryBuilder.build();
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e ).push( ServiceRegistry::close, serviceRegistry );
+			new SuppressingCloser( e )
+					.push( bootstrapServiceRegistry )
+					.push( serviceRegistry );
 			throw e;
 		}
 	}

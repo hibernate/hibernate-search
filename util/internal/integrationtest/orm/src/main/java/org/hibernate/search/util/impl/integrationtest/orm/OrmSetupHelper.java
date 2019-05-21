@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.classloading.internal.TcclLookupPrecedence;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
@@ -45,6 +46,11 @@ public final class OrmSetupHelper
 		SetupContext() {
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
+		}
+
+		public SetupContext withTcclLookupPrecedence(TcclLookupPrecedence tcclLookupPrecedence) {
+			withConfiguration( builder -> builder.setTcclLookupPrecedence( tcclLookupPrecedence ) );
+			return thisAsC();
 		}
 
 		@Override
