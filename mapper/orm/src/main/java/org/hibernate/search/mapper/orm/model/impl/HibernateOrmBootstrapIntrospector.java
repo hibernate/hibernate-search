@@ -149,7 +149,7 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	 * Also, this cache allows to not care at all about implementing equals and hashcode,
 	 * since type models are presumably instantiated only once per type.
 	 *
-	 * @see HibernateOrmRawTypeModel#propertyModelCache
+	 * See also HibernateOrmRawTypeModel#propertyModelCache
 	 */
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
