@@ -30,7 +30,7 @@ public @interface AssociationInverseSide {
 	 * allowing the definition of the inverse side of an association modeled by container elements.
 	 * This is useful when the property is of container type,
 	 * for example a {@code Map<EntityA, EntityB>}:
-	 * defining the extraction as {@code @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))}
+	 * defining the extraction as {@code @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)}
 	 * allows referring to the association modeled by the map keys instead of the one modeled by the map values.
 	 * By default, Hibernate Search will try to apply a set of extractors for common container types.
 	 * @see ContainerExtraction

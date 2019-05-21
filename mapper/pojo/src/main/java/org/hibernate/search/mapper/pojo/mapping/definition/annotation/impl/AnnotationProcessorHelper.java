@@ -8,8 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -39,7 +38,6 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
@@ -78,7 +76,7 @@ class AnnotationProcessorHelper {
 
 	ContainerExtractorPath getExtractorPath(ContainerExtraction extraction) {
 		ContainerExtract extract = extraction.extract();
-		ContainerExtractorRef[] extractors = extraction.value();
+		String[] extractors = extraction.value();
 		switch ( extract ) {
 			case NO:
 				if ( extractors.length != 0 ) {
@@ -90,7 +88,7 @@ class AnnotationProcessorHelper {
 					return ContainerExtractorPath.defaultExtractors();
 				}
 				else {
-					return toExtractorPath( extractors );
+					return ContainerExtractorPath.explicitExtractors( Arrays.asList( extractors ) );
 				}
 			default:
 				throw new AssertionFailure(
@@ -299,12 +297,4 @@ class AnnotationProcessorHelper {
 		}
 	}
 
-	private ContainerExtractorPath toExtractorPath(ContainerExtractorRef[] extractors) {
-		List<String> explicitExtractorNames = new ArrayList<>();
-		for ( ContainerExtractorRef extractor : extractors ) {
-			explicitExtractorNames.add( extractor.value() );
-		}
-
-		return ContainerExtractorPath.explicitExtractors( explicitExtractorNames );
-	}
 }
