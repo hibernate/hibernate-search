@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -41,6 +42,8 @@ public class DefaultDecimalScaleMappingIT {
 				.field( "notDecimal", Integer.class )
 				.field( "general", BigDecimal.class, f -> f.defaultDecimalScale( 3 ) )
 				.field( "both", BigDecimal.class, f -> f.defaultDecimalScale( 3 ).decimalScale( 2 ) )
+				.field( "generalInteger", BigInteger.class, f -> f.defaultDecimalScale( -3 ) )
+				.field( "bothInteger", BigInteger.class, f -> f.defaultDecimalScale( -3 ).decimalScale( -2 ) )
 		);
 
 		ormSetupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
@@ -90,5 +93,13 @@ public class DefaultDecimalScaleMappingIT {
 		// Only use two digits after the dot in the full-text index
 		@Column(precision = 14, scale = 3)
 		private BigDecimal both;
+
+		@GenericField
+		@Column(precision = 14, scale = -3)
+		private BigInteger generalInteger;
+
+		@ScaledNumberField(decimalScale = -2)
+		@Column(precision = 14, scale = -3)
+		private BigInteger bothInteger;
 	}
 }

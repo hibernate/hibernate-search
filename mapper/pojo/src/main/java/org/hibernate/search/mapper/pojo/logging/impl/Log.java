@@ -400,7 +400,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 51,
 			value = "This property is mapped to a scaled number field,"
-					+ " but with a value bridge that creates a non-BigDecimal or otherwise incompatible field."
+					+ " but with a value bridge that creates neither a BigDecimal nor a BigInteger field."
 					+ " Make sure to use a compatible bridge."
 					+ " Details: the value bridge's bind() method returned context '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."

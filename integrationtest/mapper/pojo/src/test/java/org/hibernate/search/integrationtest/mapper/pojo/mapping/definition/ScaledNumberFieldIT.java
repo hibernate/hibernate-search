@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
@@ -38,7 +39,7 @@ public class ScaledNumberFieldIT {
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
 
 	@Test
-	public void validDecimalScales() {
+	public void validDecimalScales_bigDecimals() {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -78,6 +79,46 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
+	public void validDecimalScales_bigIntegers() {
+
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			BigInteger scaled;
+			BigInteger unscaled;
+			BigInteger defaultScaled;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@ScaledNumberField(decimalScale = 7)
+			public BigInteger getScaled() {
+				return scaled;
+			}
+
+			@ScaledNumberField(decimalScale = 0)
+			public BigInteger getUnscaled() {
+				return unscaled;
+			}
+
+			@ScaledNumberField
+			public BigInteger getDefaultScaled() {
+				return defaultScaled;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "scaled", BigInteger.class, f -> f.decimalScale( 7 ) )
+				.field( "unscaled", BigInteger.class, f -> f.decimalScale( 0 ) )
+				.field( "defaultScaled", BigInteger.class )
+		);
+		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	public void invalidFieldType() {
 
 		@Indexed(index = INDEX_NAME)
@@ -105,7 +146,7 @@ public class ScaledNumberFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".notScalable" )
 						.failure(
-								"This property is mapped to a scaled number field, but with a value bridge that creates a non-BigDecimal or otherwise incompatible field",
+								"This property is mapped to a scaled number field, but with a value bridge that creates neither a BigDecimal nor a BigInteger field.",
 								"bind() method returned context '",
 								"expected '" + ScaledNumberIndexFieldTypeContext.class.getName() + "'"
 						)
@@ -193,7 +234,7 @@ public class ScaledNumberFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".scaled" )
 						.failure(
-								"This property is mapped to a scaled number field, but with a value bridge that creates a non-BigDecimal or otherwise incompatible field",
+								"This property is mapped to a scaled number field, but with a value bridge that creates neither a BigDecimal nor a BigInteger field.",
 								"bind() method returned context '",
 								"expected '" + ScaledNumberIndexFieldTypeContext.class.getName() + "'"
 						)
