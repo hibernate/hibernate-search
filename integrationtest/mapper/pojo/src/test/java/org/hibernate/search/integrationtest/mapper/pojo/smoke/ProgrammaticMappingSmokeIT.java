@@ -27,7 +27,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -200,7 +200,7 @@ public class ProgrammaticMappingSmokeIT {
 									.associationInverseSide(
 											PojoModelPath.ofValue( "embeddingAsMap" )
 									)
-									.genericField( "embeddedMapKeys" ).withExtractor( BuiltinContainerExtractor.MAP_KEY )
+									.genericField( "embeddedMapKeys" ).withExtractor( BuiltinContainerExtractors.MAP_KEY )
 									.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 				} )
 				.setup();

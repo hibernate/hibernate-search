@@ -14,7 +14,6 @@ import java.util.Deque;
 import java.util.function.Consumer;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -61,17 +60,17 @@ public class PojoModelPathTest {
 
 	@Test
 	public void ofValue_propertyAndContainerExtractorPath() {
-		assertThat( PojoModelPath.ofValue( "foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractor.MAP_KEY ) ) )
+		assertThat( PojoModelPath.ofValue( "foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) ) )
 				.satisfies( isPath( "foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) ) );
 
 		SubTest.expectException(
-				() -> PojoModelPath.ofValue( null, ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractor.MAP_KEY ) )
+				() -> PojoModelPath.ofValue( null, ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) )
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 
 		SubTest.expectException(
-				() -> PojoModelPath.ofValue( "", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractor.MAP_KEY ) )
+				() -> PojoModelPath.ofValue( "", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) )
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
@@ -124,7 +123,7 @@ public class PojoModelPathTest {
 	@Test
 	public void builder() {
 		PojoModelPath.Builder builder = PojoModelPath.builder();
-		builder.property( "foo" ).value( BuiltinContainerExtractor.COLLECTION )
+		builder.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
 				.property( "bar" ).valueWithoutExtractors()
 				.property( "fubar" ).valueWithDefaultExtractors()
 				.property( "other" ).value( BuiltinContainerExtractors.MAP_KEY )
@@ -147,8 +146,8 @@ public class PojoModelPathTest {
 				) );
 
 		builder = PojoModelPath.builder();
-		builder.property( "foo" ).value( BuiltinContainerExtractor.COLLECTION )
-				.property( "bar" ).value( BuiltinContainerExtractor.MAP_KEY );
+		builder.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+				.property( "bar" ).value( BuiltinContainerExtractors.MAP_KEY );
 		assertThat( builder.toPropertyPath() )
 				.satisfies( isPath(
 						"foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
@@ -159,7 +158,7 @@ public class PojoModelPathTest {
 	@Test
 	public void builder_missingContainerExtractorPath_middle() {
 		PojoModelPath.Builder builder = PojoModelPath.builder();
-		builder.property( "foo" ).property( "bar" ).value( BuiltinContainerExtractor.MAP_KEY );
+		builder.property( "foo" ).property( "bar" ).value( BuiltinContainerExtractors.MAP_KEY );
 		assertThat( builder.toValuePath() )
 				.satisfies( isPath(
 						"foo", ContainerExtractorPath.defaultExtractors(),
@@ -170,7 +169,7 @@ public class PojoModelPathTest {
 	@Test
 	public void builder_missingContainerExtractorPath_end() {
 		PojoModelPath.Builder builder = PojoModelPath.builder();
-		builder.property( "foo" ).value( BuiltinContainerExtractor.COLLECTION ).property( "bar" );
+		builder.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION ).property( "bar" );
 		assertThat( builder.toValuePath() )
 				.satisfies( isPath(
 						"foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
@@ -178,7 +177,7 @@ public class PojoModelPathTest {
 				) );
 
 		builder = PojoModelPath.builder();
-		builder.property( "foo" ).value( BuiltinContainerExtractor.COLLECTION ).property( "bar" );
+		builder.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION ).property( "bar" );
 		assertThat( builder.toPropertyPath() )
 				.satisfies( isPath(
 						"foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
@@ -209,7 +208,7 @@ public class PojoModelPathTest {
 				.hasMessageContaining( errorMessage );
 
 		SubTest.expectException(
-				() -> PojoModelPath.builder().value( BuiltinContainerExtractor.COLLECTION )
+				() -> PojoModelPath.builder().value( BuiltinContainerExtractors.COLLECTION )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -233,8 +232,8 @@ public class PojoModelPathTest {
 	@Test
 	public void builder_chainedContainerExtractors() {
 		PojoModelPath.Builder builder = PojoModelPath.builder();
-		builder.property( "foo" ).value( BuiltinContainerExtractor.COLLECTION ).value( BuiltinContainerExtractor.ITERABLE )
-				.property( "bar" ).value( BuiltinContainerExtractor.MAP_KEY );
+		builder.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION ).value( BuiltinContainerExtractors.ITERABLE )
+				.property( "bar" ).value( BuiltinContainerExtractors.MAP_KEY );
 		assertThat( builder.toValuePath() )
 				.satisfies( isPath(
 						"foo",
@@ -259,7 +258,7 @@ public class PojoModelPathTest {
 
 		SubTest.expectException(
 				() -> PojoModelPath.builder().property( "foo" )
-						.value( BuiltinContainerExtractor.COLLECTION ).valueWithDefaultExtractors()
+						.value( BuiltinContainerExtractors.COLLECTION ).valueWithDefaultExtractors()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -267,7 +266,7 @@ public class PojoModelPathTest {
 
 		SubTest.expectException(
 				() -> PojoModelPath.builder().property( "foo" )
-						.valueWithDefaultExtractors().value( BuiltinContainerExtractor.COLLECTION )
+						.valueWithDefaultExtractors().value( BuiltinContainerExtractors.COLLECTION )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 
 /**
  * @author Yoann Rodiere
@@ -21,14 +20,6 @@ public interface AssociationInverseSideMappingContext extends PropertyMappingCon
 	 */
 	default AssociationInverseSideMappingContext withExtractor(String extractorName) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
-	}
-
-	/**
-	 * @param extractorType The type of container extractor to use.
-	 * @return {@code this}, for method chaining.
-	 */
-	default AssociationInverseSideMappingContext withExtractor(BuiltinContainerExtractor extractorType) {
-		return withExtractor( extractorType.getName() );
 	}
 
 	/**

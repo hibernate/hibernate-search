@@ -16,9 +16,9 @@ import java.lang.annotation.Target;
  * allowing reference to a specific value of a container property.
  * <p>
  * For instance, on a property of type {@code Map<EntityA, EntityB>},
- * {@code @ContainerExtraction(@ContainerExtractor(BuiltinContainerExtractor.MAP_KEY))}
+ * {@code @ContainerExtraction(@ContainerExtractor(BuiltinContainerExtractors.MAP_KEY))}
  * would point to the map keys (of type {@code EntityA}),
- * while {@code @ContainerExtraction(@ContainerExtractor(BuiltinContainerExtractor.MAP_VALUE))}
+ * while {@code @ContainerExtraction(@ContainerExtractor(BuiltinContainerExtractors.MAP_VALUE))}
  * would point to the map values (of type {@code EntityB}).
  * <p>
  * By default, if no attributes are set on this annotation,

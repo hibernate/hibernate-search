@@ -26,7 +26,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
@@ -286,7 +286,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
-				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
+				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))
 		)
 		private Map<ContainedEntity, String> containedIndexedEmbedded = new LinkedHashMap<>();
 
@@ -310,11 +310,11 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
-				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
+				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))
 		)
 		@IndexingDependency(
 				reindexOnUpdate = ReindexOnUpdate.NO,
-				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
+				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))
 		)
 		private Map<ContainedEntity, String> containedIndexedEmbeddedNoReindexOnUpdate = new LinkedHashMap<>();
 
@@ -392,14 +392,14 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				@ObjectPath({
 						@PropertyValue(
 								propertyName = "containedUsedInCrossEntityDerivedProperty",
-								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
+								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))
 						),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField1")
 				}),
 				@ObjectPath({
 						@PropertyValue(
 								propertyName = "containedUsedInCrossEntityDerivedProperty",
-								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
+								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))
 						),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField2")
 				})
@@ -440,7 +440,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				inversePath = @ObjectPath(
 						@PropertyValue(
 								propertyName = "containedIndexedEmbedded",
-								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
+								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))
 						)
 				)
 		)
@@ -464,7 +464,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				inversePath = @ObjectPath(
 						@PropertyValue(
 								propertyName = "containedIndexedEmbeddedNoReindexOnUpdate",
-								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
+								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))
 						)
 				)
 		)
@@ -479,7 +479,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				inversePath = @ObjectPath(
 						@PropertyValue(
 								propertyName = "containedUsedInCrossEntityDerivedProperty",
-								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
+								extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))
 						)
 				)
 		)

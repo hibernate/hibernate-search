@@ -34,7 +34,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -513,7 +513,7 @@ public class AnnotationMappingSmokeIT {
 		@IndexedEmbedded(includePaths = "embedded.prefix_myLocalDateField")
 		@GenericField(
 				name = "embeddedMapKeys",
-				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractor.MAP_KEY))
+				extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))
 		)
 		public Map<String, IndexedEntity> getEmbeddedMap() {
 			return embeddedMap;

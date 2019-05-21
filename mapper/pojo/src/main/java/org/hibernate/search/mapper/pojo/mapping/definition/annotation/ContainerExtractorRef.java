@@ -11,8 +11,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
-
 /**
  * @author Yoann Rodiere
  */
@@ -21,9 +19,6 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtrac
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ContainerExtractorRef {
 
-	@SuppressWarnings("deprecation")
-	BuiltinContainerExtractor value() default BuiltinContainerExtractor.UNDEFINED;
-
-	String name() default "";
+	String value();
 
 }
