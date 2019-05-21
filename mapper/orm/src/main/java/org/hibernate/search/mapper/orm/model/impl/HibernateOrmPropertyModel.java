@@ -99,7 +99,7 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 	public PropertyHandle<T> getHandle() {
 		if ( handle == null ) {
 			try {
-				handle = (PropertyHandle<T>) introspector.createPropertyHandle( name, member );
+				handle = (PropertyHandle<T>) introspector.createPropertyHandle( name, member, ormPropertyMetadata );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );
