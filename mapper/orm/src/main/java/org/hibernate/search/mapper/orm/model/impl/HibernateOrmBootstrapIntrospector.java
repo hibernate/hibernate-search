@@ -30,6 +30,8 @@ import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.boot.Metadata;
+import org.hibernate.bytecode.enhance.spi.EnhancerConstants;
+import org.hibernate.engine.spi.PersistentAttributeInterceptable;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.IndexedCollection;
 import org.hibernate.mapping.PersistentClass;
@@ -232,7 +234,8 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 				.filter( annotation -> annotationHelper.isMetaAnnotated( annotation, metaAnnotationType ) );
 	}
 
-	PropertyHandle<?> createPropertyHandle(String name, Member member) throws IllegalAccessException {
+	PropertyHandle<?> createPropertyHandle(String name, Member member,
+			HibernateOrmBasicPropertyMetadata ormPropertyMetadata) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			setAccessible( method );
@@ -240,6 +243,14 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 		}
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
+			if ( ormPropertyMetadata != null && !ormPropertyMetadata.isId() ) {
+				Method bytecodeEnhancerReaderMethod = getBytecodeEnhancerReaderMethod( field );
+				if ( bytecodeEnhancerReaderMethod != null ) {
+					setAccessible( bytecodeEnhancerReaderMethod );
+					return propertyHandleFactory.createForMethod( name, bytecodeEnhancerReaderMethod );
+				}
+			}
+
 			setAccessible( field );
 			return propertyHandleFactory.createForField( name, field );
 		}
@@ -277,6 +288,31 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 			if ( !Modifier.isPublic( ( (Member) member ).getModifiers() ) ) {
 				throw se;
 			}
+		}
+	}
+
+	/**
+	 * @param field A member field from the Hibernate metamodel or from a XProperty.
+	 * @return A method generated through bytecode enhancement that triggers lazy-loading before returning the member's value,
+	 * or {@code null} if there is no such method.
+	 */
+	private static Method getBytecodeEnhancerReaderMethod(Field field) {
+		Class<?> declaringClass = field.getDeclaringClass();
+
+		if ( !PersistentAttributeInterceptable.class.isAssignableFrom( declaringClass ) ) {
+			// The declaring class is not enhanced, the only way to access the field is to read it directly.
+			return null;
+		}
+
+		/*
+		 * The declaring class is enhanced.
+		 * Use the "magic" methods that trigger lazy loading instead of accessing the field directly.
+		 */
+		try {
+			return declaringClass.getDeclaredMethod( EnhancerConstants.PERSISTENT_FIELD_READER_PREFIX + field.getName() );
+		}
+		catch (NoSuchMethodException e) {
+			throw new AssertionFailure( "Read method for enhanced field " + field + " is unexpectedly missing.", e );
 		}
 	}
 }
