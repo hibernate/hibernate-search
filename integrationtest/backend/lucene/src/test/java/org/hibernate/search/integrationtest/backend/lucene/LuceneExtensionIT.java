@@ -196,12 +196,12 @@ public class LuceneExtensionIT {
 
 		// Matching document
 		Assertions.assertThat( query.explain( FIRST_ID ) )
-				.extracting( Object::toString ).first().asString()
+				.extracting( Object::toString ).asString()
 				.contains( LuceneFields.idFieldName() );
 
 		// Non-matching document
 		Assertions.assertThat( query.explain( FIFTH_ID ) )
-				.extracting( Object::toString ).first().asString()
+				.extracting( Object::toString ).asString()
 				.contains( LuceneFields.idFieldName() );
 	}
 
@@ -234,12 +234,12 @@ public class LuceneExtensionIT {
 
 		// Matching document
 		Assertions.assertThat( query.explain( INDEX_NAME, FIRST_ID ) )
-				.extracting( Object::toString ).first().asString()
+				.extracting( Object::toString ).asString()
 				.contains( LuceneFields.idFieldName() );
 
 		// Non-matching document
 		Assertions.assertThat( query.explain( INDEX_NAME, FIFTH_ID ) )
-				.extracting( Object::toString ).first().asString()
+				.extracting( Object::toString ).asString()
 				.contains( LuceneFields.idFieldName() );
 	}
 
@@ -631,7 +631,7 @@ public class LuceneExtensionIT {
 		Assertions.assertThat( result ).hasSize( 1 );
 		Assertions.assertThat( result.get( 0 ) )
 				.isInstanceOf( Explanation.class )
-				.extracting( Object::toString ).first().asString()
+				.extracting( Object::toString ).asString()
 				.contains( LuceneFields.idFieldName() );
 	}
 

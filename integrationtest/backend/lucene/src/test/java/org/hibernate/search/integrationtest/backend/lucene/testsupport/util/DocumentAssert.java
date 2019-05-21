@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
@@ -23,7 +24,6 @@ import org.apache.lucene.util.BytesRef;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.assertj.core.api.ListAssert;
-import org.assertj.core.api.iterable.Extractor;
 
 public class DocumentAssert {
 	private static final String INTERNAL_FIELDS_PREFIX = "__HSEARCH_";
@@ -92,7 +92,7 @@ public class DocumentAssert {
 		asFields()
 				.areAtLeastOne( new Condition<>( predicate, fieldDescription ) )
 				.filteredOn( predicate )
-				.extracting( (Extractor<IndexableField, Object>) f -> {
+				.extracting( (Function<IndexableField, Object>) f -> {
 					// We can't just return everything and then exclude nulls,
 					// since .stringValue() converts a number to a string automatically...
 					Number number = f.numericValue();
@@ -111,7 +111,7 @@ public class DocumentAssert {
 				} )
 				.filteredOn( Objects::nonNull )
 				.as( fieldDescription )
-				.containsExactlyInAnyOrder( values );
+				.containsExactlyInAnyOrder( (Object[]) values );
 		allCheckedPaths.add( absoluteFieldPath );
 		return this;
 	}
