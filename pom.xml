@@ -227,7 +227,7 @@
         <version.junit>4.12</version.junit>
         <version.org.easymock>4.0.1</version.org.easymock>
         <version.org.unitils>3.4.6</version.org.unitils>
-        <version.org.assertj.assertj-core>3.9.1</version.org.assertj.assertj-core>
+        <version.org.assertj.assertj-core>3.12.2</version.org.assertj.assertj-core>
         <version.org.skyscreamer.jsonassert>1.2.3</version.org.skyscreamer.jsonassert>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
         <version.com.h2database>1.4.178</version.com.h2database>
