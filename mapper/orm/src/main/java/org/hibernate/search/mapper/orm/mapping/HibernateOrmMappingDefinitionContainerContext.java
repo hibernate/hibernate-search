@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping;
 
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 
@@ -14,5 +15,7 @@ public interface HibernateOrmMappingDefinitionContainerContext {
 	ProgrammaticMappingDefinitionContext programmaticMapping();
 
 	AnnotationMappingDefinitionContext annotationMapping();
+
+	ContainerExtractorDefinitionContext containerExtractors();
 
 }

@@ -15,6 +15,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorDefinitionContext;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
@@ -34,6 +36,8 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 
 	private final AnnotationMappingDefinitionContextImpl annotationMappingDefinition;
 
+	private final ContainerExtractorRegistry.Builder containerExtractorRegistryBuilder;
+
 	private final List<PojoMappingConfigurationContributor> delegates = new ArrayList<>();
 
 	protected AbstractPojoMappingInitiator(PojoMappingFactory<MPBS> mappingFactory,
@@ -50,6 +54,8 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		 */
 		annotationMappingDefinition = new AnnotationMappingDefinitionContextImpl( introspector );
 		addConfigurationContributor( annotationMappingDefinition );
+
+		containerExtractorRegistryBuilder = ContainerExtractorRegistry.builder();
 	}
 
 	public ProgrammaticMappingDefinitionContext programmaticMapping() {
@@ -60,6 +66,10 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 
 	public AnnotationMappingDefinitionContext annotationMapping() {
 		return annotationMappingDefinition;
+	}
+
+	public ContainerExtractorDefinitionContext containerExtractors() {
+		return containerExtractorRegistryBuilder;
 	}
 
 	public void setImplicitProvidedId(boolean implicitProvidedId) {
@@ -90,7 +100,10 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider) {
 		return new PojoMapper<>(
 				buildContext, contributorProvider,
-				introspector, implicitProvidedId, mappingFactory::createMapping
+				introspector,
+				containerExtractorRegistryBuilder.build(),
+				implicitProvidedId,
+				mappingFactory::createMapping
 		);
 	}
 

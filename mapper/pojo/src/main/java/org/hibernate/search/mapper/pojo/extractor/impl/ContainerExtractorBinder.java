@@ -19,14 +19,8 @@ import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.ArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.IterableElementExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.MapValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalDoubleValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalIntValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalLongValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.ExtractingTypePatternMatcher;
@@ -67,9 +61,8 @@ public class ContainerExtractorBinder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	// TODO add an extension point to override the builtin extractors, or at least to add defaults for other types
-
 	private final BeanProvider beanProvider;
+	private final ContainerExtractorRegistry containerExtractorRegistry;
 	private final TypePatternMatcherFactory typePatternMatcherFactory;
 	private final FirstMatchingExtractorContributor firstMatchingExtractorContributor =
 			new FirstMatchingExtractorContributor();
@@ -78,17 +71,14 @@ public class ContainerExtractorBinder {
 			new HashMap<>();
 
 	public ContainerExtractorBinder(MappingBuildContext buildContext,
+			ContainerExtractorRegistry containerExtractorRegistry,
 			TypePatternMatcherFactory typePatternMatcherFactory) {
 		this.beanProvider = buildContext.getBeanProvider();
+		this.containerExtractorRegistry = containerExtractorRegistry;
 		this.typePatternMatcherFactory = typePatternMatcherFactory;
-		addDefaultExtractor( MapValueExtractor.class );
-		addDefaultExtractor( CollectionElementExtractor.class );
-		addDefaultExtractor( IterableElementExtractor.class );
-		addDefaultExtractor( OptionalValueExtractor.class );
-		addDefaultExtractor( OptionalIntValueExtractor.class );
-		addDefaultExtractor( OptionalLongValueExtractor.class );
-		addDefaultExtractor( OptionalDoubleValueExtractor.class );
-		addDefaultExtractor( ArrayElementExtractor.class );
+		for ( Class<? extends ContainerExtractor> defaultExtractor : containerExtractorRegistry.getDefaults() ) {
+			addDefaultExtractor( defaultExtractor );
+		}
 	}
 
 	/**

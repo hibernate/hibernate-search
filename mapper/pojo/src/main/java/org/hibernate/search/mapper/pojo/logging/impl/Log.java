@@ -421,4 +421,13 @@ public interface Log extends BasicLogger {
 					+ " or an explicit type (using 'type')."
 	)
 	SearchException emptyContainerExtractorRef();
+
+	@Message(id = ID_OFFSET_2 + 53,
+			value = "Cannot resolve container extractor name '%1$s'."
+					+ " Check that this name matches a container extractor,"
+					+ " either a builtin one whose name is a constant in '%2$s'"
+					+ " or a custom one that was properly registered."
+	)
+	SearchException cannotResolveContainerExtractorName(String extractorName,
+			@FormatWith(ClassFormatter.class) Class<?> builtinExtractorConstantsClass);
 }
