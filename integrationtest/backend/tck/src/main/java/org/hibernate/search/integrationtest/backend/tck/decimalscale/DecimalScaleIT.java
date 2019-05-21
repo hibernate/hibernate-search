@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -35,14 +36,18 @@ public class DecimalScaleIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private ScaleIndexMapping scaleIndexMapping;
-	private DefaultScaleIndexMapping defaultScaleIndexMapping;
-	private BothScaleIndexMapping bothScaleIndexMapping;
+	private DecimalScaleIndexMapping decimalScaleIndexMapping;
+	private DefaultDecimalScaleIndexMapping defaultDecimalScaleIndexMapping;
+	private BothDecimalScaleIndexMapping bothDecimalScaleIndexMapping;
+
+	private IntegerScaleIndexMapping integerScaleIndexMapping;
+	private DefaultIntegerScaleIndexMapping defaultIntegerScaleIndexMapping;
+	private BothIntegerScaleIndexMapping bothIntegerScaleIndexMapping;
 
 	private StubMappingIndexManager indexManager;
 
 	@Test
-	public void noDecimalScale() {
+	public void noDecimalScale_bigDecimal() {
 		SubTest.expectException( () ->
 				setupHelper.withDefaultConfiguration()
 						.withIndex( INDEX_NAME, ctx -> ctx.getSchemaElement().field( "noScaled", f -> f.asBigDecimal() ).toReference() )
@@ -53,65 +58,123 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale() {
+	public void noDecimalScale_bigInteger() {
+		SubTest.expectException( () ->
+				setupHelper.withDefaultConfiguration()
+						.withIndex( INDEX_NAME, ctx -> ctx.getSchemaElement().field( "noScaled", f -> f.asBigInteger() ).toReference() )
+						.setup()
+		).assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Impossible to detect a decimal scale to use for this field." );
+	}
+
+	@Test
+	public void positiveDecimalScale_bigInteger() {
+		SubTest.expectException( () ->
+				setupHelper.withDefaultConfiguration()
+						.withIndex( INDEX_NAME, ctx -> ctx.getSchemaElement().field( "positiveScaled", f -> f.asBigInteger().decimalScale( 3 ) ).toReference() )
+						.setup()
+		).assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Positive decimal scale ['3'] is not allowed for BigInteger fields" );
+	}
+
+	@Test
+	public void decimalScale_bigDecimal() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.scaleIndexMapping = new ScaleIndexMapping( ctx.getSchemaElement(), 3 ),
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 3 ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( scaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
 		workPlan.execute().join();
 
 		// decimal scale is 3, affecting the search precision
 		// so the provided value 739.11111 will be treated as if it were 739.111
-		matchAbove( "739.11" );
-		doNotMatchAbove( "739.111" );
+		matchAbove( new BigDecimal( "739.11" ) );
+		doNotMatchAbove( new BigDecimal( "739.111" ) );
 	}
 
 	@Test
-	public void decimalScale_zeroScale() {
+	public void decimalScale_zeroScale_bigDecimal() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.scaleIndexMapping = new ScaleIndexMapping( ctx.getSchemaElement(), 0 ),
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( scaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
 		workPlan.execute().join();
 
 		// decimal scale is 0, affecting the search precision
 		// so the provided value 739.11111 will be treated as if it were 739
-		matchAbove( "738" );
-		doNotMatchAbove( "739" );
+		matchAbove( new BigDecimal( "738" ) );
+		doNotMatchAbove( new BigDecimal( "739" ) );
 	}
 
 	@Test
-	public void decimalScale_negativeScale() {
+	public void decimalScale_zeroScale_bigInteger() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.scaleIndexMapping = new ScaleIndexMapping( ctx.getSchemaElement(), -3 ),
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( scaleIndexMapping.scaled, new BigDecimal( "11111.11111" ) ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "739" ) ) );
+		workPlan.execute().join();
+
+		// decimal scale is 0, affecting the search precision
+		// so the provided value 739 will be treated as if it were 739
+		matchAbove( new BigInteger( "738" ) );
+		doNotMatchAbove( new BigInteger( "739" ) );
+	}
+
+	@Test
+	public void decimalScale_negativeScale_bigDecimal() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), -3 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "11111.11111" ) ) );
 		workPlan.execute().join();
 
 		// decimal scale is -3, affecting the search precision
 		// so the provided value 11111.11111 will be treated as if it were 11000
-		matchAbove( "10000" );
-		doNotMatchAbove( "11000" );
+		matchAbove( new BigDecimal( "10000" ) );
+		doNotMatchAbove( new BigDecimal( "11000" ) );
 	}
 
 	@Test
-	public void decimalScale_largeScale() {
+	public void decimalScale_negativeScale_bigInteger() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -3 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "11111" ) ) );
+		workPlan.execute().join();
+
+		// decimal scale is -3, affecting the search precision
+		// so the provided value 11111 will be treated as if it were 11000
+		matchAbove( new BigInteger( "10000" ) );
+		doNotMatchAbove( new BigInteger( "11000" ) );
+	}
+
+	@Test
+	public void decimalScale_largeScale_bigDecimal() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
 						// 16 seems the MAX here. A 17-bases similar test would fail for Elasticsearch. Lucene would work.
-						ctx -> this.scaleIndexMapping = new ScaleIndexMapping( ctx.getSchemaElement(), 16 ),
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 16 ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
@@ -121,26 +184,26 @@ public class DecimalScaleIT {
 		);
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( scaleIndexMapping.scaled, providedValue ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, providedValue ) );
 		workPlan.execute().join();
 
 		// decimal scale is 16, affecting the search precision
 		// so the provided value (20 decimals) will be treated as if it had 16 decimals
-		matchAbove(
+		matchAbove( new BigDecimal(
 				// 15 decimal ciphers
 				"1.111111111111111"
-		);
-		doNotMatchAbove(
+		) );
+		doNotMatchAbove( new BigDecimal(
 				// 16 decimal ciphers
 				"1.1111111111111111"
-		);
+		) );
 	}
 
 	@Test
-	public void decimalScale_negativeScale_largeScale() {
+	public void decimalScale_negativeScale_largeScale_bigDecimal() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.scaleIndexMapping = new ScaleIndexMapping( ctx.getSchemaElement(), -78 ),
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), -78 ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
@@ -149,48 +212,98 @@ public class DecimalScaleIT {
 		);
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( scaleIndexMapping.scaled, providedValue ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, providedValue ) );
 		workPlan.execute().join();
 
 		// decimal scale is -78, affecting the search precision
 		// so the provided value of 80 of 1 digits will be treated as if it had 2 of 1 digits followed by 78 of 0 digits
-		matchAbove(
+		matchAbove( new BigDecimal(
 				"10000000000000000000000000000000000000000000000000000000000000000000000000000000"
-		);
-		doNotMatchAbove(
+		) );
+		doNotMatchAbove( new BigDecimal(
 				"11000000000000000000000000000000000000000000000000000000000000000000000000000000"
-		);
+		) );
 	}
 
 	@Test
-	public void decimalScale_rounding() {
+	public void decimalScale_negativeScale_largeScale_bigInteger() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.scaleIndexMapping = new ScaleIndexMapping( ctx.getSchemaElement(), 2 ),
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -78 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		BigInteger providedValue = new BigInteger(
+				"11111111111111111111111111111111111111111111111111111111111111111111111111111111"
+		);
+
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, providedValue ) );
+		workPlan.execute().join();
+
+		// decimal scale is -78, affecting the search precision
+		// so the provided value of 80 of 1 digits will be treated as if it had 2 of 1 digits followed by 78 of 0 digits
+		matchAbove( new BigInteger(
+				"10000000000000000000000000000000000000000000000000000000000000000000000000000000"
+		) );
+		doNotMatchAbove( new BigInteger(
+				"11000000000000000000000000000000000000000000000000000000000000000000000000000000"
+		) );
+	}
+
+	@Test
+	public void decimalScale_rounding_bigDecimal() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 2 ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( scaleIndexMapping.scaled, new BigDecimal( "739.114999" ) ) );
-		workPlan.add( referenceProvider( "2" ), doc -> doc.addValue( scaleIndexMapping.scaled, new BigDecimal( "739.115" ) ) );
-		workPlan.add( referenceProvider( "3" ), doc -> doc.addValue( scaleIndexMapping.scaled, new BigDecimal( "739.11" ) ) );
-		workPlan.add( referenceProvider( "4" ), doc -> doc.addValue( scaleIndexMapping.scaled, new BigDecimal( "739.12" ) ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.114999" ) ) );
+		workPlan.add( referenceProvider( "2" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.115" ) ) );
+		workPlan.add( referenceProvider( "3" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.11" ) ) );
+		workPlan.add( referenceProvider( "4" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.12" ) ) );
 		workPlan.execute().join();
 
 		// RoundingMode.HALF_UP expected on both values:
-		match( "739.11", "1", "3" );
-		match( "739.12", "2", "4" );
+		match( new BigDecimal( "739.11" ), "1", "3" );
+		match( new BigDecimal( "739.12" ), "2", "4" );
 
 		// and parameters:
-		match( "739.114999", "1", "3" );
-		match( "739.115", "2", "4" );
+		match( new BigDecimal( "739.114999" ), "1", "3" );
+		match( new BigDecimal( "739.115" ), "2", "4" );
 	}
 
 	@Test
-	public void decimalScale_largeDecimal() {
+	public void decimalScale_rounding_bigInteger() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.scaleIndexMapping = new ScaleIndexMapping( ctx.getSchemaElement(), 0 ),
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -4 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "7394999" ) ) );
+		workPlan.add( referenceProvider( "2" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "7395000" ) ) );
+		workPlan.add( referenceProvider( "3" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "7390000" ) ) );
+		workPlan.add( referenceProvider( "4" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "7400000" ) ) );
+		workPlan.execute().join();
+
+		// RoundingMode.HALF_UP expected on both values:
+		match( new BigInteger( "7390000" ), "1", "3" );
+		match( new BigInteger( "7400000" ), "2", "4" );
+
+		// and parameters:
+		match( new BigInteger( "7394999" ), "1", "3" );
+		match( new BigInteger( "7395000" ), "2", "4" );
+	}
+
+	@Test
+	public void decimalScale_largeDecimal_bigDecimal() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
@@ -199,7 +312,7 @@ public class DecimalScaleIT {
 		BigDecimal largeDecimal = new BigDecimal( "2" ).pow( 53 );
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( scaleIndexMapping.scaled, largeDecimal ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, largeDecimal ) );
 		workPlan.execute().join();
 
 		// the precision is supposed to be preserved
@@ -208,10 +321,31 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale0() {
+	public void decimalScale_largeDecimal_bigInteger() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.scaleIndexMapping = new ScaleIndexMapping( ctx.getSchemaElement(), 0 ),
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), 0 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		// That seems a limit for ES. Even if new BigDecimal( "2" ).pow( 54 ) << Long.MAX_VALUE
+		// If the exponent were 54, the test would fail for Elasticsearch, whereas it would work for Lucene backend.
+		BigInteger largeInteger = new BigInteger( "2" ).pow( 53 );
+
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, largeInteger ) );
+		workPlan.execute().join();
+
+		// the precision is supposed to be preserved
+		matchAbove( largeInteger.subtract( BigInteger.ONE ) );
+		doNotMatchAbove( largeInteger );
+	}
+
+	@Test
+	public void decimalScale_tooLargeDecimal_scale0_bigDecimal() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
@@ -220,7 +354,7 @@ public class DecimalScaleIT {
 
 		SubTest.expectException( () -> {
 			IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-			workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( scaleIndexMapping.scaled, tooLargeDecimal ) );
+			workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
 			workPlan.execute().join();
 		} )
 				.assertThrown()
@@ -229,19 +363,40 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale2() {
+	public void decimalScale_tooLargeDecimal_scale0_bigInteger() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.scaleIndexMapping = new ScaleIndexMapping( ctx.getSchemaElement(), 2 ),
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		// Provide a value that if it were multiplied by 100, could not be represented as a long
+		// Provide a value that cannot be represented as a long
+		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.TEN );
+
+		SubTest.expectException( () -> {
+			IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+			workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
+			workPlan.execute().join();
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "is too large to be indexed." );
+	}
+
+	@Test
+	public void decimalScale_tooLargeDecimal_scale2_bigDecimal() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 2 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		// Provide a value that if it were divided by 10, could not be represented as a long, because the scale of 2
 		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MAX_VALUE ).divide( BigDecimal.TEN );
 
 		SubTest.expectException( () -> {
 			IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-			workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( scaleIndexMapping.scaled, tooLargeDecimal ) );
+			workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
 			workPlan.execute().join();
 		} )
 				.assertThrown()
@@ -250,67 +405,141 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void defaultDecimalScale() {
+	public void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.defaultScaleIndexMapping = new DefaultScaleIndexMapping( ctx ),
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -2 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		// Provide a value that if it were multiplied by 100, could not be represented as a long, because the scale of -2
+		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MAX_VALUE ).multiply( new BigInteger( "1000" ) );
+
+		SubTest.expectException( () -> {
+			IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+			workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
+			workPlan.execute().join();
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "is too large to be indexed." );
+	}
+
+	@Test
+	public void defaultDecimalScale_bigDecimal() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.defaultDecimalScaleIndexMapping = new DefaultDecimalScaleIndexMapping( ctx ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( defaultScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( defaultDecimalScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
 		workPlan.execute().join();
 
 		// default decimal scale is 2, affecting the search precision
 		// so the provided value 739.11111 will be treated as if it were 739.11
-		matchAbove( "739.1" );
-		doNotMatchAbove( "739.11" );
+		matchAbove( new BigDecimal( "739.1" ) );
+		doNotMatchAbove( new BigDecimal( "739.11" ) );
 	}
 
 	@Test
-	public void decimalScale_andDefaultDecimalScale() {
+	public void defaultDecimalScale_bigInteger() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.bothScaleIndexMapping = new BothScaleIndexMapping( ctx ),
+						ctx -> this.defaultIntegerScaleIndexMapping = new DefaultIntegerScaleIndexMapping( ctx ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( bothScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( defaultIntegerScaleIndexMapping.scaled, new BigInteger( "7391111" ) ) );
+		workPlan.execute().join();
+
+		// default decimal scale is -2, affecting the search precision
+		// so the provided value 7391111 will be treated as if it were 7391100
+		matchAbove( new BigInteger( "7391000" ) );
+		doNotMatchAbove( new BigInteger( "7391100" ) );
+	}
+
+	@Test
+	public void decimalScale_andDefaultDecimalScale_bigDecimal() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.bothDecimalScaleIndexMapping = new BothDecimalScaleIndexMapping( ctx ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( bothDecimalScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
 		workPlan.execute().join();
 
 		// default decimal scale is 2
 		// decimal scale has been set to 3, overriding the default and affecting the search precision
 		// so the provided value 739.11111 will be treated as if it were 739.111
-		matchAbove( "739.11" );
-		doNotMatchAbove( "739.111" );
+		matchAbove( new BigDecimal( "739.11" ) );
+		doNotMatchAbove( new BigDecimal( "739.111" ) );
 	}
 
 	@Test
-	public void decimalScale_doesNotAffectProjections() {
+	public void decimalScale_andDefaultDecimalScale_bigInteger() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.scaleIndexMapping = new ScaleIndexMapping( ctx.getSchemaElement(), 3 ),
+						ctx -> this.bothIntegerScaleIndexMapping = new BothIntegerScaleIndexMapping( ctx ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( scaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( bothIntegerScaleIndexMapping.scaled, new BigInteger( "7391111" ) ) );
+		workPlan.execute().join();
+
+		// default decimal scale is -2,
+		// decimal scale has been set to -3, overriding the default and affecting the search precision
+		// so the provided value 7391111 will be treated as if it were 7391000
+		matchAbove( new BigInteger( "7390000" ) );
+		doNotMatchAbove( new BigInteger( "7391000" ) );
+	}
+
+	@Test
+	public void decimalScale_doesNotAffectProjections_bigDecimal() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 3 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
 		workPlan.execute().join();
 
 		// even though decimal scale is 3, projected values wont be affected to
-		projection( "739.11111" );
+		projection( new BigDecimal( "739.11111" ) );
 	}
 
-	private void matchAbove(String value) {
-		matchAbove( new BigDecimal( value ) );
-	}
+	@Test
+	public void decimalScale_doesNotAffectProjections_bigInteger() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -7 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
 
-	public void doNotMatchAbove(String value) {
-		doNotMatchAbove( new BigDecimal( value ) );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "73911111" ) ) );
+		workPlan.execute().join();
+
+		// even though decimal scale is -7, projected values wont be affected to
+		projection( new BigInteger( "73911111" ) );
 	}
 
 	private void matchAbove(BigDecimal value) {
+		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
+				.query().asReference()
+				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
+				.toQuery();
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, "1" );
+	}
+
+	private void matchAbove(BigInteger value) {
 		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
 				.query().asReference()
 				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
@@ -326,48 +555,101 @@ public class DecimalScaleIT {
 		assertThat( query ).hasNoHits();
 	}
 
-	public void projection(String value) {
+	public void doNotMatchAbove(BigInteger value) {
+		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
+				.query().asReference()
+				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
+				.toQuery();
+		assertThat( query ).hasNoHits();
+	}
+
+	public void projection(BigDecimal value) {
 		SearchQuery<Object> query = indexManager.createSearchScope().query()
 				.asProjection( p -> p.field( "scaled" ) )
 				.predicate( p -> p.matchAll() )
 				.toQuery();
-		assertThat( query ).hasHitsExactOrder( new BigDecimal( value ) );
+		assertThat( query ).hasHitsExactOrder( value );
 	}
 
-	private void match(String matching, String match1, String match2 ) {
+	public void projection(BigInteger value) {
+		SearchQuery<Object> query = indexManager.createSearchScope().query()
+				.asProjection( p -> p.field( "scaled" ) )
+				.predicate( p -> p.matchAll() )
+				.toQuery();
+		assertThat( query ).hasHitsExactOrder( value );
+	}
+
+	private void match(BigDecimal matching, String match1, String match2 ) {
 		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
 				.query().asReference()
-				.predicate( p -> p.match().onField( "scaled" ).matching( new BigDecimal( matching ) ) )
+				.predicate( p -> p.match().onField( "scaled" ).matching( matching ) )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, match1, match2 );
 	}
 
-	private static class ScaleIndexMapping {
+	private void match(BigInteger matching, String match1, String match2 ) {
+		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
+				.query().asReference()
+				.predicate( p -> p.match().onField( "scaled" ).matching( matching ) )
+				.toQuery();
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, match1, match2 );
+	}
+
+	private static class DecimalScaleIndexMapping {
 		IndexFieldReference<BigDecimal> scaled;
 
-		ScaleIndexMapping(IndexSchemaElement root, int decimalScale) {
+		DecimalScaleIndexMapping(IndexSchemaElement root, int decimalScale) {
 			scaled = root.field( "scaled", f -> f.asBigDecimal().projectable( Projectable.YES ).decimalScale( decimalScale ) ).toReference();
 		}
 	}
 
-	private static class DefaultScaleIndexMapping {
+	private static class DefaultDecimalScaleIndexMapping {
 		IndexFieldReference<BigDecimal> scaled;
 
-		DefaultScaleIndexMapping(IndexedEntityBindingContext ctx) {
+		DefaultDecimalScaleIndexMapping(IndexedEntityBindingContext ctx) {
 			scaled = ctx.getSchemaElement()
-					.field( "scaled", ctx.createTypeFactory( new IndexFieldTypeDefaultsProvider( 2 ) ).asBigDecimal().projectable( Projectable.YES ) ).toReference();
+					.field( "scaled", ctx.createTypeFactory( new IndexFieldTypeDefaultsProvider( 2 ) ).asBigDecimal() ).toReference();
 		}
 	}
 
-	private static class BothScaleIndexMapping {
+	private static class BothDecimalScaleIndexMapping {
 		IndexFieldReference<BigDecimal> scaled;
 
-		BothScaleIndexMapping(IndexedEntityBindingContext ctx) {
+		BothDecimalScaleIndexMapping(IndexedEntityBindingContext ctx) {
 			scaled = ctx.getSchemaElement()
 					// setting both default decimal scale
 					.field( "scaled", ctx.createTypeFactory( new IndexFieldTypeDefaultsProvider( 2 ) )
 							// and the not-default decimal scale
-							.asBigDecimal().decimalScale( 3 ).projectable( Projectable.YES ) ).toReference();
+							.asBigDecimal().decimalScale( 3 ) ).toReference();
+		}
+	}
+
+	private static class IntegerScaleIndexMapping {
+		IndexFieldReference<BigInteger> scaled;
+
+		IntegerScaleIndexMapping(IndexSchemaElement root, int decimalScale) {
+			scaled = root.field( "scaled", f -> f.asBigInteger().projectable( Projectable.YES ).decimalScale( decimalScale ) ).toReference();
+		}
+	}
+
+	private static class DefaultIntegerScaleIndexMapping {
+		IndexFieldReference<BigInteger> scaled;
+
+		DefaultIntegerScaleIndexMapping(IndexedEntityBindingContext ctx) {
+			scaled = ctx.getSchemaElement()
+					.field( "scaled", ctx.createTypeFactory( new IndexFieldTypeDefaultsProvider( -2 ) ).asBigInteger() ).toReference();
+		}
+	}
+
+	private static class BothIntegerScaleIndexMapping {
+		IndexFieldReference<BigInteger> scaled;
+
+		BothIntegerScaleIndexMapping(IndexedEntityBindingContext ctx) {
+			scaled = ctx.getSchemaElement()
+					// setting both default decimal scale
+					.field( "scaled", ctx.createTypeFactory( new IndexFieldTypeDefaultsProvider( -2 ) )
+							// and the not-default decimal scale
+							.asBigInteger().decimalScale( -3 ) ).toReference();
 		}
 	}
 }
