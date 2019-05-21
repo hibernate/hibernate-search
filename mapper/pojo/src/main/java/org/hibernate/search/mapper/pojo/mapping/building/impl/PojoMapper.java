@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoAssociationP
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -70,6 +71,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	public PojoMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoBootstrapIntrospector introspector,
+			ContainerExtractorRegistry containerExtractorRegistry,
 			boolean implicitProvidedId,
 			Function<PojoMappingDelegate, MPBS> wrapperFactory) {
 		this.failureCollector = buildContext.getFailureCollector();
@@ -82,7 +84,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		);
 
 		TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );
-		extractorBinder = new ContainerExtractorBinder( buildContext, typePatternMatcherFactory );
+		extractorBinder = new ContainerExtractorBinder( buildContext, containerExtractorRegistry, typePatternMatcherFactory );
 
 		BridgeResolver bridgeResolver = new BridgeResolver( typePatternMatcherFactory );
 		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinderImpl(
