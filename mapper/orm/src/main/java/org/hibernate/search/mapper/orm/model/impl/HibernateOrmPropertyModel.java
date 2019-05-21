@@ -31,24 +31,29 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 	private final HibernateOrmRawTypeModel<?> holderTypeModel;
 
 	private final String name;
-	private final Member member;
 	/**
 	 * The declared XProperties for this property in the holder type.
 	 * May be empty if this property is declared in a supertype of the holder type
 	 * and not overridden in the holder type.
  	 */
 	private final List<XProperty> declaredXProperties;
+	private final HibernateOrmBasicPropertyMetadata ormPropertyMetadata;
+
+	private final Member member;
 
 	private PropertyHandle<T> handle;
 	private PojoGenericTypeModel<T> typeModel;
 
 	HibernateOrmPropertyModel(HibernateOrmBootstrapIntrospector introspector, HibernateOrmRawTypeModel<?> holderTypeModel,
-			String name, List<XProperty> declaredXProperties, Member member) {
+			String name, List<XProperty> declaredXProperties,
+			HibernateOrmBasicPropertyMetadata ormPropertyMetadata,
+			Member member) {
 		this.introspector = introspector;
 		this.holderTypeModel = holderTypeModel;
 		this.name = name;
-		this.member = member;
 		this.declaredXProperties = declaredXProperties;
+		this.ormPropertyMetadata = ormPropertyMetadata;
+		this.member = member;
 	}
 
 	@Override
