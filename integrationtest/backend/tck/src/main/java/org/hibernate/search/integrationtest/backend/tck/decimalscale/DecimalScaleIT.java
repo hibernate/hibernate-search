@@ -359,7 +359,28 @@ public class DecimalScaleIT {
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "is too large to be indexed." );
+				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+	}
+
+	@Test
+	public void decimalScale_tooLargeDecimal_scale0_bigDecimal_lowerBound() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 0 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		// Provide a value that cannot be represented as a long
+		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MIN_VALUE ).multiply( BigDecimal.TEN );
+
+		SubTest.expectException( () -> {
+			IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+			workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
+			workPlan.execute().join();
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
 
 	@Test
@@ -380,7 +401,28 @@ public class DecimalScaleIT {
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "is too large to be indexed." );
+				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+	}
+
+	@Test
+	public void decimalScale_tooLargeDecimal_scale0_bigInteger_lowerBound() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), 0 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		// Provide a value that cannot be represented as a long
+		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MIN_VALUE ).multiply( BigInteger.TEN );
+
+		SubTest.expectException( () -> {
+			IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+			workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
+			workPlan.execute().join();
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
 
 	@Test
@@ -401,7 +443,28 @@ public class DecimalScaleIT {
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "is too large to be indexed." );
+				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+	}
+
+	@Test
+	public void decimalScale_tooLargeDecimal_scale2_bigDecimal_lowerBound() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 2 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		// Provide a value that if it were divided by 10, could not be represented as a long, because the scale of 2
+		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MIN_VALUE ).divide( BigDecimal.TEN );
+
+		SubTest.expectException( () -> {
+			IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+			workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
+			workPlan.execute().join();
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
 
 	@Test
@@ -422,7 +485,28 @@ public class DecimalScaleIT {
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "is too large to be indexed." );
+				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+	}
+
+	@Test
+	public void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger_lowerBound() {
+		setupHelper.withDefaultConfiguration()
+				.withIndex( INDEX_NAME,
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -2 ),
+						indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		// Provide a value that if it were multiplied by 100, could not be represented as a long, because the scale of -2
+		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MIN_VALUE ).multiply( new BigInteger( "1000" ) );
+
+		SubTest.expectException( () -> {
+			IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+			workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
+			workPlan.execute().join();
+		} )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
 
 	@Test

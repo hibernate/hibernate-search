@@ -490,7 +490,7 @@ public interface Log extends BasicLogger {
 			+ " If the value is bridged, set '.asBigDecimal().decimalScale( int )' in the bind, else verify your mapping.")
 	SearchException nullDecimalScale(@Param EventContext eventContext);
 
-	@Message(id = ID_OFFSET_2 + 81, value = "The value '%1$s' is too large to be indexed.")
+	@Message(id = ID_OFFSET_2 + 81, value = "The value '%1$s' cannot be indexed because its absolute value is too large.")
 	SearchException scaledNumberTooLarge(Number value);
 
 	@Message(id = ID_OFFSET_2 + 82, value = "Positive decimal scale ['%1$s'] is not allowed for BigInteger fields, since a BigInteger value cannot have any decimal digits.")

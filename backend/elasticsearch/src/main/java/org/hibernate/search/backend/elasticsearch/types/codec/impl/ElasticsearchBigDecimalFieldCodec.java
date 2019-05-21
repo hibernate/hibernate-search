@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -33,7 +34,7 @@ public class ElasticsearchBigDecimalFieldCodec implements ElasticsearchFieldCode
 			return JsonNull.INSTANCE;
 		}
 
-		if ( value.multiply( scalingFactor ).compareTo( BigDecimal.valueOf( Long.MAX_VALUE ) ) > 0 ) {
+		if ( isTooLarge( value ) ) {
 			throw log.scaledNumberTooLarge( value );
 		}
 
@@ -61,5 +62,13 @@ public class ElasticsearchBigDecimalFieldCodec implements ElasticsearchFieldCode
 		ElasticsearchBigDecimalFieldCodec other = (ElasticsearchBigDecimalFieldCodec) obj;
 		// comparing only their numeric values, they can have different scales
 		return scalingFactor.compareTo( other.scalingFactor ) == 0;
+	}
+
+	private boolean isTooLarge(BigDecimal value) {
+		BigDecimal scaled = value.multiply( scalingFactor );
+		return (
+			scaled.compareTo( NumberScaleConstants.MIN_LONG_AS_BIGDECIMAL ) < 0 ||
+			scaled.compareTo( NumberScaleConstants.MAX_LONG_AS_BIGDECIMAL ) > 0
+		);
 	}
 }

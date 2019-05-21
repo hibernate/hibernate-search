@@ -13,6 +13,7 @@ import java.math.RoundingMode;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
@@ -24,15 +25,19 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final int decimalScale;
+	private final BigDecimal minScaledValue;
+	private final BigDecimal maxScaledValue;
 
 	public LuceneBigIntegerFieldCodec(boolean projectable, boolean sortable, BigInteger indexNullAsValue, int decimalScale) {
 		super( projectable, sortable, indexNullAsValue );
 		this.decimalScale = decimalScale;
+		this.minScaledValue = new BigDecimal( NumberScaleConstants.MIN_LONG_AS_BIGINTEGER, decimalScale );
+		this.maxScaledValue = new BigDecimal( NumberScaleConstants.MAX_LONG_AS_BIGINTEGER, decimalScale );
 	}
 
 	@Override
 	void validate(BigInteger value) {
-		if ( new BigDecimal( value ).compareTo( BigDecimal.valueOf( Long.MAX_VALUE, decimalScale ) ) > 0 ) {
+		if ( isTooLarge( value ) ) {
 			throw log.scaledNumberTooLarge( value );
 		}
 	}
@@ -81,5 +86,10 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	private Long unscale(BigInteger value) {
 		// See tck.DecimalScaleIT#roundingMode
 		return new BigDecimal( value ).setScale( decimalScale, RoundingMode.HALF_UP ).unscaledValue().longValue();
+	}
+
+	private boolean isTooLarge(BigInteger value) {
+		BigDecimal decimal = new BigDecimal( value );
+		return ( decimal.compareTo( minScaledValue ) < 0 || decimal.compareTo( maxScaledValue ) > 0 );
 	}
 }
