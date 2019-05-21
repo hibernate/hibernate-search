@@ -35,7 +35,7 @@ public @interface IndexedEmbedded {
 	 * allowing the definition of an indexed-embedded for container elements.
 	 * This is useful when the property is of container type,
 	 * for example a {@code Map<TypeA, TypeB>}:
-	 * defining the extraction as {@code @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_KEY))}
+	 * defining the extraction as {@code @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)}
 	 * allows referencing map keys instead of map values.
 	 * By default, Hibernate Search will try to apply a set of extractors for common container types.
 	 * @see ContainerExtraction

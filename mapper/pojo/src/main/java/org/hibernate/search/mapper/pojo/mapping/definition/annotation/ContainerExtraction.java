@@ -40,9 +40,10 @@ public @interface ContainerExtraction {
 	ContainerExtract extract() default ContainerExtract.DEFAULT;
 
 	/**
-	 * @return An array of reference to container value extractors.
+	 * @return An array of container value extractor names.
 	 * Setting this together with {@code extract = } {@link ContainerExtract#NO} will trigger an exception.
+	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	ContainerExtractorRef[] value() default {};
+	String[] value() default {};
 
 }

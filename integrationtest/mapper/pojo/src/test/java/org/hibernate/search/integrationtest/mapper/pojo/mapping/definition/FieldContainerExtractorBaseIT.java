@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtrac
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -59,7 +58,7 @@ public class FieldContainerExtractorBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(MyContainerExtractor.NAME)))
+			@GenericField(extraction = @ContainerExtraction(MyContainerExtractor.NAME))
 			public MyContainer<String> getText() {
 				return text;
 			}
@@ -116,7 +115,7 @@ public class FieldContainerExtractorBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef("some-undefined-name")))
+			@GenericField(extraction = @ContainerExtraction("some-undefined-name"))
 			public Integer getId() {
 				return id;
 			}
@@ -145,7 +144,7 @@ public class FieldContainerExtractorBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(RawContainerExtractor.NAME)))
+			@GenericField(extraction = @ContainerExtraction(RawContainerExtractor.NAME))
 			public Integer getId() {
 				return id;
 			}
@@ -190,7 +189,7 @@ public class FieldContainerExtractorBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(BuiltinContainerExtractors.MAP_VALUE)))
+			@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_VALUE))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}
@@ -224,7 +223,7 @@ public class FieldContainerExtractorBaseIT {
 			}
 			@GenericField(extraction = @ContainerExtraction(
 					extract = ContainerExtract.NO,
-					value = @ContainerExtractorRef(value = BuiltinContainerExtractors.MAP_VALUE)
+					value = BuiltinContainerExtractors.MAP_VALUE
 			))
 			public List<Integer> getNumbers() {
 				return numbers;
