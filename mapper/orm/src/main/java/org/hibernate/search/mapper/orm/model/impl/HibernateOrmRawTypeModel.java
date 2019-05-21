@@ -39,7 +39,7 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	private final HibernateOrmBootstrapIntrospector introspector;
 	private final XClass xClass;
 	private final Class<T> clazz;
-	private final HibernateOrmBasicTypeMetadata metadataFromHibernateOrm;
+	private final HibernateOrmBasicTypeMetadata ormTypeMetadata;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 	private final PojoCaster<T> caster;
 
@@ -51,11 +51,11 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	private Map<String, XProperty> declaredMethodAccessXPropertiesByName;
 
 	HibernateOrmRawTypeModel(HibernateOrmBootstrapIntrospector introspector, Class<T> clazz,
-			HibernateOrmBasicTypeMetadata metadataFromHibernateOrm, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
+			HibernateOrmBasicTypeMetadata ormTypeMetadata, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		this.introspector = introspector;
 		this.xClass = introspector.toXClass( clazz );
 		this.clazz = clazz;
-		this.metadataFromHibernateOrm = metadataFromHibernateOrm;
+		this.ormTypeMetadata = ormTypeMetadata;
 		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
 		this.caster = new JavaClassPojoCaster<>( clazz );
 	}
@@ -208,7 +208,18 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 			declaredXProperties.add( fieldAccessXProperty );
 		}
 
-		Member member = findPropertyMember( propertyName, methodAccessXProperty, fieldAccessXProperty );
+		HibernateOrmBasicPropertyMetadata ormPropertyMetadata;
+		if ( ormTypeMetadata == null ) {
+			// There isn't any Hibernate ORM metadata for this type
+			ormPropertyMetadata = null;
+		}
+		else {
+			ormPropertyMetadata = ormTypeMetadata.getPropertyMetadataOrNull( propertyName );
+		}
+
+		Member member = findPropertyMember(
+				propertyName, methodAccessXProperty, fieldAccessXProperty, ormPropertyMetadata
+		);
 
 		if ( member == null ) {
 			return null;
@@ -216,14 +227,15 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 
 		return new HibernateOrmPropertyModel<>(
 				introspector, this, propertyName,
-				declaredXProperties, member
+				declaredXProperties, ormPropertyMetadata, member
 		);
 	}
 
-	private Member findPropertyMember(String propertyName, XProperty methodAccessXProperty, XProperty fieldAccessXProperty) {
-		Member memberFromHibernateOrmMetamodel = getPropertyMemberFromHibernateOrmMetamodel( propertyName );
-
-		if ( memberFromHibernateOrmMetamodel != null ) {
+	private Member findPropertyMember(String propertyName,
+			XProperty methodAccessXProperty, XProperty fieldAccessXProperty,
+			HibernateOrmBasicPropertyMetadata propertyMetadataFromHibernateOrmMetamodel) {
+		if ( propertyMetadataFromHibernateOrmMetamodel != null ) {
+			Member memberFromHibernateOrmMetamodel = propertyMetadataFromHibernateOrmMetamodel.getMember();
 			/*
 			 * Hibernate ORM has metadata for this property,
 			 * which means this property is persisted.
@@ -272,16 +284,6 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 				 */
 				return getPropertyMemberFromParentTypes( propertyName );
 			}
-		}
-	}
-
-	private Member getPropertyMemberFromHibernateOrmMetamodel(String propertyName) {
-		if ( metadataFromHibernateOrm == null ) {
-			// There isn't any Hibernate ORM metadata for this type
-			return null;
-		}
-		else {
-			return metadataFromHibernateOrm.getMemberOrNull( propertyName );
 		}
 	}
 
