@@ -40,7 +40,7 @@ public @interface ContainerExtraction {
 	ContainerExtract extract() default ContainerExtract.DEFAULT;
 
 	/**
-	 * @return An array of reference to container value extractor implementation classes.
+	 * @return An array of reference to container value extractors.
 	 * Setting this together with {@code extract = } {@link ContainerExtract#NO} will trigger an exception.
 	 */
 	ContainerExtractorRef[] value() default {};

@@ -21,6 +21,8 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
  * Any runtime use of this extractor will simply increment a counter and throw an exception.
  */
 public class StartupStubContainerExtractor implements ContainerExtractor<Object, Object> {
+	public static String NAME = "stub-container-extractor";
+
 	public static class CounterKeys {
 		public final StaticCounters.Key instance = StaticCounters.createKey();
 		public final StaticCounters.Key runtimeUse = StaticCounters.createKey();

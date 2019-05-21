@@ -11,8 +11,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 
 /**
@@ -26,11 +24,6 @@ public @interface ContainerExtractorRef {
 	@SuppressWarnings("deprecation")
 	BuiltinContainerExtractor value() default BuiltinContainerExtractor.UNDEFINED;
 
-	@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
-	Class<? extends ContainerExtractor> type() default UndefinedContainerExtractorImplementationType.class;
+	String name() default "";
 
-	abstract class UndefinedContainerExtractorImplementationType implements ContainerExtractor<Object, Object> {
-		private UndefinedContainerExtractorImplementationType() {
-		}
-	}
 }

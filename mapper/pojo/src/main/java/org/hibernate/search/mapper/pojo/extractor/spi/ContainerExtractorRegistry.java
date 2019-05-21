@@ -38,7 +38,7 @@ public final class ContainerExtractorRegistry {
 	}
 
 	private final Map<String, Class<? extends ContainerExtractor>> extractorsByName = new HashMap<>();
-	private final List<Class<? extends ContainerExtractor>> defaultExtractors = new ArrayList<>();
+	private final List<String> defaultExtractors = new ArrayList<>();
 
 	private ContainerExtractorRegistry(Map<String, Class<? extends ContainerExtractor>> customExtractorsByName) {
 		extractorsByName.putAll( customExtractorsByName );
@@ -56,7 +56,7 @@ public final class ContainerExtractorRegistry {
 		addNonDefaultExtractor( BuiltinContainerExtractors.MAP_KEY, MapKeyExtractor.class );
 	}
 
-	public List<Class<? extends ContainerExtractor>> getDefaults() {
+	public List<String> getDefaults() {
 		return Collections.unmodifiableList( defaultExtractors );
 	}
 
@@ -70,7 +70,7 @@ public final class ContainerExtractorRegistry {
 
 	private void addDefaultExtractor(String name, Class<? extends ContainerExtractor> extractorClass) {
 		extractorsByName.put( name, extractorClass );
-		defaultExtractors.add( extractorClass );
+		defaultExtractors.add( name );
 	}
 
 	private void addNonDefaultExtractor(String name, Class<? extends ContainerExtractor> extractorClass) {

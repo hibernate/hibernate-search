@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
@@ -49,13 +51,17 @@ public class FieldContainerExtractorBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(type = RawContainerExtractor.class)))
+			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(name = RawContainerExtractor.NAME)))
 			public Integer getId() {
 				return id;
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.withBackendMock( backendMock )
+						.withConfiguration( builder -> {
+							builder.containerExtractors().define( RawContainerExtractor.NAME, RawContainerExtractor.class );
+						} )
+						.setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -73,6 +79,7 @@ public class FieldContainerExtractorBaseIT {
 
 	@SuppressWarnings("rawtypes")
 	private static class RawContainerExtractor implements ContainerExtractor {
+		public static final String NAME = "raw-container-extractor";
 		@Override
 		public Stream extract(Object container) {
 			throw new UnsupportedOperationException( "Should not be called" );
@@ -103,8 +110,9 @@ public class FieldContainerExtractorBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
 						.failure(
-								"Cannot apply the requested container value extractor '" + BuiltinContainerExtractor.MAP_VALUE.getType().getName()
-										+ "' to type '" + List.class.getName() + "<" + Integer.class.getName() + ">'"
+								"Cannot apply the requested container value extractor '" + BuiltinContainerExtractors.MAP_VALUE
+								+ "' (implementation class: '" + MapValueExtractor.class.getName()
+								+ "') to type '" + List.class.getName() + "<" + Integer.class.getName() + ">'"
 						)
 						.build()
 				);
@@ -121,14 +129,18 @@ public class FieldContainerExtractorBaseIT {
 				return id;
 			}
 			@GenericField(extraction = @ContainerExtraction(
-					@ContainerExtractorRef(value = BuiltinContainerExtractor.MAP_VALUE, type = RawContainerExtractor.class)
+					@ContainerExtractorRef(value = BuiltinContainerExtractor.MAP_VALUE, name = RawContainerExtractor.NAME)
 			))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.withBackendMock( backendMock )
+						.withConfiguration( builder -> {
+							builder.containerExtractors().define( RawContainerExtractor.NAME, RawContainerExtractor.class );
+						} )
+						.setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

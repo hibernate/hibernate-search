@@ -23,9 +23,8 @@ import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
@@ -254,29 +253,24 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 				throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), propertyNode, null );
 			}
 
-			@SuppressWarnings("rawtypes")
-			List<? extends Class<? extends ContainerExtractor>> extractorClasses =
-					extractorPath.getExplicitExtractorClasses();
-			@SuppressWarnings("rawtypes")
-			Iterator<? extends Class<? extends ContainerExtractor>> extractorClassIterator =
-					extractorClasses.iterator();
+			List<String> extractorNames = extractorPath.getExplicitExtractorNames();
+			Iterator<String> extractorNameIterator = extractorNames.iterator();
 
 			Value containedValue = baseValue;
 			org.hibernate.mapping.Collection collectionValue;
 			do {
 				collectionValue = (org.hibernate.mapping.Collection) containedValue;
 				try {
-					Class<? extends ContainerExtractor> extractorClass =
-							extractorClassIterator.hasNext() ? extractorClassIterator.next() : null;
-					containedValue = resolveContainedValue( collectionValue, extractorClass );
+					String extractorName = extractorNameIterator.hasNext() ? extractorNameIterator.next() : null;
+					containedValue = resolveContainedValue( collectionValue, extractorName );
 				}
 				catch (SearchException e) {
 					throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), path, e );
 				}
 			}
-			while ( extractorClassIterator.hasNext() && containedValue instanceof org.hibernate.mapping.Collection );
+			while ( extractorNameIterator.hasNext() && containedValue instanceof org.hibernate.mapping.Collection );
 
-			if ( !extractorClassIterator.hasNext() ) {
+			if ( !extractorNameIterator.hasNext() ) {
 				// We managed to resolve the whole container value extractor list
 				Class<? extends Value> containedValueClass = containedValue.getClass();
 				if ( SimpleValue.class.equals( containedValueClass ) // equals() and not isAssignableFrom(), we mean it.
@@ -299,30 +293,29 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 	}
 
 	@SuppressWarnings("rawtypes")
-	private Value resolveContainedValue(org.hibernate.mapping.Collection collectionValue,
-			Class<? extends ContainerExtractor> extractorClass) {
+	private Value resolveContainedValue(org.hibernate.mapping.Collection collectionValue, String extractorName) {
 		if ( collectionValue instanceof org.hibernate.mapping.Array ) {
-			if ( extractorClass == null || BuiltinContainerExtractor.ARRAY.getType().equals( extractorClass ) ) {
+			if ( extractorName == null || BuiltinContainerExtractors.ARRAY.equals( extractorName ) ) {
 				return collectionValue.getElement();
 			}
 		}
 		else if ( collectionValue instanceof org.hibernate.mapping.Map ) {
-			if ( BuiltinContainerExtractor.MAP_KEY.getType().equals( extractorClass ) ) {
+			if ( BuiltinContainerExtractors.MAP_KEY.equals( extractorName ) ) {
 				/*
 				 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
 				 * but the value of the foreign key to the targeted entity...
 				 */
 				return ( (org.hibernate.mapping.Map) collectionValue ).getIndex();
 			}
-			else if ( extractorClass == null || BuiltinContainerExtractor.MAP_VALUE.getType().equals( extractorClass ) ) {
+			else if ( extractorName == null || BuiltinContainerExtractors.MAP_VALUE.equals( extractorName ) ) {
 				return collectionValue.getElement();
 			}
 		}
-		else if ( extractorClass == null || BuiltinContainerExtractor.COLLECTION.getType().equals( extractorClass ) ) {
+		else if ( extractorName == null || BuiltinContainerExtractors.COLLECTION.equals( extractorName ) ) {
 			return collectionValue.getElement();
 		}
 
-		throw log.invalidContainerExtractorForDirtyChecking( collectionValue.getClass(), extractorClass );
+		throw log.invalidContainerExtractorForDirtyChecking( collectionValue.getClass(), extractorName );
 	}
 
 	private Property resolveProperty(PersistentClass persistentClass, PojoModelPathPropertyNode propertyNode) {

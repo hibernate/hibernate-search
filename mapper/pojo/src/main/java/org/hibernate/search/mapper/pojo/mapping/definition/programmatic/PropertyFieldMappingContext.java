@@ -10,7 +10,6 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 
@@ -42,13 +41,12 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 	S valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder);
 
 	/**
-	 * @param extractorClass The type of container extractor to use.
+	 * @param extractorName The name of the container extractor to use.
 	 * @return {@code this}, for method chaining.
+	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
-	default S withExtractor(
-			Class<? extends ContainerExtractor> extractorClass) {
-		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );
+	default S withExtractor(String extractorName) {
+		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
 	/**
@@ -56,7 +54,7 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 	 * @return {@code this}, for method chaining.
 	 */
 	default S withExtractor(BuiltinContainerExtractor extractorType) {
-		return withExtractor( extractorType.getType() );
+		return withExtractor( extractorType.getName() );
 	}
 
 	/**

@@ -181,8 +181,9 @@ public interface Log extends BasicLogger {
 
 	@SuppressWarnings("rawtypes")
 	@Message(id = ID_OFFSET_2 + 16,
-			value = "Cannot apply the requested container value extractor '%1$s' to type '%2$s'")
+			value = "Cannot apply the requested container value extractor '%1$s' (implementation class: '%2$s') to type '%3$s'")
 	SearchException invalidContainerExtractorForType(
+			String extractorName,
 			@FormatWith(ClassFormatter.class) Class<? extends ContainerExtractor> extractorClass,
 			@FormatWith(PojoTypeModelFormatter.class) PojoGenericTypeModel<?> extractedType);
 
@@ -342,13 +343,13 @@ public interface Log extends BasicLogger {
 	)
 	SearchException cannotUseDefaultExtractorsInMultiExtractorChain();
 
-	@SuppressWarnings("rawtypes")
 	@Message(id = ID_OFFSET_2 + 42,
-			value = "Annotation @ContainerExtractorRef references both built-in extractor (using '%1$s') and an explicit type (using '%2$s')."
+			value = "Annotation @ContainerExtractorRef references both built-in extractor (using '%1$s') and an explicit name (using '%2$s')."
 			+ " Only one of those can be defined, not both."
 	)
-	SearchException invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType(@FormatWith(EnumFormatter.class) BuiltinContainerExtractor value,
-			@FormatWith(ClassFormatter.class) Class<? extends ContainerExtractor> type);
+	SearchException invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitName(
+			@FormatWith(EnumFormatter.class) BuiltinContainerExtractor value,
+			String name);
 
 	@Message(id = ID_OFFSET_2 + 43, value = "Error creating URL from String '%1$s'.")
 	SearchException malformedURL(String value, @Cause MalformedURLException e);

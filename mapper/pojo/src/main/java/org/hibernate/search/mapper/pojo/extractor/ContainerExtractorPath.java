@@ -35,7 +35,6 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtrac
  * This second form may result in different "resolved" paths depending on the type of the property it is applied to.
  * </ul>
  */
-@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 public class ContainerExtractorPath {
 
 	private static final ContainerExtractorPath DEFAULT = new ContainerExtractorPath(
@@ -60,14 +59,14 @@ public class ContainerExtractorPath {
 	}
 
 	/**
-	 * @param extractorClass A container extractor referenced by its type.
+	 * @param extractorName A container extractor referenced by its name.
 	 * @return A path that will apply the referenced container extractor.
+	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	public static ContainerExtractorPath explicitExtractor(
-			Class<? extends ContainerExtractor> extractorClass) {
+	public static ContainerExtractorPath explicitExtractor(String extractorName) {
 		return new ContainerExtractorPath(
 				false,
-				Collections.singletonList( extractorClass )
+				Collections.singletonList( extractorName )
 		);
 	}
 
@@ -76,33 +75,31 @@ public class ContainerExtractorPath {
 	 * @return A path that will apply the referenced container extractor.
 	 */
 	public static ContainerExtractorPath explicitExtractor(BuiltinContainerExtractor extractorType) {
-		return explicitExtractor( extractorType.getType() );
+		return explicitExtractor( extractorType.getName() );
 	}
 
 	/**
-	 * @param extractorClasses A list of container extractors referenced by their type.
+	 * @param extractorNames A list of container extractors referenced by their name.
 	 * @return A path that will apply the referenced container extractors in order.
 	 */
-	public static ContainerExtractorPath explicitExtractors(
-			List<? extends Class<? extends ContainerExtractor>> extractorClasses) {
-		if ( extractorClasses.isEmpty() ) {
+	public static ContainerExtractorPath explicitExtractors(List<String> extractorNames) {
+		if ( extractorNames.isEmpty() ) {
 			return noExtractors();
 		}
 		else {
 			return new ContainerExtractorPath(
 					false,
-					Collections.unmodifiableList( new ArrayList<>( extractorClasses ) )
+					Collections.unmodifiableList( new ArrayList<>( extractorNames ) )
 			);
 		}
 	}
 
 	private final boolean applyDefaultExtractors;
-	private final List<? extends Class<? extends ContainerExtractor>> explicitExtractorClasses;
+	private final List<String> explicitExtractorNames;
 
-	private ContainerExtractorPath(boolean applyDefaultExtractors,
-			List<? extends Class<? extends ContainerExtractor>> explicitExtractorClasses) {
+	private ContainerExtractorPath(boolean applyDefaultExtractors, List<String> explicitExtractorNames) {
 		this.applyDefaultExtractors = applyDefaultExtractors;
-		this.explicitExtractorClasses = explicitExtractorClasses;
+		this.explicitExtractorNames = explicitExtractorNames;
 	}
 
 	@Override
@@ -112,12 +109,12 @@ public class ContainerExtractorPath {
 		}
 		ContainerExtractorPath other = (ContainerExtractorPath) obj;
 		return applyDefaultExtractors == other.applyDefaultExtractors
-				&& Objects.equals( explicitExtractorClasses, other.explicitExtractorClasses );
+				&& Objects.equals( explicitExtractorNames, other.explicitExtractorNames );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( applyDefaultExtractors, explicitExtractorClasses );
+		return Objects.hash( applyDefaultExtractors, explicitExtractorNames );
 	}
 
 	@Override
@@ -125,13 +122,13 @@ public class ContainerExtractorPath {
 		if ( isDefault() ) {
 			return "<default value extractors>";
 		}
-		else if ( explicitExtractorClasses.isEmpty() ) {
+		else if ( explicitExtractorNames.isEmpty() ) {
 			return "<no value extractors>";
 		}
 		else {
 			StringJoiner joiner = new StringJoiner( ", ", "<", ">" );
-			for ( Class<? extends ContainerExtractor> extractorClass : explicitExtractorClasses ) {
-				joiner.add( extractorClass.getName() );
+			for ( String extractorName : explicitExtractorNames ) {
+				joiner.add( extractorName );
 			}
 			return joiner.toString();
 		}
@@ -142,10 +139,10 @@ public class ContainerExtractorPath {
 	}
 
 	public boolean isEmpty() {
-		return !isDefault() && explicitExtractorClasses.isEmpty();
+		return !isDefault() && explicitExtractorNames.isEmpty();
 	}
 
-	public List<? extends Class<? extends ContainerExtractor>> getExplicitExtractorClasses() {
-		return explicitExtractorClasses;
+	public List<String> getExplicitExtractorNames() {
+		return explicitExtractorNames;
 	}
 }
