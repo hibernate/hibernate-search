@@ -73,18 +73,20 @@ public class HibernateSearchIntegrator implements Integrator {
 				.getMetadataBuildingContext().getBootstrapContext();
 		HibernateOrmIntegrationBooterImpl booter = new HibernateOrmIntegrationBooterImpl( metadata, bootstrapContext );
 
-		// Listen to the session factory lifecycle to boot/shutdown Hibernate Search at the right time
-		CompletableFuture<SessionFactoryImplementor> sessionFactoryCreatedFuture = new CompletableFuture<>();
-		CompletableFuture<?> sessionFactoryClosingFuture = new CompletableFuture<>();
-		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
-				sessionFactoryCreatedFuture,
-				sessionFactoryClosingFuture
-		);
-		sessionFactory.addObserver( observer );
 
 		// Orchestrate bootstrap and shutdown
+		CompletableFuture<SessionFactoryImplementor> sessionFactoryCreatedFuture = new CompletableFuture<>();
+		CompletableFuture<?> sessionFactoryClosingFuture = new CompletableFuture<>();
 		CompletableFuture<HibernateSearchContextService> contextFuture =
 				booter.orchestrateBootAndShutdown( sessionFactoryCreatedFuture, sessionFactoryClosingFuture );
+
+		// Listen to the session factory lifecycle to boot/shutdown Hibernate Search at the right time
+		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
+				sessionFactoryCreatedFuture,
+				sessionFactoryClosingFuture,
+				contextFuture
+		);
+		sessionFactory.addObserver( observer );
 
 		// Listen to Hibernate ORM events to index automatically
 		HibernateOrmAutomaticIndexingStrategyName automaticIndexingStrategyName =
