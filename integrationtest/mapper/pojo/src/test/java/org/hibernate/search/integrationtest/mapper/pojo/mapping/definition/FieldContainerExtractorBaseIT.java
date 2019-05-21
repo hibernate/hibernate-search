@@ -7,10 +7,13 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -39,6 +42,8 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-2554")
 public class FieldContainerExtractorBaseIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
@@ -46,7 +51,97 @@ public class FieldContainerExtractorBaseIT {
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
 
 	@Test
-	public void error_cannotInferClassTypePattern() {
+	public void custom() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			MyContainer<String> text;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(name = MyContainerExtractor.NAME)))
+			public MyContainer<String> getText() {
+				return text;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "text", String.class, f -> f.multiValued( true ) )
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+				.withConfiguration( builder -> {
+					builder.containerExtractors().define( MyContainerExtractor.NAME, MyContainerExtractor.class );
+				} )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity();
+			entity.id = 1;
+			entity.text = new MyContainer<>( "value1", "value2" );
+			session.getMainWorkPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					// Stub backend is not supposed to use 'indexNullAs' option
+					.add( "1", b -> b.field( "text", "value1", "value2" ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	private static class MyContainer<T> {
+		private final List<T> elements;
+
+		private MyContainer(T ... elements) {
+			this.elements = Arrays.asList( elements );
+		}
+
+		private Stream<T> toStream() {
+			return elements.stream();
+		}
+	}
+
+	public static class MyContainerExtractor<T> implements ContainerExtractor<MyContainer<T>, T> {
+		public static final String NAME = "my-container-extractor";
+		@Override
+		public Stream<T> extract(MyContainer<T> container) {
+			return container == null ? Stream.empty() : container.toStream();
+		}
+	}
+
+	@Test
+	public void custom_error_undefined() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			@DocumentId
+			@GenericField(extraction = @ContainerExtraction(@ContainerExtractorRef(name = "some-undefined-name")))
+			public Integer getId() {
+				return id;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure(
+								"Cannot resolve container extractor name 'some-undefined-name'."
+								+ " Check that this name matches a container extractor,"
+								+ " either a builtin one whose name is a constant in '" + BuiltinContainerExtractors.class.getName() + "'"
+								+ " or a custom one that was properly registered."
+						)
+						.build()
+				);
+	}
+
+	@Test
+	public void custom_error_cannotInferClassTypePattern() {
 		@Indexed
 		class IndexedEntity {
 			Integer id;
