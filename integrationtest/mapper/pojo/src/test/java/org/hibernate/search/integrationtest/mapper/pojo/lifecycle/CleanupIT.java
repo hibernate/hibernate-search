@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorDefinitionContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
@@ -78,9 +79,7 @@ public class CleanupIT {
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
 									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-									.withExtractors( ContainerExtractorPath.explicitExtractor(
-											StartupStubContainerExtractor.class
-									) );
+									.withExtractor( StartupStubContainerExtractor.NAME );
 		} );
 
 		backendMock.verifyExpectationsMet();
@@ -127,9 +126,7 @@ public class CleanupIT {
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
 									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-									.withExtractors( ContainerExtractorPath.explicitExtractor(
-											StartupStubContainerExtractor.class
-									) );
+									.withExtractor( StartupStubContainerExtractor.NAME );
 			typeContext.routingKeyBridge( new FailingBridgeBuilder() );
 		} );
 
@@ -163,9 +160,7 @@ public class CleanupIT {
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
 									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-									.withExtractors( ContainerExtractorPath.explicitExtractor(
-											StartupStubContainerExtractor.class
-									) );
+									.withExtractor( StartupStubContainerExtractor.NAME );
 			typeContext.bridge( new FailingBridgeBuilder() );
 		} );
 
@@ -196,9 +191,7 @@ public class CleanupIT {
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-								.withExtractors( ContainerExtractorPath.explicitExtractor(
-										StartupStubContainerExtractor.class
-								) )
+								.withExtractor( StartupStubContainerExtractor.NAME )
 				.property( "id" )
 						.documentId()
 								.identifierBridge( new FailingBridgeBuilder() )
@@ -233,9 +226,7 @@ public class CleanupIT {
 				.property( "text" )
 						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-								.withExtractors( ContainerExtractorPath.explicitExtractor(
-										StartupStubContainerExtractor.class
-								) )
+								.withExtractor( StartupStubContainerExtractor.NAME )
 						.bridge( new FailingBridgeBuilder() )
 		);
 
@@ -268,14 +259,10 @@ public class CleanupIT {
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-								.withExtractors( ContainerExtractorPath.explicitExtractor(
-										StartupStubContainerExtractor.class
-								) )
+								.withExtractor( StartupStubContainerExtractor.NAME )
 						.genericField( "yetAnotherText" )
 								.valueBridge( new FailingBridgeBuilder() )
-								.withExtractors( ContainerExtractorPath.explicitExtractor(
-										StartupStubContainerExtractor.class
-								) )
+								.withExtractor( StartupStubContainerExtractor.NAME )
 		);
 
 
@@ -308,14 +295,12 @@ public class CleanupIT {
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-								.withExtractors( ContainerExtractorPath.explicitExtractor(
-										StartupStubContainerExtractor.class
-								) )
+								.withExtractor( StartupStubContainerExtractor.NAME )
 						.genericField( "yetAnotherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractors( ContainerExtractorPath.explicitExtractors( Arrays.asList(
-										StartupStubContainerExtractor.class, // The first one succeeds, but...
-										FailingContainerExtractor.class // This one fails.
+										StartupStubContainerExtractor.NAME, // The first one succeeds, but...
+										FailingContainerExtractor.NAME // This one fails.
 								) ) )
 		);
 
@@ -370,6 +355,10 @@ public class CleanupIT {
 							builder.addEntityType( IndexedEntity.class );
 							builder.addEntityType( OtherIndexedEntity.class );
 
+							ContainerExtractorDefinitionContext containerExtractorDefinition = builder.containerExtractors();
+							containerExtractorDefinition.define( StartupStubContainerExtractor.NAME, StartupStubContainerExtractor.class );
+							containerExtractorDefinition.define( FailingContainerExtractor.NAME, FailingContainerExtractor.class );
+
 							ProgrammaticMappingDefinitionContext mappingDefinition = builder.programmaticMapping();
 							mappingDefinition.type( IndexedEntity.class )
 									.indexed( IndexedEntity.INDEX )
@@ -382,13 +371,11 @@ public class CleanupIT {
 									.property( "text" )
 											.genericField()
 													.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-													.withExtractors( ContainerExtractorPath.explicitExtractor(
-															StartupStubContainerExtractor.class
-													) )
+													.withExtractor( StartupStubContainerExtractor.NAME )
 									.property( "embedded" )
 											.associationInverseSide(
 													PojoModelPath.builder().property( "embedding" )
-															.value( StartupStubContainerExtractor.class )
+															.value( StartupStubContainerExtractor.NAME )
 															.toValuePath()
 											)
 											.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
@@ -402,7 +389,7 @@ public class CleanupIT {
 									.property( "otherEmbedded" )
 											.associationInverseSide(
 													PojoModelPath.builder().property( "otherEmbedding" )
-															.value( StartupStubContainerExtractor.class )
+															.value( StartupStubContainerExtractor.NAME )
 															.toValuePath()
 											);
 
@@ -542,6 +529,8 @@ public class CleanupIT {
 	}
 
 	public static class FailingContainerExtractor implements ContainerExtractor<Object, Object> {
+		public static final String NAME = "failing-container-extractor";
+
 		public FailingContainerExtractor() {
 			throw new SimulatedFailure();
 		}

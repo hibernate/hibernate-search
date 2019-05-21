@@ -66,9 +66,7 @@ public class ContainerExtractorBinder {
 	private final TypePatternMatcherFactory typePatternMatcherFactory;
 	private final FirstMatchingExtractorContributor firstMatchingExtractorContributor =
 			new FirstMatchingExtractorContributor();
-	@SuppressWarnings("rawtypes") // Checks are implemented using reflection
-	private final Map<Class<? extends ContainerExtractor>, ExtractorContributor> extractorContributorCache =
-			new HashMap<>();
+	private final Map<String, SingleExtractorContributor> extractorContributorCache = new HashMap<>();
 
 	public ContainerExtractorBinder(MappingBuildContext buildContext,
 			ContainerExtractorRegistry containerExtractorRegistry,
@@ -76,8 +74,8 @@ public class ContainerExtractorBinder {
 		this.beanProvider = buildContext.getBeanProvider();
 		this.containerExtractorRegistry = containerExtractorRegistry;
 		this.typePatternMatcherFactory = typePatternMatcherFactory;
-		for ( Class<? extends ContainerExtractor> defaultExtractor : containerExtractorRegistry.getDefaults() ) {
-			addDefaultExtractor( defaultExtractor );
+		for ( String extractorName : containerExtractorRegistry.getDefaults() ) {
+			addDefaultExtractor( extractorName );
 		}
 	}
 
@@ -92,7 +90,6 @@ public class ContainerExtractorBinder {
 	 * @return The resolved extractor path, or an empty optional if
 	 * one of the extractors in the path cannot be applied.
 	 */
-	@SuppressWarnings({"rawtypes"}) // Checks are implemented using reflection
 	public <C> Optional<BoundContainerExtractorPath<C, ?>> tryBindPath(PojoGenericTypeModel<C> sourceType,
 			ContainerExtractorPath extractorPath) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
@@ -100,9 +97,8 @@ public class ContainerExtractorBinder {
 			firstMatchingExtractorContributor.tryAppend( state );
 		}
 		else {
-			for ( Class<? extends ContainerExtractor> extractorClass
-					: extractorPath.getExplicitExtractorClasses() ) {
-				ExtractorContributor extractorContributor = getExtractorContributorForClass( extractorClass );
+			for ( String extractorName : extractorPath.getExplicitExtractorNames() ) {
+				ExtractorContributor extractorContributor = getExtractorContributorForName( extractorName );
 				if ( !extractorContributor.tryAppend( state ) ) {
 					/*
 					 * Assume failure, even if a previous extractor was applied successfully:
@@ -128,7 +124,6 @@ public class ContainerExtractorBinder {
 	 * @throws SearchException if
 	 * one of the extractors in the path cannot be applied.
 	 */
-	@SuppressWarnings({"rawtypes"}) // Checks are implemented using reflection
 	public <C> BoundContainerExtractorPath<C, ?> bindPath(PojoGenericTypeModel<C> sourceType,
 			ContainerExtractorPath extractorPath) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
@@ -136,12 +131,9 @@ public class ContainerExtractorBinder {
 			firstMatchingExtractorContributor.tryAppend( state );
 		}
 		else {
-			for ( Class<? extends ContainerExtractor> extractorClass
-					: extractorPath.getExplicitExtractorClasses() ) {
-				ExtractorContributor extractorContributor = getExtractorContributorForClass( extractorClass );
-				if ( !extractorContributor.tryAppend( state ) ) {
-					throw log.invalidContainerExtractorForType( extractorClass, state.extractedType );
-				}
+			for ( String extractorName : extractorPath.getExplicitExtractorNames() ) {
+				SingleExtractorContributor extractorContributor = getExtractorContributorForName( extractorName );
+				extractorContributor.append( state );
 			}
 		}
 		return state.build();
@@ -168,8 +160,9 @@ public class ContainerExtractorBinder {
 		ContainerExtractor<? super C, ?> extractor = null;
 		List<BeanHolder<?>> beanHolders = new ArrayList<>();
 		try {
-			for ( Class<? extends ContainerExtractor> extractorClass :
-					boundPath.getExtractorPath().getExplicitExtractorClasses() ) {
+			for ( String extractorName : boundPath.getExtractorPath().getExplicitExtractorNames() ) {
+				Class<? extends ContainerExtractor> extractorClass =
+						containerExtractorRegistry.getForName( extractorName );
 				BeanHolder<? extends ContainerExtractor> newExtractorHolder =
 						beanProvider.getBean( extractorClass );
 				beanHolders.add( newExtractorHolder );
@@ -202,21 +195,18 @@ public class ContainerExtractorBinder {
 		);
 	}
 
-	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
-	private void addDefaultExtractor(Class<? extends ContainerExtractor> extractorClass) {
-		ExtractorContributor extractorContributor = getExtractorContributorForClass( extractorClass );
+	private void addDefaultExtractor(String extractorName) {
+		ExtractorContributor extractorContributor = getExtractorContributorForName( extractorName );
 		firstMatchingExtractorContributor.addCandidate( extractorContributor );
 	}
 
-	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
-	private ExtractorContributor getExtractorContributorForClass(
-			Class<? extends ContainerExtractor> extractorClass) {
-		return extractorContributorCache.computeIfAbsent( extractorClass, this::createExtractorContributorForClass );
+	private SingleExtractorContributor getExtractorContributorForName(String extractorName) {
+		return extractorContributorCache.computeIfAbsent( extractorName, this::createExtractorContributorForName );
 	}
 
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
-	private ExtractorContributor createExtractorContributorForClass(
-			Class<? extends ContainerExtractor> extractorClass) {
+	private SingleExtractorContributor createExtractorContributorForName(String extractorName) {
+		Class<? extends ContainerExtractor> extractorClass = containerExtractorRegistry.getForName( extractorName );
 		GenericTypeContext typeContext = new GenericTypeContext( extractorClass );
 		Type typePattern = typeContext.resolveTypeArgument( ContainerExtractor.class, 0 )
 				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass ) );
@@ -229,7 +219,7 @@ public class ContainerExtractorBinder {
 		catch (UnsupportedOperationException e) {
 			throw log.cannotInferContainerExtractorClassTypePattern( extractorClass );
 		}
-		return new SingleExtractorContributor( typePatternMatcher, extractorClass );
+		return new SingleExtractorContributor( typePatternMatcher, extractorName, extractorClass );
 	}
 
 	private interface ExtractorContributor {
@@ -246,11 +236,14 @@ public class ContainerExtractorBinder {
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
 	private class SingleExtractorContributor implements ExtractorContributor {
 		private final ExtractingTypePatternMatcher typePatternMatcher;
+		private final String extractorName;
 		private final Class<? extends ContainerExtractor> extractorClass;
 
 		SingleExtractorContributor(ExtractingTypePatternMatcher typePatternMatcher,
+				String extractorName,
 				Class<? extends ContainerExtractor> extractorClass) {
 			this.typePatternMatcher = typePatternMatcher;
+			this.extractorName = extractorName;
 			this.extractorClass = extractorClass;
 		}
 
@@ -259,11 +252,17 @@ public class ContainerExtractorBinder {
 			Optional<? extends PojoGenericTypeModel<?>> resultTypeOptional =
 					typePatternMatcher.extract( state.extractedType );
 			if ( resultTypeOptional.isPresent() ) {
-				state.append( extractorClass, resultTypeOptional.get() );
+				state.append( extractorName, resultTypeOptional.get() );
 				return true;
 			}
 			else {
 				return false;
+			}
+		}
+
+		void append(ExtractorResolutionState<?> state) {
+			if ( !tryAppend( state ) ) {
+				throw log.invalidContainerExtractorForType( extractorName, extractorClass, state.extractedType );
 			}
 		}
 	}
@@ -291,7 +290,7 @@ public class ContainerExtractorBinder {
 	@SuppressWarnings({"rawtypes"}) // Checks are implemented using reflection
 	private static class ExtractorResolutionState<C> {
 
-		private final List<Class<? extends ContainerExtractor>> extractorClasses = new ArrayList<>();
+		private final List<String> extractorNames = new ArrayList<>();
 		private final PojoGenericTypeModel<C> sourceType;
 		private PojoGenericTypeModel<?> extractedType;
 
@@ -300,15 +299,15 @@ public class ContainerExtractorBinder {
 			this.extractedType = sourceType;
 		}
 
-		void append(Class<? extends ContainerExtractor> extractorClass, PojoGenericTypeModel<?> extractedType) {
-			extractorClasses.add( extractorClass );
+		void append(String extractorName, PojoGenericTypeModel<?> extractedType) {
+			extractorNames.add( extractorName );
 			this.extractedType = extractedType;
 		}
 
 		BoundContainerExtractorPath<C, ?> build() {
 			return new BoundContainerExtractorPath<>(
 					sourceType,
-					ContainerExtractorPath.explicitExtractors( extractorClasses ),
+					ContainerExtractorPath.explicitExtractors( extractorNames ),
 					extractedType
 			);
 		}

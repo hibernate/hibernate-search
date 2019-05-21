@@ -35,7 +35,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -303,34 +302,33 @@ class AnnotationProcessorHelper {
 
 	@SuppressWarnings("deprecation")
 	private ContainerExtractorPath toExtractorPath(ContainerExtractorRef[] extractors) {
-		@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
-				List<Class<? extends ContainerExtractor>> explicitExtractorClasses = new ArrayList<>();
+		List<String> explicitExtractorNames = new ArrayList<>();
 		for ( ContainerExtractorRef extractor : extractors ) {
 			BuiltinContainerExtractor builtin = extractor.value();
 			if ( BuiltinContainerExtractor.UNDEFINED.equals( builtin ) ) {
 				builtin = null;
 			}
-			Class<? extends ContainerExtractor> explicit = extractor.type();
-			if ( ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( explicit ) ) {
+			String explicit = extractor.name();
+			if ( explicit.isEmpty() ) {
 				explicit = null;
 			}
 
 			if ( builtin != null && explicit != null ) {
-				throw log.invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType(
+				throw log.invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitName(
 						builtin, explicit
 				);
 			}
 			else if ( builtin != null ) {
-				explicitExtractorClasses.add( builtin.getType() );
+				explicitExtractorNames.add( builtin.getName() );
 			}
 			else if ( explicit != null ) {
-				explicitExtractorClasses.add( explicit );
+				explicitExtractorNames.add( explicit );
 			}
 			else {
 				throw log.emptyContainerExtractorRef();
 			}
 		}
 
-		return ContainerExtractorPath.explicitExtractors( explicitExtractorClasses );
+		return ContainerExtractorPath.explicitExtractors( explicitExtractorNames );
 	}
 }

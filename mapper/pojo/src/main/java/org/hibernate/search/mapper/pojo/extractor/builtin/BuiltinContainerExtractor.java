@@ -6,29 +6,18 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.builtin;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.ArrayElementExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.IterableElementExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.MapKeyExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.MapValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalDoubleValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalIntValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalLongValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalValueExtractor;
-
-@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
+// FIXME Remove this type, it can be replaced with string references, which are more flexible
 public enum BuiltinContainerExtractor {
 
-	ARRAY( ArrayElementExtractor.class ),
-	COLLECTION( CollectionElementExtractor.class ),
-	ITERABLE( IterableElementExtractor.class ),
-	MAP_KEY( MapKeyExtractor.class ),
-	MAP_VALUE( MapValueExtractor.class ),
-	OPTIONAL_DOUBLE( OptionalDoubleValueExtractor.class ),
-	OPTIONAL_INT( OptionalIntValueExtractor.class ),
-	OPTIONAL_LONG( OptionalLongValueExtractor.class ),
-	OPTIONAL_VALUE( OptionalValueExtractor.class ),
+	ARRAY( BuiltinContainerExtractors.ARRAY ),
+	COLLECTION( BuiltinContainerExtractors.COLLECTION ),
+	ITERABLE( BuiltinContainerExtractors.ITERABLE ),
+	MAP_KEY( BuiltinContainerExtractors.MAP_KEY ),
+	MAP_VALUE( BuiltinContainerExtractors.MAP_VALUE ),
+	OPTIONAL_DOUBLE( BuiltinContainerExtractors.OPTIONAL_DOUBLE ),
+	OPTIONAL_INT( BuiltinContainerExtractors.OPTIONAL_INT ),
+	OPTIONAL_LONG( BuiltinContainerExtractors.OPTIONAL_LONG ),
+	OPTIONAL_VALUE( BuiltinContainerExtractors.OPTIONAL ),
 
 	/**
 	 * Used as a default value in annotations.
@@ -36,14 +25,14 @@ public enum BuiltinContainerExtractor {
  	 */
 	UNDEFINED( null );
 
-	private final Class<? extends ContainerExtractor> type;
+	private final String name;
 
-	BuiltinContainerExtractor(Class<? extends ContainerExtractor> type) {
-		this.type = type;
+	BuiltinContainerExtractor(String name) {
+		this.name = name;
 	}
 
-	public Class<? extends ContainerExtractor> getType() {
-		return type;
+	public String getName() {
+		return name;
 	}
 
 }

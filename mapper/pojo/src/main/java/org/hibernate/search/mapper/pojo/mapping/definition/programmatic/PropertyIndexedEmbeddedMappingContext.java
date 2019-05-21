@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 
@@ -29,13 +28,12 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 	PropertyIndexedEmbeddedMappingContext includePaths(Collection<String> paths);
 
 	/**
-	 * @param extractorClass The type of container extractor to use.
+	 * @param extractorName The name of the container extractor to use.
 	 * @return {@code this}, for method chaining.
+	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
-	default PropertyIndexedEmbeddedMappingContext withExtractor(
-			Class<? extends ContainerExtractor> extractorClass) {
-		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );
+	default PropertyIndexedEmbeddedMappingContext withExtractor(String extractorName) {
+		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
 	/**
@@ -43,7 +41,7 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 	 * @return {@code this}, for method chaining.
 	 */
 	default PropertyIndexedEmbeddedMappingContext withExtractor(BuiltinContainerExtractor extractorType) {
-		return withExtractor( extractorType.getType() );
+		return withExtractor( extractorType.getName() );
 	}
 
 	/**

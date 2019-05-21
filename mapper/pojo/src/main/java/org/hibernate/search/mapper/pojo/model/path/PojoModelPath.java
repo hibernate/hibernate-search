@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -124,7 +123,7 @@ public abstract class PojoModelPath {
 	public static class Builder {
 
 		private PojoModelPathPropertyNode currentPropertyNode;
-		private final List<Class<? extends ContainerExtractor>> currentExplicitExtractors = new ArrayList<>();
+		private final List<String> currentExplicitExtractors = new ArrayList<>();
 		private boolean noExtractors;
 		private boolean defaultExtractors;
 
@@ -161,8 +160,8 @@ public abstract class PojoModelPath {
 				return valueWithoutExtractors();
 			}
 			else {
-				for ( Class<? extends ContainerExtractor> clazz : extractorPath.getExplicitExtractorClasses() ) {
-					value( clazz );
+				for ( String extractorName : extractorPath.getExplicitExtractorNames() ) {
+					value( extractorName );
 				}
 				return this;
 			}
@@ -171,7 +170,7 @@ public abstract class PojoModelPath {
 		/**
 		 * Append to the path a value extraction using the given container extractor.
 		 * <p>
-		 * Multiple {@link #value(BuiltinContainerExtractor)} or {@link #value(Class)}
+		 * Multiple {@link #value(BuiltinContainerExtractor)} or {@link #value(String)}
 		 * calls can be chained to apply multiple extractors.
 		 *
 		 * @param extractor The container extractor to apply, as a {@link BuiltinContainerExtractor}.
@@ -179,26 +178,27 @@ public abstract class PojoModelPath {
 		 * @throws org.hibernate.search.util.common.SearchException If no property name was previously given.
 		 */
 		public Builder value(BuiltinContainerExtractor extractor) {
-			return value( extractor.getType() );
+			return value( extractor.getName() );
 		}
 
 		/**
 		 * Append to the path a value extraction using the given container extractor.
 		 * <p>
-		 * Multiple {@link #value(BuiltinContainerExtractor)} or {@link #value(Class)}
+		 * Multiple {@link #value(BuiltinContainerExtractor)} or {@link #value(String)}
 		 * calls can be chained to apply multiple extractors.
 		 *
-		 * @param extractorClass The container extractor to apply, as a {@link Class}.
+		 * @param extractorName The name of the container extractor to apply.
 		 * @return {@code this}, for method chaining.
 		 * @throws org.hibernate.search.util.common.SearchException If no property name was previously given.
+		 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 		 */
-		public Builder value(Class<? extends ContainerExtractor> extractorClass) {
+		public Builder value(String extractorName) {
 			checkHasPropertyName();
 			if ( defaultExtractors ) {
 				throw log.cannotUseDefaultExtractorsInMultiExtractorChain();
 			}
 			noExtractors = false;
-			currentExplicitExtractors.add( extractorClass );
+			currentExplicitExtractors.add( extractorName );
 			return this;
 		}
 

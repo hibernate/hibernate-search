@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 
@@ -16,13 +15,12 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtrac
 public interface AssociationInverseSideMappingContext extends PropertyMappingContext {
 
 	/**
-	 * @param extractorClass The type of container extractor to use.
+	 * @param extractorName The name of the container extractor to use.
 	 * @return {@code this}, for method chaining.
+	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
-	default AssociationInverseSideMappingContext withExtractor(
-			Class<? extends ContainerExtractor> extractorClass) {
-		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );
+	default AssociationInverseSideMappingContext withExtractor(String extractorName) {
+		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
 	/**
@@ -30,7 +28,7 @@ public interface AssociationInverseSideMappingContext extends PropertyMappingCon
 	 * @return {@code this}, for method chaining.
 	 */
 	default AssociationInverseSideMappingContext withExtractor(BuiltinContainerExtractor extractorType) {
-		return withExtractor( extractorType.getType() );
+		return withExtractor( extractorType.getName() );
 	}
 
 	/**

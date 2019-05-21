@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -19,13 +18,12 @@ public interface IndexingDependencyMappingContext extends PropertyMappingContext
 	IndexingDependencyMappingContext derivedFrom(PojoModelPathValueNode pojoModelPath);
 
 	/**
-	 * @param extractorClass The type of container extractor to use.
+	 * @param extractorName The name of the container extractor to use.
 	 * @return {@code this}, for method chaining.
+	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
-	default IndexingDependencyMappingContext withExtractor(
-			Class<? extends ContainerExtractor> extractorClass) {
-		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );
+	default IndexingDependencyMappingContext withExtractor(String extractorName) {
+		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
 	/**
@@ -33,7 +31,7 @@ public interface IndexingDependencyMappingContext extends PropertyMappingContext
 	 * @return {@code this}, for method chaining.
 	 */
 	default IndexingDependencyMappingContext withExtractor(BuiltinContainerExtractor extractorType) {
-		return withExtractor( extractorType.getType() );
+		return withExtractor( extractorType.getName() );
 	}
 
 	/**

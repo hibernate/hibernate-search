@@ -332,8 +332,9 @@ public class PropertyBridgeBaseIT {
 						.pathContext( ".contained" )
 						.failure(
 								"Cannot apply the requested container value extractor '"
-										+ CollectionElementExtractor.class.getName()
-										+ "' to type '" + Contained.class.getName() + "'"
+								+ BuiltinContainerExtractors.COLLECTION
+								+ "' (implementation class: '" + CollectionElementExtractor.class.getName()
+								+ "') to type '" + Contained.class.getName() + "'"
 						)
 						.build()
 				);
@@ -596,8 +597,9 @@ public class PropertyBridgeBaseIT {
 						.pathContext( ".child" )
 						.failure(
 								"Cannot apply the requested container value extractor '"
-										+ CollectionElementExtractor.class.getName()
-										+ "' to type '" + PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity.class.getName() + "'"
+								+ BuiltinContainerExtractors.COLLECTION
+								+ "' (implementation class: '" + CollectionElementExtractor.class.getName()
+								+ "') to type '" + PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity.class.getName() + "'"
 						)
 						.build()
 				);
