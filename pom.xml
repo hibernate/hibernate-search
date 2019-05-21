@@ -904,6 +904,13 @@
                 <artifactId>${jdbc.driver.artifactId}</artifactId>
                 <version>${jdbc.driver.version}</version>
             </dependency>
+
+            <!-- Hibernate ORM testing tools -->
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-testing</artifactId>
+                <version>${version.org.hibernate}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
