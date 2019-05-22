@@ -177,6 +177,9 @@ stage('Configure') {
 							// Elasticsearch won't run on JDK13
 							elasticsearchTool: 'OpenJDK 11 Latest')
 			],
+			compiler: [
+					new CompilerITEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse', status: ITEnvironmentStatus.SUPPORTED),
+			],
 			database: [
 					new DatabaseITEnvironment(dbName: 'h2', mavenProfile: 'h2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
 					new DatabaseITEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb', status: ITEnvironmentStatus.SUPPORTED),
@@ -476,6 +479,21 @@ stage('Non-default environment ITs') {
 		})
 	}
 
+	// Build with different compilers
+	environments.content.compiler.enabled.each { CompilerITEnvironment itEnv ->
+		executions.put(itEnv.tag, {
+			node(NODE_PATTERN_BASE) {
+				helper.withMavenWorkspace {
+					mavenNonDefaultIT itEnv, """ \
+							clean install --fail-at-end \
+							-DskipTests \
+							-P${itEnv.mavenProfile} \
+					"""
+				}
+			}
+		})
+	}
+
 	// Test ORM integration with multiple databases
 	environments.content.database.enabled.each { DatabaseITEnvironment itEnv ->
 		executions.put(itEnv.tag, {
@@ -627,6 +645,12 @@ class JdkITEnvironment extends ITEnvironment {
 	String tool
 	String elasticsearchTool
 	String getTag() { "jdk-$version" }
+}
+
+class CompilerITEnvironment extends ITEnvironment {
+	String name
+	String mavenProfile
+	String getTag() { "compiler-$name" }
 }
 
 class DatabaseITEnvironment extends ITEnvironment {
