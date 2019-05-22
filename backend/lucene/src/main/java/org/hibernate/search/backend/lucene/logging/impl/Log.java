@@ -113,7 +113,7 @@ public interface Log extends BasicLogger {
 					+ " This might indicate a concurrent initialization;"
 					+ " If you experience errors on this index you might need to remove the lock, or rebuild the index."
 	)
-	void lockingFailureDuringInitialization(String directoryDescription);
+	void lockingFailureDuringInitialization(String directoryDescription, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_1 + 228,
 			value = "Value '%1$ss' is not in a valid format to express a Lucene version: %2$s" )
