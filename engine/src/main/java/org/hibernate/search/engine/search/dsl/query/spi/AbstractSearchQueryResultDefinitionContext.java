@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 public abstract class AbstractSearchQueryResultDefinitionContext<
-				N extends SearchQueryContext<? extends N, E, ?>,
+				N extends SearchQueryContext<?, E, ?>,
 				R,
 				E,
 				PJC extends SearchProjectionFactoryContext<R, E>,
