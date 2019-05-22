@@ -43,7 +43,7 @@ abstract class AbstractLuceneWriteWorkOrchestrator
 		return future;
 	}
 
-	interface LuceneWorkSet extends BatchingExecutor.Task<LuceneWriteWorkProcessor> {
+	interface LuceneWorkSet extends BatchingExecutor.WorkSet<LuceneWriteWorkProcessor> {
 	}
 
 	static class LuceneMultipleWorkSet implements LuceneWorkSet {
