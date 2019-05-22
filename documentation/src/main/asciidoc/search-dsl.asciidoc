@@ -201,9 +201,11 @@ There are three different constraints when it comes to field compatibility:
 
 1. The fields must be "encoded" in a compatible way.
 This means the backend must use the same representation for the two fields,
-for example they are both `Integer`, or they are both `LocalDate` with the same date format, etc.
+for example they are both `Integer`,
+or they are both `BigDecimal` with the same decimal scale,
+or they are both `LocalDate` with the same date format, etc.
 2. The fields must have a compatible DSL converter (for predicates and sorts) or projection converter (for projections).
-2. For full-text predicates, the fields must have a compatible analyzer.
+3. For full-text predicates, the fields must have a compatible analyzer.
 
 The following sections describe all the possible incompatibilities, and how to solve them.
 
@@ -212,11 +214,25 @@ The following sections describe all the possible incompatibilities, and how to s
 In a search query targeting multiple indexes,
 if a field is encoded differently in each index,
 you cannot apply predicates, sorts or projections on that field.
-Your only option is to change your mapping,
-renaming some fields or changing their type to avoid the conflict.
 
-If you need to apply a similar predicate to two fields with different names and incompatible codec,
-you will have to use two separate predicates and combine them with a <<search-dsl-predicate-boolean,boolean junction>>.
+NOTE: Encoding is not only about the field type, such as `LocalDate` or `BigDecimal`.
+Some codecs are parameterized and two codecs with different parameters will often be considered incompatible.
+Examples of parameters include the format for temporal types
+or the <<mapper-orm-directfieldmapping-annotations-scalednumberfield, decimal scale>>
+for `BigDecimal` and `BigInteger`.
+
+In that case, your only option is to change your mapping to avoid the conflict:
+
+1. rename the field in one index
+2. OR change the field type in one index
+3. OR if the problem is simply different codec parameters (date format, decimal scale, ...),
+align the value of these parameters in one index with the other index.
+
+If you choose to rename the field in one index,
+you will still be able to apply a similar predicate
+to the two fields in a single query:
+you will have to create one predicate per field
+and combine them with a <<search-dsl-predicate-boolean,boolean junction>>.
 
 === Incompatible DSL converters
 
@@ -254,12 +270,3 @@ or skip analysis completely with `.skipAnalysis()`.
 
 See <<search-dsl-predicate>> for more information about how to create predicates
 and about the available options.
-
-=== Incompatible decimal scale
-
-Incompatible decimal scales are only a problem when the query is performed on scaled number fields among different indexes.
-
-Such queries requires that the fields involved not only have the same encoded type (for instance both as `BigDecimal`),
-but they must have the same decimal scale.
-
-For scaled number fields and decimal scale attribute see <<mapper-orm-directfieldmapping-annotations-scalednumberfield, here>>.

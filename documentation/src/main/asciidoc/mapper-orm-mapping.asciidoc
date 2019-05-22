@@ -227,10 +227,13 @@ Keyword fields may be assigned a `normalizer`, referenced by its name.
 See <<concepts-analysis>> for more details about normalizers and full-text analysis.
 
 [[mapper-orm-directfieldmapping-annotations-scalednumberfield]] `@ScaledNumberField`::
-A numeric field with arbitrary scale and fixed precision.
+A numeric field for integer or floating-point values
+that require a higher precision than doubles
+but always have roughly the same scale.
 Only works for either `java.math.BigDecimal` or `java.math.BigInteger` fields.
 +
-Scaled numbers are indexed as integers, typically a long (128 bits), with a fixed scale that is consistent for all values of the field across all documents.
+Scaled numbers are indexed as integers, typically a long (64 bits),
+with a fixed scale that is consistent for all values of the field across all documents.
 Because scaled numbers are indexed with a fixed precision, they cannot represent all `BigDecimal` or `BigInteger` values.
 Values that are too large to be indexed  will trigger a runtime exception.
 Values that have trailing decimal digits will be rounded to the nearest integer.
@@ -243,15 +246,17 @@ The decimal point will shifted that many times to the left before indexing, drop
 `decimalScale` with strictly positive values is allowed only for `BigDecimal`, since `BigInteger` values have no decimal digits.
 +
 Note that shifting of the decimal points is completely transparent and will not affect how you use the search DSL:
-you be expected to provide "normal" `BigDecimal` or `BigInteger` values, and Hibernate Search will apply the `decimalScale` and rounding transparently.
+you be expected to provide "normal" `BigDecimal` or `BigInteger` values,
+and Hibernate Search will apply the `decimalScale` and rounding transparently.
 +
 As a result of the rounding, search predicates and sorts will only be as precise as what the `decimalScale` allows.
 +
 Note that rounding does not affect projections, which will return the original value without any loss of precision.
 +
-A typical value for currency amounts is 2, because only two digits are needed beyond the decimal point.
+NOTE: A typical use case is monetary amounts, with a decimal scale of 2
+because only two digits are generally needed beyond the decimal point.
 +
-IMPORTANT: Using Hibernate ORM mapping,
+NOTE: Using Hibernate ORM mapping,
 a default `decimalScale` is taken automatically from the underlying `scale` value of the relative SQL `@Column`,
 using the Hibernate ORM metadata. The value could be overridden explicitly using the `decimalScale` attribute.
 
