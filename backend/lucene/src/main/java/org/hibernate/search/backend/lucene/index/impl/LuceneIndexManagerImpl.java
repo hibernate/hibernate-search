@@ -133,7 +133,7 @@ class LuceneIndexManagerImpl
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( LuceneWriteWorkOrchestratorImplementor::close, writeOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
-			closer.push( IndexWriterHolder::closeIndexWriter, indexWriterHolder );
+			closer.push( IndexWriterHolder::close, indexWriterHolder );
 			closer.push( LuceneIndexModel::close, model );
 		}
 		catch (IOException | RuntimeException e) {

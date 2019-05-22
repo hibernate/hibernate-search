@@ -14,6 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -28,7 +29,7 @@ import org.apache.lucene.store.Directory;
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
-public class IndexWriterHolder {
+public class IndexWriterHolder implements AutoCloseable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String indexName;
@@ -65,6 +66,14 @@ public class IndexWriterHolder {
 		this.indexParameters = luceneParameters.getIndexParameters();
 		this.similarity = indexManager.getSimilarity();
 		 */
+	}
+
+	@Override
+	public void close() throws IOException {
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.push( IndexWriterHolder::closeIndexWriter, this );
+			closer.push( Directory::close, directory );
+		}
 	}
 
 	/**
