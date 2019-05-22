@@ -7,7 +7,9 @@
 package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterHolder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
@@ -25,12 +27,17 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.store.Directory;
 
 public class IndexingBackendContext {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final EventContext eventContext;
 
 	private final DirectoryProvider directoryProvider;
@@ -59,12 +66,24 @@ public class IndexingBackendContext {
 		return eventContext;
 	}
 
-	Directory createDirectory(String indexName) throws IOException {
-		return directoryProvider.createDirectory( indexName );
-	}
-
-	IndexWriterHolder createIndexWriterHolder(String indexName, Directory directory, Analyzer analyzer) {
-		return new IndexWriterHolder( indexName, directory, analyzer, errorHandler );
+	IndexWriterHolder createIndexWriterHolder(String indexName, Analyzer analyzer) {
+		Directory directory;
+		try {
+			directory = directoryProvider.createDirectory( indexName );
+		}
+		catch (IOException | RuntimeException e) {
+			throw log.unableToCreateIndexDirectory(
+					eventContext.append( EventContexts.fromIndexName( indexName ) ),
+					e
+			);
+		}
+		try {
+			return new IndexWriterHolder( indexName, directory, analyzer, errorHandler );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e ).push( directory );
+			throw e;
+		}
 	}
 
 	IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(
