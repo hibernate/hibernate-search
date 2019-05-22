@@ -149,8 +149,6 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
 
 @Field boolean enableDefaultBuild = false
 @Field boolean enableDefaultBuildIT = false
-@Field boolean enableNonDefaultSupportedBuildEnv = false
-@Field boolean enableExperimentalBuildEnv = false
 @Field boolean performRelease = false
 @Field boolean deploySnapshot = false
 
@@ -263,67 +261,7 @@ while other options will trigger multiple Maven executions in different environm
 		}
 	}
 
-	switch (params.ENVIRONMENT_SET) {
-		case 'DEFAULT':
-			enableDefaultBuildIT = true
-			break
-		case 'SUPPORTED':
-			enableDefaultBuildIT = true
-			enableNonDefaultSupportedBuildEnv = true
-			break
-		case 'ALL':
-			enableDefaultBuildIT = true
-			enableNonDefaultSupportedBuildEnv = true
-			enableExperimentalBuildEnv = true
-			break
-		case 'EXPERIMENTAL':
-			enableExperimentalBuildEnv = true
-			break
-		case 'AUTOMATIC':
-			if (params.RELEASE_VERSION) {
-				echo "Skipping default build and integration tests to speed up the release of version $params.RELEASE_VERSION"
-			} else if (helper.scmSource.pullRequest) {
-				echo "Enabling only the default build with integration tests in the default environment for pull request $helper.scmSource.pullRequest.id"
-				enableDefaultBuildIT = true
-			} else if (helper.scmSource.branch.primary) {
-				echo "Enabling builds on all supported environments for primary branch '$helper.scmSource.branch.name'"
-				enableDefaultBuildIT = true
-				enableNonDefaultSupportedBuildEnv = true
-			} else {
-				echo "Enabling only the default build with integration tests in the default environment for feature branch $helper.scmSource.branch.name"
-				enableDefaultBuildIT = true
-			}
-			break
-		default:
-			throw new IllegalArgumentException(
-					"Unknown value for param 'ENVIRONMENT_SET': '$params.ENVIRONMENT_SET'."
-			)
-	}
-
-	enableDefaultBuild =
-			enableDefaultBuildIT || enableNonDefaultSupportedBuildEnv || enableExperimentalBuildEnv || deploySnapshot
-
-	echo """Branch: ${helper.scmSource.branch.name}, PR: ${helper.scmSource.pullRequest?.id}, environment setting: $params.ENVIRONMENT_SET, resulting execution plan:
-enableDefaultBuild=$enableDefaultBuild
-enableDefaultBuildIT=$enableDefaultBuildIT
-enableNonDefaultSupportedBuildEnv=$enableNonDefaultSupportedBuildEnv
-enableExperimentalBuildEnv=$enableExperimentalBuildEnv
-performRelease=$performRelease
-deploySnapshot=$deploySnapshot"""
-
-	// Filter environments
-
-	environments.content.each { key, envSet ->
-		// No need to re-test default environments, they are already tested as part of the default build
-		envSet.enabled.remove(envSet.default)
-
-		if (!enableNonDefaultSupportedBuildEnv) {
-			envSet.enabled.removeAll { buildEnv -> buildEnv.status == BuildEnvironmentStatus.SUPPORTED }
-		}
-		if (!enableExperimentalBuildEnv) {
-			envSet.enabled.removeAll { buildEnv -> buildEnv.status == BuildEnvironmentStatus.EXPERIMENTAL }
-		}
-	}
+	keepOnlyEnvironmentsFromSet(params.ENVIRONMENT_SET)
 
 	environments.content.esAws.enabled.removeAll { buildEnv ->
 		buildEnv.endpointUrl = env.getProperty(buildEnv.endpointVariableName)
@@ -339,12 +277,29 @@ deploySnapshot=$deploySnapshot"""
 		return false // Environment is fully defined, do not remove
 	}
 
-	if (environments.isAnyEnabled()) {
-		echo "Enabled non-default environments: ${environments.enabledAsString}"
+	// Determine whether ITs need to be run in the default build
+	enableDefaultBuildIT = environments.content.any { key, envSet ->
+		return envSet.enabled.contains(envSet.default)
 	}
-	else {
-		echo "Non-default environments are completely disabled."
+	// No need to re-test default environments separately, they will be tested as part of the default build if needed
+	environments.content.each { key, envSet ->
+		envSet.enabled.remove(envSet.default)
 	}
+
+	enableDefaultBuild =
+			enableDefaultBuildIT || environments.isAnyEnabled() || deploySnapshot
+
+	echo """Branch: ${helper.scmSource.branch.name}
+PR: ${helper.scmSource.pullRequest?.id}
+params.ENVIRONMENT_SET: ${params.ENVIRONMENT_SET}
+
+Resulting execution plan:
+    enableDefaultBuild=$enableDefaultBuild
+    enableDefaultBuildIT=$enableDefaultBuildIT
+    environments=${environments.enabledAsString}
+    performRelease=$performRelease
+    deploySnapshot=$deploySnapshot
+"""
 
 	if (performRelease) {
 		releaseVersion = Version.parseReleaseVersion(params.RELEASE_VERSION)
@@ -614,6 +569,62 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
+	}
+}
+
+void keepOnlyEnvironmentsFromSet(String environmentSetName) {
+	boolean enableDefaultBuildEnv = false
+	boolean enableNonDefaultSupportedBuildEnv = false
+	boolean enableExperimentalBuildEnv = false
+	switch (environmentSetName) {
+		case 'DEFAULT':
+			enableDefaultBuildEnv = true
+			break
+		case 'SUPPORTED':
+			enableDefaultBuildEnv = true
+			enableNonDefaultSupportedBuildEnv = true
+			break
+		case 'ALL':
+			enableDefaultBuildEnv = true
+			enableNonDefaultSupportedBuildEnv = true
+			enableExperimentalBuildEnv = true
+			break
+		case 'EXPERIMENTAL':
+			enableExperimentalBuildEnv = true
+			break
+		case 'AUTOMATIC':
+			if (params.RELEASE_VERSION) {
+				echo "Skipping default build and integration tests to speed up the release of version $params.RELEASE_VERSION"
+			} else if (helper.scmSource.pullRequest) {
+				echo "Enabling only the default build in the default environment for pull request $helper.scmSource.pullRequest.id"
+				enableDefaultBuildEnv = true
+			} else if (helper.scmSource.branch.primary) {
+				echo "Enabling builds on all supported environments for primary branch '$helper.scmSource.branch.name'"
+				enableDefaultBuildEnv = true
+				enableNonDefaultSupportedBuildEnv = true
+			} else {
+				echo "Enabling only the default build in the default environment for feature branch $helper.scmSource.branch.name"
+				enableDefaultBuildEnv = true
+			}
+			break
+		default:
+			throw new IllegalArgumentException(
+					"Unknown value for param 'ENVIRONMENT_SET': '$environmentSetName'."
+			)
+	}
+
+	// Filter environments
+
+	environments.content.each { key, envSet ->
+		if (!enableDefaultBuildEnv) {
+			envSet.enabled.remove(envSet.default)
+		}
+		if (!enableNonDefaultSupportedBuildEnv) {
+			envSet.enabled.removeAll { buildEnv -> buildEnv.status == BuildEnvironmentStatus.SUPPORTED }
+		}
+		if (!enableExperimentalBuildEnv) {
+			envSet.enabled.removeAll { buildEnv -> buildEnv.status == BuildEnvironmentStatus.EXPERIMENTAL }
+		}
 	}
 }
 
