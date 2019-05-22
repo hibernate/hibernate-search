@@ -61,7 +61,7 @@ class DirectoryHelper {
 			iw.close();
 		}
 		catch (LockObtainFailedException lofe) {
-			log.lockingFailureDuringInitialization( directory.toString() );
+			log.lockingFailureDuringInitialization( directory.toString(), eventContext );
 		}
 	}
 
