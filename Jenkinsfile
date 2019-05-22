@@ -134,13 +134,13 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
 // such as sending a notification. May include the master node in particular.
 @Field final String QUICK_USE_NODE_PATTERN = 'Master||Slave'
 
-@Field AlternativeMultiMap<ITEnvironment> environments
+@Field AlternativeMultiMap<BuildEnvironment> environments
 @Field JobHelper helper
 
 @Field boolean enableDefaultBuild = false
-@Field boolean enableDefaultEnvIT = false
-@Field boolean enableNonDefaultSupportedEnvIT = false
-@Field boolean enableExperimentalEnvIT = false
+@Field boolean enableDefaultBuildIT = false
+@Field boolean enableNonDefaultSupportedBuildEnv = false
+@Field boolean enableExperimentalBuildEnv = false
 @Field boolean performRelease = false
 @Field boolean deploySnapshot = false
 
@@ -156,35 +156,35 @@ stage('Configure') {
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
-					new JdkITEnvironment(version: '8', tool: 'Oracle JDK 8', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
-					new JdkITEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: ITEnvironmentStatus.SUPPORTED),
-					new JdkITEnvironment(version: '12', tool: 'OpenJDK 12 Latest', status: ITEnvironmentStatus.SUPPORTED),
-					new JdkITEnvironment(version: '13', tool: 'OpenJDK 13 Latest', status: ITEnvironmentStatus.EXPERIMENTAL,
+					new JdkBuildEnvironment(version: '8', tool: 'Oracle JDK 8', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD),
+					new JdkBuildEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					new JdkBuildEnvironment(version: '12', tool: 'OpenJDK 12 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					new JdkBuildEnvironment(version: '13', tool: 'OpenJDK 13 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL,
 							// Elasticsearch won't run on JDK13
 							elasticsearchTool: 'OpenJDK 11 Latest')
 			],
 			compiler: [
-					new CompilerITEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse', status: ITEnvironmentStatus.SUPPORTED),
+					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse', status: BuildEnvironmentStatus.SUPPORTED),
 			],
 			database: [
-					new DatabaseITEnvironment(dbName: 'h2', mavenProfile: 'h2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
-					new DatabaseITEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb', status: ITEnvironmentStatus.SUPPORTED),
-					new DatabaseITEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql', status: ITEnvironmentStatus.SUPPORTED)
+					new DatabaseBuildEnvironment(dbName: 'h2', mavenProfile: 'h2', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD),
+					new DatabaseBuildEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb', status: BuildEnvironmentStatus.SUPPORTED),
+					new DatabaseBuildEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql', status: BuildEnvironmentStatus.SUPPORTED)
 			],
 			esLocal: [
-					new EsLocalITEnvironment(versionRange: '[2.0,2.2)', mavenProfile: 'elasticsearch-2.0', status: ITEnvironmentStatus.SUPPORTED),
-					new EsLocalITEnvironment(versionRange: '[2.2,5.0)', mavenProfile: 'elasticsearch-2.2', status: ITEnvironmentStatus.SUPPORTED),
+					new EsLocalBuildEnvironment(versionRange: '[2.0,2.2)', mavenProfile: 'elasticsearch-2.0', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsLocalBuildEnvironment(versionRange: '[2.2,5.0)', mavenProfile: 'elasticsearch-2.2', status: BuildEnvironmentStatus.SUPPORTED),
 					// Use Elasticsearch 5.0.2 instead of the default 5.1.2, because a bug crashes ES on startup in our environment
 					// See https://github.com/elastic/elasticsearch/issues/23218
-					new EsLocalITEnvironment(versionRange: '[5.0,5.2)', version: '5.0.2', mavenProfile: 'elasticsearch-5.0', status: ITEnvironmentStatus.SUPPORTED),
-					new EsLocalITEnvironment(versionRange: '[5.2,6.0)', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD)
+					new EsLocalBuildEnvironment(versionRange: '[5.0,5.2)', version: '5.0.2', mavenProfile: 'elasticsearch-5.0', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsLocalBuildEnvironment(versionRange: '[5.2,6.0)', mavenProfile: 'elasticsearch-5.2', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD)
 			],
 			esAws: [
-					new EsAwsITEnvironment(version: '2.3', mavenProfile: 'elasticsearch-2.2', status: ITEnvironmentStatus.SUPPORTED),
-					new EsAwsITEnvironment(version: '5.1', mavenProfile: 'elasticsearch-5.0', status: ITEnvironmentStatus.SUPPORTED),
-					new EsAwsITEnvironment(version: '5.3', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.SUPPORTED),
-					new EsAwsITEnvironment(version: '5.5', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.SUPPORTED),
-					new EsAwsITEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.SUPPORTED)
+					new EsAwsBuildEnvironment(version: '2.3', mavenProfile: 'elasticsearch-2.2', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsAwsBuildEnvironment(version: '5.1', mavenProfile: 'elasticsearch-5.0', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsAwsBuildEnvironment(version: '5.3', mavenProfile: 'elasticsearch-5.2', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsAwsBuildEnvironment(version: '5.5', mavenProfile: 'elasticsearch-5.2', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.2', status: BuildEnvironmentStatus.SUPPORTED)
 			]
 	])
 
@@ -214,16 +214,17 @@ stage('Configure') {
 			helper.generateNotificationProperty(),
 			parameters([
 					choice(
-							name: 'INTEGRATION_TESTS',
+							name: 'ENVIRONMENT_SET',
 							choices: """AUTOMATIC
-DEFAULT_ENV_ONLY
-SUPPORTED_ENV_ONLY
-EXPERIMENTAL_ENV_ONLY
-ALL_ENV""",
+DEFAULT
+SUPPORTED
+EXPERIMENTAL
+ALL""",
 							defaultValue: 'AUTOMATIC',
-							description: """Which integration tests to run.
-'AUTOMATIC' chooses based on the branch name and whether a release is being performed.
-'DEFAULT_ENV_ONLY' means a single build, while other options will trigger multiple Maven executions in different environments."""
+							description: """A set of environments that must be checked.
+'AUTOMATIC' picks a different set of environments based on the branch name and whether a release is being performed.
+'DEFAULT' means a single build with the default environment expected by the Maven configuration,
+while other options will trigger multiple Maven executions in different environments."""
 					),
 					string(
 							name: 'RELEASE_VERSION',
@@ -256,53 +257,51 @@ ALL_ENV""",
 		}
 	}
 
-	switch (params.INTEGRATION_TESTS) {
-		case 'DEFAULT_ENV_ONLY':
-			enableDefaultEnvIT = true
+	switch (params.ENVIRONMENT_SET) {
+		case 'DEFAULT':
+			enableDefaultBuildIT = true
 			break
-		case 'SUPPORTED_ENV_ONLY':
-			enableDefaultEnvIT = true
-			enableNonDefaultSupportedEnvIT = true
+		case 'SUPPORTED':
+			enableDefaultBuildIT = true
+			enableNonDefaultSupportedBuildEnv = true
 			break
-		case 'ALL_ENV':
-			enableDefaultEnvIT = true
-			enableNonDefaultSupportedEnvIT = true
-			enableExperimentalEnvIT = true
+		case 'ALL':
+			enableDefaultBuildIT = true
+			enableNonDefaultSupportedBuildEnv = true
+			enableExperimentalBuildEnv = true
 			break
-		case 'EXPERIMENTAL_ENV_ONLY':
-			enableExperimentalEnvIT = true
+		case 'EXPERIMENTAL':
+			enableExperimentalBuildEnv = true
 			break
 		case 'AUTOMATIC':
 			if (params.RELEASE_VERSION) {
 				echo "Skipping default build and integration tests to speed up the release of version $params.RELEASE_VERSION"
 			} else if (helper.scmSource.pullRequest) {
-				echo "Enabling only the default build and integration tests in the default environment for pull request $helper.scmSource.pullRequest.id"
-				enableDefaultEnvIT = true
+				echo "Enabling only the default build with integration tests in the default environment for pull request $helper.scmSource.pullRequest.id"
+				enableDefaultBuildIT = true
 			} else if (helper.scmSource.branch.primary) {
-				echo "Enabling integration tests on all supported environments for primary branch '$helper.scmSource.branch.name'"
-				enableDefaultBuild = true
-				enableDefaultEnvIT = true
-				enableNonDefaultSupportedEnvIT = true
+				echo "Enabling builds on all supported environments for primary branch '$helper.scmSource.branch.name'"
+				enableDefaultBuildIT = true
+				enableNonDefaultSupportedBuildEnv = true
 			} else {
-				echo "Enabling only the default build and integration tests in the default environment for feature branch $helper.scmSource.branch.name"
-				enableDefaultBuild = true
-				enableDefaultEnvIT = true
+				echo "Enabling only the default build with integration tests in the default environment for feature branch $helper.scmSource.branch.name"
+				enableDefaultBuildIT = true
 			}
 			break
 		default:
 			throw new IllegalArgumentException(
-					"Unknown value for param 'INTEGRATION_TESTS': '$params.INTEGRATION_TESTS'."
+					"Unknown value for param 'ENVIRONMENT_SET': '$params.ENVIRONMENT_SET'."
 			)
 	}
 
 	enableDefaultBuild =
-			enableDefaultEnvIT || enableNonDefaultSupportedEnvIT || enableExperimentalEnvIT || deploySnapshot
+			enableDefaultBuildIT || enableNonDefaultSupportedBuildEnv || enableExperimentalBuildEnv || deploySnapshot
 
-	echo """Branch: ${helper.scmSource.branch.name}, PR: ${helper.scmSource.pullRequest?.id}, integration test setting: $params.INTEGRATION_TESTS, resulting execution plan:
+	echo """Branch: ${helper.scmSource.branch.name}, PR: ${helper.scmSource.pullRequest?.id}, environment setting: $params.ENVIRONMENT_SET, resulting execution plan:
 enableDefaultBuild=$enableDefaultBuild
-enableDefaultEnvIT=$enableDefaultEnvIT
-enableNonDefaultSupportedEnvIT=$enableNonDefaultSupportedEnvIT
-enableExperimentalEnvIT=$enableExperimentalEnvIT
+enableDefaultBuildIT=$enableDefaultBuildIT
+enableNonDefaultSupportedBuildEnv=$enableNonDefaultSupportedBuildEnv
+enableExperimentalBuildEnv=$enableExperimentalBuildEnv
 performRelease=$performRelease
 deploySnapshot=$deploySnapshot"""
 
@@ -312,33 +311,33 @@ deploySnapshot=$deploySnapshot"""
 		// No need to re-test default environments, they are already tested as part of the default build
 		envSet.enabled.remove(envSet.default)
 
-		if (!enableNonDefaultSupportedEnvIT) {
-			envSet.enabled.removeAll { itEnv -> itEnv.status == ITEnvironmentStatus.SUPPORTED }
+		if (!enableNonDefaultSupportedBuildEnv) {
+			envSet.enabled.removeAll { buildEnv -> buildEnv.status == BuildEnvironmentStatus.SUPPORTED }
 		}
-		if (!enableExperimentalEnvIT) {
-			envSet.enabled.removeAll { itEnv -> itEnv.status == ITEnvironmentStatus.EXPERIMENTAL }
+		if (!enableExperimentalBuildEnv) {
+			envSet.enabled.removeAll { buildEnv -> buildEnv.status == BuildEnvironmentStatus.EXPERIMENTAL }
 		}
 	}
 
-	environments.content.esAws.enabled.removeAll { itEnv ->
-		itEnv.endpointUrl = env.getProperty(itEnv.endpointVariableName)
-		if (!itEnv.endpointUrl) {
-			echo "Skipping test ${itEnv.tag} because environment variable '${itEnv.endpointVariableName}' is not defined."
+	environments.content.esAws.enabled.removeAll { buildEnv ->
+		buildEnv.endpointUrl = env.getProperty(buildEnv.endpointVariableName)
+		if (!buildEnv.endpointUrl) {
+			echo "Skipping test ${buildEnv.tag} because environment variable '${buildEnv.endpointVariableName}' is not defined."
 			return true
 		}
-		itEnv.awsRegion = env.ES_AWS_REGION
-		if (!itEnv.awsRegion) {
-			echo "Skipping test ${itEnv.tag} because environment variable 'ES_AWS_REGION' is not defined."
+		buildEnv.awsRegion = env.ES_AWS_REGION
+		if (!buildEnv.awsRegion) {
+			echo "Skipping test ${buildEnv.tag} because environment variable 'ES_AWS_REGION' is not defined."
 			return true
 		}
 		return false // Environment is fully defined, do not remove
 	}
 
 	if (environments.isAnyEnabled()) {
-		echo "Enabled non-default environment ITs: ${environments.enabledAsString}"
+		echo "Enabled non-default environments: ${environments.enabledAsString}"
 	}
 	else {
-		echo "Non-default environment ITs are completely disabled."
+		echo "Non-default environments are completely disabled."
 	}
 
 	if (performRelease) {
@@ -376,11 +375,11 @@ stage('Default build') {
 			sh """ \
 					mvn clean install \
 					-Pdist -Pcoverage -Pjqassistant \
-					${enableDefaultEnvIT ? '' : '-DskipTests'} \
+					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 			"""
 
 			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing
-			if (enableDefaultEnvIT) {
+			if (enableDefaultBuildIT) {
 				try {
 					withCredentials([string(credentialsId: 'coveralls-repository-token', variable: 'COVERALLS_TOKEN')]) {
 						sh """ \
@@ -406,16 +405,16 @@ stage('Default build') {
 	}
 }
 
-stage('Non-default environment ITs') {
+stage('Non-default environments') {
 	Map<String, Closure> executions = [:]
 
 	// Test with multiple JDKs
-	environments.content.jdk.enabled.each { JdkITEnvironment itEnv ->
-		executions.put(itEnv.tag, {
+	environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
+		executions.put(buildEnv.tag, {
 			node(NODE_PATTERN_BASE) {
-				def elasticsearchJdkTool = itEnv.elasticsearchTool ? tool(name: itEnv.elasticsearchTool, type: 'jdk') : null
-				helper.withMavenWorkspace(jdk: itEnv.tool) {
-					mavenNonDefaultIT itEnv, """ \
+				def elasticsearchJdkTool = buildEnv.elasticsearchTool ? tool(name: buildEnv.elasticsearchTool, type: 'jdk') : null
+				helper.withMavenWorkspace(jdk: buildEnv.tool) {
+					mavenNonDefaultBuild buildEnv, """ \
 							clean install --fail-at-end \
 							${elasticsearchJdkTool ? "-Dtest.elasticsearch.java_home=$elasticsearchJdkTool" : ""} \
 					"""
@@ -425,14 +424,14 @@ stage('Non-default environment ITs') {
 	}
 
 	// Build with different compilers
-	environments.content.compiler.enabled.each { CompilerITEnvironment itEnv ->
-		executions.put(itEnv.tag, {
+	environments.content.compiler.enabled.each { CompilerBuildEnvironment buildEnv ->
+		executions.put(buildEnv.tag, {
 			node(NODE_PATTERN_BASE) {
 				helper.withMavenWorkspace {
-					mavenNonDefaultIT itEnv, """ \
+					mavenNonDefaultBuild buildEnv, """ \
 							clean install --fail-at-end \
 							-DskipTests \
-							-P${itEnv.mavenProfile} \
+							-P${buildEnv.mavenProfile} \
 					"""
 				}
 			}
@@ -440,13 +439,13 @@ stage('Non-default environment ITs') {
 	}
 
 	// Test ORM integration with multiple databases
-	environments.content.database.enabled.each { DatabaseITEnvironment itEnv ->
-		executions.put(itEnv.tag, {
+	environments.content.database.enabled.each { DatabaseBuildEnvironment buildEnv ->
+		executions.put(buildEnv.tag, {
 			node(NODE_PATTERN_BASE) {
 				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
-					mavenNonDefaultIT itEnv, """ \
-							clean install -pl org.hibernate:hibernate-search-orm -P$itEnv.mavenProfile \
+					mavenNonDefaultBuild buildEnv, """ \
+							clean install -pl org.hibernate:hibernate-search-orm -P$buildEnv.mavenProfile \
 					"""
 				}
 			}
@@ -454,14 +453,14 @@ stage('Non-default environment ITs') {
 	}
 
 	// Test Elasticsearch integration with multiple versions in a local instance
-	environments.content.esLocal.enabled.each { EsLocalITEnvironment itEnv ->
-		executions.put(itEnv.tag, {
+	environments.content.esLocal.enabled.each { EsLocalBuildEnvironment buildEnv ->
+		executions.put(buildEnv.tag, {
 			node(NODE_PATTERN_BASE) {
 				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
-					mavenNonDefaultIT itEnv, """ \
+					mavenNonDefaultBuild buildEnv, """ \
 							clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
-							${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \
+							${toMavenElasticsearchProfileArg(buildEnv.mavenProfile)} \
 							${itEnv.version ? "-Dtest.elasticsearch.host.version=$itEnv.version" : ''} \
 					"""
 				}
@@ -470,15 +469,15 @@ stage('Non-default environment ITs') {
 	}
 
 	// Test Elasticsearch integration with multiple versions in an AWS instance
-	environments.content.esAws.enabled.each { EsAwsITEnvironment itEnv ->
-		if (!itEnv.endpointUrl) {
+	environments.content.esAws.enabled.each { EsAwsBuildEnvironment buildEnv ->
+		if (!buildEnv.endpointUrl) {
 			throw new IllegalStateException("Unexpected empty endpoint URL")
 		}
-		if (!itEnv.awsRegion) {
+		if (!buildEnv.awsRegion) {
 			throw new IllegalStateException("Unexpected empty AWS region")
 		}
-		executions.put(itEnv.tag, {
-			lock(label: itEnv.lockedResourcesLabel) {
+		executions.put(buildEnv.tag, {
+			lock(label: buildEnv.lockedResourcesLabel) {
 				node(NODE_PATTERN_BASE + '&&AWS') {
 					helper.withMavenWorkspace {
 						resumeFromDefaultBuild()
@@ -487,15 +486,15 @@ stage('Non-default environment ITs') {
 										 usernameVariable: 'AWS_ACCESS_KEY_ID',
 										 passwordVariable: 'AWS_SECRET_ACCESS_KEY'
 						]]) {
-							mavenNonDefaultIT itEnv, """ \
+							mavenNonDefaultBuild buildEnv, """ \
 								clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
-								${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \
+								${toMavenElasticsearchProfileArg(buildEnv.mavenProfile)} \
 								-Dtest.elasticsearch.host.provided=true \
-								-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \
+								-Dtest.elasticsearch.host.url=$buildEnv.endpointUrl \
 								-Dtest.elasticsearch.host.aws.signing.enabled=true \
 								-Dtest.elasticsearch.host.aws.access_key=$AWS_ACCESS_KEY_ID \
 								-Dtest.elasticsearch.host.aws.secret_key=$AWS_SECRET_ACCESS_KEY \
-								-Dtest.elasticsearch.host.aws.region=$itEnv.awsRegion \
+								-Dtest.elasticsearch.host.aws.region=$buildEnv.awsRegion \
 							"""
 						}
 					}
@@ -505,7 +504,7 @@ stage('Non-default environment ITs') {
 	}
 
 	if (executions.isEmpty()) {
-		echo 'Skipping integration tests in non-default environments'
+		echo 'Skipping builds in non-default environments'
 		helper.markStageSkipped()
 	}
 	else {
@@ -565,8 +564,8 @@ stage('Deploy') {
 
 // Job-specific helpers
 
-enum ITEnvironmentStatus {
-	// For environments used as part of the integration tests in the default build (tested on all branches)
+enum BuildEnvironmentStatus {
+	// For environments used as part of the default build (tested on all branches)
 	USED_IN_DEFAULT_BUILD,
 	// For environments that are expected to work correctly (tested on master and maintenance branches)
 	SUPPORTED,
@@ -575,43 +574,43 @@ enum ITEnvironmentStatus {
 
 	// Work around JENKINS-33023
 	// See https://issues.jenkins-ci.org/browse/JENKINS-33023?focusedCommentId=325738&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-325738
-	public ITEnvironmentStatus() {}
+	public BuildEnvironmentStatus() {}
 }
 
-abstract class ITEnvironment {
-	ITEnvironmentStatus status
+abstract class BuildEnvironment {
+	BuildEnvironmentStatus status
 	String toString() { getTag() }
 	abstract String getTag()
-	boolean isDefault() { status == ITEnvironmentStatus.USED_IN_DEFAULT_BUILD }
+	boolean isDefault() { status == BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD }
 }
 
-class JdkITEnvironment extends ITEnvironment {
+class JdkBuildEnvironment extends BuildEnvironment {
 	String version
 	String tool
 	String elasticsearchTool
 	String getTag() { "jdk-$version" }
 }
 
-class CompilerITEnvironment extends ITEnvironment {
+class CompilerBuildEnvironment extends BuildEnvironment {
 	String name
 	String mavenProfile
 	String getTag() { "compiler-$name" }
 }
 
-class DatabaseITEnvironment extends ITEnvironment {
+class DatabaseBuildEnvironment extends BuildEnvironment {
 	String dbName
 	String mavenProfile
 	String getTag() { "database-$dbName" }
 }
 
-class EsLocalITEnvironment extends ITEnvironment {
+class EsLocalBuildEnvironment extends BuildEnvironment {
 	String versionRange
 	String version
 	String mavenProfile
 	String getTag() { "elasticsearch-local-$versionRange${version ? "-as-$version" : ''}" }
 }
 
-class EsAwsITEnvironment extends ITEnvironment {
+class EsAwsBuildEnvironment extends BuildEnvironment {
 	String version
 	String mavenProfile
 	String endpointUrl = null
@@ -634,10 +633,10 @@ void resumeFromDefaultBuild() {
 	}
 }
 
-void mavenNonDefaultIT(ITEnvironment itEnv, String args) {
+void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args) {
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
-	def testSuffix = itEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
+	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
 	sh "mvn -Dsurefire.environment=$testSuffix $args"
 }
 
