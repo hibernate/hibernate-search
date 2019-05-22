@@ -21,13 +21,13 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Executors;
 
 /**
- * An executor of tasks that accepts tasks from multiple threads, puts them in a queue,
+ * An executor of works that accepts works from multiple threads, puts them in a queue,
  * and processes them in batches in a single background thread.
  * <p>
- * Useful when tasks can be merged together for optimization purposes (bulking in Elasticsearch),
+ * Useful when works can be merged together for optimization purposes (bulking in Elasticsearch),
  * or when they should never be executed in parallel (writes to a Lucene index).
  */
-public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, P extends BatchingExecutor.Processor> {
+public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P>, P extends BatchingExecutor.Processor> {
 
 	private final String name;
 
@@ -35,8 +35,8 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 	private final ErrorHandler errorHandler;
 	private final int maxTasksPerBatch;
 
-	private final BlockingQueue<T> taskQueue;
-	private final List<T> taskBuffer;
+	private final BlockingQueue<W> workQueue;
+	private final List<W> workBuffer;
 	private final AtomicBoolean processingScheduled;
 
 	private ExecutorService executorService;
@@ -65,64 +65,64 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 		this.processor = processor;
 		this.errorHandler = errorHandler;
 		this.maxTasksPerBatch = maxTasksPerBatch;
-		taskQueue = new ArrayBlockingQueue<>( maxTasksPerBatch, fair );
-		taskBuffer = new ArrayList<>( maxTasksPerBatch );
+		workQueue = new ArrayBlockingQueue<>( maxTasksPerBatch, fair );
+		workBuffer = new ArrayList<>( maxTasksPerBatch );
 		processingScheduled = new AtomicBoolean( false );
 	}
 
 	/**
-	 * Start the executor, allowing tasks to be submitted
-	 * through {@link #submit(Task)}.
+	 * Start the executor, allowing works to be submitted
+	 * through {@link #submit(WorkSet)}.
 	 */
 	public synchronized void start() {
 		executorService = Executors.newFixedThreadPool( 1, name );
 	}
 
 	/**
-	 * Stop the executor, no longer allowing tasks to be submitted
-	 * through {@link #submit(Task)}.
+	 * Stop the executor, no longer allowing works to be submitted
+	 * through {@link #submit(WorkSet)}.
 	 * <p>
-	 * This will attempt to forcibly terminate currently executing tasks,
-	 * and will remove pending tasks from the queue.
+	 * This will attempt to forcibly terminate currently executing works,
+	 * and will remove pending works from the queue.
 	 */
 	public synchronized void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ExecutorService::shutdownNow, executorService );
 			executorService = null;
-			taskQueue.clear();
-			//It's possible that a task was successfully scheduled but had no chance to run,
+			workQueue.clear();
+			//It's possible that processing was successfully scheduled in the executor service but had no chance to run,
 			//so we need to release waiting threads:
 			closer.push( Phaser::forceTermination, phaser );
 		}
 	}
 
 	/**
-	 * Submit a task for execution.
+	 * Submit a set of works for execution.
 	 * <p>
 	 * Must not be called when the executor is stopped.
-	 * @param task A task to execute.
-	 * @throws InterruptedException If the current thread is interrupted while enqueuing the task.
+	 * @param workset A set of works to execute.
+	 * @throws InterruptedException If the current thread is interrupted while enqueuing the workset.
 	 */
-	public void submit(T task) throws InterruptedException {
+	public void submit(W workset) throws InterruptedException {
 		if ( executorService == null ) {
 			throw new AssertionFailure(
-					"Attempt to submit a task to executor '" + name + "', which is stopped"
+					"Attempt to submit a workset to executor '" + name + "', which is stopped"
 					+ " There is probably a bug in Hibernate Search, please report it."
 			);
 		}
-		taskQueue.put( task );
+		workQueue.put( workset );
 		ensureProcessingScheduled();
 	}
 
 	/**
-	 * Block the current thread until the executor has completed all pending tasks.
+	 * Block the current thread until the executor has completed all pending worksets.
 	 * <p>
 	 * Tasks submitted to the executor after entering this method
 	 * may delay the wait.
 	 *
 	 * TODO HSEARCH-3576 we should use child executors, sharing the same execution service but each with its own child phaser,
-	 *  allowing each child executor to only wait until all of its *own* tasks are completed.
-	 *  That would however require to register/deregister the phaser for each single task,
+	 *  allowing each child executor to only wait until all of its *own* worksets are completed.
+	 *  That would however require to register/deregister the phaser for each single workset,
 	 *  instead of for each scheduling of the processing like we do now.
 	 *  Phaser only support up to 65535 parties, so we would may need to use multiple phasers per child executor...
 	 *
@@ -158,6 +158,7 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 					catch (Throwable e) {
 						/*
 						 * Make sure a failure to submit the processing task
+						 * to the executor service
 						 * doesn't leave other threads waiting indefinitely
 						 */
 						try {
@@ -172,6 +173,7 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 				else {
 					/*
 					 * Corner case: another thread submitted a processing task
+					 * to the executor service
 					 * just after we registered the phaser.
 					 * Cancel our own registration.
 					 */
@@ -181,6 +183,7 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 			catch (Throwable e) {
 				/*
 				 * Make sure a failure to submit the processing task
+				 * to the executor service
 				 * doesn't leave other threads waiting indefinitely
 				 */
 				try {
@@ -195,7 +198,7 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 	}
 
 	/**
-	 * Takes a batch of tasks from the queue and processes them.
+	 * Takes a batch of worksets from the queue and processes them.
 	 */
 	private void processBatch() {
 		try {
@@ -203,16 +206,16 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 			try {
 				synchronized (processor) {
 					processor.beginBatch();
-					taskBuffer.clear();
+					workBuffer.clear();
 
-					taskQueue.drainTo( taskBuffer, maxTasksPerBatch );
+					workQueue.drainTo( workBuffer, maxTasksPerBatch );
 
-					for ( T task : taskBuffer ) {
+					for ( W workset : workBuffer ) {
 						try {
-							task.submitTo( processor );
+							workset.submitTo( processor );
 						}
 						catch (Throwable e) {
-							task.markAsFailed( e );
+							workset.markAsFailed( e );
 							throw e;
 						}
 					}
@@ -236,21 +239,21 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 					processingScheduled.set( false );
 
 					/*
-					 * Just in case tasks were added to the queue between
+					 * Just in case works were added to the queue between
 					 * when we drained the queue and the resetting of
 					 * processingScheduled above.
 					 * This must be executed before we arrive at the phaser to ensure that
 					 * threads calling submit(), then awaitCompletion() will not be unblocked
 					 * before we called ensureProcessingScheduled() below.
 					 */
-					if ( !taskQueue.isEmpty() ) {
+					if ( !workQueue.isEmpty() ) {
 						ensureProcessingScheduled();
 					}
 				}
 				catch (Throwable e) {
 					// This will only happen if there is a bug in this class, but we don't want to fail silently
 					errorHandler.handleException(
-							"Error while ensuring the next task submitted to executor '" + name + "' will be processed",
+							"Error while ensuring the next work submitted to executor '" + name + "' will be processed",
 							e
 					);
 				}
@@ -262,7 +265,7 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 		catch (Throwable e) {
 			// This will only happen if there is a bug in the processor
 			errorHandler.handleException(
-					"Error while processing tasks in executor '" + name + "'",
+					"Error while processing works in executor '" + name + "'",
 					e
 			);
 		}
@@ -286,7 +289,7 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 		void beginBatch();
 
 		/**
-		 * Ensure all tasks submitted since the last call to {@link #beginBatch()} will actually be executed,
+		 * Ensure all works submitted since the last call to {@link #beginBatch()} will actually be executed,
 		 * along with any finishing task (commit, ...).
 		 *
 		 * @return A future completing when all works submitted since the last call to {@link #beginBatch()}
@@ -296,7 +299,7 @@ public final class BatchingExecutor<T extends BatchingExecutor.Task<? super P>, 
 
 	}
 
-	public interface Task<P extends Processor> {
+	public interface WorkSet<P extends Processor> {
 
 		void submitTo(P processor);
 

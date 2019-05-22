@@ -40,7 +40,7 @@ abstract class AbstractElasticsearchWorkOrchestrator
 		return future;
 	}
 
-	interface ElasticsearchWorkSet extends BatchingExecutor.Task<ElasticsearchWorkOrchestrationStrategy> {
+	interface ElasticsearchWorkSet extends BatchingExecutor.WorkSet<ElasticsearchWorkOrchestrationStrategy> {
 	}
 
 	static class ElasticsearchMultipleWorkSet implements ElasticsearchWorkSet {
