@@ -180,7 +180,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 	@Entity(name = "indexed")
 	@Indexed(index = IndexedEntity.INDEX)
 	public static class IndexedEntity {
-		private static final String INDEX = "indexedentity";
+		static final String INDEX = "indexedentity";
 
 		@Id
 		private Integer id;
