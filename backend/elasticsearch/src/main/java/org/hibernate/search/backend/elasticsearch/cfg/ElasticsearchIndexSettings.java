@@ -56,7 +56,6 @@ public final class ElasticsearchIndexSettings {
 		public static final ElasticsearchIndexLifecycleStrategyName LIFECYCLE_STRATEGY = ElasticsearchIndexLifecycleStrategyName.CREATE;
 		public static final ElasticsearchIndexStatus LIFECYCLE_MINIMAL_REQUIRED_STATUS = ElasticsearchIndexStatus.GREEN;
 		public static final int LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
-		public static final boolean REFRESH_AFTER_WRITE = false;
 	}
 
 }
