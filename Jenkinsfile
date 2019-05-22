@@ -295,7 +295,9 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 	}
 
 	enableDefaultBuild =
-			enableDefaultBuildIT || environments.isAnyEnabled() || deploySnapshot
+			enableDefaultBuildIT ||
+			environments.content.any { key, envSet -> envSet.enabled.any { buildEnv -> buildEnv.requiresDefaultBuildArtifacts() } } ||
+			deploySnapshot
 
 	echo """Branch: ${helper.scmSource.branch.name}
 PR: ${helper.scmSource.pullRequest?.id}
@@ -413,7 +415,6 @@ stage('Non-default environments') {
 		executions.put(buildEnv.tag, {
 			node(NODE_PATTERN_BASE) {
 				helper.withMavenWorkspace {
-					resumeFromDefaultBuild()
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install -pl org.hibernate:hibernate-search-orm -P$buildEnv.mavenProfile \
 					"""
@@ -427,7 +428,6 @@ stage('Non-default environments') {
 		executions.put(buildEnv.tag, {
 			node(NODE_PATTERN_BASE) {
 				helper.withMavenWorkspace {
-					resumeFromDefaultBuild()
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
 							${toMavenElasticsearchProfileArg(buildEnv.mavenProfile)} \
@@ -450,7 +450,6 @@ stage('Non-default environments') {
 			lock(label: buildEnv.lockedResourcesLabel) {
 				node(NODE_PATTERN_BASE + '&&AWS') {
 					helper.withMavenWorkspace {
-						resumeFromDefaultBuild()
 						withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
 										 credentialsId   : 'aws-elasticsearch',
 										 usernameVariable: 'AWS_ACCESS_KEY_ID',
@@ -552,6 +551,7 @@ abstract class BuildEnvironment {
 	String toString() { getTag() }
 	abstract String getTag()
 	boolean isDefault() { status == BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD }
+	boolean requiresDefaultBuildArtifacts() { true }
 }
 
 class JdkBuildEnvironment extends BuildEnvironment {
@@ -559,12 +559,16 @@ class JdkBuildEnvironment extends BuildEnvironment {
 	String tool
 	String elasticsearchTool
 	String getTag() { "jdk-$version" }
+	@Override
+	boolean requiresDefaultBuildArtifacts() { false }
 }
 
 class CompilerBuildEnvironment extends BuildEnvironment {
 	String name
 	String mavenProfile
 	String getTag() { "compiler-$name" }
+	@Override
+	boolean requiresDefaultBuildArtifacts() { false }
 }
 
 class DatabaseBuildEnvironment extends BuildEnvironment {
@@ -665,13 +669,13 @@ void keepOnlyEnvironmentsFromSet(String environmentSetName) {
 	}
 }
 
-void resumeFromDefaultBuild() {
-	dir(helper.configuration.maven.localRepositoryPath) {
-		unstash name:'main-build'
-	}
-}
-
 void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args) {
+	if ( buildEnv.requiresDefaultBuildArtifacts() ) {
+		dir(helper.configuration.maven.localRepositoryPath) {
+			unstash name:'main-build'
+		}
+	}
+
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
