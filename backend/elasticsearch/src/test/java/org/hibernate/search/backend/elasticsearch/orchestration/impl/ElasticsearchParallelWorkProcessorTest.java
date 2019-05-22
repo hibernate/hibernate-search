@@ -29,7 +29,7 @@ import org.easymock.IAnswer;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSupport {
+public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	/**
 	 * @return A value that should not matter, because it should not be used.
@@ -56,8 +56,8 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkOrchestrationStrategy strategy =
-				new ElasticsearchSerialWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
+		ElasticsearchParallelWorkProcessor strategy =
+				new ElasticsearchParallelWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -81,11 +81,13 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		replayAll();
 		CompletableFuture<Void> futureAll = strategy.endBatch();
 		verifyAll();
-		assertThat( futureAll ).isSameAs( sequenceFuture );
+		assertThat( futureAll ).isPending();
+		sequenceFuture.complete( null );
+		assertThat( futureAll ).isSuccessful( (Void) null );
 	}
 
 	@Test
-	public void newSequenceBetweenWorkset() {
+	public void parallelSequenceBetweenWorkset() {
 		ElasticsearchWork<?> work1 = work( 1 );
 		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1 );
 
@@ -96,8 +98,8 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkOrchestrationStrategy strategy =
-				new ElasticsearchSerialWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
+		ElasticsearchParallelWorkProcessor strategy =
+				new ElasticsearchParallelWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -114,7 +116,7 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
 		resetAll();
-		sequenceBuilderMock.init( sequence1Future );
+		sequenceBuilderMock.init( anyObject() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
@@ -130,7 +132,11 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		replayAll();
 		CompletableFuture<Void> futureAll = strategy.endBatch();
 		verifyAll();
-		assertThat( futureAll ).isSameAs( sequence2Future );
+		assertThat( futureAll ).isPending();
+		sequence2Future.complete( null );
+		assertThat( futureAll ).isPending();
+		sequence1Future.complete( null );
+		assertThat( futureAll ).isSuccessful( (Void) null );
 	}
 
 	@Test
@@ -145,8 +151,8 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkOrchestrationStrategy strategy =
-				new ElasticsearchSerialWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
+		ElasticsearchParallelWorkProcessor strategy =
+				new ElasticsearchParallelWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -162,7 +168,7 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
 		resetAll();
-		sequenceBuilderMock.init( sequence1Future );
+		sequenceBuilderMock.init( anyObject() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
@@ -178,7 +184,19 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		replayAll();
 		CompletableFuture<Void> futureAll = strategy.endBatch();
 		verifyAll();
-		assertThat( futureAll ).isSameAs( sequence2Future );
+		assertThat( futureAll ).isPending();
+
+		resetAll();
+		replayAll();
+		sequence2Future.complete( null );
+		verifyAll();
+		assertThat( futureAll ).isPending();
+
+		resetAll();
+		replayAll();
+		sequence1Future.complete( null );
+		verifyAll();
+		assertThat( futureAll ).isSuccessful( (Void) null );
 	}
 
 	@Test
@@ -191,8 +209,8 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkOrchestrationStrategy strategy =
-				new ElasticsearchSerialWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
+		ElasticsearchParallelWorkProcessor strategy =
+				new ElasticsearchParallelWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -220,7 +238,13 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		replayAll();
 		CompletableFuture<Void> futureAll = strategy.endBatch();
 		verifyAll();
-		assertThat( futureAll ).isSameAs( sequence1Future );
+		assertThat( futureAll ).isPending();
+
+		resetAll();
+		replayAll();
+		sequence1Future.complete( null );
+		verifyAll();
+		assertThat( futureAll ).isSuccessful( (Void) null );
 	}
 
 	@Test
@@ -235,8 +259,8 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkOrchestrationStrategy strategy =
-				new ElasticsearchSerialWorkOrchestrationStrategy( sequenceBuilderMock, bulkerMock );
+		ElasticsearchParallelWorkProcessor strategy =
+				new ElasticsearchParallelWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -273,14 +297,26 @@ public class ElasticsearchSerialWorkOrchestrationStrategyTest extends EasyMockSu
 		replayAll();
 		CompletableFuture<Void> futureAll = strategy.endBatch();
 		verifyAll();
-		assertThat( futureAll ).isSameAs( sequence2Future );
+		assertThat( futureAll ).isPending();
+
+		resetAll();
+		replayAll();
+		sequence2Future.complete( null );
+		verifyAll();
+		assertThat( futureAll ).isPending();
+
+		resetAll();
+		replayAll();
+		sequence1Future.complete( null );
+		verifyAll();
+		assertThat( futureAll ).isSuccessful( (Void) null );
 	}
 
-	private ElasticsearchWork<?> work(int index) {
+	private <T> ElasticsearchWork<T> work(int index) {
 		return createStrictMock( "work" + index, ElasticsearchWork.class );
 	}
 
-	private BulkableElasticsearchWork<?> bulkableWork(int index) {
+	private <T> BulkableElasticsearchWork<T> bulkableWork(int index) {
 		return createStrictMock( "bulkableWork" + index, BulkableElasticsearchWork.class );
 	}
 

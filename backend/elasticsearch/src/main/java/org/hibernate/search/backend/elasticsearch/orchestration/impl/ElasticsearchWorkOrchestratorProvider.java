@@ -113,7 +113,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 		 */
 		this.rootParallelOrchestrator = createBatchingSharedOrchestrator(
 				rootParallelOrchestratorName,
-				createParallelOrchestrationStrategy(),
+				createParallelWorkProcessor(),
 				PARALLEL_MAX_WORKSETS_PER_BATCH,
 				false // Do not care about ordering when queuing worksets
 		);
@@ -141,11 +141,11 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	 * @return A <a href="#serial-orchestrators">serial orchestrator</a>.
 	 */
 	public ElasticsearchWorkOrchestratorImplementor createSerialOrchestrator(String name) {
-		ElasticsearchWorkOrchestrationStrategy strategy = createSerialOrchestrationStrategy();
+		ElasticsearchWorkProcessor processor = createSerialWorkProcessor();
 
 		return createBatchingSharedOrchestrator(
 				name,
-				strategy,
+				processor,
 				SERIAL_MAX_WORKSETS_PER_BATCH,
 				true /* enqueue worksets in the exact order they were submitted */
 		);
@@ -160,23 +160,23 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	}
 
 	private ElasticsearchBatchingWorkOrchestrator createBatchingSharedOrchestrator(
-			String name, ElasticsearchWorkOrchestrationStrategy strategy,
+			String name, ElasticsearchWorkProcessor processor,
 			int maxWorksetsPerBatch, boolean fair) {
 		return new ElasticsearchBatchingWorkOrchestrator(
-				name, strategy, maxWorksetsPerBatch, fair, errorHandler
+				name, processor, maxWorksetsPerBatch, fair, errorHandler
 		);
 	}
 
-	private ElasticsearchWorkOrchestrationStrategy createSerialOrchestrationStrategy() {
+	private ElasticsearchWorkProcessor createSerialWorkProcessor() {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( this::createRefreshingWorkExecutionContext );
 		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, SERIAL_MIN_BULK_SIZE );
-		return new ElasticsearchSerialWorkOrchestrationStrategy( sequenceBuilder, bulker );
+		return new ElasticsearchSerialWorkProcessor( sequenceBuilder, bulker );
 	}
 
-	private ElasticsearchWorkOrchestrationStrategy createParallelOrchestrationStrategy() {
+	private ElasticsearchWorkProcessor createParallelWorkProcessor() {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( this::createRefreshingWorkExecutionContext );
 		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, PARALLEL_MIN_BULK_SIZE );
-		return new ElasticsearchParallelWorkOrchestrationStrategy( sequenceBuilder, bulker );
+		return new ElasticsearchParallelWorkProcessor( sequenceBuilder, bulker );
 	}
 
 	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier) {

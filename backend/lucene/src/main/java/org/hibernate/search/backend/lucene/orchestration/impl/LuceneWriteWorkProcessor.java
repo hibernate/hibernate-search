@@ -26,7 +26,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
  * <p>
  * Ported from Search 5's LuceneBackendQueueTask, in particular.
  */
-public class LuceneWriteWorkProcessor implements BatchingExecutor.Processor {
+public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

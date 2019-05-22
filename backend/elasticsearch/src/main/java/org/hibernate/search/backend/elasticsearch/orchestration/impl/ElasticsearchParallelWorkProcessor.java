@@ -25,12 +25,12 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
  *
  * @author Yoann Rodiere
  */
-class ElasticsearchParallelWorkOrchestrationStrategy implements ElasticsearchWorkOrchestrationStrategy {
+class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 
 	private final BulkAndSequenceAggregator aggregator;
 	private final List<CompletableFuture<?>> sequenceFutures = new ArrayList<>();
 
-	public ElasticsearchParallelWorkOrchestrationStrategy(ElasticsearchWorkSequenceBuilder sequenceBuilder,
+	public ElasticsearchParallelWorkProcessor(ElasticsearchWorkSequenceBuilder sequenceBuilder,
 			ElasticsearchWorkBulker bulker) {
 		this.aggregator = new BulkAndSequenceAggregator( sequenceBuilder, bulker );
 	}

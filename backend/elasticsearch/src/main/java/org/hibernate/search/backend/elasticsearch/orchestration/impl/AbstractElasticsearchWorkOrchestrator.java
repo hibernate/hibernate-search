@@ -40,7 +40,7 @@ abstract class AbstractElasticsearchWorkOrchestrator
 		return future;
 	}
 
-	interface ElasticsearchWorkSet extends BatchingExecutor.WorkSet<ElasticsearchWorkOrchestrationStrategy> {
+	interface ElasticsearchWorkSet extends BatchingExecutor.WorkSet<ElasticsearchWorkProcessor> {
 	}
 
 	static class ElasticsearchMultipleWorkSet implements ElasticsearchWorkSet {
@@ -53,7 +53,7 @@ abstract class AbstractElasticsearchWorkOrchestrator
 		}
 
 		@Override
-		public void submitTo(ElasticsearchWorkOrchestrationStrategy delegate) {
+		public void submitTo(ElasticsearchWorkProcessor delegate) {
 			delegate.submit( works ).whenComplete( Futures.copyHandler( future ) );
 		}
 
@@ -73,7 +73,7 @@ abstract class AbstractElasticsearchWorkOrchestrator
 		}
 
 		@Override
-		public void submitTo(ElasticsearchWorkOrchestrationStrategy delegate) {
+		public void submitTo(ElasticsearchWorkProcessor delegate) {
 			delegate.submit( work ).whenComplete( Futures.copyHandler( future ) );
 		}
 

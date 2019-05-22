@@ -27,7 +27,7 @@ import org.hibernate.search.util.common.impl.Executors;
  * Useful when works can be merged together for optimization purposes (bulking in Elasticsearch),
  * or when they should never be executed in parallel (writes to a Lucene index).
  */
-public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P>, P extends BatchingExecutor.Processor> {
+public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P>, P extends BatchingExecutor.WorkProcessor> {
 
 	private final String name;
 
@@ -284,7 +284,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 		}
 	}
 
-	public interface Processor {
+	public interface WorkProcessor {
 
 		void beginBatch();
 
@@ -299,7 +299,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 
 	}
 
-	public interface WorkSet<P extends Processor> {
+	public interface WorkSet<P extends WorkProcessor> {
 
 		void submitTo(P processor);
 
