@@ -31,11 +31,11 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final BatchingExecutor<ElasticsearchWorkSet, ElasticsearchWorkOrchestrationStrategy> executor;
+	private final BatchingExecutor<ElasticsearchWorkSet, ElasticsearchWorkProcessor> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
-	 * @param strategy An orchestration strategy to use in the background thread.
+	 * @param processor A work processor to use in the background thread.
 	 * @param maxWorksetsPerBatch The maximum number of worksets to
 	 * process in a single batch. Higher values mean lesser chance of transport
 	 * thread starvation, but higher heap consumption.
@@ -45,12 +45,12 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	 * @param errorHandler An error handler to report failures of the background thread.
 	 */
 	public ElasticsearchBatchingWorkOrchestrator(
-			String name, ElasticsearchWorkOrchestrationStrategy strategy,
+			String name, ElasticsearchWorkProcessor processor,
 			int maxWorksetsPerBatch, boolean fair,
 			ErrorHandler errorHandler) {
 		super( name );
 		this.executor = new BatchingExecutor<>(
-				name, strategy, maxWorksetsPerBatch, fair,
+				name, processor, maxWorksetsPerBatch, fair,
 				errorHandler
 		);
 	}

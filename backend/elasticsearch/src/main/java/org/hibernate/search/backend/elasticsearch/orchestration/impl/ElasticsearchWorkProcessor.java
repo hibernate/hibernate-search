@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
  * <p>
  * Depending on the implementation, works may be executed serially, or in parallel.
  */
-interface ElasticsearchWorkOrchestrationStrategy extends BatchingExecutor.Processor {
+interface ElasticsearchWorkProcessor extends BatchingExecutor.WorkProcessor {
 
 	<T> CompletableFuture<T> submit(ElasticsearchWork<T> work);
 
