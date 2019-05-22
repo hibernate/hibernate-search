@@ -34,7 +34,7 @@ import org.hibernate.search.util.common.SearchException;
  * @param <PDC> The type of contexts used to create predicates in {@link #predicate(Function)}.
  */
 public interface SearchQueryResultDefinitionContext<
-				N extends SearchQueryContext<? extends N, E, ?>,
+				N extends SearchQueryContext<?, E, ?>,
 				R,
 				E,
 				PJC extends SearchProjectionFactoryContext<R, E>,

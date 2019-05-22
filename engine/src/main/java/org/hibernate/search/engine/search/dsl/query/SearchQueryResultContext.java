@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
  * @param <PDC> The type of contexts used to create predicates in {@link #predicate(Function)}.
  */
 public interface SearchQueryResultContext<
-		N extends SearchQueryContext<? extends N, H, ?>,
+		N extends SearchQueryContext<?, H, ?>,
 		H,
 		PDC extends SearchPredicateFactoryContext
 		> {
