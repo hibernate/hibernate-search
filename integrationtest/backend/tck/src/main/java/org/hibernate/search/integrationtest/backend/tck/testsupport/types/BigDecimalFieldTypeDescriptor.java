@@ -107,9 +107,11 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 
 		// Transform to a double to make it consistent with ES behaviour
 		// Lucene backend would not need that
+		// TODO HSEARCH-3583 Fix the precision issue in Elasticsearch and remove this hack
 		BigDecimal bigDecimal = BigDecimal.valueOf( decimal.doubleValue() );
 
 		// for double imprecision we risk to cross the bounds
+		// TODO HSEARCH-3583 Fix the precision issue in Elasticsearch and remove this hack
 		return ( longValue > 0 ) ?
 				bigDecimal.subtract( BigDecimal.TEN ) :
 				bigDecimal.add( BigDecimal.TEN );
