@@ -372,6 +372,15 @@
         <maven.compiler.argument.source>${maven.compiler.source}</maven.compiler.argument.source>
         <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
+        
+        <!--
+                Options to compile with the Eclipse compiler when building with maven (not with the IDE).
+                See profile "compiler-eclipse".
+                Note the version of ECJ is overridden because the one bundled with the latest plexus-compiler version
+                is outdated and leads to compilation errors.
+         -->
+        <version.org.codehaus.plexus.plexus-compiler-eclipse>2.8.5</version.org.codehaus.plexus.plexus-compiler-eclipse>
+        <version.org.eclipse.jdt.ecj>3.17.0</version.org.eclipse.jdt.ecj>
 
         <surefire.jvm.args.memory>-Xmx512m -Xms128m</surefire.jvm.args.memory>
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
@@ -2076,6 +2085,34 @@
                 <!-- https://bugs.openjdk.java.net/browse/JDK-8212233?focusedCommentId=14245762 -->
                 <javadoc.additionalOptions.java-version>-html5 -source 8</javadoc.additionalOptions.java-version>
             </properties>
+        </profile>
+        
+        <profile>
+            <id>compiler-eclipse</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <compilerId>eclipse</compilerId>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.codehaus.plexus</groupId>
+                                    <artifactId>plexus-compiler-eclipse</artifactId>
+                                    <version>${version.org.codehaus.plexus.plexus-compiler-eclipse}</version>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.eclipse.jdt</groupId>
+                                    <artifactId>ecj</artifactId>
+                                    <version>${version.org.eclipse.jdt.ecj}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
 
         <profile>
