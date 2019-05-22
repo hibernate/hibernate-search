@@ -29,9 +29,25 @@ import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.assertj.core.api.Assertions;
+
 public class DecimalScaleIT {
 
 	private static final String INDEX_NAME = "indexname";
+
+	/*
+	 * Longs only have 64 bits to represent the value, or approximately 18 decimal digits
+	 * (actually 19, but not all values with 19 digits can be represented).
+	 * We would expect the indexed value to be indexed with approximately that precision,
+	 * which is limited but still higher than the precision of doubles,
+	 * which have ~53 bits to represent the unscaled value, or approximately 16 decimal digits.
+	 *
+	 * TODO HSEARCH-3583 We do get this precision with the Lucene backend,
+	 *  but unfortunately there's a bug in Elasticsearch that reduces precision
+	 *  to that of a double.
+	 *  We should fix that and raise this constant to 18.
+	 */
+	int INDEX_PRECISION = 16;
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -171,84 +187,122 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_largeScale_bigDecimal() {
+		final int schemaDecimalScale = 275;
+
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						// 16 seems the MAX here. A 17-bases similar test would fail for Elasticsearch. Lucene would work.
-						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 16 ),
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), schemaDecimalScale ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		BigDecimal providedValue = new BigDecimal(
-				// 20 decimal ciphers
-				"1.11111111111111111111"
-		);
+		/*
+		 * Use extra digits in the original value, which will be assumed to be lost during indexing.
+		 *
+		 * The original value will look like this:
+		 *
+		 * 111111111111(...)111111.11111(...)111 * 10^-275
+		 *
+		 * The indexed value lower bound will look like this:
+		 *
+		 * 111111111111(...)111110.0 * 10^-275
+		 *
+		 * The indexed value upper bound will look like this:
+		 *
+		 * 111111111111(...)111112.0 * 10^-275
+		 */
+		BigDecimal originalValue = bigDecimalWithOnes( INDEX_PRECISION, 50, schemaDecimalScale );
+		BigDecimal estimatedIndexedValue = bigDecimalWithOnes( INDEX_PRECISION, 0, schemaDecimalScale );
+		BigDecimal indexedValueLowerBound = estimatedIndexedValue.subtract( new BigDecimal( BigInteger.ONE, schemaDecimalScale ) );
+		BigDecimal indexedValueUpperBound = estimatedIndexedValue.add( new BigDecimal( BigInteger.ONE, schemaDecimalScale ) );
+		Assertions.assertThat( originalValue )
+				.isBetween( indexedValueLowerBound, indexedValueUpperBound );
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, providedValue ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, originalValue ) );
 		workPlan.execute().join();
 
-		// decimal scale is 16, affecting the search precision
-		// so the provided value (20 decimals) will be treated as if it had 16 decimals
-		matchAbove( new BigDecimal(
-				// 15 decimal ciphers
-				"1.111111111111111"
-		) );
-		doNotMatchAbove( new BigDecimal(
-				// 16 decimal ciphers
-				"1.1111111111111111"
-		) );
+		matchAbove( indexedValueLowerBound );
+		doNotMatchAbove( indexedValueUpperBound );
 	}
 
 	@Test
 	public void decimalScale_negativeScale_largeScale_bigDecimal() {
+		final int schemaDecimalScale = -275;
+
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), -78 ),
+						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), schemaDecimalScale ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		BigDecimal providedValue = new BigDecimal(
-				"11111111111111111111111111111111111111111111111111111111111111111111111111111111"
-		);
+		/*
+		 * Use extra digits in the original value, which will be assumed to be lost during indexing.
+		 *
+		 * The original value will look like this:
+		 *
+		 * 111111111111(...)111111.11111(...)111 * 10^275
+		 *
+		 * The indexed value lower bound will look like this:
+		 *
+		 * 111111111111(...)111110.0 * 10^275
+		 *
+		 * The indexed value upper bound will look like this:
+		 *
+		 * 111111111111(...)111112.0 * 10^275
+		 */
+		BigDecimal originalValue = bigDecimalWithOnes( INDEX_PRECISION, 5, schemaDecimalScale );
+		BigDecimal estimatedIndexedValue = bigDecimalWithOnes( INDEX_PRECISION, 0, schemaDecimalScale );
+		BigDecimal indexedValueLowerBound = estimatedIndexedValue.subtract( new BigDecimal( BigInteger.ONE, schemaDecimalScale ) );
+		BigDecimal indexedValueUpperBound = estimatedIndexedValue.add( new BigDecimal( BigInteger.ONE, schemaDecimalScale ) );
+		Assertions.assertThat( originalValue )
+				.isBetween( indexedValueLowerBound, indexedValueUpperBound );
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, providedValue ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, originalValue ) );
 		workPlan.execute().join();
 
-		// decimal scale is -78, affecting the search precision
-		// so the provided value of 80 of 1 digits will be treated as if it had 2 of 1 digits followed by 78 of 0 digits
-		matchAbove( new BigDecimal(
-				"10000000000000000000000000000000000000000000000000000000000000000000000000000000"
-		) );
-		doNotMatchAbove( new BigDecimal(
-				"11000000000000000000000000000000000000000000000000000000000000000000000000000000"
-		) );
+		matchAbove( indexedValueLowerBound );
+		doNotMatchAbove( indexedValueUpperBound );
 	}
 
 	@Test
 	public void decimalScale_negativeScale_largeScale_bigInteger() {
+		final int schemaDecimalScale = -275;
+
 		setupHelper.withDefaultConfiguration()
 				.withIndex( INDEX_NAME,
-						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -78 ),
+						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), schemaDecimalScale ),
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		BigInteger providedValue = new BigInteger(
-				"11111111111111111111111111111111111111111111111111111111111111111111111111111111"
-		);
+		/*
+		 * Use extra digits in the original value, which will be assumed to be lost during indexing.
+		 *
+		 * The original value will look like this:
+		 *
+		 * 111111111111(...)111111.11111(...)111 * 10^275
+		 *
+		 * The indexed value lower bound will look like this:
+		 *
+		 * 111111111111(...)111110.0 * 10^275
+		 *
+		 * The indexed value upper bound will look like this:
+		 *
+		 * 111111111111(...)111112.0 * 10^275
+		 */
+		BigInteger originalValue = bigDecimalWithOnes( INDEX_PRECISION, 100, schemaDecimalScale ).toBigIntegerExact();
+		BigInteger estimatedIndexedValue = bigDecimalWithOnes( INDEX_PRECISION, 0, schemaDecimalScale ).toBigIntegerExact();
+		BigInteger indexedValueLowerBound = estimatedIndexedValue.subtract( new BigDecimal( BigInteger.ONE, schemaDecimalScale ).toBigIntegerExact() );
+		BigInteger indexedValueUpperBound = estimatedIndexedValue.add( new BigDecimal( BigInteger.ONE, schemaDecimalScale ).toBigIntegerExact() );
+		Assertions.assertThat( originalValue )
+				.isBetween( indexedValueLowerBound, indexedValueUpperBound );
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, providedValue ) );
+		workPlan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, originalValue ) );
 		workPlan.execute().join();
 
-		// decimal scale is -78, affecting the search precision
-		// so the provided value of 80 of 1 digits will be treated as if it had 2 of 1 digits followed by 78 of 0 digits
-		matchAbove( new BigInteger(
-				"10000000000000000000000000000000000000000000000000000000000000000000000000000000"
-		) );
-		doNotMatchAbove( new BigInteger(
-				"11000000000000000000000000000000000000000000000000000000000000000000000000000000"
-		) );
+		matchAbove( indexedValueLowerBound );
+		doNotMatchAbove( indexedValueUpperBound );
 	}
 
 	@Test
@@ -677,6 +731,34 @@ public class DecimalScaleIT {
 				.predicate( p -> p.match().onField( "scaled" ).matching( matching ) )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, match1, match2 );
+	}
+
+	/**
+	 * @param digitsBeforeDot The number of times the digit {@code 1} appears before the decimal dot.
+	 * @param digitsAfterDot The number of times the digit {@code 1} appears after the decimal dot.
+	 * @param scale The scale of the resulting number.
+	 * @return A BigDecimal equal to this number:
+	 * {@code <the digit '1' as many times as digitsBeforeDot>.<the digit '1' as many times as digitsAfterDot> * 10^<scale>}
+	 */
+	private static BigDecimal bigDecimalWithOnes(int digitsBeforeDot, int digitsAfterDot, int scale) {
+		BigInteger unscaled = bigIntegerWithOnes( digitsBeforeDot + digitsAfterDot );
+		return new BigDecimal( unscaled, scale + digitsAfterDot );
+	}
+
+	/**
+	 * @param oneDigits The number of times the digit {@code 1} appears in most significant digits.
+	 * @return A BigInteger equal to this number:
+	 * {@code <the digit '1' as many times as oneDigits><the digit '0' as many times as zeroDigits>}
+	 */
+	private static BigInteger bigIntegerWithOnes(int oneDigits) {
+		if ( oneDigits < 1 ) {
+			throw new IllegalArgumentException();
+		}
+		BigInteger number = BigInteger.ONE;
+		for ( int i = 1 /* we start with one digit */; i < oneDigits; i++ ) {
+			number = number.multiply( BigInteger.TEN ).add( BigInteger.ONE );
+		}
+		return number;
 	}
 
 	private static class DecimalScaleIndexMapping {
