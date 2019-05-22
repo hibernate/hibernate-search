@@ -54,13 +54,15 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(
 			String relativeFieldName, IndexFieldType<F> type) {
 		checkRelativeFieldName( relativeFieldName );
-		IndexSchemaFieldContext<?, IndexFieldReference<F>> fieldContext = nestingContext.nest(
-				relativeFieldName,
-				// If the field is included
-				prefixedName -> objectNodeBuilder.addField( prefixedName, type ),
-				// If the field is filtered out
-				prefixedName -> objectNodeBuilder.createExcludedField( prefixedName, type )
-		);
+		IndexSchemaFieldContext<?, IndexFieldReference<F>> fieldContext =
+				// Explicit type parameter needed in order for JDT to compile correctly (probably a bug)
+				nestingContext.<IndexSchemaFieldContext<?, IndexFieldReference<F>>>nest(
+						relativeFieldName,
+						// If the field is included
+						prefixedName -> objectNodeBuilder.addField( prefixedName, type ),
+						// If the field is filtered out
+						prefixedName -> objectNodeBuilder.createExcludedField( prefixedName, type )
+				);
 		if ( directChildrenAreMultiValuedByDefault ) {
 			fieldContext.multiValued();
 		}
