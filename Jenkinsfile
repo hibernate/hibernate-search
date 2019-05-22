@@ -237,6 +237,15 @@ ALL""",
 'DEFAULT' means a single build with the default environment expected by the Maven configuration,
 while other options will trigger multiple Maven executions in different environments."""
 					),
+					string(
+							name: 'ENVIRONMENT_FILTER',
+							defaultValue: '',
+							trim: true,
+							description: """A regex filter to apply to the environments that must be checked.
+If this parameter is non-empty, ENVIRONMENT_SET will be ignored and environments whose tag matches the given regex will be checked.
+Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elasticsearch-local-[5.6'.
+"""
+					),
 					booleanParam(
 							name: 'LEGACY_IT',
 							defaultValue: false,
@@ -273,7 +282,12 @@ while other options will trigger multiple Maven executions in different environm
 		}
 	}
 
-	keepOnlyEnvironmentsFromSet(params.ENVIRONMENT_SET)
+	if (params.ENVIRONMENT_FILTER) {
+		keepOnlyEnvironmentsMatchingFilter(params.ENVIRONMENT_FILTER)
+	}
+	else {
+		keepOnlyEnvironmentsFromSet(params.ENVIRONMENT_SET)
+	}
 
 	environments.content.esAws.enabled.removeAll { buildEnv ->
 		buildEnv.endpointUrl = env.getProperty(buildEnv.endpointVariableName)
@@ -309,6 +323,7 @@ while other options will trigger multiple Maven executions in different environm
 	echo """Branch: ${helper.scmSource.branch.name}
 PR: ${helper.scmSource.pullRequest?.id}
 params.ENVIRONMENT_SET: ${params.ENVIRONMENT_SET}
+params.ENVIRONMENT_FILTER: ${params.ENVIRONMENT_FILTER}
 
 Resulting execution plan:
     enableDefaultBuild=$enableDefaultBuild
@@ -631,6 +646,18 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
+	}
+}
+
+void keepOnlyEnvironmentsMatchingFilter(String regex) {
+	def pattern = /$regex/
+
+	boolean enableDefault = ('default' =~ pattern)
+
+	environments.content.each { key, envSet ->
+		envSet.enabled.removeAll { buildEnv ->
+			!(buildEnv.tag =~ pattern) && !(envSet.default == buildEnv && enableDefault)
+		}
 	}
 }
 
