@@ -25,22 +25,18 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.test.FutureAssert;
-import org.hibernate.search.util.impl.test.powermock.PowerMockSupport;
 
 import org.junit.Test;
 
-import org.apache.lucene.index.IndexWriter;
 import org.easymock.Capture;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.easymock.EasyMockSupport;
 
-@PrepareForTest({ IndexWriter.class }) // To intercept commit() calls
-public class LuceneWriteWorkProcessorTest extends PowerMockSupport {
+public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 	private static final String INDEX_NAME = "SomeIndexName";
 
 	private EventContext indexEventContext = EventContexts.fromIndexName( INDEX_NAME );
-	private IndexWriterHolder indexWriterHolderMock = PowerMock.createStrictMock( IndexWriterHolder.class );
+	private IndexWriterHolder indexWriterHolderMock = createStrictMock( IndexWriterHolder.class );
 	private ErrorHandler errorHandlerMock = createStrictMock( ErrorHandler.class );
 	private ContextualErrorHandler contextualErrorHandlerMock = createMock( ContextualErrorHandler.class );
 
