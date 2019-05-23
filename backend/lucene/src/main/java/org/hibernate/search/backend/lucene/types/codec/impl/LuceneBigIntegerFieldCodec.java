@@ -36,13 +36,6 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
-	void validate(BigInteger value) {
-		if ( isTooLarge( value ) ) {
-			throw log.scaledNumberTooLarge( value );
-		}
-	}
-
-	@Override
 	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, BigInteger value,
 			Long encodedValue) {
 		// storing field as String for projections
@@ -52,7 +45,6 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	@Override
 	public BigInteger decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
-
 		if ( field == null ) {
 			return null;
 		}
@@ -62,7 +54,12 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 
 	@Override
 	public Long encode(BigInteger value) {
-		return unscale( value );
+		BigDecimal decimal = new BigDecimal( value );
+		if ( isTooLarge( decimal ) ) {
+			throw log.scaledNumberTooLarge( value );
+		}
+
+		return unscale( decimal );
 	}
 
 	@Override
@@ -83,13 +80,12 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 		return decimalScale == other.decimalScale;
 	}
 
-	private Long unscale(BigInteger value) {
+	private Long unscale(BigDecimal decimal) {
 		// See tck.DecimalScaleIT#roundingMode
-		return new BigDecimal( value ).setScale( decimalScale, RoundingMode.HALF_UP ).unscaledValue().longValue();
+		return decimal.setScale( decimalScale, RoundingMode.HALF_UP ).unscaledValue().longValue();
 	}
 
-	private boolean isTooLarge(BigInteger value) {
-		BigDecimal decimal = new BigDecimal( value );
+	private boolean isTooLarge(BigDecimal decimal) {
 		return ( decimal.compareTo( minScaledValue ) < 0 || decimal.compareTo( maxScaledValue ) > 0 );
 	}
 }

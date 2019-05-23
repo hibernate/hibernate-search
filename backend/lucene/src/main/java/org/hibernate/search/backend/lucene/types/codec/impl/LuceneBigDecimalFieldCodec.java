@@ -35,13 +35,6 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
-	void validate(BigDecimal value) {
-		if ( isTooLarge( value ) ) {
-			throw log.scaledNumberTooLarge( value );
-		}
-	}
-
-	@Override
 	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, BigDecimal value,
 			Long encodedValue) {
 		// storing field as String for projections
@@ -51,7 +44,6 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 	@Override
 	public BigDecimal decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
-
 		if ( field == null ) {
 			return null;
 		}
@@ -61,6 +53,10 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 
 	@Override
 	public Long encode(BigDecimal value) {
+		if ( isTooLarge( value ) ) {
+			throw log.scaledNumberTooLarge( value );
+		}
+
 		return unscale( value );
 	}
 
