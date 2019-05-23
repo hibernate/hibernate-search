@@ -130,6 +130,13 @@ public class IndexWriterHolder implements AutoCloseable {
 	}
 
 	/**
+	 * Exposed here to make unit tests easier: we don't want to have to mock IndexWriter...
+	 */
+	public void commitIndexWriter() throws IOException {
+		getIndexWriter().commit();
+	}
+
+	/**
 	 * Closes a previously opened IndexWriter.
 	 */
 	public void closeIndexWriter() throws IOException {

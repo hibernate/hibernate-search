@@ -131,7 +131,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			try {
 				// TODO HSEARCH-3117 restore the commit policy feature to allow scheduled commits?
 				hasUncommittedWorks = false;
-				indexWriterHolder.getIndexWriter().commit();
+				indexWriterHolder.commitIndexWriter();
 			}
 			catch (RuntimeException | IOException e) {
 				throw log.unableToCommitIndex( indexEventContext, e );
