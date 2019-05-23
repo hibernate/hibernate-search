@@ -9,9 +9,9 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -37,15 +37,16 @@ public abstract class AbstractLuceneUpdateEntryWork extends AbstractLuceneWriteW
 	@Override
 	public Long execute(LuceneWriteWorkExecutionContext context) {
 		try {
-			IndexWriter indexWriter = context.getIndexWriter();
-			return doUpdateEntry( indexWriter, tenantId, id, indexEntry );
+			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
+			return doUpdateEntry( indexWriterDelegator, tenantId, id, indexEntry );
 		}
 		catch (IOException e) {
 			throw log.unableToIndexEntry( tenantId, id, getEventContext(), e );
 		}
 	}
 
-	protected abstract long doUpdateEntry(IndexWriter indexWriter, String tenantId, String id, LuceneIndexEntry indexEntry) throws IOException;
+	protected abstract long doUpdateEntry(IndexWriterDelegator indexWriterDelegator, String tenantId, String id,
+			LuceneIndexEntry indexEntry) throws IOException;
 
 	@Override
 	public String toString() {

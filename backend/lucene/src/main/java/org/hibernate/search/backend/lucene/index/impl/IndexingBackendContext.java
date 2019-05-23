@@ -11,7 +11,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProvider;
-import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterHolder;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
@@ -66,7 +67,7 @@ public class IndexingBackendContext {
 		return eventContext;
 	}
 
-	IndexWriterHolder createIndexWriterHolder(String indexName, Analyzer analyzer) {
+	IndexAccessor createIndexAccessor(String indexName, Analyzer analyzer) {
 		Directory directory;
 		try {
 			directory = directoryProvider.createDirectory( indexName );
@@ -78,7 +79,7 @@ public class IndexingBackendContext {
 			);
 		}
 		try {
-			return new IndexWriterHolder( indexName, directory, analyzer, errorHandler );
+			return new IndexAccessor( indexName, directory, analyzer, errorHandler );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e ).push( directory );
@@ -99,10 +100,10 @@ public class IndexingBackendContext {
 		);
 	}
 
-	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, IndexWriterHolder indexWriterHolder) {
+	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, IndexWriterDelegator indexWriterDelegator) {
 		return new LuceneBatchingWriteWorkOrchestrator(
 				"Lucene write work orchestrator for index " + indexName,
-				new LuceneWriteWorkProcessor( EventContexts.fromIndexName( indexName ), indexWriterHolder, errorHandler ),
+				new LuceneWriteWorkProcessor( EventContexts.fromIndexName( indexName ), indexWriterDelegator, errorHandler ),
 				errorHandler
 		);
 	}

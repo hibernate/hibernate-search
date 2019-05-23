@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -33,15 +33,16 @@ public abstract class AbstractLuceneDeleteEntryWork extends AbstractLuceneWriteW
 	@Override
 	public Long execute(LuceneWriteWorkExecutionContext context) {
 		try {
-			IndexWriter indexWriter = context.getIndexWriter();
-			return doDeleteDocuments( indexWriter, tenantId, id );
+			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
+			return doDeleteDocuments( indexWriterDelegator, tenantId, id );
 		}
 		catch (IOException e) {
 			throw log.unableToDeleteEntryFromIndex( tenantId, id, getEventContext(), e );
 		}
 	}
 
-	protected abstract long doDeleteDocuments(IndexWriter indexWriter, String tenantId, String id) throws IOException;
+	protected abstract long doDeleteDocuments(IndexWriterDelegator indexWriterDelegator, String tenantId, String id)
+			throws IOException;
 
 	@Override
 	public String toString() {

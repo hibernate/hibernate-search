@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterHolder;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
@@ -31,7 +31,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EventContext indexEventContext;
-	private final IndexWriterHolder indexWriterHolder;
+	private final IndexWriterDelegator indexWriterDelegator;
 	private final LuceneWriteWorkExecutionContextImpl context;
 	private final ErrorHandler errorHandler;
 
@@ -41,11 +41,11 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private ContextualErrorHandler workSetContextualErrorHandler;
 	private boolean workSetForcesCommit;
 
-	public LuceneWriteWorkProcessor(EventContext indexEventContext, IndexWriterHolder indexWriterHolder,
+	public LuceneWriteWorkProcessor(EventContext indexEventContext, IndexWriterDelegator indexWriterDelegator,
 			ErrorHandler errorHandler) {
 		this.indexEventContext = indexEventContext;
-		this.indexWriterHolder = indexWriterHolder;
-		this.context = new LuceneWriteWorkExecutionContextImpl( indexWriterHolder );
+		this.indexWriterDelegator = indexWriterDelegator;
+		this.context = new LuceneWriteWorkExecutionContextImpl( indexWriterDelegator );
 		this.errorHandler = errorHandler;
 	}
 
@@ -131,7 +131,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			try {
 				// TODO HSEARCH-3117 restore the commit policy feature to allow scheduled commits?
 				hasUncommittedWorks = false;
-				indexWriterHolder.commitIndexWriter();
+				indexWriterDelegator.commit();
 			}
 			catch (RuntimeException | IOException e) {
 				throw log.unableToCommitIndex( indexEventContext, e );
@@ -146,7 +146,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			 * Note this will close the index writer,
 			 * which with the default settings will trigger a commit.
 			 */
-			indexWriterHolder.forceLockRelease();
+			indexWriterDelegator.forceLockRelease();
 		}
 		catch (RuntimeException | IOException e) {
 			throw log.unableToCleanUpAfterError( indexEventContext, e );

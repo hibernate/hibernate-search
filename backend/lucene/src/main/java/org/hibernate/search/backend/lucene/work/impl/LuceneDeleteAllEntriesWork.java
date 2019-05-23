@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 
 public class LuceneDeleteAllEntriesWork extends AbstractLuceneDeleteAllEntriesWork {
 
@@ -17,7 +17,7 @@ public class LuceneDeleteAllEntriesWork extends AbstractLuceneDeleteAllEntriesWo
 	}
 
 	@Override
-	protected long doDeleteDocuments(IndexWriter indexWriter, String tenantId) throws IOException {
-		return indexWriter.deleteAll();
+	protected long doDeleteDocuments(IndexWriterDelegator indexWriterDelegator, String tenantId) throws IOException {
+		return indexWriterDelegator.deleteAll();
 	}
 }

@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -27,8 +27,8 @@ public class LuceneFlushWork extends AbstractLuceneWriteWork<Void> {
 	@Override
 	public Void execute(LuceneWriteWorkExecutionContext context) {
 		try {
-			IndexWriter indexWriter = context.getIndexWriter();
-			indexWriter.flush();
+			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
+			indexWriterDelegator.flush();
 			return null;
 		}
 		catch (IOException e) {

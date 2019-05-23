@@ -8,12 +8,12 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 
 /**
  * @author Guillaume Smet
  */
 public interface LuceneWriteWorkExecutionContext {
 
-	IndexWriter getIndexWriter() throws IOException;
+	IndexWriterDelegator getIndexWriterDelegator() throws IOException;
 }

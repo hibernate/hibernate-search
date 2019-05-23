@@ -8,8 +8,9 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
 /**
@@ -22,7 +23,8 @@ public class LuceneTermBasedDeleteEntryWork extends AbstractLuceneDeleteEntryWor
 	}
 
 	@Override
-	protected long doDeleteDocuments(IndexWriter indexWriter, String tenantId, String id) throws IOException {
-		return indexWriter.deleteDocuments( new Term( LuceneFields.idFieldName(), id ) );
+	protected long doDeleteDocuments(IndexWriterDelegator indexWriterDelegator, String tenantId, String id)
+			throws IOException {
+		return indexWriterDelegator.deleteDocuments( new Term( LuceneFields.idFieldName(), id ) );
 	}
 }

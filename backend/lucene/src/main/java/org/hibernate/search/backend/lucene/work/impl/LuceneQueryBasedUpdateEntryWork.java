@@ -8,8 +8,8 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 
 /**
@@ -22,8 +22,9 @@ public class LuceneQueryBasedUpdateEntryWork extends AbstractLuceneUpdateEntryWo
 	}
 
 	@Override
-	protected long doUpdateEntry(IndexWriter indexWriter, String tenantId, String id, LuceneIndexEntry indexEntry) throws IOException {
-		indexWriter.deleteDocuments( LuceneQueries.discriminatorMultiTenancyDeleteDocumentQuery( tenantId, id ) );
-		return indexWriter.addDocuments( indexEntry );
+	protected long doUpdateEntry(IndexWriterDelegator indexWriterDelegator, String tenantId, String id,
+			LuceneIndexEntry indexEntry) throws IOException {
+		indexWriterDelegator.deleteDocuments( LuceneQueries.discriminatorMultiTenancyDeleteDocumentQuery( tenantId, id ) );
+		return indexWriterDelegator.addDocuments( indexEntry );
 	}
 }
