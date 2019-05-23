@@ -226,7 +226,6 @@
         <version.log4j>1.2.16</version.log4j>
         <version.junit>4.12</version.junit>
         <version.org.easymock>4.0.1</version.org.easymock>
-        <version.org.powermock>2.0.2</version.org.powermock>
         <version.org.unitils>3.4.6</version.org.unitils>
         <version.org.assertj.assertj-core>3.12.2</version.org.assertj.assertj-core>
         <version.org.skyscreamer.jsonassert>1.2.3</version.org.skyscreamer.jsonassert>
@@ -850,16 +849,6 @@
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
                 <version>${version.org.easymock}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-module-junit4</artifactId>
-                <version>${version.org.powermock}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-api-easymock</artifactId>
-                <version>${version.org.powermock}</version>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>
