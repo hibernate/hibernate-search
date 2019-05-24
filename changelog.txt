@@ -1,6 +1,48 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Alpha6 (24-05-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3581 Indexing entities whose bytecode was enhanced by Hibernate ORM fails to load lazy properties
+    * HSEARCH-3579 Failing to boot the ORM integration no longer throws an exception
+    * HSEARCH-3571 Extra type name parameters trigger warnings in ES6.7+
+    * HSEARCH-3539 LuceneDistanceToFieldProjection is not thread safe
+    * HSEARCH-3213 @Spatial bridge set at type level are applied regardless of @IndexedEmbedded.includePaths
+    * HSEARCH-2663 Null handling for elements in container bridges isn't consistent with non-container bridges
+
+** Improvement
+    * HSEARCH-3578 Make the call to asXXX() (asEntity, asReference) optional in the Search DSL
+    * HSEARCH-3574 Rename ElasticsearchJsonStringIndexFieldTypeContext to ElasticsearchNativeIndexFieldTypeContext
+    * HSEARCH-3573 Use consistent naming for hits and projections
+    * HSEARCH-3572 Add fetch methods to terminal steps of the query DSL
+    * HSEARCH-3536 Use Analyzer.normalize instead of our own code for normalization
+    * HSEARCH-3475 Make automatic indexing configuration properties clearer
+    * HSEARCH-3463 Make APIs clearer about the fact automatic extractor resolution is an "all or nothing"
+    * HSEARCH-1857 Throw exceptions on usage of a FullTextSession whose underlying Session is closed
+    * HSEARCH-1667 Create an optimised IndexManager meant for asynchronous processing of remote index updates
+    * HSEARCH-1214 Review SearchFactory initialization
+
+** New Feature
+    * HSEARCH-3487 Support java.math.BigDecimal and java.math.BigInteger as field types
+    * HSEARCH-3316 Allow to configure whether indexing in the ORM mapper should be synchronous or asynchronous
+
+** Remove Feature
+    * HSEARCH-3577 Remove support for longs when specifying the limit/offset of a Search query
+    * HSEARCH-1645 Drop @ProvidedId annotation
+
+** Task
+    * HSEARCH-3585 Upgrade AWS-Elasticsearch tests to ES 6.5
+    * HSEARCH-3582 Ensure the code is compatible with the Eclipse compiler as part of integration tests
+    * HSEARCH-3570 Switch to XML format for JaCoCo reports
+    * HSEARCH-3569 Adapt the build to JDK11.0.3
+    * HSEARCH-3544 Allow extensions at the top level of the query DSL
+    * HSEARCH-3353 Search 6 groundwork - Restore support for search hit explanation
+    * HSEARCH-3324 Keep track of which field may be multi-valued and force bridges to declare fields as such
+    * HSEARCH-3118 Search 6 groundwork - Restore the full orchestration (queues, threadpools) from Search 5 and remove the explicit commits in LuceneIndexWorker
+    * HSEARCH-1777 Clarify the documentation on automatic indexing
+
 6.0.0.Alpha5 (30-04-2019)
 -------------------------
 
