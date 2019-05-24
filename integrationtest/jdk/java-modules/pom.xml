@@ -19,14 +19,6 @@
     <properties>
         <maven.compiler.target>9</maven.compiler.target>
         <maven.compiler.source>9</maven.compiler.source>
-
-        <!--
-             TODO HSEARCH-3551 Restore these tests
-             We currently skip these tests by default, because they fail with this error:
-             org.hibernate.service.UnknownServiceException: Unknown service requested [org.hibernate.search.mapper.orm.impl.HibernateSearchContextService]
-             at org.hibernate.search.integrationtest.java.module/org.hibernate.search.integrationtest.java.module.service.AuthorServiceIT.test(AuthorServiceIT.java:29)
-         -->
-        <skipJavaModuleTests>true</skipJavaModuleTests>
     </properties>
 
     <dependencies>
@@ -85,7 +77,6 @@
                         </goals>
                         <phase>integration-test</phase>
                         <configuration>
-                            <skip>${skipJavaModuleTests}</skip>
                             <includes>
                                 <include>**/*IT.java</include>
                             </includes>
@@ -101,9 +92,6 @@
             <plugin>
                 <groupId>com.github.alexcojocaru</groupId>
                 <artifactId>elasticsearch-maven-plugin</artifactId>
-                <configuration>
-                    <skip>${skipJavaModuleTests}</skip>
-                </configuration>
             </plugin>
         </plugins>
     </build>
