@@ -12,8 +12,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
+import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
-import org.hibernate.search.engine.environment.classpath.spi.DefaultClassAndResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 
 /**
@@ -28,16 +30,21 @@ final class HibernateOrmClassLoaderServiceClassAndResourceResolver implements Cl
 	 */
 	private final org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService;
 
-	/**
-	 * A Search internal class loader service which in particular tries to use the current class loader. This can be
-	 * necessary in case the ORM class loader can due to modularity not access the required resources
+	/*
+	 * Search internal class loader and resource loader resolvers
+	 * which in particular try to use the current class loader.
+	 * These can be necessary in case the ORM class loader can due to modularity
+	 * not access the required resources.
 	 */
-	private final DefaultClassAndResourceResolver internalClassResolver;
+	private final DefaultClassResolver internalClassResolver;
+	private final DefaultResourceResolver internalResourceResolver;
 
-
-	HibernateOrmClassLoaderServiceClassAndResourceResolver(org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
+	HibernateOrmClassLoaderServiceClassAndResourceResolver(
+			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
 		this.hibernateClassLoaderService = hibernateClassLoaderService;
-		this.internalClassResolver = new DefaultClassAndResourceResolver();
+		AggregatedClassLoader aggregatedClassLoader = AggregatedClassLoader.createDefault();
+		this.internalClassResolver = new DefaultClassResolver( aggregatedClassLoader );
+		this.internalResourceResolver = new DefaultResourceResolver( aggregatedClassLoader );
 	}
 
 	@Override
@@ -54,7 +61,7 @@ final class HibernateOrmClassLoaderServiceClassAndResourceResolver implements Cl
 	public URL locateResource(String name) {
 		URL url = hibernateClassLoaderService.locateResource( name );
 		if ( url == null ) {
-			url = internalClassResolver.locateResource( name );
+			url = internalResourceResolver.locateResource( name );
 		}
 		return url;
 	}
@@ -63,7 +70,7 @@ final class HibernateOrmClassLoaderServiceClassAndResourceResolver implements Cl
 	public InputStream locateResourceStream(String name) {
 		InputStream in = hibernateClassLoaderService.locateResourceStream( name );
 		if ( in == null ) {
-			in = internalClassResolver.locateResourceStream( name );
+			in = internalResourceResolver.locateResourceStream( name );
 		}
 		return in;
 	}
