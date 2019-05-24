@@ -17,10 +17,11 @@ public final class DefaultServiceResolver implements ServiceResolver {
 
 	private final AggregatedClassLoader aggregatedClassLoader;
 
-	/**
-	 * Constructs a ClassLoaderServiceImpl with standard set-up
-	 */
-	public DefaultServiceResolver(AggregatedClassLoader aggregatedClassLoader) {
+	public static ServiceResolver create(AggregatedClassLoader aggregatedClassLoader) {
+		return new DefaultServiceResolver( aggregatedClassLoader );
+	}
+
+	private DefaultServiceResolver(AggregatedClassLoader aggregatedClassLoader) {
 		this.aggregatedClassLoader = aggregatedClassLoader;
 	}
 

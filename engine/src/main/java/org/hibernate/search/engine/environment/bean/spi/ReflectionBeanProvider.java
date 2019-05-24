@@ -17,7 +17,11 @@ public final class ReflectionBeanProvider implements BeanProvider {
 
 	private final ClassResolver classResolver;
 
-	public ReflectionBeanProvider(ClassResolver classResolver) {
+	public static ReflectionBeanProvider create(ClassResolver classResolver) {
+		return new ReflectionBeanProvider( classResolver );
+	}
+
+	private ReflectionBeanProvider(ClassResolver classResolver) {
 		this.classResolver = classResolver;
 	}
 

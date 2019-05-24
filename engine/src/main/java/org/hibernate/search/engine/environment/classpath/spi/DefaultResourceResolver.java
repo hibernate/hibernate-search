@@ -18,10 +18,11 @@ public final class DefaultResourceResolver implements ResourceResolver {
 
 	private final AggregatedClassLoader aggregatedClassLoader;
 
-	/**
-	 * Constructs a ClassLoaderServiceImpl with standard set-up
-	 */
-	public DefaultResourceResolver(AggregatedClassLoader aggregatedClassLoader) {
+	public static ResourceResolver create(AggregatedClassLoader aggregatedClassLoader) {
+		return new DefaultResourceResolver( aggregatedClassLoader );
+	}
+
+	private DefaultResourceResolver(AggregatedClassLoader aggregatedClassLoader) {
 		this.aggregatedClassLoader = aggregatedClassLoader;
 	}
 

@@ -39,17 +39,17 @@ final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
 	 * These can be necessary in case the ORM class loader can due to modularity
 	 * not access the required resources.
 	 */
-	private final DefaultClassResolver internalClassResolver;
-	private final DefaultResourceResolver internalResourceResolver;
-	private final DefaultServiceResolver internalServiceResolver;
+	private final ClassResolver internalClassResolver;
+	private final ResourceResolver internalResourceResolver;
+	private final ServiceResolver internalServiceResolver;
 
 	HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver(
 			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
 		this.hibernateClassLoaderService = hibernateClassLoaderService;
 		AggregatedClassLoader aggregatedClassLoader = AggregatedClassLoader.createDefault();
-		this.internalClassResolver = new DefaultClassResolver( aggregatedClassLoader );
-		this.internalResourceResolver = new DefaultResourceResolver( aggregatedClassLoader );
-		this.internalServiceResolver = new DefaultServiceResolver( aggregatedClassLoader );
+		this.internalClassResolver = DefaultClassResolver.create( aggregatedClassLoader );
+		this.internalResourceResolver = DefaultResourceResolver.create( aggregatedClassLoader );
+		this.internalServiceResolver = DefaultServiceResolver.create( aggregatedClassLoader );
 	}
 
 	@Override
