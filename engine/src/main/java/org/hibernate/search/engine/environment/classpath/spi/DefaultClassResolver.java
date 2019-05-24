@@ -7,9 +7,6 @@
 package org.hibernate.search.engine.environment.classpath.spi;
 
 import java.lang.invoke.MethodHandles;
-import java.util.LinkedHashSet;
-import java.util.ServiceLoader;
-import java.util.Set;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -43,13 +40,4 @@ public final class DefaultClassResolver implements ClassResolver {
 		}
 	}
 
-	@Override
-	public <S> Set<S> loadJavaServices(Class<S> serviceContract) {
-		ServiceLoader<S> serviceLoader = ServiceLoader.load( serviceContract, aggregatedClassLoader );
-		final LinkedHashSet<S> services = new LinkedHashSet<>();
-		for ( S service : serviceLoader ) {
-			services.add( service );
-		}
-		return services;
-	}
 }

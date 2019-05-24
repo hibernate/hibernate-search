@@ -32,7 +32,9 @@ import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoad
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -64,6 +66,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 	private ClassResolver classResolver;
 	private ResourceResolver resourceResolver;
+	private ServiceResolver serviceResolver;
 	private BeanProvider beanProvider;
 	private boolean frozen = false;
 
@@ -80,6 +83,12 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	@Override
 	public SearchIntegrationBuilder setResourceResolver(ResourceResolver resourceResolver) {
 		this.resourceResolver = resourceResolver;
+		return this;
+	}
+
+	@Override
+	public SearchIntegrationBuilder setServiceResolver(ServiceResolver serviceResolver) {
+		this.serviceResolver = serviceResolver;
 		return this;
 	}
 
@@ -138,13 +147,20 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				resourceResolver = new DefaultResourceResolver( aggregatedClassLoader );
 			}
 
+			if ( serviceResolver == null ) {
+				if ( aggregatedClassLoader == null ) {
+					aggregatedClassLoader = AggregatedClassLoader.createDefault();
+				}
+				serviceResolver = new DefaultServiceResolver( aggregatedClassLoader );
+			}
+
 			if ( beanProvider == null ) {
 				beanProvider = new ReflectionBeanProvider( classResolver );
 			}
 
 			ConfigurationPropertySource propertySource = mainPropertySource;
 
-			BeanResolver beanResolver = new ConfiguredBeanResolver( classResolver, beanProvider, propertySource );
+			BeanResolver beanResolver = new ConfiguredBeanResolver( serviceResolver, beanProvider, propertySource );
 			RootBuildContext rootBuildContext = new RootBuildContext( classResolver, resourceResolver, beanResolver, failureCollector );
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanResolver, propertySource, rootBuildContext );

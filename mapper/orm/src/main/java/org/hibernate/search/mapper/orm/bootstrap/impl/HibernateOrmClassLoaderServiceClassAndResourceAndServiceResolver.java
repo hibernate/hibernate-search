@@ -16,7 +16,9 @@ import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoad
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 
 /**
  * An implementation of {@link ClassResolver} which delegates to the ORM-provided {@code ClassResolver}.
@@ -24,7 +26,8 @@ import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
  *
  * @author Hardy Ferentschik
  */
-final class HibernateOrmClassLoaderServiceClassAndResourceResolver implements ClassResolver, ResourceResolver {
+final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
+		implements ClassResolver, ResourceResolver, ServiceResolver {
 	/**
 	 * {@code ClassResolver] as provided by Hibernate ORM. This is the class loader which we attempt to use first.
 	 */
@@ -38,13 +41,15 @@ final class HibernateOrmClassLoaderServiceClassAndResourceResolver implements Cl
 	 */
 	private final DefaultClassResolver internalClassResolver;
 	private final DefaultResourceResolver internalResourceResolver;
+	private final DefaultServiceResolver internalServiceResolver;
 
-	HibernateOrmClassLoaderServiceClassAndResourceResolver(
+	HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver(
 			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
 		this.hibernateClassLoaderService = hibernateClassLoaderService;
 		AggregatedClassLoader aggregatedClassLoader = AggregatedClassLoader.createDefault();
 		this.internalClassResolver = new DefaultClassResolver( aggregatedClassLoader );
 		this.internalResourceResolver = new DefaultResourceResolver( aggregatedClassLoader );
+		this.internalServiceResolver = new DefaultServiceResolver( aggregatedClassLoader );
 	}
 
 	@Override
@@ -80,7 +85,7 @@ final class HibernateOrmClassLoaderServiceClassAndResourceResolver implements Cl
 		// when it comes to services, we need to search in both services and the de-duplicate
 		// however, we cannot rely on 'equals' for comparison. Instead compare class names
 		Iterable<T> servicesFromORMCLassLoader = hibernateClassLoaderService.loadJavaServices( serviceContract );
-		Iterable<T> servicesFromLocalClassLoader = internalClassResolver.loadJavaServices( serviceContract );
+		Iterable<T> servicesFromLocalClassLoader = internalServiceResolver.loadJavaServices( serviceContract );
 
 		//LinkedHashMap to maintain order; elements from Hibernate ORM first.
 		Map<String,T> combined = new LinkedHashMap<>();
