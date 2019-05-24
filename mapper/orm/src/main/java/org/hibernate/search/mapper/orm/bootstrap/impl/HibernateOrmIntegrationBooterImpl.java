@@ -199,7 +199,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			builder.setResourceResolver( classAndResourceAndServiceResolver );
 			builder.setServiceResolver( classAndResourceAndServiceResolver );
 
-			reflectionBeanProvider = new ReflectionBeanProvider( classAndResourceAndServiceResolver );
+			reflectionBeanProvider = ReflectionBeanProvider.create( classAndResourceAndServiceResolver );
 			if ( managedBeanRegistryService.isPresent() ) {
 				BeanContainer beanContainer = managedBeanRegistryService.get().getBeanContainer();
 				if ( beanContainer != null ) {

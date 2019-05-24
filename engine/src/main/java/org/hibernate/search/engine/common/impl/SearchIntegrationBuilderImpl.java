@@ -137,25 +137,25 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			if ( classResolver == null ) {
 				aggregatedClassLoader = AggregatedClassLoader.createDefault();
-				classResolver = new DefaultClassResolver( aggregatedClassLoader );
+				classResolver = DefaultClassResolver.create( aggregatedClassLoader );
 			}
 
 			if ( resourceResolver == null ) {
 				if ( aggregatedClassLoader == null ) {
 					aggregatedClassLoader = AggregatedClassLoader.createDefault();
 				}
-				resourceResolver = new DefaultResourceResolver( aggregatedClassLoader );
+				resourceResolver = DefaultResourceResolver.create( aggregatedClassLoader );
 			}
 
 			if ( serviceResolver == null ) {
 				if ( aggregatedClassLoader == null ) {
 					aggregatedClassLoader = AggregatedClassLoader.createDefault();
 				}
-				serviceResolver = new DefaultServiceResolver( aggregatedClassLoader );
+				serviceResolver = DefaultServiceResolver.create( aggregatedClassLoader );
 			}
 
 			if ( beanProvider == null ) {
-				beanProvider = new ReflectionBeanProvider( classResolver );
+				beanProvider = ReflectionBeanProvider.create( classResolver );
 			}
 
 			ConfigurationPropertySource propertySource = mainPropertySource;

@@ -22,10 +22,11 @@ public final class DefaultClassResolver implements ClassResolver {
 
 	private final AggregatedClassLoader aggregatedClassLoader;
 
-	/**
-	 * Constructs a ClassLoaderServiceImpl with standard set-up
-	 */
-	public DefaultClassResolver(AggregatedClassLoader aggregatedClassLoader) {
+	public static ClassResolver create(AggregatedClassLoader aggregatedClassLoader) {
+		return new DefaultClassResolver( aggregatedClassLoader );
+	}
+
+	private DefaultClassResolver(AggregatedClassLoader aggregatedClassLoader) {
 		this.aggregatedClassLoader = aggregatedClassLoader;
 	}
 
