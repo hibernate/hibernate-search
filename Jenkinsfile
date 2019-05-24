@@ -431,7 +431,7 @@ stage('Non-default environments') {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
 							${toMavenElasticsearchProfileArg(buildEnv.mavenProfile)} \
-							${itEnv.version ? "-Dtest.elasticsearch.host.version=$itEnv.version" : ''} \
+							${buildEnv.version ? "-Dtest.elasticsearch.host.version=$buildEnv.version" : ''} \
 					"""
 				}
 			}
