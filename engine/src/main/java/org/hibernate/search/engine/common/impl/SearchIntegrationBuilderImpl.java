@@ -28,8 +28,10 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
+import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
-import org.hibernate.search.engine.environment.classpath.spi.DefaultClassAndResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
@@ -122,18 +124,18 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		try {
 			frozen = true;
 
-			DefaultClassAndResourceResolver defaultClassAndResourceResolver = null;
+			AggregatedClassLoader aggregatedClassLoader = null;
 
 			if ( classResolver == null ) {
-				defaultClassAndResourceResolver = new DefaultClassAndResourceResolver();
-				classResolver = defaultClassAndResourceResolver;
+				aggregatedClassLoader = AggregatedClassLoader.createDefault();
+				classResolver = new DefaultClassResolver( aggregatedClassLoader );
 			}
 
 			if ( resourceResolver == null ) {
-				if ( defaultClassAndResourceResolver == null ) {
-					defaultClassAndResourceResolver = new DefaultClassAndResourceResolver();
+				if ( aggregatedClassLoader == null ) {
+					aggregatedClassLoader = AggregatedClassLoader.createDefault();
 				}
-				resourceResolver = defaultClassAndResourceResolver;
+				resourceResolver = new DefaultResourceResolver( aggregatedClassLoader );
 			}
 
 			if ( beanProvider == null ) {

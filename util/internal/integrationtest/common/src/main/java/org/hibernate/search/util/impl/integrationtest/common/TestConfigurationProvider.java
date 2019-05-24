@@ -19,7 +19,8 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
-import org.hibernate.search.engine.environment.classpath.spi.DefaultClassAndResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -49,10 +50,10 @@ public final class TestConfigurationProvider implements TestRule {
 	}
 
 	public BeanResolver createBeanResolverForTest() {
-		DefaultClassAndResourceResolver classAndResourceResolver = new DefaultClassAndResourceResolver();
-		ReflectionBeanProvider beanProvider = new ReflectionBeanProvider( classAndResourceResolver );
+		DefaultClassResolver classResolver = new DefaultClassResolver( AggregatedClassLoader.createDefault() );
+		ReflectionBeanProvider beanProvider = new ReflectionBeanProvider( classResolver );
 		return new ConfiguredBeanResolver(
-				classAndResourceResolver, beanProvider, ConfigurationPropertySource.empty()
+				classResolver, beanProvider, ConfigurationPropertySource.empty()
 		);
 	}
 

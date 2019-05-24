@@ -4,16 +4,21 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.environment.classpath.impl;
+package org.hibernate.search.engine.environment.classpath.spi;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 /**
  * A classloader which keeps an ordered list of aggregated classloaders.
+ * <p>
+ * This is especially useful in modular environments such as WildFly
+ * where some classes may not be accessible from Hibernate Search's classloader,
+ * for example custom user components such as bridges.
  *
  * @author Steve Ebersole
  * @author Hardy Ferentschik
@@ -22,7 +27,31 @@ import java.util.Iterator;
 public final class AggregatedClassLoader extends ClassLoader {
 	private ClassLoader[] individualClassLoaders;
 
-	public AggregatedClassLoader(ClassLoader... classLoaders) {
+	public static AggregatedClassLoader createDefault() {
+		final LinkedHashSet<ClassLoader> orderedClassLoaderSet = new LinkedHashSet<>();
+
+		//  adding known class-loaders...
+		orderedClassLoaderSet.add( AggregatedClassLoader.class.getClassLoader() );
+
+		// then the TCCL, if one...
+		final ClassLoader tccl = locateTCCL();
+		if ( tccl != null ) {
+			orderedClassLoaderSet.add( tccl );
+		}
+
+		// finally the system classloader
+		final ClassLoader sysClassLoader = locateSystemClassLoader();
+		if ( sysClassLoader != null ) {
+			orderedClassLoaderSet.add( sysClassLoader );
+		}
+
+		// now build the aggregated class loader...
+		return new AggregatedClassLoader(
+				orderedClassLoaderSet.toArray( new ClassLoader[0] )
+		);
+	}
+
+	private AggregatedClassLoader(ClassLoader... classLoaders) {
 		super( null );
 		individualClassLoaders = classLoaders;
 	}
@@ -77,7 +106,21 @@ public final class AggregatedClassLoader extends ClassLoader {
 		throw new ClassNotFoundException( "Could not load requested class : " + name );
 	}
 
-	public void destroy() {
-		individualClassLoaders = null;
+	private static ClassLoader locateSystemClassLoader() {
+		try {
+			return ClassLoader.getSystemClassLoader();
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+
+	private static ClassLoader locateTCCL() {
+		try {
+			return Thread.currentThread().getContextClassLoader();
+		}
+		catch (Exception e) {
+			return null;
+		}
 	}
 }
