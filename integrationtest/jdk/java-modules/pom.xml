@@ -37,6 +37,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${jdbc.driver.groupId}</groupId>
             <artifactId>${jdbc.driver.artifactId}</artifactId>
             <scope>test</scope>
