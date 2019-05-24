@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
 
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -100,6 +101,53 @@ public class KeywordFieldIT {
 				String.class, String.class,
 				value, value
 		);
+	}
+
+	@Test
+	public void norms() {
+
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String norms;
+			String noNorms;
+			String defaultNorms;
+			String implicit;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@KeywordField(norms = Norms.YES)
+			public String getNorms() {
+				return norms;
+			}
+
+			@KeywordField(norms = Norms.NO)
+			public String getNoNorms() {
+				return noNorms;
+			}
+
+			@KeywordField(norms = Norms.DEFAULT)
+			public String getDefaultNorms() {
+				return defaultNorms;
+			}
+
+			@KeywordField
+			public String getImplicit() {
+				return implicit;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "norms", String.class, f -> f.norms( Norms.YES ) )
+				.field( "noNorms", String.class, f -> f.norms( Norms.NO ) )
+				.field( "defaultNorms", String.class )
+				.field( "implicit", String.class )
+		);
+		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test

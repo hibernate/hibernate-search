@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
 
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -76,6 +77,53 @@ public class FullTextFieldIT {
 				String.class, String.class,
 				value, value
 		);
+	}
+
+	@Test
+	public void norms() {
+
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String norms;
+			String noNorms;
+			String defaultNorms;
+			String implicit;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, norms = Norms.YES)
+			public String getNorms() {
+				return norms;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, norms = Norms.NO)
+			public String getNoNorms() {
+				return noNorms;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, norms = Norms.DEFAULT)
+			public String getDefaultNorms() {
+				return defaultNorms;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME)
+			public String getImplicit() {
+				return implicit;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "norms", String.class, f -> f.analyzerName( ANALYZER_NAME ).norms( Norms.YES ) )
+				.field( "noNorms", String.class, f -> f.analyzerName( ANALYZER_NAME ).norms( Norms.NO ) )
+				.field( "defaultNorms", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+		);
+		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
