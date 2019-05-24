@@ -24,19 +24,4 @@ public interface ClassResolver {
 	 * @throws ClassLoadingException Indicates the class could not be found
 	 */
 	<T> Class<T> classForName(String className);
-
-	/**
-	 * Discovers and instantiates implementations of the named service contract.
-	 * <p>
-	 * NOTE : We are talking about services as defined by {@link java.util.ServiceLoader}.
-	 *
-	 * @param serviceContract The java type defining the service contract
-	 * @param <T> The type of the service contract
-	 *
-	 * @return The ordered set of discovered services.
-	 */
-	<T> Iterable<T> loadJavaServices(Class<T> serviceContract);
 }
-
-
-

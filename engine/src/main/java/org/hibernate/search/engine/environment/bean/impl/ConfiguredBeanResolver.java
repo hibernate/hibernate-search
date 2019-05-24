@@ -21,7 +21,7 @@ import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanCreationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -40,12 +40,12 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 
 	private final BeanCreationContext beanCreationContext;
 
-	public ConfiguredBeanResolver(ClassResolver classResolver, BeanProvider beanProvider,
+	public ConfiguredBeanResolver(ServiceResolver serviceResolver, BeanProvider beanProvider,
 			ConfigurationPropertySource configurationPropertySource) {
 		this.beanProvider = beanProvider;
 
 		BeanConfigurationContextImpl configurationContext = new BeanConfigurationContextImpl();
-		for ( BeanConfigurer beanConfigurer : classResolver.loadJavaServices( BeanConfigurer.class ) ) {
+		for ( BeanConfigurer beanConfigurer : serviceResolver.loadJavaServices( BeanConfigurer.class ) ) {
 			beanConfigurer.configure( configurationContext );
 		}
 		BeanProviderOnlyBeanResolver beanResolverForConfigurers = new BeanProviderOnlyBeanResolver( beanProvider );

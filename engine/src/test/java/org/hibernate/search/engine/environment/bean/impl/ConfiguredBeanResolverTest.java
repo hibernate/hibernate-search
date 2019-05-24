@@ -24,7 +24,7 @@ import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.engine.testsupport.util.AbstractConfigurationPropertySourcePartialMock;
 import org.hibernate.search.util.common.SearchException;
 
@@ -36,7 +36,7 @@ import org.easymock.EasyMockSupport;
 @SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types with EasyMock
 public class ConfiguredBeanResolverTest extends EasyMockSupport {
 
-	private ClassResolver classResolverMock = createMock( ClassResolver.class );
+	private ServiceResolver serviceResolverMock = createMock( ServiceResolver.class );
 	private BeanProvider beanProviderMock = createMock( BeanProvider.class );
 	private ConfigurationPropertySource configurationSourceMock =
 			partialMockBuilder( AbstractConfigurationPropertySourcePartialMock.class ).mock();
@@ -45,13 +45,13 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 	public void resolve_withoutBeanConfigurer() {
 		// Setup
 		resetAll();
-		expect( classResolverMock.loadJavaServices( BeanConfigurer.class ) )
+		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
 				.andStubReturn( Collections.emptyList() );
 		expect( configurationSourceMock.get( EngineSpiSettings.BEAN_CONFIGURERS ) )
 				.andStubReturn( Optional.empty() );
 		replayAll();
 		BeanResolver beanResolver =
-				new ConfiguredBeanResolver( classResolverMock, beanProviderMock, configurationSourceMock );
+				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
 		verifyAll();
 
 		BeanHolder<Type1> type1BeanHolder = BeanHolder.of( new Type1() );
@@ -112,7 +112,7 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		BeanFactory<Type3> beanFactory4Mock = createMock( BeanFactory.class );
 
 		resetAll();
-		expect( classResolverMock.loadJavaServices( BeanConfigurer.class ) )
+		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
 				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
 		expect( configurationSourceMock.get( EngineSpiSettings.BEAN_CONFIGURERS ) )
 				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
@@ -132,7 +132,7 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		} );
 		replayAll();
 		BeanResolver beanResolver =
-				new ConfiguredBeanResolver( classResolverMock, beanProviderMock, configurationSourceMock );
+				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
 		verifyAll();
 
 		BeanHolder<Type1> type1BeanHolder = BeanHolder.of( new Type1() );
@@ -185,7 +185,7 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		BeanFactory<Type3> beanFactory3Mock = createMock( BeanFactory.class );
 
 		resetAll();
-		expect( classResolverMock.loadJavaServices( BeanConfigurer.class ) )
+		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
 				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
 		expect( configurationSourceMock.get( EngineSpiSettings.BEAN_CONFIGURERS ) )
 				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
@@ -207,7 +207,7 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		} );
 		replayAll();
 		BeanResolver beanResolver =
-				new ConfiguredBeanResolver( classResolverMock, beanProviderMock, configurationSourceMock );
+				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
 		verifyAll();
 
 		BeanHolder<Type3> type3BeanHolder1 = BeanHolder.of( new Type3() );
