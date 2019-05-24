@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexF
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
@@ -61,6 +62,12 @@ class ElasticsearchStringIndexFieldTypeContext
 	@Override
 	public ElasticsearchStringIndexFieldTypeContext projectable(Projectable projectable) {
 		this.projectable = projectable;
+		return this;
+	}
+
+	@Override
+	public ElasticsearchStringIndexFieldTypeContext norms(Norms norms) {
+		// TODO HSEARCH-3048 (current) contribute norms
 		return this;
 	}
 

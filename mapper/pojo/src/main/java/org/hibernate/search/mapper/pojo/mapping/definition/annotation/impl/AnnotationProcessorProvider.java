@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
@@ -45,6 +46,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFullTextFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyNotFullTextFieldMappingContext;
@@ -298,8 +300,14 @@ class AnnotationProcessorProvider {
 		@Override
 		PropertyFieldMappingContext<?> initFieldMappingContext(PropertyMappingContext mappingContext,
 				PojoPropertyModel<?> propertyModel, FullTextField annotation, String fieldName) {
-			return mappingContext.fullTextField( fieldName )
+			PropertyFullTextFieldMappingContext fieldContext = mappingContext.fullTextField( fieldName )
 					.analyzer( annotation.analyzer() );
+
+			Norms norms = annotation.norms();
+			if ( !Norms.DEFAULT.equals( norms ) ) {
+				fieldContext.norms( norms );
+			}
+			return fieldContext;
 		}
 
 		@Override
@@ -332,10 +340,17 @@ class AnnotationProcessorProvider {
 		PropertyNotFullTextFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
 				PojoPropertyModel<?> propertyModel, KeywordField annotation, String fieldName) {
 			PropertyKeywordFieldMappingContext fieldContext = mappingContext.keywordField( fieldName );
+
 			String normalizer = annotation.normalizer();
 			if ( !normalizer.isEmpty() ) {
 				fieldContext.normalizer( annotation.normalizer() );
 			}
+
+			Norms norms = annotation.norms();
+			if ( !Norms.DEFAULT.equals( norms ) ) {
+				fieldContext.norms( norms );
+			}
+
 			return fieldContext;
 		}
 

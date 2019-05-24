@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import org.hibernate.search.engine.backend.types.Norms;
+
 /**
  * @author Yoann Rodiere
  */
@@ -13,5 +15,7 @@ public interface PropertyKeywordFieldMappingContext
 		extends PropertyNotFullTextFieldMappingContext<PropertyKeywordFieldMappingContext> {
 
 	PropertyKeywordFieldMappingContext normalizer(String analyzerName);
+
+	PropertyKeywordFieldMappingContext norms(Norms norms);
 
 }

@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import org.hibernate.search.engine.backend.types.Norms;
+
 /**
  * @author Yoann Rodiere
  */
 public interface PropertyFullTextFieldMappingContext extends PropertyFieldMappingContext<PropertyFullTextFieldMappingContext> {
 
 	PropertyFullTextFieldMappingContext analyzer(String analyzerName);
+
+	PropertyFullTextFieldMappingContext norms(Norms norms);
 
 }
