@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
 
@@ -56,6 +57,12 @@ public @interface KeywordField {
 	 * @see GenericField#projectable()
 	 */
 	Projectable projectable() default Projectable.DEFAULT;
+
+	/**
+	 * @return Whether index time scoring information should be stored or not.
+	 * @see Norms
+	 */
+	Norms norms() default Norms.DEFAULT;
 
 	/**
 	 * @return Whether this field should be sortable.

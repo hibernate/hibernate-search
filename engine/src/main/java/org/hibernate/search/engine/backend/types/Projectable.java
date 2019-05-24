@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.backend.types;
 
-
 /**
  * Whether or not we want to be able to obtain the value of the field as a projection.
  * <p>

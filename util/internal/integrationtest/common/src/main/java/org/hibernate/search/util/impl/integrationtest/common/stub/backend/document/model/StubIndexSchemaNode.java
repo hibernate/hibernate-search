@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -141,6 +142,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder projectable(Projectable projectable) {
 			attribute( "projectable", projectable );
+			return this;
+		}
+
+		public Builder norms(Norms norms) {
+			attribute( "norms", norms );
 			return this;
 		}
 

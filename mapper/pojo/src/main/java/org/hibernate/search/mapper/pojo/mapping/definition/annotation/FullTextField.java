@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 
 /**
@@ -53,6 +54,12 @@ public @interface FullTextField {
 	 * @see GenericField#projectable()
 	 */
 	Projectable projectable() default Projectable.DEFAULT;
+
+	/**
+	 * @return Whether index-time scoring information should be stored or not.
+	 * @see Norms
+	 */
+	Norms norms() default Norms.DEFAULT;
 
 	/**
 	 * @return A reference to the value bridge to use for this field.

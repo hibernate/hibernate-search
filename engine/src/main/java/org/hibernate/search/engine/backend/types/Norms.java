@@ -7,21 +7,22 @@
 package org.hibernate.search.engine.backend.types;
 
 /**
- * Whether a field can be used in sorts.
- *
- * @author Emmanuel Bernard
+ * Whether index-time scoring information for the field should be stored or not.
+ * <p>
+ * Enabling norms will improve the quality of scoring.
+ * Disabling norms will reduce the disk space used by the index.
  */
-public enum Sortable {
+public enum Norms {
 	/**
 	 * Use the backend-specific default.
 	 */
 	DEFAULT,
 	/**
-	 * The field is not sortable.
+	 * The index-time scoring information is not stored.
 	 */
 	NO,
 	/**
-	 * The field is sortable
+	 * The index-time scoring information is stored.
 	 */
 	YES
 }

@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -34,6 +35,12 @@ class PropertyKeywordFieldMappingContextImpl
 	@Override
 	public PropertyKeywordFieldMappingContext normalizer(String normalizerName) {
 		fieldModelContributor.add( (c, b) -> c.normalizer( normalizerName ) );
+		return thisAsS();
+	}
+
+	@Override
+	public PropertyKeywordFieldMappingContext norms(Norms norms) {
+		fieldModelContributor.add( (c, b) -> c.norms( norms ) );
 		return thisAsS();
 	}
 
