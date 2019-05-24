@@ -102,9 +102,6 @@
     <profiles>
         <profile>
             <id>module-descriptors</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
             <!--
                 TODO HSEARCH-3274
                 Trying to generate module info, we got some issues on package names
