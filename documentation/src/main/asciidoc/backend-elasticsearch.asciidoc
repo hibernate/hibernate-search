@@ -406,7 +406,7 @@ The Elasticsearch `date` type does not support the whole range of years that can
 // TODO also document "extension" types
 
 [[backend-elasticsearch-analysis]]
-=== Analysis
+== Analysis
 // Search 5 anchors backward compatibility
 [[elasticsearch-mapping-analyzer]]
 
