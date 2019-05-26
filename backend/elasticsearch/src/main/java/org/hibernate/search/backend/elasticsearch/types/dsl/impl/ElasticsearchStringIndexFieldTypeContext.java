@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
@@ -40,6 +41,7 @@ class ElasticsearchStringIndexFieldTypeContext
 	private String analyzerName;
 	private String normalizerName;
 	private Projectable projectable = Projectable.DEFAULT;
+	private Norms norms = Norms.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 	private String indexNullAs;
 
@@ -67,7 +69,7 @@ class ElasticsearchStringIndexFieldTypeContext
 
 	@Override
 	public ElasticsearchStringIndexFieldTypeContext norms(Norms norms) {
-		// TODO HSEARCH-3048 (current) contribute norms
+		this.norms = norms;
 		return this;
 	}
 
@@ -116,6 +118,7 @@ class ElasticsearchStringIndexFieldTypeContext
 		}
 
 		mapping.setStore( resolvedProjectable );
+		mapping.setNorms( resolveNorms() );
 
 		if ( indexNullAs != null ) {
 			mapping.setNullValue( new JsonPrimitive( indexNullAs ) );
@@ -139,5 +142,18 @@ class ElasticsearchStringIndexFieldTypeContext
 	@Override
 	protected ElasticsearchStringIndexFieldTypeContext thisAsS() {
 		return this;
+	}
+
+	private boolean resolveNorms() {
+		switch ( norms ) {
+			case YES:
+				return true;
+			case NO:
+				return false;
+			case DEFAULT:
+				return ( analyzerName != null );
+			default:
+				throw new AssertionFailure( "Unexpected value for Norms: " + norms );
+		}
 	}
 }
