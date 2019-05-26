@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -38,6 +39,8 @@ class LuceneStringIndexFieldTypeContext
 	private Analyzer analyzer;
 	private String normalizerName;
 	private Analyzer normalizer;
+
+	private Norms norms = Norms.DEFAULT;
 
 	private Sortable sortable = Sortable.DEFAULT;
 
@@ -67,7 +70,7 @@ class LuceneStringIndexFieldTypeContext
 
 	@Override
 	public LuceneStringIndexFieldTypeContext norms(Norms norms) {
-		// TODO HSEARCH-3048 (current) contribute norms
+		this.norms = norms;
 		return thisAsS();
 	}
 
@@ -81,6 +84,7 @@ class LuceneStringIndexFieldTypeContext
 	public LuceneIndexFieldType<String> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedNorms = resolveNorms();
 
 		if ( analyzer != null ) {
 			if ( resolvedSortable ) {
@@ -104,7 +108,7 @@ class LuceneStringIndexFieldTypeContext
 				createIndexToProjectionConverter();
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
 				resolvedSortable,
-				getFieldType( resolvedProjectable, analyzer != null ), indexNullAsValue,
+				getFieldType( resolvedProjectable, analyzer != null, resolvedNorms ), indexNullAsValue,
 				analyzerOrNormalizer
 		);
 
@@ -126,11 +130,23 @@ class LuceneStringIndexFieldTypeContext
 		return getBuildContext().getAnalysisDefinitionRegistry();
 	}
 
-	private static FieldType getFieldType(boolean projectable, boolean analyzed) {
+	private boolean resolveNorms() {
+		switch ( norms ) {
+			case YES:
+				return true;
+			case NO:
+				return false;
+			case DEFAULT:
+				return ( analyzerName != null );
+			default:
+				throw new AssertionFailure( "Unexpected value for Norms: " + norms );
+		}
+	}
+
+	private static FieldType getFieldType(boolean projectable, boolean analyzed, boolean norms) {
 		FieldType fieldType = new FieldType();
 		if ( analyzed ) {
-			// TODO HSEARCH-3048 take into account the norms and term vectors options
-			fieldType.setOmitNorms( false );
+			// TODO HSEARCH-3048 take into account term vectors option
 			fieldType.setIndexOptions( IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
 			fieldType.setStoreTermVectors( true );
 			fieldType.setStoreTermVectorPositions( true );
@@ -138,7 +154,6 @@ class LuceneStringIndexFieldTypeContext
 			fieldType.setTokenized( true );
 		}
 		else {
-			fieldType.setOmitNorms( true );
 			fieldType.setIndexOptions( IndexOptions.DOCS );
 			/*
 			 * Note that the name "tokenized" is misleading: it actually means "should the analyzer (or normalizer) be applied".
@@ -149,6 +164,7 @@ class LuceneStringIndexFieldTypeContext
 		}
 
 		fieldType.setStored( projectable );
+		fieldType.setOmitNorms( !norms );
 		fieldType.freeze();
 
 		return fieldType;
