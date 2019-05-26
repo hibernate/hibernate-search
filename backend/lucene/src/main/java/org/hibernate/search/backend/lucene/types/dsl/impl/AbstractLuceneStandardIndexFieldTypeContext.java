@@ -61,7 +61,7 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 
 	@Override
 	public S indexNullAs(F indexNullAs) {
-		indexNullAsValue = indexNullAs;
+		this.indexNullAsValue = indexNullAs;
 		return thisAsS();
 	}
 
