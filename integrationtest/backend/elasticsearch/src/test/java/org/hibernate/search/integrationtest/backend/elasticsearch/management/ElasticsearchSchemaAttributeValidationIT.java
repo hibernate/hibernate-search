@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
@@ -527,11 +528,32 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.build() );
 	}
 
-	// TODO HSEARCH-3048: test attribute norm (same pattern: missing, valid, invalid)
 	@Test
-	public void property_norms_invalid() throws Exception {
-		Assume.assumeTrue( "Norms configuration is not supported yet; see HSEARCH-3048", false );
+	public void property_norms_valid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'text',"
+									+ "'norms': false"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
 
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.NO ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void property_norms_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
 				"{"
@@ -549,8 +571,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				validateSchemaConfig()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
-									// TODO disable norms once the APIs allow it; see HSEARCH-3048
-									root.field( "myField", f -> f.asString().analyzer( "default" ) ).toReference();
+									root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.YES ) ).toReference();
 								}
 						)
 						.setup() )
@@ -562,8 +583,55 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexFieldContext( "myField" )
 						.failure( "Invalid value for attribute 'norms'. Expected 'true', actual is 'false'" )
 						.build()
-		);
+				);
 	}
+
+	@Test
+	public void property_norms_missing_textField() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'text'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.YES ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void property_norms_missing_keywordField() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'keyword'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asString().norms( Norms.NO ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
 	@Test
 	public void attribute_store_true() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
