@@ -403,4 +403,9 @@ public interface Log extends BasicLogger {
 	SearchException cannotResolveContainerExtractorName(String extractorName,
 			@FormatWith(ClassFormatter.class) Class<?> builtinExtractorConstantsClass);
 
+	@Message(id = ID_OFFSET_2 + 54,
+			value = "Builder '%1$s' cannot be initialized with annotations of type '%2$s'.")
+	SearchException invalidAnnotationTypeForBuilder(Object builder,
+			@FormatWith(ClassFormatter.class) Class<?> annotationType);
+
 }
