@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -120,6 +121,53 @@ public class FullTextFieldIT {
 				.field( "norms", String.class, f -> f.analyzerName( ANALYZER_NAME ).norms( Norms.YES ) )
 				.field( "noNorms", String.class, f -> f.analyzerName( ANALYZER_NAME ).norms( Norms.NO ) )
 				.field( "defaultNorms", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+		);
+		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void searchable() {
+
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String searchable;
+			String unsearchable;
+			String useDefault;
+			String implicit;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.YES)
+			public String getSearchable() {
+				return searchable;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.NO)
+			public String getUnsearchable() {
+				return unsearchable;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.DEFAULT)
+			public String getUseDefault() {
+				return useDefault;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME)
+			public String getImplicit() {
+				return implicit;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "searchable", String.class, f -> f.analyzerName( ANALYZER_NAME ).searchable( Searchable.YES ) )
+				.field( "unsearchable", String.class, f -> f.analyzerName( ANALYZER_NAME ).searchable( Searchable.NO ) )
+				.field( "useDefault", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 		);
 		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );

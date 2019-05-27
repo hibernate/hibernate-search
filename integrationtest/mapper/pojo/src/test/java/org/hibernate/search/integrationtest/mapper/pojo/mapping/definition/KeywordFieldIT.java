@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -144,6 +145,53 @@ public class KeywordFieldIT {
 				.field( "norms", String.class, f -> f.norms( Norms.YES ) )
 				.field( "noNorms", String.class, f -> f.norms( Norms.NO ) )
 				.field( "defaultNorms", String.class )
+				.field( "implicit", String.class )
+		);
+		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void searchable() {
+
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String searchable;
+			String unsearchable;
+			String useDefault;
+			String implicit;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@KeywordField(searchable = Searchable.YES)
+			public String getSearchable() {
+				return searchable;
+			}
+
+			@KeywordField(searchable = Searchable.NO)
+			public String getUnsearchable() {
+				return unsearchable;
+			}
+
+			@KeywordField(searchable = Searchable.DEFAULT)
+			public String getUseDefault() {
+				return useDefault;
+			}
+
+			@KeywordField
+			public String getImplicit() {
+				return implicit;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "searchable", String.class, f -> f.searchable( Searchable.YES ) )
+				.field( "unsearchable", String.class, f -> f.searchable( Searchable.NO ) )
+				.field( "useDefault", String.class )
 				.field( "implicit", String.class )
 		);
 		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );

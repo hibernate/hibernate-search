@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -152,6 +153,53 @@ public class ScaledNumberFieldIT {
 						)
 						.build()
 				);
+	}
+
+	@Test
+	public void searchable() {
+
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			BigDecimal searchable;
+			BigInteger unsearchable;
+			BigDecimal useDefault;
+			BigInteger implicit;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@ScaledNumberField(searchable = Searchable.YES)
+			public BigDecimal getSearchable() {
+				return searchable;
+			}
+
+			@ScaledNumberField(searchable = Searchable.NO)
+			public BigInteger getUnsearchable() {
+				return unsearchable;
+			}
+
+			@ScaledNumberField(searchable = Searchable.DEFAULT)
+			public BigDecimal getUseDefault() {
+				return useDefault;
+			}
+
+			@ScaledNumberField
+			public BigInteger getImplicit() {
+				return implicit;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "searchable", BigDecimal.class, f -> f.searchable( Searchable.YES ) )
+				.field( "unsearchable", BigInteger.class, f -> f.searchable( Searchable.NO ) )
+				.field( "useDefault", BigDecimal.class )
+				.field( "implicit", BigInteger.class )
+		);
+		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
