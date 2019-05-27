@@ -4,12 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.fieldtype;
+package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
@@ -17,17 +18,13 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import com.google.gson.JsonObject;
 
-/**
- * Test the property types defined on Elasticsearch server
- */
-public class ElasticsearchFieldTypesIT {
+public class ElasticsearchFieldAttributesIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
-	private static final String INDEX_NAME = "indexname";
+	private static final String BACKEND_NAME = "my-backend";
+	private static final String INDEX_NAME = "my-index";
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
@@ -37,11 +34,8 @@ public class ElasticsearchFieldTypesIT {
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	@Test
-	public void addUpdateDelete_routing() {
+	public void spyMappedAttributes() {
 		clientSpy.expectNext(
 				ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.STRICT
 		);
@@ -91,40 +85,26 @@ public class ElasticsearchFieldTypesIT {
 		JsonObject properties = new JsonObject();
 		mapping.add( "properties", properties );
 
-		properties.add( "keyword", type( "keyword" ) );
-		properties.add( "text", type( "text" ) );
-		properties.add( "integer", type( "integer" ) );
-		properties.add( "long", type( "long" ) );
-		properties.add( "boolean", type( "boolean" ) );
-		properties.add( "byte", type( "byte" ) );
-		properties.add( "short", type( "short" ) );
-		properties.add( "float", type( "float" ) );
-		properties.add( "double", type( "double" ) );
-
+		properties.add( "keyword", json( "keyword", false ) );
+		properties.add( "text", json( "text", true ) );
+		properties.add( "norms", json( "keyword", true ) );
+		properties.add( "omitNorms", json( "text", false ) );
 		return payload;
 	}
 
-	private static JsonObject type(String type) {
+	private static JsonObject json(String type, boolean norms) {
 		JsonObject field = new JsonObject();
 		field.addProperty( "type", type );
+		field.addProperty( "norms", norms );
 		return field;
 	}
 
 	private static class IndexMapping {
 		IndexMapping(IndexSchemaElement root) {
-			// string type + not analyzed => keyword
 			root.field( "keyword", f -> f.asString() ).toReference();
-
-			// string type + analyzed => text
 			root.field( "text", f -> f.asString().analyzer( "standard" ) ).toReference();
-
-			root.field( "integer", f -> f.asInteger() ).toReference();
-			root.field( "long", f -> f.asLong() ).toReference();
-			root.field( "boolean", f -> f.asBoolean() ).toReference();
-			root.field( "byte", f -> f.asByte() ).toReference();
-			root.field( "short", f -> f.asShort() ).toReference();
-			root.field( "float", f -> f.asFloat() ).toReference();
-			root.field( "double", f -> f.asDouble() ).toReference();
+			root.field( "norms", f -> f.asString().norms( Norms.YES ) ).toReference();
+			root.field( "omitNorms", f -> f.asString().analyzer( "standard" ).norms( Norms.NO ) ).toReference();
 		}
 	}
 }
