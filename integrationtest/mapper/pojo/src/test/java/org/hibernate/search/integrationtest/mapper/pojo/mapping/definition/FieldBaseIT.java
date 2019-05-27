@@ -192,7 +192,7 @@ public class FieldBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
-								"Value bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
+								"Bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
 										+ Integer.class.getName() + "'"
 						)
 						.build()
@@ -223,7 +223,7 @@ public class FieldBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
 						.failure(
-								"Value bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
+								"Bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
 										+ Integer.class.getName() + "'"
 						)
 						.build()
