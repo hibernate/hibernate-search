@@ -15,11 +15,6 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-orm</artifactId>
             <scope>test</scope>
         </dependency>
