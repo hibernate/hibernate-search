@@ -16,12 +16,12 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -169,17 +169,14 @@ public class ElasticsearchSchemaCreationIT {
 	}
 
 	@Test
-	public void textField_noNorms() throws Exception {
-		Assume.assumeTrue( "Norms configuration is not supported yet; see HSEARCH-3048", false );
-
+	public void textField_noNorms() {
 		elasticSearchClient.index( INDEX_NAME )
 				.ensureDoesNotExist().registerForCleanup();
 
 		setup( ctx -> {
 			ctx.getSchemaElement().field(
 					"myField",
-					f -> f.asString().analyzer( "standard" )
-							// TODO disable norms once the APIs allow it; see HSEARCH-3048
+					f -> f.asString().analyzer( "standard" ).norms( Norms.NO )
 			)
 					.toReference();
 		} );
