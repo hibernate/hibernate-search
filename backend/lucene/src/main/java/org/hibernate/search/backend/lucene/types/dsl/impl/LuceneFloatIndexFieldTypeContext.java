@@ -34,12 +34,13 @@ class LuceneFloatIndexFieldTypeContext
 	public LuceneIndexFieldType<Float> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends Float> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Float, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneFloatFieldCodec codec = new LuceneFloatFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
+		LuceneFloatFieldCodec codec = new LuceneFloatFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

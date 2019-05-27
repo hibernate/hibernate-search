@@ -33,6 +33,7 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 	private ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
 	private FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
 	protected Projectable projectable = Projectable.DEFAULT;
+	protected Searchable searchable = Searchable.DEFAULT;
 	protected F indexNullAsValue = null;
 
 	AbstractLuceneStandardIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType) {
@@ -68,7 +69,7 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 
 	@Override
 	public S searchable(Searchable searchable) {
-		// TODO HSEARCH-3048 (current) contribute searchable
+		this.searchable = searchable;
 		return thisAsS();
 	}
 
@@ -106,6 +107,18 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 				return true;
 			default:
 				throw new AssertionFailure( "Unexpected value for Projectable: " + projectable );
+		}
+	}
+
+	protected static boolean resolveDefault(Searchable searchable) {
+		switch ( searchable ) {
+			case DEFAULT:
+			case YES:
+				return true;
+			case NO:
+				return false;
+			default:
+				throw new AssertionFailure( "Unexpected value for Searchable: " + searchable );
 		}
 	}
 

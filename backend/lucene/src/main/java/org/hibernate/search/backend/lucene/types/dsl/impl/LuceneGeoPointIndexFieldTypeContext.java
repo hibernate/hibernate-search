@@ -38,13 +38,14 @@ class LuceneGeoPointIndexFieldTypeContext
 	public LuceneIndexFieldType<GeoPoint> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends GeoPoint> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super GeoPoint, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
 		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
-				resolvedProjectable, resolvedSortable, indexNullAsValue
+				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
 		);
 
 		return new LuceneIndexFieldType<>(

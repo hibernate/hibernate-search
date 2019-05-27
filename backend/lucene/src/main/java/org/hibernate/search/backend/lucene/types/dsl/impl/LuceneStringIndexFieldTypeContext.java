@@ -84,6 +84,7 @@ class LuceneStringIndexFieldTypeContext
 	public LuceneIndexFieldType<String> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedNorms = resolveNorms();
 
 		if ( analyzer != null ) {
@@ -107,8 +108,8 @@ class LuceneStringIndexFieldTypeContext
 		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
-				resolvedSortable,
-				getFieldType( resolvedProjectable, analyzer != null, resolvedNorms ), indexNullAsValue,
+				resolvedSearchable, resolvedSortable,
+				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms ), indexNullAsValue,
 				analyzerOrNormalizer
 		);
 
@@ -143,8 +144,16 @@ class LuceneStringIndexFieldTypeContext
 		}
 	}
 
-	private static FieldType getFieldType(boolean projectable, boolean analyzed, boolean norms) {
+	private static FieldType getFieldType(boolean projectable, boolean searchable, boolean analyzed, boolean norms) {
 		FieldType fieldType = new FieldType();
+
+		if ( !searchable ) {
+			fieldType.setIndexOptions( IndexOptions.NONE );
+			fieldType.setStored( projectable );
+			fieldType.freeze();
+			return fieldType;
+		}
+
 		if ( analyzed ) {
 			// TODO HSEARCH-3048 take into account term vectors option
 			fieldType.setIndexOptions( IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
@@ -166,7 +175,6 @@ class LuceneStringIndexFieldTypeContext
 		fieldType.setStored( projectable );
 		fieldType.setOmitNorms( !norms );
 		fieldType.freeze();
-
 		return fieldType;
 	}
 }

@@ -39,12 +39,13 @@ class LuceneLocalDateIndexFieldTypeContext
 	public LuceneIndexFieldType<LocalDate> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends LocalDate> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super LocalDate, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneLocalDateFieldCodec codec = new LuceneLocalDateFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
+		LuceneLocalDateFieldCodec codec = new LuceneLocalDateFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

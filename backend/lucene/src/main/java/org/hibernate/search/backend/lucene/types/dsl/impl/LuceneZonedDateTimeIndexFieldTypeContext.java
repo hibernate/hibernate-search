@@ -36,12 +36,13 @@ class LuceneZonedDateTimeIndexFieldTypeContext
 	public LuceneIndexFieldType<ZonedDateTime> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends ZonedDateTime> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super ZonedDateTime, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneZonedDateTimeFieldCodec codec = new LuceneZonedDateTimeFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
+		LuceneZonedDateTimeFieldCodec codec = new LuceneZonedDateTimeFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

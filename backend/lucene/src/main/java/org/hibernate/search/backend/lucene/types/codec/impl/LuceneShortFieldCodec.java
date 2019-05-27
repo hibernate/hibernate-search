@@ -14,8 +14,8 @@ import org.apache.lucene.index.IndexableField;
 
 public final class LuceneShortFieldCodec extends AbstractLuceneNumericFieldCodec<Short, Integer> {
 
-	public LuceneShortFieldCodec(boolean projectable, boolean sortable, Short indexNullAsValue) {
-		super( projectable, sortable, indexNullAsValue );
+	public LuceneShortFieldCodec(boolean projectable, boolean searchable, boolean sortable, Short indexNullAsValue) {
+		super( projectable, searchable, sortable, indexNullAsValue );
 	}
 
 	@Override

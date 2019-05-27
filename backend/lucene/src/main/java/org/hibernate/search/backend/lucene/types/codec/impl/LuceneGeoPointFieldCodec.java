@@ -27,12 +27,14 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	private static final String LONGITUDE = "longitude";
 
 	private final boolean projectable;
+	private final boolean searchable;
 	private final boolean sortable;
 
 	private final GeoPoint indexNullAsValue;
 
-	public LuceneGeoPointFieldCodec(boolean projectable, boolean sortable, GeoPoint indexNullAsValue) {
+	public LuceneGeoPointFieldCodec(boolean projectable, boolean searchable, boolean sortable, GeoPoint indexNullAsValue) {
 		this.projectable = projectable;
+		this.searchable = searchable;
 		this.sortable = sortable;
 		this.indexNullAsValue = indexNullAsValue;
 	}
@@ -52,9 +54,11 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 			documentBuilder.addField( new StoredField( getLongitudeAbsoluteFieldPath( absoluteFieldPath ), value.getLongitude() ) );
 		}
 
-		// doc values fields are required for predicates, distance projections and distance sorts
-		documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
-		documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
+		if ( searchable || sortable ) {
+			// doc values fields are required for predicates, distance projections and distance sorts
+			documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
+			documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
+		}
 	}
 
 	@Override

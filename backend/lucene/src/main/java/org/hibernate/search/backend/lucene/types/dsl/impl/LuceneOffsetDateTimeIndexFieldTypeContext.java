@@ -36,12 +36,13 @@ class LuceneOffsetDateTimeIndexFieldTypeContext
 	public LuceneIndexFieldType<OffsetDateTime> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends OffsetDateTime> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super OffsetDateTime, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneOffsetDateTimeFieldCodec codec = new LuceneOffsetDateTimeFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
+		LuceneOffsetDateTimeFieldCodec codec = new LuceneOffsetDateTimeFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

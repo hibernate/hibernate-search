@@ -25,6 +25,7 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String> {
 
 	private final boolean sortable;
+	private final boolean searchable;
 
 	private final FieldType fieldType;
 
@@ -32,8 +33,9 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 
 	private final Analyzer analyzerOrNormalizer;
 
-	public LuceneStringFieldCodec(boolean sortable, FieldType fieldType, String indexNullAsValue, Analyzer analyzerOrNormalizer) {
+	public LuceneStringFieldCodec(boolean searchable, boolean sortable, FieldType fieldType, String indexNullAsValue, Analyzer analyzerOrNormalizer) {
 		this.sortable = sortable;
+		this.searchable = searchable;
 		this.fieldType = fieldType;
 		this.indexNullAsValue = indexNullAsValue;
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
@@ -49,9 +51,13 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 			return;
 		}
 
-		documentBuilder.addField( new Field( absoluteFieldPath, value, fieldType ) );
+		if ( searchable || fieldType.stored() ) {
+			// searchable or projectable or both
+			documentBuilder.addField( new Field( absoluteFieldPath, value, fieldType ) );
+		}
 
 		if ( sortable ) {
+			// sortable
 			documentBuilder.addField( new SortedDocValuesField( absoluteFieldPath, normalize( absoluteFieldPath, value ) ) );
 		}
 

@@ -34,12 +34,13 @@ class LuceneShortIndexFieldTypeContext
 	public LuceneIndexFieldType<Short> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends Short> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Short, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneShortFieldCodec codec = new LuceneShortFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
+		LuceneShortFieldCodec codec = new LuceneShortFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

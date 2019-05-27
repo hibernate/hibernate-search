@@ -54,12 +54,13 @@ class LuceneBigDecimalIndexFieldTypeContext
 	public LuceneIndexFieldType<BigDecimal> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends BigDecimal> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super BigDecimal, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneBigDecimalFieldCodec codec = new LuceneBigDecimalFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue, resolveDecimalScale() );
+		LuceneBigDecimalFieldCodec codec = new LuceneBigDecimalFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue, resolveDecimalScale() );
 
 		return new LuceneIndexFieldType<>(
 				codec,

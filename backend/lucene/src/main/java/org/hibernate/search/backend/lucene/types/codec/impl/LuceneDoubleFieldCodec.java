@@ -14,8 +14,8 @@ import org.apache.lucene.index.IndexableField;
 
 public final class LuceneDoubleFieldCodec extends AbstractLuceneNumericFieldCodec<Double, Double> {
 
-	public LuceneDoubleFieldCodec(boolean projectable, boolean sortable, Double indexNullAsValue) {
-		super( projectable, sortable, indexNullAsValue );
+	public LuceneDoubleFieldCodec(boolean projectable, boolean searchable, boolean sortable, Double indexNullAsValue) {
+		super( projectable, searchable, sortable, indexNullAsValue );
 	}
 
 	@Override
