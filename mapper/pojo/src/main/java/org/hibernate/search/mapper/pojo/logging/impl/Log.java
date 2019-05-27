@@ -25,7 +25,6 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ToStringTreeAppendableMultilineFormatter;
@@ -122,16 +121,6 @@ public interface Log extends BasicLogger {
 					+ " or use the method of the same name, but without Class<?> parameters."
 	)
 	SearchException cannotSearchOnEmptyTarget();
-
-	@Message(id = ID_OFFSET_2 + 8,
-			value = "Could not auto-detect the input type for value bridge '%1$s'."
-					+ " There is a bug in Hibernate Search, please report it.")
-	AssertionFailure unableToInferValueBridgeInputType(ValueBridge<?, ?> bridge);
-
-	@Message(id = ID_OFFSET_2 + 9,
-			value = "Could not auto-detect the return type for value bridge '%1$s'."
-					+ " There is a bug in Hibernate Search, please report it.")
-	AssertionFailure unableToInferValueBridgeIndexFieldType(ValueBridge<?, ?> bridge);
 
 	@Message(id = ID_OFFSET_2 + 10,
 			value = "Value bridge '%1$s' cannot be applied to input type '%2$s'.")

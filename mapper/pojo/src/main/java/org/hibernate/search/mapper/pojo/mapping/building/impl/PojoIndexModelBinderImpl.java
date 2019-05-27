@@ -54,6 +54,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
 import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -318,10 +319,14 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			String relativeFieldName, FieldModelContributor contributor) {
 		B bridge = bridgeHolder.get();
 
-		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridgeHolder.get().getClass() );
+		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
 		Class<?> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
 				.map( ReflectionUtils::getRawType )
-				.orElseThrow( () -> log.unableToInferValueBridgeInputType( bridge ) );
+				.orElseThrow( () -> new AssertionFailure(
+						"Could not auto-detect the input type for value bridge '"
+						+ bridge + "'."
+						+ " There is a bug in Hibernate Search, please report it."
+				) );
 		// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
 		if ( !valueTypeModel.getRawType().isSubTypeOf( bridgeParameterType ) ) {
 			throw log.invalidInputTypeForValueBridge( bridge, valueTypeModel );
@@ -347,7 +352,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			Class<? super F> returnType =
 					(Class<? super F>) bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )
 					.map( ReflectionUtils::getRawType )
-					.orElseThrow( () -> log.unableToInferValueBridgeIndexFieldType( bridge ) );
+					.orElseThrow( () -> new AssertionFailure(
+							"Could not auto-detect the return type for value bridge '"
+							+ bridge + "'."
+							+ " There is a bug in Hibernate Search, please report it."
+					) );
 			fieldTypeContext = indexFieldTypeFactory.as( returnType );
 		}
 
