@@ -8,6 +8,8 @@ package org.hibernate.search.engine.environment.classpath.spi;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -104,6 +106,10 @@ public final class AggregatedClassLoader extends ClassLoader {
 			}
 		}
 		throw new ClassNotFoundException( "Could not load requested class : " + name );
+	}
+
+	void addAllTo(Collection<ClassLoader> classLoaders) {
+		Collections.addAll( classLoaders, individualClassLoaders );
 	}
 
 	private static ClassLoader locateSystemClassLoader() {
