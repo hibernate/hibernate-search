@@ -28,6 +28,9 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 	private Projectable projectable = Projectable.DEFAULT;
 	protected boolean resolvedProjectable;
 
+	private Searchable searchable = Searchable.DEFAULT;
+	protected boolean resolvedSearchable;
+
 	protected F indexNullAs;
 
 	AbstractElasticsearchScalarFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
@@ -56,7 +59,7 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 
 	@Override
 	public S searchable(Searchable searchable) {
-		// TODO HSEARCH-3048 (current) contribute searchable
+		this.searchable = searchable;
 		return thisAsS();
 	}
 
@@ -68,9 +71,9 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 
 		resolvedSortable = resolveDefault( sortable );
 		resolvedProjectable = resolveDefault( projectable );
+		resolvedSearchable = resolveDefault( searchable );
 
-		// TODO HSEARCH-3048 allow to configure indexed/not indexed
-		mapping.setIndex( true );
+		mapping.setIndex( resolvedSearchable );
 		mapping.setStore( resolvedProjectable );
 		mapping.setDocValues( resolvedSortable );
 

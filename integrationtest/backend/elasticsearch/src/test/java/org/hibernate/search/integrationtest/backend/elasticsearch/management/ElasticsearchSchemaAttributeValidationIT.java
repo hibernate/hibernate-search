@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
@@ -251,6 +252,57 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexFieldContext( "myField" )
 						.failure( "Invalid value for attribute 'index'. Expected 'true', actual is 'false'" )
 						.build() );
+	}
+
+	@Test
+	public void attribute_index_false_scalar() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'integer',"
+									+ "'index': false"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							// Searchable.NO allows to have index false
+							root.field( "myField", f -> f.asInteger().searchable( Searchable.NO ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void attribute_index_false_text() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'text',"
+									+ "'analyzer': 'keyword',"
+									+ "'index': false"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							// Searchable.NO allows to have index false
+							root.field( "myField", f -> f.asString().analyzer( "keyword" ).searchable( Searchable.NO ) ).toReference();
+						}
+				)
+				.setup();
 	}
 
 	@Test

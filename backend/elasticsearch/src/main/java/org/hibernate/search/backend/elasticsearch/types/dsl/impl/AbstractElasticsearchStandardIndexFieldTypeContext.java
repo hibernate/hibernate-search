@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchStandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -32,6 +33,18 @@ abstract class AbstractElasticsearchStandardIndexFieldTypeContext<S extends Abst
 				return true;
 			default:
 				throw new AssertionFailure( "Unexpected value for Projectable: " + projectable );
+		}
+	}
+
+	protected static boolean resolveDefault(Searchable searchable) {
+		switch ( searchable ) {
+			case DEFAULT:
+			case YES:
+				return true;
+			case NO:
+				return false;
+			default:
+				throw new AssertionFailure( "Unexpected value for Searchable: " + searchable );
 		}
 	}
 
