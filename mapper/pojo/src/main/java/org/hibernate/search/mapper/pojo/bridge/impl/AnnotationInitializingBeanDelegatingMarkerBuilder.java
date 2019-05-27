@@ -51,7 +51,6 @@ public final class AnnotationInitializingBeanDelegatingMarkerBuilder<A extends A
 			@SuppressWarnings("unchecked")
 			AnnotationMarkerBuilder<A> castedDelegate = delegateHolder.get();
 			castedDelegate.initialize( annotation );
-			castedDelegate.initialize( annotation );
 			return castedDelegate.build( buildContext );
 		}
 	}
