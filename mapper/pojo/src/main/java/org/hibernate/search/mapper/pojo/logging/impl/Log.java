@@ -15,7 +15,6 @@ import java.net.URISyntaxException;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
@@ -123,8 +122,8 @@ public interface Log extends BasicLogger {
 	SearchException cannotSearchOnEmptyTarget();
 
 	@Message(id = ID_OFFSET_2 + 10,
-			value = "Value bridge '%1$s' cannot be applied to input type '%2$s'.")
-	SearchException invalidInputTypeForValueBridge(ValueBridge<?, ?> bridge,
+			value = "Bridge '%1$s' cannot be applied to input type '%2$s'.")
+	SearchException invalidInputTypeForBridge(Object bridge,
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel);
 
 	@Message(id = ID_OFFSET_2 + 11,
@@ -403,4 +402,5 @@ public interface Log extends BasicLogger {
 	)
 	SearchException cannotResolveContainerExtractorName(String extractorName,
 			@FormatWith(ClassFormatter.class) Class<?> builtinExtractorConstantsClass);
+
 }

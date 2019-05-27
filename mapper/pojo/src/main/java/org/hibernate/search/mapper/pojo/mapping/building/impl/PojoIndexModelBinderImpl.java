@@ -105,20 +105,16 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		if ( builder == null ) {
 			defaultedBuilder = bridgeResolver.resolveIdentifierBridgeForType( typeModel );
 		}
-		/*
-		 * TODO HSEARCH-3243 check that the bridge is suitable for the given typeModel
-		 * (use introspection, similarly to what we do to detect the value bridge's field type?)
-		 */
-		@SuppressWarnings("unchecked")
-		BeanHolder<? extends IdentifierBridge<I>> bridgeHolder =
-				(BeanHolder<IdentifierBridge<I>>) defaultedBuilder.build( bridgeBuildContext );
+
+		BeanHolder<? extends IdentifierBridge<?>> bridgeHolder = defaultedBuilder.build( bridgeBuildContext );
 		try {
-			IdentifierBridge<I> bridge = bridgeHolder.get();
-			bridge.bind( new IdentifierBridgeBindingContextImpl<>(
-					new PojoModelValueElement<>( typeModel )
-			) );
-			bindingContext.idDslConverter( new PojoIdentifierBridgeToDocumentIdentifierValueConverter<>( bridge ) );
-			return bridgeHolder;
+			// This cast is safe, see the similar cast in addValueBridge for a detailed explanation
+			@SuppressWarnings({"unchecked", "rawtypes"})
+			BeanHolder<? extends IdentifierBridge<I>> boundIdentifierBridge = bindIdentifierBridge(
+					bindingContext, typeModel,
+					(BeanHolder<? extends IdentifierBridge>) bridgeHolder
+			);
+			return boundIdentifierBridge;
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -312,6 +308,42 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		}
 	}
 
+	private <I, I2, B extends IdentifierBridge<I2>> BeanHolder<? extends IdentifierBridge<I>> bindIdentifierBridge(
+			IndexedEntityBindingContext bindingContext, PojoGenericTypeModel<I> valueTypeModel,
+			BeanHolder<? extends B> bridgeHolder) {
+		IdentifierBridge<I2> bridge = bridgeHolder.get();
+
+		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
+		Class<?> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( IdentifierBridge.class, 0 )
+				.map( ReflectionUtils::getRawType )
+				.orElseThrow( () -> new AssertionFailure(
+						"Could not auto-detect the input type for identifier bridge '"
+						+ bridge + "'."
+						+ " There is a bug in Hibernate Search, please report it."
+				) );
+		// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
+		//  Also we're checking that the bridge parameter type is a subtype, but we really should be checking it
+		//  is either the same type or a generic type parameter that can represent the same type.
+		if ( !valueTypeModel.getRawType().isSubTypeOf( bridgeParameterType ) ) {
+			throw log.invalidInputTypeForBridge( bridge, valueTypeModel );
+		}
+
+		@SuppressWarnings("unchecked") // Checked using reflection just above
+		PojoGenericTypeModel<I2> castedValueTypeModel =
+				(PojoGenericTypeModel<I2>) valueTypeModel;
+		@SuppressWarnings("unchecked") // Checked using reflection just above
+		BeanHolder<? extends IdentifierBridge<I>> castedBridgeHolder =
+				(BeanHolder<? extends IdentifierBridge<I>>) bridgeHolder;
+
+		bridge.bind( new IdentifierBridgeBindingContextImpl<>(
+				new PojoModelValueElement<>( castedValueTypeModel )
+		) );
+
+		bindingContext.idDslConverter( new PojoIdentifierBridgeToDocumentIdentifierValueConverter<>( bridge ) );
+
+		return castedBridgeHolder;
+	}
+
 	private <V, V2, F, B extends ValueBridge<V2, F>> BoundValueBridge<V, ?> bindValueBridge(
 			IndexFieldTypeFactoryContext indexFieldTypeFactory,
 			IndexSchemaElement schemaElement, PojoGenericTypeModel<V> valueTypeModel, boolean multiValued,
@@ -329,7 +361,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				) );
 		// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
 		if ( !valueTypeModel.getRawType().isSubTypeOf( bridgeParameterType ) ) {
-			throw log.invalidInputTypeForValueBridge( bridge, valueTypeModel );
+			throw log.invalidInputTypeForBridge( bridge, valueTypeModel );
 		}
 
 		@SuppressWarnings("unchecked") // Checked using reflection just above
