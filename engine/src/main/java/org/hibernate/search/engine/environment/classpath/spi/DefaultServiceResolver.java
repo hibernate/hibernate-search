@@ -6,75 +6,184 @@
  */
 package org.hibernate.search.engine.environment.classpath.spi;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import org.hibernate.search.util.common.AssertionFailure;
 
 /**
  * Default implementation of {@code ClassResolver} relying on an {@link AggregatedClassLoader}.
- * <p>
- * When retrieving services from providers in the module path,
- * the service loader internally uses a map from classloader to service catalog.
- * Since the aggregated class loader is artificial and unknown from the service loader,
- * it will never match any service from the module path.
- * <p>
- * To work around this problem,
- * we instantiate one service loader per individual class loader and get services from these.
- * This could result in duplicates, so we take specific care to avoid using the same service provider twice.
- * See {@link #loadJavaServices(Class)}.
- * <p>
- * Note that, in the worst case,
- * the service retrieved from each individual class loader could load duplicate versions
- * of classes already loaded from another class loader.
- * For example in an aggregated class loader made up of individual class loader A, B, C:
- * it is possible that class C1 was already loaded from A,
- * but then we load service S1 from B, and this service will also need class C1 but won't find it in class loader B,
- * so it will load its own version of that class.
- * <p>
- * We assume that this situation will never occur in practice because class loaders
- * are structure in a hierarchy that prevents one class to be loaded twice.
  */
-public final class DefaultServiceResolver implements ServiceResolver {
+public abstract class DefaultServiceResolver implements ServiceResolver {
+
+	private static final Method SERVICE_LOADER_STREAM_METHOD;
+	private static final Method PROVIDER_TYPE_METHOD;
+
+	static {
+		Class<?> serviceLoaderClass = ServiceLoader.class;
+		Method serviceLoaderStreamMethod = null;
+		Method providerTypeMethod = null;
+		try {
+			/*
+			 * JDK 9 introduced the stream() method on ServiceLoader,
+			 * which we need in order to avoid duplicate service instantiation.
+			 * See ClassPathAndModulePathServiceResolver.
+			 */
+			serviceLoaderStreamMethod = serviceLoaderClass.getMethod( "stream" );
+			Class<?> providerClass = Class.forName( serviceLoaderClass.getName() + "$Provider" );
+			providerTypeMethod = providerClass.getMethod( "type" );
+		}
+		catch (NoSuchMethodException | ClassNotFoundException e) {
+			/*
+			 * Probably Java 8.
+			 * Leave the method constants null,
+			 * we will automatically use a service loader implementation that doesn't rely on them.
+			 * See create(...).
+			 */
+		}
+
+		SERVICE_LOADER_STREAM_METHOD = serviceLoaderStreamMethod;
+		PROVIDER_TYPE_METHOD = providerTypeMethod;
+	}
 
 	public static ServiceResolver create(AggregatedClassLoader aggregatedClassLoader) {
-		return new DefaultServiceResolver( aggregatedClassLoader );
+		if ( SERVICE_LOADER_STREAM_METHOD != null ) {
+			// Java 9+
+			return new ClassPathAndModulePathServiceResolver( aggregatedClassLoader );
+		}
+		else {
+			// Java 8
+			return new ClassPathOnlyServiceResolver( aggregatedClassLoader );
+		}
 	}
 
-	private final List<ClassLoader> classLoaders;
+	final AggregatedClassLoader aggregatedClassLoader;
 
 	private DefaultServiceResolver(AggregatedClassLoader aggregatedClassLoader) {
-		this.classLoaders = new ArrayList<>();
-		// Always try the aggregated class loader first
-		this.classLoaders.add( aggregatedClassLoader );
-		// Then also try the individual class loaders,
-		// because only them can instantiate services provided by jars in the module path
-		aggregatedClassLoader.addAllTo( this.classLoaders );
+		this.aggregatedClassLoader = aggregatedClassLoader;
 	}
 
-	@Override
-	public <S> Collection<S> loadJavaServices(Class<S> serviceContract) {
-		Set<String> alreadyEncountered = new HashSet<>();
-		Set<S> result = new LinkedHashSet<>();
-		for ( ClassLoader classLoader : classLoaders ) {
-			ServiceLoader<S> serviceLoader = ServiceLoader.load( serviceContract, classLoader );
-			for ( S service : serviceLoader ) {
-				Class<?> type = service.getClass();
-				String typeName = type.getName();
-				/*
-				 * We may encounter the same service provider multiple times,
-				 * because the individual class loaders may give access to the same types
-				 * (at the very least a single class loader may be present twice in the aggregated class loader).
-				 * However, we only want to get the service from each provider once.
-				 */
-				if ( alreadyEncountered.add( typeName ) ) {
-					result.add( service );
-				}
-			}
+	/**
+	 * A {@link ServiceResolver} that will only detect services defined in the class path,
+	 * because it passes the aggregated classloader directly to the service loader.
+	 * <p>
+	 * This implementation is best when running Hibernate Search on Java 8.
+	 * On Java 9 and above, {@link ClassPathAndModulePathServiceResolver} should be used.
+	 */
+	private static class ClassPathOnlyServiceResolver extends DefaultServiceResolver {
+
+		private ClassPathOnlyServiceResolver(AggregatedClassLoader aggregatedClassLoader) {
+			super( aggregatedClassLoader );
 		}
-		return result;
+
+		@Override
+		public <S> Set<S> loadJavaServices(Class<S> serviceContract) {
+			ServiceLoader<S> serviceLoader = ServiceLoader.load( serviceContract, aggregatedClassLoader );
+			final Set<S> services = new LinkedHashSet<>();
+			for ( S service : serviceLoader ) {
+				services.add( service );
+			}
+			return services;
+		}
+	}
+
+	/**
+	 * A {@link ServiceResolver} that will detect services defined in the class path or in the module path.
+	 * <p>
+	 * This implementation only works when running Hibernate Search on Java 9 and above.
+	 * On Java 8, {@link ClassPathOnlyServiceResolver} must be used.
+	 * <p>
+	 * When retrieving services from providers in the module path,
+	 * the service loader internally uses a map from classloader to service catalog.
+	 * Since the aggregated class loader is artificial and unknown from the service loader,
+	 * it will never match any service from the module path.
+	 * <p>
+	 * To work around this problem,
+	 * we try to get services from a service loader bound to the aggregated class loader first,
+	 * then we try a service loader bound to each individual class loader.
+	 * <p>
+	 * This could result in duplicates, so we take specific care to avoid using the same service provider twice.
+	 * See {@link #loadJavaServices(Class)}.
+	 * <p>
+	 * Note that, in the worst case,
+	 * the service retrieved from each individual class loader could load duplicate versions
+	 * of classes already loaded from another class loader.
+	 * For example in an aggregated class loader made up of individual class loader A, B, C:
+	 * it is possible that class C1 was already loaded from A,
+	 * but then we load service S1 from B, and this service will also need class C1 but won't find it in class loader B,
+	 * so it will load its own version of that class.
+	 * <p>
+	 * We assume that this situation will never occur in practice because class loaders
+	 * are structure in a hierarchy that prevents one class to be loaded twice.
+	 */
+	private static class ClassPathAndModulePathServiceResolver extends DefaultServiceResolver {
+		private final List<ClassLoader> classLoaders;
+
+		private ClassPathAndModulePathServiceResolver(AggregatedClassLoader aggregatedClassLoader) {
+			super( aggregatedClassLoader );
+			this.classLoaders = new ArrayList<>();
+			// Always try the aggregated class loader first
+			this.classLoaders.add( aggregatedClassLoader );
+			// Then also try the individual class loaders,
+			// because only them can instantiate services provided by jars in the module path
+			aggregatedClassLoader.addAllTo( this.classLoaders );
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public <S> Collection<S> loadJavaServices(Class<S> serviceContract) {
+			final Set<String> alreadyUsedProviderTypes = new LinkedHashSet<>();
+			final Set<S> services = new LinkedHashSet<>();
+			this.classLoaders.stream()
+					.map( classLpader -> ServiceLoader.load( serviceContract, aggregatedClassLoader ) )
+					// Each loader's stream() method returns a stream of service providers: flatten these into a single stream
+					.flatMap( delegate -> {
+						try {
+							return (Stream<? extends Supplier<S>>) SERVICE_LOADER_STREAM_METHOD.invoke( delegate );
+						}
+						catch (RuntimeException | IllegalAccessException | InvocationTargetException e) {
+							throw new AssertionFailure( "Error calling ServiceLoader.stream()", e );
+						}
+					} )
+					// For each provider, check its type to be sure we don't use a provider twice, then get the service
+					.forEach( provider -> {
+						Class<?> type;
+						try {
+							type = (Class<?>) PROVIDER_TYPE_METHOD.invoke( provider );
+						}
+						catch (RuntimeException | IllegalAccessException | InvocationTargetException e) {
+							throw new AssertionFailure( "Error calling ServiceLoader.Provider.type()", e );
+						}
+						String typeName = type.getName();
+						/*
+						 * We may encounter service provider multiple times,
+						 * because the individual classloaders may give access to the same types.
+						 * However, we only want to get the service from each provider once.
+						 *
+						 * ServiceLoader.stream() is useful in that regard,
+						 * since it allows us to check the type of the service provider
+						 * before the service is even instantiated.
+						 *
+						 * We could just instantiate every service and check their type afterwards,
+						 * but 1. it would lead to unnecessary instantiation which could have side effects,
+						 * in particular regarding class loading,
+						 * and 2. the type of the provider may not always be the type of the service,
+						 * and one provider may return different types of services
+						 * depending on conditions known only to itself.
+						 */
+						if ( alreadyUsedProviderTypes.add( typeName ) ) {
+							services.add( provider.get() );
+						}
+					} );
+			return services;
+		}
 	}
 }
