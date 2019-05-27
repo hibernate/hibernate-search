@@ -15,6 +15,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuildContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -77,6 +79,62 @@ public class MarkerBaseIT {
 	@Target({ElementType.FIELD, ElementType.METHOD})
 	@MarkerMapping(builder = @MarkerRef)
 	private @interface MarkerAnnotationWithEmptyMarkerMapping {
+	}
+
+	@Test
+	public void error_invalidAnnotationType() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			@DocumentId
+			@MarkerAnnotationMappedToMarkerBuilderWithDifferentAnnotationType
+			public Integer getId() {
+				return id;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure(
+								"Builder '" + MarkerBuilderWithDifferentAnnotationType.TOSTRING
+										+ "' cannot be initialized with annotations of type '"
+										+ MarkerAnnotationMappedToMarkerBuilderWithDifferentAnnotationType.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.FIELD, ElementType.METHOD})
+	@MarkerMapping(builder = @MarkerRef(builderType = MarkerBuilderWithDifferentAnnotationType.class))
+	private @interface MarkerAnnotationMappedToMarkerBuilderWithDifferentAnnotationType {
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.FIELD, ElementType.METHOD})
+	private @interface DifferentAnnotationType {
+	}
+
+	public static class MarkerBuilderWithDifferentAnnotationType
+			implements AnnotationMarkerBuilder<DifferentAnnotationType> {
+		private static String TOSTRING = "<MarkerBuilderWithDifferentAnnotationType toString() result>";
+		@Override
+		public void initialize(DifferentAnnotationType annotation) {
+			throw new UnsupportedOperationException( "This should not be called" );
+		}
+		@Override
+		public Object build(MarkerBuildContext buildContext) {
+			throw new UnsupportedOperationException( "This should not be called" );
+		}
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
 	}
 
 }

@@ -24,6 +24,8 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
@@ -1018,6 +1020,63 @@ public class PropertyBridgeBaseIT {
 	@Target({ElementType.FIELD, ElementType.METHOD})
 	@PropertyBridgeMapping(bridge = @PropertyBridgeRef())
 	private @interface BridgeAnnotationWithEmptyPropertyBridgeMapping {
+	}
+
+	@Test
+	public void mapping_error_invalidAnnotationType() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			@DocumentId
+			@BridgeAnnotationMappedToBridgeBuilderWithDifferentAnnotationType
+			public Integer getId() {
+				return id;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure(
+								"Builder '" + BridgeBuilderWithDifferentAnnotationType.TOSTRING
+										+ "' cannot be initialized with annotations of type '"
+										+ BridgeAnnotationMappedToBridgeBuilderWithDifferentAnnotationType.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.FIELD, ElementType.METHOD})
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(builderType = BridgeBuilderWithDifferentAnnotationType.class))
+	private @interface BridgeAnnotationMappedToBridgeBuilderWithDifferentAnnotationType {
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.FIELD, ElementType.METHOD})
+	private @interface DifferentAnnotationType {
+	}
+
+	public static class BridgeBuilderWithDifferentAnnotationType
+			implements AnnotationBridgeBuilder<PropertyBridge, DifferentAnnotationType> {
+		private static String TOSTRING = "<BridgeBuilderWithDifferentAnnotationType toString() result>";
+		@Override
+		public void initialize(DifferentAnnotationType annotation) {
+			throw new UnsupportedOperationException( "This should not be called" );
+		}
+
+		@Override
+		public BeanHolder<? extends PropertyBridge> build(BridgeBuildContext buildContext) {
+			throw new UnsupportedOperationException( "This should not be called" );
+		}
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
 	}
 
 	@Test
