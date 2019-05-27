@@ -42,6 +42,7 @@ class ElasticsearchStringIndexFieldTypeContext
 	private String analyzerName;
 	private String normalizerName;
 	private Projectable projectable = Projectable.DEFAULT;
+	private Searchable searchable = Searchable.DEFAULT;
 	private Norms norms = Norms.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 	private String indexNullAs;
@@ -88,7 +89,7 @@ class ElasticsearchStringIndexFieldTypeContext
 
 	@Override
 	public ElasticsearchStringIndexFieldTypeContext searchable(Searchable searchable) {
-		// TODO HSEARCH-3048 (current) contribute searchable
+		this.searchable = searchable;
 		return this;
 	}
 
@@ -98,9 +99,9 @@ class ElasticsearchStringIndexFieldTypeContext
 
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
-		// TODO HSEARCH-3048 allow to configure indexed/not indexed
-		mapping.setIndex( true );
+		mapping.setIndex( resolvedSearchable );
 
 		if ( analyzerName != null ) {
 			mapping.setType( DataType.TEXT );
