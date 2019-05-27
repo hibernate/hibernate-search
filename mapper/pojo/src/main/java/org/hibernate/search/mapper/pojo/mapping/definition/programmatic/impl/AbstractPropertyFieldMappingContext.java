@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -61,6 +62,12 @@ abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappin
 	}
 
 	@Override
+	public S searchable(Searchable searchable) {
+		fieldModelContributor.add( (c, b) -> c.searchable( searchable ) );
+		return thisAsS();
+	}
+
+	@Override
 	public S valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass) {
 		return valueBridge( BeanReference.of( bridgeClass ) );
 	}
@@ -81,5 +88,4 @@ abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappin
 		this.extractorPath = extractorPath;
 		return thisAsS();
 	}
-
 }

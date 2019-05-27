@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -50,6 +51,12 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 	@Override
 	public S indexNullAs(F indexNullAs) {
 		this.indexNullAs = indexNullAs;
+		return thisAsS();
+	}
+
+	@Override
+	public S searchable(Searchable searchable) {
+		// TODO HSEARCH-3048 (current) contribute searchable
 		return thisAsS();
 	}
 

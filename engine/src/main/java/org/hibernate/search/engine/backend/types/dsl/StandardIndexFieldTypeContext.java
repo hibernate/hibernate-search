@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.types.dsl;
 
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 
@@ -17,4 +18,7 @@ public interface StandardIndexFieldTypeContext<S extends StandardIndexFieldTypeC
 	S sortable(Sortable sortable);
 
 	S indexNullAs(F indexNullAs);
+
+	S searchable(Searchable searchable);
+
 }
