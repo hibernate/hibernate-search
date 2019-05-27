@@ -7,12 +7,18 @@
 package org.hibernate.search.mapper.pojo.bridge.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
+import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A bridge builder that upon building retrieves an {@link AnnotationBridgeBuilder} from the bean provider,
@@ -22,7 +28,10 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
  * @param <A> The type of annotations accepted by the delegate {@link AnnotationBridgeBuilder}.
  */
 @SuppressWarnings("rawtypes") // Clients cannot provide a level of guarantee stronger than raw types
-public final class AnnotationInitializingBeanDelegatingBridgeBuilder<B, A extends Annotation> implements BridgeBuilder<B> {
+public final class AnnotationInitializingBeanDelegatingBridgeBuilder<B, A extends Annotation>
+		implements BridgeBuilder<B> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanReference<? extends AnnotationBridgeBuilder> delegateReference;
 	private final Class<B> expectedBridgeType;
@@ -47,21 +56,33 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<B, A extend
 		BeanHolder<?> bridgeHolder;
 		try ( BeanHolder<? extends AnnotationBridgeBuilder> delegateHolder =
 				delegateReference.getBean( buildContext.getBeanProvider() ) ) {
-			/*
-			 * TODO HSEARCH-3077 make this raw type use safer by checking the generic parameters of castedDelegate.getClass() somehow,
-			 * maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge,
-			 * and throwing an exception with a detailed explanation if something is wrong.
-			 */
-			@SuppressWarnings("unchecked")
-			AnnotationBridgeBuilder<?, A> castedDelegate = delegateHolder.get();
-			castedDelegate.initialize( annotation );
-			bridgeHolder = castedDelegate.build( buildContext );
+			bridgeHolder = doBuild( buildContext, delegateHolder.get() );
 		}
 
 		expectedBridgeType.cast( bridgeHolder.get() );
 		@SuppressWarnings( "unchecked" ) // The cast above is enough, since BeanHolder must return the same instance for each call to get()
 		BeanHolder<? extends B> castedBridgeHolder = (BeanHolder<? extends B>) bridgeHolder;
 		return castedBridgeHolder;
+	}
+
+	private BeanHolder<?> doBuild(BridgeBuildContext buildContext, AnnotationBridgeBuilder<?, ?> delegate) {
+		Class<?> annotationType = annotation.annotationType();
+		GenericTypeContext bridgeTypeContext = new GenericTypeContext( delegate.getClass() );
+		Class<?> builderAnnotationType = bridgeTypeContext.resolveTypeArgument( AnnotationBridgeBuilder.class, 1 )
+				.map( ReflectionUtils::getRawType )
+				.orElseThrow( () -> new AssertionFailure(
+						"Could not auto-detect the annotation type accepted by builder '"
+						+ delegate + "'."
+						+ " There is a bug in Hibernate Search, please report it."
+				) );
+		if ( !builderAnnotationType.isAssignableFrom( annotationType ) ) {
+			throw log.invalidAnnotationTypeForBuilder( delegate, annotationType );
+		}
+
+		@SuppressWarnings("unchecked") // Checked using reflection just above
+		AnnotationBridgeBuilder<?, ? super A> castedDelegate = (AnnotationBridgeBuilder<?, ? super A>) delegate;
+		castedDelegate.initialize( annotation );
+		return castedDelegate.build( buildContext );
 	}
 
 }
