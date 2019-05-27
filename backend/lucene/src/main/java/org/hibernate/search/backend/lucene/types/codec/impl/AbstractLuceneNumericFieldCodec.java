@@ -17,13 +17,14 @@ import org.apache.lucene.search.TermQuery;
 public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> implements LuceneStandardFieldCodec<F, E> {
 
 	private final boolean projectable;
-
+	private final boolean searchable;
 	private final boolean sortable;
 
 	private final F indexNullAsValue;
 
-	public AbstractLuceneNumericFieldCodec(boolean projectable, boolean sortable, F indexNullAsValue) {
+	public AbstractLuceneNumericFieldCodec(boolean projectable, boolean searchable, boolean sortable, F indexNullAsValue) {
 		this.projectable = projectable;
+		this.searchable = searchable;
 		this.sortable = sortable;
 		this.indexNullAsValue = indexNullAsValue;
 	}
@@ -54,7 +55,9 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 			documentBuilder.addFieldName( absoluteFieldPath );
 		}
 
-		documentBuilder.addField( domain.createIndexField( absoluteFieldPath, encodedValue ) );
+		if ( searchable ) {
+			documentBuilder.addField( domain.createIndexField( absoluteFieldPath, encodedValue ) );
+		}
 	}
 
 	@Override

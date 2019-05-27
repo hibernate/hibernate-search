@@ -54,6 +54,7 @@ class LuceneBigIntegerIndexFieldTypeContext
 	public LuceneIndexFieldType<BigInteger> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		int resolvedDecimalScale = resolveDecimalScale();
 		if ( resolvedDecimalScale > 0 ) {
@@ -64,7 +65,7 @@ class LuceneBigIntegerIndexFieldTypeContext
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super BigInteger, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneBigIntegerFieldCodec codec = new LuceneBigIntegerFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue, resolvedDecimalScale );
+		LuceneBigIntegerFieldCodec codec = new LuceneBigIntegerFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue, resolvedDecimalScale );
 
 		return new LuceneIndexFieldType<>(
 				codec,

@@ -34,12 +34,13 @@ class LuceneByteIndexFieldTypeContext
 	public LuceneIndexFieldType<Byte> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends Byte> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Byte, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneByteFieldCodec codec = new LuceneByteFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
+		LuceneByteFieldCodec codec = new LuceneByteFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

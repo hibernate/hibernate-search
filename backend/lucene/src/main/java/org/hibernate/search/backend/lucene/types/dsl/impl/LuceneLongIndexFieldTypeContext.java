@@ -34,12 +34,13 @@ class LuceneLongIndexFieldTypeContext
 	public LuceneIndexFieldType<Long> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends Long> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Long, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneLongFieldCodec codec = new LuceneLongFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
+		LuceneLongFieldCodec codec = new LuceneLongFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

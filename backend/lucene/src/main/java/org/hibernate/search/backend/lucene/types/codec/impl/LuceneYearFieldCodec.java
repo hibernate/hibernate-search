@@ -16,8 +16,8 @@ import org.apache.lucene.index.IndexableField;
 
 public final class LuceneYearFieldCodec extends AbstractLuceneNumericFieldCodec<Year, Integer> {
 
-	public LuceneYearFieldCodec(boolean projectable, boolean sortable, Year indexNullAsValue) {
-		super( projectable, sortable, indexNullAsValue );
+	public LuceneYearFieldCodec(boolean projectable, boolean searchable, boolean sortable, Year indexNullAsValue) {
+		super( projectable, searchable, sortable, indexNullAsValue );
 	}
 
 	@Override

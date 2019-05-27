@@ -34,12 +34,13 @@ class LuceneDoubleIndexFieldTypeContext
 	public LuceneIndexFieldType<Double> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends Double> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Double, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneDoubleFieldCodec codec = new LuceneDoubleFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
+		LuceneDoubleFieldCodec codec = new LuceneDoubleFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

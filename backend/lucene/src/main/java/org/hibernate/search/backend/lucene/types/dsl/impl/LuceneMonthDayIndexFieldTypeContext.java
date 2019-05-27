@@ -36,12 +36,13 @@ class LuceneMonthDayIndexFieldTypeContext
 	public LuceneIndexFieldType<MonthDay> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedSearchable = resolveDefault( searchable );
 
 		ToDocumentFieldValueConverter<?, ? extends MonthDay> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super MonthDay, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		LuceneMonthDayFieldCodec codec = new LuceneMonthDayFieldCodec( resolvedProjectable, resolvedSortable, indexNullAsValue );
+		LuceneMonthDayFieldCodec codec = new LuceneMonthDayFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
 
 		return new LuceneIndexFieldType<>(
 				codec,

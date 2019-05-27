@@ -28,8 +28,8 @@ public final class LuceneLocalDateTimeFieldCodec extends AbstractLuceneNumericFi
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneLocalDateTimeFieldCodec(boolean projectable, boolean sortable, LocalDateTime indexNullAsValue) {
-		super( projectable, sortable, indexNullAsValue );
+	public LuceneLocalDateTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable, LocalDateTime indexNullAsValue) {
+		super( projectable, searchable, sortable, indexNullAsValue );
 	}
 
 	@Override
