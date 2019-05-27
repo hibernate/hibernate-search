@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 
@@ -60,6 +61,12 @@ public @interface FullTextField {
 	 * @see Norms
 	 */
 	Norms norms() default Norms.DEFAULT;
+
+	/**
+	 * @return Whether this field should be searchable.
+	 * @see Searchable
+	 */
+	Searchable searchable() default Searchable.DEFAULT;
 
 	/**
 	 * @return A reference to the value bridge to use for this field.

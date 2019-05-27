@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -69,6 +70,12 @@ public @interface KeywordField {
 	 * @see GenericField#sortable()
 	 */
 	Sortable sortable() default Sortable.DEFAULT;
+
+	/**
+	 * @return Whether this field should be searchable.
+	 * @see Searchable
+	 */
+	Searchable searchable() default Searchable.DEFAULT;
 
 	/**
 	 * @return An optional value to replace any null value.

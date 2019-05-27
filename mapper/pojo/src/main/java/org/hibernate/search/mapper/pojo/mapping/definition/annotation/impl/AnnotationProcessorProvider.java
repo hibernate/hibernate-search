@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -272,6 +273,11 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
+		Searchable getSearchable(GenericField annotation) {
+			return annotation.searchable();
+		}
+
+		@Override
 		Sortable getSortable(GenericField annotation) {
 			return annotation.sortable();
 		}
@@ -321,6 +327,11 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
+		Searchable getSearchable(FullTextField annotation) {
+			return annotation.searchable();
+		}
+
+		@Override
 		ValueBridgeRef getValueBridge(FullTextField annotation) {
 			return annotation.valueBridge();
 		}
@@ -362,6 +373,11 @@ class AnnotationProcessorProvider {
 		@Override
 		Projectable getProjectable(KeywordField annotation) {
 			return annotation.projectable();
+		}
+
+		@Override
+		Searchable getSearchable(KeywordField annotation) {
+			return annotation.searchable();
 		}
 
 		@Override
@@ -409,6 +425,11 @@ class AnnotationProcessorProvider {
 		@Override
 		Projectable getProjectable(ScaledNumberField annotation) {
 			return annotation.projectable();
+		}
+
+		@Override
+		Searchable getSearchable(ScaledNumberField annotation) {
+			return annotation.searchable();
 		}
 
 		@Override

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.types.dsl.LuceneStandardIndexFieldTypeContext;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -62,6 +63,12 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 	@Override
 	public S indexNullAs(F indexNullAs) {
 		this.indexNullAsValue = indexNullAs;
+		return thisAsS();
+	}
+
+	@Override
+	public S searchable(Searchable searchable) {
+		// TODO HSEARCH-3048 (current) contribute searchable
 		return thisAsS();
 	}
 
