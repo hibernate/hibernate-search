@@ -260,6 +260,19 @@ NOTE: Using Hibernate ORM mapping,
 a default `decimalScale` is taken automatically from the underlying `scale` value of the relative SQL `@Column`,
 using the Hibernate ORM metadata. The value could be overridden explicitly using the `decimalScale` attribute.
 
+==== Norms creation
+
+For both `@FullTextField` and `@KeywordField` fields it is possible to control the creation of the norms.
+The norms are index time scoring information for the fields.
+
+Storing them can make scoring queries faster.
+But if the score is not used, it is better to not store it.
+Since not storing the norms can save a considerable amount of memory.
+
+To store the norms set the attribute `norms` to `Norms.YES`, otherwise set it to `Norms.NO`.
+If the attribute is not set or set to `Norms.DEFAULT`,
+the storing of norms will depend on the current backend default behavior.
+
 [[mapper-orm-directfieldmapping-spatial-types]]
 === Mapping spatial types
 // Search 5 anchors backward compatibility
