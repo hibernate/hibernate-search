@@ -10,6 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -33,6 +35,8 @@ import org.junit.Test;
  * (and others, see javadoc on that class).
  */
 public class FieldBaseIT {
+
+	private static final String INDEX_NAME = "IndexName";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -273,4 +277,85 @@ public class FieldBaseIT {
 				);
 	}
 
+	@Test
+	public void indexNullAs() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Integer integer;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(valueBridge = @ValueBridgeRef(type = ParsingValueBridge.class), indexNullAs = "7")
+			public Integer getInteger() { return integer; }
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "integer", Integer.class, f -> f.indexNullAs( 7 ) )
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity();
+			entity.id = 1;
+			session.getMainWorkPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					// Stub backend is not supposed to use 'indexNullAs' option
+					.add( "1", b -> b.field( "integer", null ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	public static class ParsingValueBridge extends NoParsingValueBridge {
+
+		public ParsingValueBridge() {
+		}
+
+		@Override
+		public Integer parse(String value) {
+			return Integer.parseInt( value );
+		}
+	}
+
+	@Test
+	public void error_indexNullAs_noParsing() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Integer integer;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(valueBridge = @ValueBridgeRef(type = NoParsingValueBridge.class), indexNullAs = "7")
+			public Integer getInteger() { return integer; }
+		}
+
+		SubTest.expectException( () -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "does not support parsing a value from a String" )
+				.hasMessageContaining( "integer" );
+	}
+
+	public static class NoParsingValueBridge implements ValueBridge<Integer, Integer> {
+
+		public NoParsingValueBridge() {
+		}
+
+		@Override
+		public Integer toIndexedValue(Integer value, ValueBridgeToIndexedValueContext context) {
+			return value;
+		}
+
+		@Override
+		public Integer cast(Object value) {
+			return (Integer) value;
+		}
+	}
 }
