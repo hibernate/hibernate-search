@@ -4,10 +4,8 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.lucene.fieldtype;
+package org.hibernate.search.integrationtest.backend.lucene.mapping;
 
-
-import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
@@ -22,7 +20,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,11 +28,10 @@ import org.junit.Test;
 import org.apache.lucene.document.Document;
 import org.assertj.core.api.Assertions;
 
-public class LuceneFieldContentIT {
+public class LuceneFieldAttributesIT {
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String TEXT_1 = "This is a text containing things. Red house with a blue carpet on the road...";
-	private static final String TEXT_2 = "This is a text containing other things. Such as move the line on the right margin...";
+	private static final String INDEX_NAME = "my-index";
+	private static final String TEXT = "This is a text containing things. Red house with a blue carpet on the road...";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -57,8 +53,7 @@ public class LuceneFieldContentIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-1640")
-	public void verifyProjectionsOnDifferentTypes() {
+	public void verifyIndexFieldTypes() {
 		SearchQuery<Document> query = indexManager.createSearchScope().query()
 				.asProjection(
 						f -> f.extension( LuceneExtension.get() ).document()
@@ -67,26 +62,15 @@ public class LuceneFieldContentIT {
 				.toQuery();
 
 		List<Document> result = query.fetch().getHits();
-		Assertions.assertThat( result )
-				.hasSize( 2 )
-				.satisfies( containsDocument(
-						"ID:1",
-						doc -> doc.hasField( "string", "keyword" )
-								.hasField( "text", TEXT_1 )
-								.hasField( "integer", 739 )
-								.hasField( "longNumber", 739L )
-								.hasField( "bool", 1 )
-								.andOnlyInternalFields()
-				) )
-				.satisfies( containsDocument(
-						"ID:2",
-						doc -> doc.hasField( "string", "anotherKeyword" )
-								.hasField( "text", TEXT_2 )
-								.hasField( "integer", 123 )
-								.hasField( "longNumber", 123L )
-								.hasField( "bool", 0 )
-								.andOnlyInternalFields()
-				) );
+
+		Assertions.assertThat( result ).hasSize( 1 );
+		Document document = result.get( 0 );
+
+		// norms false => omit-norms true
+		Assertions.assertThat( document.getField( "keyword" ).fieldType().omitNorms() ).isTrue();
+
+		// norms true => omit-norms false
+		Assertions.assertThat( document.getField( "text" ).fieldType().omitNorms() ).isFalse();
 	}
 
 	private void initData() {
@@ -94,17 +78,7 @@ public class LuceneFieldContentIT {
 
 		workPlan.add( referenceProvider( "ID:1" ), document -> {
 			document.addValue( indexMapping.string, "keyword" );
-			document.addValue( indexMapping.text, TEXT_1 );
-			document.addValue( indexMapping.integer, 739 );
-			document.addValue( indexMapping.longNumber, 739L );
-			document.addValue( indexMapping.bool, true );
-		} );
-		workPlan.add( referenceProvider( "ID:2" ), document -> {
-			document.addValue( indexMapping.string, "anotherKeyword" );
-			document.addValue( indexMapping.text, TEXT_2 );
-			document.addValue( indexMapping.integer, 123 );
-			document.addValue( indexMapping.longNumber, 123L );
-			document.addValue( indexMapping.bool, false );
+			document.addValue( indexMapping.text, TEXT );
 		} );
 
 		workPlan.execute().join();
@@ -114,20 +88,10 @@ public class LuceneFieldContentIT {
 
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> text;
-		final IndexFieldReference<Integer> integer;
-		final IndexFieldReference<Long> longNumber;
-		final IndexFieldReference<Boolean> bool;
 
 		IndexMapping(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) ).toReference();
+			string = root.field( "keyword", f -> f.asString().projectable( Projectable.YES ) ).toReference();
 			text = root.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES ) ).toReference();
-			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) ).toReference();
-			longNumber = root.field( "longNumber", f -> f.asLong().projectable( Projectable.YES ) ).toReference();
-
-			// the external form is the Boolean,
-			// BUT we treat it as **Integer** for comparison operation (range, sort)
-			// and we store it as **Integer** as well.
-			bool = root.field( "bool", f -> f.asBoolean().projectable( Projectable.YES ) ).toReference();
 		}
 	}
 }
