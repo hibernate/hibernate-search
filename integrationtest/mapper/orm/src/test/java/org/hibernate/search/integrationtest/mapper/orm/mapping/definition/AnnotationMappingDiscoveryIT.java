@@ -255,7 +255,7 @@ public class AnnotationMappingDiscoveryIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.METHOD, ElementType.FIELD})
-	@MarkerMapping(builder = @MarkerRef(builderType = CustomMarker.Builder.class))
+	@MarkerMapping(marker = @MarkerRef(builderType = CustomMarker.Builder.class))
 	private @interface CustomMarkerAnnotation {
 	}
 
