@@ -77,7 +77,7 @@ public class MarkerBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@MarkerMapping(builder = @MarkerRef)
+	@MarkerMapping(marker = @MarkerRef)
 	private @interface MarkerAnnotationWithEmptyMarkerMapping {
 	}
 
@@ -111,7 +111,7 @@ public class MarkerBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@MarkerMapping(builder = @MarkerRef(builderType = MarkerBuilderWithDifferentAnnotationType.class))
+	@MarkerMapping(marker = @MarkerRef(builderType = MarkerBuilderWithDifferentAnnotationType.class))
 	private @interface MarkerAnnotationMappedToMarkerBuilderWithDifferentAnnotationType {
 	}
 

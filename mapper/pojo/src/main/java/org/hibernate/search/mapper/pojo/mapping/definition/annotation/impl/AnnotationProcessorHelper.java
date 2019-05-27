@@ -99,7 +99,7 @@ class AnnotationProcessorHelper {
 
 	<A extends Annotation> MarkerBuilder createMarkerBuilder(A annotation) {
 		MarkerMapping markerMapping = annotation.annotationType().getAnnotation( MarkerMapping.class );
-		MarkerRef markerBuilderReferenceAnnotation = markerMapping.builder();
+		MarkerRef markerBuilderReferenceAnnotation = markerMapping.marker();
 
 		return new AnnotationInitializingBeanDelegatingMarkerBuilder<>(
 				toBeanReference(

@@ -21,11 +21,11 @@ import java.lang.annotation.Target;
 public @interface MarkerMapping {
 
 	/**
-	 * Define a marker mapper builder
+	 * Map a marker to an annotation type.
 	 *
 	 * @see MarkerRef
-	 * @return A reference to the marker mapping builder.
+	 * @return A reference to the marker to use.
 	 */
-	MarkerRef builder();
+	MarkerRef marker();
 
 }
