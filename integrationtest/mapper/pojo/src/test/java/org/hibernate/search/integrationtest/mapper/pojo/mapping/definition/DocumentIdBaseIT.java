@@ -8,6 +8,9 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -140,6 +143,53 @@ public class DocumentIdBaseIT {
 	enum EnumForEnumSuperClassTest {
 		VALUE1,
 		VALUE2
+	}
+
+	@Test
+	public void error_invalidInputTypeForIdentifierBridge() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyStringBridge.class))
+			public Integer getId() {
+				return id;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure(
+								"Bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
+										+ Integer.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	public static class MyStringBridge implements IdentifierBridge<String> {
+		private static String TOSTRING = "<MyStringBridge toString() result>";
+		@Override
+		public String cast(Object value) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+		@Override
+		public String fromDocumentIdentifier(String documentIdentifier,
+				IdentifierBridgeFromDocumentIdentifierContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+		@Override
+		public String toDocumentIdentifier(String propertyValue, IdentifierBridgeToDocumentIdentifierContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
 	}
 
 	@Test
