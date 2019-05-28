@@ -39,7 +39,6 @@ import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -236,6 +235,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	@Test
+	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testAnalyzer")
 	public void analyzerOverride() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
@@ -508,15 +508,6 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		assertThat( createQuery.apply( TERM_1 + "~2" ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2678")
-	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testFuzzy")
-	public void analyzer() {
-		// TODO HSEARCH-3312 implement this test once we allow to override the analyzer
-		// See the original test in Search 5 for examples of use
-		Assume.assumeTrue( "This feature is not implemented yet", false );
 	}
 
 	@Test
