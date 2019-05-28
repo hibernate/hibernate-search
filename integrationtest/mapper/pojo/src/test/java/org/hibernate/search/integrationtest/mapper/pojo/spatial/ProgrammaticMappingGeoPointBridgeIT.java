@@ -283,19 +283,20 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 	// Does not implement GeoPoint on purpose
 	public static class CustomCoordinates {
 
-		private final Double lat;
+		private final double lat;
 		private final Double lon;
 
-		public CustomCoordinates(Double lat, Double lon) {
+		public CustomCoordinates(double lat, Double lon) {
 			this.lat = lat;
 			this.lon = lon;
 		}
 
-		// TODO make this work even when the property is of primitive type double
-		public Double getLat() {
+		// Test primitive type
+		public double getLat() {
 			return lat;
 		}
 
+		// Test boxed type
 		public Double getLon() {
 			return lon;
 		}
