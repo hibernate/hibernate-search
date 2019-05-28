@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.showcase.library;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -392,11 +391,5 @@ public class OrmLibraryShowcaseIT {
 
 		results = documentService.getAuthorsOfBooksHavingTerms( "Indonesia", SortOrder.DESC );
 		assertThat( results ).containsExactly( "Mark Red", "Mark Red" );
-	}
-
-	@Test
-	public void aggregation() {
-		// TODO aggregation
-		assumeTrue( "Aggregation not implemented yet", false );
 	}
 }
