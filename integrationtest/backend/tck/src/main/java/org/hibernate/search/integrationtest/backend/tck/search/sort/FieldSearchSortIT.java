@@ -58,7 +58,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.test.SubTest;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -335,9 +334,6 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void error_unknownField() {
-		Assume.assumeTrue( "Errors on attempt to sort on unknown fields are not supported yet", false );
-		// TODO throw an error on attempts to sort on unknown fields
-
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		String absoluteFieldPath = "unknownField";
@@ -355,9 +351,6 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void error_objectField_nested() {
-		Assume.assumeTrue( "Errors on attempt to sort on object fields are not supported yet", false );
-		// TODO throw an error on attempts to sort on object fields
-
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName;
@@ -375,9 +368,6 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void error_objectField_flattened() {
-		Assume.assumeTrue( "Errors on attempt to sort on object fields are not supported yet", false );
-		// TODO throw an error on attempts to sort on object fields
-
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName;
