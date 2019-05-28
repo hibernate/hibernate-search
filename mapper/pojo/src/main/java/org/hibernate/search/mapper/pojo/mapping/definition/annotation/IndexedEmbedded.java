@@ -44,6 +44,5 @@ public @interface IndexedEmbedded {
 
 	// TODO includeEmbeddedObjectId?
 	// TODO targetElement?
-	// TODO indexNullAs? => Maybe we should rather use "missing" queries?
 
 }

@@ -331,7 +331,6 @@ public class SearchProjectionIT extends EasyMockSupport {
 		// Conditional extensions with orElse - two, both supported
 		query = scope.query()
 				.asProjection( f -> f.<String>extension()
-						// FIXME find some way to forbid using the context passed to the consumers twice... ?
 						.ifSupported(
 								new SupportedExtension<>(),
 								extended -> extended.extendedProjection( "string1", String.class )

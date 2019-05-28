@@ -10,6 +10,6 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 
 public interface ElasticsearchIndexManager extends IndexManager {
 
-	// TODO add Elasticsearch-specific index manager APIs
+	// No Elasticsearch-specific index manager APIs yet.
 
 }

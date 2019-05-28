@@ -20,8 +20,6 @@ public interface SearchQueryBuilder<H, C> {
 
 	void addRoutingKey(String routingKey);
 
-	// TODO add more arguments, such as faceting options
-
 	SearchQuery<H> build();
 
 }

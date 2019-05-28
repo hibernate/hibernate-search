@@ -14,6 +14,4 @@ package org.hibernate.search.engine.search.dsl.predicate;
 public interface WildcardPredicateTerminalContext
 		extends SearchPredicateTerminalContext, SearchPredicateBoostContext<WildcardPredicateTerminalContext> {
 
-	// FIXME no specific options for wildcard predicates; move boost option here
-
 }

@@ -29,7 +29,6 @@ public class Person extends AbstractEntity<Integer> {
 	private Integer id;
 
 	@Basic(optional = false)
-	// TODO use a different analyzer/normalizer for these fields
 	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
 	@KeywordField(
 			name = "firstName_sort",
@@ -39,7 +38,6 @@ public class Person extends AbstractEntity<Integer> {
 	private String firstName;
 
 	@Basic(optional = false)
-	// TODO use a different analyzer/normalizer for these fields
 	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
 	@KeywordField(
 			name = "lastName_sort",

@@ -10,6 +10,6 @@ import org.hibernate.search.engine.backend.Backend;
 
 public interface LuceneBackend extends Backend {
 
-	// TODO add Lucene-specific backend APIs
+	// No Lucene-specific backend APIs yet
 
 }

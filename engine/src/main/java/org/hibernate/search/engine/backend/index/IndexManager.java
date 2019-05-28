@@ -17,7 +17,6 @@ import org.hibernate.search.util.common.SearchException;
 public interface IndexManager {
 
 	// TODO add standard APIs related to statistics?
-	// TODO add other standard index manager APIs?
 
 	/**
 	 * Unwrap the index manager to some implementation-specific type.
