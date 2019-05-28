@@ -41,7 +41,6 @@ public class Library extends AbstractEntity<Integer> {
 
 	@Basic
 	// TODO use multi-fields here
-	// TODO use a different analyzer/normalizer for these fields
 	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
 	@KeywordField(
 			name = "name_sort",

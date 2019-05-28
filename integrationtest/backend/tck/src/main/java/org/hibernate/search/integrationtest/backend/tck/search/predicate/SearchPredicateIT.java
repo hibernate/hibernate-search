@@ -203,7 +203,6 @@ public class SearchPredicateIT {
 		// Conditional extensions with orElse - two, both supported
 		query = scope.query()
 				.predicate( f -> f.extension()
-						// FIXME find some way to forbid using the context passed to the consumers twice... ?
 						.ifSupported(
 								new SupportedExtension(),
 								extended -> extended.extendedPredicate( "string", STRING_1 )

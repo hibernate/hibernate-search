@@ -10,6 +10,6 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 
 public interface LuceneIndexManager extends IndexManager {
 
-	// TODO add Lucene-specific index manager APIs
+	// No Lucene-specific index manager APIs yet.
 
 }

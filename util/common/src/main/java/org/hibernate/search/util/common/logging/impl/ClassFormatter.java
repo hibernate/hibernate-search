@@ -17,8 +17,6 @@ public class ClassFormatter {
 	private final String stringRepresentation;
 
 	public ClassFormatter(Class<?> clazz) {
-		// TODO clazz should never be null, but it actually is in some cases; Ignoring that for now as it should be gone
-		// with the free-form rework
 		this.stringRepresentation = clazz != null ? clazz.getName() : null;
 	}
 

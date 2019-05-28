@@ -86,7 +86,6 @@ class ElasticsearchStringIndexFieldTypeContext
 		// TODO HSEARCH-3048 allow to configure indexed/not indexed
 		mapping.setIndex( true );
 
-		// TODO Use sub-fields? (but in that case, adjust projections accordingly)
 		if ( analyzerName != null ) {
 			mapping.setType( DataType.TEXT );
 			mapping.setAnalyzer( analyzerName );

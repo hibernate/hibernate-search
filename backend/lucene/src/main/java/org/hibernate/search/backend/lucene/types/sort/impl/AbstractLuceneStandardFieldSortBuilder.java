@@ -101,7 +101,6 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 			return;
 		}
 
-		// TODO so this is to mimic the Elasticsearch behavior, I'm not totally convinced it's the good choice though
 		Object effectiveMissingValue;
 		if ( missingValue == SortMissingValue.MISSING_FIRST ) {
 			effectiveMissingValue = order == SortOrder.DESC ? sortMissingValueLastPlaceholder : sortMissingValueFirstPlaceholder;

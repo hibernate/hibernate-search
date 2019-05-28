@@ -40,8 +40,6 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final HibernateOrmMapping mapping;
 	private final PojoMappingWorkExecutor mappingWorkExecutor;
 
-	//TODO: use the workPlan to handle optimize tasks
-
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
 	private final CacheMode cacheMode;

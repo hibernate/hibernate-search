@@ -51,8 +51,8 @@ class PojoSearchScopeDelegateImpl<E, E2> implements PojoSearchScopeDelegate<E, E
 	public PojoReference toPojoReference(DocumentReference documentReference) {
 		PojoIndexedTypeManager<?, ?, ?> typeManager = typeManagers.getByIndexName( documentReference.getIndexName() )
 				.orElseThrow( () -> new AssertionFailure(
-						"Document reference " + documentReference + " could not be converted to a PojoReference" ) );
-		// TODO error handling if typeManager is null
+						"Document reference " + documentReference + " could not be converted to a PojoReference"
+				) );
 		Object id = typeManager.getIdentifierMapping().fromDocumentIdentifier( documentReference.getId(), sessionContext );
 		return new PojoReferenceImpl( typeManager.getIndexedJavaClass(), id );
 	}

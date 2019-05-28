@@ -73,7 +73,6 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 			collectEmbeddedTypesRecursively( typeMetadata, persistentClass.getPropertyIterator() );
 		}
 
-		// TODO get the user lookup from Hibernate ORM?
 		MethodHandles.Lookup lookup = MethodHandles.publicLookup();
 		AnnotationHelper annotationHelper = new AnnotationHelper( lookup );
 

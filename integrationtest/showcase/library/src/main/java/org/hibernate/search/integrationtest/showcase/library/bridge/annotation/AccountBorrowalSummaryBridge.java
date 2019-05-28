@@ -25,6 +25,4 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
 @Documented
 public @interface AccountBorrowalSummaryBridge {
 
-	// TODO add options related to field storage in particular?
-
 }

@@ -8,8 +8,6 @@ package org.hibernate.search.mapper.orm.session.spi;
 
 public interface SearchSessionBuilder {
 
-	// TODO other options (default query timeout, default query hints, ...)
-
 	SearchSessionImplementor build();
 
 }

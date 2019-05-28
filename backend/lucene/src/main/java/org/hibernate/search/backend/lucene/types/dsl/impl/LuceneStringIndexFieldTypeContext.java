@@ -89,7 +89,6 @@ class LuceneStringIndexFieldTypeContext
 			}
 		}
 
-		// TODO GSM: the idea would be to create only one global QueryBuilder object per analyzer/normalizer
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
 
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =

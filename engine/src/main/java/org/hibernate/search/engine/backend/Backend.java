@@ -18,7 +18,6 @@ public interface Backend {
 
 	// TODO add standard APIs related to analysis (which is backend-scoped). To test if an analyzer is defined, for example.
 	// TODO add standard APIs related to statistics?
-	// TODO add other standard backend APIs?
 
 	/**
 	 * Unwrap the backend to some implementation-specific type.

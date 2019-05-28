@@ -21,7 +21,6 @@ import java.util.stream.Stream;
  */
 public interface PojoModelCompositeElement extends PojoModelElement {
 
-	// FIXME what if I want a PojoElementAccessor<List<MyType>>?
 	<T> PojoElementAccessor<T> createAccessor(Class<T> type);
 
 	PojoElementAccessor<?> createAccessor();

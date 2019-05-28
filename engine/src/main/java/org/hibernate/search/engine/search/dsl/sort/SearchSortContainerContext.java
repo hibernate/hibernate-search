@@ -77,9 +77,6 @@ public interface SearchSortContainerContext {
 		return byDistance( absoluteFieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 
-	// TODO other sorts
-
-
 	/**
 	 * Order by the given sort.
 	 *
