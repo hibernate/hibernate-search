@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -46,11 +47,25 @@ class PojoSearchSessionDelegateImpl implements PojoSearchSessionDelegate {
 		}
 
 		Set<PojoIndexedTypeManager<?, ? extends E, ?>> targetedTypeManagers = new LinkedHashSet<>();
+		Set<Class<?>> nonIndexedTypes = new LinkedHashSet<>();
+		Set<Class<?>> nonIndexedButContainedTypes = new LinkedHashSet<>();
 		for ( Class<? extends E> targetedType : targetedTypes ) {
-			targetedTypeManagers.addAll(
-					indexedTypeManagers.getAllBySuperClass( targetedType )
-							.orElseThrow( () -> log.notIndexedType( targetedType ) )
-			);
+			Optional<? extends Set<? extends PojoIndexedTypeManager<?, ? extends E, ?>>> targetedTypeManagersForType =
+					indexedTypeManagers.getAllBySuperClass( targetedType );
+			if ( targetedTypeManagersForType.isPresent() ) {
+				targetedTypeManagers.addAll( targetedTypeManagersForType.get() );
+			}
+			else {
+				// Remember this to produce a clear error message
+				nonIndexedTypes.add( targetedType );
+				if ( containedTypeManagers.getByExactClass( targetedType ).isPresent() ) {
+					nonIndexedButContainedTypes.add( targetedType );
+				}
+			}
+		}
+
+		if ( !nonIndexedTypes.isEmpty() || !nonIndexedButContainedTypes.isEmpty() ) {
+			throw log.invalidScopeTarget( nonIndexedTypes, nonIndexedButContainedTypes );
 		}
 
 		return new PojoScopeDelegateImpl<>( indexedTypeManagers, targetedTypeManagers, sessionContext );

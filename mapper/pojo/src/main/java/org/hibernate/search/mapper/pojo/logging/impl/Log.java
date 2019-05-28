@@ -12,6 +12,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
@@ -307,8 +308,13 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 35, value = "Found multiple properties with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
 	SearchException multiplePropertiesForMarker(String markerName, String fieldName, String markerSet);
 
-	@Message(id = ID_OFFSET_2 + 36, value = "Type '%1$s' is not indexed and hasn't any indexed supertype.")
-	SearchException notIndexedType(@FormatWith(ClassFormatter.class) Class<?> targetedType);
+	@Message(id = ID_OFFSET_2 + 36,
+			value = "Some of the given types cannot be targeted."
+					+ " These types are not indexed, nor is any of their subtypes: %1$s."
+					+ " Note that some of them are indexed-embedded in an indexed entity, but this is not enough to be targeted"
+					+ " (only indexed types can be targeted): %2$s."
+	)
+	SearchException invalidScopeTarget(Collection<Class<?>> nonIndexedTypes, Collection<Class<?>> containedTypes);
 
 	@Message(id = ID_OFFSET_2 + 37, value = "Cannot work on type %1$s, because it is not indexed, neither directly nor as a contained entity in another type.")
 	SearchException notIndexedTypeNorAsDelegate(@FormatWith(ClassFormatter.class) Class<?> targetedType);
