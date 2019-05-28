@@ -39,7 +39,7 @@ import org.apache.lucene.index.IndexReader;
 /**
  * @author Guillaume Smet
  */
-// TODO in the end the IndexManager won't implement ReaderProvider as it's far more complex than that
+// TODO HSEARCH-3117 in the end the IndexManager won't implement ReaderProvider as it's far more complex than that
 class LuceneIndexManagerImpl
 		implements IndexManagerImplementor<LuceneRootDocumentBuilder>, LuceneIndexManager, ReaderProvider {
 

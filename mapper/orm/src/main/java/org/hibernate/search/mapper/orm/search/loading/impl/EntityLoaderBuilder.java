@@ -36,14 +36,14 @@ public class EntityLoaderBuilder<E> {
 
 	private HibernateOrmComposableEntityLoader<PojoReference, E> buildForSingleType(
 			MutableEntityLoadingOptions mutableLoadingOptions, Class<? extends E> concreteIndexedType) {
-		// TODO Add support for entities whose document ID is not the entity ID (natural ID, or other)
-		// TODO Add support for other types of database retrieval and object lookup? See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.EntityLoaderBuilder#getObjectInitializer
+		// TODO HSEARCH-3203 Add support for entities whose document ID is not the entity ID (natural ID, or other)
+		// TODO HSEARCH-3349 Add support for other types of database retrieval and object lookup? See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.EntityLoaderBuilder#getObjectInitializer
 		return new HibernateOrmSingleTypeByIdEntityLoader<>( session, concreteIndexedType, mutableLoadingOptions );
 	}
 
 	private EntityLoader<PojoReference, E> buildForMultipleTypes(MutableEntityLoadingOptions mutableLoadingOptions) {
 		/*
-		 * TODO Group together entity types from a same hierarchy, so as to optimize loads
+		 * TODO HSEARCH-3349 Group together entity types from a same hierarchy, so as to optimize loads
 		 * (one query per entity hierarchy, and not one query per index).
 		 */
 		Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends E>> delegateByConcreteType =

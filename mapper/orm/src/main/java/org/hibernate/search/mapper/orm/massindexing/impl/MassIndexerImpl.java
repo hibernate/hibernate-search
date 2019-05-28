@@ -61,7 +61,7 @@ public class MassIndexerImpl implements MassIndexer {
 		this.tenantIdentifier = tenantIdentifier;
 		this.rootEntities = toRootEntities( mapping, entities );
 
-		// TODO provide a JMXRegistrar alternative
+		// TODO HSEARCH-3057 use a JMX monitor if JMX is enabled (see Search 5)
 		this.monitor = new SimpleIndexingProgressMonitor();
 	}
 

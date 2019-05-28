@@ -42,7 +42,7 @@ public @interface IndexedEmbedded {
 	 */
 	ContainerExtraction extraction() default @ContainerExtraction;
 
-	// TODO includeEmbeddedObjectId?
-	// TODO targetElement?
+	// TODO HSEARCH-3071 includeEmbeddedObjectId
+	// TODO HSEARCH-3072 targetElement
 
 }

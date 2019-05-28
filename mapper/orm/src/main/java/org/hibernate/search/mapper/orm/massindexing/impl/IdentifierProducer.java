@@ -84,7 +84,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		catch (Exception exception) {
 			String errorMessage = log.massIndexerExceptionWhileFetchingIds();
 
-			//TODO: handle with an errorHandler
+			// TODO HSEARCH-3110 handle with an errorHandler
 			// temporary rethrowing a RuntimeException
 			throw new RuntimeException( errorMessage, exception );
 		}

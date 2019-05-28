@@ -124,13 +124,13 @@ public class LuceneBackendFactory implements BackendFactory {
 	}
 
 	private DirectoryProvider getDirectoryProvider(EventContext backendContext, ConfigurationPropertySource propertySource) {
-		// TODO be more clever about the type, also supports providing a class => use a BeanReference?
+		// TODO HSEARCH-3440 be more clever about the type, also support providing a class => use a BeanReference?
 		String directoryProviderString = DIRECTORY_PROVIDER.getOrThrow(
 				propertySource, propertyKey -> log.undefinedLuceneDirectoryProvider( propertyKey, backendContext )
 		);
 
 		if ( "local_directory".equals( directoryProviderString ) ) {
-			// TODO GSM: implement the checks properly
+			// TODO HSEARCH-3440 implement the checks properly
 			Path rootDirectory = ROOT_DIRECTORY.get( propertySource ).toAbsolutePath();
 
 			initializeRootDirectory( rootDirectory, backendContext );

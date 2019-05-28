@@ -114,7 +114,7 @@ public class OrmLibraryShowcaseIT {
 				SUBURBAN_1_ID,
 				SUBURBAN_2_ID
 		);
-		// TODO introduce an AND operator in the match query to make this match SUBURBAN_1_ID only
+		// TODO HSEARCH-917 introduce an AND operator in the match query to make this match SUBURBAN_1_ID only
 		libraries = libraryService.search( "Suburban 1", 0, 10 );
 		assertThat( libraries ).extracting( Library::getId ).containsExactly(
 				SUBURBAN_1_ID,
@@ -150,7 +150,7 @@ public class OrmLibraryShowcaseIT {
 				JOHN_PAUL_SMITH_ID
 		);
 
-		// TODO introduce an AND operator in the match query to make this match JOHN_SMITH_ID and JOHN_PAUL_SMITH_ID only
+		// TODO HSEARCH-917 introduce an AND operator in the match query to make this match JOHN_SMITH_ID and JOHN_PAUL_SMITH_ID only
 		results = borrowalService.searchPerson(
 				"john smith", 0, 10
 		);

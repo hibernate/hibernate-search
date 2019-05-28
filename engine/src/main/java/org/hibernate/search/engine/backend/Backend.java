@@ -16,8 +16,8 @@ import org.hibernate.search.util.common.SearchException;
  */
 public interface Backend {
 
-	// TODO add standard APIs related to analysis (which is backend-scoped). To test if an analyzer is defined, for example.
-	// TODO add standard APIs related to statistics?
+	// TODO HSEARCH-3589 add standard APIs related to analysis (which is backend-scoped). To test if an analyzer is defined, for example.
+	// TODO HSEARCH-3129 add standard APIs related to statistics?
 
 	/**
 	 * Unwrap the backend to some implementation-specific type.

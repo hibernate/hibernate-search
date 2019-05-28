@@ -60,7 +60,7 @@ public class PojoMappingWorkExecutorImpl implements PojoMappingWorkExecutor {
 			futures[typeCounter++] = operation.apply( workExecutors.get( type ) );
 		}
 
-		// TODO use an << errorHandler >> here
+		// TODO HSEARCH-3110 use an ErrorHandler here?
 		return CompletableFuture.allOf( futures );
 	}
 

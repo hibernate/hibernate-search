@@ -75,7 +75,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 
 		multiTenancyStrategy.contributeToMapping( mapping );
 
-		// TODO allow to configure this, both at index level (configuration properties) and at field level (ElasticsearchExtension)
+		// TODO HSEARCH-3273 allow to configure this, both at index level (configuration properties) and at field level (ElasticsearchExtension)
 		mapping.setDynamic( DynamicType.STRICT );
 
 		final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();

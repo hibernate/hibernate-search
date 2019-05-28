@@ -55,7 +55,7 @@ class LuceneIndexSearchScopeBuilder implements IndexSearchScopeBuilder {
 		Set<LuceneIndexModel> indexModels = indexManagers.stream().map( LuceneIndexManagerImpl::getModel )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
-		// TODO obviously, this will have to be changed once we have the full storage complexity from Search 5
+		// TODO HSEARCH-3117 obviously, this will have to be changed once we have the full storage complexity from Search 5
 		Set<ReaderProvider> readerProviders = indexManagers.stream().map( LuceneIndexManagerImpl::getReaderProvider )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 

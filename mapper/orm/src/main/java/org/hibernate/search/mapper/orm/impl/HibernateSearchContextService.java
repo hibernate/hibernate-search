@@ -42,8 +42,8 @@ public class HibernateSearchContextService implements Service, AutoCloseable {
 	private volatile HibernateOrmMapping mapping;
 
 	/*
-	 * FIXME support "enlist in transaction"? This only makes sense when index managers support it,
-	 * maybe there's something to change here...
+	 * FIXME HSEARCH-3317 support "enlist in transaction"? This only makes sense when index managers support it,
+	 *  maybe there's something to change here...
 	 */
 	private boolean enlistInTransaction = false;
 
@@ -136,7 +136,7 @@ public class HibernateSearchContextService implements Service, AutoCloseable {
 			return workPlan;
 		}
 		/*
-		 * TODO handle the "simulated" transaction when "a Flush listener is registered".
+		 * TODO HSEARCH-3068 handle the "simulated" transaction when "a Flush listener is registered".
 		 * See:
 		 *  - HibernateSearchEventListener (in Search 5 and here)
 		 *  - the else block in org.hibernate.search.event.impl.EventSourceTransactionContext#registerSynchronization in Search 5
@@ -145,15 +145,15 @@ public class HibernateSearchContextService implements Service, AutoCloseable {
 		}
 		 */
 		else {
-			// TODO add a warning when configuration expects transactions, but none was found
+			// TODO HSEARCH-3069 add a warning when configuration expects transactions, but none was found
 //			if ( transactionExpected ) {
 //				// this is a workaround: isTransactionInProgress should return "true"
 //				// for correct configurations.
 //				log.pushedChangesOutOfTransaction();
 //			}
-			// TODO Create a work plan (to handle automatic reindexing of containing types),
-			// but ensure changes will be applied without waiting for a call to workPlan.execute()
-			// TODO also ensure synchronicity if necessary (make some Session event, such as flush(), wait for the works to be executed)
+			// TODO HSEARCH-3069 Create a work plan (to handle automatic reindexing of containing types),
+			//  but ensure changes will be applied without waiting for a call to workPlan.execute()
+			// TODO HSEARCH-3069 also ensure synchronicity if necessary (make some Session event, such as flush(), wait for the works to be executed)
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}

@@ -102,7 +102,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		catch (Exception exception) {
 			String logMessage = log.massIndexerExceptionWhileTransformingIds();
 
-			//TODO: use an errorHandler instance
+			// TODO HSEARCH-3110 use an errorHandler instance
 			// errorHandler.handleException( logMessage, exception );
 			// temporary re-throw the exception as a Runtime
 			throw new RuntimeException( logMessage, exception );
@@ -235,7 +235,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	private void handleException(Object entity, Throwable e) {
 		String errorMsg = log.massIndexerUnableToIndexInstance( entity.getClass().getName(), entity.toString() );
 
-		// TODO: implements exception handler
+		// TODO HSEARCH-3110 implements exception handler
 		// errorHandler.handleException( errorMsg, e );
 		// temporary re-throw the exception
 		throw new RuntimeException( errorMsg, e );

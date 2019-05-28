@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 public class BookCopy extends DocumentCopy<Book> {
 
 	@GenericField
-	// TODO facet
+	// TODO HSEARCH-3271 facet
 	private BookMedium medium;
 
 	public BookMedium getMedium() {

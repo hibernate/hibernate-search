@@ -443,13 +443,10 @@ public class FieldSearchProjectionIT {
 	@Test
 	public void multivalued() {
 		Assume.assumeTrue( "Multi-valued projections are not supported yet", false );
-		// TODO support multi-valued projections
-
-		// TODO Project on multi-valued field
-
-		// TODO Project on fields within a multi-valued flattened object
-
-		// TODO Project on fields within a multi-valued nested object
+		// TODO HSEARCH-3391 support multi-valued projections
+		//  Project on multi-valued field
+		//  Project on fields within a multi-valued flattened object
+		//  Project on fields within a multi-valued nested object
 	}
 
 	@Test
