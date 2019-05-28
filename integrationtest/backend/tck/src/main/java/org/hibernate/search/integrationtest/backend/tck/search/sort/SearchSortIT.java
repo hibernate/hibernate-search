@@ -38,7 +38,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Assert;
@@ -87,7 +87,7 @@ public class SearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
@@ -122,7 +122,7 @@ public class SearchSortIT {
 
 	@Test
 	public void byScore() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query;
 
 		SearchPredicate predicate = scope.predicate()
@@ -152,7 +152,7 @@ public class SearchSortIT {
 
 	@Test
 	public void separateSort() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query;
 
 		SearchSort sortAsc = scope.sort()
@@ -283,7 +283,7 @@ public class SearchSortIT {
 
 		// Mandatory extension, unsupported
 		SubTest.expectException(
-				() -> indexManager.createSearchScope().sort().extension( new UnSupportedExtension() )
+				() -> indexManager.createScope().sort().extension( new UnSupportedExtension() )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class );
@@ -464,7 +464,7 @@ public class SearchSortIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

@@ -18,7 +18,7 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.ut
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -63,7 +63,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@Test
 	public void projection_sourceFiltering() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Object> query = scope.query()
 				.asProjection( f -> f.field( "string" ) )
@@ -84,7 +84,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@Test
 	public void routing() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		String routingKey = "someRoutingKey";
 

@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -261,13 +261,13 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 24,
 			value = "A search query cannot have a scope spanning both an Lucene index and another type of index."
 					+ " Base scope was: '%1$s', Lucene index was: '%2$s'")
-	SearchException cannotMixLuceneSearchScopeWithOtherType(IndexSearchScopeBuilder baseScope,
+	SearchException cannotMixLuceneScopeWithOtherType(IndexScopeBuilder baseScope,
 			LuceneIndexManager luceneIndex, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 25,
 			value = "A search query cannot have a scope spanning multiple Lucene backends."
 					+ " Base scope was: '%1$s', index from another backend was: '%2$s'")
-	SearchException cannotMixLuceneSearchScopeWithOtherBackend(IndexSearchScopeBuilder baseScope,
+	SearchException cannotMixLuceneScopeWithOtherBackend(IndexScopeBuilder baseScope,
 			LuceneIndexManager indexFromOtherBackend, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 27,

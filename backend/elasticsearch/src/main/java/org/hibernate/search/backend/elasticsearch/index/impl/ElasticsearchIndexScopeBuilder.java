@@ -13,16 +13,16 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
-import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexSearchScope;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-class ElasticsearchIndexSearchScopeBuilder implements IndexSearchScopeBuilder {
+class ElasticsearchIndexScopeBuilder implements IndexScopeBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -32,7 +32,7 @@ class ElasticsearchIndexSearchScopeBuilder implements IndexSearchScopeBuilder {
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<ElasticsearchIndexManagerImpl> indexManagers = new LinkedHashSet<>();
 
-	ElasticsearchIndexSearchScopeBuilder(SearchBackendContext searchBackendContext,
+	ElasticsearchIndexScopeBuilder(SearchBackendContext searchBackendContext,
 			MappingContextImplementor mappingContext, ElasticsearchIndexManagerImpl indexManager) {
 		this.searchBackendContext = searchBackendContext;
 		this.mappingContext = mappingContext;
@@ -41,7 +41,7 @@ class ElasticsearchIndexSearchScopeBuilder implements IndexSearchScopeBuilder {
 
 	void add(SearchBackendContext searchBackendContext, ElasticsearchIndexManagerImpl indexManager) {
 		if ( ! this.searchBackendContext.equals( searchBackendContext ) ) {
-			throw log.cannotMixElasticsearchSearchScopeWithOtherBackend(
+			throw log.cannotMixElasticsearchScopeWithOtherBackend(
 					this, indexManager, searchBackendContext.getEventContext()
 			);
 		}
@@ -49,12 +49,12 @@ class ElasticsearchIndexSearchScopeBuilder implements IndexSearchScopeBuilder {
 	}
 
 	@Override
-	public IndexSearchScope<?> build() {
+	public IndexScope<?> build() {
 		// Use LinkedHashSet to ensure stable order when generating requests
 		Set<ElasticsearchIndexModel> indexModels = indexManagers.stream().map( ElasticsearchIndexManagerImpl::getModel )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
-		ElasticsearchSearchScopeModel model = new ElasticsearchSearchScopeModel( indexModels );
-		return new ElasticsearchIndexSearchScope( mappingContext, searchBackendContext, model );
+		ElasticsearchScopeModel model = new ElasticsearchScopeModel( indexModels );
+		return new ElasticsearchIndexScope( mappingContext, searchBackendContext, model );
 	}
 
 	@Override

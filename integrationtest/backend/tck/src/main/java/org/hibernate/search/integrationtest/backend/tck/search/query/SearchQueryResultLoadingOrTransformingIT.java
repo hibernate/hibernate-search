@@ -39,10 +39,10 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTra
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -111,8 +111,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		resetAll();
 		// No calls expected on the mocks
 		replayAll();
-		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericSearchScope();
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -137,7 +137,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void references_noReferenceTransformer() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -148,7 +148,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void entities_noEntityLoading() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.asEntity()
@@ -175,8 +175,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		resetAll();
 		// No calls expected on the mocks
 		replayAll();
-		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericSearchScope();
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createGenericScope();
 		SearchQuery<StubTransformedReference> referencesQuery = scope.query( loadingContextMock )
 				.asReference()
 				.predicate( f -> f.matchAll() )
@@ -219,8 +219,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		resetAll();
 		// No calls expected on the mocks
 		replayAll();
-		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericSearchScope();
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.asEntity()
 				.predicate( f -> f.matchAll() )
@@ -263,8 +263,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		resetAll();
 		// No calls expected on the mocks
 		replayAll();
-		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericSearchScope();
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createGenericScope();
 		SearchQuery<List<?>> projectionsQuery = scope.query( loadingContextMock )
 				.asProjection( f ->
 						f.composite(
@@ -316,7 +316,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		resetAll();
 		// No calls expected on the mocks
 		replayAll();
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<StubTransformedHit> query = scope.query()
 				.asProjection( f ->
 						f.composite(
@@ -373,8 +373,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		resetAll();
 		// No calls expected on the mocks
 		replayAll();
-		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericSearchScope();
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createGenericScope();
 		SearchQuery<StubTransformedHit> query = scope.query( loadingContextMock )
 				.asProjection( f ->
 						f.composite(
@@ -422,7 +422,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void countQuery() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -452,7 +452,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void countQueryWithProjection() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<String> query = scope.query()
 				.asProjection( f -> f.field( "string", String.class ) )
@@ -477,7 +477,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		resetAll();
 		// No calls expected on the mocks
 		replayAll();
-		GenericStubMappingSearchScope<DocumentReference, DocumentReference> scope = indexManager.createGenericSearchScope();
+		GenericStubMappingScope<DocumentReference, DocumentReference> scope = indexManager.createGenericScope();
 		SearchQuery<DocumentReference> query = scope.query( loadingContextMock )
 				.asEntity()
 				.predicate( f -> f.matchAll() )
@@ -530,7 +530,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

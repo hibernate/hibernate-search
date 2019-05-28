@@ -52,7 +52,7 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -115,7 +115,7 @@ public class LuceneExtensionIT {
 	@Test
 	@SuppressWarnings("unused")
 	public void queryContext() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
 		LuceneSearchQueryResultDefinitionContext<DocumentReference, DocumentReference> context1 =
@@ -159,7 +159,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void query() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> genericQuery = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -188,7 +188,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void query_explain_singleIndex() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
@@ -207,7 +207,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void query_explain_singleIndex_invalidId() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
@@ -226,7 +226,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void query_explain_multipleIndexes() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+		StubMappingScope scope = indexManager.createScope( otherIndexManager );
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
@@ -245,7 +245,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void query_explain_multipleIndexes_missingIndexName() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+		StubMappingScope scope = indexManager.createScope( otherIndexManager );
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
@@ -264,7 +264,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void query_explain_multipleIndexes_invalidIndexName() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+		StubMappingScope scope = indexManager.createScope( otherIndexManager );
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
@@ -283,7 +283,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void predicate_fromLuceneQuery() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -305,7 +305,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void predicate_fromLuceneQuery_separatePredicate() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().extension( LuceneExtension.get() )
 				.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) ).toPredicate();
@@ -329,7 +329,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void sort_fromLuceneSortField() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -369,7 +369,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void sort_fromLuceneSortField_separateSort() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchSort sort1 = scope.sort().extension()
 						.ifSupported(
@@ -415,7 +415,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void predicate_nativeField_throwsException() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException(
 				"match() predicate on unsupported native field",
@@ -433,7 +433,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void sort_nativeField_throwsException() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException(
 				"sort on unsupported native field",
@@ -452,7 +452,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void predicate_nativeField_nativeQuery() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.extension( LuceneExtension.get() )
@@ -466,7 +466,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void predicate_nativeField_exists() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException(
 				"exists() predicate on unsupported native field",
@@ -482,7 +482,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void projection_nativeField() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Integer> query = scope.query()
 				.asProjection( f -> f.field( "nativeField", Integer.class ) )
@@ -494,7 +494,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void projection_nativeField_unsupportedProjection() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		// let's check that it's possible to query the field beforehand
 		SearchQuery<DocumentReference> query = scope.query()
@@ -521,7 +521,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void sort_nativeField_nativeSort() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -534,7 +534,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void projection_document() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Document> query = scope.query()
 				.asProjection(
@@ -592,7 +592,7 @@ public class LuceneExtensionIT {
 	 */
 	@Test
 	public void projection_documentAndField() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
@@ -620,7 +620,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void projection_explanation() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Explanation> query = scope.query()
 				.asProjection( f -> f.extension( LuceneExtension.get() ).explanation() )
@@ -739,7 +739,7 @@ public class LuceneExtensionIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

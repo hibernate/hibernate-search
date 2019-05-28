@@ -11,7 +11,7 @@ import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrateg
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -49,7 +49,7 @@ public class SearchBackendContext {
 	}
 
 	public LuceneSearchContext createSearchContext(MappingContextImplementor mappingContext,
-			LuceneSearchScopeModel scopeModel) {
+			LuceneScopeModel scopeModel) {
 		return new LuceneSearchContext(
 				mappingContext, analysisDefinitionRegistry, multiTenancyStrategy, scopeModel
 		);

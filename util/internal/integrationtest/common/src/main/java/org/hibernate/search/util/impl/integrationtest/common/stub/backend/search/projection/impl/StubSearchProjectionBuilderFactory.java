@@ -27,14 +27,14 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.function.TriFunction;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchScopeModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
 public class StubSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
-	private final StubSearchScopeModel scopeModel;
+	private final StubScopeModel scopeModel;
 
-	public StubSearchProjectionBuilderFactory(StubSearchScopeModel scopeModel) {
+	public StubSearchProjectionBuilderFactory(StubScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
 	}
 

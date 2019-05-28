@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.Ela
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.impl.ElasticsearchSearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
-import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexSearchScope;
+import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
@@ -37,7 +37,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionC
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -90,12 +90,12 @@ public final class ElasticsearchExtension<H, R, E>
 	@Override
 	public Optional<ElasticsearchSearchQueryResultDefinitionContext<R, E>> extendOptional(
 			SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
-			IndexSearchScope<?> indexSearchScope,
+			IndexScope<?> indexScope,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
-		if ( indexSearchScope instanceof ElasticsearchIndexSearchScope ) {
+		if ( indexScope instanceof ElasticsearchIndexScope ) {
 			return Optional.of( new ElasticsearchSearchQueryResultDefinitionContextImpl<>(
-					(ElasticsearchIndexSearchScope) indexSearchScope, sessionContext, loadingContextBuilder
+					(ElasticsearchIndexScope) indexScope, sessionContext, loadingContextBuilder
 			) );
 		}
 		else {

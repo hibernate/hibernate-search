@@ -29,7 +29,7 @@ import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangeSe
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSearchSortIT;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -76,7 +76,7 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private SearchQuery<DocumentReference> sortQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
@@ -84,7 +84,7 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private SearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactoryContext, SearchPredicateTerminalContext> rangePredicate) {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( rangePredicate )
 				.toQuery();
@@ -129,7 +129,7 @@ public class BooleanSortAndRangePredicateIT {
 
 	@Test
 	public void rangeFromToSortByFieldQuery() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.range().onField( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.TRUE ) )
 				.sort( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() )
@@ -195,7 +195,7 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private void checkAllDocumentsAreSearchable() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

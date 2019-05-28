@@ -21,7 +21,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  * {@link SearchQueryResultDefinitionContext#asEntity() entity queries}
  * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
  */
-public interface MappedIndexSearchScope<R, E> {
+public interface MappedIndexScope<R, E> {
 
 	/*
 	 * IMPLEMENTATION NOTE: we *must* only accept a loading context with the same R/E type parameters as this class,

@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoSearchScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class HibernateOrmLoadingContext<E> implements LoadingContext<PojoReference, E> {
@@ -60,12 +60,12 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<PojoR
 
 	public static final class Builder<E> implements LoadingContextBuilder<PojoReference, E> {
 		private final SessionImplementor sessionImplementor;
-		private final PojoSearchScopeDelegate<?, ?> scopeDelegate;
+		private final PojoScopeDelegate<?, ?> scopeDelegate;
 		private final EntityLoaderBuilder<E> entityLoaderBuilder;
 		private final MutableEntityLoadingOptions loadingOptions;
 
 		public Builder(SessionImplementor sessionImplementor,
-				PojoSearchScopeDelegate<?, ?> scopeDelegate,
+				PojoScopeDelegate<?, ?> scopeDelegate,
 				EntityLoaderBuilder<E> entityLoaderBuilder,
 				MutableEntityLoadingOptions loadingOptions) {
 			this.sessionImplementor = sessionImplementor;

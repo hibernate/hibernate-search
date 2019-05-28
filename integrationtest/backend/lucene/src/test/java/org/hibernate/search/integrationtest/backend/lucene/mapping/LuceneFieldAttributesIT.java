@@ -109,7 +109,7 @@ public class LuceneFieldAttributesIT {
 	}
 
 	private Document loadDocument() {
-		SearchQuery<Document> query = indexManager.createSearchScope().query()
+		SearchQuery<Document> query = indexManager.createScope().query()
 				.asProjection(
 						f -> f.extension( LuceneExtension.get() ).document()
 				)

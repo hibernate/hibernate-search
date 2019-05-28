@@ -13,13 +13,13 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoSearchScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl implements SearchScope {
 
-	private final PojoSearchScopeDelegate<?, Void> delegate;
+	private final PojoScopeDelegate<?, Void> delegate;
 
-	public SearchScopeImpl(PojoSearchScopeDelegate<?, Void> delegate) {
+	public SearchScopeImpl(PojoScopeDelegate<?, Void> delegate) {
 		this.delegate = delegate;
 	}
 

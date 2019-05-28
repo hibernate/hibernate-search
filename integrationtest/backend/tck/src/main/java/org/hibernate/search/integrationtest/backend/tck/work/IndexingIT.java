@@ -25,7 +25,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 
 import org.junit.Assume;
 import org.junit.Before;
@@ -102,7 +102,7 @@ public class IndexingIT<F> {
 		// If we get here, indexing went well.
 		// However, it may have failed silently... Let's check the documents are there, with the right value.
 
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.fieldModel.relativeFieldName;
 
 		for ( int i = 0; i < values.size(); i++ ) {

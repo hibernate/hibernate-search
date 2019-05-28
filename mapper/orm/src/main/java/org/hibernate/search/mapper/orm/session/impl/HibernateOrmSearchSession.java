@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionC
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoSearchScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -70,8 +70,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
 		checkOrmSessionIsOpen();
 
-		PojoSearchScopeDelegate<T, T> searchScopeDelegate = getDelegate().createPojoSearchScope( types );
-		return new SearchScopeImpl<>( searchScopeDelegate, sessionImplementor );
+		PojoScopeDelegate<T, T> scopeDelegate = getDelegate().createPojoScope( types );
+		return new SearchScopeImpl<>( scopeDelegate, sessionImplementor );
 	}
 
 	@Override

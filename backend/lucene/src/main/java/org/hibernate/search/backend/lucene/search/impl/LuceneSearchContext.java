@@ -11,7 +11,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
@@ -31,12 +31,12 @@ public final class LuceneSearchContext {
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	// Targeted indexes
-	private final LuceneSearchScopeModel scopeModel;
+	private final LuceneScopeModel scopeModel;
 
 	public LuceneSearchContext(MappingContextImplementor mappingContext,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
-			LuceneSearchScopeModel scopeModel) {
+			LuceneScopeModel scopeModel) {
 		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
 		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;

@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
@@ -45,10 +45,10 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 			new PredicateBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchContext searchContext;
-	private final LuceneSearchScopeModel scopeModel;
+	private final LuceneScopeModel scopeModel;
 
 	public LuceneSearchPredicateBuilderFactoryImpl(LuceneSearchContext searchContext,
-			LuceneSearchScopeModel scopeModel) {
+			LuceneScopeModel scopeModel) {
 		this.searchContext = searchContext;
 		this.scopeModel = scopeModel;
 	}

@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSucceedingCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldContext;
@@ -38,7 +38,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private static final JsonPrimitive OR_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "or" );
 
 
-	private final ElasticsearchSearchScopeModel scopeModel;
+	private final ElasticsearchScopeModel scopeModel;
 
 	private final Map<String, ElasticsearchSimpleQueryStringPredicateBuilderFieldContext> fields = new LinkedHashMap<>();
 	private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
@@ -46,7 +46,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private String analyzer;
 	private ElasticsearchCompatibilityChecker analyzerChecker = new ElasticsearchSucceedingCompatibilityChecker();
 
-	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchSearchScopeModel scopeModel) {
+	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
 	}
 

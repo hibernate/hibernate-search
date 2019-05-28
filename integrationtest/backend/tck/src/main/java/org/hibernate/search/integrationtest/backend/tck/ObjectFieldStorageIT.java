@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -118,7 +118,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_match() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -149,7 +149,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_range() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -191,7 +191,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_error_nonNestedField() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "'flattenedObject'" );
@@ -201,7 +201,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_error_nonObjectField() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "'flattenedObject.string'" );
@@ -211,7 +211,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_error_missingField() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field" );
@@ -315,7 +315,7 @@ public class ObjectFieldStorageIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

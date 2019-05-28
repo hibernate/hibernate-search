@@ -27,7 +27,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -68,7 +68,7 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_fluid() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
@@ -80,7 +80,7 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_search_predicate() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
 
@@ -94,7 +94,7 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_lambda() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
@@ -106,7 +106,7 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_caching_root() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
@@ -142,7 +142,7 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_caching_nonRoot() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
@@ -181,7 +181,7 @@ public class SearchPredicateIT {
 
 	@Test
 	public void extension() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query;
 
 		// Mandatory extension, supported
@@ -269,7 +269,7 @@ public class SearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

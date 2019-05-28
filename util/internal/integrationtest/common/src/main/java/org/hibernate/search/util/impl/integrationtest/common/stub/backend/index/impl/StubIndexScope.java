@@ -10,28 +10,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchScopeModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicateBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSortBuilderFactory;
 
-class StubIndexSearchScope implements IndexSearchScope<StubQueryElementCollector> {
+class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 	private final StubSearchPredicateBuilderFactory predicateFactory;
 	private final StubSearchSortBuilderFactory sortFactory;
 	private final StubSearchQueryBuilderFactory queryFactory;
 	private final StubSearchProjectionBuilderFactory projectionFactory;
 
-	private StubIndexSearchScope(Builder builder) {
+	private StubIndexScope(Builder builder) {
 		List<String> immutableIndexNames = Collections.unmodifiableList( new ArrayList<>( builder.indexNames ) );
 		List<StubIndexSchemaNode> immutableRootSchemaNodes =
 				Collections.unmodifiableList( new ArrayList<>( builder.rootSchemaNodes ) );
-		StubSearchScopeModel model = new StubSearchScopeModel( immutableIndexNames, immutableRootSchemaNodes );
+		StubScopeModel model = new StubScopeModel( immutableIndexNames, immutableRootSchemaNodes );
 		this.predicateFactory = new StubSearchPredicateBuilderFactory();
 		this.sortFactory = new StubSearchSortBuilderFactory();
 		this.projectionFactory = new StubSearchProjectionBuilderFactory( model );
@@ -58,7 +58,7 @@ class StubIndexSearchScope implements IndexSearchScope<StubQueryElementCollector
 		return projectionFactory;
 	}
 
-	static class Builder implements IndexSearchScopeBuilder {
+	static class Builder implements IndexScopeBuilder {
 
 		private final StubBackend backend;
 		// In a real mapper, this should be used for some features; keeping this here in case we need to stub such feature
@@ -83,8 +83,8 @@ class StubIndexSearchScope implements IndexSearchScope<StubQueryElementCollector
 		}
 
 		@Override
-		public IndexSearchScope<?> build() {
-			return new StubIndexSearchScope( this );
+		public IndexScope<?> build() {
+			return new StubIndexScope( this );
 		}
 	}
 }

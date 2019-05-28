@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.SearchSort;
@@ -37,10 +37,10 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	private final ElasticsearchSearchContext searchContext;
 
-	private final ElasticsearchSearchScopeModel scopeModel;
+	private final ElasticsearchScopeModel scopeModel;
 
 	public ElasticsearchSearchSortBuilderFactoryImpl(ElasticsearchSearchContext searchContext,
-			ElasticsearchSearchScopeModel scopeModel) {
+			ElasticsearchScopeModel scopeModel) {
 		this.searchContext = searchContext;
 		this.scopeModel = scopeModel;
 	}

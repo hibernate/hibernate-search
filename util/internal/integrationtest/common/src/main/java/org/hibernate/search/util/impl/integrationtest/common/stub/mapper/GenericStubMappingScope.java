@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
-import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScope;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -16,14 +16,14 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 /**
- * A wrapper around {@link MappedIndexSearchScope} providing some syntactic sugar,
+ * A wrapper around {@link MappedIndexScope} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
  */
-public class GenericStubMappingSearchScope<R, E> {
+public class GenericStubMappingScope<R, E> {
 
-	private final MappedIndexSearchScope<R, E> delegate;
+	private final MappedIndexScope<R, E> delegate;
 
-	GenericStubMappingSearchScope(MappedIndexSearchScope<R, E> delegate) {
+	GenericStubMappingScope(MappedIndexScope<R, E> delegate) {
 		this.delegate = delegate;
 	}
 

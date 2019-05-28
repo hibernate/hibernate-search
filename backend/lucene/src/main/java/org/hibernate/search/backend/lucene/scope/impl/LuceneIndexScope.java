@@ -8,30 +8,30 @@ package org.hibernate.search.backend.lucene.scope.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactoryImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 
 /**
  * @author Guillaume Smet
  */
-public class LuceneIndexSearchScope
-		implements IndexSearchScope<LuceneSearchQueryElementCollector> {
+public class LuceneIndexScope
+		implements IndexScope<LuceneSearchQueryElementCollector> {
 
-	private final LuceneSearchScopeModel model;
+	private final LuceneScopeModel model;
 	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
 	private final LuceneSearchSortBuilderFactoryImpl searchSortFactory;
 	private final LuceneSearchQueryBuilderFactory searchQueryFactory;
 	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 
-	public LuceneIndexSearchScope(SearchBackendContext searchBackendContext,
+	public LuceneIndexScope(SearchBackendContext searchBackendContext,
 			MappingContextImplementor mappingContext,
-			LuceneSearchScopeModel model) {
+			LuceneScopeModel model) {
 		LuceneSearchContext searchContext = searchBackendContext.createSearchContext( mappingContext, model );
 		this.model = model;
 		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchContext, model );

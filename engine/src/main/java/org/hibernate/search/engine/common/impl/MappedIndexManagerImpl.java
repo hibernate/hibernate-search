@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScopeBuilder;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -50,14 +50,14 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public <R, E> MappedIndexSearchScopeBuilder<R, E> createSearchScopeBuilder(MappingContextImplementor mappingContext) {
-		return new MappedIndexSearchScopeBuilderImpl<>(
+	public <R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(MappingContextImplementor mappingContext) {
+		return new MappedIndexScopeBuilderImpl<>(
 				implementor, mappingContext
 		);
 	}
 
 	@Override
-	public void addTo(MappedIndexSearchScopeBuilder<?, ?> builder) {
-		((MappedIndexSearchScopeBuilderImpl<?, ?>) builder).add( implementor );
+	public void addTo(MappedIndexScopeBuilder<?, ?> builder) {
+		((MappedIndexScopeBuilderImpl<?, ?>) builder).add( implementor );
 	}
 }

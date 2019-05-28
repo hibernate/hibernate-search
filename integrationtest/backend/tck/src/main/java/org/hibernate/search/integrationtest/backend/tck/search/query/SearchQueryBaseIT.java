@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -36,7 +36,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubLoadingContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -68,7 +68,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void getQueryString() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
@@ -81,7 +81,7 @@ public class SearchQueryBaseIT {
 	public void extension() {
 		initData( 2 );
 
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -104,7 +104,7 @@ public class SearchQueryBaseIT {
 	public void context_extension() {
 		initData( 5 );
 
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query;
 
 		// Mandatory extension, supported
@@ -138,7 +138,7 @@ public class SearchQueryBaseIT {
 		indexManager.createWorkExecutor().flush().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -189,10 +189,10 @@ public class SearchQueryBaseIT {
 	private static class SupportedQueryDslExtension<R, E> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, E> {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
-				IndexSearchScope<?> indexSearchScope, SessionContextImplementor sessionContext,
+				IndexScope<?> indexScope, SessionContextImplementor sessionContext,
 				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( indexSearchScope ).isNotNull();
+			Assertions.assertThat( indexScope ).isNotNull();
 			Assertions.assertThat( sessionContext ).isNotNull();
 			Assertions.assertThat( loadingContextBuilder ).isNotNull();
 			return Optional.of( new MyExtendedDslContext<R>( original.asReference() ) );
@@ -202,10 +202,10 @@ public class SearchQueryBaseIT {
 	private static class UnSupportedQueryDslExtension<R, E> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, E> {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
-				IndexSearchScope<?> indexSearchScope, SessionContextImplementor sessionContext,
+				IndexScope<?> indexScope, SessionContextImplementor sessionContext,
 				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( indexSearchScope ).isNotNull();
+			Assertions.assertThat( indexScope ).isNotNull();
 			Assertions.assertThat( sessionContext ).isNotNull();
 			Assertions.assertThat( loadingContextBuilder ).isNotNull();
 			return Optional.empty();

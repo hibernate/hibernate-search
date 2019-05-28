@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScopeBuilder;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 /**
@@ -34,7 +34,7 @@ public interface MappedIndexManager<D extends DocumentElement> {
 
 	IndexWorkExecutor createWorkExecutor();
 
-	<R, E> MappedIndexSearchScopeBuilder<R, E> createSearchScopeBuilder(MappingContextImplementor mappingContext);
+	<R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(MappingContextImplementor mappingContext);
 
-	void addTo(MappedIndexSearchScopeBuilder<?, ?> builder);
+	void addTo(MappedIndexScopeBuilder<?, ?> builder);
 }

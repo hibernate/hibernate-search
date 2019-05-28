@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -87,13 +87,13 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public IndexSearchScopeBuilder createSearchScopeBuilder(MappingContextImplementor mappingContext) {
-		return new StubIndexSearchScope.Builder( backend, mappingContext, name, rootSchemaNode );
+	public IndexScopeBuilder createScopeBuilder(MappingContextImplementor mappingContext) {
+		return new StubIndexScope.Builder( backend, mappingContext, name, rootSchemaNode );
 	}
 
 	@Override
-	public void addTo(IndexSearchScopeBuilder builder) {
-		((StubIndexSearchScope.Builder) builder ).add( backend, name, rootSchemaNode );
+	public void addTo(IndexScopeBuilder builder) {
+		((StubIndexScope.Builder) builder ).add( backend, name, rootSchemaNode );
 	}
 
 	@Override

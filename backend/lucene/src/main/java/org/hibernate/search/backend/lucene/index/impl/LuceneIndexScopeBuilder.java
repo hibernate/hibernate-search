@@ -11,19 +11,19 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexSearchScope;
+import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-class LuceneIndexSearchScopeBuilder implements IndexSearchScopeBuilder {
+class LuceneIndexScopeBuilder implements IndexScopeBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -33,7 +33,7 @@ class LuceneIndexSearchScopeBuilder implements IndexSearchScopeBuilder {
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<LuceneIndexManagerImpl> indexManagers = new LinkedHashSet<>();
 
-	LuceneIndexSearchScopeBuilder(SearchBackendContext searchBackendContext, MappingContextImplementor mappingContext,
+	LuceneIndexScopeBuilder(SearchBackendContext searchBackendContext, MappingContextImplementor mappingContext,
 			LuceneIndexManagerImpl indexManager) {
 		this.searchBackendContext = searchBackendContext;
 		this.mappingContext = mappingContext;
@@ -42,7 +42,7 @@ class LuceneIndexSearchScopeBuilder implements IndexSearchScopeBuilder {
 
 	void add(SearchBackendContext searchBackendContext, LuceneIndexManagerImpl indexManager) {
 		if ( ! this.searchBackendContext.equals( searchBackendContext ) ) {
-			throw log.cannotMixLuceneSearchScopeWithOtherBackend(
+			throw log.cannotMixLuceneScopeWithOtherBackend(
 					this, indexManager, searchBackendContext.getEventContext()
 			);
 		}
@@ -50,7 +50,7 @@ class LuceneIndexSearchScopeBuilder implements IndexSearchScopeBuilder {
 	}
 
 	@Override
-	public IndexSearchScope<?> build() {
+	public IndexScope<?> build() {
 		// Use LinkedHashSet to ensure stable order when generating requests
 		Set<LuceneIndexModel> indexModels = indexManagers.stream().map( LuceneIndexManagerImpl::getModel )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
@@ -59,9 +59,9 @@ class LuceneIndexSearchScopeBuilder implements IndexSearchScopeBuilder {
 		Set<ReaderProvider> readerProviders = indexManagers.stream().map( LuceneIndexManagerImpl::getReaderProvider )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
-		LuceneSearchScopeModel model = new LuceneSearchScopeModel( indexModels, readerProviders );
+		LuceneScopeModel model = new LuceneScopeModel( indexModels, readerProviders );
 
-		return new LuceneIndexSearchScope( searchBackendContext, mappingContext, model );
+		return new LuceneIndexScope( searchBackendContext, mappingContext, model );
 	}
 
 	@Override

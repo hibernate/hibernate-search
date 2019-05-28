@@ -130,7 +130,7 @@ public class IndexWorkExecutorIT {
 	}
 
 	private void assertBookNumberIsEqualsTo(long bookNumber, StubSessionContext sessionContext) {
-		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query( sessionContext )
+		SearchQuery<DocumentReference> query = indexManager.createScope().query( sessionContext )
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 

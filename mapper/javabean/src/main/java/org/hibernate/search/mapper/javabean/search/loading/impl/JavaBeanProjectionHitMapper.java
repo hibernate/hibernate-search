@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoSearchScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -21,9 +21,9 @@ public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<PojoRefe
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoSearchScopeDelegate<?, ?> scopeDelegate;
+	private final PojoScopeDelegate<?, ?> scopeDelegate;
 
-	public JavaBeanProjectionHitMapper(PojoSearchScopeDelegate<?, ?> scopeDelegate) {
+	public JavaBeanProjectionHitMapper(PojoScopeDelegate<?, ?> scopeDelegate) {
 		this.scopeDelegate = scopeDelegate;
 	}
 
