@@ -26,11 +26,11 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 	private final String analyzer;
 	private final String normalizer;
 
-	public ElasticsearchTextFieldPredicateBuilderFactory(
+	public ElasticsearchTextFieldPredicateBuilderFactory( boolean searchable,
 			ToDocumentFieldValueConverter<?, ? extends String> converter,
 			ToDocumentFieldValueConverter<String, ? extends String> rawConverter,
 			ElasticsearchFieldCodec<String> codec, PropertyMapping mapping) {
-		super( converter, rawConverter, codec );
+		super( searchable, converter, rawConverter, codec );
 		this.type = mapping.getType();
 		this.analyzer = mapping.getAnalyzer();
 		this.normalizer = mapping.getNormalizer();
