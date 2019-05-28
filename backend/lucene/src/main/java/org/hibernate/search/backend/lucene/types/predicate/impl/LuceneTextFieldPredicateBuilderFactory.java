@@ -25,9 +25,10 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	private final Analyzer analyzer;
 	private final Analyzer normalizer;
 
-	public LuceneTextFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+	public LuceneTextFieldPredicateBuilderFactory( boolean searchable,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneTextFieldCodec<F> codec, Analyzer analyzerOrNormalizer, Analyzer analyzer, Analyzer normalizer) {
-		super( converter, rawConverter, codec );
+		super( searchable, converter, rawConverter, codec );
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 		this.analyzer = analyzer;
 		this.normalizer = normalizer;
@@ -36,6 +37,7 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	@Override
 	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
+		checkSearchable( absoluteFieldPath );
 		return new LuceneTextMatchPredicateBuilder<>(
 				searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, analyzerOrNormalizer, analyzerChecker
 		);
@@ -44,24 +46,28 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	@Override
 	public LuceneTextRangePredicateBuilder<?> createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker) {
+		checkSearchable( absoluteFieldPath );
 		return new LuceneTextRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath, LuceneCompatibilityChecker analyzerChecker) {
+		checkSearchable( absoluteFieldPath );
 		return new LuceneTextPhrasePredicateBuilder( searchContext, absoluteFieldPath, codec, analyzerOrNormalizer, analyzerChecker );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
 			String absoluteFieldPath) {
+		checkSearchable( absoluteFieldPath );
 		return new LuceneTextWildcardPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public LuceneSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
 			String absoluteFieldPath) {
+		checkSearchable( absoluteFieldPath );
 		return new LuceneSimpleQueryStringPredicateBuilderFieldContext(
 				analyzerOrNormalizer
 		);

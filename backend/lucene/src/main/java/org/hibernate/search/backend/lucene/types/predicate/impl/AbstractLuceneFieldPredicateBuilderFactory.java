@@ -28,6 +28,12 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final boolean searchable;
+
+	public AbstractLuceneFieldPredicateBuilderFactory(boolean searchable) {
+		this.searchable = searchable;
+	}
+
 	@Override
 	public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other) {
 		if ( !getClass().equals( other.getClass() ) ) {
@@ -110,4 +116,10 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 	protected abstract LuceneFieldCodec<?> getCodec();
 
 	protected abstract ToDocumentFieldValueConverter<?, ?> getConverter();
+
+	protected void checkSearchable(String absoluteFieldPath) {
+		if ( !searchable ) {
+			throw log.nonSearchableField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
+	}
 }
