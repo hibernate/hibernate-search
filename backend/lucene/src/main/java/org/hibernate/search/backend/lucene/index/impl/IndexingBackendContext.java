@@ -19,8 +19,8 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkPro
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexDocumentWorkExecutor;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkExecutor;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkPlan;
-import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
