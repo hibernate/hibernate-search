@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index;
 
-import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 
 public final class StubIndexWork {

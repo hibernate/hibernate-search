@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
-import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 

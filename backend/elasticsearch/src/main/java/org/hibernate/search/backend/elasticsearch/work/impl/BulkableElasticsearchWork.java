@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
 import com.google.gson.JsonObject;
 

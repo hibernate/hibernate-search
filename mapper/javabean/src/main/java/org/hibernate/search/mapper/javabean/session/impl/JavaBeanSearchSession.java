@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.javabean.session.impl;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;

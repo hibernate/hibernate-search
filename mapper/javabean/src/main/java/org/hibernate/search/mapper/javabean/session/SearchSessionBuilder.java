@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.javabean.session;
 
-import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
 public interface SearchSessionBuilder {
 
