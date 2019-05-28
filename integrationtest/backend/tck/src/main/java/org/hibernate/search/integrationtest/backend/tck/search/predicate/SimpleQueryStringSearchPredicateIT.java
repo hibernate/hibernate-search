@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -51,6 +52,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
 	private static final String INCOMPATIBLE_ANALYZER_INDEX_NAME = "IndexWithIncompatibleAnalyzer";
+	private static final String UNSEARCHABLE_FIELDS_INDEX_NAME = "IndexWithUnsearchableFields";
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -91,6 +93,8 @@ public class SimpleQueryStringSearchPredicateIT {
 	private OtherIndexMapping incompatibleAnalyzerIndexMapping;
 	private StubMappingIndexManager incompatibleAnalyzerIndexManager;
 
+	private StubMappingIndexManager unsearchableFieldsIndexManager;
+
 	@Before
 	public void setup() {
 		setupHelper.withConfiguration( CONFIGURATION_ID )
@@ -116,6 +120,11 @@ public class SimpleQueryStringSearchPredicateIT {
 						ctx -> this.incompatibleAnalyzerIndexMapping =
 								OtherIndexMapping.createIncompatibleAnalyzer( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleAnalyzerIndexManager = indexManager
+				)
+				.withIndex(
+						UNSEARCHABLE_FIELDS_INDEX_NAME,
+						ctx -> OtherIndexMapping.createUnsearchableFieldsIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.unsearchableFieldsIndexManager = indexManager
 				)
 				.setup();
 
@@ -146,6 +155,20 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		assertThat( createQuery.apply( TERM_1 + " + -" + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+	}
+
+	@Test
+	public void simpleQueryString_unsearchable() {
+		StubMappingSearchScope scope = unsearchableFieldsIndexManager.createSearchScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		SubTest.expectException( () ->
+				scope.predicate().simpleQueryString().onField( absoluteFieldPath )
+		).assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "is not searchable" )
+				.hasMessageContaining( "Make sure the field is marked as searchable" )
+				.hasMessageContaining( absoluteFieldPath );
 	}
 
 	@Test
@@ -712,6 +735,22 @@ public class SimpleQueryStringSearchPredicateIT {
 		} );
 	}
 
+	@Test
+	public void multiIndex_incompatibleSearchable() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( unsearchableFieldsIndexManager );
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		SubTest.expectException( () -> scope.predicate().simpleQueryString().onField( absoluteFieldPath ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( absoluteFieldPath )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INDEX_NAME, UNSEARCHABLE_FIELDS_INDEX_NAME )
+				) )
+		;
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
@@ -871,6 +910,16 @@ public class SimpleQueryStringSearchPredicateIT {
 					MainFieldModel.mapper(
 							// Using a different analyzer
 							c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+					)
+							.map( root, "analyzedString1" )
+			);
+		}
+
+		static OtherIndexMapping createUnsearchableFieldsIndexMapping(IndexSchemaElement root) {
+			return new OtherIndexMapping(
+					MainFieldModel.mapper(
+							// make the field not searchable
+							c -> c.asString().searchable( Searchable.NO )
 					)
 							.map( root, "analyzedString1" )
 			);

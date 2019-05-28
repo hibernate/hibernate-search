@@ -18,6 +18,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.search.predicate.DslConverter;
@@ -51,6 +52,7 @@ public class RangeSearchPredicateIT {
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
 	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
 	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME = "IndexWithIncompatibleDecimalScale";
+	private static final String UNSEARCHABLE_FIELDS_INDEX_NAME = "IndexWithUnsearchableFields";
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -76,6 +78,8 @@ public class RangeSearchPredicateIT {
 
 	private IncompatibleDecimalScaleIndexMapping incompatibleDecimalScaleIndexMapping;
 	private StubMappingIndexManager incompatibleDecimalScaleIndexManager;
+
+	private StubMappingIndexManager unsearchableFieldsIndexManager;
 
 	@Before
 	public void setup() {
@@ -105,9 +109,31 @@ public class RangeSearchPredicateIT {
 						ctx -> this.incompatibleDecimalScaleIndexMapping = new IncompatibleDecimalScaleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleDecimalScaleIndexManager = indexManager
 				)
+				.withIndex(
+						UNSEARCHABLE_FIELDS_INDEX_NAME,
+						ctx -> new UnsearchableFieldsIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.unsearchableFieldsIndexManager = indexManager
+				)
 				.setup();
 
 		initData();
+	}
+
+	@Test
+	public void range_unsearchable() {
+		StubMappingSearchScope scope = unsearchableFieldsIndexManager.createSearchScope();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+
+			SubTest.expectException( () ->
+					scope.predicate().range().onField( absoluteFieldPath )
+			).assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "is not searchable" )
+					.hasMessageContaining( "Make sure the field is marked as searchable" )
+					.hasMessageContaining( absoluteFieldPath );
+		}
 	}
 
 	@Test
@@ -935,6 +961,26 @@ public class RangeSearchPredicateIT {
 				) );
 	}
 
+	@Test
+	public void multiIndex_incompatibleSearchable() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( unsearchableFieldsIndexManager );
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			SubTest.expectException(
+					() -> scope.predicate().range().onField( fieldPath )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "'" + fieldPath + "'" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexNames( INDEX_NAME, UNSEARCHABLE_FIELDS_INDEX_NAME )
+					) );
+		}
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
@@ -1139,6 +1185,24 @@ public class RangeSearchPredicateIT {
 					new BigDecimal( "739.739" ), BigDecimal.ONE, BigDecimal.TEN
 			)
 					.map( root, "scaledBigDecimal" );
+		}
+	}
+
+	private static class UnsearchableFieldsIndexMapping {
+		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
+
+		@SuppressWarnings("unchecked")
+		UnsearchableFieldsIndexMapping(IndexSchemaElement root) {
+			mapByTypeFields(
+					root, "byType_",
+					// make the field not searchable
+					c -> c.searchable( Searchable.NO ),
+					(typeDescriptor, expectations, model) -> {
+						if ( expectations.isRangePredicateSupported() ) {
+							supportedFieldModels.add( model );
+						}
+					}
+			);
 		}
 	}
 
