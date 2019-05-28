@@ -88,6 +88,19 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	}
 
 	@Test
+	public void within_unsearchable_circle() {
+		StubMappingSearchScope scope = unsearchableFieldsIndexManager.createSearchScope();
+
+		SubTest.expectException( () ->
+				scope.predicate().spatial().within().onField( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 )
+		).assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "is not searchable" )
+				.hasMessageContaining( "Make sure the field is marked as searchable" )
+				.hasMessageContaining( "geoPoint" );
+	}
+
+	@Test
 	public void unsupported_field_types() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
@@ -400,5 +413,30 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
+	}
+
+	@Test
+	public void multiIndex_withCompatibleIndexManager() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( compatibleIndexManager );
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+	}
+
+	@Test
+	public void multiIndex_incompatibleSearchable() {
+		StubMappingSearchScope scope = indexManager.createSearchScope( unsearchableFieldsIndexManager );
+
+		SubTest.expectException( () -> scope.predicate().spatial().within().onField( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "geoPoint" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INDEX_NAME, UNSEARCHABLE_FIELDS_INDEX_NAME )
+				) );
 	}
 }

@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -28,6 +29,8 @@ import org.junit.Rule;
 public abstract class AbstractSpatialWithinSearchPredicateIT {
 
 	protected static final String INDEX_NAME = "IndexName";
+	protected static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
+	protected static final String UNSEARCHABLE_FIELDS_INDEX_NAME = "IndexWithUnsearchableFields";
 
 	protected static final String OURSON_QUI_BOIT_ID = "ourson qui boit";
 	protected static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = GeoPoint.of( 45.7705687,4.835233 );
@@ -49,6 +52,11 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	protected IndexMapping indexMapping;
 	protected StubMappingIndexManager indexManager;
 
+	protected StubMappingIndexManager compatibleIndexManager;
+
+	// TODO HSEARCH-3593 test other incompatibilities ( projection, sort and so on and so forth )
+	protected StubMappingIndexManager unsearchableFieldsIndexManager;
+
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
@@ -56,6 +64,16 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
+				)
+				.withIndex(
+						COMPATIBLE_INDEX_NAME,
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.compatibleIndexManager = indexManager
+				)
+				.withIndex(
+						UNSEARCHABLE_FIELDS_INDEX_NAME,
+						ctx -> new UnsearchableFieldsIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.unsearchableFieldsIndexManager = indexManager
 				)
 				.setup();
 
@@ -143,6 +161,18 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			string = root.field(
 					"string",
 					f -> f.asString().projectable( Projectable.YES ).sortable( Sortable.YES )
+			)
+					.toReference();
+		}
+	}
+
+	protected static class UnsearchableFieldsIndexMapping {
+		final IndexFieldReference<GeoPoint> geoPoint;
+
+		UnsearchableFieldsIndexMapping(IndexSchemaElement root) {
+			geoPoint = root.field(
+					// make the field not searchable
+					"geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).searchable( Searchable.NO )
 			)
 					.toReference();
 		}
