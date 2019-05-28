@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
-import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 /**

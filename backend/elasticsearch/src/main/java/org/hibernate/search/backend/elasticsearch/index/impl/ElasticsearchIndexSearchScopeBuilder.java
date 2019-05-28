@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchIndexSearchScope;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexSearchScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 

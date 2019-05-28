@@ -11,10 +11,10 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchCompatibilityChecker;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchScopedIndexFieldComponent;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSucceedingCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSucceedingCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerConstants;

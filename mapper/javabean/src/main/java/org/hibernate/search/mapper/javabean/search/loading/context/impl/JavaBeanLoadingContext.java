@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.mapper.javabean.search.loading.impl.JavaBeanProjectionHitMapper;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoSearchScopeDelegate;
 
 public final class JavaBeanLoadingContext implements LoadingContext<PojoReference, Void> {
 

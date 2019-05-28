@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
-import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;

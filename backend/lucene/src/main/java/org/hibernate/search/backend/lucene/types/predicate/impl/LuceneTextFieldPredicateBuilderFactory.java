@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneCompatibilityChecker;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;

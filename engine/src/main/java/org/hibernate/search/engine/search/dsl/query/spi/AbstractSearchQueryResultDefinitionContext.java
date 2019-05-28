@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProje
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 public abstract class AbstractSearchQueryResultDefinitionContext<

@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class HibernateOrmLoadingContext<E> implements LoadingContext<PojoReference, E> {

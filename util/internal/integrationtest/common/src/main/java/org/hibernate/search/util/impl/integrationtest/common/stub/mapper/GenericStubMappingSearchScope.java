@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;

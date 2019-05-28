@@ -31,7 +31,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 
 	private final ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory;
 
-	ElasticsearchSearchQueryBuilderFactory(SearchBackendContext searchBackendContext, ElasticsearchSearchContext searchContext,
+	public ElasticsearchSearchQueryBuilderFactory(SearchBackendContext searchBackendContext, ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
 		this.searchContext = searchContext;

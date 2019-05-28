@@ -11,15 +11,15 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneIndexSearchScope;
+import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexSearchScope;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 

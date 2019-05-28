@@ -11,7 +11,7 @@ import java.util.Collections;
 
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.javabean.search.SearchScope;
+import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 

@@ -31,7 +31,7 @@ public class LuceneSearchQueryBuilderFactory
 
 	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 
-	LuceneSearchQueryBuilderFactory(SearchBackendContext searchBackendContext,
+	public LuceneSearchQueryBuilderFactory(SearchBackendContext searchBackendContext,
 			LuceneSearchContext searchContext,
 			LuceneSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;

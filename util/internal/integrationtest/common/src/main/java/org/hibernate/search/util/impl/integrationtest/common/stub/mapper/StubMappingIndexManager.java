@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScopeBuilder;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubMappingContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;

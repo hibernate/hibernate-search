@@ -14,9 +14,9 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
-import org.hibernate.search.backend.lucene.search.impl.LuceneScopedIndexFieldComponent;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
