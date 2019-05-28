@@ -23,7 +23,6 @@ import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
-import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<HibernateOrmMapping>
@@ -79,11 +78,6 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	@Override
 	public <E> Set<Class<? extends E>> getIndexedTypesPolymorphic(Class<E> entityType) {
 		return getDelegate().getIndexedTypesPolymorphic( entityType );
-	}
-
-	@Override
-	public PojoMappingWorkExecutor createMappingWorkExecutor() {
-		return getDelegate().createMappingWorkExecutor();
 	}
 
 	private SearchSessionBuilder createSessionBuilder(EntityManager entityManager) {

@@ -6,15 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.work.spi;
 
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-public interface PojoMappingWorkExecutor {
+public interface PojoScopeWorkExecutor {
 
-	CompletableFuture<?> optimize(Collection<Class<?>> types);
+	CompletableFuture<?> optimize();
 
-	CompletableFuture<?> purge(Collection<Class<?>> types, String tenantId);
+	CompletableFuture<?> purge();
 
-	CompletableFuture<?> flush(Collection<Class<?>> types);
+	CompletableFuture<?> flush();
 
 }

@@ -107,12 +107,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 276, value = "No transaction is active while indexing entity type '%1$s'; Consider increasing the connection time-out")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(@FormatWith(ClassFormatter.class) Class<?> entityType);
 
-	@Message(id = ID_OFFSET_1 + 348, value = "Some of the specified entity types ('%s') are not configured, nor is any of their subclasses." )
-	IllegalArgumentException someTargetedEntityTypesNotConfigured(String targetedEntities);
-
-	@Message(id = ID_OFFSET_1 + 349, value = "Some of the specified entity types ('%s') are not indexed, nor is any of their subclasses." )
-	IllegalArgumentException someTargetedEntityTypesNotIndexed(String targetedEntities);
-
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
 
 	// -----------------------------------

@@ -13,8 +13,6 @@ import java.util.Set;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
-import org.hibernate.search.mapper.pojo.work.impl.PojoMappingWorkExecutorImpl;
-import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
 import org.hibernate.search.util.common.impl.Closer;
 
 
@@ -75,10 +73,5 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		}
 
 		return result;
-	}
-
-	@Override
-	public PojoMappingWorkExecutor createMappingWorkExecutor() {
-		return new PojoMappingWorkExecutorImpl( indexedTypeManagers );
 	}
 }

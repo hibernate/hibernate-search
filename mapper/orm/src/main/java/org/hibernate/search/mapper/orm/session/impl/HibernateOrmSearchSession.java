@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
@@ -83,7 +84,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			types = new Class<?>[] { Object.class };
 		}
 
-		return new MassIndexerImpl( sessionImplementor.getFactory(), sessionImplementor.getTenantIdentifier(), types );
+		PojoScopeDelegate<?, ?> scopeDelegate = getDelegate().createPojoScope( Arrays.asList( types ) );
+
+		return new MassIndexerImpl(
+				sessionImplementor.getFactory(), sessionImplementor.getTenantIdentifier(),
+				scopeDelegate.getIncludedIndexedTypes(), scopeDelegate.executor()
+		);
 	}
 
 	@Override

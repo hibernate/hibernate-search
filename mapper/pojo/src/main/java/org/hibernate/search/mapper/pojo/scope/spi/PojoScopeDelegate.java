@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionC
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 
 /**
  * @param <E> A common supertype of the indexed types included in this scope.
@@ -35,5 +36,7 @@ public interface PojoScopeDelegate<E, E2> {
 	SearchSortContainerContext sort();
 
 	SearchProjectionFactoryContext<PojoReference, E2> projection();
+
+	PojoScopeWorkExecutor executor();
 
 }
