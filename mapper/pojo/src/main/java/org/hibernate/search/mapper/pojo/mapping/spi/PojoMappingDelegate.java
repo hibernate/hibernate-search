@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 import java.util.Collection;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
@@ -51,7 +50,5 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	 * @return The set of configured subtypes that are indexed.
 	 */
 	<E> Set<Class<? extends E>> getIndexedTypesPolymorphic(Class<E> entityType);
-
-	PojoMappingWorkExecutor createMappingWorkExecutor();
 
 }

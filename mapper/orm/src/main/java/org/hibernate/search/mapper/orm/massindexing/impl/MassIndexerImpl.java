@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -19,8 +20,8 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.orm.massindexing.monitor.impl.SimpleIndexingProgressMonitor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.impl.StringHelper;
 
 /**
  * Prepares and configures a BatchIndexingWorkspace to start rebuilding
@@ -38,7 +39,8 @@ public class MassIndexerImpl implements MassIndexer {
 	private final SessionFactoryImplementor sessionFactory;
 	private final String tenantIdentifier;
 
-	protected final Set<Class<?>> rootEntities;
+	private final Set<Class<?>> rootEntities;
+	private final PojoScopeWorkExecutor scopeWorkExecutor;
 
 	// default settings defined here:
 	private int typesToIndexInParallel = 1;
@@ -53,11 +55,13 @@ public class MassIndexerImpl implements MassIndexer {
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 	private Integer idLoadingTransactionTimeout;
 
-	public MassIndexerImpl(SessionFactoryImplementor sessionFactory, String tenantIdentifier, Class<?>... entities) {
+	public MassIndexerImpl(SessionFactoryImplementor sessionFactory, String tenantIdentifier,
+			Set<? extends Class<?>> targetedIndexedTypes, PojoScopeWorkExecutor scopeWorkExecutor) {
 		this.sessionFactory = sessionFactory;
 		this.mapping = sessionFactory.getServiceRegistry().getService( HibernateSearchContextService.class ).getMapping();
 		this.tenantIdentifier = tenantIdentifier;
-		this.rootEntities = toRootEntities( mapping, entities );
+		this.rootEntities = toRootEntities( targetedIndexedTypes );
+		this.scopeWorkExecutor = scopeWorkExecutor;
 
 		// TODO HSEARCH-3057 use a JMX monitor if JMX is enabled (see Search 5)
 		this.monitor = new SimpleIndexingProgressMonitor();
@@ -67,36 +71,11 @@ public class MassIndexerImpl implements MassIndexer {
 	 * From the set of classes a new set is built containing all indexed
 	 * subclasses, but removing then all subtypes of indexed entities.
 	 */
-	private static Set<Class<?>> toRootEntities(HibernateOrmMapping mapping, Class<?>... selection) {
-		//first build the "entities" set containing all indexed subtypes of "selection".
-		Set<Class<?>> entities = new HashSet<>();
-		Set<Class<?>> nonIndexedEntities = new HashSet<>();
-		for ( Class<?> entityType : selection ) {
-			Set<? extends Class<?>> indexedTypesPolymorphic = mapping.getIndexedTypesPolymorphic( entityType );
-			if ( indexedTypesPolymorphic.isEmpty() ) {
-				nonIndexedEntities.add( entityType );
-			}
-			else {
-				entities.addAll( indexedTypesPolymorphic );
-			}
-		}
-
-		// check for not configured entities
-		for ( Class<?> nonIndexedEntity : nonIndexedEntities ) {
-			if ( !mapping.isWorkable( nonIndexedEntity ) ) {
-				throw log.someTargetedEntityTypesNotConfigured( StringHelper.join( nonIndexedEntities, "," ) );
-			}
-		}
-
-		// check for not indexed entities
-		if ( !nonIndexedEntities.isEmpty() ) {
-			throw log.someTargetedEntityTypesNotIndexed( StringHelper.join( nonIndexedEntities, "," ) );
-		}
-
-		Set<Class<?>> cleaned = new HashSet<>();
+	private static Set<Class<?>> toRootEntities(Set<? extends Class<?>> targetedIndexedTypes) {
+		Set<Class<?>> cleaned = new LinkedHashSet<>();
 		Set<Class<?>> toRemove = new HashSet<>();
 		//now remove all repeated types to avoid duplicate loading by polymorphic query loading
-		for ( Class<?> type : entities ) {
+		for ( Class<?> type : targetedIndexedTypes ) {
 			boolean typeIsOk = true;
 			for ( Class<?> existing : cleaned ) {
 				if ( existing.isAssignableFrom( type ) ) {
@@ -192,12 +171,12 @@ public class MassIndexerImpl implements MassIndexer {
 
 	protected BatchCoordinator createCoordinator() {
 		return new BatchCoordinator(
-				rootEntities, sessionFactory, mapping,
+				sessionFactory, mapping, tenantIdentifier,
+				rootEntities, scopeWorkExecutor,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				monitor, idFetchSize, idLoadingTransactionTimeout,
-				tenantIdentifier
+				monitor, idFetchSize, idLoadingTransactionTimeout
 		);
 	}
 

@@ -12,7 +12,6 @@ import javax.persistence.EntityManager;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
-import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 public interface HibernateOrmMapping {
@@ -58,7 +57,5 @@ public interface HibernateOrmMapping {
 	 * @return The set of configured subtypes that are indexed.
 	 */
 	<E> Set<Class<? extends E>> getIndexedTypesPolymorphic(Class<E> entityType);
-
-	PojoMappingWorkExecutor createMappingWorkExecutor();
 
 }

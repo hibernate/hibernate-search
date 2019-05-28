@@ -18,7 +18,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
-import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Executors;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -35,10 +35,11 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Set<Class<?>> rootEntities; //entity types to reindex excluding all subtypes of each-other
 	private final SessionFactoryImplementor sessionFactory;
 	private final HibernateOrmMapping mapping;
-	private final PojoMappingWorkExecutor mappingWorkExecutor;
+	private final String tenantId;
+	private final Set<Class<?>> rootEntities; //entity types to reindex excluding all subtypes of each-other
+	private final PojoScopeWorkExecutor scopeWorkExecutor;
 
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
@@ -52,21 +53,22 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final long objectsLimit;
 	private final int idFetchSize;
 	private final Integer transactionTimeout;
-	private final String tenantId;
 	private final List<Future<?>> indexingTasks = new ArrayList<>();
 
-	public BatchCoordinator(Set<Class<?>> rootEntities, SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping,
-							int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
-							int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,
-							boolean purgeAtStart, boolean optimizeAfterPurge, MassIndexingMonitor monitor,
-							int idFetchSize, Integer transactionTimeout, String tenantId) {
-		this.idFetchSize = idFetchSize;
-		this.transactionTimeout = transactionTimeout;
-		this.tenantId = tenantId;
-		this.rootEntities = rootEntities;
+	public BatchCoordinator(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, String tenantId,
+			Set<Class<?>> rootEntities, PojoScopeWorkExecutor scopeWorkExecutor,
+			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
+			int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,
+			boolean purgeAtStart, boolean optimizeAfterPurge, MassIndexingMonitor monitor,
+			int idFetchSize, Integer transactionTimeout) {
 		this.sessionFactory = sessionFactory;
 		this.mapping = mapping;
-		this.mappingWorkExecutor = mapping.createMappingWorkExecutor();
+		this.tenantId = tenantId;
+		this.rootEntities = rootEntities;
+		this.scopeWorkExecutor = scopeWorkExecutor;
+
+		this.idFetchSize = idFetchSize;
+		this.transactionTimeout = transactionTimeout;
 		this.typesToIndexInParallel = typesToIndexInParallel;
 		this.documentBuilderThreads = documentBuilderThreads;
 		this.cacheMode = cacheMode;
@@ -133,16 +135,16 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	 */
 	private void afterBatch() {
 		if ( this.optimizeAtEnd ) {
-			mappingWorkExecutor.optimize( rootEntities ).join();
+			scopeWorkExecutor.optimize().join();
 		}
-		mappingWorkExecutor.flush( rootEntities ).join();
+		scopeWorkExecutor.flush().join();
 	}
 
 	/**
 	 * batch indexing has been interrupted : flush to apply all index update realized before interruption
 	 */
 	private void afterBatchOnInterruption() {
-		mappingWorkExecutor.flush( rootEntities ).join();
+		scopeWorkExecutor.flush().join();
 	}
 
 	/**
@@ -150,9 +152,9 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	 */
 	private void beforeBatch() {
 		if ( this.purgeAtStart ) {
-			mappingWorkExecutor.purge( rootEntities, tenantId ).join();
+			scopeWorkExecutor.purge().join();
 			if ( this.optimizeAfterPurge ) {
-				mappingWorkExecutor.optimize( rootEntities ).join();
+				scopeWorkExecutor.optimize().join();
 			}
 		}
 	}
