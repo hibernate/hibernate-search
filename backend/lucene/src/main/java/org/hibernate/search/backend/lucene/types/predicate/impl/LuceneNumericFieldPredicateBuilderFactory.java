@@ -22,21 +22,23 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 public final class LuceneNumericFieldPredicateBuilderFactory<F, E extends Number>
 		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, AbstractLuceneNumericFieldCodec<F, E>> {
 
-	public LuceneNumericFieldPredicateBuilderFactory(
+	public LuceneNumericFieldPredicateBuilderFactory( boolean searchable,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			AbstractLuceneNumericFieldCodec<F, E> codec) {
-		super( converter, rawConverter, codec );
+		super( searchable, converter, rawConverter, codec );
 	}
 
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
 			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
+		checkSearchable( absoluteFieldPath );
 		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override
 	public LuceneNumericRangePredicateBuilder<F, E> createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker) {
+		checkSearchable( absoluteFieldPath );
 		return new LuceneNumericRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 	}
 }

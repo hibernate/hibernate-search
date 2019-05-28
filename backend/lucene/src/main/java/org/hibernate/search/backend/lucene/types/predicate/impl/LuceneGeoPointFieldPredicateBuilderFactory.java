@@ -32,8 +32,10 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	private final ToDocumentFieldValueConverter<?, ? extends GeoPoint> converter;
 	private final LuceneGeoPointFieldCodec codec;
 
-	public LuceneGeoPointFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends GeoPoint> converter,
+	public LuceneGeoPointFieldPredicateBuilderFactory( boolean searchable,
+			ToDocumentFieldValueConverter<?, ? extends GeoPoint> converter,
 			LuceneGeoPointFieldCodec codec) {
+		super( searchable );
 		this.converter = converter;
 		this.codec = codec;
 	}
@@ -57,18 +59,21 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	@Override
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath) {
+		checkSearchable( absoluteFieldPath );
 		return new LuceneGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
 			String absoluteFieldPath) {
+		checkSearchable( absoluteFieldPath );
 		return new LuceneGeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath) {
+		checkSearchable( absoluteFieldPath );
 		return new LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
 	}
 

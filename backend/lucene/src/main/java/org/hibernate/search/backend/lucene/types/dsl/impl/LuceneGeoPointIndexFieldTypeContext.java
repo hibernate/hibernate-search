@@ -50,7 +50,7 @@ class LuceneGeoPointIndexFieldTypeContext
 
 		return new LuceneIndexFieldType<>(
 				codec,
-				new LuceneGeoPointFieldPredicateBuilderFactory( dslToIndexConverter, codec ),
+				new LuceneGeoPointFieldPredicateBuilderFactory( resolvedSearchable, dslToIndexConverter, codec ),
 				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable ),
 				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec, indexToProjectionConverter, createFromDocumentRawConverter() )
 		);

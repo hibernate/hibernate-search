@@ -23,8 +23,10 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 
 	final C codec;
 
-	AbstractLuceneStandardFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+	AbstractLuceneStandardFieldPredicateBuilderFactory( boolean searchable,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			C codec) {
+		super( searchable );
 		Contracts.assertNotNull( converter, "converter" );
 		Contracts.assertNotNull( rawConverter, "rawConverter" );
 		Contracts.assertNotNull( codec, "codec" );
