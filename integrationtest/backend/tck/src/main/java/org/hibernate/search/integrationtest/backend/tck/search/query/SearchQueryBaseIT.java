@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.SearchQuery;

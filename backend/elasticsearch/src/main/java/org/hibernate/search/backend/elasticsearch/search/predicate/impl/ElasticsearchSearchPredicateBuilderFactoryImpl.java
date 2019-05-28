@@ -10,10 +10,10 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchScopedIndexFieldComponent;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
-import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;

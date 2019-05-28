@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import org.apache.lucene.search.SortField;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneCompatibilityChecker;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;

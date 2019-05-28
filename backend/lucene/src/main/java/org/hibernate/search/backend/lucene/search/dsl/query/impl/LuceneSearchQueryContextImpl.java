@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortConta
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneIndexSearchScope;
+import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexSearchScope;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryContext;

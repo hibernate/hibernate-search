@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;

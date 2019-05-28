@@ -7,10 +7,10 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScope;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScopeBuilder;
 
 class MappedIndexSearchScopeBuilderImpl<R, E> implements MappedIndexSearchScopeBuilder<R, E> {
 	private final IndexSearchScopeBuilder delegate;

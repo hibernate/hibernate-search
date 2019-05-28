@@ -22,9 +22,9 @@ import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeB
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.search.SearchScope;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;

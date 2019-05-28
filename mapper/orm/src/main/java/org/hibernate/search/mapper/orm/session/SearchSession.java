@@ -13,8 +13,8 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
-import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
 
 public interface SearchSession {
@@ -57,7 +57,7 @@ public interface SearchSession {
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default <T> SearchScope<T> scope(Class<T> type) {
+	default <T> org.hibernate.search.mapper.orm.search.SearchScope<T> scope(Class<T> type) {
 		return scope( Collections.singleton( type ) );
 	}
 
@@ -69,7 +69,7 @@ public interface SearchSession {
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
+	<T> org.hibernate.search.mapper.orm.search.SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
 
 	/**
 	 * Creates a {@link MassIndexer} to rebuild the indexes of some or all indexed entity types.

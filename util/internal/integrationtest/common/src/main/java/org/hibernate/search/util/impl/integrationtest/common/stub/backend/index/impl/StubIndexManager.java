@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;

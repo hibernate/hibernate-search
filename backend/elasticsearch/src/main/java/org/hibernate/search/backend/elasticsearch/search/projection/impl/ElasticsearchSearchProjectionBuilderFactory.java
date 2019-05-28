@@ -14,9 +14,9 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchScopedIndexFieldComponent;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
-import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;

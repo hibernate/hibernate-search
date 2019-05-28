@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchS
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchIndexSearchScope;
+import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexSearchScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryContext;

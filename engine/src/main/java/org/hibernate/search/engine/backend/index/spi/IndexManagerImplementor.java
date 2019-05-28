@@ -10,6 +10,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;

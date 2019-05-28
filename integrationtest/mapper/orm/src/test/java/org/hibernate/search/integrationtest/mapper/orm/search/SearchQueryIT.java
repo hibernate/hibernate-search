@@ -20,7 +20,7 @@ import org.assertj.core.api.Assertions;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.mapper.orm.search.SearchScope;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;

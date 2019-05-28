@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;

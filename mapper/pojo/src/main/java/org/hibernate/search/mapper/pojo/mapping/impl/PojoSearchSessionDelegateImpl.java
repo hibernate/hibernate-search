@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.impl.PojoSessionWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
-import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

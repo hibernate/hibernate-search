@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
