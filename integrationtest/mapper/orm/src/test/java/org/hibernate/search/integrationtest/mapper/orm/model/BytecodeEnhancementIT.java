@@ -36,6 +36,7 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
 import org.hibernate.testing.bytecode.enhancement.EnhancerTestUtils;
@@ -58,7 +59,7 @@ public class BytecodeEnhancementIT {
 	@Before
 	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
-				/* TODO HSEARCH-3581 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
+				/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 				.field( "mappedSuperClassText", String.class )
 				.field( "entitySuperClassText", String.class )
 				 */
@@ -88,7 +89,7 @@ public class BytecodeEnhancementIT {
 				 */
 				.withTcclLookupPrecedence( TcclLookupPrecedence.BEFORE )
 				.setup(
-						/* TODO HSEARCH-3581 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
+						/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 						IndexedMappedSuperClass.class,
 						IndexedEntitySuperClass.class,
 						 */
@@ -100,11 +101,12 @@ public class BytecodeEnhancementIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3584")
 	public void test() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;
-			/* TODO HSEARCH-3581 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
+			/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 			entity1.mappedSuperClassText = "initialValue";
 			entity1.entitySuperClassText = "initialValue";
 			 */
@@ -140,7 +142,7 @@ public class BytecodeEnhancementIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
-							/* TODO HSEARCH-3581 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
+							/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 							.field( "mappedSuperClassText", "initialValue" )
 							.field( "entitySuperClassText", "initialValue" )
 							 */
@@ -173,7 +175,7 @@ public class BytecodeEnhancementIT {
 				entityFromTransaction.set( entity );
 
 				assertOnlyLoadedPropertiesAre( entity, "id" );
-				/* TODO HSEARCH-3581 For some reason, lazy loading doesn't work in the embeddable
+				/* TODO HSEARCH-3584 For some reason, lazy loading doesn't work in the embeddable
 				assertOnlyLoadedPropertiesAre( entity.containedEmbeddable );
 				 */
 
@@ -181,14 +183,14 @@ public class BytecodeEnhancementIT {
 				entity.text1 = "updatedValue";
 
 				assertOnlyLoadedPropertiesAre( entity, "id", "text1" );
-				/* TODO HSEARCH-3581 For some reason, lazy loading doesn't work in the embeddable
+				/* TODO HSEARCH-3584 For some reason, lazy loading doesn't work in the embeddable
 				assertOnlyLoadedPropertiesAre( entity.containedEmbeddable );
 				 */
 
 				// Expect all properties to be correctly loaded, even though we're using bytecode enhancement
 				backendMock.expectWorks( IndexedEntity.INDEX )
 						.update( "1", b -> b
-								/* TODO HSEARCH-3581 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
+								/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 								.field( "mappedSuperClassText", "initialValue" )
 								.field( "entitySuperClassText", "initialValue" )
 								 */
@@ -253,7 +255,7 @@ public class BytecodeEnhancementIT {
 		}
 	}
 
-	/* TODO HSEARCH-3581 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
+	/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 	@MappedSuperclass
 	public static class IndexedMappedSuperClass {
 
@@ -283,13 +285,13 @@ public class BytecodeEnhancementIT {
 	@Entity(name = "indexed")
 	@Indexed(index = IndexedEntity.INDEX)
 	public static class IndexedEntity
-	/* TODO HSEARCH-3581 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
+	/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 			extends IndexedEntitySuperClass
 	 */ {
 		public static final String INDEX = "IndexedEntity";
 
 		private static final String[] LAZY_PROPERTY_NAMES = new String[] {
-				/* TODO HSEARCH-3581 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
+				/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 				"mappedSuperClassText",
 				"entitySuperClassText",
 				 */
