@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDoc
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -18,21 +17,18 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 
 public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> {
 
-	private final IndexingBackendContext indexingBackendContext;
-	private final SearchBackendContext searchBackendContext;
+	private final IndexManagerBackendContext backendContext;
 
 	private final String hibernateSearchIndexName;
 	private final String elasticsearchIndexName;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 	private final ElasticsearchIndexSettingsBuilder settingsBuilder;
 
-	public ElasticsearchIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
-			SearchBackendContext searchBackendContext,
+	public ElasticsearchIndexManagerBuilder(IndexManagerBackendContext backendContext,
 			String hibernateSearchIndexName, String elasticsearchIndexName,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
 			ElasticsearchIndexSettingsBuilder settingsBuilder) {
-		this.indexingBackendContext = indexingBackendContext;
-		this.searchBackendContext = searchBackendContext;
+		this.backendContext = backendContext;
 
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
@@ -58,7 +54,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 				.build( hibernateSearchIndexName, encodedElasticsearchIndexName, settingsBuilder );
 
 		return new ElasticsearchIndexManagerImpl(
-				indexingBackendContext, searchBackendContext,
+				backendContext,
 				hibernateSearchIndexName, encodedElasticsearchIndexName,
 				model
 		);

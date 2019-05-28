@@ -16,12 +16,11 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
-import org.hibernate.search.backend.lucene.index.impl.IndexingBackendContext;
+import org.hibernate.search.backend.lucene.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestratorImpl;
-import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
@@ -49,8 +48,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final EventContext eventContext;
-	private final IndexingBackendContext indexingContext;
-	private final SearchBackendContext searchContext;
+	private final IndexManagerBackendContext indexManagerBackendContext;
 
 	LuceneBackendImpl(String name, BeanHolder<? extends DirectoryProvider> directoryProviderHolder,
 			LuceneWorkFactory workFactory,
@@ -67,14 +65,13 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		this.eventContext = EventContexts.fromBackendName( name );
-		this.indexingContext = new IndexingBackendContext(
+		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				eventContext, directoryProviderHolder.get(),
 				workFactory, multiTenancyStrategy,
+				analysisDefinitionRegistry,
 				// TODO the LogErrorHandler should be replaced with a user-configurable instance at some point. See HSEARCH-3110.
-				new LogErrorHandler()
-		);
-		this.searchContext = new SearchBackendContext(
-				eventContext, workFactory, multiTenancyStrategy, readOrchestrator, analysisDefinitionRegistry
+				new LogErrorHandler(),
+				readOrchestrator
 		);
 	}
 
@@ -116,7 +113,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 		 * and therefore the internal key should stay unique.
 		 */
 		return new LuceneIndexManagerBuilder(
-				indexingContext, searchContext,
+				indexManagerBackendContext,
 				indexName, indexSchemaRootNodeBuilder
 		);
 	}

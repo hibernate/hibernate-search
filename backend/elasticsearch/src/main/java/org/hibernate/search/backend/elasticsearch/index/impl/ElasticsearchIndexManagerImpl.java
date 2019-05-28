@@ -20,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.index.admin.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -67,8 +66,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
 					.build();
 
-	private final IndexingBackendContext indexingBackendContext;
-	private final SearchBackendContext searchBackendContext;
+	private final IndexManagerBackendContext backendContext;
 
 	private final String hibernateSearchIndexName;
 	private final URLEncodedString elasticsearchIndexName;
@@ -81,17 +79,16 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	private ElasticsearchIndexLifecycleStrategy lifecycleStrategy;
 
-	ElasticsearchIndexManagerImpl(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
+	ElasticsearchIndexManagerImpl(IndexManagerBackendContext backendContext,
 			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
 			ElasticsearchIndexModel model) {
-		this.indexingBackendContext = indexingBackendContext;
-		this.searchBackendContext = searchBackendContext;
+		this.backendContext = backendContext;
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.model = model;
-		this.parallelOrchestrator = indexingBackendContext.createParallelOrchestrator( elasticsearchIndexName.original );
-		this.serialOrchestrator = indexingBackendContext.createSerialOrchestrator( elasticsearchIndexName.original );
-		this.administrationClient = indexingBackendContext.createAdministrationClient(
+		this.parallelOrchestrator = backendContext.createParallelOrchestrator( elasticsearchIndexName.original );
+		this.serialOrchestrator = backendContext.createSerialOrchestrator( elasticsearchIndexName.original );
+		this.administrationClient = backendContext.createAdministrationClient(
 				elasticsearchIndexName, model
 		);
 	}
@@ -125,7 +122,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 			closer.push( strategy -> strategy.onStop( administrationClient ), lifecycleStrategy );
 		}
 		catch (IOException e) {
-			throw log.failedToShutdownIndexManager( hibernateSearchIndexName, e, indexingBackendContext.getEventContext() );
+			throw log.failedToShutdownIndexManager( hibernateSearchIndexName, e, backendContext.getEventContext() );
 		}
 	}
 
@@ -137,7 +134,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	public IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
-		return indexingBackendContext.createWorkPlan(
+		return backendContext.createWorkPlan(
 				serialOrchestrator,
 				elasticsearchIndexName,
 				refreshStrategy,
@@ -149,33 +146,35 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	public IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(
 			SessionContextImplementor sessionContext, DocumentCommitStrategy commitStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
-		return indexingBackendContext.createDocumentWorkExecutor(
+		return backendContext.createDocumentWorkExecutor(
 				parallelOrchestrator, elasticsearchIndexName, sessionContext
 		);
 	}
 
 	@Override
 	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
-		return indexingBackendContext.createWorkExecutor(
+		return backendContext.createWorkExecutor(
 				parallelOrchestrator, elasticsearchIndexName, sessionContext
 		);
 	}
 
 	@Override
 	public IndexScopeBuilder createScopeBuilder(MappingContextImplementor mappingContext) {
-		return new ElasticsearchIndexScopeBuilder( searchBackendContext, mappingContext, this );
+		return new ElasticsearchIndexScopeBuilder(
+				backendContext, mappingContext, this
+		);
 	}
 
 	@Override
 	public void addTo(IndexScopeBuilder builder) {
 		if ( !( builder instanceof ElasticsearchIndexScopeBuilder ) ) {
 			throw log.cannotMixElasticsearchScopeWithOtherType(
-					builder, this, searchBackendContext.getEventContext()
+					builder, this, backendContext.getEventContext()
 			);
 		}
 
 		ElasticsearchIndexScopeBuilder esBuilder = (ElasticsearchIndexScopeBuilder) builder;
-		esBuilder.add( searchBackendContext, this );
+		esBuilder.add( backendContext, this );
 	}
 
 	@Override
@@ -205,7 +204,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	private EventContext getBackendAndIndexEventContext() {
-		return indexingBackendContext.getEventContext().append(
+		return backendContext.getEventContext().append(
 				EventContexts.fromIndexName( hibernateSearchIndexName )
 		);
 	}

@@ -34,7 +34,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 	private final LuceneSearchProjection<?, H> rootProjection;
 	private final LuceneSearchQueryElementCollector elementCollector;
 
-	LuceneSearchQueryBuilder(
+	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
 			LuceneReadWorkOrchestrator queryOrchestrator,
 			LuceneSearchContext searchContext,

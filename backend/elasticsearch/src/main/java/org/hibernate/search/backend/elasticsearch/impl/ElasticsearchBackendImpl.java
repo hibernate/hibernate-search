@@ -21,9 +21,8 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
-import org.hibernate.search.backend.elasticsearch.index.impl.IndexingBackendContext;
+import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -61,8 +60,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final Map<String, String> hibernateSearchIndexNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
 
 	private final EventContext eventContext;
-	private final IndexingBackendContext indexingContext;
-	private final SearchBackendContext searchContext;
+	private final IndexManagerBackendContext indexManagerBackendContext;
 
 	ElasticsearchBackendImpl(ElasticsearchLinkImpl link,
 			String name,
@@ -86,11 +84,9 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.typeFactoryProvider = typeFactoryProvider;
 
 		this.eventContext = EventContexts.fromBackendName( name );
-		this.indexingContext = new IndexingBackendContext( eventContext, link, multiTenancyStrategy,
-				orchestratorProvider
-		);
-		this.searchContext = new SearchBackendContext(
-				eventContext, link, userFacingGson,
+		this.indexManagerBackendContext = new IndexManagerBackendContext(
+				eventContext, link,
+				userFacingGson,
 				( String elasticsearchIndexName ) -> {
 					String result = hibernateSearchIndexNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
 					if ( result == null ) {
@@ -98,7 +94,9 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 					}
 					return result;
 				},
-				multiTenancyStrategy, queryOrchestrator
+				multiTenancyStrategy,
+				orchestratorProvider,
+				queryOrchestrator
 		);
 	}
 
@@ -181,7 +179,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				new ElasticsearchIndexSettingsBuilder( analysisDefinitionRegistry );
 
 		return new ElasticsearchIndexManagerBuilder(
-				indexingContext, searchContext,
+				indexManagerBackendContext,
 				hibernateSearchIndexName, elasticsearchIndexName,
 				indexSchemaRootNodeBuilder, settingsBuilder
 		);

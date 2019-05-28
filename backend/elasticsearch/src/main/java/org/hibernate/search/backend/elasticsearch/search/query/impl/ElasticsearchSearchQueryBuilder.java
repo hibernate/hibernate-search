@@ -42,7 +42,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
 
-	ElasticsearchSearchQueryBuilder(
+	public ElasticsearchSearchQueryBuilder(
 			ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,

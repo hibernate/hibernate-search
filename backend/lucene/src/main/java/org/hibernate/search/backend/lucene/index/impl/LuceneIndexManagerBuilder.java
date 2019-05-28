@@ -12,24 +12,20 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 
 public class LuceneIndexManagerBuilder implements IndexManagerBuilder<LuceneRootDocumentBuilder> {
 
-	private final IndexingBackendContext indexingBackendContext;
-	private final SearchBackendContext searchBackendContext;
+	private final IndexManagerBackendContext backendContext;
 
 	private final String indexName;
 	private final LuceneIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
-	public LuceneIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
-			SearchBackendContext searchBackendContext,
+	public LuceneIndexManagerBuilder(IndexManagerBackendContext backendContext,
 			String indexName,
 			LuceneIndexSchemaRootNodeBuilder schemaRootNodeBuilder) {
-		this.indexingBackendContext = indexingBackendContext;
-		this.searchBackendContext = searchBackendContext;
+		this.backendContext = backendContext;
 		this.indexName = indexName;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 	}
@@ -50,11 +46,11 @@ public class LuceneIndexManagerBuilder implements IndexManagerBuilder<LuceneRoot
 		IndexAccessor indexAccessor = null;
 		try {
 			model = schemaRootNodeBuilder.build( indexName );
-			indexAccessor = indexingBackendContext.createIndexAccessor(
+			indexAccessor = backendContext.createIndexAccessor(
 					model.getIndexName(), model.getScopedAnalyzer()
 			);
 			return new LuceneIndexManagerImpl(
-					indexingBackendContext, searchBackendContext, indexName, model, indexAccessor
+					backendContext, indexName, model, indexAccessor
 			);
 		}
 		catch (RuntimeException e) {

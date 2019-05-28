@@ -6,90 +6,39 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import java.util.function.Function;
-
-import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.util.common.reporting.EventContext;
 
-import com.google.gson.Gson;
+/**
+ * An interface with knowledge of the backend internals,
+ * able to create components related to work execution.
+ * <p>
+ * Note this interface exists mainly to more cleanly pass information
+ * from the backend to the various search-related components.
+ * If we just passed the backend to the various search-related components,
+ * we would have a cyclic dependency.
+ * If we passed all the components held by the backend to the various search-related components,
+ * we would end up with methods with many parameters.
+ */
+public interface SearchBackendContext {
 
-public class SearchBackendContext {
-	private final EventContext eventContext;
+	DocumentReferenceExtractorHelper getDocumentReferenceExtractorHelper();
 
-	private final ElasticsearchLink link;
-	private final Gson userFacingGson;
-	private final MultiTenancyStrategy multiTenancyStrategy;
+	SearchProjectionBackendContext getSearchProjectionBackendContext();
 
-	private final ElasticsearchWorkOrchestrator orchestrator;
-
-	private final SearchProjectionBackendContext searchProjectionBackendContext;
-
-	private final DocumentReferenceExtractorHelper documentReferenceExtractorHelper;
-
-	public SearchBackendContext(EventContext eventContext,
-			ElasticsearchLink link,
-			Gson userFacingGson,
-			Function<String, String> indexNameConverter,
-			MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchWorkOrchestrator orchestrator) {
-		this.eventContext = eventContext;
-		this.link = link;
-		this.userFacingGson = userFacingGson;
-		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.orchestrator = orchestrator;
-
-		this.documentReferenceExtractorHelper =
-				new DocumentReferenceExtractorHelper( indexNameConverter, multiTenancyStrategy );
-
-		this.searchProjectionBackendContext = new SearchProjectionBackendContext(
-				documentReferenceExtractorHelper,
-				userFacingGson
-		);
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[" + eventContext + "]";
-	}
-
-	public EventContext getEventContext() {
-		return eventContext;
-	}
-
-	DocumentReferenceExtractorHelper getDocumentReferenceExtractorHelper() {
-		return documentReferenceExtractorHelper;
-	}
-
-	public SearchProjectionBackendContext getSearchProjectionBackendContext() {
-		return searchProjectionBackendContext;
-	}
-
-	public ElasticsearchSearchContext createSearchContext(MappingContextImplementor mappingContext,
-			ElasticsearchScopeModel scopeModel) {
-		return new ElasticsearchSearchContext( mappingContext, userFacingGson, multiTenancyStrategy, scopeModel );
-	}
+	ElasticsearchSearchContext createSearchContext(MappingContextImplementor mappingContext,
+			ElasticsearchScopeModel scopeModel);
 
 	<H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
 			ElasticsearchSearchContext searchContext,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
-			ElasticsearchSearchProjection<?, H> rootProjection) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
-		return new ElasticsearchSearchQueryBuilder<>(
-				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(),
-				orchestrator, multiTenancyStrategy,
-				searchContext, sessionContext, loadingContextBuilder, rootProjection
-		);
-	}
+			ElasticsearchSearchProjection<?, H> rootProjection);
 
 }

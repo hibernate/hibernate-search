@@ -28,20 +28,20 @@ public class ElasticsearchIndexScope
 
 	public ElasticsearchIndexScope(
 			MappingContextImplementor mappingContext,
-			SearchBackendContext searchBackendContext,
+			SearchBackendContext backendContext,
 			ElasticsearchScopeModel model) {
-		ElasticsearchSearchContext searchContext = searchBackendContext.createSearchContext(
+		ElasticsearchSearchContext searchContext = backendContext.createSearchContext(
 				mappingContext, model
 		);
 		this.model = model;
 		this.searchPredicateFactory = new ElasticsearchSearchPredicateBuilderFactoryImpl( searchContext, model );
 		this.searchSortFactory = new ElasticsearchSearchSortBuilderFactoryImpl( searchContext, model );
 		this.searchProjectionFactory = new ElasticsearchSearchProjectionBuilderFactory(
-				searchBackendContext.getSearchProjectionBackendContext(),
+				backendContext.getSearchProjectionBackendContext(),
 				model
 		);
 		this.searchQueryFactory = new ElasticsearchSearchQueryBuilderFactory(
-				searchBackendContext, searchContext,
+				backendContext, searchContext,
 				this.searchProjectionFactory
 		);
 	}
