@@ -53,7 +53,7 @@ class LuceneNestedPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 			parentQuery = LuceneQueries.nestedDocumentPathQuery( context.getNestedPath() );
 		}
 
-		// TODO at some point we should have a parameter for the score mode
+		// TODO HSEARCH-3090 at some point we should have a parameter for the score mode
 		return new ToParentBlockJoinQuery( childQueryBuilder.build(), new QueryBitSetProducer( parentQuery ), ScoreMode.Avg );
 	}
 }

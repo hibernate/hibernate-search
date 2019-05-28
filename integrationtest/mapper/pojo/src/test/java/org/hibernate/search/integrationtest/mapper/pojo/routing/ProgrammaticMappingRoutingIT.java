@@ -132,7 +132,7 @@ public class ProgrammaticMappingRoutingIT {
 		}
 	}
 
-	// TODO implement filters and allow them to use routing predicates, then test this here
+	// TODO HSEARCH-3325 implement filters and allow them to use routing predicates, then test this here
 
 	public enum EntityCategory {
 		CATEGORY_1,

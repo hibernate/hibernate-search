@@ -83,7 +83,7 @@ public final class BridgeResolver {
 	private final List<TypePatternBridgeMapping<? extends ValueBridge<?, ?>>> typePatternValueBridgeMappings = new ArrayList<>();
 
 	public BridgeResolver(TypePatternMatcherFactory typePatternMatcherFactory) {
-		// TODO add an extension point to override these maps, or at least to add defaults for other types
+		// TODO HSEARCH-3096 add an extension point to override these maps, or at least to add defaults for other types
 
 		TypePatternMatcher concreteEnumPattern = typePatternMatcherFactory.createRawSuperTypeMatcher( Enum.class )
 				.and( typePatternMatcherFactory.createExactRawTypeMatcher( Enum.class ).negate() );

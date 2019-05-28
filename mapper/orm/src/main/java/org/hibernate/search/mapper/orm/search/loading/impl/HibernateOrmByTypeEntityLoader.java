@@ -54,7 +54,7 @@ public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<PojoRe
 
 		for ( T value : objectsByReference.values() ) {
 			/*
-			 * TODO remove null values? We used to do it in Search 5...
+			 * TODO HSEARCH-3349 remove null values? We used to do it in Search 5...
 			 * Note that if we do, we have to change the javadoc
 			 * for this method and also change the other EntityLoader implementations.
 			 */

@@ -84,7 +84,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 								.matching( terms )
 						);
 					}
-					// Bridged query with complex bridge: TODO rely on the bridge to split the String
+					// Bridged query with complex bridge: TODO HSEARCH-3320 rely on the bridge to split the String
 					String[] splitTags = tags == null ? null : tags.split( "," );
 					if ( splitTags != null && splitTags.length > 0 ) {
 						b.must( f.bool( b2 -> {
@@ -120,7 +120,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 						);
 					}
 				} ) )
-				// TODO facets (tag, medium, library in particular)
+				// TODO HSEARCH-3271 facets (tag, medium, library in particular)
 				.sort( b -> {
 					if ( myLocation != null ) {
 						// TODO HSEARCH-2254 sort by distance once we implement nested support for sorts ("copies" is a nested object field)

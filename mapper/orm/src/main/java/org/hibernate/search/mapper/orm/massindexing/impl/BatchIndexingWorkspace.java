@@ -103,10 +103,10 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 			final BatchTransactionalContext transactionalContext = new BatchTransactionalContext( sessionFactory );
 			//first start the consumers, then the producers (reverse order):
 			//from primary keys to LuceneWork ADD operations:
-			//TODO: implement and pass the error handler
+			//TODO HSEARCH-3110 implement and pass the error handler
 			startTransformationToLuceneWork();
 			//from class definition to all primary keys:
-			//TODO: implement and pass the error handler
+			//TODO HSEARCH-3110 implement and pass the error handler
 			startProducingPrimaryKeys( transactionalContext );
 			try {
 				producerEndSignal.await(); //await for all work being sent to the backend

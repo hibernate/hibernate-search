@@ -60,7 +60,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		this.dirtyCheckingEnabled = dirtyCheckingEnabled;
 	}
 
-	// TODO handle the "simulated" transaction when a Flush listener is registered
+	// TODO HSEARCH-3068 handle the "simulated" transaction when a Flush listener is registered
 	//only used by the HibernateSearchEventListener instance playing in the FlushEventListener role.
 	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
 //	private final Map<Session, Synchronization> flushSynch = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
@@ -123,7 +123,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	 */
 	@Override
 	public void onFlush(FlushEvent event) {
-		// TODO handle the "simulated" transaction when a Flush listener is registered
+		// TODO HSEARCH-3068 handle the "simulated" transaction when a Flush listener is registered
 //		Session session = event.getSession();
 //		Synchronization synchronization = flushSynch.get( session );
 //		if ( synchronization != null ) {
@@ -146,7 +146,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		return context.getMapping().isWorkable( entity );
 	}
 
-	// TODO handle the "simulated" transaction when a Flush listener is registered
+	// TODO HSEARCH-3068 handle the "simulated" transaction when a Flush listener is registered
 //	/**
 //	 * Adds a synchronization to be performed in the onFlush method;
 //	 * should only be used as workaround for the case a flush is happening

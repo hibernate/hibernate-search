@@ -35,7 +35,7 @@ public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneSearchSortB
 
 	@Override
 	public void order(SortOrder order) {
-		// TODO contribute the support of descending order to Lucene
+		// TODO HSEARCH-3193 contribute the support of descending order to Lucene
 		if ( SortOrder.DESC == order ) {
 			throw log.descendingOrderNotSupportedByDistanceSort(
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )

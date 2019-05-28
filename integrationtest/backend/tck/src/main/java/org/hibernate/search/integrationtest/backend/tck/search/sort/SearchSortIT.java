@@ -117,7 +117,7 @@ public class SearchSortIT {
 	@Test
 	public void nested() {
 		Assume.assumeTrue( "Sorts on fields within nested fields are not supported yet", false );
-		// TODO support sorts on fields within nested fields
+		// TODO HSEARCH-2254 support sorts on fields within nested fields
 	}
 
 	@Test

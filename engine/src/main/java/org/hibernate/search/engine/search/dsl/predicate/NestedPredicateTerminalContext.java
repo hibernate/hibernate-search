@@ -13,6 +13,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface NestedPredicateTerminalContext extends SearchPredicateTerminalContext {
 
-	// TODO add tuning methods, like the "score_mode" in Elasticsearch (avg, min, ...)
+	// TODO HSEARCH-3090 add tuning methods, like the "score_mode" in Elasticsearch (avg, min, ...)
 
 }

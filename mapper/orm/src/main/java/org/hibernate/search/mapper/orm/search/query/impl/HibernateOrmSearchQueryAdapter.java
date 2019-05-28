@@ -182,13 +182,13 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	private UnsupportedOperationException resultStreamingNotImplemented() {
-		// TODO result streaming
+		// TODO HSEARCH-3323 result streaming
 		return new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
-		// TODO hints (javax.persistence.query.timeout hint in particular)
+		// TODO HSEARCH-3352 hints (javax.persistence.query.timeout hint in particular)
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
@@ -309,7 +309,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	private UnsupportedOperationException resultTransformerNotImplemented() {
-		// TODO result transformer
+		// TODO HSEARCH-3093 result transformer
 		return new UnsupportedOperationException( "Not implemented yet" );
 	}
 
@@ -344,7 +344,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	private UnsupportedOperationException timeoutNotImplementedYet() {
-		// TODO add support for timeouts
+		// TODO HSEARCH-3352 add support for timeouts
 		return new UnsupportedOperationException( "Not implemented yet" );
 	}
 

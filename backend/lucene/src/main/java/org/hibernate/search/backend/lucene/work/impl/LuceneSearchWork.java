@@ -63,7 +63,7 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 
-			// TODO GSM implement timeout handling by wrapping the collector with the timeout limiting one
+			// TODO HSEARCH-3352 implement timeout handling by wrapping the collector with the timeout limiting one
 			LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( luceneSort, getMaxDocs( context ) );
 			luceneCollectorProvider.contributeCollectors( luceneCollectorsBuilder );
 			LuceneCollectors luceneCollectors = luceneCollectorsBuilder.build();
@@ -86,9 +86,9 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 
 	private int getMaxDocs(LuceneReadWorkExecutionContext context) {
 		IndexReader reader = context.getIndexReader();
-		// FIXME this is very naive for now, we will probably need to implement some scrolling in the collector
-		// as it is done in Search 5.
-		// Note that Lucene initializes data structures of this size so setting it to a large value consumes memory.
+		// FIXME HSEARCH-3323 this is very naive for now, we will probably need to implement some scrolling in the collector
+		//  as it is done in Search 5.
+		//  Note that Lucene initializes data structures of this size so setting it to a large value consumes memory.
 		if ( limit == null ) {
 			return reader.maxDoc();
 		}

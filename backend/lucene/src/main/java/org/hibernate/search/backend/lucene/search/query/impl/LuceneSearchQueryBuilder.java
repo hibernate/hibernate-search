@@ -61,7 +61,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 
 	@Override
 	public void addRoutingKey(String routingKey) {
-		// TODO see what to do with the routing key
+		// TODO HSEARCH-3314 see what to do with the routing key
 		throw new UnsupportedOperationException( "Routing keys are not supported by the Lucene backend yet." );
 	}
 

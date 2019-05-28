@@ -122,7 +122,7 @@ class LuceneStringIndexFieldTypeContext
 	private static FieldType getFieldType(boolean projectable, boolean analyzed) {
 		FieldType fieldType = new FieldType();
 		if ( analyzed ) {
-			// TODO GSM: take into account the norms and term vectors options
+			// TODO HSEARCH-3048 take into account the norms and term vectors options
 			fieldType.setOmitNorms( false );
 			fieldType.setIndexOptions( IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
 			fieldType.setStoreTermVectors( true );

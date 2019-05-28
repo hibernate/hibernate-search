@@ -187,7 +187,7 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 		if ( similarity != null ) {
 			writerConfig.setSimilarity( similarity );
 		}
-		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO make it possible to configure a different policy?
+		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO HSEARCH-3117 make it possible to configure a different policy?
 		writerConfig.setMergePolicy( newMergePolicy );
 		 */
 		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler( this.errorHandler, this.indexName );

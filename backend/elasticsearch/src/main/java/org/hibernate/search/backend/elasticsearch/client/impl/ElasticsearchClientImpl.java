@@ -135,9 +135,9 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				);
 
 		/*
-		 * TODO maybe the callback should also cancel the request?
-		 * In any case, the RestClient doesn't return the Future<?> from Apache HTTP client,
-		 * so we can't do much until this changes.
+		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?
+		 *  In any case, the RestClient doesn't return the Future<?> from Apache HTTP client,
+		 *  so we can't do much until this changes.
 		 */
 		ScheduledFuture<?> timeout = timeoutExecutorService.schedule(
 				() -> {

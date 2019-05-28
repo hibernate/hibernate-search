@@ -24,7 +24,7 @@ abstract class ErrorHandledRunnable implements Runnable {
 
 	@Override
 	public final void run() {
-		//TODO: extract error handler instance from work plan
+		// TODO HSEARCH-3110 extract error handler instance from work plan
 		try {
 			runWithErrorHandler();
 		}
@@ -39,7 +39,7 @@ abstract class ErrorHandledRunnable implements Runnable {
 			// being this an async thread we want to make sure everything is somehow reported
 			String errorMessage = log.massIndexerUnexpectedErrorMessage();
 
-			//TODO: handle it with a exception handler
+			// TODO HSEARCH-3110 handle it with a exception handler
 			// errorHandler.handleException( errorMessage , re );
 			// temporary re-throwing a runtime exception
 			throw new RuntimeException( errorMessage, re );
