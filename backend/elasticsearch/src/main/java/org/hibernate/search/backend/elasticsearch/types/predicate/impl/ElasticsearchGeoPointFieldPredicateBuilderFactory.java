@@ -69,18 +69,27 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath) {
+		checkSearchable( absoluteFieldPath );
 		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, CODEC );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
 			String absoluteFieldPath) {
+		checkSearchable( absoluteFieldPath );
 		return new ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath) {
+		checkSearchable( absoluteFieldPath );
 		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, CODEC );
+	}
+
+	private void checkSearchable(String absoluteFieldPath) {
+		if ( !searchable ) {
+			throw log.nonSearchableField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
 	}
 }

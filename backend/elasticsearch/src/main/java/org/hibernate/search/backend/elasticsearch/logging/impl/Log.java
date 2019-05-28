@@ -512,4 +512,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 70, value = "Positive decimal scale ['%1$s'] is not allowed for BigInteger fields, since a BigInteger value cannot have any decimal digits.")
 	SearchException invalidDecimalScale(Integer decimalScale, @Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET_3 + 71, value = "Field '%1$s' is not searchable. Make sure the field is marked as searchable.")
+	SearchException nonSearchableField(String absoluteFieldPath, @Param EventContext context);
 }

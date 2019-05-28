@@ -50,24 +50,28 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker,
 			ElasticsearchCompatibilityChecker analyzerChecker) {
+		checkSearchable( absoluteFieldPath );
 		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, type, analyzerChecker );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
 			String absoluteFieldPath, ElasticsearchCompatibilityChecker analyzerChecker) {
+		checkSearchable( absoluteFieldPath );
 		return new ElasticsearchTextPhrasePredicateBuilder( absoluteFieldPath, analyzerChecker );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
 			String absoluteFieldPath) {
+		checkSearchable( absoluteFieldPath );
 		return new ElasticsearchTextWildcardPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public ElasticsearchSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
 			String absoluteFieldPath) {
+		checkSearchable( absoluteFieldPath );
 		return new ElasticsearchSimpleQueryStringPredicateBuilderFieldContext( absoluteFieldPath );
 	}
 }
