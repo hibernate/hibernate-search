@@ -172,7 +172,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		UnsearchableFieldsIndexMapping(IndexSchemaElement root) {
 			geoPoint = root.field(
 					// make the field not searchable
-					"geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).searchable( Searchable.NO )
+					"geoPoint", f -> f.asGeoPoint().searchable( Searchable.NO )
 			)
 					.toReference();
 		}
