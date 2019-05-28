@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
@@ -30,11 +30,11 @@ public final class ElasticsearchSearchContext {
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	// Targeted indexes
-	private final ElasticsearchSearchScopeModel scopeModel;
+	private final ElasticsearchScopeModel scopeModel;
 
 	public ElasticsearchSearchContext(MappingContextImplementor mappingContext,
 			Gson userFacingGson, MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchSearchScopeModel scopeModel) {
+			ElasticsearchScopeModel scopeModel) {
 		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
 		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
 		this.userFacingGson = userFacingGson;

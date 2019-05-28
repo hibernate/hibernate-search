@@ -28,7 +28,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -161,19 +161,19 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexSearchScopeBuilder createSearchScopeBuilder(MappingContextImplementor mappingContext) {
-		return new ElasticsearchIndexSearchScopeBuilder( searchBackendContext, mappingContext, this );
+	public IndexScopeBuilder createScopeBuilder(MappingContextImplementor mappingContext) {
+		return new ElasticsearchIndexScopeBuilder( searchBackendContext, mappingContext, this );
 	}
 
 	@Override
-	public void addTo(IndexSearchScopeBuilder builder) {
-		if ( !( builder instanceof ElasticsearchIndexSearchScopeBuilder ) ) {
-			throw log.cannotMixElasticsearchSearchScopeWithOtherType(
+	public void addTo(IndexScopeBuilder builder) {
+		if ( !( builder instanceof ElasticsearchIndexScopeBuilder ) ) {
+			throw log.cannotMixElasticsearchScopeWithOtherType(
 					builder, this, searchBackendContext.getEventContext()
 			);
 		}
 
-		ElasticsearchIndexSearchScopeBuilder esBuilder = (ElasticsearchIndexSearchScopeBuilder) builder;
+		ElasticsearchIndexScopeBuilder esBuilder = (ElasticsearchIndexScopeBuilder) builder;
 		esBuilder.add( searchBackendContext, this );
 	}
 

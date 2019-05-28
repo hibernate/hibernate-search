@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProje
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 public abstract class AbstractSearchQueryResultDefinitionContext<
@@ -32,16 +32,16 @@ public abstract class AbstractSearchQueryResultDefinitionContext<
 		return DslExtensionState.returnIfSupported(
 				extension,
 				extension.extendOptional(
-						this, getIndexSearchScope(), getSessionContext(), getLoadingContextBuilder()
+						this, getIndexScope(), getSessionContext(), getLoadingContextBuilder()
 				)
 		);
 	}
 
 	protected final SearchProjectionFactoryContext<R, E> createDefaultProjectionFactoryContext() {
-		return new DefaultSearchProjectionFactoryContext<>( getIndexSearchScope().getSearchProjectionFactory() );
+		return new DefaultSearchProjectionFactoryContext<>( getIndexScope().getSearchProjectionFactory() );
 	}
 
-	protected abstract IndexSearchScope<C> getIndexSearchScope();
+	protected abstract IndexScope<C> getIndexScope();
 
 	protected abstract SessionContextImplementor getSessionContext();
 

@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryRes
 import org.hibernate.search.backend.lucene.search.dsl.query.impl.LuceneSearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexSearchScope;
+import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
@@ -37,7 +37,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionC
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -91,12 +91,12 @@ public final class LuceneExtension<H, R, E>
 	@Override
 	public Optional<LuceneSearchQueryResultDefinitionContext<R, E>> extendOptional(
 			SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
-			IndexSearchScope<?> indexSearchScope,
+			IndexScope<?> indexScope,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
-		if ( indexSearchScope instanceof LuceneIndexSearchScope ) {
+		if ( indexScope instanceof LuceneIndexScope ) {
 			return Optional.of( new LuceneSearchQueryResultDefinitionContextImpl<>(
-					(LuceneIndexSearchScope) indexSearchScope, sessionContext, loadingContextBuilder
+					(LuceneIndexScope) indexScope, sessionContext, loadingContextBuilder
 			) );
 		}
 		else {

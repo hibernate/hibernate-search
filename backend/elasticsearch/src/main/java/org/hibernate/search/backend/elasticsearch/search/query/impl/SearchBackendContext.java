@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
@@ -75,7 +75,7 @@ public class SearchBackendContext {
 	}
 
 	public ElasticsearchSearchContext createSearchContext(MappingContextImplementor mappingContext,
-			ElasticsearchSearchScopeModel scopeModel) {
+			ElasticsearchScopeModel scopeModel) {
 		return new ElasticsearchSearchContext( mappingContext, userFacingGson, multiTenancyStrategy, scopeModel );
 	}
 

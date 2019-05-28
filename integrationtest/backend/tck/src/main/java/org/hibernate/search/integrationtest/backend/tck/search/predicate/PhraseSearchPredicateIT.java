@@ -35,7 +35,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
@@ -133,7 +133,7 @@ public class PhraseSearchPredicateIT {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testPhraseQuery")
 	public void phrase() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -146,7 +146,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void phrase_unsearchable() {
-		StubMappingSearchScope scope = unsearchableFieldsIndexManager.createSearchScope();
+		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException( () ->
@@ -165,7 +165,7 @@ public class PhraseSearchPredicateIT {
 	 */
 	@Test
 	public void withDslConverter() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringFieldWithDslConverter.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -179,7 +179,7 @@ public class PhraseSearchPredicateIT {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testPhraseQuery")
 	public void singleTerm() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -192,7 +192,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void emptyStringBeforeAnalysis() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -205,7 +205,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void noTokenAfterAnalysis() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -219,7 +219,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void analyzerOverride() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
@@ -249,7 +249,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void analyzerOverride_notExistingName() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 
 		SubTest.expectException( () -> scope.query()
@@ -265,7 +265,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void skipAnalysis() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -295,7 +295,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void error_unsupportedFieldType() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel fieldModel : indexMapping.unsupportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
@@ -317,7 +317,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void error_null() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException(
@@ -334,7 +334,7 @@ public class PhraseSearchPredicateIT {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testPhraseQuery")
 	public void slop() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		Function<Integer, SearchQuery<DocumentReference>> createQuery = slop -> scope.query()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ).withSlop( slop ) )
@@ -358,7 +358,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void perFieldBoostWithConstantScore_error() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException(
@@ -375,7 +375,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void fieldLevelBoost() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
@@ -406,7 +406,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void predicateLevelBoost() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
@@ -445,7 +445,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void predicateLevelBoost_withConstantScore() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
@@ -486,7 +486,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void multiFields() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 		String absoluteFieldPath3 = indexMapping.analyzedStringField3.relativeFieldName;
@@ -558,7 +558,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void error_unknownField() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException(
@@ -603,7 +603,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void error_invalidSlop() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException(
@@ -629,7 +629,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void multiIndex_withCompatibleIndexManager() {
-		StubMappingSearchScope scope = indexManager.createSearchScope(
+		StubMappingScope scope = indexManager.createScope(
 				compatibleIndexManager
 		);
 
@@ -647,7 +647,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void multiIndex_withRawFieldCompatibleIndexManager() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
+		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -662,7 +662,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void multiIndex_incompatibleAnalyzer() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
+		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException(
@@ -684,7 +684,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void multiIndex_incompatibleAnalyzer_overrideAnalyzer() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
+		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -700,7 +700,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void multiIndex_incompatibleAnalyzer_skipAnalysis() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleAnalyzerIndexManager );
+		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -716,7 +716,7 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void multiIndex_incompatibleSearchable() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( unsearchableFieldsIndexManager );
+		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException( () -> scope.predicate().phrase().onField( absoluteFieldPath ) )
@@ -782,21 +782,21 @@ public class PhraseSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
-		query = compatibleIndexManager.createSearchScope().query()
+		query = compatibleIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
-		query = rawFieldCompatibleIndexManager.createSearchScope().query()
+		query = rawFieldCompatibleIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
-		query = incompatibleAnalyzerIndexManager.createSearchScope().query()
+		query = incompatibleAnalyzerIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );

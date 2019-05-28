@@ -52,7 +52,7 @@ public class ElasticsearchMatchSearchPredicateIT {
 
 	@Test
 	public void match_skipAnalysis_normalizedStringField() {
-		SubTest.expectException( () -> indexManager.createSearchScope().query()
+		SubTest.expectException( () -> indexManager.createScope().query()
 				.predicate( f -> f.match().onField( "normalizedStringField" ).matching( TEST_TERM ).skipAnalysis() )
 				.toQuery()
 		)

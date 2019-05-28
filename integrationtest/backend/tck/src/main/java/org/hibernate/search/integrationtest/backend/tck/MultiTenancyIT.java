@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -85,7 +85,7 @@ public class MultiTenancyIT {
 
 	@Test
 	public void search_only_returns_elements_of_the_selected_tenant() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
 				.asProjection( f ->
@@ -114,7 +114,7 @@ public class MultiTenancyIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3421")
 	public void id_predicate_takes_tenantId_into_account() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
 				.asProjection( f ->
@@ -141,7 +141,7 @@ public class MultiTenancyIT {
 
 	@Test
 	public void search_on_nested_object_only_returns_elements_of_the_tenant() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
 				.asProjection( f ->
@@ -178,7 +178,7 @@ public class MultiTenancyIT {
 	public void delete_only_deletes_elements_of_the_tenant() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant2SessionContext );
 
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant2SessionContext )
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -229,7 +229,7 @@ public class MultiTenancyIT {
 	public void update_only_updates_elements_of_the_tenant() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant2SessionContext );
 
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> checkQuery = scope.query( tenant2SessionContext )
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -363,7 +363,7 @@ public class MultiTenancyIT {
 				)
 				.setup();
 
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant1SessionContext )
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -452,7 +452,7 @@ public class MultiTenancyIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query( new StubSessionContext() )
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -555,7 +555,7 @@ public class MultiTenancyIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant1SessionContext )
 				.predicate( f -> f.matchAll() )
 				.toQuery();

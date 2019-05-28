@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.query.spi;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.query.ExtendedSearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -24,9 +24,9 @@ public abstract class AbstractExtendedSearchQueryContext<
 		>
 		extends AbstractSearchQueryContext<S, H, PDC, SC, C> {
 
-	public AbstractExtendedSearchQueryContext(IndexSearchScope<C> indexSearchScope,
+	public AbstractExtendedSearchQueryContext(IndexScope<C> indexScope,
 			SearchQueryBuilder<H, C> searchQueryBuilder) {
-		super( indexSearchScope, searchQueryBuilder );
+		super( indexScope, searchQueryBuilder );
 	}
 
 	@Override

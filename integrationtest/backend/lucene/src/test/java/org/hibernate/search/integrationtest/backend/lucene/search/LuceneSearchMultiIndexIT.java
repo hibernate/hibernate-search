@@ -20,7 +20,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -85,7 +85,7 @@ public class LuceneSearchMultiIndexIT {
 
 	@Test
 	public void field_in_one_index_only_is_supported_for_sorting() {
-		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
+		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -124,7 +124,7 @@ public class LuceneSearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		StubMappingSearchScope scope = indexManager_1_1.createSearchScope();
+		StubMappingScope scope = indexManager_1_1.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
@@ -140,7 +140,7 @@ public class LuceneSearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		scope = indexManager_1_2.createSearchScope();
+		scope = indexManager_1_2.createScope();
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScopeBuilder;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
@@ -142,11 +142,11 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	<R, E2> MappedIndexSearchScopeBuilder<R, E2> createSearchScopeBuilder(MappingContextImplementor mappingContext) {
-		return indexManager.createSearchScopeBuilder( mappingContext );
+	<R, E2> MappedIndexScopeBuilder<R, E2> createScopeBuilder(MappingContextImplementor mappingContext) {
+		return indexManager.createScopeBuilder( mappingContext );
 	}
 
-	void addTo(MappedIndexSearchScopeBuilder<?, ?> builder) {
+	void addTo(MappedIndexScopeBuilder<?, ?> builder) {
 		indexManager.addTo( builder );
 	}
 }

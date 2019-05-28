@@ -25,7 +25,7 @@ public class ReferenceProjectionContextImpl<R> implements ReferenceProjectionCon
 	 * The backend has no control over the type of entities.
 	 * This cast is only safe because we make sure to only use SearchProjectionFactoryContext
 	 * with generic type arguments that are consistent with the type of entity loaders.
-	 * See comments in MappedIndexSearchScope.
+	 * See comments in MappedIndexScope.
 	 */
 	public SearchProjection<R> toProjection() {
 		return referenceProjectionBuilder.build();

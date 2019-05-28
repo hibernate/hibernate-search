@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -240,7 +240,7 @@ public class AnalysisCustomIT {
 	}
 
 	private SearchResultAssert<DocumentReference> assertMatchQuery(String valueToMatch) {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.match().onField( indexMapping.field.relativeFieldName ).matching( valueToMatch ) )
@@ -292,7 +292,7 @@ public class AnalysisCustomIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

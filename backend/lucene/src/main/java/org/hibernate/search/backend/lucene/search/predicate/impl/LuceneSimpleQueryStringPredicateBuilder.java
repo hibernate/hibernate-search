@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSucceedingCompatibilityChecker;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldContext;
@@ -35,7 +35,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearchScopeModel scopeModel;
+	private final LuceneScopeModel scopeModel;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private final Map<String, LuceneSimpleQueryStringPredicateBuilderFieldContext> fields = new LinkedHashMap<>();
@@ -45,7 +45,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	private boolean ignoreAnalyzer = false;
 	private LuceneCompatibilityChecker analyzerChecker = new LuceneSucceedingCompatibilityChecker();
 
-	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneSearchScopeModel scopeModel) {
+	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}

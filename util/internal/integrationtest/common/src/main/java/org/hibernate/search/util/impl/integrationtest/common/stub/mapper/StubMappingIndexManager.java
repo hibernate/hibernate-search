@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.mapper.scope.spi.MappedIndexSearchScopeBuilder;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubMappingContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
@@ -62,35 +62,35 @@ public class StubMappingIndexManager {
 	}
 
 	/**
-	 * @return A search target scoped to this index only.
+	 * @return A scope containing this index only.
 	 */
-	public StubMappingSearchScope createSearchScope() {
-		MappedIndexSearchScopeBuilder<DocumentReference, DocumentReference> builder =
-				indexManager.createSearchScopeBuilder( new StubMappingContext() );
-		return new StubMappingSearchScope( builder.build() );
+	public StubMappingScope createScope() {
+		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
+				indexManager.createScopeBuilder( new StubMappingContext() );
+		return new StubMappingScope( builder.build() );
 	}
 
 	/**
-	 * @return A search target scoped to this index and the given other indexes.
+	 * @return A scope containing this index and the given other indexes.
 	 */
-	public StubMappingSearchScope createSearchScope(StubMappingIndexManager... others) {
-		MappedIndexSearchScopeBuilder<DocumentReference, DocumentReference> builder =
-				indexManager.createSearchScopeBuilder( new StubMappingContext() );
+	public StubMappingScope createScope(StubMappingIndexManager... others) {
+		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
+				indexManager.createScopeBuilder( new StubMappingContext() );
 		for ( StubMappingIndexManager other : others ) {
 			other.indexManager.addTo( builder );
 		}
-		return new StubMappingSearchScope( builder.build() );
+		return new StubMappingScope( builder.build() );
 	}
 
 	/**
-	 * @return A search target scoped to this index and the given other indexes.
+	 * @return A scope containing this index and the given other indexes.
 	 */
-	public <R, E> GenericStubMappingSearchScope<R, E> createGenericSearchScope(StubMappingIndexManager... others) {
-		MappedIndexSearchScopeBuilder<R, E> builder =
-				indexManager.createSearchScopeBuilder( new StubMappingContext() );
+	public <R, E> GenericStubMappingScope<R, E> createGenericScope(StubMappingIndexManager... others) {
+		MappedIndexScopeBuilder<R, E> builder =
+				indexManager.createScopeBuilder( new StubMappingContext() );
 		for ( StubMappingIndexManager other : others ) {
 			other.indexManager.addTo( builder );
 		}
-		return new GenericStubMappingSearchScope<>( builder.build() );
+		return new GenericStubMappingScope<>( builder.build() );
 	}
 }

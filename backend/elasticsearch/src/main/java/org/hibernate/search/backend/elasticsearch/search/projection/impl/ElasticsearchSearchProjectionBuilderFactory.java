@@ -15,7 +15,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -44,10 +44,10 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
-	private final ElasticsearchSearchScopeModel scopeModel;
+	private final ElasticsearchScopeModel scopeModel;
 
 	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
-			ElasticsearchSearchScopeModel scopeModel) {
+			ElasticsearchScopeModel scopeModel) {
 		this.searchProjectionBackendContext = searchProjectionBackendContext;
 		this.scopeModel = scopeModel;
 	}

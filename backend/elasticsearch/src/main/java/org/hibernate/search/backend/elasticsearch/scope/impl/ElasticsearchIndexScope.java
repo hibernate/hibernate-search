@@ -8,28 +8,28 @@ package org.hibernate.search.backend.elasticsearch.scope.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactoryImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 
-public class ElasticsearchIndexSearchScope
-		implements IndexSearchScope<ElasticsearchSearchQueryElementCollector> {
+public class ElasticsearchIndexScope
+		implements IndexScope<ElasticsearchSearchQueryElementCollector> {
 
-	private final ElasticsearchSearchScopeModel model;
+	private final ElasticsearchScopeModel model;
 	private final ElasticsearchSearchPredicateBuilderFactoryImpl searchPredicateFactory;
 	private final ElasticsearchSearchSortBuilderFactoryImpl searchSortFactory;
 	private final ElasticsearchSearchQueryBuilderFactory searchQueryFactory;
 	private final ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory;
 
-	public ElasticsearchIndexSearchScope(
+	public ElasticsearchIndexScope(
 			MappingContextImplementor mappingContext,
 			SearchBackendContext searchBackendContext,
-			ElasticsearchSearchScopeModel model) {
+			ElasticsearchScopeModel model) {
 		ElasticsearchSearchContext searchContext = searchBackendContext.createSearchContext(
 				mappingContext, model
 		);

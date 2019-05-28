@@ -59,7 +59,7 @@ public class LuceneFieldTypesIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1640")
 	public void verifyProjectionsOnDifferentTypes() {
-		SearchQuery<Document> query = indexManager.createSearchScope().query()
+		SearchQuery<Document> query = indexManager.createScope().query()
 				.asProjection(
 						f -> f.extension( LuceneExtension.get() ).document()
 				)

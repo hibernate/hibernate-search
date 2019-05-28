@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -42,7 +42,7 @@ public class LuceneBoolSearchPredicateIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3535")
 	public void minimumShouldMatch_outOfBounds() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException(
 				"bool() predicate with a minimumShouldMatch constraint providing an out-of-bounds value",

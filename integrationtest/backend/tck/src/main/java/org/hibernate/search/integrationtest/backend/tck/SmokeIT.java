@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -58,7 +58,7 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_match() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ) )
@@ -98,7 +98,7 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_range() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.range().onField( "string" ).from( "text 2" ).to( "text 42" ) )
@@ -141,7 +141,7 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_boolean() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -176,7 +176,7 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_nested() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		// Without nested storage, we expect predicates to be able to match on different objects
 		SearchQuery<DocumentReference> query = scope.query()
@@ -226,7 +226,7 @@ public class SmokeIT {
 
 	@Test
 	public void separatePredicate() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().onField( "string" ).matching( "text 1" ).toPredicate();
 		SearchQuery<DocumentReference> query = scope.query()
@@ -319,7 +319,7 @@ public class SmokeIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

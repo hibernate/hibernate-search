@@ -433,7 +433,7 @@ public class DecimalScaleIT {
 		workPlan.execute().join();
 
 		SubTest.expectException( () -> {
-			indexManager.createSearchScope()
+			indexManager.createScope()
 					.query().asReference()
 					.predicate( p -> p.range().onField( "scaled" ).below( tooLargeDecimal ) );
 		} )
@@ -522,7 +522,7 @@ public class DecimalScaleIT {
 		workPlan.execute().join();
 
 		SubTest.expectException( () -> {
-			indexManager.createSearchScope()
+			indexManager.createScope()
 					.query().asReference()
 					.predicate( p -> p.range().onField( "scaled" ).above( tooLargeInteger ) );
 		} )
@@ -590,7 +590,7 @@ public class DecimalScaleIT {
 		workPlan.execute().join();
 
 		SubTest.expectException( () -> {
-			indexManager.createSearchScope()
+			indexManager.createScope()
 					.query().asReference()
 					.predicate( p -> p.range().onField( "scaled" ).above( tooLargeDecimal ) );
 		} )
@@ -637,7 +637,7 @@ public class DecimalScaleIT {
 		workPlan.execute().join();
 
 		SubTest.expectException( () -> {
-			indexManager.createSearchScope()
+			indexManager.createScope()
 					.query().asReference()
 					.predicate( p -> p.range().onField( "scaled" ).below( tooLargeInteger ) );
 		} )
@@ -774,7 +774,7 @@ public class DecimalScaleIT {
 	}
 
 	private void matchAbove(BigDecimal value) {
-		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
+		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asReference()
 				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
 				.toQuery();
@@ -782,7 +782,7 @@ public class DecimalScaleIT {
 	}
 
 	private void matchAbove(BigInteger value) {
-		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
+		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asReference()
 				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
 				.toQuery();
@@ -790,7 +790,7 @@ public class DecimalScaleIT {
 	}
 
 	public void doNotMatchAbove(BigDecimal value) {
-		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
+		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asReference()
 				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
 				.toQuery();
@@ -798,7 +798,7 @@ public class DecimalScaleIT {
 	}
 
 	public void doNotMatchAbove(BigInteger value) {
-		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
+		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asReference()
 				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
 				.toQuery();
@@ -806,7 +806,7 @@ public class DecimalScaleIT {
 	}
 
 	public void projection(BigDecimal value) {
-		SearchQuery<Object> query = indexManager.createSearchScope().query()
+		SearchQuery<Object> query = indexManager.createScope().query()
 				.asProjection( p -> p.field( "scaled" ) )
 				.predicate( p -> p.matchAll() )
 				.toQuery();
@@ -814,7 +814,7 @@ public class DecimalScaleIT {
 	}
 
 	public void projection(BigInteger value) {
-		SearchQuery<Object> query = indexManager.createSearchScope().query()
+		SearchQuery<Object> query = indexManager.createScope().query()
 				.asProjection( p -> p.field( "scaled" ) )
 				.predicate( p -> p.matchAll() )
 				.toQuery();
@@ -822,7 +822,7 @@ public class DecimalScaleIT {
 	}
 
 	private void match(BigDecimal matching, String match1, String match2 ) {
-		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
+		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asReference()
 				.predicate( p -> p.match().onField( "scaled" ).matching( matching ) )
 				.toQuery();
@@ -830,7 +830,7 @@ public class DecimalScaleIT {
 	}
 
 	private void match(BigInteger matching, String match1, String match2 ) {
-		SearchQuery<DocumentReference> query = indexManager.createSearchScope()
+		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asReference()
 				.predicate( p -> p.match().onField( "scaled" ).matching( matching ) )
 				.toQuery();

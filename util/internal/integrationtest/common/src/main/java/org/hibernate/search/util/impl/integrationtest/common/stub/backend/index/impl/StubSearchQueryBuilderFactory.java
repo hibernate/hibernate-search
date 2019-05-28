@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchQueryBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchScopeModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubCompositeListSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubEntitySearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubReferenceSearchProjection;
@@ -27,9 +27,9 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 
 class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQueryElementCollector> {
 	private final StubBackend backend;
-	private final StubSearchScopeModel scopeModel;
+	private final StubScopeModel scopeModel;
 
-	StubSearchQueryBuilderFactory(StubBackend backend, StubSearchScopeModel scopeModel) {
+	StubSearchQueryBuilderFactory(StubBackend backend, StubScopeModel scopeModel) {
 		this.backend = backend;
 		this.scopeModel = scopeModel;
 	}

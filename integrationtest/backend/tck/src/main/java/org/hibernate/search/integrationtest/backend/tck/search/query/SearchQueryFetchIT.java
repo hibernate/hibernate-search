@@ -29,7 +29,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -262,27 +262,27 @@ public class SearchQueryFetchIT {
 	}
 
 	private SearchQueryContext<?, DocumentReference, ?> matchAllQuery() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "integer" ).asc() );
 	}
 
 	private SearchQueryContext<?, DocumentReference, ?> matchFirstHalfQuery() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.range().onField( "integer" ).below( DOCUMENT_COUNT / 2 ).excludeLimit() )
 				.sort( c -> c.byField( "integer" ).asc() );
 	}
 
 	private SearchQueryContext<?, DocumentReference, ?> matchOneQuery(int id) {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.match().onField( "integer" ).matching( id ) );
 	}
 
 	private SearchQueryContext<?, DocumentReference, ?> matchNoneQuery() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.match().onField( "integer" ).matching( DOCUMENT_COUNT + 2 ) );
 	}
@@ -302,7 +302,7 @@ public class SearchQueryFetchIT {
 		indexManager.createWorkExecutor().flush().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

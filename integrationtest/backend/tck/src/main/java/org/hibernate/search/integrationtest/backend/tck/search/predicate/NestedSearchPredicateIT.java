@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -70,7 +70,7 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
@@ -111,7 +111,7 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels_onlySecondLevel() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -150,7 +150,7 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels_conditionOnFirstLevel() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
@@ -182,7 +182,7 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels_separatePredicates() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().nested().onObjectField( "nestedObject.nestedObject" )
 				.nest( f -> f.bool()
@@ -340,7 +340,7 @@ public class NestedSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

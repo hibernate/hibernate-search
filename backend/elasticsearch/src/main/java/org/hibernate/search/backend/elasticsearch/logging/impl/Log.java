@@ -21,7 +21,7 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -239,13 +239,13 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 2,
 			value = "A search query cannot have a scope spanning both an Elasticsearch index and another type of index."
 					+ " Base scope was: '%1$s', Elasticsearch index was: '%2$s'")
-	SearchException cannotMixElasticsearchSearchScopeWithOtherType(IndexSearchScopeBuilder baseScope,
+	SearchException cannotMixElasticsearchScopeWithOtherType(IndexScopeBuilder baseScope,
 			ElasticsearchIndexManager elasticsearchIndex, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 3,
 			value = "A search query cannot have a scope spanning multiple Elasticsearch backends."
 					+ " Base scope was: '%1$s', index from another backend was: '%2$s'")
-	SearchException cannotMixElasticsearchSearchScopeWithOtherBackend(IndexSearchScopeBuilder baseScope,
+	SearchException cannotMixElasticsearchScopeWithOtherBackend(IndexScopeBuilder baseScope,
 			ElasticsearchIndexManager indexFromOtherBackend, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 4,

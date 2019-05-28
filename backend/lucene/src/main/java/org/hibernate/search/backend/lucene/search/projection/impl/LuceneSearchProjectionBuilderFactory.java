@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
@@ -45,9 +45,9 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	private static final ProjectionBuilderFactoryRetrievalStrategy PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
 			new ProjectionBuilderFactoryRetrievalStrategy();
 
-	private final LuceneSearchScopeModel scopeModel;
+	private final LuceneScopeModel scopeModel;
 
-	public LuceneSearchProjectionBuilderFactory(LuceneSearchScopeModel scopeModel) {
+	public LuceneSearchProjectionBuilderFactory(LuceneScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
 	}
 

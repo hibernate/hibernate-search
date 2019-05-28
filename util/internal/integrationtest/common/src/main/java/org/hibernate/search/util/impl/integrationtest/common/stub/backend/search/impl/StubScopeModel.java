@@ -13,11 +13,11 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
-public class StubSearchScopeModel {
+public class StubScopeModel {
 	private final List<String> indexNames;
 	private final List<StubIndexSchemaNode> rootSchemaNodes;
 
-	public StubSearchScopeModel(List<String> indexNames, List<StubIndexSchemaNode> rootSchemaNodes) {
+	public StubScopeModel(List<String> indexNames, List<StubIndexSchemaNode> rootSchemaNodes) {
 		this.indexNames = indexNames;
 		this.rootSchemaNodes = rootSchemaNodes;
 	}

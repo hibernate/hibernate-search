@@ -11,19 +11,19 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchScopeModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
 public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQueryElementCollector> {
 
 	private final StubBackend backend;
-	private final StubSearchScopeModel scopeModel;
+	private final StubScopeModel scopeModel;
 	private final StubSearchWork.Builder workBuilder;
 	private final FromDocumentFieldValueConvertContext convertContext;
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final StubSearchProjection<H> rootProjection;
 
-	public StubSearchQueryBuilder(StubBackend backend, StubSearchScopeModel scopeModel,
+	public StubSearchQueryBuilder(StubBackend backend, StubScopeModel scopeModel,
 			StubSearchWork.ResultType resultType,
 			FromDocumentFieldValueConvertContext convertContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder, StubSearchProjection<H> rootProjection) {

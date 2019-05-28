@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
  * {@link SearchQueryResultDefinitionContext#asEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
  */
-public interface PojoSearchScopeDelegate<E, E2> {
+public interface PojoScopeDelegate<E, E2> {
 	Set<Class<? extends E>> getIncludedIndexedTypes();
 
 	PojoReference toPojoReference(DocumentReference documentReference);

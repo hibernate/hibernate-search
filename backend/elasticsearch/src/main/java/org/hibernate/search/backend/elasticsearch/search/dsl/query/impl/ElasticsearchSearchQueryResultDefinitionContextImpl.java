@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.query.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
-import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexSearchScope;
+import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -37,28 +37,28 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 		>
 		implements ElasticsearchSearchQueryResultDefinitionContext<R, E> {
 
-	private final ElasticsearchIndexSearchScope indexSearchScope;
+	private final ElasticsearchIndexScope indexScope;
 	private final SessionContextImplementor sessionContext;
 	private final LoadingContextBuilder<R, E> loadingContextBuilder;
 
-	public ElasticsearchSearchQueryResultDefinitionContextImpl(ElasticsearchIndexSearchScope indexSearchScope,
+	public ElasticsearchSearchQueryResultDefinitionContextImpl(ElasticsearchIndexScope indexScope,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
-		this.indexSearchScope = indexSearchScope;
+		this.indexScope = indexScope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
 	@Override
 	public ElasticsearchSearchQueryResultContext<E> asEntity() {
-		ElasticsearchSearchQueryBuilder<E> builder = indexSearchScope.getSearchQueryBuilderFactory()
+		ElasticsearchSearchQueryBuilder<E> builder = indexScope.getSearchQueryBuilderFactory()
 				.asEntity( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
 	public ElasticsearchSearchQueryResultContext<R> asReference() {
-		ElasticsearchSearchQueryBuilder<R> builder = indexSearchScope.getSearchQueryBuilderFactory()
+		ElasticsearchSearchQueryBuilder<R> builder = indexScope.getSearchQueryBuilderFactory()
 				.asReference( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
@@ -74,14 +74,14 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 
 	@Override
 	public <P> ElasticsearchSearchQueryResultContext<P> asProjection(SearchProjection<P> projection) {
-		ElasticsearchSearchQueryBuilder<P> builder = indexSearchScope.getSearchQueryBuilderFactory()
+		ElasticsearchSearchQueryBuilder<P> builder = indexScope.getSearchQueryBuilderFactory()
 				.asProjection( sessionContext, loadingContextBuilder, projection );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
 	public ElasticsearchSearchQueryResultContext<List<?>> asProjections(SearchProjection<?>... projections) {
-		ElasticsearchSearchQueryBuilder<List<?>> builder = indexSearchScope.getSearchQueryBuilderFactory()
+		ElasticsearchSearchQueryBuilder<List<?>> builder = indexScope.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, loadingContextBuilder, projections );
 		return createSearchQueryContext( builder );
 	}
@@ -98,8 +98,8 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 	}
 
 	@Override
-	protected ElasticsearchIndexSearchScope getIndexSearchScope() {
-		return indexSearchScope;
+	protected ElasticsearchIndexScope getIndexScope() {
+		return indexScope;
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 	}
 
 	private <H> ElasticsearchSearchQueryResultContext<H> createSearchQueryContext(ElasticsearchSearchQueryBuilder<H> builder) {
-		return new ElasticsearchSearchQueryContextImpl<>( indexSearchScope, builder );
+		return new ElasticsearchSearchQueryContextImpl<>( indexScope, builder );
 	}
 }
 

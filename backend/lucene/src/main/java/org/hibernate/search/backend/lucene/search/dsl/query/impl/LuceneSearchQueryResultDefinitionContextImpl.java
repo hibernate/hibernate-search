@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryCon
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultDefinitionContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
-import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexSearchScope;
+import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -37,28 +37,28 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 		>
 		implements LuceneSearchQueryResultDefinitionContext<R, E> {
 
-	private final LuceneIndexSearchScope indexSearchScope;
+	private final LuceneIndexScope indexScope;
 	private final SessionContextImplementor sessionContext;
 	private final LoadingContextBuilder<R, E> loadingContextBuilder;
 
-	public LuceneSearchQueryResultDefinitionContextImpl(LuceneIndexSearchScope indexSearchScope,
+	public LuceneSearchQueryResultDefinitionContextImpl(LuceneIndexScope indexScope,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
-		this.indexSearchScope = indexSearchScope;
+		this.indexScope = indexScope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
 	@Override
 	public LuceneSearchQueryResultContext<E> asEntity() {
-		LuceneSearchQueryBuilder<E> builder = indexSearchScope.getSearchQueryBuilderFactory()
+		LuceneSearchQueryBuilder<E> builder = indexScope.getSearchQueryBuilderFactory()
 				.asEntity( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
 	public LuceneSearchQueryResultContext<R> asReference() {
-		LuceneSearchQueryBuilder<R> builder = indexSearchScope.getSearchQueryBuilderFactory()
+		LuceneSearchQueryBuilder<R> builder = indexScope.getSearchQueryBuilderFactory()
 				.asReference( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
@@ -74,14 +74,14 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 
 	@Override
 	public <P> LuceneSearchQueryResultContext<P> asProjection(SearchProjection<P> projection) {
-		LuceneSearchQueryBuilder<P> builder = indexSearchScope.getSearchQueryBuilderFactory()
+		LuceneSearchQueryBuilder<P> builder = indexScope.getSearchQueryBuilderFactory()
 				.asProjection( sessionContext, loadingContextBuilder, projection );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
 	public LuceneSearchQueryResultContext<List<?>> asProjections(SearchProjection<?>... projections) {
-		LuceneSearchQueryBuilder<List<?>> builder = indexSearchScope.getSearchQueryBuilderFactory()
+		LuceneSearchQueryBuilder<List<?>> builder = indexScope.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, loadingContextBuilder, projections );
 		return createSearchQueryContext( builder );
 	}
@@ -98,8 +98,8 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 	}
 
 	@Override
-	protected LuceneIndexSearchScope getIndexSearchScope() {
-		return indexSearchScope;
+	protected LuceneIndexScope getIndexScope() {
+		return indexScope;
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 	}
 
 	private <H> LuceneSearchQueryResultContext<H> createSearchQueryContext(LuceneSearchQueryBuilder<H> builder) {
-		return new LuceneSearchQueryContextImpl<>( indexSearchScope, builder );
+		return new LuceneSearchQueryContextImpl<>( indexScope, builder );
 	}
 }
 

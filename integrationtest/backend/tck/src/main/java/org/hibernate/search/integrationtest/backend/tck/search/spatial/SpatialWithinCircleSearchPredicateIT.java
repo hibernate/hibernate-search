@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -34,7 +34,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void within_circle() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.spatial().within()
@@ -89,7 +89,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void within_unsearchable_circle() {
-		StubMappingSearchScope scope = unsearchableFieldsIndexManager.createSearchScope();
+		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 
 		SubTest.expectException( () ->
 				scope.predicate().spatial().within().onField( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 )
@@ -102,7 +102,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void unsupported_field_types() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException(
 				"spatial().within().circle() predicate on field with unsupported type",
@@ -120,7 +120,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void fieldLevelBoost() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -163,7 +163,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void predicateLevelBoost() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -208,7 +208,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void predicateLevelBoost_andFieldLevelBoost() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -253,7 +253,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void predicateLevelBoost_multiFields() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -298,7 +298,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void multi_fields() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		// onField(...).orField(...)
 
@@ -379,7 +379,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void circle_error_null() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException(
 				"spatial().within().circle() predicate with null center",
@@ -402,7 +402,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void unknown_field() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException(
 				"spatial().within().circle() predicate on unknown field",
@@ -417,7 +417,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void multiIndex_withCompatibleIndexManager() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( compatibleIndexManager );
+		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
@@ -428,7 +428,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void multiIndex_incompatibleSearchable() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( unsearchableFieldsIndexManager );
+		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
 
 		SubTest.expectException( () -> scope.predicate().spatial().within().onField( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
 				.assertThrown()

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 /**
@@ -42,14 +42,14 @@ public interface SearchQueryContextExtension<T, R, E> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link SearchQueryResultContext}.
-	 * @param indexSearchScope An {@link IndexSearchScope}.
+	 * @param indexScope An {@link IndexScope}.
 	 * @param sessionContext A {@link SessionContextImplementor}.
 	 * @param loadingContextBuilder A {@link LoadingContextBuilder}.
 	 * @return An optional containing the extended search query context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
 	Optional<T> extendOptional(SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
-			IndexSearchScope<?> indexSearchScope,
+			IndexScope<?> indexScope,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder);
 

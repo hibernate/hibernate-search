@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -38,25 +38,25 @@ public abstract class AbstractSearchQueryContext<
 		>
 		implements SearchQueryResultContext<S, H, PDC>, SearchQueryContext<S, H, SC> {
 
-	private final IndexSearchScope<C> indexSearchScope;
+	private final IndexScope<C> indexScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;
 
-	public AbstractSearchQueryContext(IndexSearchScope<C> indexSearchScope,
+	public AbstractSearchQueryContext(IndexScope<C> indexScope,
 			SearchQueryBuilder<H, C> searchQueryBuilder) {
-		this.indexSearchScope = indexSearchScope;
+		this.indexScope = indexScope;
 		this.searchQueryBuilder = searchQueryBuilder;
 	}
 
 	@Override
 	public S predicate(SearchPredicate predicate) {
-		SearchPredicateBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchPredicateBuilderFactory();
+		SearchPredicateBuilderFactory<? super C, ?> factory = indexScope.getSearchPredicateBuilderFactory();
 		contribute( factory, predicate );
 		return thisAsS();
 	}
 
 	@Override
 	public S predicate(Function<? super PDC, SearchPredicateTerminalContext> predicateContributor) {
-		SearchPredicateBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchPredicateBuilderFactory();
+		SearchPredicateBuilderFactory<? super C, ?> factory = indexScope.getSearchPredicateBuilderFactory();
 		SearchPredicateFactoryContext factoryContext = new DefaultSearchPredicateFactoryContext<>( factory );
 		SearchPredicate predicate = predicateContributor.apply( extendPredicateContext( factoryContext ) ).toPredicate();
 		contribute( factory, predicate );
@@ -77,14 +77,14 @@ public abstract class AbstractSearchQueryContext<
 
 	@Override
 	public S sort(SearchSort sort) {
-		SearchSortBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchSortBuilderFactory();
+		SearchSortBuilderFactory<? super C, ?> factory = indexScope.getSearchSortBuilderFactory();
 		contribute( factory, sort );
 		return thisAsS();
 	}
 
 	@Override
 	public S sort(Consumer<? super SC> sortContributor) {
-		SearchSortBuilderFactory<? super C, ?> factory = indexSearchScope.getSearchSortBuilderFactory();
+		SearchSortBuilderFactory<? super C, ?> factory = indexScope.getSearchSortBuilderFactory();
 		contribute( factory, sortContributor );
 		return thisAsS();
 	}

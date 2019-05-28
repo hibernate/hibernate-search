@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -39,10 +39,10 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 			new SortBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchContext searchContext;
-	private final LuceneSearchScopeModel scopeModel;
+	private final LuceneScopeModel scopeModel;
 
 	public LuceneSearchSortBuilderFactoryImpl(LuceneSearchContext searchContext,
-			LuceneSearchScopeModel scopeModel) {
+			LuceneScopeModel scopeModel) {
 		this.searchContext = searchContext;
 		this.scopeModel = scopeModel;
 	}

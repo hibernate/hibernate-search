@@ -37,7 +37,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -103,7 +103,7 @@ public class ExistsSearchPredicateIT {
 
 	@Test
 	public void exists() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
@@ -123,7 +123,7 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void exists_withDocValues() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDocValuesModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
@@ -143,7 +143,7 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void missing() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
@@ -159,7 +159,7 @@ public class ExistsSearchPredicateIT {
 
 	@Test
 	public void predicateLevelBoost() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -186,7 +186,7 @@ public class ExistsSearchPredicateIT {
 
 	@Test
 	public void inFlattenedObject() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
 			String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
@@ -206,7 +206,7 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void inFlattenedObject_withDocValues() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldWithDocValuesModels ) {
 			String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
@@ -225,7 +225,7 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void inNestedObject() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
@@ -240,7 +240,7 @@ public class ExistsSearchPredicateIT {
 
 	@Test
 	public void inNestedPredicate() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
@@ -261,7 +261,7 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void inNestedPredicate_withDocValues() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldWithDocValuesModels ) {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
@@ -282,7 +282,7 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void inNestedPredicate_missing() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
@@ -300,7 +300,7 @@ public class ExistsSearchPredicateIT {
 
 	@Test
 	public void unknownField() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException(
 				"exists() predicate with unknown field",
@@ -314,7 +314,7 @@ public class ExistsSearchPredicateIT {
 
 	@Test
 	public void multiIndex_withCompatibleIndexManager() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( compatibleIndexManager );
+		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
@@ -335,7 +335,7 @@ public class ExistsSearchPredicateIT {
 
 	@Test
 	public void multiIndex_withRawFieldCompatibleIndexManager() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
+		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
@@ -363,7 +363,7 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void multiIndex_withIncompatibleIndexManager() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
+		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -449,15 +449,15 @@ public class ExistsSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
+		SearchQuery<DocumentReference> query = indexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-		query = compatibleIndexManager.createSearchScope().query()
+		query = compatibleIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
-		query = rawFieldCompatibleIndexManager.createSearchScope().query()
+		query = rawFieldCompatibleIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );

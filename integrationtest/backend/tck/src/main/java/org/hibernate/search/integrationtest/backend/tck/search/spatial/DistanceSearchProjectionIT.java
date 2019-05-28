@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Rule;
@@ -29,7 +29,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
@@ -51,7 +51,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_unit() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
@@ -74,7 +74,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_several() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
@@ -109,7 +109,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_distanceSort() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
 
@@ -137,7 +137,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_longCalculatedField() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
@@ -166,7 +166,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		thrown.expectMessage( "Distance related operations are not supported" );
 		thrown.expectMessage( "string" );
 
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		scope.projection()
 				.distance( "string", GeoPoint.of( 43.749828, 1.854172 ) )
 				.toProjection();
@@ -178,7 +178,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		thrown.expectMessage( "center" );
 		thrown.expectMessage( "must not be null" );
 
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		scope.projection()
 				.distance( "geoPoint", null )
 				.toProjection();
@@ -190,7 +190,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		thrown.expectMessage( "unit" );
 		thrown.expectMessage( "must not be null" );
 
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		scope.projection()
 				.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ).unit( null )
 				.toProjection();
@@ -198,7 +198,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_nonProjectable() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException( () -> {
 			scope.projection().field( "nonProjectableGeoPoint", GeoPoint.class ).toProjection();
@@ -217,7 +217,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceSort_unsortable() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException( () -> {
 			scope.sort().byDistance( "unsortableGeoPoint", GeoPoint.of( 43d, 4d ) );

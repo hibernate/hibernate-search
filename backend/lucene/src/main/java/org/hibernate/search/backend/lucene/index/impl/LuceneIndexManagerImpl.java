@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrc
 import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
-import org.hibernate.search.engine.backend.scope.spi.IndexSearchScopeBuilder;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
@@ -103,19 +103,19 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexSearchScopeBuilder createSearchScopeBuilder(MappingContextImplementor mappingContext) {
-		return new LuceneIndexSearchScopeBuilder( searchBackendContext, mappingContext, this );
+	public IndexScopeBuilder createScopeBuilder(MappingContextImplementor mappingContext) {
+		return new LuceneIndexScopeBuilder( searchBackendContext, mappingContext, this );
 	}
 
 	@Override
-	public void addTo(IndexSearchScopeBuilder builder) {
-		if ( ! ( builder instanceof LuceneIndexSearchScopeBuilder ) ) {
-			throw log.cannotMixLuceneSearchScopeWithOtherType(
+	public void addTo(IndexScopeBuilder builder) {
+		if ( ! ( builder instanceof LuceneIndexScopeBuilder ) ) {
+			throw log.cannotMixLuceneScopeWithOtherType(
 					builder, this, searchBackendContext.getEventContext()
 			);
 		}
 
-		LuceneIndexSearchScopeBuilder luceneBuilder = (LuceneIndexSearchScopeBuilder) builder;
+		LuceneIndexScopeBuilder luceneBuilder = (LuceneIndexScopeBuilder) builder;
 		luceneBuilder.add( searchBackendContext, this );
 	}
 

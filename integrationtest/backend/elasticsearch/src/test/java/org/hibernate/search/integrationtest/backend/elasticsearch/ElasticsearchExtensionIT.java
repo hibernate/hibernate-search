@@ -30,7 +30,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -105,7 +105,7 @@ public class ElasticsearchExtensionIT {
 	@Test
 	@SuppressWarnings("unused")
 	public void queryContext() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
 		ElasticsearchSearchQueryResultDefinitionContext<DocumentReference, DocumentReference> context1 =
@@ -149,7 +149,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void query() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> genericQuery = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -178,7 +178,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void query_explain_singleIndex() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
@@ -197,7 +197,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void query_explain_singleIndex_invalidId() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
@@ -222,7 +222,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void query_explain_multipleIndexes() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+		StubMappingScope scope = indexManager.createScope( otherIndexManager );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
@@ -241,7 +241,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void query_explain_multipleIndexes_missingIndexName() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+		StubMappingScope scope = indexManager.createScope( otherIndexManager );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
@@ -263,7 +263,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void query_explain_multipleIndexes_invalidIndexName() {
-		StubMappingSearchScope scope = indexManager.createSearchScope( otherIndexManager );
+		StubMappingScope scope = indexManager.createScope( otherIndexManager );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
@@ -284,7 +284,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void predicate_fromJson() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
@@ -318,7 +318,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void predicate_fromJson_separatePredicate() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().extension( ElasticsearchExtension.get() )
 				.fromJson( "{'match': {'string': 'text 1'}}" ).toPredicate();
@@ -357,7 +357,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void sort_fromJson() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -399,7 +399,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void sort_fromJson_separateSort() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchSort sort1Asc = scope.sort().extension( ElasticsearchExtension.get() )
 				.fromJson( "{'sort1': 'asc'}" )
@@ -447,7 +447,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void projection_document() throws JSONException {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<String> query = scope.query()
 				.asProjection(
@@ -477,7 +477,7 @@ public class ElasticsearchExtensionIT {
 	 */
 	@Test
 	public void projection_documentAndField() throws JSONException {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
@@ -508,7 +508,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void projection_explanation() {
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<String> query = scope.query()
 				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation() )
@@ -635,7 +635,7 @@ public class ElasticsearchExtensionIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchScope scope = indexManager.createSearchScope();
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();

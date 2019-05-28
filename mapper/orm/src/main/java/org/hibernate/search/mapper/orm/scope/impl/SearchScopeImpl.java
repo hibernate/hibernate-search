@@ -17,14 +17,14 @@ import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmL
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoSearchScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.mapper.orm.search.SearchScope<E> {
 
-	private final PojoSearchScopeDelegate<E, E> delegate;
+	private final PojoScopeDelegate<E, E> delegate;
 	private final SessionImplementor sessionImplementor;
 
-	public SearchScopeImpl(PojoSearchScopeDelegate<E, E> delegate,
+	public SearchScopeImpl(PojoScopeDelegate<E, E> delegate,
 			SessionImplementor sessionImplementor) {
 		this.delegate = delegate;
 		this.sessionImplementor = sessionImplementor;
