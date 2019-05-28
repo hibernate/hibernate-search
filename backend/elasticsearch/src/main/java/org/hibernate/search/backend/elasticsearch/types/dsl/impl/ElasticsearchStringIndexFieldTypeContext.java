@@ -140,7 +140,7 @@ class ElasticsearchStringIndexFieldTypeContext
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,
-				new ElasticsearchTextFieldPredicateBuilderFactory( dslToIndexConverter, createToDocumentRawConverter(), codec, mapping ),
+				new ElasticsearchTextFieldPredicateBuilderFactory( resolvedSearchable, dslToIndexConverter, createToDocumentRawConverter(), codec, mapping ),
 				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
 				mapping

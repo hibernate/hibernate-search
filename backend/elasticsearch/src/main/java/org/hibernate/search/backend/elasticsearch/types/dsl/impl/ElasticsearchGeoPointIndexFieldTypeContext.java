@@ -35,7 +35,7 @@ class ElasticsearchGeoPointIndexFieldTypeContext
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,
-				ElasticsearchGeoPointFieldPredicateBuilderFactory.INSTANCE,
+				new ElasticsearchGeoPointFieldPredicateBuilderFactory( resolvedSearchable ),
 				new ElasticsearchGeoPointFieldSortBuilderFactory( resolvedSortable ),
 				new ElasticsearchGeoPointFieldProjectionBuilderFactory( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
 				mapping

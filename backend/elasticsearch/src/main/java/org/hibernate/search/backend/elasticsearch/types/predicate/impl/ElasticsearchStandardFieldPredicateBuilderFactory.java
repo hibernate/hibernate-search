@@ -23,9 +23,12 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 
 	protected final ElasticsearchFieldCodec<F> codec;
 
-	public ElasticsearchStandardFieldPredicateBuilderFactory(
+	private final boolean searchable;
+
+	public ElasticsearchStandardFieldPredicateBuilderFactory(boolean searchable,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			ElasticsearchFieldCodec<F> codec) {
+		this.searchable = searchable;
 		this.converter = converter;
 		this.rawConverter = rawConverter;
 		this.codec = codec;
@@ -38,7 +41,7 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 		}
 		ElasticsearchStandardFieldPredicateBuilderFactory<?> castedOther =
 				(ElasticsearchStandardFieldPredicateBuilderFactory<?>) other;
-		return codec.isCompatibleWith( castedOther.codec );
+		return searchable == castedOther.searchable && codec.isCompatibleWith( castedOther.codec );
 	}
 
 	@Override

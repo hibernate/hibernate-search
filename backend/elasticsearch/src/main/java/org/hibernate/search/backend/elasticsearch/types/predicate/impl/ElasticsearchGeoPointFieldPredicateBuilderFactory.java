@@ -24,18 +24,24 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 		extends AbstractElasticsearchFieldPredicateBuilderFactory {
 
-	public static final ElasticsearchGeoPointFieldPredicateBuilderFactory INSTANCE = new ElasticsearchGeoPointFieldPredicateBuilderFactory();
-
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ElasticsearchGeoPointFieldCodec CODEC = ElasticsearchGeoPointFieldCodec.INSTANCE;
 
-	private ElasticsearchGeoPointFieldPredicateBuilderFactory() {
+	private final boolean searchable;
+
+	public ElasticsearchGeoPointFieldPredicateBuilderFactory(boolean searchable) {
+		this.searchable = searchable;
 	}
 
 	@Override
 	public boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other) {
-		return getClass().equals( other.getClass() );
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		ElasticsearchGeoPointFieldPredicateBuilderFactory castedOther =
+				(ElasticsearchGeoPointFieldPredicateBuilderFactory) other;
+		return searchable == castedOther.searchable;
 	}
 
 	@Override
