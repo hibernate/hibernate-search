@@ -32,7 +32,6 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -189,7 +188,6 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	@Ignore // TODO HSEARCH-3047 enable this test when we add support for the Double type
 	public void optionalDouble_nonEmpty() {
 		doTest(
 				testModelProvider.optionalDouble(),
@@ -200,7 +198,6 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	@Ignore // TODO HSEARCH-3047 enable this test when we add support for the Double type
 	public void optionalDouble_empty() {
 		doTestExpectMissing(
 				testModelProvider.optionalDouble(),
