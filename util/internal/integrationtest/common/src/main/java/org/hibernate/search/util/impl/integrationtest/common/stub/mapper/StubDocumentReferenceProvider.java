@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
-import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
+import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 
 class StubDocumentReferenceProvider implements DocumentReferenceProvider {
 

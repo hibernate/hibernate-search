@@ -9,9 +9,9 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
-import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
+import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;

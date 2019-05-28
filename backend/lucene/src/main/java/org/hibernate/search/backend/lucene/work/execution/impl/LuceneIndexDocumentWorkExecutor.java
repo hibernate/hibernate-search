@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.index.impl;
+package org.hibernate.search.backend.lucene.work.execution.impl;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -15,12 +15,12 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrc
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
-import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
+import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
-class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> {
+public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> {
 
 	private final LuceneWorkFactory factory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -29,7 +29,7 @@ class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<Lucen
 	private final String tenantId;
 	private final DocumentCommitStrategy commitStrategy;
 
-	LuceneIndexDocumentWorkExecutor(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
+	public LuceneIndexDocumentWorkExecutor(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			LuceneWriteWorkOrchestrator orchestrator,
 			String indexName, SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy) {
