@@ -76,11 +76,6 @@ public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescript
 			}
 
 			@Override
-			public boolean isNullTranslatedAsNull() {
-				return false;
-			}
-
-			@Override
 			public List<Integer> getDocumentFieldValues() {
 				return getEntityPropertyValues();
 			}

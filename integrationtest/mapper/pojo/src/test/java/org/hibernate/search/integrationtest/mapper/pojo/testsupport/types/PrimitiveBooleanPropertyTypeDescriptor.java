@@ -46,11 +46,6 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 			}
 
 			@Override
-			public boolean isNullTranslatedAsNull() {
-				return false;
-			}
-
-			@Override
 			public List<Boolean> getDocumentFieldValues() {
 				return getEntityPropertyValues();
 			}

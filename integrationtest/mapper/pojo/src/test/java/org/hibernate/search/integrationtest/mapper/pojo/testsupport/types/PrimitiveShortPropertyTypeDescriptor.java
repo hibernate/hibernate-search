@@ -76,11 +76,6 @@ public class PrimitiveShortPropertyTypeDescriptor extends PropertyTypeDescriptor
 			}
 
 			@Override
-			public boolean isNullTranslatedAsNull() {
-				return false;
-			}
-
-			@Override
 			public List<Short> getDocumentFieldValues() {
 				return getEntityPropertyValues();
 			}

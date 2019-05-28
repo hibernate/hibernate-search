@@ -46,11 +46,6 @@ public class PrimitiveDoublePropertyTypeDescriptor extends PropertyTypeDescripto
 			}
 
 			@Override
-			public boolean isNullTranslatedAsNull() {
-				return false;
-			}
-
-			@Override
 			public List<Double> getDocumentFieldValues() {
 				return getEntityPropertyValues();
 			}

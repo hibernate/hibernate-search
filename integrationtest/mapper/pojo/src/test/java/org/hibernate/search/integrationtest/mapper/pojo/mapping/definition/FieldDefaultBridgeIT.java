@@ -66,6 +66,7 @@ public class FieldDefaultBridgeIT<V, F> {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
 
+	private PropertyTypeDescriptor<V> typeDescriptor;
 	private DefaultValueBridgeExpectations<V, F> expectations;
 	private JavaBeanMapping mapping;
 	private StubIndexSchemaNode index1FieldSchemaNode;
@@ -75,6 +76,7 @@ public class FieldDefaultBridgeIT<V, F> {
 		Assume.assumeTrue(
 				"Type " + typeDescriptor + " does not have a default value bridge", expectations.isPresent()
 		);
+		this.typeDescriptor = typeDescriptor;
 		this.expectations = expectations.get();
 	}
 
@@ -86,7 +88,7 @@ public class FieldDefaultBridgeIT<V, F> {
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME, b -> {
 					b.field( FIELD_NAME, expectations.getIndexFieldJavaType() );
 
-					if ( expectations.isNullTranslatedAsNull() ) {
+					if ( typeDescriptor.isNullable() ) {
 						b.field( FIELD_INDEXNULLAS_NAME, expectations.getIndexFieldJavaType(), f -> f.indexNullAs( expectations.getNullAsValueBridge1() ) );
 					}
 				}, schemaCapture1
@@ -95,7 +97,7 @@ public class FieldDefaultBridgeIT<V, F> {
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME, b -> {
 					b.field( FIELD_NAME, expectations.getIndexFieldJavaType() );
 
-					if ( expectations.isNullTranslatedAsNull() ) {
+					if ( typeDescriptor.isNullable() ) {
 						b.field( FIELD_INDEXNULLAS_NAME, expectations.getIndexFieldJavaType(), f -> f.indexNullAs( expectations.getNullAsValueBridge2() ) );
 					}
 				}, schemaCapture2
@@ -125,7 +127,7 @@ public class FieldDefaultBridgeIT<V, F> {
 				expectationSetter.add( String.valueOf( id ), b -> {
 					b.field( FIELD_NAME, expectedFieldValue );
 
-					if ( expectations.isNullTranslatedAsNull() ) {
+					if ( typeDescriptor.isNullable() ) {
 						// Stub backend is not supposed to use 'indexNullAs' option
 						b.field( FIELD_INDEXNULLAS_NAME, null );
 					}
@@ -258,7 +260,7 @@ public class FieldDefaultBridgeIT<V, F> {
 
 	private List<V> getPropertyValues() {
 		List<V> propertyValues = new ArrayList<>( expectations.getEntityPropertyValues() );
-		if ( expectations.isNullTranslatedAsNull() ) {
+		if ( typeDescriptor.isNullable() ) {
 			propertyValues.add( null );
 		}
 		return propertyValues;
@@ -266,7 +268,7 @@ public class FieldDefaultBridgeIT<V, F> {
 
 	private List<F> getDocumentFieldValues() {
 		List<F> documentFieldValues = new ArrayList<>( expectations.getDocumentFieldValues() );
-		if ( expectations.isNullTranslatedAsNull() ) {
+		if ( typeDescriptor.isNullable() ) {
 			documentFieldValues.add( null );
 		}
 		return documentFieldValues;

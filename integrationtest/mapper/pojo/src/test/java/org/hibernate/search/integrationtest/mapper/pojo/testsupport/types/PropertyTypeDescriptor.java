@@ -76,6 +76,10 @@ public abstract class PropertyTypeDescriptor<V> {
 		return javaType;
 	}
 
+	public boolean isNullable() {
+		return !javaType.isPrimitive();
+	}
+
 	public abstract Optional<DefaultIdentifierBridgeExpectations<V>> getDefaultIdentifierBridgeExpectations();
 
 	public abstract Optional<DefaultValueBridgeExpectations<V, ?>> getDefaultValueBridgeExpectations();

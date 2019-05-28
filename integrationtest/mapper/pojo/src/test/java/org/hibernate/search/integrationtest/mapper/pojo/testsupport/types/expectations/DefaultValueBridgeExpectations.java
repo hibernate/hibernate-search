@@ -20,10 +20,6 @@ public interface DefaultValueBridgeExpectations<V, F> {
 
 	List<V> getEntityPropertyValues();
 
-	default boolean isNullTranslatedAsNull() {
-		return true;
-	}
-
 	List<F> getDocumentFieldValues();
 
 	Class<?> getTypeWithValueBridge1();

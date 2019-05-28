@@ -32,8 +32,7 @@ public class IndexNullAsErrorIT<V, F> {
 		return PropertyTypeDescriptor.getAll().stream()
 				// do not test types that do not have a default value bridge
 				.filter( type -> type.getDefaultValueBridgeExpectations().isPresent() )
-				// TODO do not test primitive types
-				.filter( type -> type.getDefaultValueBridgeExpectations().get().isNullTranslatedAsNull() )
+				.filter( type -> type.isNullable() )
 				.map( type -> new Object[] { type, type.getDefaultValueBridgeExpectations() } )
 				.toArray();
 	}
