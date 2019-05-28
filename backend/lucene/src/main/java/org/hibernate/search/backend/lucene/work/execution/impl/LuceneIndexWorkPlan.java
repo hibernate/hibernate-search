@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.index.impl;
+package org.hibernate.search.backend.lucene.work.execution.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,9 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
-import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
+import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -27,7 +27,7 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 /**
  * @author Guillaume Smet
  */
-class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
+public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 
 	private final LuceneWorkFactory factory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -39,7 +39,7 @@ class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 
 	private final List<LuceneWriteWork<?>> works = new ArrayList<>();
 
-	LuceneIndexWorkPlan(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
+	public LuceneIndexWorkPlan(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			LuceneWriteWorkOrchestrator orchestrator,
 			String indexName, SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
