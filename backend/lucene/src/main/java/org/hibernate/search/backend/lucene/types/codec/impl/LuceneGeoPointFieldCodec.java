@@ -95,8 +95,8 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 
 		LuceneGeoPointFieldCodec other = (LuceneGeoPointFieldCodec) obj;
 
-		return ( projectable == other.projectable ) &&
-				( sortable == other.sortable );
+		return ( projectable == other.projectable ) && ( searchable == other.searchable )
+				&& ( sortable == other.sortable );
 	}
 
 	private String getLatitudeAbsoluteFieldPath(String absoluteFieldPath) {

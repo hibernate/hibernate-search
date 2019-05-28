@@ -81,7 +81,8 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 
 		AbstractLuceneNumericFieldCodec<?, ?> other = (AbstractLuceneNumericFieldCodec<?, ?>) obj;
 
-		return projectable == other.projectable && sortable == other.sortable;
+		return ( projectable == other.projectable ) && ( searchable == other.searchable )
+				&& ( sortable == other.sortable );
 	}
 
 	public abstract LuceneNumericDomain<E> getDomain();
