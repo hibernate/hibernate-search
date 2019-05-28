@@ -421,6 +421,7 @@
     </constraint>
 
     <constraint id="my-rules:TypeNamesShouldBeUniqueInInterdependentModules">
+        <requiresConcept refId="java:Deprecated" />
         <requiresConcept refId="my-rules:TypeMetadata" />
         <requiresConcept refId="my-rules:HibernateSearch" />
         <requiresConcept refId="my-rules:Api" />
@@ -430,6 +431,7 @@
             The simple (non-qualified) name of public Hibernate Search types should be unique.
             Exceptions are only allowed when the two types sharing an identical name:
             - are located in two modules that do not depend on each other
+            - or are deprecated (at least one of them)
             - or are both nested types.
         </description>
         <cypher><![CDATA[
@@ -440,6 +442,7 @@
                 type1 <> type2
                 AND type1.nameWithoutContainingTypeName = type2.nameWithoutContainingTypeName
                 AND NOT (type1.name =~ ".*\\$.*" AND type2.name =~ ".*\\$.*")
+                AND NOT (type1:Deprecated OR type2:Deprecated)
             RETURN
                 type1, type2
         ]]></cypher>
