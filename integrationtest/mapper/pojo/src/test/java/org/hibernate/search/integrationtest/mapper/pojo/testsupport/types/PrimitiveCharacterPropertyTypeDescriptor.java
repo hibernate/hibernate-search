@@ -46,11 +46,6 @@ public class PrimitiveCharacterPropertyTypeDescriptor extends PropertyTypeDescri
 			}
 
 			@Override
-			public boolean isNullTranslatedAsNull() {
-				return false;
-			}
-
-			@Override
 			public List<String> getDocumentFieldValues() {
 				return Arrays.asList( Character.toString( Character.MIN_VALUE ), "7", "A", "a", "f", Character.toString( Character.MAX_VALUE ) );
 			}

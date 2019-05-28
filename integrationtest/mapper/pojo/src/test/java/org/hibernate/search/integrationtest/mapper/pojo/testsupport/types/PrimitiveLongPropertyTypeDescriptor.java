@@ -76,11 +76,6 @@ public class PrimitiveLongPropertyTypeDescriptor extends PropertyTypeDescriptor<
 			}
 
 			@Override
-			public boolean isNullTranslatedAsNull() {
-				return false;
-			}
-
-			@Override
 			public List<Long> getDocumentFieldValues() {
 				return getEntityPropertyValues();
 			}
