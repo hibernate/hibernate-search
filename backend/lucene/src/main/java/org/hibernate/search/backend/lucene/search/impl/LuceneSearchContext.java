@@ -60,8 +60,8 @@ public final class LuceneSearchContext {
 		return scopeModel.getIndexNames();
 	}
 
-	public Set<ReaderProvider> getReaderProviders() {
-		return scopeModel.getReaderProviders();
+	public Set<? extends ReaderProvider> getReaderProviders() {
+		return scopeModel.getIndexManagerContexts();
 	}
 
 	public Query decorateLuceneQuery(Query originalLuceneQuery, String tenantId) {

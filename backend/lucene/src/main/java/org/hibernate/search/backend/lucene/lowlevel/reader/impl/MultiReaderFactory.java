@@ -30,7 +30,7 @@ public final class MultiReaderFactory {
 		//not allowed
 	}
 
-	public static IndexReader openReader(Set<String> indexNames, Set<ReaderProvider> readerProviders) {
+	public static IndexReader openReader(Set<String> indexNames, Set<? extends ReaderProvider> readerProviders) {
 		if ( readerProviders.isEmpty() ) {
 			return null;
 		}

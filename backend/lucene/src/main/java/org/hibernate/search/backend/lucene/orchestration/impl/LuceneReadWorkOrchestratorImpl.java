@@ -35,7 +35,7 @@ public class LuceneReadWorkOrchestratorImpl
 	}
 
 	@Override
-	public <T> T submit(Set<String> indexNames, Set<ReaderProvider> readerProviders, LuceneReadWork<T> work) {
+	public <T> T submit(Set<String> indexNames, Set<? extends ReaderProvider> readerProviders, LuceneReadWork<T> work) {
 		ReadTask<T> task = new ReadTask<>( indexNames, readerProviders, work );
 		Throwable throwable = null;
 		try {
@@ -77,7 +77,7 @@ public class LuceneReadWorkOrchestratorImpl
 
 		private T result;
 
-		ReadTask(Set<String> indexNames, Set<ReaderProvider> readerProviders, LuceneReadWork<T> work) {
+		ReadTask(Set<String> indexNames, Set<? extends ReaderProvider> readerProviders, LuceneReadWork<T> work) {
 			this.indexNames = indexNames;
 			this.indexReader = MultiReaderFactory.openReader( indexNames, readerProviders );
 			this.work = work;

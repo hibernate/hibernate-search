@@ -11,9 +11,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
@@ -54,11 +54,9 @@ class LuceneIndexScopeBuilder implements IndexScopeBuilder {
 		Set<LuceneIndexModel> indexModels = indexManagers.stream().map( LuceneIndexManagerImpl::getModel )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
-		// TODO HSEARCH-3117 obviously, this will have to be changed once we have the full storage complexity from Search 5
-		Set<ReaderProvider> readerProviders = indexManagers.stream().map( LuceneIndexManagerImpl::getReaderProvider )
-				.collect( Collectors.toCollection( LinkedHashSet::new ) );
+		Set<LuceneScopeIndexManagerContext> indexManagerContexts = new LinkedHashSet<>( indexManagers );
 
-		LuceneScopeModel model = new LuceneScopeModel( indexModels, readerProviders );
+		LuceneScopeModel model = new LuceneScopeModel( indexModels, indexManagerContexts );
 
 		return new LuceneIndexScope( backendContext, mappingContext, model );
 	}

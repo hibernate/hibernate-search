@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -28,14 +27,15 @@ public class LuceneScopeModel {
 
 	private final Set<LuceneIndexModel> indexModels;
 	private final Set<String> indexNames;
-	private final Set<ReaderProvider> readerProviders;
+	private final Set<LuceneScopeIndexManagerContext> indexManagerContexts;
 
-	public LuceneScopeModel(Set<LuceneIndexModel> indexModels, Set<ReaderProvider> readerProviders) {
+	public LuceneScopeModel(Set<LuceneIndexModel> indexModels,
+			Set<LuceneScopeIndexManagerContext> indexManagerContexts) {
 		this.indexModels = indexModels;
 		this.indexNames = indexModels.stream()
 				.map( LuceneIndexModel::getIndexName )
 				.collect( Collectors.toSet() );
-		this.readerProviders = readerProviders;
+		this.indexManagerContexts = indexManagerContexts;
 	}
 
 	public Set<String> getIndexNames() {
@@ -46,8 +46,8 @@ public class LuceneScopeModel {
 		return EventContexts.fromIndexNames( indexNames );
 	}
 
-	public Set<ReaderProvider> getReaderProviders() {
-		return readerProviders;
+	public Set<LuceneScopeIndexManagerContext> getIndexManagerContexts() {
+		return indexManagerContexts;
 	}
 
 	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
