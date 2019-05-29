@@ -151,43 +151,6 @@ and <<mapper-orm-directfieldmapping-custom-types>> for indications on how to han
 be it simply containers (`List<String>`, `Map<String, Integer>`, ...)
 or custom types.
 
-Each field annotation has its own attributes, but the following ones are common to most annotations:
-
-`name`::
-The name of the index field. By default, it is the same as the property name.
-You may want to change it in particular when mapping a single property to multiple fields.
-+
-Value: `String`. Defaults to the name of the property.
-[[mapper-orm-directfieldmapping-sortable]] `sortable`::
-Whether the field can be <<mapper-orm-query-sort, sorted on>>,
-i.e. whether a specific data structure is added to the index to allow efficient sorts when querying.
-+
-Value: `Sortable.YES`, `Sortable.NO`, `Sortable.DEFAULT`.
-+
-[IMPORTANT]
-====
-This option is not available for `@FullTextField`.
-See <<mapper-orm-directfieldmapping-annotations-fulltextfield,here>> for an explanation and some solutions.
-====
-[[mapper-orm-directfieldmapping-projectable]] `projectable`::
-Whether the field can be <<mapper-orm-query-projection, projected on>>,
-i.e. whether the field value is stored in the index to allow later retrieval when querying.
-+
-Value: `Projectable.YES`, `Projectable.NO`, `Projectable.DEFAULT`.
-`searchable`::
-Whenever the field can be searched on.
-i.e. whether the field is indexed. So the document will be searchable using this field, using it in the query predicates.
-+
-Value: `Searchable.YES`, `Searchable.NO`, `Searchable.DEFAULT`.
-[[mapper-orm-directfieldmapping-indexnullas]] `indexNullAs`::
-Disabled by default. When set, it defines the value to use as a replacement anytime the property value is null.
-+
-[IMPORTANT]
-====
-The replacement is defined as a String. Thus its value has to be parsed.
-Look up the column _Parsing method for 'indexNullAs'_ in <<mapper-orm-bridge-valuebridge-builtin>> to find out the format used when parsing.
-====
-
 [[mapper-orm-directfieldmapping-annotations]]
 === Available field annotations
 
@@ -243,6 +206,64 @@ Because scaled numbers are indexed with a fixed precision, they cannot represent
 Values that are too large to be indexed  will trigger a runtime exception.
 Values that have trailing decimal digits will be rounded to the nearest integer.
 +
+Annotation allows to set <<mapper-orm-directfieldmapping-decimalscale, the decimalScale attribute>>.
+
+=== Field annotation attributes
+
+Each field annotation has its own attributes, but the following ones are common to most annotations:
+
+`name`::
+The name of the index field. By default, it is the same as the property name.
+You may want to change it in particular when mapping a single property to multiple fields.
++
+Value: `String`. Defaults to the name of the property.
+
+[[mapper-orm-directfieldmapping-sortable]] `sortable`::
+Whether the field can be <<mapper-orm-query-sort, sorted on>>,
+i.e. whether a specific data structure is added to the index to allow efficient sorts when querying.
++
+Value: `Sortable.YES`, `Sortable.NO`, `Sortable.DEFAULT`.
++
+[IMPORTANT]
+====
+This option is not available for `@FullTextField`.
+See <<mapper-orm-directfieldmapping-annotations-fulltextfield,here>> for an explanation and some solutions.
+====
+
+[[mapper-orm-directfieldmapping-projectable]] `projectable`::
+Whether the field can be <<mapper-orm-query-projection, projected on>>,
+i.e. whether the field value is stored in the index to allow later retrieval when querying.
++
+Value: `Projectable.YES`, `Projectable.NO`, `Projectable.DEFAULT`.
+
+`searchable`::
+Whether the field can be searched on.
+i.e. whether the field is indexed in order to allow applying predicates later when querying.
++
+Value: `Searchable.YES`, `Searchable.NO`, `Searchable.DEFAULT`.
+
+[[mapper-orm-directfieldmapping-indexnullas]] `indexNullAs`::
+Disabled by default. When set, it defines the value to use as a replacement anytime the property value is null.
++
+[IMPORTANT]
+====
+The replacement is defined as a String. Thus its value has to be parsed.
+Look up the column _Parsing method for 'indexNullAs'_ in <<mapper-orm-bridge-valuebridge-builtin>> to find out the format used when parsing.
+====
+
+`norms`::
+It's only available on `@KeywordField` and `@FullTextField`.
+The norms are index time scoring information for the fields.
++
+Enabling norms will improve the quality of scoring.
+But if the score is not used, it is better to not store it.
+Since not storing the norms can save a considerable amount of memory.
++
+To store the norms set the attribute `norms` to `Norms.YES`, otherwise set it to `Norms.NO`.
+If the attribute is not set or set to `Norms.DEFAULT`.
+
+[[mapper-orm-directfieldmapping-decimalscale]] `decimalScale`::
+It's only available on `@KeywordField` and `@FullTextField`.
 To index numbers that have significant digits after the decimal point, set the `decimalScale` to the number of digits you need indexed.
 The decimal point will be shifted that many times to the right before indexing, preserving that many digits from the decimal part.
 To index very large numbers that cannot fit in a long, set the decimal point to a negative value.
@@ -264,19 +285,6 @@ because only two digits are generally needed beyond the decimal point.
 NOTE: Using Hibernate ORM mapping,
 a default `decimalScale` is taken automatically from the underlying `scale` value of the relative SQL `@Column`,
 using the Hibernate ORM metadata. The value could be overridden explicitly using the `decimalScale` attribute.
-
-==== Norms creation
-
-For both `@FullTextField` and `@KeywordField` fields it is possible to control the creation of the norms.
-The norms are index time scoring information for the fields.
-
-Storing them can make scoring queries faster.
-But if the score is not used, it is better to not store it.
-Since not storing the norms can save a considerable amount of memory.
-
-To store the norms set the attribute `norms` to `Norms.YES`, otherwise set it to `Norms.NO`.
-If the attribute is not set or set to `Norms.DEFAULT`,
-the storing of norms will depend on the current backend default behavior.
 
 [[mapper-orm-directfieldmapping-spatial-types]]
 === Mapping spatial types
