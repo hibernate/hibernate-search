@@ -930,6 +930,56 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	}
 
 	@Test
+	public void attribute_docValues_false() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'integer',"
+									+ "'doc_values': false"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							// Sortable.NO and Sortable.DEFAULT allow to have doc_values false
+							root.field( "myField", f -> f.asInteger() ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void attribute_docValues_skip() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'keyword',"
+									+ "'doc_values': true"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							// Sortable.NO or Sortable.DEFAULT does not impose doc_values false
+							root.field( "myField", f -> f.asString().sortable( Sortable.NO ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
 	public void attribute_scaling_factor_valid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
