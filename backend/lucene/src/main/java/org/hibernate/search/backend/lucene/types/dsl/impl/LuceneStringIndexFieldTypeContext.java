@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextFieldP
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneTextFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -71,6 +72,12 @@ class LuceneStringIndexFieldTypeContext
 	@Override
 	public LuceneStringIndexFieldTypeContext norms(Norms norms) {
 		this.norms = norms;
+		return thisAsS();
+	}
+
+	@Override
+	public LuceneStringIndexFieldTypeContext termVector(TermVector termVector) {
+		// TODO HSEARCH-3048 (current) contribute termVector
 		return thisAsS();
 	}
 

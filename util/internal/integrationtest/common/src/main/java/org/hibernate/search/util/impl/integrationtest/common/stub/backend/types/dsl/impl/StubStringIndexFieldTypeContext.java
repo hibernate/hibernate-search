@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 
 class StubStringIndexFieldTypeContext
@@ -37,6 +38,12 @@ class StubStringIndexFieldTypeContext
 	@Override
 	public StubStringIndexFieldTypeContext norms(Norms norms) {
 		modifiers.add( b -> b.norms( norms ) );
+		return this;
+	}
+
+	@Override
+	public StubStringIndexFieldTypeContext termVector(TermVector termVector) {
+		modifiers.add( b -> b.termVector( termVector ) );
 		return this;
 	}
 }
