@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Locale;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
@@ -47,6 +48,7 @@ class ElasticsearchStringIndexFieldTypeContext
 	private Norms norms = Norms.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 	private String indexNullAs;
+	private TermVector termVector = TermVector.DEFAULT;
 
 	ElasticsearchStringIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, String.class );
@@ -78,7 +80,7 @@ class ElasticsearchStringIndexFieldTypeContext
 
 	@Override
 	public ElasticsearchStringIndexFieldTypeContext termVector(TermVector termVector) {
-		// TODO HSEARCH-3048 (current) contribute termVector
+		this.termVector = termVector;
 		return this;
 	}
 
@@ -113,6 +115,7 @@ class ElasticsearchStringIndexFieldTypeContext
 		if ( analyzerName != null ) {
 			mapping.setType( DataType.TEXT );
 			mapping.setAnalyzer( analyzerName );
+			mapping.setTermVector( resolveTermVector() );
 
 			if ( normalizerName != null ) {
 				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getBuildContext().getEventContext() );
@@ -169,6 +172,16 @@ class ElasticsearchStringIndexFieldTypeContext
 				return ( analyzerName != null );
 			default:
 				throw new AssertionFailure( "Unexpected value for Norms: " + norms );
+		}
+	}
+
+	private String resolveTermVector() {
+		switch ( termVector ) {
+			case NO:
+			case DEFAULT:
+				return "no";
+			default:
+				return termVector.name().toLowerCase( Locale.ROOT );
 		}
 	}
 }
