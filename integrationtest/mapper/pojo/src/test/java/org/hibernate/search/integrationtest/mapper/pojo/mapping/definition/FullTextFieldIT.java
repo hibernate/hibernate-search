@@ -11,6 +11,7 @@ import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -167,6 +168,60 @@ public class FullTextFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "searchable", String.class, f -> f.analyzerName( ANALYZER_NAME ).searchable( Searchable.YES ) )
 				.field( "unsearchable", String.class, f -> f.analyzerName( ANALYZER_NAME ).searchable( Searchable.NO ) )
+				.field( "useDefault", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+		);
+		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void termVector() {
+
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String termVector;
+			String noTermVector;
+			String moreOptions;
+			String useDefault;
+			String implicit;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, termVector = TermVector.YES)
+			public String getTermVector() {
+				return termVector;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, termVector = TermVector.NO)
+			public String getNoTermVector() {
+				return noTermVector;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, termVector = TermVector.WITH_POSITIONS_OFFSETS)
+			public String getMoreOptions() {
+				return moreOptions;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.DEFAULT)
+			public String getUseDefault() {
+				return useDefault;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME)
+			public String getImplicit() {
+				return implicit;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "termVector", String.class, f -> f.analyzerName( ANALYZER_NAME ).termVector( TermVector.YES ) )
+				.field( "noTermVector", String.class, f -> f.analyzerName( ANALYZER_NAME ).termVector( TermVector.NO ) )
+				.field( "moreOptions", String.class, f -> f.analyzerName( ANALYZER_NAME ).termVector( TermVector.WITH_POSITIONS_OFFSETS ) )
 				.field( "useDefault", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 		);
