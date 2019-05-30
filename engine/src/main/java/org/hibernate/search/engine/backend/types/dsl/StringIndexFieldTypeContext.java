@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.types.dsl;
 
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.TermVector;
 
 /**
  * @param <S> The type of this context.
@@ -19,5 +20,7 @@ public interface StringIndexFieldTypeContext<S extends StringIndexFieldTypeConte
 	S normalizer(String normalizerName);
 
 	S norms(Norms norms);
+
+	S termVector(TermVector termVector);
 
 }

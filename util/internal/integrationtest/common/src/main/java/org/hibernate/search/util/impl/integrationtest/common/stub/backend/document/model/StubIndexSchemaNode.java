@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -173,6 +174,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder searchable(Searchable searchable) {
 			attribute( "searchable", searchable );
+			return this;
+		}
+
+		public Builder termVector(TermVector termVector) {
+			attribute( "termVector", termVector );
 			return this;
 		}
 

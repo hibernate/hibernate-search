@@ -20,6 +20,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
@@ -72,6 +73,12 @@ class ElasticsearchStringIndexFieldTypeContext
 	@Override
 	public ElasticsearchStringIndexFieldTypeContext norms(Norms norms) {
 		this.norms = norms;
+		return this;
+	}
+
+	@Override
+	public ElasticsearchStringIndexFieldTypeContext termVector(TermVector termVector) {
+		// TODO HSEARCH-3048 (current) contribute termVector
 		return this;
 	}
 
