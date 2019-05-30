@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
+import java.util.function.Consumer;
+
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
@@ -35,38 +38,54 @@ public class ElasticsearchFieldAttributesIT {
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
 
 	@Test
-	public void spyMappedAttributes() {
-		clientSpy.expectNext(
-				ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.STRICT
-		);
+	public void verifyNorms() {
+		JsonObject properties = new JsonObject();
+		properties.add( "keyword", fieldWithNorms( "keyword", false ) );
+		properties.add( "text", fieldWithNorms( "text", true ) );
+		properties.add( "norms", fieldWithNorms( "keyword", true ) );
+		properties.add( "omitNorms", fieldWithNorms( "text", false ) );
 
-		clientSpy.expectNext(
-				ElasticsearchRequest.head().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(),
-				ElasticsearchRequestAssertionMode.EXTENSIBLE
-		);
+		matchMapping( root -> {
+			root.field( "keyword", f -> f.asString() ).toReference();
+			root.field( "text", f -> f.asString().analyzer( "standard" ) ).toReference();
+			root.field( "norms", f -> f.asString().norms( Norms.YES ) ).toReference();
+			root.field( "omitNorms", f -> f.asString().analyzer( "standard" ).norms( Norms.NO ) ).toReference();
+		}, properties );
+	}
 
-		clientSpy.expectNext(
-				ElasticsearchRequest.put()
-						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
-						.body( indexCreationPayload() )
-						.build(),
-				ElasticsearchRequestAssertionMode.EXTENSIBLE
-		);
+	@Test
+	public void verifyTermVector() {
+		JsonObject properties = new JsonObject();
+		properties.add( "no", fieldWithTermVector( "no" ) );
+		properties.add( "yes", fieldWithTermVector( "yes" ) );
+		properties.add( "implicit", fieldWithTermVector( "no" ) );
+		properties.add( "moreOptions", fieldWithTermVector( "with_positions_offsets_payloads" ) );
+
+		matchMapping( root -> {
+			root.field( "no", f -> f.asString().analyzer( "standard" ).termVector( TermVector.NO ) ).toReference();
+			root.field( "yes", f -> f.asString().analyzer( "standard" ).termVector( TermVector.YES ) ).toReference();
+			root.field( "implicit", f -> f.asString().analyzer( "standard" ) ).toReference();
+			root.field( "moreOptions", f -> f.asString().analyzer( "standard" ).termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS ) ).toReference();
+		}, properties );
+	}
+
+	public void matchMapping(Consumer<IndexSchemaElement> mapping, JsonObject properties) {
+		clientSpy.expectNext( ElasticsearchRequest.get().build(),
+				ElasticsearchRequestAssertionMode.STRICT );
+		clientSpy.expectNext( ElasticsearchRequest.head().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(),
+				ElasticsearchRequestAssertionMode.EXTENSIBLE );
+		clientSpy.expectNext( ElasticsearchRequest.put().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).body( createIndex( properties ) ).build(),
+				ElasticsearchRequestAssertionMode.EXTENSIBLE );
 
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
-				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
-				)
-				.withIndex(
-						INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() )
-				)
+				.withBackendProperty( BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory() )
+				.withIndex( INDEX_NAME, ctx -> mapping.accept( ctx.getSchemaElement() ) )
 				.setup();
 
 		clientSpy.verifyExpectationsMet();
 	}
 
-	private JsonObject indexCreationPayload() {
+	private JsonObject createIndex(JsonObject properties) {
 		JsonObject payload = new JsonObject();
 
 		JsonObject mappings = new JsonObject();
@@ -82,29 +101,21 @@ public class ElasticsearchFieldAttributesIT {
 				// ES7 and below: the mapping is the "mappings" node
 				.orElse( mappings );
 
-		JsonObject properties = new JsonObject();
 		mapping.add( "properties", properties );
-
-		properties.add( "keyword", json( "keyword", false ) );
-		properties.add( "text", json( "text", true ) );
-		properties.add( "norms", json( "keyword", true ) );
-		properties.add( "omitNorms", json( "text", false ) );
 		return payload;
 	}
 
-	private static JsonObject json(String type, boolean norms) {
+	private static JsonObject fieldWithNorms(String type, boolean value) {
 		JsonObject field = new JsonObject();
 		field.addProperty( "type", type );
-		field.addProperty( "norms", norms );
+		field.addProperty( "norms", value );
 		return field;
 	}
 
-	private static class IndexMapping {
-		IndexMapping(IndexSchemaElement root) {
-			root.field( "keyword", f -> f.asString() ).toReference();
-			root.field( "text", f -> f.asString().analyzer( "standard" ) ).toReference();
-			root.field( "norms", f -> f.asString().norms( Norms.YES ) ).toReference();
-			root.field( "omitNorms", f -> f.asString().analyzer( "standard" ).norms( Norms.NO ) ).toReference();
-		}
+	private static JsonObject fieldWithTermVector(String termVector) {
+		JsonObject field = new JsonObject();
+		field.addProperty( "type", "text" );
+		field.addProperty( "term_vector", termVector );
+		return field;
 	}
 }
