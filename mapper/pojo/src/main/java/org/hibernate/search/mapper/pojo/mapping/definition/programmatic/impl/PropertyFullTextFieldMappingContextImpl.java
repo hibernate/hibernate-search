@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -44,6 +45,12 @@ class PropertyFullTextFieldMappingContextImpl
 	@Override
 	public PropertyFullTextFieldMappingContext norms(Norms norms) {
 		fieldModelContributor.add( (c, b) -> c.norms( norms ) );
+		return thisAsS();
+	}
+
+	@Override
+	public PropertyFullTextFieldMappingContext termVector(TermVector termVector) {
+		fieldModelContributor.add( (c, b) -> c.termVector( termVector ) );
 		return thisAsS();
 	}
 

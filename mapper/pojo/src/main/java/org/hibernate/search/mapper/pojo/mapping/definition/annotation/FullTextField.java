@@ -16,6 +16,7 @@ import java.lang.annotation.Target;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.TermVector;
 
 /**
  * A full-text field in the full text index, potentially holding multiple tokens (words) of text.
@@ -67,6 +68,12 @@ public @interface FullTextField {
 	 * @see Searchable
 	 */
 	Searchable searchable() default Searchable.DEFAULT;
+
+	/**
+	 * @return The term vector storing strategy
+	 * @see TermVector
+	 */
+	TermVector termVector() default TermVector.DEFAULT;
 
 	/**
 	 * @return A reference to the value bridge to use for this field.

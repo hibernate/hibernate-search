@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
@@ -313,6 +314,12 @@ class AnnotationProcessorProvider {
 			if ( !Norms.DEFAULT.equals( norms ) ) {
 				fieldContext.norms( norms );
 			}
+
+			TermVector termVector = annotation.termVector();
+			if ( !TermVector.DEFAULT.equals( termVector ) ) {
+				fieldContext.termVector( termVector );
+			}
+
 			return fieldContext;
 		}
 
