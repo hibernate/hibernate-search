@@ -85,6 +85,9 @@ public class PropertyMapping extends AbstractTypeMapping {
 	@SerializedName("scaling_factor")
 	private Double scalingFactor;
 
+	@SerializedName("term_vector")
+	private String termVector;
+
 	public DataType getType() {
 		return type;
 	}
@@ -182,5 +185,13 @@ public class PropertyMapping extends AbstractTypeMapping {
 
 	public void setScalingFactor(Double scalingFactor) {
 		this.scalingFactor = scalingFactor;
+	}
+
+	public String getTermVector() {
+		return termVector;
+	}
+
+	public void setTermVector(String termVector) {
+		this.termVector = termVector;
 	}
 }

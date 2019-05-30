@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -682,6 +683,88 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						}
 				)
 				.setup();
+	}
+
+	@Test
+	public void property_termVector_valid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'text',"
+									+ "'analyzer': 'english',"
+									+ "'term_vector': 'with_positions_offsets'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.WITH_POSITIONS_OFFSETS ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void property_termVector_missing() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'text',"
+									+ "'analyzer': 'english'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.NO ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void property_termVector_invalid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'text',"
+									+ "'analyzer': 'english',"
+									+ "'term_vector': 'with_offsets'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		SubTest.expectException( () -> validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.YES ) ).toReference();
+						}
+				)
+				.setup() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.indexFieldContext( "myField" )
+						.failure( "Invalid value for attribute 'term_vector'. Expected 'yes', actual is 'with_offsets'" )
+						.build() );
 	}
 
 	@Test
