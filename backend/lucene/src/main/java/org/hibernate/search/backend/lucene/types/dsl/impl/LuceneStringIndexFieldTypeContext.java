@@ -42,6 +42,7 @@ class LuceneStringIndexFieldTypeContext
 	private Analyzer normalizer;
 
 	private Norms norms = Norms.DEFAULT;
+	private TermVector termVector = TermVector.DEFAULT;
 
 	private Sortable sortable = Sortable.DEFAULT;
 
@@ -72,13 +73,13 @@ class LuceneStringIndexFieldTypeContext
 	@Override
 	public LuceneStringIndexFieldTypeContext norms(Norms norms) {
 		this.norms = norms;
-		return thisAsS();
+		return this;
 	}
 
 	@Override
 	public LuceneStringIndexFieldTypeContext termVector(TermVector termVector) {
-		// TODO HSEARCH-3048 (current) contribute termVector
-		return thisAsS();
+		this.termVector = termVector;
+		return this;
 	}
 
 	@Override
@@ -93,6 +94,7 @@ class LuceneStringIndexFieldTypeContext
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedNorms = resolveNorms();
+		ResolvedTermVector resolvedTermVector = resolveTermVector();
 
 		if ( analyzer != null ) {
 			if ( resolvedSortable ) {
@@ -116,7 +118,7 @@ class LuceneStringIndexFieldTypeContext
 				createIndexToProjectionConverter();
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
 				resolvedSearchable, resolvedSortable,
-				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms ), indexNullAsValue,
+				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector ), indexNullAsValue,
 				analyzerOrNormalizer
 		);
 
@@ -151,7 +153,31 @@ class LuceneStringIndexFieldTypeContext
 		}
 	}
 
-	private static FieldType getFieldType(boolean projectable, boolean searchable, boolean analyzed, boolean norms) {
+	private ResolvedTermVector resolveTermVector() {
+		switch ( termVector ) {
+			// using NO as default to be consistent with Elasticsearch,
+			// the default for Lucene would be WITH_POSITIONS_OFFSETS
+			case NO:
+			case DEFAULT:
+				return new ResolvedTermVector( false, false, false, false );
+			case YES:
+				return new ResolvedTermVector( true, false, false, false );
+			case WITH_POSITIONS:
+				return new ResolvedTermVector( true, true, false, false );
+			case WITH_OFFSETS:
+				return new ResolvedTermVector( true, false, true, false );
+			case WITH_POSITIONS_OFFSETS:
+				return new ResolvedTermVector( true, true, true, false );
+			case WITH_POSITIONS_PAYLOADS:
+				return new ResolvedTermVector( true, true, false, true );
+			case WITH_POSITIONS_OFFSETS_PAYLOADS:
+				return new ResolvedTermVector( true, true, true, true );
+			default:
+				throw new AssertionFailure( "Unexpected value for TermVector: " + termVector );
+		}
+	}
+
+	private static FieldType getFieldType(boolean projectable, boolean searchable, boolean analyzed, boolean norms, ResolvedTermVector termVector) {
 		FieldType fieldType = new FieldType();
 
 		if ( !searchable ) {
@@ -164,9 +190,7 @@ class LuceneStringIndexFieldTypeContext
 		if ( analyzed ) {
 			// TODO HSEARCH-3048 take into account term vectors option
 			fieldType.setIndexOptions( IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
-			fieldType.setStoreTermVectors( true );
-			fieldType.setStoreTermVectorPositions( true );
-			fieldType.setStoreTermVectorOffsets( true );
+			termVector.applyTo( fieldType );
 			fieldType.setTokenized( true );
 		}
 		else {
@@ -183,5 +207,26 @@ class LuceneStringIndexFieldTypeContext
 		fieldType.setOmitNorms( !norms );
 		fieldType.freeze();
 		return fieldType;
+	}
+
+	private static final class ResolvedTermVector {
+		private final boolean store;
+		private final boolean positions;
+		private final boolean offsets;
+		private final boolean payloads;
+
+		private ResolvedTermVector(boolean store, boolean positions, boolean offsets, boolean payloads) {
+			this.store = store;
+			this.positions = positions;
+			this.offsets = offsets;
+			this.payloads = payloads;
+		}
+
+		private void applyTo( FieldType fieldType ) {
+			fieldType.setStoreTermVectors( store );
+			fieldType.setStoreTermVectorPositions( positions );
+			fieldType.setStoreTermVectorOffsets( offsets );
+			fieldType.setStoreTermVectorPayloads( payloads );
+		}
 	}
 }
