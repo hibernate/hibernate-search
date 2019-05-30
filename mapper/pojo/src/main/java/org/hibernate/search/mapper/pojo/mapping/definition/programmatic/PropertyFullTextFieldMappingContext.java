@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.TermVector;
 
 /**
  * @author Yoann Rodiere
@@ -16,5 +17,7 @@ public interface PropertyFullTextFieldMappingContext extends PropertyFieldMappin
 	PropertyFullTextFieldMappingContext analyzer(String analyzerName);
 
 	PropertyFullTextFieldMappingContext norms(Norms norms);
+
+	PropertyFullTextFieldMappingContext termVector(TermVector termVector);
 
 }
