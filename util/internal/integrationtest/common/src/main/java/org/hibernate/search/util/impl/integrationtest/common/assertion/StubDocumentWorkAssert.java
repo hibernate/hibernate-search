@@ -11,32 +11,32 @@ import java.util.Objects;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeCompare;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeMismatch;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 import org.junit.Assert;
 
-public class StubIndexWorkAssert {
+public class StubDocumentWorkAssert {
 
-	public static StubIndexWorkAssert assertThat(StubIndexWork work) {
-		return new StubIndexWorkAssert( work );
+	public static StubDocumentWorkAssert assertThat(StubDocumentWork work) {
+		return new StubDocumentWorkAssert( work );
 	}
 
-	private final StubIndexWork actual;
+	private final StubDocumentWork actual;
 
-	private String messageBase = "Index work did not match: ";
+	private String messageBase = "Document work did not match: ";
 
-	private StubIndexWorkAssert(StubIndexWork actual) {
+	private StubDocumentWorkAssert(StubDocumentWork actual) {
 		this.actual = actual;
 	}
 
-	public StubIndexWorkAssert as(String messageBase) {
+	public StubDocumentWorkAssert as(String messageBase) {
 		this.messageBase = messageBase;
 		return this;
 	}
 
-	public StubIndexWorkAssert matches(StubIndexWork expected) {
+	public StubDocumentWorkAssert matches(StubDocumentWork expected) {
 		ToStringTreeBuilder builder = new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() );
 
 		builder.startObject();

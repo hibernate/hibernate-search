@@ -101,7 +101,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 				session.getMainWorkPlan().add( entity );
 			}
 
-			BackendMock.WorkCallListContext expectationSetter = backendMock.expectWorks(
+			BackendMock.DocumentWorkCallListContext expectationSetter = backendMock.expectWorks(
 					DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME
 			);
 			for ( String expectedDocumentIdentifierValue : expectations.getDocumentIdentifierValues() ) {

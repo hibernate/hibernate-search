@@ -133,8 +133,8 @@ public class SearchSessionWritePlanPersistBatchIndexingIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	private BackendMock.WorkCallListContext expectAddWorks(int firstId, int afterLastId) {
-		BackendMock.WorkCallListContext expectations = backendMock.expectWorks( IndexedEntity.INDEX_NAME );
+	private BackendMock.DocumentWorkCallListContext expectAddWorks(int firstId, int afterLastId) {
+		BackendMock.DocumentWorkCallListContext expectations = backendMock.expectWorks( IndexedEntity.INDEX_NAME );
 		for ( int i = firstId; i < afterLastId; ++i ) {
 			final int id = i;
 			expectations.add( String.valueOf( id ), b -> b.field( "text", "number" + id ) );

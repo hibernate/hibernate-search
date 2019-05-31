@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 
 public class StubIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<StubDocumentElement> {
 	private final StubIndexManager indexManager;
@@ -36,7 +36,7 @@ public class StubIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
 
-		StubIndexWork work = StubIndexWork.builder( StubIndexWork.Type.ADD )
+		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.ADD )
 				.tenantIdentifier( sessionContext.getTenantIdentifier() )
 				.identifier( documentReferenceProvider.getIdentifier() )
 				.routingKey( documentReferenceProvider.getRoutingKey() )

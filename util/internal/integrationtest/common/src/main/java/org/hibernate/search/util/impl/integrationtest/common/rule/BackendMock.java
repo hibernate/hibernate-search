@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +28,11 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
-import org.junit.Assert;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -114,30 +115,46 @@ public class BackendMock implements TestRule {
 		return this;
 	}
 
-	public WorkCallListContext expectWorks(String indexName) {
+	public DocumentWorkCallListContext expectWorks(String indexName) {
 		// Default to force commit and no refresh, which is what the mapper should use by default
 		return expectWorks( indexName, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 	}
 
-	public WorkCallListContext expectWorks(String indexName,
-			DocumentCommitStrategy commitStrategyForDocumentWorks,
-			DocumentRefreshStrategy refreshStrategyForDocumentWorks) {
-		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( indexName );
-		return new WorkCallListContext(
+	public DocumentWorkCallListContext expectWorks(String indexName,
+			DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy) {
+		CallQueue<DocumentWorkCall> callQueue = behaviorMock.getDocumentWorkCalls( indexName );
+		return new DocumentWorkCallListContext(
 				indexName,
-				commitStrategyForDocumentWorks, refreshStrategyForDocumentWorks,
+				commitStrategy, refreshStrategy,
 				callQueue::expectInOrder
 		);
 	}
 
-	public WorkCallListContext expectWorksAnyOrder(String indexName,
-			DocumentCommitStrategy commitStrategyForDocumentWorks,
-			DocumentRefreshStrategy refreshStrategyForDocumentWorks) {
-		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( indexName );
-		return new WorkCallListContext(
+	public DocumentWorkCallListContext expectWorksAnyOrder(String indexName,
+			DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy) {
+		CallQueue<DocumentWorkCall> callQueue = behaviorMock.getDocumentWorkCalls( indexName );
+		return new DocumentWorkCallListContext(
 				indexName,
-				commitStrategyForDocumentWorks, refreshStrategyForDocumentWorks,
+				commitStrategy, refreshStrategy,
 				callQueue::expectOutOfOrder
+		);
+	}
+
+	public IndexScopeWorkCallListContext expectIndexScopeWorks(String indexName) {
+		return expectIndexScopeWorks( indexName , null );
+	}
+
+	public IndexScopeWorkCallListContext expectIndexScopeWorks(String indexName, String tenantId) {
+		return expectIndexScopeWorks( Collections.singletonList( indexName ), tenantId );
+	}
+
+	public IndexScopeWorkCallListContext expectIndexScopeWorks(List<String> indexNames, String tenantId) {
+		CallQueue<IndexScopeWorkCall> callQueue = behaviorMock.getIndexScopeWorkCalls();
+		return new IndexScopeWorkCallListContext(
+				indexNames, tenantId,
+				callQueue::expectInOrder
 		);
 	}
 
@@ -176,69 +193,57 @@ public class BackendMock implements TestRule {
 		return this;
 	}
 
-	public class WorkCallListContext {
+	public class DocumentWorkCallListContext {
 		private final String indexName;
 		private final DocumentCommitStrategy commitStrategyForDocumentWorks;
 		private final DocumentRefreshStrategy refreshStrategyForDocumentWorks;
-		private final Consumer<IndexWorkCall> expectationConsumer;
-		private final List<StubIndexWork> works = new ArrayList<>();
+		private final Consumer<DocumentWorkCall> expectationConsumer;
+		private final List<StubDocumentWork> works = new ArrayList<>();
 
-		private WorkCallListContext(String indexName,
+		private DocumentWorkCallListContext(String indexName,
 				DocumentCommitStrategy commitStrategyForDocumentWorks,
 				DocumentRefreshStrategy refreshStrategyForDocumentWorks,
-				Consumer<IndexWorkCall> expectationConsumer) {
+				Consumer<DocumentWorkCall> expectationConsumer) {
 			this.indexName = indexName;
 			this.commitStrategyForDocumentWorks = commitStrategyForDocumentWorks;
 			this.refreshStrategyForDocumentWorks = refreshStrategyForDocumentWorks;
 			this.expectationConsumer = expectationConsumer;
 		}
 
-		public WorkCallListContext add(Consumer<StubIndexWork.Builder> contributor) {
-			return documentWork( StubIndexWork.Type.ADD, contributor );
+		public DocumentWorkCallListContext add(Consumer<StubDocumentWork.Builder> contributor) {
+			return documentWork( StubDocumentWork.Type.ADD, contributor );
 		}
 
-		public WorkCallListContext add(String id, Consumer<StubDocumentNode.Builder> documentContributor) {
-			return documentWork( StubIndexWork.Type.ADD, id, documentContributor );
+		public DocumentWorkCallListContext add(String id, Consumer<StubDocumentNode.Builder> documentContributor) {
+			return documentWork( StubDocumentWork.Type.ADD, id, documentContributor );
 		}
 
-		public WorkCallListContext update(Consumer<StubIndexWork.Builder> contributor) {
-			return documentWork( StubIndexWork.Type.UPDATE, contributor );
+		public DocumentWorkCallListContext update(Consumer<StubDocumentWork.Builder> contributor) {
+			return documentWork( StubDocumentWork.Type.UPDATE, contributor );
 		}
 
-		public WorkCallListContext update(String id, Consumer<StubDocumentNode.Builder> documentContributor) {
-			return documentWork( StubIndexWork.Type.UPDATE, id, documentContributor );
+		public DocumentWorkCallListContext update(String id, Consumer<StubDocumentNode.Builder> documentContributor) {
+			return documentWork( StubDocumentWork.Type.UPDATE, id, documentContributor );
 		}
 
-		public WorkCallListContext delete(String id) {
-			return documentWork( StubIndexWork.Type.DELETE, b -> b.identifier( id ) );
+		public DocumentWorkCallListContext delete(String id) {
+			return documentWork( StubDocumentWork.Type.DELETE, b -> b.identifier( id ) );
 		}
 
-		public WorkCallListContext delete(Consumer<StubIndexWork.Builder> contributor) {
-			return documentWork( StubIndexWork.Type.DELETE, contributor );
+		public DocumentWorkCallListContext delete(Consumer<StubDocumentWork.Builder> contributor) {
+			return documentWork( StubDocumentWork.Type.DELETE, contributor );
 		}
 
-		public WorkCallListContext optimize() {
-			return work( StubIndexWork.builder( StubIndexWork.Type.OPTIMIZE ).build() );
-		}
-
-		public WorkCallListContext purge(String tenantIdentifier) {
-			return work( StubIndexWork.builder( StubIndexWork.Type.PURGE ).tenantIdentifier( tenantIdentifier ).build() );
-		}
-
-		public WorkCallListContext flush() {
-			return work( StubIndexWork.builder( StubIndexWork.Type.FLUSH ).build() );
-		}
-
-		WorkCallListContext documentWork(StubIndexWork.Type type,
-				Consumer<StubIndexWork.Builder> contributor) {
-			StubIndexWork.Builder builder = StubIndexWork.builder( type );
+		DocumentWorkCallListContext documentWork(StubDocumentWork.Type type,
+				Consumer<StubDocumentWork.Builder> contributor) {
+			StubDocumentWork.Builder builder = StubDocumentWork.builder( type );
 			contributor.accept( builder );
 			builder.commit( commitStrategyForDocumentWorks );
 			builder.refresh( refreshStrategyForDocumentWorks );
 			return work( builder.build() );
 		}
 
-		WorkCallListContext documentWork(StubIndexWork.Type type, String id,
+		DocumentWorkCallListContext documentWork(StubDocumentWork.Type type, String id,
 				Consumer<StubDocumentNode.Builder> documentContributor) {
 			return documentWork( type, b -> {
 				b.identifier( id );
@@ -248,7 +253,7 @@ public class BackendMock implements TestRule {
 			} );
 		}
 
-		public WorkCallListContext work(StubIndexWork work) {
+		public DocumentWorkCallListContext work(StubDocumentWork work) {
 			works.add( work );
 			return this;
 		}
@@ -257,10 +262,10 @@ public class BackendMock implements TestRule {
 			log.debugf( "Expecting %d works to be prepared, then executed", works.size() );
 			// First expect all works to be prepared, then expect all works to be executed
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ) )
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PREPARE, work ) )
 					.forEach( expectationConsumer );
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work, future ) )
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
 					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}
@@ -272,7 +277,7 @@ public class BackendMock implements TestRule {
 		public BackendMock executed(CompletableFuture<?> future) {
 			log.debugf( "Expecting %d works to be executed", works.size() );
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work, future ) )
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
 					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}
@@ -284,9 +289,63 @@ public class BackendMock implements TestRule {
 		public BackendMock prepared() {
 			log.debugf( "Expecting %d works to be prepared", works.size() );
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ) )
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PREPARE, work ) )
 					.forEach( expectationConsumer );
 			return BackendMock.this;
+		}
+	}
+
+	public class IndexScopeWorkCallListContext {
+		private final List<String> indexNames;
+		private final String tenantIdentifier;
+		private final Consumer<IndexScopeWorkCall> expectationConsumer;
+
+		private IndexScopeWorkCallListContext(List<String> indexNames,
+				String tenantIdentifier,
+				Consumer<IndexScopeWorkCall> expectationConsumer) {
+			this.indexNames = indexNames;
+			this.tenantIdentifier = tenantIdentifier;
+			this.expectationConsumer = expectationConsumer;
+		}
+
+		public IndexScopeWorkCallListContext optimize() {
+			return optimize( CompletableFuture.completedFuture( null ) );
+		}
+
+		public IndexScopeWorkCallListContext optimize(CompletableFuture<?> future) {
+			return work(
+					StubIndexScopeWork.builder( StubIndexScopeWork.Type.OPTIMIZE ).build(),
+					future
+			);
+		}
+
+		public IndexScopeWorkCallListContext purge() {
+			return purge( CompletableFuture.completedFuture( null ) );
+		}
+
+		public IndexScopeWorkCallListContext purge(CompletableFuture<?> future) {
+			return work(
+					StubIndexScopeWork.builder( StubIndexScopeWork.Type.PURGE )
+							.tenantIdentifier( tenantIdentifier )
+							.build(),
+					future
+			);
+		}
+
+		public IndexScopeWorkCallListContext flush() {
+			return flush( CompletableFuture.completedFuture( null ) );
+		}
+
+		public IndexScopeWorkCallListContext flush(CompletableFuture<?> future) {
+			return work(
+					StubIndexScopeWork.builder( StubIndexScopeWork.Type.FLUSH ).build(),
+					future
+			);
+		}
+
+		private IndexScopeWorkCallListContext work(StubIndexScopeWork work, CompletableFuture<?> future) {
+			expectationConsumer.accept( new IndexScopeWorkCall( indexNames, work, future ) );
+			return this;
 		}
 	}
 
@@ -296,7 +355,9 @@ public class BackendMock implements TestRule {
 
 		private final Map<String, CallQueue<PushSchemaCall>> pushSchemaCalls = new HashMap<>();
 
-		private final Map<String, CallQueue<IndexWorkCall>> indexWorkCalls = new HashMap<>();
+		private final Map<String, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
+
+		private final CallQueue<IndexScopeWorkCall> indexScopeWorkCalls = new CallQueue<>();
 
 		private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
@@ -310,8 +371,12 @@ public class BackendMock implements TestRule {
 			return pushSchemaCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 		}
 
-		CallQueue<IndexWorkCall> getIndexWorkCalls(String indexName) {
-			return indexWorkCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+		CallQueue<DocumentWorkCall> getDocumentWorkCalls(String indexName) {
+			return documentWorkCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+		}
+
+		CallQueue<IndexScopeWorkCall> getIndexScopeWorkCalls() {
+			return indexScopeWorkCalls;
 		}
 
 		CallQueue<SearchWorkCall<?>> getSearchWorkCalls() {
@@ -325,13 +390,13 @@ public class BackendMock implements TestRule {
 		void resetExpectations() {
 			indexFieldAddBehaviors.clear();
 			pushSchemaCalls.clear();
-			indexWorkCalls.clear();
+			documentWorkCalls.clear();
 			searchCalls.reset();
 		}
 
 		void verifyExpectationsMet() {
 			pushSchemaCalls.values().forEach( CallQueue::verifyExpectationsMet );
-			indexWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
+			documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
 			searchCalls.verifyExpectationsMet();
 		}
 
@@ -350,33 +415,33 @@ public class BackendMock implements TestRule {
 		}
 
 		@Override
-		public void prepareWorks(String indexName, List<StubIndexWork> works) {
-			CallQueue<IndexWorkCall> callQueue = getIndexWorkCalls( indexName );
+		public void prepareDocumentWorks(String indexName, List<StubDocumentWork> works) {
+			CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ) )
-					.forEach( call -> callQueue.verify( call, IndexWorkCall::verify ) );
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PREPARE, work ) )
+					.forEach( call -> callQueue.verify( call, DocumentWorkCall::verify ) );
 		}
 
 		@Override
-		public CompletableFuture<?> executeWorks(String indexName, List<StubIndexWork> works) {
-			CallQueue<IndexWorkCall> callQueue = getIndexWorkCalls( indexName );
+		public CompletableFuture<?> executeDocumentWorks(String indexName, List<StubDocumentWork> works) {
+			CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 			return works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ) )
-					.<CompletableFuture<?>>map( call -> callQueue.verify( call, IndexWorkCall::verify ) )
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ) )
+					.<CompletableFuture<?>>map( call -> callQueue.verify( call, DocumentWorkCall::verify ) )
 					.reduce( (first, second) -> second )
 					.orElseGet( () -> CompletableFuture.completedFuture( null ) );
 		}
 
 		@Override
-		public CompletableFuture<?> prepareAndExecuteWork(String indexName, StubIndexWork work) {
-			CallQueue<IndexWorkCall> callQueue = getIndexWorkCalls( indexName );
+		public CompletableFuture<?> prepareAndExecuteDocumentWork(String indexName, StubDocumentWork work) {
+			CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 			callQueue.verify(
-					new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ),
-					IndexWorkCall::verify
+					new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PREPARE, work ),
+					DocumentWorkCall::verify
 			);
 			return callQueue.verify(
-					new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ),
-					IndexWorkCall::verify
+					new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
+					DocumentWorkCall::verify
 			);
 		}
 
@@ -391,15 +456,10 @@ public class BackendMock implements TestRule {
 		}
 
 		@Override
-		public CompletableFuture<?> executeBulkWork(String indexName, StubIndexWork work) {
-			if ( work.getDocument() != null ) {
-				Assert.fail( "A bulk work is supposed not to have a document. Actual work: " + work );
-			}
-
-			CallQueue<IndexWorkCall> callQueue = getIndexWorkCalls( indexName );
-			return callQueue.verify(
-					new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ),
-					IndexWorkCall::verify
+		public CompletableFuture<?> executeIndexScopeWork(List<String> indexNames, StubIndexScopeWork work) {
+			return indexScopeWorkCalls.verify(
+					new IndexScopeWorkCall( indexNames, work ),
+					IndexScopeWorkCall::verify
 			);
 		}
 

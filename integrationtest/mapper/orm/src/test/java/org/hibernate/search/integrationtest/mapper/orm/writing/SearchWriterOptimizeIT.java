@@ -16,9 +16,8 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 public class SearchWriterOptimizeIT extends AbstractSearchWriterSimpleOperationIT {
 	@Override
 	protected void expectWork(BackendMock backendMock, String indexName, CompletableFuture<?> future) {
-		backendMock.expectWorks( indexName )
-				.optimize()
-				.executed( future );
+		backendMock.expectIndexScopeWorks( indexName )
+				.optimize( future );
 	}
 
 	@Override

@@ -119,7 +119,7 @@ public class FieldDefaultBridgeIT<V, F> {
 				++id;
 			}
 
-			BackendMock.WorkCallListContext expectationSetter = backendMock.expectWorks(
+			BackendMock.DocumentWorkCallListContext expectationSetter = backendMock.expectWorks(
 					DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME
 			);
 			id = 0;
