@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -133,20 +134,32 @@ public class LuceneFieldAttributesIT {
 			string = root.field( "keyword", f -> f.asString().projectable( Projectable.YES ) ).toReference();
 			text = root.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES ) ).toReference();
 
-			norms = root.field( "norms", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES )
-					.norms( Norms.YES )
+			norms = root.field( "norms", f -> {
+				// extracting a variable to workaround an Eclipse compiler issue
+				StringIndexFieldTypeContext<?> ctx = f.asString()
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES );
+				return ctx.norms( Norms.YES ); }
 			).toReference();
 
-			noNorms = root.field( "noNorms", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES )
-					.norms( Norms.NO )
+			noNorms = root.field( "noNorms", f -> {
+				// extracting a variable to workaround an Eclipse compiler issue
+				StringIndexFieldTypeContext<?> ctx = f.asString()
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES );
+				return ctx.norms( Norms.NO );
+			} ).toReference();
+
+			termVector = root.field( "termVector", f -> {
+				// extracting a variable to workaround an Eclipse compiler issue
+				StringIndexFieldTypeContext<?> ctx = f.asString()
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES );
+				return ctx.termVector( TermVector.YES ); }
 			).toReference();
 
-			termVector = root.field( "termVector", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES )
-					.termVector( TermVector.YES )
-			).toReference();
-
-			moreOptions = root.field( "moreOptions", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES )
-					.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS )
+			moreOptions = root.field( "moreOptions", f -> {
+				// extracting a variable to workaround an Eclipse compiler issue
+				StringIndexFieldTypeContext<?> ctx = f.asString()
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES );
+				return ctx.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS ); }
 			).toReference();
 		}
 	}
