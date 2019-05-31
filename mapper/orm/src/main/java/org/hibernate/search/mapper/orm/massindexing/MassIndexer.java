@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.massindexing;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.CacheMode;
 
@@ -94,7 +94,7 @@ public interface MassIndexer {
 	 * Can be called only once.
 	 * @return a Future to control the indexing task.
 	 */
-	Future<?> start();
+	CompletableFuture<?> start();
 
 	/**
 	 * Starts the indexing process, and then block until it's finished.
