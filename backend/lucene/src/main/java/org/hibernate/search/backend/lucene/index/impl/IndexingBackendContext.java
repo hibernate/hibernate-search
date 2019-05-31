@@ -29,6 +29,7 @@ import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrateg
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -124,7 +125,10 @@ public class IndexingBackendContext {
 		);
 	}
 
-	IndexWorkExecutor createWorkExecutor(LuceneWriteWorkOrchestrator orchestrator, String indexName) {
-		return new LuceneIndexWorkExecutor( workFactory, multiTenancyStrategy, orchestrator, indexName, eventContext );
+	IndexWorkExecutor createWorkExecutor(LuceneWriteWorkOrchestrator orchestrator, String indexName,
+			DetachedSessionContextImplementor sessionContext) {
+		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
+
+		return new LuceneIndexWorkExecutor( workFactory, orchestrator, indexName, sessionContext );
 	}
 }

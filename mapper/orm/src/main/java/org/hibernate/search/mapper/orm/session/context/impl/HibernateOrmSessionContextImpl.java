@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.session.context.impl;
 
-import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
@@ -43,7 +42,7 @@ public class HibernateOrmSessionContextImpl extends AbstractPojoSessionContextIm
 	}
 
 	@Override
-	public Session getSession() {
+	public SessionImplementor getSession() {
 		return sessionImplementor;
 	}
 }

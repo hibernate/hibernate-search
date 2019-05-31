@@ -30,7 +30,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession implements 
 	private SearchWorkPlanImpl workPlan;
 
 	private JavaBeanSearchSession(JavaBeanSearchSessionBuilder builder) {
-		super( builder );
+		super( builder, builder.buildSessionContext() );
 		this.commitStrategy = builder.commitStrategy;
 		this.refreshStrategy = builder.refreshStrategy;
 	}
@@ -88,7 +88,6 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession implements 
 			return this;
 		}
 
-		@Override
 		protected AbstractPojoSessionContextImplementor buildSessionContext() {
 			return new JavaBeanSessionContext( mappingContext, tenantId, PojoRuntimeIntrospector.noProxy() );
 		}

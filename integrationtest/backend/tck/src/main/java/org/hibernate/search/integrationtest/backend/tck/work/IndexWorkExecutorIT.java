@@ -30,7 +30,7 @@ import org.assertj.core.api.Assertions;
 
 /**
  * Verify that the work executor operations:
- * {@link IndexWorkExecutor#optimize()}, {@link IndexWorkExecutor#purge(String)}, {@link IndexWorkExecutor#flush()}
+ * {@link IndexWorkExecutor#optimize()}, {@link IndexWorkExecutor#purge()}, {@link IndexWorkExecutor#flush()}
  * work properly, in every backends.
  */
 public class IndexWorkExecutorIT {
@@ -66,6 +66,7 @@ public class IndexWorkExecutorIT {
 				)
 				.setup();
 
+		// Do not provide a tenant
 		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
 		createBookIndexes( noTenantSessionContext );
 
@@ -76,7 +77,7 @@ public class IndexWorkExecutorIT {
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
 		// purge without providing a tenant
-		workExecutor.purge( null ).join();
+		workExecutor.purge().join();
 		workExecutor.flush().join();
 
 		assertBookNumberIsEqualsTo( 0, noTenantSessionContext );
@@ -93,7 +94,8 @@ public class IndexWorkExecutorIT {
 				.withMultiTenancy()
 				.setup();
 
-		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
+		// Do provide a tenant ID
+		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor( tenant1SessionContext );
 
 		createBookIndexes( tenant1SessionContext );
 		createBookIndexes( tenant2SessionContext );
@@ -106,11 +108,10 @@ public class IndexWorkExecutorIT {
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 
-		// purge only TENANT_1
-		workExecutor.purge( TENANT_1 ).join();
+		workExecutor.purge().join();
 		workExecutor.flush().join();
 
-		// so that it will affect only TENANT_1
+		// check that only TENANT_1 is affected by the purge
 		assertBookNumberIsEqualsTo( 0, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 	}

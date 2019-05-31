@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkE
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -99,7 +100,13 @@ public class IndexingBackendContext {
 				indexName, sessionContext );
 	}
 
-	IndexWorkExecutor createWorkExecutor(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName) {
-		return new ElasticsearchIndexWorkExecutor( link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator, indexName, eventContext );
+	IndexWorkExecutor createWorkExecutor(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName,
+			DetachedSessionContextImplementor sessionContext) {
+		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
+
+		return new ElasticsearchIndexWorkExecutor(
+				link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator, indexName,
+				sessionContext
+		);
 	}
 }

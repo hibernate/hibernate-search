@@ -33,6 +33,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkE
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -156,8 +157,10 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor() {
-		return indexingBackendContext.createWorkExecutor( parallelOrchestrator, elasticsearchIndexName );
+	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
+		return indexingBackendContext.createWorkExecutor(
+				parallelOrchestrator, elasticsearchIndexName, sessionContext
+		);
 	}
 
 	@Override

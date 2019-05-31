@@ -8,29 +8,27 @@ package org.hibernate.search.backend.lucene.work.execution.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
-import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 
 public class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 
 	private final LuceneWorkFactory factory;
-	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final LuceneWriteWorkOrchestrator orchestrator;
 	private final String indexName;
-	private final EventContext eventContext;
+	private final DetachedSessionContextImplementor sessionContext;
 
-	public LuceneIndexWorkExecutor(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy, LuceneWriteWorkOrchestrator orchestrator, String indexName,
-			EventContext eventContext) {
+	public LuceneIndexWorkExecutor(LuceneWorkFactory factory,
+			LuceneWriteWorkOrchestrator orchestrator, String indexName,
+			DetachedSessionContextImplementor sessionContext) {
 		this.factory = factory;
-		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexName;
-		this.eventContext = eventContext;
+		this.sessionContext = sessionContext;
 	}
 
 	@Override
@@ -43,10 +41,9 @@ public class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 	}
 
 	@Override
-	public CompletableFuture<?> purge(String tenantId) {
-		multiTenancyStrategy.checkTenantId( tenantId, eventContext );
+	public CompletableFuture<?> purge() {
 		return orchestrator.submit(
-				factory.deleteAll( indexName, tenantId ),
+				factory.deleteAll( indexName, sessionContext.getTenantIdentifier() ),
 				DocumentCommitStrategy.FORCE,
 				DocumentRefreshStrategy.NONE
 		);

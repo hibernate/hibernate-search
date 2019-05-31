@@ -16,6 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
@@ -34,6 +35,8 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SessionFactoryImplementor sessionFactory;
+	private final HibernateOrmMapping mapping;
+	private final DetachedSessionContextImplementor sessionContext;
 
 	private final ProducerConsumerQueue<List<Serializable>> primaryKeyStream;
 
@@ -56,24 +59,25 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private final int idFetchSize;
 	private final Integer transactionTimeout;
 
-	private final String tenantId;
-	private final HibernateOrmMapping mapping;
 
 	private final List<Future<?>> tasks = new ArrayList<>();
 
-	public BatchIndexingWorkspace(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, Class<?> type,
+	public BatchIndexingWorkspace(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping,
+			DetachedSessionContextImplementor sessionContext,
+			Class<?> type,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
 			CountDownLatch endAllSignal, MassIndexingMonitor monitor, long objectsLimit,
-			int idFetchSize, Integer transactionTimeout, String tenantId) {
+			int idFetchSize, Integer transactionTimeout) {
+		this.sessionFactory = sessionFactory;
+		this.mapping = mapping;
+		this.sessionContext = sessionContext;
+
 		this.indexedType = type;
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
-		this.tenantId = tenantId;
 
-		this.mapping = mapping;
 		this.idNameOfIndexedType = sessionFactory.getMetamodel().entity( indexedType ).locateIdAttribute().getName();
 
-		this.sessionFactory = sessionFactory;
 
 		//thread pool sizing:
 		this.documentBuilderThreads = objectLoadingThreads;
@@ -130,13 +134,15 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	}
 
 	private void startProducingPrimaryKeys(BatchTransactionalContext transactionalContext) {
-		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction( transactionalContext,
+		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction(
+				transactionalContext,
 				new IdentifierProducer(
 						primaryKeyStream, sessionFactory, objectLoadingBatchSize,
 						indexedType, monitor, objectsLimit,
-						idFetchSize, tenantId
+						idFetchSize, sessionContext.getTenantIdentifier()
 				),
-				transactionTimeout, tenantId );
+				transactionTimeout, sessionContext.getTenantIdentifier()
+		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor execIdentifiersLoader = Executors.newFixedThreadPool( 1, "identifierloader" );
 		try {
@@ -151,7 +157,8 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer(
 				primaryKeyStream, monitor, sessionFactory,
 				producerEndSignal, cacheMode, indexedType,
-				idNameOfIndexedType, transactionTimeout, tenantId,
+				idNameOfIndexedType, transactionTimeout,
+				sessionContext.getTenantIdentifier(),
 				mapping
 		);
 		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );

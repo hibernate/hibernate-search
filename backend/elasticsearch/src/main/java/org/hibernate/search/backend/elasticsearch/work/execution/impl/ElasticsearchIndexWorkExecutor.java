@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
-import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 
 import com.google.gson.JsonObject;
 
@@ -23,16 +23,17 @@ public class ElasticsearchIndexWorkExecutor implements IndexWorkExecutor {
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final URLEncodedString indexName;
-	private final EventContext eventContext;
+	private final DetachedSessionContextImplementor sessionContext;
 
 	public ElasticsearchIndexWorkExecutor(ElasticsearchWorkBuilderFactory builderFactory,
 			MultiTenancyStrategy multiTenancyStrategy, ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName, EventContext eventContext) {
+			URLEncodedString indexName,
+			DetachedSessionContextImplementor sessionContext) {
 		this.builderFactory = builderFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexName;
-		this.eventContext = eventContext;
+		this.sessionContext = sessionContext;
 	}
 
 	@Override
@@ -41,12 +42,14 @@ public class ElasticsearchIndexWorkExecutor implements IndexWorkExecutor {
 	}
 
 	@Override
-	public CompletableFuture<?> purge(String tenantId) {
-		multiTenancyStrategy.checkTenantId( tenantId, eventContext );
+	public CompletableFuture<?> purge() {
 		JsonObject matchAll = new JsonObject();
 		matchAll.add( "match_all", new JsonObject() );
 		JsonObject document = new JsonObject();
-		document.add( "query", multiTenancyStrategy.decorateJsonQuery( matchAll, tenantId ) );
+		document.add(
+				"query",
+				multiTenancyStrategy.decorateJsonQuery( matchAll, sessionContext.getTenantIdentifier() )
+		);
 
 		return orchestrator.submit( builderFactory.deleteByQuery( indexName, document ).build() );
 	}

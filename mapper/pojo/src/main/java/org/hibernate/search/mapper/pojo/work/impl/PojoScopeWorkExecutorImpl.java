@@ -13,21 +13,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 
 public class PojoScopeWorkExecutorImpl implements PojoScopeWorkExecutor {
 
 	private final List<IndexWorkExecutor> workExecutors = new ArrayList<>();
-	private final AbstractPojoSessionContextImplementor sessionContext;
 
 	public PojoScopeWorkExecutorImpl(Set<? extends PojoIndexedTypeManager<?, ?, ?>> targetedTypeManagers,
-			AbstractPojoSessionContextImplementor sessionContext) {
+			DetachedSessionContextImplementor sessionContext) {
 		for ( PojoIndexedTypeManager<?, ?, ?> targetedTypeManager : targetedTypeManagers ) {
-			workExecutors.add( targetedTypeManager.createWorkExecutor() );
+			workExecutors.add( targetedTypeManager.createWorkExecutor( sessionContext ) );
 		}
-		this.sessionContext = sessionContext;
 	}
 
 	@Override
@@ -37,7 +35,7 @@ public class PojoScopeWorkExecutorImpl implements PojoScopeWorkExecutor {
 
 	@Override
 	public CompletableFuture<?> purge() {
-		return doOperationOnTypes( workExecutor -> workExecutor.purge( sessionContext.getTenantIdentifier() ) );
+		return doOperationOnTypes( IndexWorkExecutor::purge );
 	}
 
 	@Override

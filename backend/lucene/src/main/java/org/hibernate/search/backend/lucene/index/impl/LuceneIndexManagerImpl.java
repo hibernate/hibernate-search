@@ -27,6 +27,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -98,8 +99,8 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor() {
-		return indexingBackendContext.createWorkExecutor( writeOrchestrator, indexName );
+	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
+		return indexingBackendContext.createWorkExecutor( writeOrchestrator, indexName, sessionContext );
 	}
 
 	@Override
