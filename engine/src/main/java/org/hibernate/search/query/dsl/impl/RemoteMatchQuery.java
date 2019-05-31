@@ -21,6 +21,7 @@ public class RemoteMatchQuery extends AbstractRemoteQueryWithAnalyzer {
 	private String searchTerms;
 
 	private int maxEditDistance = 0;
+	private int prefixLength = 0;
 
 	public static class Builder {
 		private String field;
@@ -28,6 +29,7 @@ public class RemoteMatchQuery extends AbstractRemoteQueryWithAnalyzer {
 		private String searchTerms;
 
 		private int maxEditDistance = 0;
+		private int prefixLength = 0;
 
 		private RemoteAnalyzerReference originalAnalyzerReference;
 
@@ -48,6 +50,11 @@ public class RemoteMatchQuery extends AbstractRemoteQueryWithAnalyzer {
 			return this;
 		}
 
+		public Builder prefixLength(int prefixLength) {
+			this.prefixLength = prefixLength;
+			return this;
+		}
+
 		public Builder analyzerReference(RemoteAnalyzerReference originalAnalyzerReference, RemoteAnalyzerReference queryAnalyzerReference) {
 			this.originalAnalyzerReference = originalAnalyzerReference;
 			this.queryAnalyzerReference = queryAnalyzerReference;
@@ -55,15 +62,16 @@ public class RemoteMatchQuery extends AbstractRemoteQueryWithAnalyzer {
 		}
 
 		public RemoteMatchQuery build() {
-			return new RemoteMatchQuery( field, searchTerms, maxEditDistance, originalAnalyzerReference, queryAnalyzerReference );
+			return new RemoteMatchQuery( field, searchTerms, maxEditDistance, prefixLength, originalAnalyzerReference, queryAnalyzerReference );
 		}
 	}
 
-	private RemoteMatchQuery(String field, String terms, int maxEditDistance,
+	private RemoteMatchQuery(String field, String terms, int maxEditDistance, int prefixLength,
 			RemoteAnalyzerReference originalAnalyzerReference, RemoteAnalyzerReference queryAnalyzerReference) {
 		super( originalAnalyzerReference, queryAnalyzerReference );
 		this.field = field;
 		this.maxEditDistance = maxEditDistance;
+		this.prefixLength = prefixLength;
 		this.searchTerms = terms;
 	}
 
@@ -79,6 +87,10 @@ public class RemoteMatchQuery extends AbstractRemoteQueryWithAnalyzer {
 		return maxEditDistance;
 	}
 
+	public int getPrefixLength() {
+		return prefixLength;
+	}
+
 	@Override
 	public String toString(String field) {
 		StringBuilder sb = new StringBuilder();
@@ -88,6 +100,9 @@ public class RemoteMatchQuery extends AbstractRemoteQueryWithAnalyzer {
 		sb.append( searchTerms );
 		if ( maxEditDistance != 0 ) {
 			sb.append( "~" ).append( maxEditDistance );
+		}
+		if ( prefixLength != 0 ) {
+			sb.append( "[^" ).append( prefixLength ).append( "]" );
 		}
 		sb.append( ToStringUtils.boost( getBoost() ) );
 		sb.append( ", originalAnalyzer=" ).append( getOriginalAnalyzerReference() );
