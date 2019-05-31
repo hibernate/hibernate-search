@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
@@ -84,7 +85,9 @@ class PojoScopeDelegateImpl<E, E2> implements PojoScopeDelegate<E, E2> {
 	@Override
 	public PojoScopeWorkExecutor executor() {
 		if ( executor == null ) {
-			executor = new PojoScopeWorkExecutorImpl( targetedTypeManagers, sessionContext );
+			executor = new PojoScopeWorkExecutorImpl(
+					targetedTypeManagers, DetachedSessionContextImplementor.of( sessionContext )
+			);
 		}
 		return executor;
 	}

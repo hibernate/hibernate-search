@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -37,7 +38,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	private final HibernateOrmMapping mapping;
 	private final SessionFactoryImplementor sessionFactory;
-	private final String tenantIdentifier;
+	private final DetachedSessionContextImplementor sessionContext;
 
 	private final Set<Class<?>> rootEntities;
 	private final PojoScopeWorkExecutor scopeWorkExecutor;
@@ -55,11 +56,12 @@ public class MassIndexerImpl implements MassIndexer {
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 	private Integer idLoadingTransactionTimeout;
 
-	public MassIndexerImpl(SessionFactoryImplementor sessionFactory, String tenantIdentifier,
-			Set<? extends Class<?>> targetedIndexedTypes, PojoScopeWorkExecutor scopeWorkExecutor) {
+	public MassIndexerImpl(SessionFactoryImplementor sessionFactory, Set<? extends Class<?>> targetedIndexedTypes,
+			DetachedSessionContextImplementor sessionContext,
+			PojoScopeWorkExecutor scopeWorkExecutor) {
 		this.sessionFactory = sessionFactory;
 		this.mapping = sessionFactory.getServiceRegistry().getService( HibernateSearchContextService.class ).getMapping();
-		this.tenantIdentifier = tenantIdentifier;
+		this.sessionContext = sessionContext;
 		this.rootEntities = toRootEntities( targetedIndexedTypes );
 		this.scopeWorkExecutor = scopeWorkExecutor;
 
@@ -171,7 +173,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	protected BatchCoordinator createCoordinator() {
 		return new BatchCoordinator(
-				sessionFactory, mapping, tenantIdentifier,
+				sessionFactory, mapping, sessionContext,
 				rootEntities, scopeWorkExecutor,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,

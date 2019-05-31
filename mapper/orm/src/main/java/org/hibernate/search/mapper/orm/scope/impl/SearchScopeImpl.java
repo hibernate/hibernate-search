@@ -16,22 +16,23 @@ import org.hibernate.search.mapper.orm.search.dsl.query.impl.HibernateOrmSearchQ
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
+import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.mapper.orm.search.SearchScope<E> {
 
 	private final PojoScopeDelegate<E, E> delegate;
-	private final SessionImplementor sessionImplementor;
+	private final HibernateOrmSessionContextImpl sessionContext;
 
-	public SearchScopeImpl(PojoScopeDelegate<E, E> delegate,
-			SessionImplementor sessionImplementor) {
+	public SearchScopeImpl(PojoScopeDelegate<E, E> delegate, HibernateOrmSessionContextImpl sessionContext) {
 		this.delegate = delegate;
-		this.sessionImplementor = sessionImplementor;
+		this.sessionContext = sessionContext;
 	}
 
 	@Override
 	public HibernateOrmSearchQueryResultDefinitionContext<E> search() {
+		SessionImplementor sessionImplementor = sessionContext.getSession();
 		EntityLoaderBuilder<E> entityLoaderBuilder =
 				new EntityLoaderBuilder<>( sessionImplementor, delegate.getIncludedIndexedTypes() );
 		MutableEntityLoadingOptions loadingOptions = new MutableEntityLoadingOptions();

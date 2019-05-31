@@ -9,17 +9,21 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
 
-public class StubIndexWorkExecutor implements IndexWorkExecutor {
+class StubIndexWorkExecutor implements IndexWorkExecutor {
 
 	private final String indexName;
 	private final StubBackendBehavior behavior;
+	private final DetachedSessionContextImplementor sessionContext;
 
-	public StubIndexWorkExecutor(String indexName, StubBackendBehavior behavior) {
+	StubIndexWorkExecutor(String indexName, StubBackendBehavior behavior,
+			DetachedSessionContextImplementor sessionContext) {
 		this.indexName = indexName;
 		this.behavior = behavior;
+		this.sessionContext = sessionContext;
 	}
 
 	@Override
@@ -29,8 +33,10 @@ public class StubIndexWorkExecutor implements IndexWorkExecutor {
 	}
 
 	@Override
-	public CompletableFuture<?> purge(String tenantId) {
-		StubIndexWork work = StubIndexWork.builder( StubIndexWork.Type.PURGE ).tenantIdentifier( tenantId ).build();
+	public CompletableFuture<?> purge() {
+		StubIndexWork work = StubIndexWork.builder( StubIndexWork.Type.PURGE )
+				.tenantIdentifier( sessionContext.getTenantIdentifier() )
+				.build();
 		return behavior.executeBulkWork( indexName, work );
 	}
 

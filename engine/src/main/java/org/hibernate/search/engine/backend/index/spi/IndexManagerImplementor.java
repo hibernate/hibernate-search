@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkE
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 /**
@@ -47,7 +48,7 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
-	IndexWorkExecutor createWorkExecutor();
+	IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext);
 
 	IndexScopeBuilder createScopeBuilder(MappingContextImplementor mappingContext);
 

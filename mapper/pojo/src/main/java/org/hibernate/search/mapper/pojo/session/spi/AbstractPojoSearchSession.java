@@ -14,8 +14,9 @@ public abstract class AbstractPojoSearchSession {
 
 	private final PojoSearchSessionDelegate delegate;
 
-	protected AbstractPojoSearchSession(AbstractBuilder<? extends AbstractPojoSearchSession> builder) {
-		this.delegate = builder.mappingDelegate.createSearchSessionDelegate( builder.buildSessionContext() );
+	protected AbstractPojoSearchSession(AbstractBuilder<? extends AbstractPojoSearchSession> builder,
+			AbstractPojoSessionContextImplementor sessionContext) {
+		this.delegate = builder.mappingDelegate.createSearchSessionDelegate( sessionContext );
 	}
 
 	protected final PojoSearchSessionDelegate getDelegate() {
@@ -29,8 +30,6 @@ public abstract class AbstractPojoSearchSession {
 		public AbstractBuilder(PojoMappingDelegate mappingDelegate) {
 			this.mappingDelegate = mappingDelegate;
 		}
-
-		protected abstract AbstractPojoSessionContextImplementor buildSessionContext();
 
 		public abstract T build();
 

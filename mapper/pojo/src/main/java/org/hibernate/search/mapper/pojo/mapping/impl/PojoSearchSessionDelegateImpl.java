@@ -40,6 +40,11 @@ class PojoSearchSessionDelegateImpl implements PojoSearchSessionDelegate {
 	}
 
 	@Override
+	public AbstractPojoSessionContextImplementor getSessionContext() {
+		return sessionContext;
+	}
+
+	@Override
 	public <E, E2> PojoScopeDelegate<E, E2> createPojoScope(
 			Collection<? extends Class<? extends E>> targetedTypes) {
 		if ( targetedTypes.isEmpty() ) {

@@ -10,11 +10,14 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 
 public interface PojoSearchSessionDelegate {
+
+	AbstractPojoSessionContextImplementor getSessionContext();
 
 	<E, E2> PojoScopeDelegate<E, E2> createPojoScope(Collection<? extends Class<? extends E>> targetedTypes);
 

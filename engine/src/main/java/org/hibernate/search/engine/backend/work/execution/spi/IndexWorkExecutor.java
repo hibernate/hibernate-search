@@ -12,7 +12,7 @@ public interface IndexWorkExecutor {
 
 	CompletableFuture<?> optimize();
 
-	CompletableFuture<?> purge(String tenantId);
+	CompletableFuture<?> purge();
 
 	CompletableFuture<?> flush();
 
