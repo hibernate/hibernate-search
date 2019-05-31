@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.session;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -13,6 +14,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
+import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
@@ -47,6 +49,35 @@ public interface SearchSession {
 	 */
 	default <T> HibernateOrmSearchQueryResultDefinitionContext<T> search(Collection<? extends Class<? extends T>> types) {
 		return scope( types ).search();
+	}
+
+	/**
+	 * Create a {@link SearchWriter} for the indexes mapped to all indexed types.
+	 *
+	 * @return A {@link SearchWriter}.
+	 */
+	default SearchWriter writer() {
+		return writer( Collections.singleton( Object.class ) );
+	}
+
+	/**
+	 * Create a {@link SearchWriter} for the indexes mapped to the given type, or to any of its sub-types.
+	 *
+	 * @param types One or more indexed types, or supertypes of all indexed types that will be targeted by the writer.
+	 * @return A {@link SearchWriter}.
+	 */
+	default SearchWriter writer(Class<?> ... types) {
+		return writer( Arrays.asList( types ) );
+	}
+
+	/**
+	 * Create a {@link SearchWriter} for the indexes mapped to the given types, or to any of their sub-types.
+	 *
+	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the writer.
+	 * @return A {@link SearchWriter}.
+	 */
+	default SearchWriter writer(Collection<? extends Class<?>> types) {
+		return scope( types ).writer();
 	}
 
 	/**
