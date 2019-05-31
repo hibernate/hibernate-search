@@ -24,7 +24,7 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 public class StubIndexManager implements IndexManagerImplementor<StubDocumentElement>, IndexManager {
@@ -111,15 +111,15 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 		throw new SearchException( "Cannot unwrap " + this + " to " + clazz );
 	}
 
-	void prepare(List<StubIndexWork> works) {
-		backend.getBehavior().prepareWorks( name, works );
+	void prepare(List<StubDocumentWork> works) {
+		backend.getBehavior().prepareDocumentWorks( name, works );
 	}
 
-	CompletableFuture<?> execute(List<StubIndexWork> works) {
-		return backend.getBehavior().executeWorks( name, works );
+	CompletableFuture<?> execute(List<StubDocumentWork> works) {
+		return backend.getBehavior().executeDocumentWorks( name, works );
 	}
 
-	CompletableFuture<?> prepareAndExecuteWork(StubIndexWork work) {
-		return backend.getBehavior().prepareAndExecuteWork( name, work );
+	CompletableFuture<?> prepareAndExecuteWork(StubDocumentWork work) {
+		return backend.getBehavior().prepareAndExecuteDocumentWork( name, work );
 	}
 }

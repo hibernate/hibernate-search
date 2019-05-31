@@ -16,9 +16,8 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 public class SearchWriterFlushIT extends AbstractSearchWriterSimpleOperationIT {
 	@Override
 	protected void expectWork(BackendMock backendMock, String indexName, CompletableFuture<?> future) {
-		backendMock.expectWorks( indexName )
-				.flush()
-				.executed( future );
+		backendMock.expectIndexScopeWorks( indexName )
+				.flush( future );
 	}
 
 	@Override

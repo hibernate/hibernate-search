@@ -16,9 +16,8 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 public class SearchWriterPurgeIT extends AbstractSearchWriterSimpleOperationIT {
 	@Override
 	protected void expectWork(BackendMock backendMock, String indexName, CompletableFuture<?> future) {
-		backendMock.expectWorks( indexName )
-				.purge( null )
-				.executed( future );
+		backendMock.expectIndexScopeWorks( indexName )
+				.purge( future );
 	}
 
 	@Override

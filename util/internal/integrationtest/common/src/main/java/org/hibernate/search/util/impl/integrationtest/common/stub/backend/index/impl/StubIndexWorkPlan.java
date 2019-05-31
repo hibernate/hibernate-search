@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributo
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 
 class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
@@ -26,7 +26,7 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final List<StubIndexWork> works = new ArrayList<>();
+	private final List<StubDocumentWork> works = new ArrayList<>();
 
 	private int preparedIndex = 0;
 
@@ -41,7 +41,7 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 	@Override
 	public void add(DocumentReferenceProvider documentReferenceProvider,
 			DocumentContributor<StubDocumentElement> documentContributor) {
-		StubIndexWork.Builder builder = StubIndexWork.builder( StubIndexWork.Type.ADD );
+		StubDocumentWork.Builder builder = StubDocumentWork.builder( StubDocumentWork.Type.ADD );
 		populate( builder, documentReferenceProvider );
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		StubDocumentElement documentElement = new StubDocumentElement( documentBuilder );
@@ -55,7 +55,7 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 	@Override
 	public void update(DocumentReferenceProvider documentReferenceProvider,
 			DocumentContributor<StubDocumentElement> documentContributor) {
-		StubIndexWork.Builder builder = StubIndexWork.builder( StubIndexWork.Type.UPDATE );
+		StubDocumentWork.Builder builder = StubDocumentWork.builder( StubDocumentWork.Type.UPDATE );
 		populate( builder, documentReferenceProvider );
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		StubDocumentElement documentElement = new StubDocumentElement( documentBuilder );
@@ -68,7 +68,7 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 
 	@Override
 	public void delete(DocumentReferenceProvider documentReferenceProvider) {
-		StubIndexWork.Builder builder = StubIndexWork.builder( StubIndexWork.Type.DELETE );
+		StubDocumentWork.Builder builder = StubDocumentWork.builder( StubDocumentWork.Type.DELETE );
 		populate( builder, documentReferenceProvider );
 		builder.commit( commitStrategy );
 		builder.refresh( refreshStrategy );
@@ -90,13 +90,13 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 		return future;
 	}
 
-	private void populate(StubIndexWork.Builder builder, DocumentReferenceProvider documentReferenceProvider) {
+	private void populate(StubDocumentWork.Builder builder, DocumentReferenceProvider documentReferenceProvider) {
 		builder.tenantIdentifier( sessionContext.getTenantIdentifier() );
 		builder.identifier( documentReferenceProvider.getIdentifier() );
 		builder.routingKey( documentReferenceProvider.getRoutingKey() );
 	}
 
-	private void addWork(StubIndexWork work) {
+	private void addWork(StubDocumentWork work) {
 		works.add( work );
 	}
 }

@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
 
 class StubIndexWorkExecutor implements IndexWorkExecutor {
 
@@ -28,21 +29,21 @@ class StubIndexWorkExecutor implements IndexWorkExecutor {
 
 	@Override
 	public CompletableFuture<?> optimize() {
-		StubIndexWork work = StubIndexWork.builder( StubIndexWork.Type.OPTIMIZE ).build();
-		return behavior.executeBulkWork( indexName, work );
+		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.OPTIMIZE ).build();
+		return behavior.executeIndexScopeWork( Collections.singletonList( indexName ), work );
 	}
 
 	@Override
 	public CompletableFuture<?> purge() {
-		StubIndexWork work = StubIndexWork.builder( StubIndexWork.Type.PURGE )
+		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.PURGE )
 				.tenantIdentifier( sessionContext.getTenantIdentifier() )
 				.build();
-		return behavior.executeBulkWork( indexName, work );
+		return behavior.executeIndexScopeWork( Collections.singletonList( indexName ), work );
 	}
 
 	@Override
 	public CompletableFuture<?> flush() {
-		StubIndexWork work = StubIndexWork.builder( StubIndexWork.Type.FLUSH ).build();
-		return behavior.executeBulkWork( indexName, work );
+		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.FLUSH ).build();
+		return behavior.executeIndexScopeWork( Collections.singletonList( indexName ), work );
 	}
 }

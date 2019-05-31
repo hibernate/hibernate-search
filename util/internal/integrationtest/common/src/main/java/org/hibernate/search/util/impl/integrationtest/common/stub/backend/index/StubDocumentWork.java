@@ -10,10 +10,10 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 
-public final class StubIndexWork {
+public final class StubDocumentWork {
 
 	public enum Type {
-		ADD, UPDATE, DELETE, OPTIMIZE, PURGE, FLUSH
+		ADD, UPDATE, DELETE
 	}
 
 	public static Builder builder(Type type) {
@@ -28,7 +28,7 @@ public final class StubIndexWork {
 	private final DocumentRefreshStrategy refreshStrategy;
 	private final StubDocumentNode document;
 
-	private StubIndexWork(Builder builder) {
+	private StubDocumentWork(Builder builder) {
 		this.type = builder.type;
 		this.tenantIdentifier = builder.tenantIdentifier;
 		this.identifier = builder.identifier;
@@ -123,8 +123,8 @@ public final class StubIndexWork {
 			return this;
 		}
 
-		public StubIndexWork build() {
-			return new StubIndexWork( this );
+		public StubDocumentWork build() {
+			return new StubDocumentWork( this );
 		}
 	}
 

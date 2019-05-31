@@ -93,12 +93,11 @@ public class BasicMassIndexingIT {
 
 			// purgeAtStart, optimizeAfterPurge and purgeAtStart flags are active by default,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
-			backendMock.expectWorks( Book.INDEX )
-					.purge( session.getTenantIdentifier() )
+			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
+					.purge()
 					.optimize()
 					.optimize()
-					.flush()
-					.executed();
+					.flush();
 
 			try {
 				indexer.startAndWait();

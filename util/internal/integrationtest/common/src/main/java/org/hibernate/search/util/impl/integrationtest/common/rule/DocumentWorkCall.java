@@ -9,12 +9,12 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.StubIndexWorkAssert;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
+import org.hibernate.search.util.impl.integrationtest.common.assertion.StubDocumentWorkAssert;
 
 import org.junit.Assert;
 
-class IndexWorkCall extends Call<IndexWorkCall> {
+class DocumentWorkCall extends Call<DocumentWorkCall> {
 
 	enum WorkPhase {
 		PREPARE,
@@ -23,10 +23,10 @@ class IndexWorkCall extends Call<IndexWorkCall> {
 
 	private final String indexName;
 	private final WorkPhase phase;
-	private final StubIndexWork work;
+	private final StubDocumentWork work;
 	private final CompletableFuture<?> completableFuture;
 
-	IndexWorkCall(String indexName, WorkPhase phase, StubIndexWork work,
+	DocumentWorkCall(String indexName, WorkPhase phase, StubDocumentWork work,
 			CompletableFuture<?> completableFuture) {
 		this.indexName = indexName;
 		this.phase = phase;
@@ -34,29 +34,29 @@ class IndexWorkCall extends Call<IndexWorkCall> {
 		this.completableFuture = completableFuture;
 	}
 
-	IndexWorkCall(String indexName, WorkPhase phase, StubIndexWork work) {
+	DocumentWorkCall(String indexName, WorkPhase phase, StubDocumentWork work) {
 		this.indexName = indexName;
 		this.phase = phase;
 		this.work = work;
 		this.completableFuture = null;
 	}
 
-	public CallBehavior<CompletableFuture<?>> verify(IndexWorkCall actualCall) {
-		String whenThisWorkWasExpected = "when a " + phase + " call for a work on index '" + indexName
+	public CallBehavior<CompletableFuture<?>> verify(DocumentWorkCall actualCall) {
+		String whenThisWorkWasExpected = "when a " + phase + " call for a document work on index '" + indexName
 				+ "', identifier '" + work.getIdentifier() + "' was expected";
 		if ( !Objects.equals( phase, actualCall.phase ) ) {
 			Assert.fail( "Incorrect work phase " + whenThisWorkWasExpected + ".\n\tExpected: "
 					+ phase + ", actual: " + actualCall.phase
 					+ ".\n\tExpected work: " + work + "\n\tActual work: " + actualCall.work );
 		}
-		StubIndexWorkAssert.assertThat( actualCall.work )
+		StubDocumentWorkAssert.assertThat( actualCall.work )
 				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
 				.matches( work );
 		return () -> completableFuture;
 	}
 
 	@Override
-	protected boolean isSimilarTo(IndexWorkCall other) {
+	protected boolean isSimilarTo(DocumentWorkCall other) {
 		return Objects.equals( phase, other.phase )
 				&& Objects.equals( indexName, other.indexName )
 				&& Objects.equals( work.getTenantIdentifier(), other.work.getTenantIdentifier() )
