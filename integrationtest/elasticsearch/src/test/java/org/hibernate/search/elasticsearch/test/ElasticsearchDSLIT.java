@@ -35,6 +35,8 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestForIssue;
+
 import org.junit.Test;
 
 /**
@@ -189,6 +191,28 @@ public class ElasticsearchDSLIT extends SearchTestBase {
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
 			String queryString = fullTextQuery.getQueryString();
 			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter','fuzziness':2}}}}", queryString );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3545")
+	public void testDSLKeywordWithFuzziness_withPrefixLength() throws Exception {
+		try ( Session session = openSession() ) {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			final QueryBuilder queryBuilder = queryBuilder( fullTextSession );
+
+			Query query = queryBuilder
+					.keyword()
+						.fuzzy()
+							.withEditDistanceUpTo( 2 )
+							.withPrefixLength( 3 )
+						.onField( "message" )
+						.matching( "A very important matter" )
+					.createQuery();
+
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Letter.class );
+			String queryString = fullTextQuery.getQueryString();
+			assertJsonEquals( "{'query':{'match':{'message':{'query':'A very important matter','fuzziness':2,'prefix_length':3}}}}", queryString );
 		}
 	}
 

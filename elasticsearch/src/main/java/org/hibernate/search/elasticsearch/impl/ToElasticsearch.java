@@ -81,6 +81,7 @@ public class ToElasticsearch {
 
 	private static final int DEFAULT_SLOP = 0;
 	private static final int DEFAULT_MAX_EDIT_DISTANCE = 0;
+	private static final int DEFAULT_PREFIX_LENGTH = 0;
 	private static final float DEFAULT_BOOST = 1.0f;
 	private static final String BOOST_OPERATOR = "^";
 
@@ -481,6 +482,7 @@ public class ToElasticsearch {
 												query.getField()
 										) )
 										.append( fuzzinessAppender( query.getMaxEditDistance() ) )
+										.append( prefixLengthAppender( query.getPrefixLength() ) )
 										.append( boostAppender( query ) )
 						)
 				).build();
@@ -695,6 +697,18 @@ public class ToElasticsearch {
 	private static JsonBuilder.JsonAppender<? super JsonBuilder.Object> fuzzinessAppender(final int maxEditDistance) {
 		if ( maxEditDistance != DEFAULT_MAX_EDIT_DISTANCE ) {
 			return builder -> builder.addProperty( "fuzziness", maxEditDistance );
+		}
+		else {
+			return NOOP_APPENDER;
+		}
+	}
+
+	/**
+	 * Appender that adds a "prefix_length" property if necessary.
+	 */
+	private static JsonBuilder.JsonAppender<? super JsonBuilder.Object> prefixLengthAppender(final int prefixLength) {
+		if ( prefixLength != DEFAULT_PREFIX_LENGTH ) {
+			return builder -> builder.addProperty( "prefix_length", prefixLength );
 		}
 		else {
 			return NOOP_APPENDER;

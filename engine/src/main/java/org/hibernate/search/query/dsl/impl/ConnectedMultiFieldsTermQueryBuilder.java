@@ -231,6 +231,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			// the max edit distance based on the total searchTerm length which is wrong
 			// It might be a good time to consider removing the deprecated threshold method
 			queryBuilder.maxEditDistance( getMaxEditDistance( searchTerm ) );
+			queryBuilder.prefixLength( termContext.getPrefixLength() );
 		}
 
 		return queryBuilder.build();
