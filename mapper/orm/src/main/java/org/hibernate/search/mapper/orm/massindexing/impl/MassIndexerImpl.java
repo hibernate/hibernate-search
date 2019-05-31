@@ -9,8 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -20,7 +19,6 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.orm.massindexing.monitor.impl.SimpleIndexingProgressMonitor;
-import org.hibernate.search.util.common.impl.Executors;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.StringHelper;
 
@@ -179,15 +177,8 @@ public class MassIndexerImpl implements MassIndexer {
 	}
 
 	@Override
-	public Future<?> start() {
-		BatchCoordinator coordinator = createCoordinator();
-		ExecutorService executor = Executors.newFixedThreadPool( 1, "batch coordinator" );
-		try {
-			return executor.submit( coordinator );
-		}
-		finally {
-			executor.shutdown();
-		}
+	public CompletableFuture<?> start() {
+		return CompletableFuture.runAsync( createCoordinator() );
 	}
 
 	@Override
