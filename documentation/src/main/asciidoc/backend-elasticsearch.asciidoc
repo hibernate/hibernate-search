@@ -360,8 +360,10 @@ See <<mapper-orm-bridge-valuebridge-builtin>> for more information.
 |java.lang.Double|`double`
 |java.lang.Float|`float`
 |java.lang.Boolean|`boolean`
-|java.math.BigDecimal|Not supported yet; see https://hibernate.atlassian.net/browse/HSEARCH-3487[HSEARCH-3487]
-|java.math.BigInteger|Not supported yet; see https://hibernate.atlassian.net/browse/HSEARCH-3487[HSEARCH-3487]
+|java.math.BigDecimal|`scaled_float`
+with a `scaling_factor` equal to 10^(`decimalScale`)
+|java.math.BigInteger|`scaled_float`
+with a `scaling_factor` equal to 10^(`decimalScale`)
 |java.time.Instant|`date` with format
 `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
 or `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'` (ES6 and below)
