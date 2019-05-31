@@ -262,6 +262,30 @@ Since not storing the norms can save a considerable amount of memory.
 To store the norms set the attribute `norms` to `Norms.YES`, otherwise set it to `Norms.NO`.
 If the attribute is not set or set to `Norms.DEFAULT`.
 
+`termVector`::
+It's only available on `@FullTextField`.
+This attribute enables the storing of the term vectors within the documents during indexing.
++
+The different values of this attribute are:
++
+[options="header"]
+|===============
+|Value|Definition
+|`TermVector.YES`|Store the term vectors of each document.
+	This produces two synchronized arrays, one contains document terms and the other contains the term's frequency.
+|`TermVector.NO`|Do not store term vectors.
+|`TermVector.WITH_POSITIONS`|Store the term vector and token position information.
+	This is the same as `TermVector.YES` plus it contains the ordinal positions of each occurrence of a term in a document.
+|`TermVector.WITH_OFFSETS`|Store the term vector and token offset information.
+	This is the same as `TermVector.YES` plus it contains the starting and ending offset position information for the terms.
+|`TermVector.WITH_POSITION_OFFSETS`|Store the term vector, token position and offset information.
+	This is a combination of the `YES`, `WITH_OFFSETS` and `WITH_POSITIONS`.
+|`TermVector.WITH_POSITIONS_PAYLOADS`|Store the term vector, token position and token payloads.
+	This is the same as `TermVector.WITH_POSITIONS` plus it contains the payload of each occurrence of a term in a document.
+|`TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS`|Store the term vector, token position, offset information and token payloads.
+	This is the same as `TermVector.WITH_POSITION_OFFSETS` plus it contains the payload of each occurrence of a term in a document.
+|===============
+
 [[mapper-orm-directfieldmapping-decimalscale]] `decimalScale`::
 It's only available on `@KeywordField` and `@FullTextField`.
 To index numbers that have significant digits after the decimal point, set the `decimalScale` to the number of digits you need indexed.
