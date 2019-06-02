@@ -10,22 +10,8 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.MonthDay;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.Period;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -172,10 +158,9 @@ public class FieldSearchSortIT {
 					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 			// Explicit order with onMissingValue().use( ... )
-			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
+			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 and HSEARCH-3387.
 			if (
 					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.before1Value ) );
 				assertThat( query )
@@ -199,10 +184,9 @@ public class FieldSearchSortIT {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
-			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
+			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 and HSEARCH-3387.
 			if (
 					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( new ValueWrapper<>( fieldModel.before1Value ) ) );
@@ -230,10 +214,9 @@ public class FieldSearchSortIT {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
-			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
+			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 and HSEARCH-3387.
 			if (
 					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-							&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( fieldModel.before1Value, DslConverter.DISABLED ) );
@@ -424,10 +407,9 @@ public class FieldSearchSortIT {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
-			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
+			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 and HSEARCH-3387.
 			if (
 					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-							&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( fieldModel.before1Value ), scope );
@@ -479,10 +461,9 @@ public class FieldSearchSortIT {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
-			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
+			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 and HSEARCH-3387.
 			if (
 					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-							&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( fieldModel.before1Value, DslConverter.DISABLED ), scope );
@@ -564,13 +545,6 @@ public class FieldSearchSortIT {
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME )
 				) );
-	}
-
-	private boolean isJavaTimeType(Class<?> type) {
-		final Class<?>[] javaTimeTypes = { LocalDate.class, LocalDateTime.class, LocalTime.class, ZonedDateTime.class, Year.class, YearMonth.class, MonthDay.class,
-				OffsetDateTime.class, OffsetTime.class, ZoneOffset.class, ZoneId.class, Period.class, Duration.class, Instant.class
-		};
-		return Arrays.asList( javaTimeTypes ).contains( type );
 	}
 
 	private void initData() {

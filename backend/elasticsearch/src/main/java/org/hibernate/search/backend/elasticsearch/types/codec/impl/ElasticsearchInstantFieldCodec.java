@@ -26,4 +26,9 @@ public class ElasticsearchInstantFieldCodec extends AbstractElasticsearchJavaTim
 	protected Instant nullUnsafeParse(String stringValue) {
 		return formatter.parse( stringValue, OffsetDateTime::from ).toInstant();
 	}
+
+	@Override
+	protected Long nullUnsafeScalar(Instant value) {
+		return value.toEpochMilli();
+	}
 }

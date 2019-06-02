@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import java.time.LocalDate;
 import java.time.MonthDay;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 public class ElasticsearchMonthDayFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<MonthDay> {
@@ -40,5 +41,11 @@ public class ElasticsearchMonthDayFieldCodec extends AbstractElasticsearchJavaTi
 	protected MonthDay nullUnsafeParse(String stringValue) {
 		LocalDate date = LocalDate.parse( stringValue, formatter );
 		return MonthDay.from( date );
+	}
+
+	@Override
+	protected Long nullUnsafeScalar(MonthDay value) {
+		LocalDate date = value.atYear( LEAP_YEAR );
+		return date.atStartOfDay().toInstant( ZoneOffset.UTC ).toEpochMilli();
 	}
 }

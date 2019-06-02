@@ -31,6 +31,21 @@ public abstract class AbstractElasticsearchJavaTimeFieldCodec<T extends Temporal
 		return new JsonPrimitive( nullUnsafeFormat( value ) );
 	}
 
+	/**
+	 * A different encoding is required for provided missing Java time values. See HSEARCH-3255.
+	 *
+	 * @param value to encode
+	 * @return a {@link JsonElement} containing the long scalar value, if {@code value} is not null.
+	 */
+	@Override
+	public JsonElement encodeForMissing(T value) {
+		if ( value == null ) {
+			return null;
+		}
+
+		return new JsonPrimitive( nullUnsafeScalar( value ) );
+	}
+
 	@Override
 	public T decode(JsonElement element) {
 		if ( element == null || element.isJsonNull() ) {
@@ -57,4 +72,6 @@ public abstract class AbstractElasticsearchJavaTimeFieldCodec<T extends Temporal
 	}
 
 	protected abstract T nullUnsafeParse(String stringValue);
+
+	protected abstract Long nullUnsafeScalar(T value);
 }

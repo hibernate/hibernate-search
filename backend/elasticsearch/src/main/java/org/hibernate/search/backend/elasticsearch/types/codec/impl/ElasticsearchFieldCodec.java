@@ -19,6 +19,10 @@ public interface ElasticsearchFieldCodec<F> {
 
 	JsonElement encode(F value);
 
+	default JsonElement encodeForMissing(F value) {
+		return encode( value );
+	}
+
 	F decode(JsonElement element);
 
 	/**

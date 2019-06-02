@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import java.time.Year;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 public class ElasticsearchYearFieldCodec extends AbstractElasticsearchJavaTimeFieldCodec<Year> {
@@ -18,5 +19,10 @@ public class ElasticsearchYearFieldCodec extends AbstractElasticsearchJavaTimeFi
 	@Override
 	protected Year nullUnsafeParse(String stringValue) {
 		return Year.parse( stringValue, formatter );
+	}
+
+	@Override
+	protected Long nullUnsafeScalar(Year value) {
+		return value.atDay( 1 ).atStartOfDay().toInstant( ZoneOffset.UTC ).toEpochMilli();
 	}
 }

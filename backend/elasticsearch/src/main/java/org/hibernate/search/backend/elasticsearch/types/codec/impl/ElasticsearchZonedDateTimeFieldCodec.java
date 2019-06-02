@@ -21,4 +21,9 @@ public class ElasticsearchZonedDateTimeFieldCodec extends AbstractElasticsearchJ
 	protected ZonedDateTime nullUnsafeParse(String stringValue) {
 		return TimeHelper.parseZoneDateTime( stringValue, formatter );
 	}
+
+	@Override
+	protected Long nullUnsafeScalar(ZonedDateTime value) {
+		return value.toInstant().toEpochMilli();
+	}
 }

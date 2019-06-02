@@ -19,4 +19,9 @@ public class ElasticsearchOffsetDateTimeFieldCodec extends AbstractElasticsearch
 	protected OffsetDateTime nullUnsafeParse(String stringValue) {
 		return OffsetDateTime.parse( stringValue, formatter );
 	}
+
+	@Override
+	protected Long nullUnsafeScalar(OffsetDateTime value) {
+		return value.toInstant().toEpochMilli();
+	}
 }

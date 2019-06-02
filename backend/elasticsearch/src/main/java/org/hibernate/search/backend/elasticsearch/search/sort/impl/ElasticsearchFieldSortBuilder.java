@@ -75,7 +75,7 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = ( dslConverter.isEnabled() ) ? converter : rawConverter;
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
-			this.missing = codec.encode( converted );
+			this.missing = codec.encodeForMissing( converted );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
