@@ -20,6 +20,11 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
+	public boolean normalizedTypeOnMissingValueUse() {
+		return dialect.normalizedTypeOnMissingValueUse();
+	}
+
+	@Override
 	public boolean geoPointIndexNullAs() {
 		return dialect.isGeoPointIndexNullAsPossible();
 	}

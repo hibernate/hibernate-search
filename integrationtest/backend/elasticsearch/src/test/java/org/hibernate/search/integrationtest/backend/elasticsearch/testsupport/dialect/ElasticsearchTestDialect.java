@@ -63,4 +63,8 @@ public interface ElasticsearchTestDialect {
 	default boolean worksFineWithStrictGraterThanRangedQueriesOnScaledFloatField() {
 		return true;
 	}
+
+	default boolean normalizedTypeOnMissingValueUse() {
+		return false;
+	}
 }

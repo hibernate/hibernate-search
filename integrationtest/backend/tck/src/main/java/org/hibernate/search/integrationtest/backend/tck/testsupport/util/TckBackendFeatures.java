@@ -12,6 +12,10 @@ public class TckBackendFeatures {
 		return true;
 	}
 
+	public boolean normalizedTypeOnMissingValueUse() {
+		return true;
+	}
+
 	public boolean localDateTypeOnMissingValueUse() {
 		return true;
 	}
