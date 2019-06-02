@@ -14,12 +14,6 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	private ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
 	@Override
-	public boolean localDateTypeOnMissingValueUse() {
-		// See https://hibernate.atlassian.net/browse/HSEARCH-3255
-		return false;
-	}
-
-	@Override
 	public boolean geoPointIndexNullAs() {
 		return dialect.isGeoPointIndexNullAsPossible();
 	}
