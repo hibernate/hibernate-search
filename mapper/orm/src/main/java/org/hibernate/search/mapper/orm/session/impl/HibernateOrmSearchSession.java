@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
@@ -16,10 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
@@ -78,24 +74,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 		PojoScopeDelegate<T, T> scopeDelegate = getDelegate().createPojoScope( types );
 		return new SearchScopeImpl<>( scopeDelegate, sessionContext );
-	}
-
-	@Override
-	public MassIndexer createIndexer(Class<?>... types) {
-		checkOrmSessionIsOpen();
-
-		if ( types.length == 0 ) {
-			// by default reindex all entities
-			types = new Class<?>[] { Object.class };
-		}
-
-		PojoScopeDelegate<?, ?> scopeDelegate = getDelegate().createPojoScope( Arrays.asList( types ) );
-
-		return new MassIndexerImpl(
-				sessionContext.getSession().getFactory(), scopeDelegate.getIncludedIndexedTypes(),
-				DetachedSessionContextImplementor.of( getDelegate().getSessionContext() ),
-				scopeDelegate.executor()
-		);
 	}
 
 	@Override

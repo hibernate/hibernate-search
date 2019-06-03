@@ -81,6 +81,39 @@ public interface SearchSession {
 	}
 
 	/**
+	 * Creates a {@link MassIndexer} to rebuild the indexes of all indexed entity types.
+	 * <p>
+	 * {@link MassIndexer} instances cannot be reused.
+	 *
+	 * @return The created mass indexer.
+	 */
+	default MassIndexer massIndexer() {
+		return massIndexer( Object.class );
+	}
+
+	/**
+	 * Creates a {@link MassIndexer} to rebuild the indexes mapped to the given types, or to any of their sub-types.
+	 * <p>
+	 * {@link MassIndexer} instances cannot be reused.
+	 *
+	 * @param types An array of indexed types, or supertypes of all indexed types that will be targeted by the writer.
+	 * @return The created mass indexer.
+	 */
+	default MassIndexer massIndexer(Class<?>... types) {
+		return massIndexer( Arrays.asList( types ) );
+	}
+
+	/**
+	 * Creates a {@link MassIndexer} to rebuild the indexes mapped to the given types, or to any of their sub-types.
+	 *
+	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the writer.
+	 * @return A {@link SearchWriter}.
+	 */
+	default MassIndexer massIndexer(Collection<? extends Class<?>> types) {
+		return scope( types ).massIndexer();
+	}
+
+	/**
 	 * Create a {@link SearchScope} limited to the given type.
 	 *
 	 * @param type A type to include in the scope.
@@ -112,8 +145,12 @@ public interface SearchSession {
 	 * @param types An array of indexed types, or supertypes of all indexed types that will be reindexed.
 	 * If empty, all indexed types will be reindexed.
 	 * @return The created mass indexer.
+	 * @deprecated Use {@link #massIndexer()} or {@link #massIndexer(Class[])} instead.
 	 */
-	MassIndexer createIndexer(Class<?>... types);
+	@Deprecated
+	default MassIndexer createIndexer(Class<?>... types) {
+		return types.length == 0 ? massIndexer() : massIndexer( types );
+	}
 
 	/**
 	 * @return The underlying {@link EntityManager} used by this {@link SearchSession}.

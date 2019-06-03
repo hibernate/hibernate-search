@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -98,5 +99,14 @@ public interface SearchScope<E> {
 	 * @return A {@link SearchWriter}.
 	 */
 	SearchWriter writer();
+
+	/**
+	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 * <p>
+	 * {@link MassIndexer} instances cannot be reused.
+	 *
+	 * @return A {@link MassIndexer}.
+	 */
+	MassIndexer massIndexer();
 
 }

@@ -7,9 +7,12 @@
 package org.hibernate.search.mapper.orm.scope.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.writing.impl.SearchWriterImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -65,5 +68,15 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 	@Override
 	public SearchWriter writer() {
 		return new SearchWriterImpl( delegate.executor() );
+	}
+
+	@Override
+	public MassIndexer massIndexer() {
+		return new MassIndexerImpl(
+				sessionContext.getSession().getFactory(),
+				delegate.getIncludedIndexedTypes(),
+				DetachedSessionContextImplementor.of( sessionContext ),
+				delegate.executor()
+		);
 	}
 }

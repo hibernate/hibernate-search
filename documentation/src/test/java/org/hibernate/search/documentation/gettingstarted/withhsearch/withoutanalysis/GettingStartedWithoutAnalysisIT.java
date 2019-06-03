@@ -86,7 +86,7 @@ public class GettingStartedWithoutAnalysisIT {
 			// tag::manual-index[]
 				SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
 
-				MassIndexer indexer = searchSession.createIndexer( Book.class ) // <2>
+				MassIndexer indexer = searchSession.massIndexer( Book.class ) // <2>
 						.threadsToLoadObjects( 7 ); // <3>
 
 				indexer.startAndWait(); // <4>
