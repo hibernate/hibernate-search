@@ -115,11 +115,10 @@ public interface Log extends BasicLogger {
 	SearchException invalidDocumentIdDefiningBothBridgeReferenceAndBridgeBuilderReference(String property);
 
 	@Message(id = ID_OFFSET_2 + 7,
-			value = "Cannot query on an empty target."
-					+ " If you want to target all indexes, put Object.class in the collection of target types,"
-					+ " or use the method of the same name, but without Class<?> parameters."
+			value = "Invalid empty target for a scoped operation."
+					+ " If you want to target all indexes, use 'Object.class' as the target type."
 	)
-	SearchException cannotSearchOnEmptyTarget();
+	SearchException invalidEmptyTargetForScope();
 
 	@Message(id = ID_OFFSET_2 + 10,
 			value = "Bridge '%1$s' cannot be applied to input type '%2$s'.")

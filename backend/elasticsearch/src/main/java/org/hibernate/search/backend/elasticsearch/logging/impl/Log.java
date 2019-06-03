@@ -237,13 +237,13 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_3 = MessageConstants.BACKEND_ES_ID_RANGE_MIN + 500;
 
 	@Message(id = ID_OFFSET_3 + 2,
-			value = "A search query cannot have a scope spanning both an Elasticsearch index and another type of index."
+			value = "A multi-index scope cannot include both an Elasticsearch index and another type of index."
 					+ " Base scope was: '%1$s', Elasticsearch index was: '%2$s'")
 	SearchException cannotMixElasticsearchScopeWithOtherType(IndexScopeBuilder baseScope,
 			ElasticsearchIndexManager elasticsearchIndex, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 3,
-			value = "A search query cannot have a scope spanning multiple Elasticsearch backends."
+			value = "A multi-index scope cannot span multiple Elasticsearch backends."
 					+ " Base scope was: '%1$s', index from another backend was: '%2$s'")
 	SearchException cannotMixElasticsearchScopeWithOtherBackend(IndexScopeBuilder baseScope,
 			ElasticsearchIndexManager indexFromOtherBackend, @Param EventContext context);

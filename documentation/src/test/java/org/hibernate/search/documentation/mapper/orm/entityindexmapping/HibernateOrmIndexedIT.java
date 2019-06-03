@@ -96,8 +96,8 @@ public class HibernateOrmIndexedIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot have a scope spanning" )
-				.hasMessageContaining( "another type of index" );
+				.hasMessageContaining( "A multi-index scope cannot include both " )
+				.hasMessageContaining( " and another type of index" );
 	}
 
 	private void initData() {

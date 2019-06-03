@@ -76,7 +76,7 @@ class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 
 		void add(StubBackend backend, String indexName, StubIndexSchemaNode rootSchemaNode) {
 			if ( !this.backend.equals( backend ) ) {
-				throw new IllegalStateException( "Attempt to run a search query across two distinct backends; this is not possible." );
+				throw new IllegalStateException( "Attempt to build a scope spanning two distinct backends; this is not possible." );
 			}
 			indexNames.add( indexName );
 			rootSchemaNodes.add( rootSchemaNode );
