@@ -253,7 +253,9 @@ i.e. whether the field is indexed in order to allow applying predicates later wh
 Value: `Searchable.YES`, `Searchable.NO`, `Searchable.DEFAULT`.
 
 [[mapper-orm-directfieldmapping-indexnullas]] `indexNullAs`::
-Disabled by default. When set, it defines the value to use as a replacement anytime the property value is null.
+The value to use as a replacement anytime the property value is null.
++
+Disabled by default.
 +
 [IMPORTANT]
 ====
@@ -262,19 +264,18 @@ Look up the column _Parsing method for 'indexNullAs'_ in <<mapper-orm-bridge-val
 ====
 
 `norms`::
-It's only available on `@KeywordField` and `@FullTextField`.
-The norms are index time scoring information for the fields.
+Whether index-time scoring information for the field should be stored or not.
+Only available on `@KeywordField` and `@FullTextField`.
 +
 Enabling norms will improve the quality of scoring.
 But if the score is not used, it is better to not store it.
 Since not storing the norms can save a considerable amount of memory.
 +
-To store the norms set the attribute `norms` to `Norms.YES`, otherwise set it to `Norms.NO`.
-If the attribute is not set or set to `Norms.DEFAULT`.
+Value: `Norms.YES`, `Norms.NO`, `Norms.DEFAULT`.
 
 `termVector`::
-It's only available on `@FullTextField`.
-This attribute enables the storing of the term vectors within the documents during indexing.
+The term vector storing strategy.
+Only available on `@FullTextField`.
 +
 The different values of this attribute are:
 +
@@ -297,7 +298,9 @@ The different values of this attribute are:
 |===============
 
 [[mapper-orm-directfieldmapping-decimalscale]] `decimalScale`::
-It's only available on `@KeywordField` and `@FullTextField`.
+How the scale of a large number (`BigInteger` or `BigDecimal`) should be adjusted before it is indexed as a fixed-precision integer.
+Only available on `@ScaledNumberField`.
++
 To index numbers that have significant digits after the decimal point, set the `decimalScale` to the number of digits you need indexed.
 The decimal point will be shifted that many times to the right before indexing, preserving that many digits from the decimal part.
 To index very large numbers that cannot fit in a long, set the decimal point to a negative value.
