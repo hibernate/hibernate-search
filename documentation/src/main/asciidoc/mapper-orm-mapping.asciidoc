@@ -155,7 +155,11 @@ or custom types.
 === Available field annotations
 
 Various direct field mapping annotations exist,
-each offering its own set of customization options:
+each offering its own set of attributes.
+
+This section lists the different annotations and their use.
+For more details about available attributes,
+see <<mapper-orm-directfieldmapping-annotation-attributes>>.
 
 `@GenericField`::
 A good default choice that will work for every supported property type.
@@ -208,9 +212,15 @@ Values that have trailing decimal digits will be rounded to the nearest integer.
 +
 Annotation allows to set <<mapper-orm-directfieldmapping-decimalscale, the decimalScale attribute>>.
 
+[[mapper-orm-directfieldmapping-annotation-attributes]
 === Field annotation attributes
 
-Each field annotation has its own attributes, but the following ones are common to most annotations:
+Various direct field mapping annotations exist,
+each offering its own set of attributes.
+
+This section lists the different annotation attributes and their use.
+For more details about available annotations,
+see <<mapper-orm-directfieldmapping-annotations>>.
 
 `name`::
 The name of the index field. By default, it is the same as the property name.
