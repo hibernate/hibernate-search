@@ -280,8 +280,7 @@ Whether index-time scoring information for the field should be stored or not.
 Only available on `@KeywordField` and `@FullTextField`.
 +
 Enabling norms will improve the quality of scoring.
-But if the score is not used, it is better to not store it.
-Since not storing the norms can save a considerable amount of memory.
+Disabling norms will reduce the disk space used by the index.
 +
 Value: `Norms.YES`, `Norms.NO`, `Norms.DEFAULT`.
 
