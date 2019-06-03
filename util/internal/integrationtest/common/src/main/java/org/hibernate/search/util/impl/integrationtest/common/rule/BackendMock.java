@@ -366,12 +366,10 @@ public class BackendMock implements TestRule {
 					new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ),
 					IndexWorkCall::verify
 			);
-			callQueue.verify(
+			return callQueue.verify(
 					new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ),
 					IndexWorkCall::verify
 			);
-
-			return CompletableFuture.completedFuture( null );
 		}
 
 		@Override
@@ -391,12 +389,10 @@ public class BackendMock implements TestRule {
 			}
 
 			CallQueue<IndexWorkCall> callQueue = getIndexWorkCalls( indexName );
-			callQueue.verify(
+			return callQueue.verify(
 					new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ),
 					IndexWorkCall::verify
 			);
-
-			return CompletableFuture.completedFuture( null );
 		}
 
 		@Override
