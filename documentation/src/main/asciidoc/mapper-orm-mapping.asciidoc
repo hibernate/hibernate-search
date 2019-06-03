@@ -210,7 +210,7 @@ Because scaled numbers are indexed with a fixed precision, they cannot represent
 Values that are too large to be indexed  will trigger a runtime exception.
 Values that have trailing decimal digits will be rounded to the nearest integer.
 +
-Annotation allows to set <<mapper-orm-directfieldmapping-decimalscale, the decimalScale attribute>>.
+This annotation allows to set <<mapper-orm-directfieldmapping-decimalscale, the decimalScale attribute>>.
 
 [[mapper-orm-directfieldmapping-annotation-attributes]
 === Field annotation attributes
