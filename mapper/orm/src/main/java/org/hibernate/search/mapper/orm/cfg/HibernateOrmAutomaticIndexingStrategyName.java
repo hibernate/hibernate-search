@@ -10,6 +10,7 @@ package org.hibernate.search.mapper.orm.cfg;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -20,7 +21,8 @@ public enum HibernateOrmAutomaticIndexingStrategyName {
 
 	/**
 	 * No automatic indexing is performed:
-	 * indexing will only happen when explicitly requested through APIs.
+	 * indexing will only happen when explicitly requested through APIs
+	 * such as {@link SearchSession#writePlan()}.
 	 */
 	NONE("none"),
 

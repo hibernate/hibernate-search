@@ -19,6 +19,7 @@ import org.hibernate.Transaction;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.ActionQueue;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -30,13 +31,17 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
 
-public class HibernateSearchContextService implements Service, AutoCloseable {
+public final class HibernateSearchContextService implements Service, AutoCloseable {
 
 	private static final String SEARCH_SESSION_KEY =
 			HibernateSearchContextService.class.getName() + "#SEARCH_SESSION_KEY";
 
 	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
 			HibernateSearchContextService.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
+
+	public static HibernateSearchContextService get(SessionFactoryImplementor sessionFactory) {
+		return sessionFactory.getServiceRegistry().getService( HibernateSearchContextService.class );
+	}
 
 	private volatile SearchIntegration integration;
 	private volatile HibernateOrmMapping mapping;
