@@ -1,4 +1,4 @@
-# The main CI of Hibernate Search is http://ci.hibernate.org/job/hibernate-search/. Travis CI can be
+# The main CI of Hibernate Search is https://ci.hibernate.org/job/hibernate-search/. Travis CI can be
 # used in github forks. https://travis-ci.org/hibernate/hibernate-search is
 # therefore deactivated. Activating Travis for your own fork is as easy as
 # activating it in the travis site of your fork.
