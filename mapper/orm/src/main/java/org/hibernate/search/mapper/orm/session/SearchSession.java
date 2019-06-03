@@ -153,6 +153,12 @@ public interface SearchSession {
 	}
 
 	/**
+	 * @return The write plan for this session, allowing to explicitly index or delete entities,
+	 * or to process entity changes or even write to the indexes before the transaction is committed.
+	 */
+	SearchSessionWritePlan writePlan();
+
+	/**
 	 * @return The underlying {@link EntityManager} used by this {@link SearchSession}.
 	 */
 	EntityManager toEntityManager();

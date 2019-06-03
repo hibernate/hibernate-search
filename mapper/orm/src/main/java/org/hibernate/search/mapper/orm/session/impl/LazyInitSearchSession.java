@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 
 /**
@@ -49,6 +50,11 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
+	public SearchSessionWritePlan writePlan() {
+		return getDelegate().writePlan();
+	}
+
+	@Override
 	public void setAutomaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		getDelegate().setAutomaticIndexingSynchronizationStrategy( synchronizationStrategy );
@@ -56,8 +62,8 @@ public class LazyInitSearchSession implements SearchSession {
 
 	private SearchSessionImplementor getDelegate() {
 		if ( delegate == null ) {
-			HibernateSearchContextService contextService = sessionImplementor.getSessionFactory().getServiceRegistry()
-					.getService( HibernateSearchContextService.class );
+			HibernateSearchContextService contextService =
+					HibernateSearchContextService.get( sessionImplementor.getSessionFactory() );
 			delegate = contextService.getSearchSession( sessionImplementor );
 		}
 		return delegate;

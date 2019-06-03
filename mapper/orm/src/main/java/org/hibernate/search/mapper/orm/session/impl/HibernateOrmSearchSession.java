@@ -15,11 +15,13 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
@@ -41,6 +43,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	private final HibernateOrmSessionContextImpl sessionContext;
 	private AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+
+	private SearchSessionWritePlanImpl writePlan;
 
 	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder) {
 		this( builder, builder.buildSessionContext() );
@@ -77,6 +81,17 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	public SearchSessionWritePlan writePlan() {
+		if ( writePlan == null ) {
+			SessionImplementor ormSession = sessionContext.getSession();
+			HibernateSearchContextService contextService =
+					HibernateSearchContextService.get( ormSession.getSessionFactory() );
+			writePlan = new SearchSessionWritePlanImpl( contextService, this, ormSession );
+		}
+		return writePlan;
+	}
+
+	@Override
 	public PojoWorkPlan createWorkPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return getDelegate().createWorkPlan( commitStrategy, refreshStrategy );
 	}
@@ -97,7 +112,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return synchronizationStrategy;
 	}
 
-	private void checkOrmSessionIsOpen() {
+	void checkOrmSessionIsOpen() {
 		try {
 			sessionContext.getSession().checkOpen();
 		}
