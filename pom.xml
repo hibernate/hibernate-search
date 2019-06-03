@@ -77,7 +77,7 @@
 
     <ciManagement>
         <system>Jenkins</system>
-        <url>http://ci.hibernate.org/view/Search/job/hibernate-search-master/</url>
+        <url>https://ci.hibernate.org/job/hibernate-search/</url>
     </ciManagement>
 
     <developers>
