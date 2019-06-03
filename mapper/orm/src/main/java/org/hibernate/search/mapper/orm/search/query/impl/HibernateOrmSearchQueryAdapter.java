@@ -325,7 +325,13 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public LockOptions getLockOptions() {
-		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
+		/*
+		 * Ideally we'd throw an UnsupportedOperationException,
+		 * but we can't because getLockOptions is called
+		 * when AbstractProducedQuery converts exceptions.
+		 * So let's just return null, which at least seems acceptable for AbstractProducedQuery.
+		 */
+		return null;
 	}
 
 	@Override
