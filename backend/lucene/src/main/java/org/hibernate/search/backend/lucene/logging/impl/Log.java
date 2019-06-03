@@ -259,13 +259,13 @@ public interface Log extends BasicLogger {
 	SearchException unableToCreateIndexReader(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 24,
-			value = "A search query cannot have a scope spanning both an Lucene index and another type of index."
+			value = "A multi-index scope cannot include both a Lucene index and another type of index."
 					+ " Base scope was: '%1$s', Lucene index was: '%2$s'")
 	SearchException cannotMixLuceneScopeWithOtherType(IndexScopeBuilder baseScope,
 			LuceneIndexManager luceneIndex, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 25,
-			value = "A search query cannot have a scope spanning multiple Lucene backends."
+			value = "A multi-index scope cannot span multiple Lucene backends."
 					+ " Base scope was: '%1$s', index from another backend was: '%2$s'")
 	SearchException cannotMixLuceneScopeWithOtherBackend(IndexScopeBuilder baseScope,
 			LuceneIndexManager indexFromOtherBackend, @Param EventContext context);

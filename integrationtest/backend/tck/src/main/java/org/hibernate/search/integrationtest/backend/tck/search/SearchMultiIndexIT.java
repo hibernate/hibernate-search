@@ -290,7 +290,7 @@ public class SearchMultiIndexIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "A search query cannot have a scope spanning multiple" )
+				.hasMessageContaining( "A multi-index scope cannot span multiple" )
 				.hasMessageContaining( "backends" );
 	}
 

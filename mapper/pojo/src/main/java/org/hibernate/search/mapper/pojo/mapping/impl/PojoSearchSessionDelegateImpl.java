@@ -42,7 +42,7 @@ class PojoSearchSessionDelegateImpl implements PojoSearchSessionDelegate {
 	public <E, E2> PojoScopeDelegate<E, E2> createPojoScope(
 			Collection<? extends Class<? extends E>> targetedTypes) {
 		if ( targetedTypes.isEmpty() ) {
-			throw log.cannotSearchOnEmptyTarget();
+			throw log.invalidEmptyTargetForScope();
 		}
 
 		Set<PojoIndexedTypeManager<?, ? extends E, ?>> targetedTypeManagers = new LinkedHashSet<>();
