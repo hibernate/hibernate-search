@@ -70,7 +70,7 @@ public class BasicMassIndexingIT {
 	public void defaultMassIndexerStartAndWait() throws Exception {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
-			MassIndexer indexer = searchSession.createIndexer();
+			MassIndexer indexer = searchSession.massIndexer();
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
@@ -118,11 +118,11 @@ public class BasicMassIndexingIT {
 		SearchSession searchSession = Search.getSearchSession( session );
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
-		searchSession.createIndexer();
+		searchSession.massIndexer();
 		session.close();
 
 		SubTest.expectException( () -> {
-			searchSession.createIndexer();
+			searchSession.massIndexer();
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -137,7 +137,7 @@ public class BasicMassIndexingIT {
 		session.close();
 
 		SubTest.expectException( () -> {
-			searchSession.createIndexer();
+			searchSession.massIndexer();
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
