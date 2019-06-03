@@ -177,7 +177,7 @@ match fields regardless of case,
 match fields ignoring diacritics,
 ...
 +
-Full-text fields must be assigned an `analyzer`, referenced by its name.
+Full-text fields must be assigned an <<analyzer,mapper-orm-directfieldmapping-analyzer>>, referenced by its name.
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
 +
 IMPORTANT: Full-text fields cannot be sorted on.
@@ -195,7 +195,7 @@ Keyword fields allow subtle matches, similarly to full-text fields,
 with the limitation that keyword fields only contain one token.
 On the other hand, this limitation allows keyword fields to be <<mapper-orm-directfieldmapping-sortable,sorted on>>.
 +
-Keyword fields may be assigned a `normalizer`, referenced by its name.
+Keyword fields may be assigned a <<normalizer,mapper-orm-directfieldmapping-normalizer>>, referenced by its name.
 See <<concepts-analysis>> for more details about normalizers and full-text analysis.
 
 [[mapper-orm-directfieldmapping-annotations-scalednumberfield]] `@ScaledNumberField`::
@@ -262,6 +262,18 @@ Disabled by default.
 The replacement is defined as a String. Thus its value has to be parsed.
 Look up the column _Parsing method for 'indexNullAs'_ in <<mapper-orm-bridge-valuebridge-builtin>> to find out the format used when parsing.
 ====
+
+[[mapper-orm-directfieldmapping-analyzer]] `analyzer`::
+The analyzer to apply to field values when indexing and querying.
+Only available on `@FullTextField`.
++
+See <<concepts-analysis>> for more details about analyzers and full-text analysis.
+
+[[mapper-orm-directfieldmapping-normalizer]] `normalizer`::
+The normalizer to apply to field values when indexing and querying.
+Only available on `@KeywordField`.
++
+See <<concepts-analysis>> for more details about normalizers and full-text analysis.
 
 `norms`::
 Whether index-time scoring information for the field should be stored or not.
