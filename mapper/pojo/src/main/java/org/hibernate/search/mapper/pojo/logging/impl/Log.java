@@ -413,4 +413,11 @@ public interface Log extends BasicLogger {
 	SearchException invalidAnnotationTypeForBuilder(Object builder,
 			@FormatWith(ClassFormatter.class) Class<?> annotationType);
 
+	@Message(id = ID_OFFSET_2 + 55,
+			value = "Type '%1$s' is contained in an indexed type but is not itself indexed,"
+					+ " thus entity with identifier '%2$s' cannot be purged."
+					+ " Use delete() and pass the entity instead of just the identifier."
+	)
+	SearchException cannotPurgeNonIndexedContainedType(
+			@FormatWith(ClassFormatter.class) Class<?> typeManager, Object providedId);
 }

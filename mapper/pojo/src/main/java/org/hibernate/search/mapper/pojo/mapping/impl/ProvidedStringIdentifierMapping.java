@@ -29,11 +29,16 @@ public class ProvidedStringIdentifierMapping implements IdentifierMapping<String
 	}
 
 	@Override
-	public String getIdentifier(Object providedId, Supplier<?> entityProvider) {
+	public String getIdentifier(Object providedId) {
 		if ( providedId == null ) {
 			throw log.nullProvidedIdentifier();
 		}
 		return String.valueOf( providedId );
+	}
+
+	@Override
+	public String getIdentifier(Object providedId, Supplier<?> entityProvider) {
+		return getIdentifier( providedId );
 	}
 
 	@Override

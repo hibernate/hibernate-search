@@ -42,9 +42,14 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 
 	@Override
 	@SuppressWarnings( "unchecked" ) // We can only cast to the raw type, if I is generic we need an unchecked cast
+	public I getIdentifier(Object providedId) {
+		return (I) caster.cast( providedId );
+	}
+
+	@Override
 	public I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier) {
 		if ( providedId != null ) {
-			return (I) caster.cast( providedId );
+			return getIdentifier( providedId );
 		}
 		return property.get( entitySupplier.get() );
 	}

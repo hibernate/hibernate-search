@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,12 +14,16 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @param <E> The contained entity type.
  */
 class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoContainedTypeManager<E> typeManager;
 
@@ -52,6 +57,11 @@ class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
 	void delete(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		getWork( providedId ).delete( entitySupplier );
+	}
+
+	@Override
+	void purge(Object providedId) {
+		throw log.cannotPurgeNonIndexedContainedType( typeManager.getJavaClass(), providedId );
 	}
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
