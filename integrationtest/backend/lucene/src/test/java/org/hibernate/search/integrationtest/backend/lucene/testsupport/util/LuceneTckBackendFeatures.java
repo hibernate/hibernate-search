@@ -11,12 +11,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 public class LuceneTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
-	public boolean stringTypeOnMissingValueUse() {
-		// See https://hibernate.atlassian.net/browse/HSEARCH-3254
-		return false;
-	}
-
-	@Override
 	public boolean distanceSortDesc() {
 		// we don't test the descending order here as it's currently not supported by Lucene
 		// see LuceneSearchSortIT

@@ -8,10 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 public class TckBackendFeatures {
 
-	public boolean stringTypeOnMissingValueUse() {
-		return true;
-	}
-
 	public boolean distanceSortDesc() {
 		return true;
 	}
