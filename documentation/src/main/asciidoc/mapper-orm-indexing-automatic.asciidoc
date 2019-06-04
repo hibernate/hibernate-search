@@ -21,6 +21,14 @@ One workaround is to <<mapper-orm-indexing-explicit,explicitly reindex>> after y
 Indexing happens after transactions are committed::
 Indexes are not updated immediately, but only after transactions are successfully committed.
 That way, if a transaction is rolled back, the indexes will be left in a state consistent with the database.
++
+This means in particular that Hibernate Search will retrieve the state of entities after the transaction is committed.
+As a result, clearing the session during the transaction may cause trouble:
+some entities may end up being referenced by Hibernate Search for indexing,
+without being attached to the session.
+When Hibernate Search will try to index them, they will not be being able to load some of their lazy properties,
+leading to a `LazyInitializationException`.
+See <<mapper-orm-indexing-explicit-writeplan-process-execute>> for a few solutions.
 Index changes may not be visible immediately::
 By default, the transaction commit will return after index changes are committed to the indexes.
 This means index changes are safely stored to disk,

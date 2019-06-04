@@ -6,29 +6,32 @@
  */
 package org.hibernate.search.documentation.mapper.orm.indexing;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 @Entity
 @Indexed
-public class Book {
+public class Author {
 
 	@Id
 	private Integer id;
 
 	@FullTextField(analyzer = "myAnalyzer")
-	private String title;
+	private String firstName;
 
-	@ManyToOne
-	@IndexedEmbedded
-	private Author author;
+	@FullTextField(analyzer = "myAnalyzer")
+	private String lastName;
 
-	public Book() {
+	@OneToMany(mappedBy = "author")
+	private List<Book> books = new ArrayList<>();
+
+	public Author() {
 	}
 
 	public Integer getId() {
@@ -39,19 +42,27 @@ public class Book {
 		this.id = id;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
-	public Author getAuthor() {
-		return author;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setAuthor(Author author) {
-		this.author = author;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public List<Book> getBooks() {
+		return books;
+	}
+
+	public void setBooks(List<Book> books) {
+		this.books = books;
 	}
 }
