@@ -140,7 +140,7 @@ but you can also define a custom strategy.
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmAutomaticIndexingIT.java[tags=automatic-indexing-synchronization-strategy-override]
 ----
 <1> Obtain the search session, which by default uses the synchronization strategy configured in properties.
-<2> Override the syncrhonization strategy.
+<2> Override the synchronization strategy.
 <3> Change an entity.
 <4> Commit the changes, triggering reindexing.
 <5> The overridden strategy guarantees that the modified book will be present in these results,
