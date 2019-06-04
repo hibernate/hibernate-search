@@ -6,14 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import org.apache.lucene.search.SortField;
-
 import org.hibernate.search.backend.lucene.search.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
+import org.hibernate.search.backend.lucene.types.sort.missing.impl.LuceneMissingValueComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.util.BytesRef;
 
 public class LuceneTextFieldSortBuilder<F>
 		extends AbstractLuceneStandardFieldSortBuilder<F, String, LuceneTextFieldCodec<F>> {
@@ -27,14 +29,27 @@ public class LuceneTextFieldSortBuilder<F>
 
 	@Override
 	protected Object encodeMissingAs(F converted) {
-		return codec.normalize( absoluteFieldPath, codec.encode( converted ) ).utf8ToString();
+		return codec.normalize( absoluteFieldPath, codec.encode( converted ) );
 	}
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
+		// For STRING type, missing value must be either STRING_FIRST or STRING_LAST.
+		// Otherwise we need a CUSTOM type.
+		collector.collectSortField( ( useMissingValue() ) ? customType() : stringType() );
+	}
+
+	private boolean useMissingValue() {
+		return missingValue != null && !SortMissingValue.MISSING_FIRST.equals( missingValue ) && !SortMissingValue.MISSING_LAST.equals( missingValue );
+	}
+
+	private SortField stringType() {
 		SortField sortField = new SortField( absoluteFieldPath, SortField.Type.STRING, order == SortOrder.DESC );
 		setEffectiveMissingValue( sortField, missingValue, order );
+		return sortField;
+	}
 
-		collector.collectSortField( sortField );
+	public SortField customType() {
+		return new SortField( absoluteFieldPath, new LuceneMissingValueComparatorSource( (BytesRef) missingValue ), order == SortOrder.DESC );
 	}
 }

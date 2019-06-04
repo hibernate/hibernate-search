@@ -37,7 +37,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -157,23 +156,18 @@ public class FieldSearchSortIT {
 					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 			// Explicit order with onMissingValue().use( ... )
-			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 and HSEARCH-3387.
-			if (
-					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-			) {
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.before1Value ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between1And2Value ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between2And3Value ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.after3Value ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-			}
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.before1Value ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between1And2Value ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between2And3Value ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.after3Value ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 		}
 	}
 
@@ -183,27 +177,22 @@ public class FieldSearchSortIT {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
-			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 and HSEARCH-3387.
-			if (
-					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-			) {
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( new ValueWrapper<>( fieldModel.before1Value ) ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( new ValueWrapper<>( fieldModel.between1And2Value ) ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( new ValueWrapper<>( fieldModel.between2And3Value ) ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( new ValueWrapper<>( fieldModel.after3Value ) ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-			}
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+					.use( new ValueWrapper<>( fieldModel.before1Value ) ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+					.use( new ValueWrapper<>( fieldModel.between1And2Value ) ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+					.use( new ValueWrapper<>( fieldModel.between2And3Value ) ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+					.use( new ValueWrapper<>( fieldModel.after3Value ) ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 		}
 	}
 
@@ -213,27 +202,22 @@ public class FieldSearchSortIT {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
-			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 and HSEARCH-3387.
-			if (
-					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-			) {
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( fieldModel.before1Value, DslConverter.DISABLED ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( fieldModel.between1And2Value, DslConverter.DISABLED ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( fieldModel.between2And3Value, DslConverter.DISABLED ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( fieldModel.after3Value, DslConverter.DISABLED ) );
-				assertThat( query )
-						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-			}
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+					.use( fieldModel.before1Value, DslConverter.DISABLED ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+					.use( fieldModel.between1And2Value, DslConverter.DISABLED ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+					.use( fieldModel.between2And3Value, DslConverter.DISABLED ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+					.use( fieldModel.after3Value, DslConverter.DISABLED ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 		}
 	}
 
@@ -377,23 +361,19 @@ public class FieldSearchSortIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object invalidValueToMatch = new InvalidType();
 
-			if (
-					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-			) {
-				SubTest.expectException(
-						"byField() sort with invalid parameter type for onMissingValue().use() on field " + absoluteFieldPath,
-						() -> scope.sort().byField( absoluteFieldPath ).onMissingValue()
-								.use( invalidValueToMatch )
-				)
-						.assertThrown()
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Unable to convert DSL parameter: " )
-						.hasMessageContaining( InvalidType.class.getName() )
-						.hasCauseInstanceOf( ClassCastException.class )
-						.satisfies( FailureReportUtils.hasContext(
-								EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-						) );
-			}
+			SubTest.expectException(
+					"byField() sort with invalid parameter type for onMissingValue().use() on field " + absoluteFieldPath,
+					() -> scope.sort().byField( absoluteFieldPath ).onMissingValue()
+							.use( invalidValueToMatch )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Unable to convert DSL parameter: " )
+					.hasMessageContaining( InvalidType.class.getName() )
+					.hasCauseInstanceOf( ClassCastException.class )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					) );
 		}
 	}
 
@@ -405,26 +385,21 @@ public class FieldSearchSortIT {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
-			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 and HSEARCH-3387.
-			if (
-					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-			) {
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( fieldModel.before1Value ), scope );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+					.use( fieldModel.before1Value ), scope );
 
-				/*
-				 * Not testing the ordering of results here because some documents have the same value.
-				 * It's not what we want tot test anyway: we just want to check that fields are correctly
-				 * detected as compatible and that no exception is thrown.
-				 */
-				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-					b.doc( INDEX_NAME, EMPTY );
-					b.doc( INDEX_NAME, DOCUMENT_1 );
-					b.doc( INDEX_NAME, DOCUMENT_2 );
-					b.doc( INDEX_NAME, DOCUMENT_3 );
-					b.doc( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
-				} );
-			}
+			/*
+			 * Not testing the ordering of results here because some documents have the same value.
+			 * It's not what we want tot test anyway: we just want to check that fields are correctly
+			 * detected as compatible and that no exception is thrown.
+			 */
+			assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+				b.doc( INDEX_NAME, EMPTY );
+				b.doc( INDEX_NAME, DOCUMENT_1 );
+				b.doc( INDEX_NAME, DOCUMENT_2 );
+				b.doc( INDEX_NAME, DOCUMENT_3 );
+				b.doc( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+			} );
 		}
 	}
 
@@ -459,26 +434,21 @@ public class FieldSearchSortIT {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
-			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 and HSEARCH-3387.
-			if (
-					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-			) {
-				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( fieldModel.before1Value, DslConverter.DISABLED ), scope );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+					.use( fieldModel.before1Value, DslConverter.DISABLED ), scope );
 
-				/*
-				 * Not testing the ordering of results here because some documents have the same value.
-				 * It's not what we want tot test anyway: we just want to check that fields are correctly
-				 * detected as compatible and that no exception is thrown.
-				 */
-				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-					b.doc( INDEX_NAME, EMPTY );
-					b.doc( INDEX_NAME, DOCUMENT_1 );
-					b.doc( INDEX_NAME, DOCUMENT_2 );
-					b.doc( INDEX_NAME, DOCUMENT_3 );
-					b.doc( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
-				} );
-			}
+			/*
+			 * Not testing the ordering of results here because some documents have the same value.
+			 * It's not what we want tot test anyway: we just want to check that fields are correctly
+			 * detected as compatible and that no exception is thrown.
+			 */
+			assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+				b.doc( INDEX_NAME, EMPTY );
+				b.doc( INDEX_NAME, DOCUMENT_1 );
+				b.doc( INDEX_NAME, DOCUMENT_2 );
+				b.doc( INDEX_NAME, DOCUMENT_3 );
+				b.doc( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+			} );
 		}
 	}
 
