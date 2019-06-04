@@ -17,7 +17,6 @@ import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -85,12 +84,12 @@ public class HibernateOrmIndexedIT {
 					SearchSession searchSession = Search.getSearchSession( entityManager );
 
 					// tag::cross-backend-search[]
-					// This will fail
-					SearchQuery<Object> query = searchSession.search(
+					// This will fail because Author and User are indexed in different backends
+					List<Object> hits = searchSession.search(
 									Arrays.asList( Author.class, User.class )
 							)
 							.predicate( f -> f.matchAll() )
-							.toQuery();
+							.fetchHits();
 					// end::cross-backend-search[]
 				} )
 		)
