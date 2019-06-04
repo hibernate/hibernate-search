@@ -67,6 +67,12 @@ class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractP
 		getWork( identifier ).delete( entitySupplier );
 	}
 
+	@Override
+	void purge(Object providedId) {
+		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId );
+		getWork( identifier ).purge();
+	}
+
 	void updateBecauseOfContained(Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		I identifier = typeManager.getIdentifierMapping().getIdentifier( null, entitySupplier );
@@ -185,6 +191,17 @@ class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractP
 				add = false;
 				delete = true;
 			}
+		}
+
+		void purge() {
+			// This is a purge: do not resolve reindexing
+			entitySupplier = null;
+			shouldResolveToReindex = false;
+			// This is a purge: force deletion even if it doesn't seem this document was added
+			considerAllDirty = false;
+			dirtyPaths = null;
+			add = false;
+			delete = true;
 		}
 
 		void resolveDirty(PojoReindexingCollector containingEntityCollector) {

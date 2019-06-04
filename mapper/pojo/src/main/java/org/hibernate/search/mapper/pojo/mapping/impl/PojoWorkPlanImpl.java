@@ -101,6 +101,12 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	}
 
 	@Override
+	public void purge(Class<?> clazz, Object id) {
+		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
+		delegate.purge( id );
+	}
+
+	@Override
 	public void prepare() {
 		for ( PojoContainedTypeWorkPlan<?> delegate : containedTypeDelegates.values() ) {
 			delegate.resolveDirty( this::updateBecauseOfContained );

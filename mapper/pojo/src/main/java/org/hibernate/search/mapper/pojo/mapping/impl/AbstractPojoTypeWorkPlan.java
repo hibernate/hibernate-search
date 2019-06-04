@@ -24,4 +24,6 @@ abstract class AbstractPojoTypeWorkPlan {
 
 	abstract void delete(Object id, Object entity);
 
+	abstract void purge(Object id);
+
 }

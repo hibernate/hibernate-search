@@ -111,6 +111,18 @@ public interface PojoWorkPlan {
 	void delete(Object id, Object entity);
 
 	/**
+	 * Purge an entity from the index.
+	 * <p>
+	 * Entities to reindex as a result from this operation will not be resolved.
+	 * <p>
+	 * No effect on the index if the entity is not in the index.
+	 *
+	 * @param clazz The type of the entity.
+	 * @param id The provided ID for the entity.
+	 */
+	void purge(Class<?> clazz, Object id);
+
+	/**
 	 * Prepare the work plan execution, i.e. execute as much as possible without writing to the index.
 	 * <p>
 	 * In particular, ensure that all data is extracted from the POJOs
