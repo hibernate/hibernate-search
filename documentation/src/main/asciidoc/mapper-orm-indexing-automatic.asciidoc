@@ -1,8 +1,5 @@
-[[mapper-orm-indexing]]
-= Indexing
-
 [[mapper-orm-indexing-automatic]]
-== Automatic indexing
+= Automatic indexing
 
 By default, every time an entity is changed through a Hibernate ORM Session,
 if that entity is <<mapper-orm-entityindexmapping,mapped to an index>>,
@@ -69,7 +66,7 @@ will automatically lead to a similar modification to the index.
 and indexing requires an explicit action (see <<mapper-orm-indexing-explicit>>).
 
 [[mapper-orm-indexing-automatic-synchronization]]
-=== Synchronization with the indexes
+== Synchronization with the indexes
 
 include::todo-placeholder.asciidoc[]
 // TODO HSEARCH-3317 explain in transaction/post transaction synchronizations, when they can be used and what they mean
@@ -141,17 +138,3 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <5> The overridden strategy guarantees that the modified book will be present in these results,
 even though the query was executed _just after_ the transaction commit.
 ====
-
-[[mapper-orm-indexing-explicit]]
-== Explicit indexing
-// Search 5 anchors backward compatibility
-[[manual-index-changes]]
-
-include::todo-placeholder.asciidoc[]
-
-[[mapper-orm-indexing-massindexing]]
-=== Rebuilding the whole index
-// Search 5 anchors backward compatibility
-[[search-batchindex]]
-
-include::todo-placeholder.asciidoc[]

@@ -1,0 +1,28 @@
+[[mapper-orm-indexing-explicit]]
+= Explicit indexing
+// Search 5 anchors backward compatibility
+[[manual-index-changes]]
+//[[search-batchindex]] // There can only be one anchor per paragraph, unfortunately...
+
+include::todo-placeholder.asciidoc[]
+
+[[mapper-orm-indexing-explicit-custom-batch]]
+== Using a custom batch process
+// Search 5 anchors backward compatibility
+[[search-batchindex-flushtoindexes]]
+
+include::todo-placeholder.asciidoc[]
+
+[[mapper-orm-indexing-explicit-massindexer]]
+== Using a `MassIndexer`
+// Search 5 anchors backward compatibility
+[[search-batchindex-massindexer]]
+
+include::todo-placeholder.asciidoc[]
+
+[[mapper-orm-indexing-explicit-jsr352]]
+== Using the JSR-352 integration
+// Search 5 anchors backward compatibility
+[[jsr352-integration]]
+
+include::todo-placeholder.asciidoc[]

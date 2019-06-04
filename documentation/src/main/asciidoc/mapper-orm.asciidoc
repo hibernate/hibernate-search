@@ -9,7 +9,9 @@ include::mapper-orm-configuration.asciidoc[]
 
 include::mapper-orm-mapping.asciidoc[]
 
-include::mapper-orm-indexing.asciidoc[]
+include::mapper-orm-indexing-automatic.asciidoc[]
+
+include::mapper-orm-indexing-explicit.asciidoc[]
 
 include::mapper-orm-query.asciidoc[]
 
