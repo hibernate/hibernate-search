@@ -22,4 +22,11 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean worksFineWithStrictAboveRangedQueriesOnDecimalScaledField() {
 		return dialect.worksFineWithStrictGraterThanRangedQueriesOnScaledFloatField();
 	}
+
+	@Override
+	public boolean normalizeStringMissingValues() {
+		// TODO HSEARCH-3387 Elasticsearch does not apply the normalizer defined on the field
+		//   to the String provided as replacement for missing values on sorting
+		return false;
+	}
 }
