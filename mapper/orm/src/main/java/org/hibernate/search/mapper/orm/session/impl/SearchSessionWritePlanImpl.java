@@ -36,6 +36,11 @@ final class SearchSessionWritePlanImpl implements SearchSessionWritePlan {
 	}
 
 	@Override
+	public void purge(Class<?> entityClass, Object providedId) {
+		getCurrentWorkPlan().purge( entityClass, providedId );
+	}
+
+	@Override
 	public void process() {
 		getCurrentWorkPlan().prepare();
 	}

@@ -46,6 +46,27 @@ public interface SearchSessionWritePlan {
 	void delete(Object entity);
 
 	/**
+	 * Delete the entity from the index.
+	 * <p>
+	 * On contrary to {@link #delete(Object)},
+	 * if documents embed this entity
+	 * (through {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded} for example),
+	 * these documents will <strong>not</strong> be re-indexed,
+	 * leaving the indexes in an inconsistent state
+	 * until they are re-indexed manually.
+	 *
+	 * @param entityClass The class of the entity to delete from the index.
+	 * @param providedId An identifier value used to generate the identifier of the document to delete from the index.
+	 * Generally this should be the entity identifier.
+	 * If the document identifier is not generated from the JPA identifier,
+	 * i.e. if a @DocumentId annotation was added on a property that is not the JPA identifier,
+	 * then the value of that property should be passed instead.
+	 * @throws org.hibernate.search.util.common.SearchException If the entity type is not indexed directly
+	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
+	 */
+	void purge(Class<?> entityClass, Object providedId);
+
+	/**
 	 * Extract all data from objects passed to the writer so far,
 	 * without writing to the indexes.
 	 * <p>

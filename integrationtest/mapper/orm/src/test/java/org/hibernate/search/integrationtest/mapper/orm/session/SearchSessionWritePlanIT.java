@@ -8,8 +8,11 @@ package org.hibernate.search.integrationtest.mapper.orm.session;
 
 import static org.hibernate.search.util.impl.integrationtest.orm.OrmUtils.withinTransaction;
 
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -19,6 +22,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -60,11 +64,13 @@ public class SearchSessionWritePlanIT {
 			writePlan.addOrUpdate( entity1 );
 			writePlan.addOrUpdate( entity2 );
 			writePlan.delete( entity3 );
+			writePlan.purge( IndexedEntity1.class, 42 ); // Does not exist in database, but may exist in the index
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.update( "1", b -> b.field( "text", "number1" ) )
 					.update( "2", b -> b.field( "text", "number2" ) )
 					.delete( "3" )
+					.delete( "42" )
 					.preparedThenExecuted();
 		} );
 		backend1Mock.verifyExpectationsMet();
@@ -79,11 +85,19 @@ public class SearchSessionWritePlanIT {
 			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
 			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
 			IndexedEntity1 entity4 = new IndexedEntity1( 4, "number4" );
+			IndexedEntity1 entity5 = new IndexedEntity1( 5, "number5" );
+			IndexedEntity1 entity6 = new IndexedEntity1( 6, "number6" );
+			IndexedEntity1 entity7 = new IndexedEntity1( 7, "number7" );
+			IndexedEntity1 entity8 = new IndexedEntity1( 8, "number8" );
 
 			session.persist( entity1 );
 			session.persist( entity2 );
 			session.persist( entity3 );
 			session.persist( entity4 );
+			session.persist( entity5 );
+			session.persist( entity6 );
+			session.persist( entity7 );
+			session.persist( entity8 );
 
 			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
 
@@ -99,6 +113,21 @@ public class SearchSessionWritePlanIT {
 			writePlan.delete( entity4 );
 			writePlan.addOrUpdate( entity4 );
 
+			writePlan.purge( IndexedEntity1.class, 42 );
+			writePlan.purge( IndexedEntity1.class, 42 );
+
+			writePlan.delete( entity5 );
+			writePlan.purge( IndexedEntity1.class, 5 );
+
+			writePlan.purge( IndexedEntity1.class, 6 );
+			writePlan.delete( entity6 );
+
+			writePlan.addOrUpdate( entity7 );
+			writePlan.purge( IndexedEntity1.class, 7 );
+
+			writePlan.purge( IndexedEntity1.class, 8 );
+			writePlan.addOrUpdate( entity8 );
+
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					// multiple addOrUpdate => single update
 					.update( "1", b -> b.field( "text", "number1" ) )
@@ -108,9 +137,35 @@ public class SearchSessionWritePlanIT {
 					.delete( "3" )
 					// delete then addOrUpdate => update
 					.update( "4", b -> b.field( "text", "number4" ) )
+					// multiple purge => single delete
+					.delete( "42" )
+					// delete then purge => single delete
+					.delete( "5" )
+					// purge then delete => single delete
+					.delete( "6" )
+					// addOrUpdate then purge => delete
+					.delete( "7" )
+					// purge then addOrUpdate => update
+					.update( "8", b -> b.field( "text", "number8" ) )
 					.preparedThenExecuted();
 		} );
 		backend1Mock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void purgeContained() {
+		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+
+		withinTransaction( sessionFactory, session -> {
+			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SubTest.expectException(
+					() -> writePlan.purge( ContainedEntity.class, 42 )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Type '" + ContainedEntity.class.getName() + "' is contained in an indexed type but is not itself indexed" )
+					.hasMessageContaining( "thus entity with identifier '42' cannot be purged" );
+		} );
 	}
 
 	@Test
@@ -307,7 +362,7 @@ public class SearchSessionWritePlanIT {
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
 						automaticIndexingStrategy
 				)
-				.setup( IndexedEntity1.class, IndexedEntity2.class );
+				.setup( IndexedEntity1.class, IndexedEntity2.class, ContainedEntity.class );
 
 		backend1Mock.verifyExpectationsMet();
 		backend2Mock.verifyExpectationsMet();
@@ -326,6 +381,10 @@ public class SearchSessionWritePlanIT {
 
 		@GenericField
 		private String text;
+
+		@OneToMany(mappedBy = "containing")
+		@IndexedEmbedded
+		private List<ContainedEntity> contained;
 
 		protected IndexedEntity1() {
 			// For ORM
@@ -354,6 +413,28 @@ public class SearchSessionWritePlanIT {
 		}
 
 		IndexedEntity2(int id, String text) {
+			this.id = id;
+			this.text = text;
+		}
+	}
+
+	@Entity(name = "contained")
+	public static class ContainedEntity {
+
+		@Id
+		private Integer id;
+
+		@GenericField
+		private String text;
+
+		@ManyToOne
+		private IndexedEntity1 containing;
+
+		protected ContainedEntity() {
+			// For ORM
+		}
+
+		ContainedEntity(int id, String text) {
 			this.id = id;
 			this.text = text;
 		}
