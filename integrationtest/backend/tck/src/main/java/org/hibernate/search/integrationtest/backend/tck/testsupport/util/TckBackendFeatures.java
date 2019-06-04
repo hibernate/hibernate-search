@@ -19,4 +19,8 @@ public class TckBackendFeatures {
 	public boolean worksFineWithStrictAboveRangedQueriesOnDecimalScaledField() {
 		return true;
 	}
+
+	public boolean normalizeStringMissingValues() {
+		return true;
+	}
 }

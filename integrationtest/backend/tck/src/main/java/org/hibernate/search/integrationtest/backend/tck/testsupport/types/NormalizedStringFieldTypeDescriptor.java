@@ -18,6 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<String> {
 
@@ -68,10 +69,14 @@ public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<Str
 
 	@Override
 	public Optional<FieldSortExpectations<String>> getFieldSortExpectations() {
+		boolean normalize = TckConfiguration.get().getBackendFeatures().normalizeStringMissingValues();
+
 		return Optional.of( new FieldSortExpectations<>(
 				"Cecilia", "george", "Stefany",
-				// TODO Fix HSEARCH-3387, then mix capitalization here
-				"aaron", "daniel", "roger", "zach"
+				"aaron",
+				( normalize ) ? "Daniel" : "daniel",
+				( normalize ) ? "Roger" : "roger",
+				"zach"
 		) );
 	}
 
