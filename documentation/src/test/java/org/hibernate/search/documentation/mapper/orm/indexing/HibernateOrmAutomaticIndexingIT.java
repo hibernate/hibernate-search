@@ -29,13 +29,10 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class HibernateOrmAutomaticIndexingIT {
 	private static final String BOOK1_TITLE = "I, Robot";
-	private static final Integer BOOK1_PAGECOUNT = 224;
 
 	private static final String BOOK2_TITLE = "The Caves of Steel";
-	private static final Integer BOOK2_PAGECOUNT = 206;
 
 	private static final String BOOK3_TITLE = "The Robots of Dawn";
-	private static final Integer BOOK3_PAGECOUNT = 435;
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[] backendSetups() {
@@ -59,7 +56,7 @@ public class HibernateOrmAutomaticIndexingIT {
 						// To be overridden below
 						HibernateOrmAutomaticIndexingSynchronizationStrategyName.QUEUED
 				)
-				.setup( Book.class );
+				.setup( Book.class, Author.class );
 		initData( entityManagerFactory );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
@@ -94,15 +91,12 @@ public class HibernateOrmAutomaticIndexingIT {
 			Book book1 = new Book();
 			book1.setId( 1 );
 			book1.setTitle( BOOK1_TITLE );
-			book1.setPageCount( BOOK1_PAGECOUNT );
 			Book book2 = new Book();
 			book2.setId( 2 );
 			book2.setTitle( BOOK2_TITLE );
-			book2.setPageCount( BOOK2_PAGECOUNT );
 			Book book3 = new Book();
 			book3.setId( 3 );
 			book3.setTitle( BOOK3_TITLE );
-			book3.setPageCount( BOOK3_PAGECOUNT );
 
 			entityManager.persist( book1 );
 			entityManager.persist( book2 );
