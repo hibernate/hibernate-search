@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,8 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -36,6 +39,8 @@ import org.junit.runners.model.Statement;
 import org.easymock.Capture;
 
 public class BackendMock implements TestRule {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String backendName;
 	private final VerifyingStubBackendBehavior behaviorMock = new VerifyingStubBackendBehavior();
@@ -249,6 +254,7 @@ public class BackendMock implements TestRule {
 		}
 
 		public BackendMock preparedThenExecuted(CompletableFuture<?> future) {
+			log.debugf( "Expecting %d works to be prepared, then executed", works.size() );
 			// First expect all works to be prepared, then expect all works to be executed
 			works.stream()
 					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ) )
@@ -264,6 +270,7 @@ public class BackendMock implements TestRule {
 		}
 
 		public BackendMock executed(CompletableFuture<?> future) {
+			log.debugf( "Expecting %d works to be executed", works.size() );
 			works.stream()
 					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work, future ) )
 					.forEach( expectationConsumer );
@@ -275,6 +282,7 @@ public class BackendMock implements TestRule {
 		}
 
 		public BackendMock prepared() {
+			log.debugf( "Expecting %d works to be prepared", works.size() );
 			works.stream()
 					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ) )
 					.forEach( expectationConsumer );

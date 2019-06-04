@@ -1,0 +1,361 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.integrationtest.mapper.orm.session;
+
+import static org.hibernate.search.util.impl.integrationtest.orm.OrmUtils.withinTransaction;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+
+import org.junit.Rule;
+import org.junit.Test;
+
+@TestForIssue(jiraKey = "HSEARCH-3049")
+public class SearchSessionWritePlanIT {
+
+	private static final String BACKEND1_NAME = "stubBackend1";
+	private static final String BACKEND2_NAME = "stubBackend2";
+
+	@Rule
+	public BackendMock backend1Mock = new BackendMock( BACKEND1_NAME );
+
+	@Rule
+	public BackendMock backend2Mock = new BackendMock( BACKEND2_NAME );
+
+	@Rule
+	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+
+	@Test
+	public void simple() {
+		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+
+		withinTransaction( sessionFactory, session -> {
+			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
+			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
+			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+			session.persist( entity3 );
+
+			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			writePlan.addOrUpdate( entity1 );
+			writePlan.addOrUpdate( entity2 );
+			writePlan.delete( entity3 );
+
+			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.update( "1", b -> b.field( "text", "number1" ) )
+					.update( "2", b -> b.field( "text", "number2" ) )
+					.delete( "3" )
+					.preparedThenExecuted();
+		} );
+		backend1Mock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void mergedEvents() {
+		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+
+		withinTransaction( sessionFactory, session -> {
+			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
+			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
+			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
+			IndexedEntity1 entity4 = new IndexedEntity1( 4, "number4" );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+			session.persist( entity3 );
+			session.persist( entity4 );
+
+			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+
+			writePlan.addOrUpdate( entity1 );
+			writePlan.addOrUpdate( entity1 );
+
+			writePlan.delete( entity2 );
+			writePlan.delete( entity2 );
+
+			writePlan.addOrUpdate( entity3 );
+			writePlan.delete( entity3 );
+
+			writePlan.delete( entity4 );
+			writePlan.addOrUpdate( entity4 );
+
+			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+					// multiple addOrUpdate => single update
+					.update( "1", b -> b.field( "text", "number1" ) )
+					// multiple delete => single delete
+					.delete( "2" )
+					// addOrUpdate then delete => delete
+					.delete( "3" )
+					// delete then addOrUpdate => update
+					.update( "4", b -> b.field( "text", "number4" ) )
+					.preparedThenExecuted();
+		} );
+		backend1Mock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void earlyProcess() {
+		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.SESSION );
+
+		withinTransaction( sessionFactory, session -> {
+			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
+			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+			session.flush();
+
+			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+
+			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.add( "1", b -> b.field( "text", "number1" ) )
+					.add( "2", b -> b.field( "text", "number2" ) )
+					.prepared();
+
+			writePlan.process();
+
+			// Works should be prepared immediately
+			backend1Mock.verifyExpectationsMet();
+
+			/*
+			 * Detach entities and change their data.
+			 * This should not matter as the call to process() should have triggered reading.
+			 * If it didn't, then data written to the index will be wrong and we'll detect it
+			 * thanks to the expectations of the backend mock.
+			 */
+			session.detach( entity1 );
+			session.detach( entity2 );
+			entity1.text = "WRONG";
+			entity2.text = "WRONG";
+
+			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.add( "1", b -> b.field( "text", "number1" ) )
+					.add( "2", b -> b.field( "text", "number2" ) )
+					.executed();
+		} );
+		// Works should be executed on transaction commit
+		backend1Mock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void earlyExecute() {
+		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.SESSION );
+
+		withinTransaction( sessionFactory, session -> {
+			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
+			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+			session.flush();
+
+			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+
+			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.add( "1", b -> b.field( "text", "number1" ) )
+					.add( "2", b -> b.field( "text", "number2" ) )
+					.preparedThenExecuted();
+
+			writePlan.execute();
+
+			// Works should be executed immediately
+			backend1Mock.verifyExpectationsMet();
+		} );
+		// There shouldn't be any more work to execute
+		backend1Mock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void mixedExplicitAndAutomaticIndexing() {
+		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.SESSION );
+
+		withinTransaction( sessionFactory, session -> {
+			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
+			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+
+			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.add( "1", b -> b.field( "text", "number1" ) )
+					.add( "2", b -> b.field( "text", "number2" ) )
+					.preparedThenExecuted();
+		} );
+		backend1Mock.verifyExpectationsMet();
+
+		withinTransaction( sessionFactory, session -> {
+			IndexedEntity1 entity1 = session.getReference( IndexedEntity1.class, 1 );
+			IndexedEntity1 entity2 = session.getReference( IndexedEntity1.class, 2 );
+			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
+
+			session.persist( entity3 );
+
+			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			writePlan.addOrUpdate( entity1 );
+			writePlan.delete( entity2 );
+
+			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+					// Requested explicitly
+					.update( "1", b -> b.field( "text", "number1" ) )
+					.delete( "2" )
+					// Automatic on persist
+					.add( "3", b -> b.field( "text", "number3" ) )
+					.preparedThenExecuted();
+		} );
+		backend1Mock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void multiIndexMultiBackend() {
+		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+
+		withinTransaction( sessionFactory, session -> {
+			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
+			IndexedEntity2 entity2 = new IndexedEntity2( 2, "number2" );
+			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+			session.persist( entity3 );
+
+			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			writePlan.addOrUpdate( entity1 );
+			writePlan.addOrUpdate( entity2 );
+			writePlan.delete( entity3 );
+
+			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.update( "1", b -> b.field( "text", "number1" ) )
+					.delete( "3" )
+					.preparedThenExecuted();
+			backend2Mock.expectWorks( IndexedEntity2.INDEX_NAME )
+					.update( "2", b -> b.field( "text", "number2" ) )
+					.preparedThenExecuted();
+		} );
+		backend1Mock.verifyExpectationsMet();
+		backend2Mock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void outOfSession() {
+		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+
+		SearchSessionWritePlan writePlan;
+		IndexedEntity1 entity;
+		try ( Session session = sessionFactory.openSession() ) {
+			entity = new IndexedEntity1( 1, "number1" );
+			session.persist( entity );
+			writePlan = Search.getSearchSession( session ).writePlan();
+		}
+
+		SubTest.expectException(
+				() -> writePlan.addOrUpdate( entity )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
+
+		SubTest.expectException(
+				() -> writePlan.delete( entity )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
+
+		SubTest.expectException(
+				() -> writePlan.process()
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
+
+		SubTest.expectException(
+				() -> writePlan.execute()
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
+	}
+
+	private SessionFactory setup(HibernateOrmAutomaticIndexingStrategyName automaticIndexingStrategy) {
+		backend1Mock.expectAnySchema( IndexedEntity1.INDEX_NAME );
+		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
+
+		SessionFactory sessionFactory = ormSetupHelper.startSetup()
+				.withBackendMock( backend1Mock )
+				.withBackendMock( backend2Mock )
+				.withProperty(
+						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
+						automaticIndexingStrategy
+				)
+				.setup( IndexedEntity1.class, IndexedEntity2.class );
+
+		backend1Mock.verifyExpectationsMet();
+		backend2Mock.verifyExpectationsMet();
+
+		return sessionFactory;
+	}
+
+	@Entity(name = "indexed1")
+	@Indexed(backend = BACKEND1_NAME, index = IndexedEntity1.INDEX_NAME)
+	public static class IndexedEntity1 {
+
+		static final String INDEX_NAME = "index1Name";
+
+		@Id
+		private Integer id;
+
+		@GenericField
+		private String text;
+
+		protected IndexedEntity1() {
+			// For ORM
+		}
+
+		IndexedEntity1(int id, String text) {
+			this.id = id;
+			this.text = text;
+		}
+	}
+
+	@Entity(name = "indexed2")
+	@Indexed(backend = BACKEND2_NAME, index = IndexedEntity2.INDEX_NAME)
+	public static class IndexedEntity2 {
+
+		static final String INDEX_NAME = "index2Name";
+
+		@Id
+		private Integer id;
+
+		@GenericField
+		private String text;
+
+		protected IndexedEntity2() {
+			// For ORM
+		}
+
+		IndexedEntity2(int id, String text) {
+			this.id = id;
+			this.text = text;
+		}
+	}
+}
