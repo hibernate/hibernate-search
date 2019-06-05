@@ -177,7 +177,7 @@ match fields regardless of case,
 match fields ignoring diacritics,
 ...
 +
-Full-text fields must be assigned an <<analyzer,mapper-orm-directfieldmapping-analyzer>>, referenced by its name.
+Full-text fields must be assigned an <<mapper-orm-directfieldmapping-analyzer,analyzer>>, referenced by its name.
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
 +
 IMPORTANT: Full-text fields cannot be sorted on.
@@ -195,7 +195,7 @@ Keyword fields allow subtle matches, similarly to full-text fields,
 with the limitation that keyword fields only contain one token.
 On the other hand, this limitation allows keyword fields to be <<mapper-orm-directfieldmapping-sortable,sorted on>>.
 +
-Keyword fields may be assigned a <<normalizer,mapper-orm-directfieldmapping-normalizer>>, referenced by its name.
+Keyword fields may be assigned a <<mapper-orm-directfieldmapping-normalizer,normalizer>>, referenced by its name.
 See <<concepts-analysis>> for more details about normalizers and full-text analysis.
 
 [[mapper-orm-directfieldmapping-annotations-scalednumberfield]] `@ScaledNumberField`::
@@ -212,7 +212,7 @@ Values that have trailing decimal digits will be rounded to the nearest integer.
 +
 This annotation allows to set <<mapper-orm-directfieldmapping-decimalscale, the decimalScale attribute>>.
 
-[[mapper-orm-directfieldmapping-annotation-attributes]
+[[mapper-orm-directfieldmapping-annotation-attributes]]
 === Field annotation attributes
 
 Various direct field mapping annotations exist,
