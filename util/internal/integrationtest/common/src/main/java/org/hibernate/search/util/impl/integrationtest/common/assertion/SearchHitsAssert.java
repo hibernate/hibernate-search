@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -87,6 +88,20 @@ public class SearchHitsAssert<H> {
 		} );
 	}
 
+	public SearchHitAssert<H> ordinal(int i) {
+		return new SearchHitAssert<>( actual.get( i ) );
+	}
+
+	public SearchHitsAssert<H> ordinals(int... ordinals) {
+		List<H> newActuals = new ArrayList<>();
+		for ( int ordinal : ordinals ) {
+			Assertions.assertThat( ordinal ).isLessThan( actual.size() );
+			newActuals.add( actual.get( ordinal ) );
+		}
+
+		return new SearchHitsAssert( newActuals );
+	}
+
 	public SearchHitsAssert<H> hasDocRefHitsExactOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
 		DocumentReferenceHitsBuilder context = new DocumentReferenceHitsBuilder();
 		expectation.accept( context );
@@ -166,5 +181,4 @@ public class SearchHitsAssert<H> {
 				.map( NormalizationUtils::normalizeReference )
 				.collect( Collectors.toList() );
 	}
-
 }

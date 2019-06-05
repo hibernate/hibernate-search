@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -29,6 +30,7 @@ import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -42,6 +44,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,11 +58,17 @@ public class FieldSearchSortIT {
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
 	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
 	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME = "IndexWithIncompatibleDecimalScale";
+	private static final String MULTIPLE_EMPTY_INDEX_NAME = "MultipleEmptyIndexName";
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
 	private static final String EMPTY = "empty";
+
+	private static final String EMPTY_1 = "empty1";
+	private static final String EMPTY_2 = "empty2";
+	private static final String EMPTY_3 = "empty3";
+	private static final String EMPTY_4 = "empty4";
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
@@ -83,6 +93,9 @@ public class FieldSearchSortIT {
 
 	private IncompatibleDecimalScaleIndexMapping incompatibleDecimalScaleIndexMapping;
 	private StubMappingIndexManager incompatibleDecimalScaleIndexManager;
+
+	private IndexMapping multipleEmptyIndexMapping;
+	private StubMappingIndexManager multipleEmptyIndexManager;
 
 	@Before
 	public void setup() {
@@ -111,6 +124,11 @@ public class FieldSearchSortIT {
 						INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME,
 						ctx -> this.incompatibleDecimalScaleIndexMapping = new IncompatibleDecimalScaleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleDecimalScaleIndexManager = indexManager
+				)
+				.withIndex(
+						MULTIPLE_EMPTY_INDEX_NAME,
+						ctx -> this.multipleEmptyIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.multipleEmptyIndexManager = indexManager
 				)
 				.setup();
 
@@ -168,6 +186,78 @@ public class FieldSearchSortIT {
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.after3Value ) );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3254")
+	public void byField_multipleEmpty_missingValue() {
+		StubMappingSearchScope scope = multipleEmptyIndexManager.createSearchScope();
+
+		for ( ByTypeFieldModel<?> fieldModel : multipleEmptyIndexMapping.supportedFieldModels ) {
+			List<DocumentReference> docRefHits;
+			String fieldPath = fieldModel.relativeFieldName;
+
+			// using before 1 value
+			docRefHits = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.before1Value ), scope ).fetchHits();
+			assertThat( docRefHits ).ordinals( 0, 1, 2, 3 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+			assertThat( docRefHits ).ordinal( 4 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
+			assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
+			assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+
+			// using between 1 and 2 value
+			docRefHits = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between1And2Value ), scope ).fetchHits();
+			assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
+			assertThat( docRefHits ).ordinals( 1, 2, 3, 4 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+			assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
+			assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+
+			// using between 2 and 3 value
+			docRefHits = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between2And3Value ), scope ).fetchHits();
+			assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
+			assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
+			assertThat( docRefHits ).ordinals( 2, 3, 4, 5 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+			assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+
+			// using after 3 value
+			docRefHits = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.after3Value ), scope ).fetchHits();
+			assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
+			assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
+			assertThat( docRefHits ).ordinal( 2 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+			assertThat( docRefHits ).ordinals( 3, 4, 5, 6 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3254")
+	public void byField_multipleEmpty_alreadyExists_missingValue() {
+		StubMappingSearchScope scope = multipleEmptyIndexManager.createSearchScope();
+
+		for ( ByTypeFieldModel<?> fieldModel : multipleEmptyIndexMapping.supportedFieldModels ) {
+			List<DocumentReference> docRefHits;
+			String fieldPath = fieldModel.relativeFieldName;
+
+			Object docValue1 = normalizeIfNecessary( fieldModel.document1Value.indexedValue );
+			Object docValue2 = normalizeIfNecessary( fieldModel.document2Value.indexedValue );
+			Object docValue3 = normalizeIfNecessary( fieldModel.document3Value.indexedValue );
+
+			// using doc 1 value
+			docRefHits = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( docValue1 ), scope ).fetchHits();
+			assertThat( docRefHits ).ordinals( 0, 1, 2, 3, 4 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+			assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
+			assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+
+			// using doc 2 value
+			docRefHits = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( docValue2 ), scope ).fetchHits();
+			assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
+			assertThat( docRefHits ).ordinals( 1, 2, 3, 4, 5 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+			assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+
+			// using doc 3 value
+			docRefHits = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( docValue3 ), scope ).fetchHits();
+			assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
+			assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
+			assertThat( docRefHits ).ordinals( 2, 3, 4, 5, 6 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 		}
 	}
 
@@ -600,6 +690,22 @@ public class FieldSearchSortIT {
 		} );
 		workPlan.execute().join();
 
+		workPlan = multipleEmptyIndexManager.createWorkPlan();
+		workPlan.add( referenceProvider( EMPTY_1 ), document -> { } );
+		workPlan.add( referenceProvider( DOCUMENT_2 ), document ->
+			multipleEmptyIndexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) )
+		);
+		workPlan.add( referenceProvider( EMPTY_2 ), document -> { } );
+		workPlan.add( referenceProvider( DOCUMENT_3 ), document ->
+			multipleEmptyIndexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) )
+		);
+		workPlan.add( referenceProvider( EMPTY_3 ), document -> { } );
+		workPlan.add( referenceProvider( DOCUMENT_1 ), document ->
+			multipleEmptyIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) )
+		);
+		workPlan.add( referenceProvider( EMPTY_4 ), document -> { } );
+		workPlan.execute().join();
+
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.predicate( f -> f.matchAll() )
@@ -618,6 +724,17 @@ public class FieldSearchSortIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 );
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T normalizeIfNecessary(T missingValue) {
+		if ( !String.class.isInstance( missingValue ) || TckConfiguration.get().getBackendFeatures().normalizeStringMissingValues() ) {
+			return missingValue;
+		}
+
+		// The backend doesn't normalize missing value replacements automatically, we have to do it ourselves
+		// TODO HSEARCH-3387 Remove this once all backends correctly normalize missing value replacements
+		return (T) ( (String)missingValue ).toLowerCase( Locale.ROOT );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
