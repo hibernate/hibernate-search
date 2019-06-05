@@ -3,10 +3,14 @@
 [[concepts-full-text]]
 == Full-text search
 
+include::todo-placeholder.asciidoc[]
+
 // TODO maybe give a short introduction to full-text search and full-text indexes?
 
 [[concepts-mapping]]
 == Mapping
+
+include::todo-placeholder.asciidoc[]
 
 // TODO maybe explain what we mean by "mapping"?
 // TODO explain what an "entity" is and what it implies
