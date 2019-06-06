@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerExtensionContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
@@ -24,7 +25,7 @@ final class SearchSortContainerExtensionContextImpl<B> implements SearchSortCont
 	private final SearchSortBuilderFactory<?, B> factory;
 	private final SearchSortDslContext<? super B> dslContext;
 
-	private final DslExtensionState<Void> state = new DslExtensionState<>();
+	private final DslExtensionState<SearchSortTerminalContext> state = new DslExtensionState<>();
 
 	SearchSortContainerExtensionContextImpl(SearchSortContainerContext parent,
 			SearchSortBuilderFactory<?, B> factory, SearchSortDslContext<? super B> dslContext) {
@@ -35,13 +36,14 @@ final class SearchSortContainerExtensionContextImpl<B> implements SearchSortCont
 
 	@Override
 	public <T> SearchSortContainerExtensionContext ifSupported(
-			SearchSortContainerContextExtension<T> extension, Consumer<T> sortContributor) {
+			SearchSortContainerContextExtension<T> extension,
+			Function<T, ? extends SearchSortTerminalContext> sortContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent, factory, dslContext ), sortContributor );
 		return this;
 	}
 
 	@Override
-	public NonEmptySortContext orElse(Consumer<SearchSortContainerContext> sortContributor) {
+	public NonEmptySortContext orElse(Function<SearchSortContainerContext, ? extends SearchSortTerminalContext> sortContributor) {
 		state.orElse( parent, sortContributor );
 		return new NonEmptySortContextImpl( parent, dslContext );
 	}

@@ -28,10 +28,9 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 		return Search.getSearchSession( entityManager )
 				.search( Library.class )
 				.predicate( f -> f.match().onField( "name" ).matching( terms ) )
-				.sort( c -> {
-					c.byField( "collectionSize" ).desc();
-					c.byField( "name_sort" );
-				} )
+				.sort( c -> c.byField( "collectionSize" ).desc()
+						.then().byField( "name_sort" )
+				)
 				.fetchHits( limit, offset );
 	}
 }

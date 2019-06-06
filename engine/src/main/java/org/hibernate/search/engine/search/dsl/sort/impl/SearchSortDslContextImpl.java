@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.sort.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * A DSL context used when building a {@link SearchSort} object,
  * either when calling {@link MappedIndexScope#sort()} from a search scope
- * or when calling {@link SearchQueryContext#sort(Consumer)} to build the sort using a lambda
+ * or when calling {@link SearchQueryContext#sort(Function)} to build the sort using a lambda
  * (in which case the lambda may retrieve the resulting {@link SearchSort} object and cache it).
  */
 public final class SearchSortDslContextImpl<B>
