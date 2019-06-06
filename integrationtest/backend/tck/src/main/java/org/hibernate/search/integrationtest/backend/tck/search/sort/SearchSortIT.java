@@ -32,7 +32,6 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -495,22 +494,22 @@ public class SearchSortIT {
 
 	private static class SupportedExtension implements SearchSortContainerContextExtension<MyExtendedContext> {
 		@Override
-		public <C, B> Optional<MyExtendedContext> extendOptional(SearchSortContainerContext original,
-				SearchSortBuilderFactory<C, B> factory, SearchSortDslContext<? super B> dslContext) {
+		public Optional<MyExtendedContext> extendOptional(SearchSortContainerContext original,
+				SearchSortDslContext<?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( factory ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
+			Assertions.assertThat( dslContext.getFactory() ).isNotNull();
 			return Optional.of( new MyExtendedContext( original ) );
 		}
 	}
 
 	private static class UnSupportedExtension implements SearchSortContainerContextExtension<MyExtendedContext> {
 		@Override
-		public <C, B> Optional<MyExtendedContext> extendOptional(SearchSortContainerContext original,
-				SearchSortBuilderFactory<C, B> factory, SearchSortDslContext<? super B> dslContext) {
+		public Optional<MyExtendedContext> extendOptional(SearchSortContainerContext original,
+				SearchSortDslContext<?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( factory ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
+			Assertions.assertThat( dslContext.getFactory() ).isNotNull();
 			return Optional.empty();
 		}
 	}

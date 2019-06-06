@@ -6,30 +6,24 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortMissingValueContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
-import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
-import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
+import org.hibernate.search.engine.search.dsl.sort.spi.AbstractNonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 class FieldSortContextImpl<B>
-		extends NonEmptySortContextImpl
-		implements FieldSortContext, FieldSortMissingValueContext<FieldSortContext>, SearchSortContributor<B> {
+		extends AbstractNonEmptySortContext<B>
+		implements FieldSortContext, FieldSortMissingValueContext<FieldSortContext> {
 
 	private final FieldSortBuilder<B> builder;
 
-	FieldSortContextImpl(SearchSortContainerContext containerContext,
-			SearchSortBuilderFactory<?, B> factory, SearchSortDslContext<?> dslContext,
+	FieldSortContextImpl(SearchSortDslContext<?, B> dslContext,
 			String absoluteFieldPath) {
-		super( containerContext, dslContext );
-		this.builder = factory.field( absoluteFieldPath );
+		super( dslContext );
+		this.builder = dslContext.getFactory().field( absoluteFieldPath );
 	}
 
 	@Override
@@ -62,7 +56,8 @@ class FieldSortContextImpl<B>
 	}
 
 	@Override
-	public void contribute(Consumer<? super B> collector) {
-		collector.accept( builder.toImplementation() );
+	protected B toImplementation() {
+		return builder.toImplementation();
 	}
+
 }

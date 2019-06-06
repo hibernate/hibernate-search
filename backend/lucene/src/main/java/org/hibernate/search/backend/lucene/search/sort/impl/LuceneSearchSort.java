@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.search.SearchSort;
 
-class LuceneSearchSort implements SearchSort {
+class LuceneSearchSort implements SearchSort, LuceneSearchSortBuilder {
 
 	private final List<LuceneSearchSortBuilder> builders;
 
@@ -18,8 +18,10 @@ class LuceneSearchSort implements SearchSort {
 		this.builders = builders;
 	}
 
-	List<LuceneSearchSortBuilder> getBuilders() {
-		return builders;
+	@Override
+	public void buildAndContribute(LuceneSearchSortCollector collector) {
+		for ( LuceneSearchSortBuilder builder : builders ) {
+			builder.buildAndContribute( collector );
+		}
 	}
-
 }

@@ -7,30 +7,31 @@
 package org.hibernate.search.engine.search.dsl.sort.spi;
 
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 /**
  * Represents the current context in the search DSL,
  * i.e. the current position in the sort tree.
+ *
+ * @param <F> The type of sort factory.
+ * @param <B> The implementation type of builders.
+ * This type is backend-specific. See {@link SearchSortBuilder#toImplementation()}.
  */
-public interface SearchSortDslContext<B> {
+public interface SearchSortDslContext<F extends SearchSortBuilderFactory<?, B>, B> {
 
 	/**
-	 * Add a sort contributor at the current position in the sort tree.
-	 * <p>
-	 * The contributor will be called as late as possible to retrieve its contributed builders.
-	 *
-	 * @param contributor The contributor to add.
+	 * @return The sort builder factory. Will always return the exact same instance.
 	 */
-	void addChild(SearchSortContributor<? extends B> contributor);
+	F getFactory();
 
 	/**
-	 * Add a sort builder at the current position in the sort tree.
+	 * Create a new context with a sort builder appended.
 	 *
 	 * @param builder The builder to add.
+	 * @return A new DSL context, with the given builder appended.
 	 */
-	default void addChild(B builder) {
-		addChild( new StaticSearchSortContributor<>( builder ) );
-	}
+	SearchSortDslContext<?, B> append(B builder);
 
 	/**
 	 * Create a {@link SearchSort} instance

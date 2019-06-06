@@ -7,7 +7,6 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 import org.hibernate.search.engine.search.SearchSort;
@@ -26,8 +25,8 @@ public class StubSearchSortBuilderFactory
 	}
 
 	@Override
-	public void toImplementation(SearchSort sort, Consumer<? super StubSortBuilder> implementationConsumer) {
-		((StubSearchSort) sort).getBuilders().forEach( implementationConsumer );
+	public StubSortBuilder toImplementation(SearchSort sort) {
+		return (StubSearchSort) sort;
 	}
 
 	@Override

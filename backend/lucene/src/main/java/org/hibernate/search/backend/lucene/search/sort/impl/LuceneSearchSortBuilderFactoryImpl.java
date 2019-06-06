@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -53,11 +52,11 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 	}
 
 	@Override
-	public void toImplementation(SearchSort sort, Consumer<? super LuceneSearchSortBuilder> implementationConsumer) {
+	public LuceneSearchSortBuilder toImplementation(SearchSort sort) {
 		if ( !( sort instanceof LuceneSearchSort ) ) {
 			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}
-		((LuceneSearchSort) sort).getBuilders().forEach( implementationConsumer );
+		return ((LuceneSearchSort) sort);
 	}
 
 	@Override

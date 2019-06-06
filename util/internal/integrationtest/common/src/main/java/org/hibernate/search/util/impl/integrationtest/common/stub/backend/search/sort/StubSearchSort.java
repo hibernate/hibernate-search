@@ -10,14 +10,15 @@ import java.util.List;
 
 import org.hibernate.search.engine.search.SearchSort;
 
-class StubSearchSort implements SearchSort {
+class StubSearchSort extends StubSortBuilder implements SearchSort {
 	private final List<StubSortBuilder> builders;
 
 	StubSearchSort(List<StubSortBuilder> builders) {
 		this.builders = builders;
 	}
 
-	List<StubSortBuilder> getBuilders() {
-		return builders;
+	@Override
+	void simulateBuild() {
+		builders.forEach( StubSortBuilder::simulateBuild );
 	}
 }

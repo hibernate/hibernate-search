@@ -6,27 +6,21 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
-import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
-import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
+import org.hibernate.search.engine.search.dsl.sort.spi.AbstractNonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 class ScoreSortContextImpl<B>
-		extends NonEmptySortContextImpl
-		implements ScoreSortContext, SearchSortContributor<B> {
+		extends AbstractNonEmptySortContext<B>
+		implements ScoreSortContext {
 
 	private final ScoreSortBuilder<B> builder;
 
-	ScoreSortContextImpl(SearchSortContainerContext containerContext,
-			SearchSortBuilderFactory<?, B> factory, SearchSortDslContext<?> dslContext) {
-		super( containerContext, dslContext );
-		this.builder = factory.score();
+	ScoreSortContextImpl(SearchSortDslContext<?, B> dslContext) {
+		super( dslContext );
+		this.builder = dslContext.getFactory().score();
 	}
 
 	@Override
@@ -36,7 +30,7 @@ class ScoreSortContextImpl<B>
 	}
 
 	@Override
-	public void contribute(Consumer<? super B> collector) {
-		collector.accept( builder.toImplementation() );
+	protected B toImplementation() {
+		return builder.toImplementation();
 	}
 }

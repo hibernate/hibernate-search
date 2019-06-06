@@ -11,7 +11,6 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 /**
  * An extension to the search query DSL, allowing to add non-standard sorts to a query.
@@ -35,14 +34,10 @@ public interface SearchSortContainerContextExtension<T> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link SearchSortContainerContext}.
-	 * @param factory A {@link SearchSortBuilderFactory}.
 	 * @param dslContext A {@link SearchSortDslContext}.
-	 * @param <C> The type of query element collector for the given sort builder factory.
-	 * @param <B> The implementation type of builders for the given sort builder factory.
 	 * @return An optional containing the extended search sort container context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	<C, B> Optional<T> extendOptional(SearchSortContainerContext original,
-			SearchSortBuilderFactory<C, B> factory, SearchSortDslContext<? super B> dslContext);
+	Optional<T> extendOptional(SearchSortContainerContext original, SearchSortDslContext<?, ?> dslContext);
 
 }
