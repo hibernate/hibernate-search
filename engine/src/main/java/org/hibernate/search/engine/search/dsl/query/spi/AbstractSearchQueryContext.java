@@ -55,7 +55,7 @@ public abstract class AbstractSearchQueryContext<
 	}
 
 	@Override
-	public S predicate(Function<? super PDC, SearchPredicateTerminalContext> predicateContributor) {
+	public S predicate(Function<? super PDC, ? extends SearchPredicateTerminalContext> predicateContributor) {
 		SearchPredicateBuilderFactory<? super C, ?> factory = indexScope.getSearchPredicateBuilderFactory();
 		SearchPredicateFactoryContext factoryContext = new DefaultSearchPredicateFactoryContext<>( factory );
 		SearchPredicate predicate = predicateContributor.apply( extendPredicateContext( factoryContext ) ).toPredicate();

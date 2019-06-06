@@ -64,7 +64,7 @@ public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, E>
 
 	@Override
 	public SearchQueryContext<?, E, ?> predicate(
-			Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor) {
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> predicateContributor) {
 		return delegate.predicate( predicateContributor );
 	}
 

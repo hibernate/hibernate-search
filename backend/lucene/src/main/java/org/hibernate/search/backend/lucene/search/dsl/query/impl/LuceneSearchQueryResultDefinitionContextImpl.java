@@ -93,7 +93,7 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 
 	@Override
 	public LuceneSearchQueryContext<E> predicate(
-			Function<? super LuceneSearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor) {
+			Function<? super LuceneSearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> predicateContributor) {
 		return asEntity().predicate( predicateContributor );
 	}
 

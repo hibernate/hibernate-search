@@ -93,7 +93,7 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 
 	@Override
 	public ElasticsearchSearchQueryContext<E> predicate(
-			Function<? super ElasticsearchSearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor) {
+			Function<? super ElasticsearchSearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> predicateContributor) {
 		return asEntity().predicate( predicateContributor );
 	}
 
