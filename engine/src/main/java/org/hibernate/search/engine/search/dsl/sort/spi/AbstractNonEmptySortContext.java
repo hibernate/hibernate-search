@@ -8,8 +8,8 @@ package org.hibernate.search.engine.search.dsl.sort.spi;
 
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortFactoryContext;
 
 public abstract class AbstractNonEmptySortContext<B> implements NonEmptySortContext {
 	private final SearchSortDslContext<?, ? super B> parentDslContext;
@@ -21,8 +21,8 @@ public abstract class AbstractNonEmptySortContext<B> implements NonEmptySortCont
 	}
 
 	@Override
-	public final SearchSortContainerContext then() {
-		return new DefaultSearchSortContainerContext<>( getSelfDslContext() );
+	public final SearchSortFactoryContext then() {
+		return new DefaultSearchSortFactoryContext<>( getSelfDslContext() );
 	}
 
 	@Override

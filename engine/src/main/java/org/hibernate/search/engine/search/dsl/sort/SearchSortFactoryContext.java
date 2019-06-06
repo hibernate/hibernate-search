@@ -11,12 +11,12 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * A context allowing to add a sort element.
+ * A context allowing to specify the type of a sort.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
  */
-public interface SearchSortContainerContext {
+public interface SearchSortFactoryContext {
 
 	/**
 	 * Order elements by their relevance score.
@@ -95,17 +95,17 @@ public interface SearchSortContainerContext {
 	 * @return The extended context.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchSortContainerContextExtension<T> extension);
+	<T> T extension(SearchSortFactoryContextExtension<T> extension);
 
 	/**
 	 * Create a context allowing to try to apply multiple extensions one after the other,
 	 * failing only if <em>none</em> of the extensions is supported.
 	 * <p>
 	 * If you only need to apply a single extension and fail if it is not supported,
-	 * use the simpler {@link #extension(SearchSortContainerContextExtension)} method instead.
+	 * use the simpler {@link #extension(SearchSortFactoryContextExtension)} method instead.
 	 *
 	 * @return A context allowing to define the extensions to attempt, and the corresponding sorts.
 	 */
-	SearchSortContainerExtensionContext extension();
+	SearchSortFactoryExtensionContext extension();
 
 }

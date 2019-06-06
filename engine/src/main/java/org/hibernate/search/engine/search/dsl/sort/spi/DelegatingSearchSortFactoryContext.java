@@ -11,21 +11,21 @@ import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerExtensionContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
- * A delegating {@link SearchSortContainerContext}.
+ * A delegating {@link SearchSortFactoryContext}.
  * <p>
- * Mainly useful when implementing a {@link SearchSortContainerContextExtension}.
+ * Mainly useful when implementing a {@link SearchSortFactoryContextExtension}.
  */
-public class DelegatingSearchSortContainerContext implements SearchSortContainerContext {
+public class DelegatingSearchSortFactoryContext implements SearchSortFactoryContext {
 
-	private final SearchSortContainerContext delegate;
+	private final SearchSortFactoryContext delegate;
 
-	public DelegatingSearchSortContainerContext(SearchSortContainerContext delegate) {
+	public DelegatingSearchSortFactoryContext(SearchSortFactoryContext delegate) {
 		this.delegate = delegate;
 	}
 
@@ -60,16 +60,16 @@ public class DelegatingSearchSortContainerContext implements SearchSortContainer
 	}
 
 	@Override
-	public <T> T extension(SearchSortContainerContextExtension<T> extension) {
+	public <T> T extension(SearchSortFactoryContextExtension<T> extension) {
 		return delegate.extension( extension );
 	}
 
 	@Override
-	public SearchSortContainerExtensionContext extension() {
+	public SearchSortFactoryExtensionContext extension() {
 		return delegate.extension();
 	}
 
-	protected SearchSortContainerContext getDelegate() {
+	protected SearchSortFactoryContext getDelegate() {
 		return delegate;
 	}
 }

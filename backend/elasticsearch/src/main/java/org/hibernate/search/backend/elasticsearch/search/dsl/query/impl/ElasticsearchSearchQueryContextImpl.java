@@ -10,7 +10,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
-import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexS
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 
 class ElasticsearchSearchQueryContextImpl<H>
 		extends AbstractExtendedSearchQueryContext<
@@ -26,7 +26,7 @@ class ElasticsearchSearchQueryContextImpl<H>
 				H,
 				ElasticsearchSearchResult<H>,
 				ElasticsearchSearchPredicateFactoryContext,
-				ElasticsearchSearchSortContainerContext,
+		ElasticsearchSearchSortFactoryContext,
 				ElasticsearchSearchQueryElementCollector
 		>
 		implements ElasticsearchSearchQueryResultContext<H>, ElasticsearchSearchQueryContext<H> {
@@ -56,8 +56,8 @@ class ElasticsearchSearchQueryContextImpl<H>
 	}
 
 	@Override
-	protected ElasticsearchSearchSortContainerContext extendSortContext(
-			SearchSortContainerContext sortContainerContext) {
-		return sortContainerContext.extension( ElasticsearchExtension.get() );
+	protected ElasticsearchSearchSortFactoryContext extendSortContext(
+			SearchSortFactoryContext sortFactoryContext) {
+		return sortFactoryContext.extension( ElasticsearchExtension.get() );
 	}
 }

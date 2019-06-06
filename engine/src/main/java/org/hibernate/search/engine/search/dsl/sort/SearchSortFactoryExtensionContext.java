@@ -12,15 +12,15 @@ import org.hibernate.search.util.common.SearchException;
 
 /**
  * The context used when attempting to apply multiple extensions
- * to a {@link SearchSortContainerContext}.
+ * to a {@link SearchSortFactoryContext}.
  *
- * @see SearchSortContainerContext#extension()
+ * @see SearchSortFactoryContext#extension()
  */
-public interface SearchSortContainerExtensionContext {
+public interface SearchSortFactoryExtensionContext {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
-	 * {@link #ifSupported(SearchSortContainerContextExtension, Function)}
+	 * {@link #ifSupported(SearchSortFactoryContextExtension, Function)}
 	 * was supported, extend the current context with this extension,
 	 * and apply the given consumer to the extended context.
 	 * <p>
@@ -34,14 +34,14 @@ public interface SearchSortContainerExtensionContext {
 	 * @param <T> The type of the extended context.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchSortContainerExtensionContext ifSupported(
-			SearchSortContainerContextExtension<T> extension,
+	<T> SearchSortFactoryExtensionContext ifSupported(
+			SearchSortFactoryContextExtension<T> extension,
 			Function<T, ? extends SearchSortTerminalContext> sortContributor
 	);
 
 	/**
-	 * If no extension passed to {@link #ifSupported(SearchSortContainerContextExtension, Function)}
-	 * was supported so far, apply the given consumer to the current (non-extended) {@link SearchSortContainerContext};
+	 * If no extension passed to {@link #ifSupported(SearchSortFactoryContextExtension, Function)}
+	 * was supported so far, apply the given consumer to the current (non-extended) {@link SearchSortFactoryContext};
 	 * otherwise do nothing.
 	 *
 	 * @param sortContributor A function called if no extension was successfully applied;
@@ -50,10 +50,10 @@ public interface SearchSortContainerExtensionContext {
 	 * Should generally be a lambda expression.
 	 * @return The next context.
 	 */
-	NonEmptySortContext orElse(Function<SearchSortContainerContext, ? extends SearchSortTerminalContext> sortContributor);
+	NonEmptySortContext orElse(Function<SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor);
 
 	/**
-	 * If no extension passed to {@link #ifSupported(SearchSortContainerContextExtension, Function)}
+	 * If no extension passed to {@link #ifSupported(SearchSortFactoryContextExtension, Function)}
 	 * was supported so far, throw an exception; otherwise do nothing.
 	 *
 	 * @return The next context.

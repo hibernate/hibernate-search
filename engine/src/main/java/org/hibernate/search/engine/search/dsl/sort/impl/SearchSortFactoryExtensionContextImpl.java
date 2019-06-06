@@ -10,37 +10,37 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerExtensionContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.StaticNonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
-final class SearchSortContainerExtensionContextImpl<B> implements SearchSortContainerExtensionContext {
+final class SearchSortFactoryExtensionContextImpl<B> implements SearchSortFactoryExtensionContext {
 
-	private final SearchSortContainerContext parent;
+	private final SearchSortFactoryContext parent;
 	private final SearchSortDslContext<?, B> dslContext;
 
 	private final DslExtensionState<SearchSortTerminalContext> state = new DslExtensionState<>();
 
-	SearchSortContainerExtensionContextImpl(SearchSortContainerContext parent,
+	SearchSortFactoryExtensionContextImpl(SearchSortFactoryContext parent,
 			SearchSortDslContext<?, B> dslContext) {
 		this.parent = parent;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <T> SearchSortContainerExtensionContext ifSupported(
-			SearchSortContainerContextExtension<T> extension,
+	public <T> SearchSortFactoryExtensionContext ifSupported(
+			SearchSortFactoryContextExtension<T> extension,
 			Function<T, ? extends SearchSortTerminalContext> sortContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent, dslContext ), sortContributor );
 		return this;
 	}
 
 	@Override
-	public NonEmptySortContext orElse(Function<SearchSortContainerContext, ? extends SearchSortTerminalContext> sortContributor) {
+	public NonEmptySortContext orElse(Function<SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor) {
 		SearchSortTerminalContext result = state.orElse( parent, sortContributor );
 		return new StaticNonEmptySortContext<>( dslContext, dslContext.getFactory().toImplementation( result.toSort() ) );
 	}

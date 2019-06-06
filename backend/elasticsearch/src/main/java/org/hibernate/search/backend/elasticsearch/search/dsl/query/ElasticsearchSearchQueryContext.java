@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.query;
 
-import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchFetchable;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 
 public interface ElasticsearchSearchQueryContext<H>
-		extends SearchQueryContext<ElasticsearchSearchQueryContext<H>, H, ElasticsearchSearchSortContainerContext>,
+		extends SearchQueryContext<ElasticsearchSearchQueryContext<H>, H, ElasticsearchSearchSortFactoryContext>,
 				ElasticsearchSearchFetchable<H> {
 
 	@Override

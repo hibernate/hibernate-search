@@ -9,13 +9,13 @@ package org.hibernate.search.backend.lucene.search.dsl.sort;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 
 /**
  * A DSL context allowing to specify the sort order, with some Lucene-specific methods.
  */
-public interface LuceneSearchSortContainerContext extends SearchSortContainerContext {
+public interface LuceneSearchSortFactoryContext extends SearchSortFactoryContext {
 
 	/**
 	 * Order elements by a given Lucene {@link SortField}.

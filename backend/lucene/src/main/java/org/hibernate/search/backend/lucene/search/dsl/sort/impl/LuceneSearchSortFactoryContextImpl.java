@@ -8,23 +8,23 @@ package org.hibernate.search.backend.lucene.search.dsl.sort.impl;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
+import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactoryContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.StaticNonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
-public class LuceneSearchSortContainerContextImpl
-		extends DelegatingSearchSortContainerContext
-		implements LuceneSearchSortContainerContext {
+public class LuceneSearchSortFactoryContextImpl
+		extends DelegatingSearchSortFactoryContext
+		implements LuceneSearchSortFactoryContext {
 
 	private final SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder> dslContext;
 
-	public LuceneSearchSortContainerContextImpl(SearchSortContainerContext delegate,
+	public LuceneSearchSortFactoryContextImpl(SearchSortFactoryContext delegate,
 			SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;

@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.engine.search.query.SearchFetchable;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 public interface SearchQueryContext<
 		S extends SearchQueryContext<? extends S, H, SC>,
 		H,
-		SC extends SearchSortContainerContext
+		SC extends SearchSortFactoryContext
 		>
 		extends SearchFetchable<H> {
 

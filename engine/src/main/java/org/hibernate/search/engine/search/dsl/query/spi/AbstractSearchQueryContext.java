@@ -18,9 +18,9 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
-import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -33,7 +33,7 @@ public abstract class AbstractSearchQueryContext<
 		S extends SearchQueryContext<S, H, SC>,
 		H,
 		PDC extends SearchPredicateFactoryContext,
-		SC extends SearchSortContainerContext,
+		SC extends SearchSortFactoryContext,
 		C
 		>
 		implements SearchQueryResultContext<S, H, PDC>, SearchQueryContext<S, H, SC> {
@@ -85,10 +85,10 @@ public abstract class AbstractSearchQueryContext<
 	@Override
 	public S sort(Function<? super SC, ? extends SearchSortTerminalContext> sortContributor) {
 		SearchSortBuilderFactory<? super C, ?> factory = indexScope.getSearchSortBuilderFactory();
-		SearchSortContainerContext containerContext = new DefaultSearchSortContainerContext<>(
+		SearchSortFactoryContext factoryContext = new DefaultSearchSortFactoryContext<>(
 				SearchSortDslContextImpl.root( factory )
 		);
-		SearchSort sort = sortContributor.apply( extendSortContext( containerContext ) ).toSort();
+		SearchSort sort = sortContributor.apply( extendSortContext( factoryContext ) ).toSort();
 		contribute( factory, sort );
 		return thisAsS();
 	}
@@ -150,5 +150,5 @@ public abstract class AbstractSearchQueryContext<
 
 	protected abstract PDC extendPredicateContext(SearchPredicateFactoryContext predicateFactoryContext);
 
-	protected abstract SC extendSortContext(SearchSortContainerContext sortContainerContext);
+	protected abstract SC extendSortContext(SearchSortFactoryContext sortFactoryContext);
 }

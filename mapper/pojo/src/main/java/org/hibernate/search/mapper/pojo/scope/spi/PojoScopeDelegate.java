@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
@@ -33,7 +33,7 @@ public interface PojoScopeDelegate<E, E2> {
 
 	SearchPredicateFactoryContext predicate();
 
-	SearchSortContainerContext sort();
+	SearchSortFactoryContext sort();
 
 	SearchProjectionFactoryContext<PojoReference, E2> projection();
 
