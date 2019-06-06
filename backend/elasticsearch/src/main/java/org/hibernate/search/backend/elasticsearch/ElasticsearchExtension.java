@@ -44,7 +44,6 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -137,11 +136,14 @@ public final class ElasticsearchExtension<H, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> Optional<ElasticsearchSearchSortContainerContext> extendOptional(
-			SearchSortContainerContext original, SearchSortBuilderFactory<C, B> factory,
-			SearchSortDslContext<? super B> dslContext) {
-		if ( factory instanceof ElasticsearchSearchSortBuilderFactory ) {
-			return Optional.of( extendUnsafe( original, (ElasticsearchSearchSortBuilderFactory) factory, dslContext ) );
+	@SuppressWarnings("unchecked") // If the factory is an instance of ElasticsearchSearchSortBuilderFactory, the cast is safe
+	public Optional<ElasticsearchSearchSortContainerContext> extendOptional(
+			SearchSortContainerContext original, SearchSortDslContext<?, ?> dslContext) {
+		if ( dslContext.getFactory() instanceof ElasticsearchSearchSortBuilderFactory ) {
+			return Optional.of( new ElasticsearchSearchSortContainerContextImpl(
+					original,
+					(SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder>) dslContext
+			) );
 		}
 		else {
 			return Optional.empty();
@@ -175,15 +177,5 @@ public final class ElasticsearchExtension<H, R, E>
 		else {
 			throw log.elasticsearchExtensionOnUnknownType( original );
 		}
-	}
-
-	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know B = ElasticsearchSearchSortBuilder
-	private <B> ElasticsearchSearchSortContainerContext extendUnsafe(
-			SearchSortContainerContext original, ElasticsearchSearchSortBuilderFactory factory,
-			SearchSortDslContext<? super B> dslContext) {
-		return new ElasticsearchSearchSortContainerContextImpl(
-				original, factory,
-				(SearchSortDslContext<? super ElasticsearchSearchSortBuilder>) dslContext
-		);
 	}
 }

@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.sort.spi;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -42,11 +41,11 @@ public interface SearchSortBuilderFactory<C, B> {
 	 * May be called multiple times for a given {@link SearchSort} object.
 	 *
 	 * @param sort The {@link SearchSort} object to convert.
-	 * @param implementationConsumer A collector for the corresponding sort builder implementations.
+	 * @return The (potentially composite) sort builder implementation.
 	 * @throws SearchException If the {@link SearchSort} object was created
 	 * by a different, incompatible factory.
 	 */
-	void toImplementation(SearchSort sort, Consumer<? super B> implementationConsumer);
+	B toImplementation(SearchSort sort);
 
 	/**
 	 * Contribute a sort builder to a collector.

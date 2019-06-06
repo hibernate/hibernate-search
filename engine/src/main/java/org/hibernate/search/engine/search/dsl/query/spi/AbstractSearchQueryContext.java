@@ -85,7 +85,11 @@ public abstract class AbstractSearchQueryContext<
 	@Override
 	public S sort(Function<? super SC, ? extends SearchSortTerminalContext> sortContributor) {
 		SearchSortBuilderFactory<? super C, ?> factory = indexScope.getSearchSortBuilderFactory();
-		contribute( factory, sortContributor );
+		SearchSortContainerContext containerContext = new DefaultSearchSortContainerContext<>(
+				SearchSortDslContextImpl.root( factory )
+		);
+		SearchSort sort = sortContributor.apply( extendSortContext( containerContext ) ).toSort();
+		contribute( factory, sort );
 		return thisAsS();
 	}
 
@@ -139,21 +143,7 @@ public abstract class AbstractSearchQueryContext<
 	}
 
 	private <B> void contribute(SearchSortBuilderFactory<? super C, B> factory, SearchSort sort) {
-		factory.toImplementation( sort, b -> factory.contribute( searchQueryBuilder.getQueryElementCollector(), b ) );
-	}
-
-	private <B> void contribute(SearchSortBuilderFactory<? super C, B> factory,
-			Function<? super SC, ? extends SearchSortTerminalContext> sortContributor) {
-		C collector = searchQueryBuilder.getQueryElementCollector();
-
-		SearchSortDslContextImpl<B> rootDslContext = new SearchSortDslContextImpl<>( factory );
-		SearchSortContainerContext containerContext =
-				new DefaultSearchSortContainerContext<>( factory, rootDslContext );
-		SearchSortTerminalContext terminalContext = sortContributor.apply( extendSortContext( containerContext ) );
-		factory.toImplementation(
-				terminalContext.toSort(),
-				b -> factory.contribute( collector, b )
-		);
+		factory.contribute( searchQueryBuilder.getQueryElementCollector(), factory.toImplementation( sort ) );
 	}
 
 	protected abstract S thisAsS();

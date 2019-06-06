@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.spi;
 
-import java.util.function.Consumer;
+public final class StaticNonEmptySortContext<B> extends AbstractNonEmptySortContext<B> {
+	protected final B builder;
 
-class StaticSearchSortContributor<B> implements SearchSortContributor<B> {
-	private final B builder;
-
-	StaticSearchSortContributor(B builder) {
+	public StaticNonEmptySortContext(SearchSortDslContext<?, B> parentDslContext,
+			B builder) {
+		super( parentDslContext );
 		this.builder = builder;
 	}
 
 	@Override
-	public void contribute(Consumer<? super B> collector) {
-		collector.accept( builder );
+	protected B toImplementation() {
+		return builder;
 	}
 }

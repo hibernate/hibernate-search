@@ -44,7 +44,6 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -138,11 +137,14 @@ public final class LuceneExtension<H, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> Optional<LuceneSearchSortContainerContext> extendOptional(
-			SearchSortContainerContext original, SearchSortBuilderFactory<C, B> factory,
-			SearchSortDslContext<? super B> dslContext) {
-		if ( factory instanceof LuceneSearchSortBuilderFactory ) {
-			return Optional.of( extendUnsafe( original, (LuceneSearchSortBuilderFactory) factory, dslContext ) );
+	@SuppressWarnings("unchecked") // If the factory is an instance of LuceneSearchSortBuilderFactory, the cast is safe
+	public Optional<LuceneSearchSortContainerContext> extendOptional(
+			SearchSortContainerContext original, SearchSortDslContext<?, ?> dslContext) {
+		if ( dslContext.getFactory() instanceof LuceneSearchSortBuilderFactory ) {
+			return Optional.of( new LuceneSearchSortContainerContextImpl(
+					original,
+					(SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder>) dslContext
+			) );
 		}
 		else {
 			return Optional.empty();
@@ -176,15 +178,5 @@ public final class LuceneExtension<H, R, E>
 		else {
 			throw log.luceneExtensionOnUnknownType( original );
 		}
-	}
-
-	@SuppressWarnings("unchecked") // If the target is Lucene, then we know B = LuceSearchSortBuilder
-	private <B> LuceneSearchSortContainerContext extendUnsafe(
-			SearchSortContainerContext original, LuceneSearchSortBuilderFactory factory,
-			SearchSortDslContext<? super B> dslContext) {
-		return new LuceneSearchSortContainerContextImpl(
-				original, factory,
-				(SearchSortDslContext<? super LuceneSearchSortBuilder>) dslContext
-		);
 	}
 }

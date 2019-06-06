@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionC
 import org.hibernate.search.engine.search.dsl.query.impl.DefaultSearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
@@ -50,7 +51,9 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 
 	@Override
 	public SearchSortContainerContext sort() {
-		return new DefaultSearchSortContainerContext<>( delegate.getSearchSortBuilderFactory() );
+		return new DefaultSearchSortContainerContext<>(
+				SearchSortDslContextImpl.root( delegate.getSearchSortBuilderFactory() )
+		);
 	}
 
 	@Override

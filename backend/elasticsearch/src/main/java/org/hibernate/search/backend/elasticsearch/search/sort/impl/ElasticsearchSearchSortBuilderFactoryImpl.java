@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -51,11 +50,11 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 	}
 
 	@Override
-	public void toImplementation(SearchSort sort, Consumer<? super ElasticsearchSearchSortBuilder> implementationConsumer) {
+	public ElasticsearchSearchSortBuilder toImplementation(SearchSort sort) {
 		if ( !( sort instanceof ElasticsearchSearchSort ) ) {
 			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( sort );
 		}
-		implementationConsumer.accept( (ElasticsearchSearchSort) sort );
+		return (ElasticsearchSearchSort) sort;
 	}
 
 	@Override

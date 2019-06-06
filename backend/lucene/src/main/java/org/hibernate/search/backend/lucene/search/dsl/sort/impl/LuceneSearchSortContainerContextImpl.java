@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuil
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.spi.StaticNonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
@@ -22,31 +22,25 @@ public class LuceneSearchSortContainerContextImpl
 		extends DelegatingSearchSortContainerContext
 		implements LuceneSearchSortContainerContext {
 
-	private final LuceneSearchSortBuilderFactory factory;
-
-	private final SearchSortDslContext<? super LuceneSearchSortBuilder> dslContext;
+	private final SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder> dslContext;
 
 	public LuceneSearchSortContainerContextImpl(SearchSortContainerContext delegate,
-			LuceneSearchSortBuilderFactory factory,
-			SearchSortDslContext<? super LuceneSearchSortBuilder> dslContext) {
+			SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder> dslContext) {
 		super( delegate );
-		this.factory = factory;
 		this.dslContext = dslContext;
 	}
 
 	@Override
 	public NonEmptySortContext fromLuceneSortField(SortField luceneSortField) {
-		dslContext.addChild( factory.fromLuceneSortField( luceneSortField ) );
-		return nonEmptyContext();
+		return staticNonEmptyContext( dslContext.getFactory().fromLuceneSortField( luceneSortField ) );
 	}
 
 	@Override
 	public NonEmptySortContext fromLuceneSort(Sort luceneSort) {
-		dslContext.addChild( factory.fromLuceneSort( luceneSort ) );
-		return nonEmptyContext();
+		return staticNonEmptyContext( dslContext.getFactory().fromLuceneSort( luceneSort ) );
 	}
 
-	private NonEmptySortContext nonEmptyContext() {
-		return new NonEmptySortContextImpl( this, dslContext );
+	private NonEmptySortContext staticNonEmptyContext(LuceneSearchSortBuilder builder) {
+		return new StaticNonEmptySortContext<>( dslContext, builder );
 	}
 }
