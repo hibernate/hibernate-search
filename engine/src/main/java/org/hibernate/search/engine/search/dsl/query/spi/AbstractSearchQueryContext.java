@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.dsl.query.spi;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -20,6 +19,7 @@ import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredic
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
@@ -83,7 +83,7 @@ public abstract class AbstractSearchQueryContext<
 	}
 
 	@Override
-	public S sort(Consumer<? super SC> sortContributor) {
+	public S sort(Function<? super SC, ? extends SearchSortTerminalContext> sortContributor) {
 		SearchSortBuilderFactory<? super C, ?> factory = indexScope.getSearchSortBuilderFactory();
 		contribute( factory, sortContributor );
 		return thisAsS();
@@ -143,13 +143,13 @@ public abstract class AbstractSearchQueryContext<
 	}
 
 	private <B> void contribute(SearchSortBuilderFactory<? super C, B> factory,
-			Consumer<? super SC> dslSortContributor) {
+			Function<? super SC, ? extends SearchSortTerminalContext> sortContributor) {
 		C collector = searchQueryBuilder.getQueryElementCollector();
 
 		SearchSortDslContextImpl<B> rootDslContext = new SearchSortDslContextImpl<>( factory );
 		SearchSortContainerContext containerContext =
 				new DefaultSearchSortContainerContext<>( factory, rootDslContext );
-		dslSortContributor.accept( extendSortContext( containerContext ) );
+		sortContributor.apply( extendSortContext( containerContext ) );
 
 		for ( B builder : rootDslContext.getResultingBuilders() ) {
 			factory.contribute( collector, builder );

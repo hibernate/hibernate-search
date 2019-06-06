@@ -26,6 +26,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
@@ -135,11 +136,13 @@ public class FieldSearchSortIT {
 		initData();
 	}
 
-	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
+	private SearchQuery<DocumentReference> simpleQuery(
+			Function<? super SearchSortContainerContext, ? extends SearchSortTerminalContext> sortContributor) {
 		return simpleQuery( sortContributor, indexManager.createScope() );
 	}
 
-	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor, StubMappingScope scope) {
+	private SearchQuery<DocumentReference> simpleQuery(
+			Function<? super SearchSortContainerContext, ? extends SearchSortTerminalContext> sortContributor, StubMappingScope scope) {
 		return scope.query()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )

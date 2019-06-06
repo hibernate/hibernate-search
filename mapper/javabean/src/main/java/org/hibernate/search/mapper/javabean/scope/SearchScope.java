@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.javabean.scope;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
@@ -62,7 +61,7 @@ public interface SearchScope {
 	 * or a wider scope.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
-	 * since you can {@link SearchQueryContext#sort(Consumer) define sorts with lambdas}
+	 * since you can {@link SearchQueryContext#sort(Function) define sorts with lambdas}
 	 * within the search query DSL,
 	 * removing the need to create separate objects to represent the sorts.
 	 *

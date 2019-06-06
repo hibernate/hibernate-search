@@ -359,6 +359,7 @@ public class LuceneExtensionIT {
 									)
 								)
 						)
+						.orElseFail()
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(

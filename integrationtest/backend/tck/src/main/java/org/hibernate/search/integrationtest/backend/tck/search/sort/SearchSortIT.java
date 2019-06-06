@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.SearchSort;
@@ -41,7 +42,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
@@ -86,7 +86,8 @@ public class SearchSortIT {
 		initData();
 	}
 
-	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
+	private SearchQuery<DocumentReference> simpleQuery(
+			Function<? super SearchSortContainerContext, ? extends SearchSortTerminalContext> sortContributor) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )
@@ -196,14 +197,13 @@ public class SearchSortIT {
 	public void lambda_caching() {
 		AtomicReference<SearchSort> cache = new AtomicReference<>();
 
-		Consumer<? super SearchSortContainerContext> cachingContributor = c -> {
+		Function<? super SearchSortContainerContext, ? extends SearchSortTerminalContext> cachingContributor = c -> {
+			SearchSort result = cache.get();
 			if ( cache.get() == null ) {
-				SearchSort result = c.byField( "string" ).onMissingValue().sortLast().toSort();
+				result = c.byField( "string" ).onMissingValue().sortLast().toSort();
 				cache.set( result );
 			}
-			else {
-				c.by( cache.get() );
-			}
+			return c.by( result );
 		};
 
 		Assertions.assertThat( cache ).hasValue( null );
@@ -297,7 +297,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.orElseFail()
 		);
@@ -311,7 +311,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.orElseFail()
 		);
@@ -323,13 +323,13 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.ifSupported(
 								new SupportedExtension(),
 								c -> c.byField( "string" ).onMissingValue().sortLast()
 						)
-						.orElse( ignored -> Assert.fail( "This should not be called" ) )
+						.orElse( ignored -> Assertions.fail( "This should not be called" ) )
 		);
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
@@ -337,13 +337,13 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.ifSupported(
 								new SupportedExtension(),
 								c -> c.byField( "string" ).desc().onMissingValue().sortLast()
 						)
-						.orElse( ignored -> Assert.fail( "This should not be called" ) )
+						.orElse( ignored -> Assertions.fail( "This should not be called" ) )
 		);
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -353,11 +353,11 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.orElse(
 								c -> c.byField( "string" ).onMissingValue().sortLast()
@@ -369,40 +369,16 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.orElse(
 								c -> c.byField( "string" ).desc().onMissingValue().sortLast()
 						)
 		);
-
-		// Conditional extensions without orElse - one, unsupported
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-		query = simpleQuery( b -> {
-			b.extension()
-					.ifSupported(
-							new UnSupportedExtension(),
-							ignored -> Assert.fail( "This should not be called" )
-					);
-			b.byField( "string" ).onMissingValue().sortLast();
-		} );
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-		query = simpleQuery( b -> {
-			b.extension()
-					.ifSupported(
-							new UnSupportedExtension(),
-							ignored -> Assert.fail( "This should not be called" )
-					);
-			b.byField( "string" ).desc().onMissingValue().sortLast();
-		} );
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 
 	private void initData() {
