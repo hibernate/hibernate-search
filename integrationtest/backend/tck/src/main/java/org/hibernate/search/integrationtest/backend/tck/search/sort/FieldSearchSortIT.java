@@ -343,39 +343,6 @@ public class FieldSearchSortIT {
 	}
 
 	@Test
-	public void multipleFields() {
-		SearchQuery<DocumentReference> query;
-
-		query = simpleQuery( b -> b
-				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc().onMissingValue().sortFirst()
-				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc()
-		);
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-
-		query = simpleQuery( b -> b
-				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc().onMissingValue().sortFirst()
-				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc()
-		);
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
-
-		query = simpleQuery( b -> b
-				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc().onMissingValue().sortFirst()
-				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc()
-		);
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
-
-		query = simpleQuery( b -> b
-				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc().onMissingValue().sortFirst()
-				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc()
-		);
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
-	}
-
-	@Test
 	public void error_unsortable() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -616,9 +583,6 @@ public class FieldSearchSortIT {
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
 
-			indexMapping.identicalForFirstTwo.document2Value.write( document );
-			indexMapping.identicalForLastTwo.document2Value.write( document );
-
 			// Note: this object must be single-valued for these tests
 			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject ) );
@@ -636,9 +600,6 @@ public class FieldSearchSortIT {
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 
-			indexMapping.identicalForFirstTwo.document1Value.write( document );
-			indexMapping.identicalForLastTwo.document1Value.write( document );
-
 			// Note: this object must be single-valued for these tests
 			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject ) );
@@ -655,9 +616,6 @@ public class FieldSearchSortIT {
 			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document3Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document3Value.write( document ) );
-
-			indexMapping.identicalForFirstTwo.document3Value.write( document );
-			indexMapping.identicalForLastTwo.document3Value.write( document );
 
 			// Note: this object must be single-valued for these tests
 			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
@@ -764,9 +722,6 @@ public class FieldSearchSortIT {
 		final List<ByTypeFieldModel<?>> unsupportedFieldModels = new ArrayList<>();
 		final List<ByTypeFieldModel<?>> supportedNonSortableFieldModels = new ArrayList<>();
 
-		final MainFieldModel<String> identicalForFirstTwo;
-		final MainFieldModel<String> identicalForLastTwo;
-
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
 
@@ -800,15 +755,6 @@ public class FieldSearchSortIT {
 						}
 					}
 			);
-
-			identicalForFirstTwo = MainFieldModel.mapper(
-					"aaron", "aaron", "zach"
-			)
-					.map( root, "identicalForFirstTwo", c -> c.sortable( Sortable.YES ) );
-			identicalForLastTwo = MainFieldModel.mapper(
-					"aaron", "zach", "zach"
-			)
-					.map( root, "identicalForLastTwo", c -> c.sortable( Sortable.YES ) );
 
 			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
 			nestedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.NESTED );
@@ -913,11 +859,6 @@ public class FieldSearchSortIT {
 	}
 
 	private static class MainFieldModel<T> {
-		static StandardFieldMapper<String, MainFieldModel<String>> mapper(
-				String document1Value, String document2Value, String document3Value) {
-			return mapper( c -> c.asString(), document1Value, document2Value, document3Value );
-		}
-
 		static <LT> StandardFieldMapper<LT, MainFieldModel<LT>> mapper(
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, LT>> configuration,
 				LT document1Value, LT document2Value, LT document3Value) {

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.dsl.sort;
 
+import java.util.function.Consumer;
+
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
@@ -85,6 +87,43 @@ public interface SearchSortFactoryContext {
 	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
 	 */
 	NonEmptySortContext by(SearchSort sort);
+
+	/**
+	 * Order by a sort composed of several elements.
+	 * <p>
+	 * Note that, in general, calling this method is not necessary as you can chain sorts by calling
+	 * {@link NonEmptySortContext#then()}.
+	 * This method is mainly useful to mix imperative and declarative style when building sorts.
+	 * See {@link #byComposite(Consumer)}
+	 *
+	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
+	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 */
+	CompositeSortContext byComposite();
+
+	/**
+	 * Order by a sort composed of several elements,
+	 * which will be defined by the given consumer.
+	 * <p>
+	 * Best used with lambda expressions.
+	 * <p>
+	 * This is mainly useful to mix imperative and declarative style when building sorts, e.g.:
+	 * <pre>{@code
+	 * f.composite( c -> {
+	 *    c.add( f.byField( "category" ) );
+	 *    if ( someInput != null ) {
+	 *        c.add( f.byDistance( "location", someInput.getLatitude(), someInput.getLongitude() );
+	 *    }
+	 *    c.add( f.byIndexOrder() );
+	 * } )
+	 * }</pre>
+	 *
+	 * @param elementContributor A consumer that will add elements to the context passed in parameter.
+	 * Should generally be a lambda expression.
+	 * @return A context allowing {@link NonEmptySortContext#then() chain other sorts}
+	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 */
+	NonEmptySortContext byComposite(Consumer<? super CompositeSortContext> elementContributor);
 
 	/**
 	 * Extend the current context with the given extension,

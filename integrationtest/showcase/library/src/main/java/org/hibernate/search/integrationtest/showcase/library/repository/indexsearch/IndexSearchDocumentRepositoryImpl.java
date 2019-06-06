@@ -121,14 +121,13 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					}
 				} ) )
 				// TODO HSEARCH-3271 facets (tag, medium, library in particular)
-				.sort( f -> {
-					// FIXME HSEARCH-3591 provide an API to address this use case ("conditional" sorts) fluently, similar to .bool( b -> ... ) for predicates
+				.sort( f -> f.byComposite( b -> {
 					if ( myLocation != null ) {
 						// TODO HSEARCH-2254 sort by distance once we implement nested support for sorts ("copies" is a nested object field)
-						//f.byDistance( "copies.library.location", myLocation );
+						//b.add( f.byDistance( "copies.library.location", myLocation ) );
 					}
-					return f.byScore();
-				} )
+					b.add( f.byScore() );
+				} ) )
 				.fetchHits( limit, offset );
 	}
 
