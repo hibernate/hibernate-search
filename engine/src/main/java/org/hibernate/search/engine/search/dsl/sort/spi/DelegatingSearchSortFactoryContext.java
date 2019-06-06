@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.spi;
 
+import java.util.function.Consumer;
+
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.dsl.sort.CompositeSortContext;
 import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
@@ -57,6 +60,16 @@ public class DelegatingSearchSortFactoryContext implements SearchSortFactoryCont
 	@Override
 	public NonEmptySortContext by(SearchSort sort) {
 		return delegate.by( sort );
+	}
+
+	@Override
+	public CompositeSortContext byComposite() {
+		return delegate.byComposite();
+	}
+
+	@Override
+	public NonEmptySortContext byComposite(Consumer<? super CompositeSortContext> elementContributor) {
+		return delegate.byComposite( elementContributor );
 	}
 
 	@Override
