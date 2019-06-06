@@ -149,11 +149,11 @@ public abstract class AbstractSearchQueryContext<
 		SearchSortDslContextImpl<B> rootDslContext = new SearchSortDslContextImpl<>( factory );
 		SearchSortContainerContext containerContext =
 				new DefaultSearchSortContainerContext<>( factory, rootDslContext );
-		sortContributor.apply( extendSortContext( containerContext ) );
-
-		for ( B builder : rootDslContext.getResultingBuilders() ) {
-			factory.contribute( collector, builder );
-		}
+		SearchSortTerminalContext terminalContext = sortContributor.apply( extendSortContext( containerContext ) );
+		factory.toImplementation(
+				terminalContext.toSort(),
+				b -> factory.contribute( collector, b )
+		);
 	}
 
 	protected abstract S thisAsS();
