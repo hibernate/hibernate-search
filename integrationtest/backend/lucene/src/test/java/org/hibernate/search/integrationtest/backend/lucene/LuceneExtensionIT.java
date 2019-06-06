@@ -132,7 +132,7 @@ public class LuceneExtensionIT {
 				context2.predicate( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
 		// Note we can use Lucene-specific sorts immediately
 		LuceneSearchQueryContext<DocumentReference> context4 =
-				context3.sort( c -> c.fromLuceneSortField( new SortField( "sort1", Type.STRING ) ) );
+				context3.sort( f -> f.fromLuceneSortField( new SortField( "sort1", Type.STRING ) ) );
 
 		// Put the query and result into variables to check they have the right type
 		LuceneSearchQuery<DocumentReference> query = context4.toQuery();
@@ -333,7 +333,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c
+				.sort( f -> f
 						.extension( LuceneExtension.get() )
 								.fromLuceneSortField( new SortField( "sort1", Type.STRING ) )
 						.then().extension( LuceneExtension.get() )
@@ -349,7 +349,7 @@ public class LuceneExtensionIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c
+				.sort( f -> f
 						.extension().ifSupported(
 								LuceneExtension.get(),
 								c2 -> c2.fromLuceneSort( new Sort(
@@ -392,7 +392,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.by( sort1 ).then().by( sort2 ).then().by( sort3 ) )
+				.sort( f -> f.by( sort1 ).then().by( sort2 ).then().by( sort3 ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
@@ -408,7 +408,7 @@ public class LuceneExtensionIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.by( sort ) )
+				.sort( f -> f.by( sort ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
@@ -440,7 +440,7 @@ public class LuceneExtensionIT {
 				"sort on unsupported native field",
 				() -> scope.query()
 						.predicate( f -> f.matchAll() )
-						.sort( c -> c.byField( "nativeField" ) )
+						.sort( f -> f.byField( "nativeField" ) )
 						.toQuery()
 				)
 				.assertThrown()
@@ -526,7 +526,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
+				.sort( f -> f.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
 				.toQuery();
 
 		assertThat( query )

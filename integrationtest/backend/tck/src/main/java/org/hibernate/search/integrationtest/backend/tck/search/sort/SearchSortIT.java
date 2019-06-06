@@ -130,21 +130,21 @@ public class SearchSortIT {
 
 		query = scope.query()
 				.predicate( predicate )
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = scope.query()
 				.predicate( predicate )
-				.sort( c -> c.byScore().desc() )
+				.sort( f -> f.byScore().desc() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = scope.query()
 				.predicate( predicate )
-				.sort( c -> c.byScore().asc() )
+				.sort( f -> f.byScore().asc() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID );
@@ -168,7 +168,7 @@ public class SearchSortIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.by( sortAsc ) )
+				.sort( f -> f.by( sortAsc ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
@@ -186,7 +186,7 @@ public class SearchSortIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.by( sortDesc ) )
+				.sort( f -> f.by( sortDesc ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );

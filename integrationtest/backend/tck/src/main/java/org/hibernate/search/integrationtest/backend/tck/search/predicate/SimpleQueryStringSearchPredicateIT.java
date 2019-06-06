@@ -449,7 +449,7 @@ public class SimpleQueryStringSearchPredicateIT {
 								.boostedTo( 7 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )
@@ -465,7 +465,7 @@ public class SimpleQueryStringSearchPredicateIT {
 								.matching( TERM_3 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )
@@ -489,7 +489,7 @@ public class SimpleQueryStringSearchPredicateIT {
 								.withConstantScore().boostedTo( 39 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )
@@ -506,7 +506,7 @@ public class SimpleQueryStringSearchPredicateIT {
 								.withConstantScore().boostedTo( 7 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )

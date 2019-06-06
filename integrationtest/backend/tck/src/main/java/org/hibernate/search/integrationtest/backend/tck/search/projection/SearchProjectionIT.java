@@ -224,7 +224,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SearchQuery<Float> query = scope.query()
 				.asProjection( f -> f.score() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
-				.sort( c -> c.byScore().desc() )
+				.sort( f -> f.byScore().desc() )
 				.toQuery();
 
 		SearchResult<Float> result = query.fetch();
@@ -249,7 +249,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SearchQuery<Float> query = scope.query()
 				.asProjection( f -> f.score() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
-				.sort( c -> c.byIndexOrder() )
+				.sort( f -> f.byIndexOrder() )
 				.toQuery();
 
 		SearchResult<Float> result = query.fetch();

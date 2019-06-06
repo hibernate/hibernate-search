@@ -404,7 +404,7 @@ public class FieldSearchSortIT {
 
 		scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.byField( absoluteFieldPath ) )
+				.sort( f -> f.byField( absoluteFieldPath ) )
 				.toQuery();
 	}
 
@@ -421,7 +421,7 @@ public class FieldSearchSortIT {
 
 		scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.byField( absoluteFieldPath ) )
+				.sort( f -> f.byField( absoluteFieldPath ) )
 				.toQuery();
 	}
 
@@ -438,7 +438,7 @@ public class FieldSearchSortIT {
 
 		scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.byField( absoluteFieldPath ) )
+				.sort( f -> f.byField( absoluteFieldPath ) )
 				.toQuery();
 	}
 

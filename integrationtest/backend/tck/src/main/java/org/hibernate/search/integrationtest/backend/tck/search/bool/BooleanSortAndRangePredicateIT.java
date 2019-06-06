@@ -133,7 +133,7 @@ public class BooleanSortAndRangePredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.range().onField( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.TRUE ) )
-				.sort( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() )
+				.sort( f -> f.byField( FIELD_PATH ).onMissingValue().sortLast() )
 				.toQuery();
 
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE );

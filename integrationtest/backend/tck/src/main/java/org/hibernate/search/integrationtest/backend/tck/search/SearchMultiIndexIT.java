@@ -131,7 +131,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.byField( "sortField" ).asc() )
+				.sort( f -> f.byField( "sortField" ).asc() )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -142,7 +142,7 @@ public class SearchMultiIndexIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.byField( "sortField" ).desc() )
+				.sort( f -> f.byField( "sortField" ).desc() )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
