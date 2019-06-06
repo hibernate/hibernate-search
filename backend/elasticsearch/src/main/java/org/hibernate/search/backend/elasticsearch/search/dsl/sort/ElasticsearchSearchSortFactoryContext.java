@@ -7,13 +7,13 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.sort;
 
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 
 /**
  * A DSL context allowing to specify the sort order, with some Elasticsearch-specific methods.
  */
-public interface ElasticsearchSearchSortContainerContext extends SearchSortContainerContext {
+public interface ElasticsearchSearchSortFactoryContext extends SearchSortFactoryContext {
 
 	/**
 	 * Order elements according to a JSON sort definition.

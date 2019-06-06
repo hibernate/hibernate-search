@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.search.dsl.query;
 
-import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
+import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactoryContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchFetchable;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 
 public interface LuceneSearchQueryContext<H>
-		extends SearchQueryContext<LuceneSearchQueryContext<H>, H, LuceneSearchSortContainerContext>,
+		extends SearchQueryContext<LuceneSearchQueryContext<H>, H, LuceneSearchSortFactoryContext>,
 				LuceneSearchFetchable<H> {
 
 	@Override

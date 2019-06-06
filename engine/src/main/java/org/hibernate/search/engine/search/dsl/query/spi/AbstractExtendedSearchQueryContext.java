@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.dsl.query.spi;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.query.ExtendedSearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -19,7 +19,7 @@ public abstract class AbstractExtendedSearchQueryContext<
 				H,
 				R extends SearchResult<H>,
 				PDC extends SearchPredicateFactoryContext,
-				SC extends SearchSortContainerContext,
+				SC extends SearchSortFactoryContext,
 				C
 		>
 		extends AbstractSearchQueryContext<S, H, PDC, SC, C> {

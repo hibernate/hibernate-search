@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTermina
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
@@ -67,9 +67,9 @@ public interface SearchScope {
 	 *
 	 * @return A context allowing to define the sort,
 	 * and ultimately {@link SearchSortTerminalContext#toSort() get the resulting sort}.
-	 * @see SearchSortContainerContext
+	 * @see SearchSortFactoryContext
 	 */
-	SearchSortContainerContext sort();
+	SearchSortFactoryContext sort();
 
 	/**
 	 * Initiate the building of a search projection that will be valid for the indexes in this scope.

@@ -10,7 +10,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
-import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
+import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactoryContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 
 class LuceneSearchQueryContextImpl<H>
 		extends AbstractExtendedSearchQueryContext<
@@ -26,7 +26,7 @@ class LuceneSearchQueryContextImpl<H>
 				H,
 				LuceneSearchResult<H>,
 				LuceneSearchPredicateFactoryContext,
-				LuceneSearchSortContainerContext,
+		LuceneSearchSortFactoryContext,
 				LuceneSearchQueryElementCollector
 		>
 		implements LuceneSearchQueryResultContext<H>, LuceneSearchQueryContext<H> {
@@ -56,8 +56,8 @@ class LuceneSearchQueryContextImpl<H>
 	}
 
 	@Override
-	protected LuceneSearchSortContainerContext extendSortContext(
-			SearchSortContainerContext sortContainerContext) {
-		return sortContainerContext.extension( LuceneExtension.get() );
+	protected LuceneSearchSortFactoryContext extendSortContext(
+			SearchSortFactoryContext sortFactoryContext) {
+		return sortFactoryContext.extension( LuceneExtension.get() );
 	}
 }

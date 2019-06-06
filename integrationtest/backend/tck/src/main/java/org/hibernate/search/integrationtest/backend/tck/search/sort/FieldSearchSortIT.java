@@ -37,7 +37,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -137,12 +137,12 @@ public class FieldSearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortContainerContext, ? extends SearchSortTerminalContext> sortContributor) {
+			Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor) {
 		return simpleQuery( sortContributor, indexManager.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortContainerContext, ? extends SearchSortTerminalContext> sortContributor, StubMappingScope scope) {
+			Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor, StubMappingScope scope) {
 		return scope.query()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )

@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.sort;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 /**
@@ -20,24 +20,24 @@ import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
  * In short, users are only expected to get instances of this type from an API ({@code SomeExtension.get()})
  * and pass it to another API.
  *
- * @param <T> The type of extended search container contexts. Should generally extend
- * {@link SearchSortContainerContext}.
+ * @param <T> The type of extended sort factory contexts. Should generally extend
+ * {@link SearchSortFactoryContext}.
  *
- * @see SearchSortContainerContext#extension(SearchSortContainerContextExtension)
- * @see DelegatingSearchSortContainerContext
+ * @see SearchSortFactoryContext#extension(SearchSortFactoryContextExtension)
+ * @see DelegatingSearchSortFactoryContext
  */
-public interface SearchSortContainerContextExtension<T> {
+public interface SearchSortFactoryContextExtension<T> {
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link SearchSortContainerContext}.
+	 * @param original The original, non-extended {@link SearchSortFactoryContext}.
 	 * @param dslContext A {@link SearchSortDslContext}.
-	 * @return An optional containing the extended search sort container context ({@link T}) in case
+	 * @return An optional containing the extended search sort factory context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchSortContainerContext original, SearchSortDslContext<?, ?> dslContext);
+	Optional<T> extendOptional(SearchSortFactoryContext original, SearchSortDslContext<?, ?> dslContext);
 
 }

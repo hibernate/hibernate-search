@@ -17,8 +17,8 @@ public interface NonEmptySortContext extends SearchSortTerminalContext {
 	/**
 	 * Start defining another sort, to be applied after the current one.
 	 *
-	 * @return A {@link SearchSortContainerContext} allowing to define a sort.
+	 * @return A {@link SearchSortFactoryContext} allowing to define a sort.
 	 */
-	SearchSortContainerContext then();
+	SearchSortFactoryContext then();
 
 }

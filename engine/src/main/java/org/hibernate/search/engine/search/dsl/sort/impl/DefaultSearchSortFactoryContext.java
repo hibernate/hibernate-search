@@ -12,19 +12,19 @@ import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerExtensionContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.StaticNonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public class DefaultSearchSortContainerContext<B> implements SearchSortContainerContext {
+public class DefaultSearchSortFactoryContext<B> implements SearchSortFactoryContext {
 
 	private final SearchSortDslContext<?, B> dslContext;
 
-	public DefaultSearchSortContainerContext(SearchSortDslContext<?, B> dslContext) {
+	public DefaultSearchSortFactoryContext(SearchSortDslContext<?, B> dslContext) {
 		this.dslContext = dslContext;
 	}
 
@@ -56,15 +56,15 @@ public class DefaultSearchSortContainerContext<B> implements SearchSortContainer
 	}
 
 	@Override
-	public <T> T extension(SearchSortContainerContextExtension<T> extension) {
+	public <T> T extension(SearchSortFactoryContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, dslContext )
 		);
 	}
 
 	@Override
-	public SearchSortContainerExtensionContext extension() {
-		return new SearchSortContainerExtensionContextImpl<>( this, dslContext );
+	public SearchSortFactoryExtensionContext extension() {
+		return new SearchSortFactoryExtensionContextImpl<>( this, dslContext );
 	}
 
 	private NonEmptySortContext staticNonEmptyContext(B builder) {

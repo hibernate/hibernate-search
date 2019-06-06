@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.javabean.scope.impl;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -34,7 +34,7 @@ public class SearchScopeImpl implements SearchScope {
 	}
 
 	@Override
-	public SearchSortContainerContext sort() {
+	public SearchSortFactoryContext sort() {
 		return delegate.sort();
 	}
 

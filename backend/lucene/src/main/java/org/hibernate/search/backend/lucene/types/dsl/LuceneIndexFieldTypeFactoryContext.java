@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl;
 
+import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
@@ -33,7 +34,7 @@ public interface LuceneIndexFieldTypeFactoryContext extends IndexFieldTypeFactor
 	 *     <li>The predicate/sort DSLs cannot be used on fields of this type.
 	 *     It is recommended to create the predicate/sort/projections targeting these fields from native Lucene objects
 	 *     using {@link org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext#fromLuceneQuery(Query)}
-	 *     or {@link org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext#fromLuceneSort(Sort)}</li>
+	 *     or {@link LuceneSearchSortFactoryContext#fromLuceneSort(Sort)}</li>
 	 *     <li>The projection DSL can only be used on fields of this type of {@code fieldValueExtractor} is non-null.
 	 *     When projecting, the value extractor will be passed the {@link org.apache.lucene.index.IndexableField}
 	 *     and will return the corresponding projected value of type {@code F}.</li>

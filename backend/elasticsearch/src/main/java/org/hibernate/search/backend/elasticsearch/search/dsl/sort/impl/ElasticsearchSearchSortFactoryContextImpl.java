@@ -6,23 +6,23 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.sort.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.StaticNonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
-public class ElasticsearchSearchSortContainerContextImpl
-		extends DelegatingSearchSortContainerContext
-		implements ElasticsearchSearchSortContainerContext {
+public class ElasticsearchSearchSortFactoryContextImpl
+		extends DelegatingSearchSortFactoryContext
+		implements ElasticsearchSearchSortFactoryContext {
 
 	private final SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder> dslContext;
 
-	public ElasticsearchSearchSortContainerContextImpl(SearchSortContainerContext delegate,
+	public ElasticsearchSearchSortFactoryContextImpl(SearchSortFactoryContext delegate,
 			SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;

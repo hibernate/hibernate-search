@@ -28,9 +28,9 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -86,7 +86,7 @@ public class SearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortContainerContext, ? extends SearchSortTerminalContext> sortContributor) {
+			Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )
@@ -196,7 +196,7 @@ public class SearchSortIT {
 	public void lambda_caching() {
 		AtomicReference<SearchSort> cache = new AtomicReference<>();
 
-		Function<? super SearchSortContainerContext, ? extends SearchSortTerminalContext> cachingContributor = c -> {
+		Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> cachingContributor = c -> {
 			SearchSort result = cache.get();
 			if ( cache.get() == null ) {
 				result = c.byField( "string" ).onMissingValue().sortLast().toSort();
@@ -492,9 +492,9 @@ public class SearchSortIT {
 		}
 	}
 
-	private static class SupportedExtension implements SearchSortContainerContextExtension<MyExtendedContext> {
+	private static class SupportedExtension implements SearchSortFactoryContextExtension<MyExtendedContext> {
 		@Override
-		public Optional<MyExtendedContext> extendOptional(SearchSortContainerContext original,
+		public Optional<MyExtendedContext> extendOptional(SearchSortFactoryContext original,
 				SearchSortDslContext<?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
@@ -503,9 +503,9 @@ public class SearchSortIT {
 		}
 	}
 
-	private static class UnSupportedExtension implements SearchSortContainerContextExtension<MyExtendedContext> {
+	private static class UnSupportedExtension implements SearchSortFactoryContextExtension<MyExtendedContext> {
 		@Override
-		public Optional<MyExtendedContext> extendOptional(SearchSortContainerContext original,
+		public Optional<MyExtendedContext> extendOptional(SearchSortFactoryContext original,
 				SearchSortDslContext<?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
@@ -514,8 +514,8 @@ public class SearchSortIT {
 		}
 	}
 
-	private static class MyExtendedContext extends DelegatingSearchSortContainerContext {
-		MyExtendedContext(SearchSortContainerContext delegate) {
+	private static class MyExtendedContext extends DelegatingSearchSortFactoryContext {
+		MyExtendedContext(SearchSortFactoryContext delegate) {
 			super( delegate );
 		}
 	}
