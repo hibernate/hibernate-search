@@ -150,7 +150,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.withConstantScore().boostedTo( 2 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )
@@ -168,7 +168,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.withConstantScore().boostedTo( 2 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )
@@ -191,7 +191,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.withConstantScore().boostedTo( 2 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )
@@ -210,7 +210,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.withConstantScore().boostedTo( 2 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )
@@ -234,7 +234,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.withConstantScore().boostedTo( 8 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )
@@ -253,7 +253,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.withConstantScore().boostedTo( 8 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )
@@ -278,7 +278,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.withConstantScore().boostedTo( 2 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )
@@ -298,7 +298,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.withConstantScore().boostedTo( 2 )
 						)
 				)
-				.sort( c -> c.byScore() )
+				.sort( f -> f.byScore() )
 				.toQuery();
 
 		assertThat( query )

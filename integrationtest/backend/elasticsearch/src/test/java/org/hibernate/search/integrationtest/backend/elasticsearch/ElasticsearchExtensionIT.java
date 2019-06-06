@@ -122,7 +122,7 @@ public class ElasticsearchExtensionIT {
 				context2.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
 		// Note we can use Elasticsearch-specific sorts immediately
 		ElasticsearchSearchQueryContext<DocumentReference> context4 =
-				context3.sort( c -> c.fromJson( "{'sort1': 'asc'}" ) );
+				context3.sort( f -> f.fromJson( "{'sort1': 'asc'}" ) );
 
 		// Put the query and result into variables to check they have the right type
 		ElasticsearchSearchQuery<DocumentReference> query = context4.toQuery();
@@ -361,7 +361,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c
+				.sort( f -> f
 						.extension( ElasticsearchExtension.get() )
 								.fromJson( "{'sort1': 'asc'}" )
 						.then().extension( ElasticsearchExtension.get() )
@@ -380,7 +380,7 @@ public class ElasticsearchExtensionIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c
+				.sort( f -> f
 						.extension( ElasticsearchExtension.get() )
 								.fromJson( "{'sort1': 'desc'}" )
 						.then().extension( ElasticsearchExtension.get() )
@@ -418,7 +418,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
+				.sort( f -> f.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
@@ -439,7 +439,7 @@ public class ElasticsearchExtensionIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( c -> c.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
+				.sort( f -> f.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
