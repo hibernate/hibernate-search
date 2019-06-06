@@ -39,6 +39,6 @@ public interface SearchQueryResultContext<
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to define the query further.
 	 */
-	N predicate(Function<? super PDC, SearchPredicateTerminalContext> predicateContributor);
+	N predicate(Function<? super PDC, ? extends SearchPredicateTerminalContext> predicateContributor);
 
 }

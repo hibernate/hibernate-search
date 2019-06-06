@@ -83,7 +83,7 @@ public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
 
 	@Override
 	public SearchQueryContext<?, E, ?> predicate(
-			Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor) {
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> predicateContributor) {
 		return asEntity().predicate( predicateContributor );
 	}
 
