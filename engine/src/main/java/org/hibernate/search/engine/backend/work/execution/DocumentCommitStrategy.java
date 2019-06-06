@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.engine.backend.work.execution;
 
+/**
+ * Defines how to handle index commits after a document is written to the index,
+ * i.e. whether changes should be committed to disk immediately or not.
+ */
 public enum DocumentCommitStrategy {
 
 	/**

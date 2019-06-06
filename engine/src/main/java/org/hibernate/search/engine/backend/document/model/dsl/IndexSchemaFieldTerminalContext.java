@@ -6,11 +6,26 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
+import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
+
 /**
+ * The terminal context when specifying an index field.
+ *
  * @param <R> The reference type.
  */
 public interface IndexSchemaFieldTerminalContext<R> {
 
+	/**
+	 * Create a reference to this field
+	 * for use when indexing.
+	 *
+	 * @return The reference to use when indexing.
+	 * @see DocumentElement#addValue(IndexFieldReference, Object)
+	 * @see DocumentElement#addObject(IndexObjectFieldReference)
+	 * @see DocumentElement#addNullObject(IndexObjectFieldReference)
+	 */
 	R toReference();
 
 }

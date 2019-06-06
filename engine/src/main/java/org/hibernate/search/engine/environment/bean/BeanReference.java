@@ -9,7 +9,10 @@ package org.hibernate.search.engine.environment.bean;
 import org.hibernate.search.util.common.impl.StringHelper;
 
 /**
- * @author Yoann Rodiere
+ * A reference to a bean, allowing the retrieval of that bean
+ * when {@link #getBean(BeanProvider) passed} a {@link BeanProvider}.
+ *
+ * @param <T> The type of the referenced bean.
  */
 public interface BeanReference<T> {
 

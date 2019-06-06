@@ -16,6 +16,12 @@ import org.hibernate.search.engine.cfg.impl.MaskedConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.OverriddenConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.PrefixedConfigurationPropertySource;
 
+/**
+ * A source of property values for Hibernate Search.
+ * <p>
+ * This is effectively a key-value store,
+ * with a few features that make it convenient when retrieving configuration property values.
+ */
 public interface ConfigurationPropertySource {
 
 	/**

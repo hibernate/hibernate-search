@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.engine.backend.work.execution;
 
+/**
+ * Defines how to handle index refreshes after a document is written to the index,
+ * i.e. whether changes should be searchable immediately or not.
+ */
 public enum DocumentRefreshStrategy {
 
 	/**

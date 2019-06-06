@@ -36,18 +36,18 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <F> StandardIndexFieldTypeContext<?, F> as(Class<F> inputType) {
-		if ( String.class.isAssignableFrom( inputType ) ) {
+	public <F> StandardIndexFieldTypeContext<?, F> as(Class<F> valueType) {
+		if ( String.class.isAssignableFrom( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asString();
 		}
-		else if ( BigDecimal.class.isAssignableFrom( inputType ) ) {
+		else if ( BigDecimal.class.isAssignableFrom( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asBigDecimal();
 		}
-		else if ( BigInteger.class.isAssignableFrom( inputType ) ) {
+		else if ( BigInteger.class.isAssignableFrom( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asBigInteger();
 		}
 		else {
-			return new StubGenericIndexFieldTypeContext<>( inputType );
+			return new StubGenericIndexFieldTypeContext<>( valueType );
 		}
 	}
 

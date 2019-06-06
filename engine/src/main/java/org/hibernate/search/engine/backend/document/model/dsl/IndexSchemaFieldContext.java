@@ -7,8 +7,14 @@
 package org.hibernate.search.engine.backend.document.model.dsl;
 
 /**
+ * A field in the index schema,
+ * allowing customization of some characteristics of this object field such as {@link #multiValued() multi-valued-ness},
+ * and the retrieval of {@link #toReference() a field reference} to be used when indexing.
+ *
  * @param <S> The exposed type for this context.
  * @param <R> The reference type.
+ *
+ * @see IndexSchemaFieldTerminalContext
  */
 public interface IndexSchemaFieldContext<S extends IndexSchemaFieldContext<?, R>, R> extends IndexSchemaFieldTerminalContext<R> {
 

@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.spatial;
 
 /**
+ * A point in the geocentric coordinate system.
+ *
  * @author Nicolas Helleringer
  */
 public interface GeoPoint {

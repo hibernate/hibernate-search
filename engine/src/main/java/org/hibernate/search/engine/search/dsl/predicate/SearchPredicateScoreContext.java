@@ -14,6 +14,14 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface SearchPredicateScoreContext<S> extends SearchPredicateBoostContext<S> {
 
+	/**
+	 * Force the score of the predicate to a single constant, identical for all documents.
+	 * <p>
+	 * By default, the score will be {@code 1.0f},
+	 * but {@link #boostedTo(float) boosts}, if any, will still be applied to the predicate.
+	 *
+	 * @return {@code this}, for method chaining.
+	 */
 	S withConstantScore();
 
 }

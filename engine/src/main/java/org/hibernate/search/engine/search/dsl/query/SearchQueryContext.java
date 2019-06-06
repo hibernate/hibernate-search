@@ -30,12 +30,45 @@ public interface SearchQueryContext<
 		>
 		extends SearchFetchable<H> {
 
+	/**
+	 * Configure routing of the search query.
+	 * <p>
+	 * Useful when indexes are sharded, to limit the number of shards interrogated by the search query.
+	 * <p>
+	 * This method may be called multiple times,
+	 * in which case all submitted routing keys will be taken into account.
+	 * <p>
+	 * By default, if routing is not configured, all shards will be queried.
+	 *
+	 * @param routingKey A string key. All shards matching this key will be queried.
+	 * @return {@code this}, for method chaining.
+	 */
 	S routing(String routingKey);
 
+	/**
+	 * Configure routing of the search query.
+	 * <p>
+	 * Similar to {@link #routing(String)}, but allows passing multiple keys in a single call.
+	 *
+	 * @param routingKeys A collection containing zero, one or multiple string keys.
+	 * @return {@code this}, for method chaining.
+	 */
 	S routing(Collection<String> routingKeys);
 
+	/**
+	 * Add a sort to this query.
+	 * @param sort A {@link SearchSort} object obtained from the search scope.
+	 * @return {@code this}, for method chaining.
+	 */
 	S sort(SearchSort sort);
 
+	/**
+	 * Add a sort to this query.
+	 * @param sortContributor A function that will use the DSL context passed in parameter to create a sort,
+	 * returning the resulting terminal context.
+	 * Should generally be a lambda expression.
+	 * @return {@code this}, for method chaining.
+	 */
 	S sort(Function<? super SC, ? extends SearchSortTerminalContext> sortContributor);
 
 	SearchQuery<H> toQuery();

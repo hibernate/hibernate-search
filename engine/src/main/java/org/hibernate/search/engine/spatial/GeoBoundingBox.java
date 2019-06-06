@@ -6,10 +6,19 @@
  */
 package org.hibernate.search.engine.spatial;
 
+/**
+ * A bounding box in the geocentric coordinate system.
+ */
 public interface GeoBoundingBox {
 
+	/**
+	 * @return The top-left coordinates of this bounding-box.
+	 */
 	GeoPoint getTopLeft();
 
+	/**
+	 * @return The bottom-right coordinates of this bounding-box.
+	 */
 	GeoPoint getBottomRight();
 
 	/**

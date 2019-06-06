@@ -59,72 +59,72 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <F> StandardIndexFieldTypeContext<?, F> as(Class<F> inputType) {
-		if ( String.class.equals( inputType ) ) {
+	public <F> StandardIndexFieldTypeContext<?, F> as(Class<F> valueType) {
+		if ( String.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asString();
 		}
-		else if ( Integer.class.equals( inputType ) ) {
+		else if ( Integer.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asInteger();
 		}
-		else if ( Long.class.equals( inputType ) ) {
+		else if ( Long.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asLong();
 		}
-		else if ( Boolean.class.equals( inputType ) ) {
+		else if ( Boolean.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asBoolean();
 		}
-		else if ( Byte.class.equals( inputType ) ) {
+		else if ( Byte.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asByte();
 		}
-		else if ( Short.class.equals( inputType ) ) {
+		else if ( Short.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asShort();
 		}
-		else if ( Float.class.equals( inputType ) ) {
+		else if ( Float.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asFloat();
 		}
-		else if ( Double.class.equals( inputType ) ) {
+		else if ( Double.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asDouble();
 		}
-		else if ( LocalDate.class.equals( inputType ) ) {
+		else if ( LocalDate.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asLocalDate();
 		}
-		else if ( LocalDateTime.class.equals( inputType ) ) {
+		else if ( LocalDateTime.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asLocalDateTime();
 		}
-		else if ( LocalTime.class.equals( inputType ) ) {
+		else if ( LocalTime.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asLocalTime();
 		}
-		else if ( Instant.class.equals( inputType ) ) {
+		else if ( Instant.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asInstant();
 		}
-		else if ( ZonedDateTime.class.equals( inputType ) ) {
+		else if ( ZonedDateTime.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asZonedDateTime();
 		}
-		else if ( Year.class.equals( inputType ) ) {
+		else if ( Year.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asYear();
 		}
-		else if ( YearMonth.class.equals( inputType ) ) {
+		else if ( YearMonth.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asYearMonth();
 		}
-		else if ( MonthDay.class.equals( inputType ) ) {
+		else if ( MonthDay.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asMonthDay();
 		}
-		else if ( OffsetDateTime.class.equals( inputType ) ) {
+		else if ( OffsetDateTime.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asOffsetDateTime();
 		}
-		else if ( OffsetTime.class.equals( inputType ) ) {
+		else if ( OffsetTime.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asOffsetTime();
 		}
-		else if ( GeoPoint.class.equals( inputType ) ) {
+		else if ( GeoPoint.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asGeoPoint();
 		}
-		else if ( BigDecimal.class.equals( inputType ) ) {
+		else if ( BigDecimal.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asBigDecimal();
 		}
-		else if ( BigInteger.class.equals( inputType ) ) {
+		else if ( BigInteger.class.equals( valueType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asBigInteger();
 		}
 		else {
-			throw log.cannotGuessFieldType( inputType, getEventContext() );
+			throw log.cannotGuessFieldType( valueType, getEventContext() );
 		}
 	}
 

@@ -13,8 +13,15 @@ import java.util.List;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.impl.Contracts;
 
+/**
+ * A polygon in the geocentric coordinate system.
+ */
 public interface GeoPolygon {
 
+	/**
+	 * @return The points of this polygon.
+	 * The first and last points are always identical.
+	 */
 	List<GeoPoint> getPoints();
 
 	/**

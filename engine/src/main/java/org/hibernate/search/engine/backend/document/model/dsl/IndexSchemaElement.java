@@ -15,7 +15,8 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalConte
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 /**
- * @author Yoann Rodiere
+ * An element of the index schema,
+ * allowing the definition of child fields.
  */
 public interface IndexSchemaElement {
 
@@ -74,6 +75,7 @@ public interface IndexSchemaElement {
 	 * @param relativeFieldName The relative name of the new field.
 	 * @param storage The storage type.
 	 * @return A context allowing to get the reference to that new object field and to add new child fields to it.
+	 * @see ObjectFieldStorage
 	 */
 	IndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage);
 

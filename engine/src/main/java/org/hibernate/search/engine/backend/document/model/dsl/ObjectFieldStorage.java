@@ -8,6 +8,9 @@ package org.hibernate.search.engine.backend.document.model.dsl;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 
+/**
+ * Defines the storage strategy for an object field.
+ */
 public enum ObjectFieldStorage {
 
 	/**
@@ -22,37 +25,55 @@ public enum ObjectFieldStorage {
 	 * <p>
 	 * For instance this structure:
 	 * <ul>
-	 *     <li>person =
-	 *     <ul>
-	 *         <li>(first element)
+	 *     <li>firstName = Bruce</li>
+	 *     <li>lastName = Wayne</li>
+	 *     <li>sidekicks =
 	 *         <ul>
-	 *             <li>firstname = john</li>
-	 *             <li>lastname = doe</li>
+	 *             <li>(first element)
+	 *                 <ul>
+	 *                     <li>firstName = Dick</li>
+	 *                     <li>lastName = Grayson</li>
+	 *                 </ul>
+	 *             </li>
+	 *             <li>(second element)
+	 *                 <ul>
+	 *                     <li>firstName = Barbara</li>
+	 *                     <li>lastName = Gordon</li>
+	 *                 </ul>
+	 *             </li>
 	 *         </ul>
-	 *         <li>(second element)
-	 *         <ul>
-	 *             <li>firstname = harold</li>
-	 *             <li>lastname = smith</li>
-	 *         </ul>
-	 *     </ul>
 	 *     </li>
 	 * </ul>
 	 * Will be stored as:
 	 * <ul>
-	 *     <li>person.firstname = john, jane</li>
-	 *     <li>person.lastname = doe, smith</li>
+	 *     <li>firstName = Bruce</li>
+	 *     <li>lastName = Wayne</li>
+	 *     <li>sidekicks.firstName =
+	 *         <ul>
+	 *             <li>(first element) Dick</li>
+	 *             <li>(second element) Barbara</li>
+	 *         </ul>
+	 *     </li>
+	 *     <li>sidekicks.lastName =
+	 *         <ul>
+	 *             <li>(first element) Grayson</li>
+	 *             <li>(second element) Gordon</li>
+	 *         </ul>
+	 *     </li>
 	 * </ul>
 	 *
-	 * As a result, a search for <code>person.firstname:john AND person.lastname=smith</code>
-	 * would return the above document even though John Smith wasn't referenced in the document.
+	 * As a result, a search for <code>sidekicks.firstname:Barbara AND sidekicks.lastname=Grayson</code>
+	 * would return the above document even though Barbara Grayson does not exist.
 	 */
 	FLATTENED,
 	/**
 	 * Store object fields as nested documents.
 	 * <p>
 	 * This storage mode is generally less efficient, but has the advantage of
-	 * keeping structural information, allowing the use of
-	 * {@link SearchPredicateFactoryContext#nested() "nested" predicates}.
+	 * keeping structural information.
+	 * Note however that access to that information when querying
+	 * requires special care.
+	 * See in particular the {@link SearchPredicateFactoryContext#nested() "nested" predicate}.
 	 */
 	NESTED
 
