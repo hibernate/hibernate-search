@@ -8,6 +8,16 @@ package org.hibernate.search.mapper.pojo.bridge.mapping;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 
+/**
+ * A builder of bridges.
+ *
+ * @param <B> The type of created bridges.
+ * @see org.hibernate.search.mapper.pojo.bridge.TypeBridge
+ * @see org.hibernate.search.mapper.pojo.bridge.PropertyBridge
+ * @see org.hibernate.search.mapper.pojo.bridge.ValueBridge
+ * @see org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge
+ * @see org.hibernate.search.mapper.pojo.bridge.IdentifierBridge
+ */
 public interface BridgeBuilder<B> {
 
 	/**

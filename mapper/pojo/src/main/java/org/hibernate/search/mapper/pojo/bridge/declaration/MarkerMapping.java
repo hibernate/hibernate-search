@@ -13,7 +13,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Yoann Rodiere
+ * Maps a marker to an annotation type,
+ * so that whenever the annotation is found on a property in the domain model,
+ * the marker mapped to the annotation will be applied.
  */
 @Documented
 @Target(value = ElementType.ANNOTATION_TYPE)

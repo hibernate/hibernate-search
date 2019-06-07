@@ -17,8 +17,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContex
  * The {@code PropertyBridge} interface is a more powerful version of {@link ValueBridge}
  * that can use reflection to get information about the property being bridged,
  * and can contribute more than one index field, in particular.
- *
- * @author Yoann Rodiere
  */
 public interface PropertyBridge extends AutoCloseable {
 

@@ -45,30 +45,26 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 public @interface RoutingKeyBridgeRef {
 
 	/**
-	 * Provide the bridge name to get the bridge reference.
-	 *
-	 * @return the bridge name
+	 * Reference a routing key bridge by its bean name.
+	 * @return The bean name of the routing key bridge.
 	 */
 	String name() default "";
 
 	/**
-	 * Provide the bridge type to get the bridge reference.
-	 *
-	 * @return the bridge type
+	 * Reference a routing key bridge by its type.
+	 * @return The type of the routing key bridge.
 	 */
 	Class<? extends RoutingKeyBridge> type() default UndefinedBridgeImplementationType.class;
 
 	/**
-	 * Provide the annotation bridge builder name to get the bridge reference.
-	 *
-	 * @return the annotation bridge builder name
+	 * Reference a routing key bridge by the bean name of its builder.
+	 * @return The bean name of the routing key bridge builder.
 	 */
 	String builderName() default "";
 
 	/**
-	 * Provide the annotation bridge builder type to get the bridge reference.
-	 *
-	 * @return the annotation bridge builder type
+	 * Reference a routing key bridge by the type of its builder.
+	 * @return The type of the routing key bridge builder.
 	 */
 	Class<? extends AnnotationBridgeBuilder<? extends RoutingKeyBridge,?>> builderType() default UndefinedBuilderImplementationType.class;
 

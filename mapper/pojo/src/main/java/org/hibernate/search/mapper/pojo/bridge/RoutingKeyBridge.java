@@ -12,8 +12,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRouting
 
 /**
  * A bridge from a POJO entity to a document routing key.
- *
- * @author Yoann Rodiere
  */
 public interface RoutingKeyBridge extends AutoCloseable {
 

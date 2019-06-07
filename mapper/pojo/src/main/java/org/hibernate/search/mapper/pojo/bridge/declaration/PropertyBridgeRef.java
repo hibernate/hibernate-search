@@ -43,30 +43,26 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 public @interface PropertyBridgeRef {
 
 	/**
-	 * Provide the bridge name to get the bridge reference.
-	 *
-	 * @return the bridge name
+	 * Reference a property bridge by its bean name.
+	 * @return The bean name of the  property bridge.
 	 */
 	String name() default "";
 
 	/**
-	 * Provide the bridge type to get the bridge reference.
-	 *
-	 * @return the bridge type
+	 * Reference a property bridge by its type.
+	 * @return The type of the  property bridge.
 	 */
 	Class<? extends PropertyBridge> type() default UndefinedBridgeImplementationType.class;
 
 	/**
-	 * Provide the annotation bridge builder name to get the bridge reference.
-	 *
-	 * @return the annotation bridge builder name
+	 * Reference a property bridge by the bean name of its builder.
+	 * @return The bean name of the  property bridge builder.
 	 */
 	String builderName() default "";
 
 	/**
-	 * Provide the annotation bridge builder type to get the bridge reference.
-	 *
-	 * @return the annotation bridge builder type
+	 * Reference a property bridge by the type of its builder.
+	 * @return The type of the  property bridge builder.
 	 */
 	Class<? extends AnnotationBridgeBuilder<? extends PropertyBridge,?>> builderType() default UndefinedBuilderImplementationType.class;
 

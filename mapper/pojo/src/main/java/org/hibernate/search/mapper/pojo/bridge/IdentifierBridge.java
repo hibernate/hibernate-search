@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 /**
  * A bridge between a POJO property of type {@code I} and a document identifier.
  *
- * @author Yoann Rodiere
+ * @param <I> The type of identifiers on the POJO side of the bridge.
  */
 public interface IdentifierBridge<I> extends AutoCloseable {
 

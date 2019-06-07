@@ -8,8 +8,18 @@ package org.hibernate.search.mapper.pojo.bridge.mapping;
 
 import java.lang.annotation.Annotation;
 
+/**
+ * A marker builder that can be initialized from an annotation.
+ *
+ * @param <A> The type of accepted annotations.
+ * @see org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping
+ */
 public interface AnnotationMarkerBuilder<A extends Annotation> extends MarkerBuilder {
 
+	/**
+	 * Initialize the parameters of this builder with the attributes of the given annotation.
+	 * @param annotation An annotation to extract paramaters from.
+	 */
 	void initialize(A annotation);
 
 }

@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.mapping;
 
 /**
- * @author Yoann Rodiere
+ * A builder of markers.
  */
 public interface MarkerBuilder {
 

@@ -13,7 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Allows to map a property bridge to an annotation type,
+ * Maps a property bridge to an annotation type,
  * so that whenever the annotation is found on a field or method in the domain model,
  * the property bridge mapped to the annotation will be applied.
  */

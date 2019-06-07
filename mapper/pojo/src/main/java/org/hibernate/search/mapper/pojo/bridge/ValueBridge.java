@@ -20,8 +20,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
  *
  * @param <V> The type of values on the POJO side of the bridge.
  * @param <F> The type of raw index field values, on the index side of the bridge.
- *
- * @author Yoann Rodiere
  */
 public interface ValueBridge<V, F> extends AutoCloseable {
 

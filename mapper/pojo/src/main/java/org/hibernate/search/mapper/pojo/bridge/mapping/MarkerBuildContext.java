@@ -10,6 +10,10 @@ import org.hibernate.search.engine.environment.bean.BeanProvider;
 
 public interface MarkerBuildContext {
 
+	/**
+	 * @return A bean provider, allowing the retrieval of beans,
+	 * including CDI/Spring DI beans when in the appropriate environment.
+	 */
 	BeanProvider getBeanProvider();
 
 }

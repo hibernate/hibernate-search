@@ -13,7 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Allows to map a type bridge to an annotation type,
+ * Maps a type bridge to an annotation type,
  * so that whenever the annotation is found on a type in the domain model,
  * the type bridge mapped to the annotation will be applied.
  */

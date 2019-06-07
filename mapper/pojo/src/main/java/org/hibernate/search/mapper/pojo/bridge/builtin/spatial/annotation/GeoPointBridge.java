@@ -22,13 +22,12 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
 
 /**
- * Defines a GeoPoint bridge, mapping a latitude and longitude, in degrees,
- * to an index field representing a point on earth..
- *
- * If your longitude and latitude information are hosted on two different properties,
- * add {@code @GeoPointBridge} on the entity (class-level). The {@link Latitude} and {@link Longitude}
- * annotations must mark the properties.
- *
+ * Defines a {@link GeoPoint} bridge, mapping a type or a property
+ * to a {@link GeoPoint} field, representing a point on earth.
+ * <p>
+ * If the longitude and latitude information is hosted on two different properties,
+ * {@code @GeoPointBridge} must be used on the entity (class level).
+ * The {@link Latitude} and {@link Longitude} annotations must mark the properties.
  * <pre><code>
  * &#064;GeoPointBridge(name="home")
  * public class User {
@@ -38,19 +37,8 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
  *     public Double getHomeLongitude() { ... }
  * }
  * </code></pre>
- *
- * Alternatively, you can put the latitude / longitude information in a property of
- * type {@link GeoPoint}.
- *
- * <pre><code>
- * public class User {
- *     &#064;GeoPointBridge
- *     public GeoPoint getHome() { ... }
- * }
- * </code></pre>
- *
- * ... or make the entity itself implement {@link GeoPoint}:
- *
+ * <p>
+ * Alternatively, {@code @GeoPointBridge} can be used on a type that implements {@link GeoPoint}:
  * <pre><code>
  * &#064;GeoPointBridge(name="location")
  * public class Home implements GeoPoint {
@@ -58,6 +46,14 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
  *     public Double getLatitude() { ... }
  *     &#064;Override
  *     public Double getLongitude() { ... }
+ * }
+ * </code></pre>
+ * <p>
+ * ... or on a property of type {@link GeoPoint}:
+ * <pre><code>
+ * public class User {
+ *     &#064;GeoPointBridge
+ *     public GeoPoint getHome() { ... }
  * }
  * </code></pre>
  *

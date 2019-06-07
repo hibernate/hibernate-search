@@ -24,19 +24,25 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
  * The builder will be passed the annotation through its {@link AnnotationMarkerBuilder#initialize(Annotation)} method,
  * and then the marker will be retrieved by calling {@link MarkerBuilder#build(org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuildContext)}.
  * <p>
- * Marker mapped this way can be parameterized:
+ * Markers mapped this way can be parameterized:
  * the marker mapping will be able to take any attribute of the mapped annotation into account
  * in its {@link AnnotationMarkerBuilder#initialize(Annotation)} method.
- *
- * @author Yoann Rodiere
  */
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MarkerRef {
 
+	/**
+	 * Reference a marker by the the bean name of its builder.
+	 * @return The marker builder bean name.
+	 */
 	String builderName() default "";
 
+	/**
+	 * Reference a marker by the type of its builder.
+	 * @return The marker builder type.
+	 */
 	Class<? extends AnnotationMarkerBuilder<?>> builderType() default UndefinedBuilderImplementationType.class;
 
 	/**
