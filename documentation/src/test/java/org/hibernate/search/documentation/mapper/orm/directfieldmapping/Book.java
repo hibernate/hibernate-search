@@ -26,8 +26,8 @@ public class Book {
 	private Integer id;
 
 	// tag::direct-field-mapping[]
-	@FullTextField(analyzer = "myAnalyzer", projectable = Projectable.YES) // <1>
-	@KeywordField(name = "title_sort", normalizer = "myNormalizer", sortable = Sortable.YES) // <2>
+	@FullTextField(analyzer = "english", projectable = Projectable.YES) // <1>
+	@KeywordField(name = "title_sort", normalizer = "english", sortable = Sortable.YES) // <2>
 	private String title;
 
 	@GenericField(projectable = Projectable.YES, sortable = Sortable.YES) // <3>

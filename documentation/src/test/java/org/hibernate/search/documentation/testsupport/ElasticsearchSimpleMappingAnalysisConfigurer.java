@@ -12,8 +12,9 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.Elasticsear
 class ElasticsearchSimpleMappingAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	@Override
 	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
-		context.analyzer( "myAnalyzer" ).type( "standard" );
-		context.normalizer( "myNormalizer" ).custom()
+		context.analyzer( "english" ).type( "standard" );
+		context.analyzer( "name" ).type( "standard" );
+		context.normalizer( "english" ).custom()
 				.withTokenFilters( "asciifolding", "lowercase" );
 	}
 }

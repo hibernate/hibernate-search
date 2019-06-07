@@ -121,7 +121,7 @@ public class DslConverterIT {
 		@Basic
 		@Enumerated
 		@FullTextField(
-				analyzer = "myAnalyzer",
+				analyzer = "english",
 				valueBridge = @ValueBridgeRef(type = AuthenticationOutcomeBridge.class)
 		)
 		private AuthenticationOutcome outcome;

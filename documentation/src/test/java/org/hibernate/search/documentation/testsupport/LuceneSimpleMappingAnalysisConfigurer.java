@@ -16,8 +16,9 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
 	public void configure(LuceneAnalysisDefinitionContainerContext context) {
-		context.analyzer( "myAnalyzer" ).instance( new StandardAnalyzer() );
-		context.normalizer( "myNormalizer" ).custom()
+		context.analyzer( "english" ).instance( new StandardAnalyzer() );
+		context.analyzer( "name" ).instance( new StandardAnalyzer() );
+		context.normalizer( "english" ).custom()
 				.tokenFilter( ASCIIFoldingFilterFactory.class )
 				.tokenFilter( LowerCaseFilterFactory.class );
 	}
