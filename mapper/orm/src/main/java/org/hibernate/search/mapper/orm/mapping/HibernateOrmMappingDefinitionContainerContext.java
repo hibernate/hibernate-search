@@ -12,10 +12,22 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 
 public interface HibernateOrmMappingDefinitionContainerContext {
 
+	/**
+	 * Start the definition of a programmatic mapping.
+	 * @return A context to define the programmatic mapping.
+	 */
 	ProgrammaticMappingDefinitionContext programmaticMapping();
 
+	/**
+	 * Start the definition of the annotation mapping.
+	 * @return A context to define the annotation mapping.
+	 */
 	AnnotationMappingDefinitionContext annotationMapping();
 
+	/**
+	 * Start the definition of container extractors available for use in mappings.
+	 * @return A context to define container extractors.
+	 */
 	ContainerExtractorDefinitionContext containerExtractors();
 
 }

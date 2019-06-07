@@ -17,6 +17,10 @@ public final class HibernateOrmMapperSettings {
 	private HibernateOrmMapperSettings() {
 	}
 
+	/**
+	 * The prefix expected for the key of every Hibernate Search configuration property
+	 * when using the Hibernate ORM mapper.
+	 */
 	public static final String PREFIX = "hibernate.search.";
 
 	/**
@@ -103,6 +107,9 @@ public final class HibernateOrmMapperSettings {
 	 */
 	public static final String MAPPING_CONFIGURER = PREFIX + Radicals.MAPPING_CONFIGURER;
 
+	/**
+	 * Configuration property keys without the {@link #PREFIX prefix}.
+	 */
 	public static class Radicals {
 
 		private Radicals() {

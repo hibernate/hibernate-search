@@ -29,6 +29,15 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExt
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContextExtension;
 
+/**
+ * An extension for the Hibernate ORM mapper, giving access to Hibernate ORM-specific contexts.
+ * <p>
+ * <strong>WARNING:</strong> while this type is API, because instances should be manipulated by users,
+ * all of its methods are considered SPIs and therefore should never be called directly by users.
+ * In short, users are only expected to get instances of this type from an API and pass it to another API.
+ *
+ * @see #get()
+ */
 public final class HibernateOrmExtension
 		implements IdentifierBridgeToDocumentIdentifierContextExtension<HibernateOrmMappingContext>,
 		IdentifierBridgeFromDocumentIdentifierContextExtension<HibernateOrmSessionContext>,

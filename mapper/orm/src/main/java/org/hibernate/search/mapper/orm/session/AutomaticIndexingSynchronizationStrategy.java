@@ -20,10 +20,26 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 public interface AutomaticIndexingSynchronizationStrategy {
 
+	/**
+	 * @return A strategy describing how commits should be handled after document changes are applied.
+	 */
 	DocumentCommitStrategy getDocumentCommitStrategy();
 
+	/**
+	 * @return A strategy describing how refresh should be handled after document changes are applied.
+	 */
 	DocumentRefreshStrategy getDocumentRefreshStrategy();
 
+	/**
+	 * Handle the result of the (asynchronous) indexing.
+	 * <p>
+	 * This typically involves waiting on the given future,
+	 * to prevent the thread from resuming execution until indexing is complete.
+	 *
+	 * @param future A future that will be completed once all document changes are applied
+	 * and the commit/refresh requirements defined by {@link #getDocumentCommitStrategy()}
+	 * and {@link #getDocumentRefreshStrategy()} are satisfied.
+	 */
 	void handleFuture(CompletableFuture<?> future);
 
 	/**
