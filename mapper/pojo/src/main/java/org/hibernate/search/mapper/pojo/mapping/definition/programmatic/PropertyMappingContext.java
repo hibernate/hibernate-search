@@ -60,6 +60,8 @@ public interface PropertyMappingContext {
 
 	PropertyKeywordFieldMappingContext keywordField(String relativeFieldName);
 
+	PropertyScaledNumberFieldMappingContext scaledNumberField();
+
 	PropertyScaledNumberFieldMappingContext scaledNumberField(String relativeFieldName);
 
 	PropertyIndexedEmbeddedMappingContext indexedEmbedded();

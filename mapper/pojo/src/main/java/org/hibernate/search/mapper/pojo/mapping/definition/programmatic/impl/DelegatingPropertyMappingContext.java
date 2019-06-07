@@ -94,6 +94,11 @@ class DelegatingPropertyMappingContext implements PropertyMappingContext {
 	}
 
 	@Override
+	public PropertyScaledNumberFieldMappingContext scaledNumberField() {
+		return delegate.scaledNumberField();
+	}
+
+	@Override
 	public PropertyScaledNumberFieldMappingContext scaledNumberField(String relativeFieldName) {
 		return delegate.scaledNumberField( relativeFieldName );
 	}

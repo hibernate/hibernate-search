@@ -128,6 +128,11 @@ public class InitialPropertyMappingContext
 	}
 
 	@Override
+	public PropertyScaledNumberFieldMappingContext scaledNumberField() {
+		return scaledNumberField( null );
+	}
+
+	@Override
 	public PropertyScaledNumberFieldMappingContext scaledNumberField(String relativeFieldName) {
 		PropertyScaledNumberFieldMappingContextImpl child = new PropertyScaledNumberFieldMappingContextImpl( this, relativeFieldName );
 		children.add( child );
