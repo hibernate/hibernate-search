@@ -18,12 +18,17 @@ import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 public class MyLuceneAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
 	public void configure(LuceneAnalysisDefinitionContainerContext context) {
-		context.analyzer( "myAnalyzer" ).custom() // <1>
+		context.analyzer( "english" ).custom() // <1>
 				.tokenizer( StandardTokenizerFactory.class ) // <2>
 				.tokenFilter( ASCIIFoldingFilterFactory.class ) // <3>
 				.tokenFilter( LowerCaseFilterFactory.class ) // <3>
 				.tokenFilter( SnowballPorterFilterFactory.class ) // <3>
 						.param( "language", "English" ); // <4>
+
+		context.analyzer( "name" ).custom() // <5>
+				.tokenizer( StandardTokenizerFactory.class )
+				.tokenFilter( ASCIIFoldingFilterFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class );
 	}
 }
 // end::include[]

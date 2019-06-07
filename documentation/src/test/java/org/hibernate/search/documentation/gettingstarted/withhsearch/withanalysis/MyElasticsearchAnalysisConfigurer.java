@@ -13,13 +13,17 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.Elasticsear
 public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	@Override
 	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
-		context.analyzer( "myAnalyzer" ).custom() // <1>
+		context.analyzer( "english" ).custom() // <1>
 				.withTokenizer( "standard" ) // <2>
-				.withTokenFilters( "asciifolding", "lowercase", "mySnowballFilter" ); // <3>
+				.withTokenFilters( "asciifolding", "lowercase", "snowball_english" ); // <3>
 
-		context.tokenFilter( "mySnowballFilter" ) // <4>
+		context.tokenFilter( "snowball_english" ) // <4>
 				.type( "snowball" )
 				.param( "language", "English" ); // <5>
+
+		context.analyzer( "name" ).custom() // <6>
+				.withTokenizer( "standard" )
+				.withTokenFilters( "asciifolding", "lowercase" );
 	}
 }
 // end::include[]

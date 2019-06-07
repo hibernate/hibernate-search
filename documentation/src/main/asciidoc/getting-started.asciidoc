@@ -394,11 +394,14 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ----
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_lucene-analysis]
 ----
-<1> Define a custom analyzer named "myAnalyzer".
+<1> Define a custom analyzer named "english", to analyze English text such as book titles.
 <2> Set the tokenizer to a standard tokenizer. You need to pass factory classes to refer to components.
 <3> Set the token filters. Token filters are applied in the order they are given.
 <4> Set the value of a parameter for the last added char filter/tokenizer/token filter.
-<5> Assign the configurer to the backend "myBackend" in the Hibernate Search configuration (here in `persistence.xml`).
+<5> Define another custom analyzer, named "name", to analyze author names.
+On contrary to the first one, do not use enable stemming,
+as it is unlikely to lead to useful results on proper nouns.
+<6> Assign the configurer to the backend "myBackend" in the Hibernate Search configuration (here in `persistence.xml`).
 ====
 
 .Analysis configurer implementation and configuration in `persistence.xml` for a "Hibernate ORM + Elasticsearch" setup
@@ -411,13 +414,16 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ----
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_elasticsearch-analysis]
 ----
-<1> Define a custom analyzer named "myAnalyzer".
+<1> Define a custom analyzer named "english", to analyze English text such as book titles.
 <2> Set the tokenizer to a standard tokenizer.
 <3> Set the token filters. Token filters are applied in the order they are given.
 <4> Note that, for Elasticsearch, any parameterized char filter, tokenizer or token filter
-must be defined separately and given a name.
+must be defined separately and assigned a name.
 <5> Set the value of a parameter for the char filter/tokenizer/token filter being defined.
-<6> Assign the configurer to the backend "myBackend" in the Hibernate Search configuration (here in `persistence.xml`).
+<6> Define another custom analyzer, named "name", to analyze author names.
+On contrary to the first one, do not use enable stemming,
+as it is unlikely to lead to useful results on proper nouns.
+<7> Assign the configurer to the backend "myBackend" in the Hibernate Search configuration (here in `persistence.xml`).
 ====
 
 Once analysis is configured, the mapping must be adapted to assign the relevant analyzer to each field:

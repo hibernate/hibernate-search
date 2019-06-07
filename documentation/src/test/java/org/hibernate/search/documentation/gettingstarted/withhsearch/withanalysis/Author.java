@@ -23,7 +23,7 @@ public class Author {
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField(analyzer = "myAnalyzer") // <1>
+	@FullTextField(analyzer = "name") // <1>
 	private String name;
 
 	@ManyToMany(mappedBy = "authors")

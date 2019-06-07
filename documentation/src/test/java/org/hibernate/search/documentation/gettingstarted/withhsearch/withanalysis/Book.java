@@ -26,7 +26,7 @@ public class Book {
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField(analyzer = "myAnalyzer") // <1>
+	@FullTextField(analyzer = "english") // <1>
 	private String title;
 
 	@ManyToMany
