@@ -23,7 +23,7 @@ public class Book {
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField(analyzer = "myAnalyzer")
+	@FullTextField(analyzer = "english")
 	private String title;
 
 	public Book() {

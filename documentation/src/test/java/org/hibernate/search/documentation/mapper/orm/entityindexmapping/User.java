@@ -23,10 +23,10 @@ public class User {
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField(analyzer = "myAnalyzer")
+	@FullTextField(analyzer = "name")
 	private String firstName;
 
-	@FullTextField(analyzer = "myAnalyzer")
+	@FullTextField(analyzer = "name")
 	private String lastName;
 
 	public User() {

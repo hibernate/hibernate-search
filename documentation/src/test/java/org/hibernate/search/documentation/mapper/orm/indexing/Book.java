@@ -21,7 +21,7 @@ public class Book {
 	@Id
 	private Integer id;
 
-	@FullTextField(analyzer = "myAnalyzer")
+	@FullTextField(analyzer = "english")
 	private String title;
 
 	@ManyToOne
