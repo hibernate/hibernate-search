@@ -7,15 +7,27 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 /**
- * @author Yoann Rodiere
+ * A context to configure a keyword index field mapped to a POJO property.
  */
 public interface PropertyKeywordFieldMappingContext
 		extends PropertyNotFullTextFieldMappingContext<PropertyKeywordFieldMappingContext> {
 
-	PropertyKeywordFieldMappingContext normalizer(String analyzerName);
+	/**
+	 * @param normalizerName A reference to the normalizer to use for this field.
+	 * @return {@code this}, for method chaining.
+	 * @see KeywordField#normalizer()
+	 */
+	PropertyKeywordFieldMappingContext normalizer(String normalizerName);
 
+	/**
+	 * @param norms Whether index time scoring information should be stored or not.
+	 * @return {@code this}, for method chaining.
+	 * @see KeywordField#norms()
+	 * @see Norms
+	 */
 	PropertyKeywordFieldMappingContext norms(Norms norms);
 
 }

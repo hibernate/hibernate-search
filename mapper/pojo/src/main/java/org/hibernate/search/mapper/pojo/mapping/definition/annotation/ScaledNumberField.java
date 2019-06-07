@@ -17,6 +17,16 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 
+/**
+ * Maps a property to a scaled number field in the index,
+ * i.e. a numeric field for integer or floating-point values
+ * that require a higher precision than doubles
+ * but always have roughly the same scale.
+ * <p>
+ * Useful for {@link java.math.BigDecimal} and {@link java.math.BigInteger} in particular.
+ *
+ * @see #decimalScale()
+ */
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
@@ -29,35 +39,48 @@ public @interface ScaledNumberField {
 	String name() default "";
 
 	/**
+	 * @return How the scale of values should be adjusted before indexing as a fixed-precision integer.
+	 * A positive {@code decimalScale} will shift the decimal point to the right before rounding to the nearest integer and indexing,
+	 * effectively retaining that many digits after the decimal place in the index.
+	 * Since numbers are indexed with a fixed number of bits,
+	 * this increase in precision also means that the maximum value that can be indexed will be smaller.
+	 * A negative {@code decimalScale} will shift the decimal point to the left before rounding to the nearest integer and indexing,
+	 * effectively setting that many of the smaller digits to zero in the index.
+	 * Since numbers are indexed with a fixed number of bits,
+	 * this decrease in precision also means that the maximum value that can be indexed will be larger.
+	 */
+	int decimalScale() default AnnotationDefaultValues.DEFAULT_DECIMAL_SCALE;
+
+	/**
 	 * @return Whether projections are enabled for this field.
 	 * @see GenericField#projectable()
+	 * @see Projectable
 	 */
 	Projectable projectable() default Projectable.DEFAULT;
 
 	/**
 	 * @return Whether this field should be sortable.
 	 * @see GenericField#sortable()
+	 * @see Sortable
 	 */
 	Sortable sortable() default Sortable.DEFAULT;
 
 	/**
 	 * @return Whether this field should be searchable.
+	 * @see GenericField#searchable()
 	 * @see Searchable
 	 */
 	Searchable searchable() default Searchable.DEFAULT;
 
 	/**
-	 * @return An optional value to replace any null value.
+	 * @return A value used instead of null values when indexing.
+	 * @see GenericField#indexNullAs()
 	 */
 	String indexNullAs() default AnnotationDefaultValues.DO_NOT_INDEX_NULL;
 
 	/**
-	 * @return The decimal scale to apply to the numeric value
-	 */
-	int decimalScale() default AnnotationDefaultValues.DEFAULT_DECIMAL_SCALE;
-
-	/**
 	 * @return A reference to the value bridge to use for this field.
+	 * @see GenericField#valueBridge()
 	 * @see ValueBridgeRef
 	 */
 	ValueBridgeRef valueBridge() default @ValueBridgeRef;

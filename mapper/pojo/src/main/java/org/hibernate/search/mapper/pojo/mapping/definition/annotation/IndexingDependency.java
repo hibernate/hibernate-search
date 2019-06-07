@@ -16,44 +16,26 @@ import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 
 /**
  * Given a property, defines how a dependency of the indexing process to this property
- * should affect automatic reindexing.
+ * should affect automatic indexing.
  * <p>
  * This annotation is generally not needed, as the default behavior is to consider all properties
  * that are actually used in the indexing process as dependencies that trigger reindexing when they are updated.
- * However, there are some reasons that could justify ignoring a dependency, in which case this annotation is necessary.
  * <p>
- * In particular, some properties might be updated very frequently,
- * or trigger reindexing to other entities that are very expensive to load in memory.
- * <p>
- * See for example this model:
- *
- * <pre><code>
- *     &#064;Indexed
- *     public class EntityA {
- *
- *         &#064;IndexedEmbedded
- *         &#064;IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
- *         // + some annotations defining "EntityB.a" as the inverse side of this association
- *         private EntityB b;
- *
- *     }
- *
- *     public class EntityB {
- *         private List&lt;EntityA&gt; a; // This is a very big list
- *
- *         &#064;GenericField
- *         private String field;
- *     }
- * </code></pre>
- *
- * Entity A is indexed and embeds entity B.
- * But the link back from entity B to entity A is a list that might contain a lot of elements,
- * so we don't want to load this list every time {@code EntityB#field} is updated:
- * the {@code @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)} annotation prevents that.
- * This means in particular that updates to {@code EntityB#field}
- * need to be taken into account through some external process.
- * One solution would be to reindex every night in a batch process, for example,
- * which would mean allowing the index to be partly out-of-date for at most 24 hours.
+ * However, some tuning may be required for some properties:
+ * <ul>
+ *     <li>Some properties may be updated very frequently
+ *     and/or trigger reindexing to other entities that are very expensive to load in memory.
+ *     In that case, it may be a good idea to tell Hibernate Search to ignore updates to those properties
+ *     using {@link #reindexOnUpdate()}.
+ *     The index will be slightly out-of-sync whenever the property is modified,
+ *     but this can be solved by triggering reindexing manually, for example every night.
+ *     </li>
+ *     <li>Some properties may be computed dynamically based on other properties, instead of being stored.
+ *     In that case, the mapper may not be able to detect changes to the computed property directly.
+ *     Thus Hibernate Search needs to know which other properties are used when generating the value of this property,
+ *     which can be configured using {@link #derivedFrom()}.
+ *     </li>
+ * </ul>
  */
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
@@ -68,6 +50,14 @@ public @interface IndexingDependency {
 	 */
 	ReindexOnUpdate reindexOnUpdate() default ReindexOnUpdate.DEFAULT;
 
+	/**
+	 * @return Paths to other values that are used to generate the value of this property.
+	 * Paths are relative to the parent type of the annotated property.
+	 * This is useful mainly for getters that are not simply bound to class field,
+	 * but rather compute a value based on other properties:
+	 * it allows Hibernate Search to know that whenever these other properties are changed,
+	 * this property may change too and thus should be reindexed.
+	 */
 	ObjectPath[] derivedFrom() default {};
 
 	/**

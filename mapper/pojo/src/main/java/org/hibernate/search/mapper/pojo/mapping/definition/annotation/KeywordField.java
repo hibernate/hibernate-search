@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
 
 /**
- * A keyword field in the full text index, holding a single token (word) of text.
+ * Maps a property to a keyword field in the index, holding a single token (word) of text.
  * <p>
  * On contrary to {@link FullTextField}, this annotation only creates non-tokenized (single-word) text fields.
  * As a result:
@@ -54,36 +54,41 @@ public @interface KeywordField {
 	String normalizer() default "";
 
 	/**
-	 * @return Whether projections are enabled for this field.
-	 * @see GenericField#projectable()
-	 */
-	Projectable projectable() default Projectable.DEFAULT;
-
-	/**
 	 * @return Whether index time scoring information should be stored or not.
 	 * @see Norms
 	 */
 	Norms norms() default Norms.DEFAULT;
 
 	/**
+	 * @return Whether projections are enabled for this field.
+	 * @see GenericField#projectable()
+	 * @see Projectable
+	 */
+	Projectable projectable() default Projectable.DEFAULT;
+
+	/**
 	 * @return Whether this field should be sortable.
 	 * @see GenericField#sortable()
+	 * @see Sortable
 	 */
 	Sortable sortable() default Sortable.DEFAULT;
 
 	/**
 	 * @return Whether this field should be searchable.
+	 * @see GenericField#searchable()
 	 * @see Searchable
 	 */
 	Searchable searchable() default Searchable.DEFAULT;
 
 	/**
-	 * @return An optional value to replace any null value.
+	 * @return A value used instead of null values when indexing.
+	 * @see GenericField#indexNullAs()
 	 */
 	String indexNullAs() default AnnotationDefaultValues.DO_NOT_INDEX_NULL;
 
 	/**
 	 * @return A reference to the value bridge to use for this field.
+	 * @see GenericField#valueBridge()
 	 * @see ValueBridgeRef
 	 */
 	ValueBridgeRef valueBridge() default @ValueBridgeRef;

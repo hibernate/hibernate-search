@@ -12,19 +12,35 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 /**
+ * A context to configure an index field mapped to a POJO property.
+ *
  * @param <S> The "self" type, i.e. the type to return from methods.
  */
 public interface PropertyFieldMappingContext<S extends PropertyFieldMappingContext<?>> extends PropertyMappingContext {
 
+	/**
+	 * @param projectable Whether projections are enabled for this field.
+	 * @return {@code this}, for method chaining.
+	 * @see GenericField#projectable()
+	 * @see Projectable
+	 */
 	S projectable(Projectable projectable);
 
+	/**
+	 * @param searchable Whether this field should be searchable.
+	 * @return {@code this}, for method chaining.
+	 * @see GenericField#searchable()
+	 * @see Searchable
+	 */
 	S searchable(Searchable searchable);
 
 	/**
 	 * @param bridgeClass The class of the bridge to use.
 	 * @return {@code this}, for method chaining.
+	 * @see GenericField#valueBridge()
 	 */
 	S valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass);
 
@@ -33,18 +49,21 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
 	 * (by name, by type, ...).
 	 * @return {@code this}, for method chaining.
+	 * @see GenericField#valueBridge()
 	 */
 	S valueBridge(BeanReference<? extends ValueBridge<?, ?>> bridgeReference);
 
 	/**
 	 * @param builder A bridge builder.
 	 * @return {@code this}, for method chaining.
+	 * @see GenericField#valueBridge()
 	 */
 	S valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder);
 
 	/**
 	 * @param extractorName The name of the container extractor to use.
 	 * @return {@code this}, for method chaining.
+	 * @see GenericField#extraction()
 	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
 	default S withExtractor(String extractorName) {
@@ -52,9 +71,10 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 	}
 
 	/**
-	 * Indicate that no container extractors should be applied,
+	 * Indicates that no container extractors should be applied,
 	 * not even the default ones.
 	 * @return {@code this}, for method chaining.
+	 * @see GenericField#extraction()
 	 */
 	default S withoutExtractors() {
 		return withExtractors( ContainerExtractorPath.noExtractors() );
@@ -63,6 +83,8 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 	/**
 	 * @param extractorPath A {@link ContainerExtractorPath}.
 	 * @return {@code this}, for method chaining.
+	 * @see GenericField#extraction()
+	 * @see ContainerExtractorPath
 	 */
 	S withExtractors(ContainerExtractorPath extractorPath);
 

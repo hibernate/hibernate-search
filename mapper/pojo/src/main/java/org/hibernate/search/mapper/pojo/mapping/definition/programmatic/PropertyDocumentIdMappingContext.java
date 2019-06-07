@@ -11,13 +11,14 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 
 /**
- * @author Yoann Rodiere
+ * A context to configure the document ID mapped to a POJO property.
  */
 public interface PropertyDocumentIdMappingContext extends PropertyMappingContext {
 
 	/**
 	 * @param bridgeClass The class of the bridge to use.
 	 * @return {@code this}, for method chaining.
+	 * @see IdentifierBridge
 	 */
 	PropertyDocumentIdMappingContext identifierBridge(Class<? extends IdentifierBridge<?>> bridgeClass);
 
@@ -26,12 +27,14 @@ public interface PropertyDocumentIdMappingContext extends PropertyMappingContext
 	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
 	 * (by name, by type, ...).
 	 * @return {@code this}, for method chaining.
+	 * @see IdentifierBridge
 	 */
 	PropertyDocumentIdMappingContext identifierBridge(BeanReference<? extends IdentifierBridge<?>> bridgeReference);
 
 	/**
 	 * @param builder A bridge builder.
 	 * @return {@code this}, for method chaining.
+	 * @see IdentifierBridge
 	 */
 	PropertyDocumentIdMappingContext identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder);
 

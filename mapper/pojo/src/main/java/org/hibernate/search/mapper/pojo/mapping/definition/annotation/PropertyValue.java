@@ -11,11 +11,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * A reference to a POJO property using its name,
+ * and to one or more target value(s) in that property using a {@link ContainerExtraction}.
+ */
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PropertyValue {
 
+	/**
+	 * @return The name of the referenced property.
+	 */
 	String propertyName();
 
 	/**

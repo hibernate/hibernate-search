@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.model;
 
 
 /**
- * An accessor allowing to retrieve an element of a POJO, e.g. a property.
+ * An accessor allowing the retrieval of an element, for example a property, from a POJO.
  * <p>
  * Accessors are created by {@link PojoModelCompositeElement} instances.
  * @hsearch.experimental This type is under active development.
@@ -16,6 +16,11 @@ package org.hibernate.search.mapper.pojo.model;
  */
 public interface PojoElementAccessor<T> {
 
-	T read(Object bridgedElement);
+	/**
+	 * Reads the element from the given parent element.
+	 * @param parentElement An object compatible with this accessor, i.e. with the right type.
+	 * @return The element pointed to by this accessor, extracted from the given parent element.
+	 */
+	T read(Object parentElement);
 
 }

@@ -8,12 +8,18 @@ package org.hibernate.search.mapper.pojo.search;
 
 
 /**
- * @author Yoann Rodiere
+ * A reference to a POJO entity.
  */
 public interface PojoReference {
 
+	/**
+	 * @return The type of the referenced entity.
+	 */
 	Class<?> getType();
 
+	/**
+	 * @return The identifier of the referenced entity.
+	 */
 	Object getId();
 
 }

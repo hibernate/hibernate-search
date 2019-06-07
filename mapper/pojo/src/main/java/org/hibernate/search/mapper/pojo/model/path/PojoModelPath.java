@@ -97,12 +97,20 @@ public abstract class PojoModelPath {
 		return builder.toString();
 	}
 
+	/**
+	 * @return A representation of this path in the form
+	 * {@code propertyA<containerExtractorPathA>.propertyB<containerExtractorPathB>.propertyC<containerExtractorPathB>}.
+	 */
 	public final String toPathString() {
 		StringBuilder builder = new StringBuilder();
 		appendPath( builder );
 		return builder.toString();
 	}
 
+	/**
+	 * @return The model path to the element from which the value represented by this node is extracted.
+	 * May be {@code null}.
+	 */
 	public abstract PojoModelPath getParent();
 
 	abstract void appendSelfPath(StringBuilder builder);

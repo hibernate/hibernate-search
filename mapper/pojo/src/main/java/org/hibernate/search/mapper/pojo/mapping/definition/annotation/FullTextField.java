@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
 
 /**
- * A full-text field in the full text index, potentially holding multiple tokens (words) of text.
+ * Maps a property to a full-text field in the index, potentially holding multiple tokens (words) of text.
  * <p>
  * Note that this annotation only creates tokenized (multi-word) text fields.
  * As a result:
@@ -52,31 +52,34 @@ public @interface FullTextField {
 	String analyzer();
 
 	/**
-	 * @return Whether projections are enabled for this field.
-	 * @see GenericField#projectable()
-	 */
-	Projectable projectable() default Projectable.DEFAULT;
-
-	/**
 	 * @return Whether index-time scoring information should be stored or not.
 	 * @see Norms
 	 */
 	Norms norms() default Norms.DEFAULT;
 
 	/**
-	 * @return Whether this field should be searchable.
-	 * @see Searchable
-	 */
-	Searchable searchable() default Searchable.DEFAULT;
-
-	/**
-	 * @return The term vector storing strategy
+	 * @return The term vector storing strategy.
 	 * @see TermVector
 	 */
 	TermVector termVector() default TermVector.DEFAULT;
 
 	/**
+	 * @return Whether projections are enabled for this field.
+	 * @see GenericField#projectable()
+	 * @see Projectable
+	 */
+	Projectable projectable() default Projectable.DEFAULT;
+
+	/**
+	 * @return Whether this field should be searchable.
+	 * @see GenericField#sortable()
+	 * @see Searchable
+	 */
+	Searchable searchable() default Searchable.DEFAULT;
+
+	/**
 	 * @return A reference to the value bridge to use for this field.
+	 * @see GenericField#valueBridge()
 	 * @see ValueBridgeRef
 	 */
 	ValueBridgeRef valueBridge() default @ValueBridgeRef;

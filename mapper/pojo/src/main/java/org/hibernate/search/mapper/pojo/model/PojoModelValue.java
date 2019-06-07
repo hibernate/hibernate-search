@@ -15,6 +15,9 @@ package org.hibernate.search.mapper.pojo.model;
  */
 public interface PojoModelValue<T> extends PojoModelElement {
 
+	/**
+	 * @return The {@link Class} representing the raw type of this value.
+	 */
 	Class<?> getRawType();
 
 }

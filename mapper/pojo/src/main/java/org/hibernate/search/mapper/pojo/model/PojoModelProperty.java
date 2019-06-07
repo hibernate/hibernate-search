@@ -17,8 +17,16 @@ import java.util.stream.Stream;
  */
 public interface PojoModelProperty extends PojoModelCompositeElement {
 
+	/**
+	 * @return The name of this property.
+	 */
 	String getName();
 
+	/**
+	 * @param markerType A type of marker.
+	 * @param <M> The type of returned markers.
+	 * @return A {@link Stream} of markers with the given type found on this property.
+	 */
 	<M> Stream<M> markers(Class<M> markerType);
 
 }

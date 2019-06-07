@@ -47,24 +47,36 @@ public final class PojoModelPathPropertyNode extends PojoModelPath {
 		return Objects.hash( parent, propertyName );
 	}
 
+	/**
+	 * @return The model path to the value from which the property represented by this node is extracted.
+	 * May be {@code null}.
+	 */
 	@Override
 	public PojoModelPathValueNode getParent() {
 		return parent;
 	}
 
+	/**
+	 * @param extractorPath The extractor path allowing extraction of a value from this property.
+	 * The extractor path may be invalid: no check will be performed.
+	 * @return A new path representing the current path, with an additional access to the given property at the end.
+	 */
 	public PojoModelPathValueNode value(ContainerExtractorPath extractorPath) {
 		return new PojoModelPathValueNode( this, extractorPath );
 	}
 
+	/**
+	 * @return The name of this property.
+	 */
 	public String getPropertyName() {
 		return propertyName;
 	}
 
 	/**
-	 * @return a simple string representation of this path taking into account property nodes only,
-	 * in the form "propertyA.propertyB.propertyC".
+	 * @return A simple string representation of this path taking into account property nodes only,
+	 * in the form {@code propertyA.propertyB.propertyC}.
 	 * <p>
-	 * Completely ignores container value extractors.
+	 * Completely ignores container extractors.
 	 */
 	public String toPropertyString() {
 		StringBuilder builder = new StringBuilder();

@@ -16,6 +16,11 @@ package org.hibernate.search.mapper.pojo.model;
  */
 public interface PojoModelElement {
 
+	/**
+	 * @param clazz A {@link Class}.
+	 * @return {@code true} if instances of the given class can be assigned to this element,
+	 * {@code false} otherwise.
+	 */
 	boolean isAssignableTo(Class<?> clazz);
 
 }

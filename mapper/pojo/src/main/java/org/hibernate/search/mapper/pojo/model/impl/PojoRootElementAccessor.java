@@ -18,8 +18,8 @@ class PojoRootElementAccessor<T> implements PojoElementAccessor<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // By construction, this accessor will only be passed PojoElement returning type T
-	public T read(Object bridgedElement) {
-		return (T) bridgedElement;
+	public T read(Object parentElement) {
+		return (T) parentElement;
 	}
 
 }

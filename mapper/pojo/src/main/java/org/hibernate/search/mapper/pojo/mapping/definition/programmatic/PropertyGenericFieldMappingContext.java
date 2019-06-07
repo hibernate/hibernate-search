@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 /**
- * @author Yoann Rodiere
+ * A context to configure a generic index field mapped to a POJO property.
  */
 public interface PropertyGenericFieldMappingContext extends PropertyNotFullTextFieldMappingContext<PropertyGenericFieldMappingContext> {
 

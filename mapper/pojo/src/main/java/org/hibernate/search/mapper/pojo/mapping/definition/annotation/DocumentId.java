@@ -13,7 +13,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Yoann Rodiere
+ * Maps a property to the identifier of documents in the index.
+ * <p>
+ * This annotation is only taken into account on {@link Indexed} types.
  */
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })

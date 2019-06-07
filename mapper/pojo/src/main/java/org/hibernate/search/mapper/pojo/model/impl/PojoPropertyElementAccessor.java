@@ -23,8 +23,8 @@ class PojoPropertyElementAccessor<P> implements PojoElementAccessor<P> {
 	}
 
 	@Override
-	public P read(Object bridgedElement) {
-		Object parentValue = parent.read( bridgedElement );
+	public P read(Object parentElement) {
+		Object parentValue = parent.read( parentElement );
 		if ( parentValue != null ) {
 			return handle.get( parentValue );
 		}

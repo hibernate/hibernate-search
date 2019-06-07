@@ -21,12 +21,29 @@ import java.util.stream.Stream;
  */
 public interface PojoModelCompositeElement extends PojoModelElement {
 
+	/**
+	 * @param type The expected type of values returned by the accessor.
+	 * @param <T> The expected type of values returned by the accessor.
+	 * @return An accessor able to retrieve this element from an object, provided it has the right type.
+	 * @throws org.hibernate.search.util.common.SearchException If this element
+	 * is not {@link #isAssignableTo(Class) assignable} to the given type.
+	 */
 	<T> PojoElementAccessor<T> createAccessor(Class<T> type);
 
+	/**
+	 * @return An accessor able to retrieve this element from an object, provided it has the right type.
+	 */
 	PojoElementAccessor<?> createAccessor();
 
-	PojoModelProperty property(String relativeFieldName);
+	/**
+	 * @param name The name of a property.
+	 * @return A element representing the given property on the current element.
+	 */
+	PojoModelProperty property(String name);
 
+	/**
+	 * @return A {@link Stream} of all properties of the current element.
+	 */
 	Stream<? extends PojoModelProperty> properties();
 
 }

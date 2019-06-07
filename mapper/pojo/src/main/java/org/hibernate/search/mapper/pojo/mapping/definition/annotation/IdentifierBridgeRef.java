@@ -15,12 +15,10 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 
 /**
- * Reference to the identifier bridge to use for a {@link DocumentId}.
+ * A reference to the identifier bridge to use for a {@link DocumentId}.
  * <p>
  * Either a bridge or a bridge builder can be provided, but never both.
  * Reference can be obtained using either a name or a type.
- *
- * @author Yoann Rodiere
  */
 @Documented
 @Target({}) // Only used as a component in other annotations
@@ -28,30 +26,26 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 public @interface IdentifierBridgeRef {
 
 	/**
-	 * Provide the bridge name to get the bridge reference.
-	 *
-	 * @return the bridge name
+	 * Reference an identifier bridge by its bean name.
+	 * @return The bean name of the  identifier bridge.
 	 */
 	String name() default "";
 
 	/**
-	 * Provide the bridge type to get the bridge reference.
-	 *
-	 * @return the bridge type
+	 * Reference an identifier bridge by its type.
+	 * @return The type of the  identifier bridge.
 	 */
-	Class<? extends IdentifierBridge<?>> type() default UndefinedBridgeImplementationType.class;
+	Class<? extends IdentifierBridge> type() default UndefinedBridgeImplementationType.class;
 
 	/**
-	 * Provide the builder bridge name to get the bridge reference.
-	 *
-	 * @return the bridge builder name
+	 * Reference an identifier bridge by the bean name of its builder.
+	 * @return The bean name of the  identifier bridge builder.
 	 */
 	String builderName() default "";
 
 	/**
-	 * Provide the builder bridge type to get the bridge reference.
-	 *
-	 * @return the bridge builder type
+	 * Reference an identifier bridge by the type of its builder.
+	 * @return The type of the  identifier bridge builder.
 	 */
 	Class<? extends BridgeBuilder<? extends IdentifierBridge<?>>> builderType() default UndefinedBuilderImplementationType.class;
 

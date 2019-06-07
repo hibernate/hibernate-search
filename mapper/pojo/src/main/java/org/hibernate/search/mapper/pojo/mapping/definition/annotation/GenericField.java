@@ -18,14 +18,16 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
 
 /**
- * A generic annotation that will work for any supported type of field in the full text index:
- * full-text, keyword (non-analyzed) text, integer, date, ...
+ * Maps an entity property to a field in the index.
+ * <p>
+ * This is a generic annotation that will work for any type of field supported by the backend:
+ * {@link String}, {@link Integer}, {@link java.time.LocalDate}, ...
  * <p>
  * Note that this annotation, being generic, does not offer configuration options
  * that are specific to only some types of fields.
  * Use more specific annotations if you want that kind of configuration.
  * For example, to define a tokenized (multi-word) text field, use {@link FullTextField}.
- * To define a non-tokenized (single-word) text field, use {@link KeywordField}.
+ * To define a non-tokenized (single-word), but normalized (lowercased, ...) text field, use {@link KeywordField}.
  */
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
@@ -55,7 +57,7 @@ public @interface GenericField {
 	Searchable searchable() default Searchable.DEFAULT;
 
 	/**
-	 * @return An optional value to replace any null value.
+	 * @return A value used instead of null values when indexing.
 	 */
 	String indexNullAs() default AnnotationDefaultValues.DO_NOT_INDEX_NULL;
 

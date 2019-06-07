@@ -13,7 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Yoann Rodiere
+ * Maps an entity type to an index.
  */
 @Documented
 @Target({ ElementType.TYPE })

@@ -12,26 +12,25 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
+
 /**
- * ContainerExtractorPath represents a list of container extractors to be applied to a property.
- * <p>
- * Container extractors tell Hibernate Search how to extract values:
- * an empty container extractor path means the property value should be taken as is,
- * a collection element extractor would extract each element of a collection,
- * a map keys extractor would extract each key of a map, etc.
- * <p>
- * Container extractor paths can chain multiple extractors,
- * so that for example the extraction of values from a {@code List<List<String>>} can be represented.
+ * A chain of {@link ContainerExtractor container extractors} to be applied one after the other to a property value,
+ * in order to extract other values.
  * <p>
  * The extractors are either represented:
  * <ul>
- * <li>explicitly by their classes, e.g. {@code [MapValuesExtractor.class, CollectionElementExtractor.class]},
- * meaning "apply an instance of MapValuesExtractor on the property value, then apply an instance of
- * CollectionElementExtractor on the map values".
+ * <li>explicitly by their name, e.g. {@code ["map-values", "collection"]},
+ * meaning "apply the 'map-values' extractor to the property value, then apply the 'collection' extractor to the map values".
+ * Names are either {@link BuiltinContainerExtractors built-in}
+ * or {@link ContainerExtractorDefinitionContext registered at bootstrap}.
  * <li>or simply by the "default" path ({@link #defaultExtractors()}),
  * which means "whatever default Hibernate Search manages to apply using its internal extractor resolution algorithm".
  * This second form may result in different "resolved" paths depending on the type of the property it is applied to.
  * </ul>
+ *
+ * @see ContainerExtractor
+ * @see BuiltinContainerExtractors
  */
 public class ContainerExtractorPath {
 
@@ -59,7 +58,7 @@ public class ContainerExtractorPath {
 	/**
 	 * @param extractorName A container extractor referenced by its name.
 	 * @return A path that will apply the referenced container extractor.
-	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
+	 * @see BuiltinContainerExtractors
 	 */
 	public static ContainerExtractorPath explicitExtractor(String extractorName) {
 		return new ContainerExtractorPath(
@@ -124,14 +123,28 @@ public class ContainerExtractorPath {
 		}
 	}
 
+	/**
+	 * @return {@code true} if this path represents the default extractor(s),
+	 * which will be determined automatically based on the property type.
+	 * {@code false} otherwise.
+	 */
 	public boolean isDefault() {
 		return applyDefaultExtractors;
 	}
 
+	/**
+	 * @return {@code true} if this path is empty,
+	 * i.e. it represents direct access to the property value.
+	 * {@code false} otherwise.
+	 */
 	public boolean isEmpty() {
 		return !isDefault() && explicitExtractorNames.isEmpty();
 	}
 
+	/**
+	 * @return The list of extractor names explicitly referenced by this path.
+	 * Empty if this path represents the default extractor(s).
+	 */
 	public List<String> getExplicitExtractorNames() {
 		return explicitExtractorNames;
 	}

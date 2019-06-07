@@ -66,6 +66,11 @@ public final class PojoModelPathValueNode extends PojoModelPath {
 		return extractorPath;
 	}
 
+	/**
+	 * @param propertyName The name of a property exposed by the type of this value.
+	 * The property name may be invalid: no check will be performed.
+	 * @return A new path representing the current path, with an additional access to the given property at the end.
+	 */
 	public PojoModelPathPropertyNode property(String propertyName) {
 		return new PojoModelPathPropertyNode( this, propertyName );
 	}

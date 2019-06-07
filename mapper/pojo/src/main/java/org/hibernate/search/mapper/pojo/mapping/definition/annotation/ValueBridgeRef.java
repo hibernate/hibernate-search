@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 
 /**
- * Reference to the value bridge to use in a {@code @*Field} annotation,
+ * A reference to the value bridge to use in a {@code @*Field} annotation,
  * for example in {@link GenericField#valueBridge()}, {@link KeywordField#valueBridge()},
  * or {@link FullTextField#valueBridge()}.
  * <p>
@@ -28,30 +28,26 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 public @interface ValueBridgeRef {
 
 	/**
-	 * Provide the bridge name to get the bridge reference.
-	 *
-	 * @return the bridge name
+	 * Reference a value bridge by its bean name.
+	 * @return The bean name of the value bridge.
 	 */
 	String name() default "";
 
 	/**
-	 * Provide the bridge type to get the bridge reference.
-	 *
-	 * @return the bridge type
+	 * Reference a value bridge by its type.
+	 * @return The type of the value bridge.
 	 */
-	Class<? extends ValueBridge<?, ?>> type() default UndefinedBridgeImplementationType.class;
+	Class<? extends ValueBridge> type() default UndefinedBridgeImplementationType.class;
 
 	/**
-	 * Provide the builder bridge name to get the bridge reference.
-	 *
-	 * @return the bridge builder name
+	 * Reference a value bridge by the bean name of its builder.
+	 * @return The bean name of the value bridge builder.
 	 */
 	String builderName() default "";
 
 	/**
-	 * Provide the builder bridge type to get the bridge reference.
-	 *
-	 * @return the bridge builder type
+	 * Reference a value bridge by the type of its builder.
+	 * @return The type of the value bridge builder.
 	 */
 	Class<? extends BridgeBuilder<? extends ValueBridge<?, ?>>> builderType() default UndefinedBuilderImplementationType.class;
 

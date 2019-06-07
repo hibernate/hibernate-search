@@ -6,6 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.extractor;
 
+import java.util.List;
+
+/**
+ * A context to assign names to container extractor implementations.
+ *
+ * @see ContainerExtractor
+ * @see ContainerExtractorPath#explicitExtractor(String)
+ * @see ContainerExtractorPath#explicitExtractors(List)
+ */
 @SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 public interface ContainerExtractorDefinitionContext {
 
