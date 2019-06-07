@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
@@ -42,36 +38,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public boolean isIndexable(Class<?> type) {
-		return indexedTypeManagers.getByExactClass( type ).isPresent();
-	}
-
-	@Override
-	public boolean isSearchable(Class<?> type) {
-		return indexedTypeManagers.getAllBySuperClass( type ).isPresent();
-	}
-
-	@Override
 	public PojoSearchSessionDelegate createSearchSessionDelegate(
 			AbstractPojoSessionContextImplementor sessionContextImplementor) {
 		return new PojoSearchSessionDelegateImpl(
 				indexedTypeManagers, containedTypeManagers,
 				sessionContextImplementor
 		);
-	}
-
-	@Override
-	public <E> Set<Class<? extends E>> getIndexedTypesPolymorphic(Class<E> entityType) {
-		Optional<Set<PojoIndexedTypeManager<?, ? extends E, ?>>> allBySuperClass = indexedTypeManagers.getAllBySuperClass( entityType );
-		if ( !allBySuperClass.isPresent() ) {
-			return new HashSet<>();
-		}
-
-		Set<Class<? extends E>> result = new HashSet<>();
-		for ( PojoIndexedTypeManager<?, ? extends E, ?> typeManager : allBySuperClass.get() ) {
-			result.add( typeManager.getIndexedJavaClass() );
-		}
-
-		return result;
 	}
 }

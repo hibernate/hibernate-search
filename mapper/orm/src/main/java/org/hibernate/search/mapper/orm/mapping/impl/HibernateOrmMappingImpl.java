@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Set;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Hibernate;
@@ -61,23 +60,8 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	}
 
 	@Override
-	public boolean isIndexable(Class<?> type) {
-		return getDelegate().isIndexable( type );
-	}
-
-	@Override
-	public boolean isSearchable(Class<?> type) {
-		return getDelegate().isSearchable( type );
-	}
-
-	@Override
 	public boolean isWorkable(Object entity) {
 		return isWorkable( Hibernate.getClass( entity ) );
-	}
-
-	@Override
-	public <E> Set<Class<? extends E>> getIndexedTypesPolymorphic(Class<E> entityType) {
-		return getDelegate().getIndexedTypesPolymorphic( entityType );
 	}
 
 	private SearchSessionBuilder createSessionBuilder(EntityManager entityManager) {
