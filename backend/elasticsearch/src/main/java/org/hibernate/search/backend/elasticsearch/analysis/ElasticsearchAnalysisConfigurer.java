@@ -15,11 +15,13 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
  * <p>
  * Users can select an analysis configurer through the
  * {@link ElasticsearchBackendSettings#ANALYSIS_CONFIGURER configuration properties}.
- *
- * @author Yoann Rodiere
  */
 public interface ElasticsearchAnalysisConfigurer {
 
+	/**
+	 * Configures analysis as necessary using the given {@code context}.
+	 * @param context A context exposing methods to configure analysis.
+	 */
 	void configure(ElasticsearchAnalysisDefinitionContainerContext context);
 
 }

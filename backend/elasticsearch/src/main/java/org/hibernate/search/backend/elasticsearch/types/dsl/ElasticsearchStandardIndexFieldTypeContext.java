@@ -9,9 +9,6 @@ package org.hibernate.search.backend.elasticsearch.types.dsl;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 
 
-/**
- * @author Yoann Rodiere
- */
 public interface ElasticsearchStandardIndexFieldTypeContext<S extends ElasticsearchStandardIndexFieldTypeContext<? extends S, F>, F>
 		extends StandardIndexFieldTypeContext<S, F> {
 

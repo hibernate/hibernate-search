@@ -8,9 +8,6 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
 import org.apache.lucene.analysis.util.TokenizerFactory;
 
-/**
- * @author Yoann Rodiere
- */
 public interface LuceneCustomAnalyzerDefinitionContext {
 
 	/**

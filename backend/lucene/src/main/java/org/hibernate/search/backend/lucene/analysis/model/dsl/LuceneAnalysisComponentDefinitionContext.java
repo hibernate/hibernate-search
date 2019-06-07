@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
-/**
- * @author Yoann Rodiere
- */
 public interface LuceneAnalysisComponentDefinitionContext extends LuceneCustomAnalysisDefinitionContext {
 
 	/**

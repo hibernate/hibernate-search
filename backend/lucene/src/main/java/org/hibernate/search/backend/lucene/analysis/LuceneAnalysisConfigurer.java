@@ -16,11 +16,13 @@ import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
  * <p>
  * Users can select a definition provider through the
  * {@link LuceneBackendSettings#ANALYSIS_CONFIGURER configuration properties}.
- *
- * @author Yoann Rodiere
  */
 public interface LuceneAnalysisConfigurer {
 
+	/**
+	 * Configures analysis as necessary using the given {@code context}.
+	 * @param context A context exposing methods to configure analysis.
+	 */
 	void configure(LuceneAnalysisDefinitionContainerContext context);
 
 }

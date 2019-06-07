@@ -9,8 +9,6 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 /**
  * A context allowing to define named analysis-related elements in an Elasticsearch backend:
  * analyzers, tokenizers, char filters, ...
- *
- * @author Yoann Rodiere
  */
 public interface ElasticsearchAnalysisDefinitionContainerContext {
 

@@ -10,9 +10,6 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchS
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 
 
-/**
- * @author Yoann Rodiere
- */
 public interface ElasticsearchIndexFieldTypeFactoryContext extends IndexFieldTypeFactoryContext {
 
 	/**

@@ -9,9 +9,6 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
-/**
- * @author Yoann Rodiere
- */
 public interface LuceneCustomAnalysisDefinitionContext extends LuceneAnalysisDefinitionContainerContext {
 
 	/**

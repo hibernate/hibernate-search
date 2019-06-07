@@ -62,6 +62,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <E> entity type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( LuceneExtension.get() }.
+ *
+ * @see #get()
  */
 public final class LuceneExtension<H, R, E>
 		implements SearchQueryContextExtension<LuceneSearchQueryResultDefinitionContext<R, E>, R, E>,
@@ -75,6 +77,20 @@ public final class LuceneExtension<H, R, E>
 
 	private static final LuceneExtension<Object, Object, Object> INSTANCE = new LuceneExtension<>();
 
+	/**
+	 * Get the extension with generic parameters automatically set as appropriate for the context in which it's used.
+	 *
+	 * @param <H> The type of query hits.
+	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+	 * {@code .extension( LuceneExtension.get() }.
+	 * @param <R> The reference type for projections.
+	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+	 * {@code .extension( LuceneExtension.get() }.
+	 * @param <E> entity type for projections.
+	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+	 * {@code .extension( LuceneExtension.get() }.
+	 * @return The extension.
+	 */
 	@SuppressWarnings("unchecked") // The instance works for any H, R and E
 	public static <H, R, E> LuceneExtension<H, R, E> get() {
 		return (LuceneExtension<H, R, E>) INSTANCE;

@@ -55,12 +55,15 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @param <H> The type of query hits.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+ * {@code .extension( ElasticsearchExtension.get() }.
  * @param <R> The reference type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
  * @param <E> The entity type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
+ *
+ * @see #get()
  */
 public final class ElasticsearchExtension<H, R, E>
 		implements SearchQueryContextExtension<ElasticsearchSearchQueryResultDefinitionContext<R, E>, R, E>,
@@ -74,6 +77,20 @@ public final class ElasticsearchExtension<H, R, E>
 
 	private static final ElasticsearchExtension<Object, Object, Object> INSTANCE = new ElasticsearchExtension<>();
 
+	/**
+	 * Get the extension with generic parameters automatically set as appropriate for the context in which it's used.
+	 *
+	 * @param <H> The type of query hits.
+	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+	 * {@code .extension( ElasticsearchExtension.get() }.
+	 * @param <R> The reference type for projections.
+	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+	 * {@code .extension( ElasticsearchExtension.get() }.
+	 * @param <E> The entity type for projections.
+	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+	 * {@code .extension( ElasticsearchExtension.get() }.
+	 * @return The extension.
+	 */
 	@SuppressWarnings("unchecked") // The instance works for any H, R and E
 	public static <H, R, E> ElasticsearchExtension<H, R, E> get() {
 		return (ElasticsearchExtension<H, R, E>) INSTANCE;
