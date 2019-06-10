@@ -4,7 +4,6 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-
 package org.hibernate.search.mapper.pojo.logging.impl;
 
 import java.lang.annotation.Annotation;
@@ -420,4 +419,7 @@ public interface Log extends BasicLogger {
 	)
 	SearchException cannotPurgeNonIndexedContainedType(
 			@FormatWith(ClassFormatter.class) Class<?> typeManager, Object providedId);
+
+	@Message(id = ID_OFFSET_2 + 56, value = "Could not access to the org.hibernate.annotations.common.reflection.java.JavaXMember#getMember method")
+	SearchException cannotAccessPropertyMember(@Cause Exception cause);
 }
