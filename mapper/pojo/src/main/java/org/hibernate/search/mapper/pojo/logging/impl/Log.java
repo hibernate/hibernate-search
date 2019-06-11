@@ -422,4 +422,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 56, value = "Could not access to the org.hibernate.annotations.common.reflection.java.JavaXMember#getMember method")
 	SearchException cannotAccessPropertyMember(@Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 57, value = "The underlying member of property '%1$s' is supposed to be a method")
+	SearchException cannotAccessPropertyMethod(String propertyName);
 }
