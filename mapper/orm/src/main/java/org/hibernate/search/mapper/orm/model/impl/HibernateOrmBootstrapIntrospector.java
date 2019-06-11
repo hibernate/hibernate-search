@@ -6,29 +6,21 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.boot.Metadata;
 import org.hibernate.bytecode.enhance.spi.EnhancerConstants;
 import org.hibernate.engine.spi.PersistentAttributeInterceptable;
@@ -42,6 +34,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmPropertyHandleFactoryName;
 import org.hibernate.search.mapper.orm.util.impl.HibernateOrmXClassOrdering;
+import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
@@ -52,9 +45,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandleFactory;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
-import org.hibernate.search.util.common.impl.StreamHelper;
 
-public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospector {
+public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private static final ConfigurationProperty<HibernateOrmPropertyHandleFactoryName> PROPERTY_HANDLE_FACTORY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.Radicals.PROPERTY_HANDLE_FACTORY )
@@ -135,9 +127,7 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	}
 
 	private final Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata;
-	private final ReflectionManager reflectionManager;
 	private final PropertyHandleFactory propertyHandleFactory;
-	private final AnnotationHelper annotationHelper;
 	private final HibernateOrmGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
@@ -159,10 +149,9 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 			ReflectionManager reflectionManager,
 			AnnotationHelper annotationHelper,
 			PropertyHandleFactory propertyHandleFactory) {
+		super( reflectionManager, annotationHelper );
 		this.typeMetadata = typeMetadata;
-		this.reflectionManager = reflectionManager;
 		this.propertyHandleFactory = propertyHandleFactory;
-		this.annotationHelper = annotationHelper;
 		this.genericContextHelper = new HibernateOrmGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
 				genericContextHelper, Object.class
@@ -199,40 +188,6 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 				.map( superType -> (HibernateOrmRawTypeModel<? super T>) getTypeModel( superType ) );
 	}
 
-	XClass toXClass(Class<?> type) {
-		return reflectionManager.toXClass( type );
-	}
-
-	Map<String, XProperty> getDeclaredFieldAccessXPropertiesByName(XClass xClass) {
-		// TODO HSEARCH-3056 remove lambdas if possible
-		return xClass.getDeclaredProperties( XClass.ACCESS_FIELD ).stream()
-				.collect( xPropertiesByNameNoDuplicate() );
-	}
-
-	Map<String, XProperty> getDeclaredMethodAccessXPropertiesByName(XClass xClass) {
-		// TODO HSEARCH-3056 remove lambdas if possible
-		return xClass.getDeclaredProperties( XClass.ACCESS_PROPERTY ).stream()
-				.collect( xPropertiesByNameNoDuplicate() );
-	}
-
-	<A extends Annotation> Optional<A> getAnnotationByType(XAnnotatedElement xAnnotated, Class<A> annotationType) {
-		return Optional.ofNullable( xAnnotated.getAnnotation( annotationType ) );
-	}
-
-	<A extends Annotation> Stream<A> getAnnotationsByType(XAnnotatedElement xAnnotated, Class<A> annotationType) {
-		return Arrays.stream( xAnnotated.getAnnotations() )
-				.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
-				.filter( annotation -> annotationType.isAssignableFrom( annotation.annotationType() ) )
-				.map( annotationType::cast );
-	}
-
-	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(
-			XAnnotatedElement xAnnotated, Class<? extends Annotation> metaAnnotationType) {
-		return Arrays.stream( xAnnotated.getAnnotations() )
-				.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
-				.filter( annotation -> annotationHelper.isMetaAnnotated( annotation, metaAnnotationType ) );
-	}
-
 	PropertyHandle<?> createPropertyHandle(String name, Member member,
 			HibernateOrmBasicPropertyMetadata ormPropertyMetadata) throws IllegalAccessException {
 		if ( member instanceof Method ) {
@@ -260,20 +215,13 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 
 	@SuppressWarnings( "unchecked" )
 	private PojoTypeModel<?> getTypeModel(XClass xClass) {
-		return getTypeModel( reflectionManager.toClass( xClass ) );
+		return getTypeModel( toClass( xClass ) );
 	}
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> type) {
 		return new HibernateOrmRawTypeModel<>(
 				this, type, typeMetadata.get( type ),
 				new RawTypeDeclaringContext<>( genericContextHelper, type )
-		);
-	}
-
-	private Collector<XProperty, ?, Map<String, XProperty>> xPropertiesByNameNoDuplicate() {
-		return StreamHelper.toMap(
-				XProperty::getName, Function.identity(),
-				TreeMap::new // Sort properties by name for deterministic iteration
 		);
 	}
 

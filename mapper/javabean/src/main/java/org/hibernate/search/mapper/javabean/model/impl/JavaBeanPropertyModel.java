@@ -13,7 +13,9 @@ import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoCommonsAnnotationsHelper;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
@@ -26,17 +28,17 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	private final JavaBeanBootstrapIntrospector introspector;
 	private final JavaBeanTypeModel<?> parentTypeModel;
 
-	private final String propertyName;
+	private final XProperty property;
 	private final Method readMethod;
 
 	private PojoGenericTypeModel<T> typeModel;
 	private PropertyHandle<T> handle;
 
-	JavaBeanPropertyModel(JavaBeanBootstrapIntrospector introspector, JavaBeanTypeModel<?> parentTypeModel, String propertyName, Method readMethod) {
+	JavaBeanPropertyModel(JavaBeanBootstrapIntrospector introspector, JavaBeanTypeModel<?> parentTypeModel, XProperty property) {
 		this.introspector = introspector;
 		this.parentTypeModel = parentTypeModel;
-		this.propertyName = propertyName;
-		this.readMethod = readMethod;
+		this.property = property;
+		this.readMethod = PojoCommonsAnnotationsHelper.getUnderlyingMethod( property );
 	}
 
 	/**
@@ -70,17 +72,17 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@Override
 	public String getName() {
-		return propertyName;
+		return property.getName();
 	}
 
 	@Override
 	public <A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType) {
-		return introspector.getAnnotationsByType( readMethod, annotationType );
+		return introspector.getAnnotationsByType( property, annotationType );
 	}
 
 	@Override
 	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType) {
-		return introspector.getAnnotationsByMetaAnnotationType( readMethod, metaAnnotationType );
+		return introspector.getAnnotationsByMetaAnnotationType( property, metaAnnotationType );
 	}
 
 	@Override
