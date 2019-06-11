@@ -22,9 +22,9 @@ import java.util.stream.Stream;
 
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.cfg.annotations.HCANNHelper;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoCommonsAnnotationsHelper;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
@@ -248,10 +248,10 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 			 * which explains the two if/else branches below.
 			 */
 			if ( memberFromHibernateOrmMetamodel instanceof Method ) {
-				return methodAccessXProperty == null ? memberFromHibernateOrmMetamodel : HCANNHelper.getUnderlyingMember( methodAccessXProperty );
+				return methodAccessXProperty == null ? memberFromHibernateOrmMetamodel : PojoCommonsAnnotationsHelper.getUnderlyingMember( methodAccessXProperty );
 			}
 			else if ( memberFromHibernateOrmMetamodel instanceof Field ) {
-				return fieldAccessXProperty == null ? memberFromHibernateOrmMetamodel : HCANNHelper.getUnderlyingMember( fieldAccessXProperty );
+				return fieldAccessXProperty == null ? memberFromHibernateOrmMetamodel : PojoCommonsAnnotationsHelper.getUnderlyingMember( fieldAccessXProperty );
 			}
 			else {
 				/*
@@ -269,11 +269,11 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 			 */
 			if ( methodAccessXProperty != null ) {
 				// We managed to find a declared, method-access XProperty on the current type. Use it.
-				return HCANNHelper.getUnderlyingMember( methodAccessXProperty );
+				return PojoCommonsAnnotationsHelper.getUnderlyingMember( methodAccessXProperty );
 			}
 			else if ( fieldAccessXProperty != null ) {
 				// We managed to find a declared, field-access XProperty on the current type. Use it.
-				return HCANNHelper.getUnderlyingMember( fieldAccessXProperty );
+				return PojoCommonsAnnotationsHelper.getUnderlyingMember( fieldAccessXProperty );
 			}
 			else {
 				/*
