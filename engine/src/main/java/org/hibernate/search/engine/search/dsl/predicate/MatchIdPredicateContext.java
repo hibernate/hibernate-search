@@ -30,7 +30,7 @@ public interface MatchIdPredicateContext {
 	 * @param values the collection of identifiers to match.
 	 * @return {@code this} for method chaining.
 	 */
-	default MatchIdPredicateTerminalContext matchingAny(Collection<Object> values) {
+	default MatchIdPredicateTerminalContext matchingAny(Collection<?> values) {
 		MatchIdPredicateTerminalContext context = null;
 		for ( Object value : values ) {
 			context = matching( value );
