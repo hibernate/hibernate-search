@@ -22,7 +22,9 @@ include::architecture.asciidoc[]
 
 include::configuration.asciidoc[]
 
-include::mapper-orm.asciidoc[]
+include::mapper-orm-mapping.asciidoc[]
+
+include::mapper-orm-indexing.asciidoc[]
 
 include::search-dsl.asciidoc[]
 

@@ -188,7 +188,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withouths
 To make these entities searchable, you will need to map them to an index structure.
 The mapping can be defined using annotations, or using a programmatic API;
 this getting started guide will show you a simple annotation mapping.
-For more details, refer to <<mapper-orm>>.
+For more details, refer to <<mapper-orm-mapping>>.
 
 Below is an example of how the model above can be mapped.
 

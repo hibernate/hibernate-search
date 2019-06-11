@@ -7,7 +7,22 @@ By default, every time an entity is changed through a Hibernate ORM Session,
 if that entity is <<mapper-orm-entityindexmapping,mapped to an index>>,
 Hibernate Search updates the relevant index.
 
-Below are a few facts to explain how automatic indexing works.
+[[mapper-orm-indexing-automatic-configuration]]
+== Configuration
+
+Automatic indexing may be unnecessary if your index is read-only
+or if you update it regularly through <<mapper-orm-indexing-explicit,explicit indexing>>.
+You can enable or disable automatic indexing by setting the configuration property
+`hibernate.search.automatic_indexing.strategy`:
+
+* when set to `session`, each change to an indexed entity
+(persist, update, delete) through a Hibernate ORM Session/EntityManager
+will automatically lead to a similar modification to the index.
+* when set to `none`, changes to entities are ignored,
+and indexing requires an explicit action (see <<mapper-orm-indexing-explicit>>).
+
+[[mapper-orm-indexing-automatic-concepts]]
+== How automatic indexing works
 
 Changes have to occur in the ORM session in order to be detected::
 Hibernate Search uses internal events of Hibernate ORM in order to detect changes:
@@ -63,17 +78,6 @@ even if you didn't need them in your business code.
 This extra cost can be mitigated to some extent by leveraging Hibernate ORM's batch fetching;
 see link:{hibernateDocUrl}#configurations-database-fetch[the `batch_fetch_size` property]
 and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
-
-Automatic indexing may be unnecessary if your index is read-only
-or if you update it regularly through <<mapper-orm-indexing-explicit,explicit indexing>>.
-You can enable or disable automatic indexing by setting the configuration property
-`hibernate.search.automatic_indexing.strategy`:
-
-* when set to `session`, each change to an indexed entity
-(persist, update, delete) through a Hibernate ORM Session/EntityManager
-will automatically lead to a similar modification to the index.
-* when set to `none`, changes to entities are ignored,
-and indexing requires an explicit action (see <<mapper-orm-indexing-explicit>>).
 
 [[mapper-orm-indexing-automatic-synchronization]]
 == Synchronization with the indexes

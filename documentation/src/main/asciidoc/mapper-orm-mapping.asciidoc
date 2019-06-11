@@ -1,5 +1,5 @@
 [[mapper-orm-mapping]]
-= Mapping ORM entities to indexes
+= Mapping Hibernate ORM entities to indexes
 // Search 5 anchors backward compatibility
 [[search-mapping]]
 
@@ -12,9 +12,20 @@ include a description of how to:
  * define a mapping programmatically.
 ////
 
+[[mapper-orm-mapping-configuration]]
 == Configuration
 
 include::todo-placeholder.asciidoc[]
+
+=== Enabling the integration
+// Search 5 anchors backward compatibility
+[[search-configuration-event]]
+
+The Hibernate ORM integration is enabled by default as soon as it is present in the classpath.
+If for some reason you need to disable it,
+set the `hibernate.search.autoregister_listeners` <<configuration-property-types,boolean property>> to `false`.
+
+=== Configuring the mapping
 
 By default, Hibernate Search will automatically process mapping annotations for entity types,
 as well as nested types in those entity types, for instance embedded types.
@@ -28,6 +39,12 @@ you can use a programmatic API to define the mapping.
 // TODO add an example
 
 See <<mapper-orm-programmatic-mapping>> for more information about the programmatic mapping API.
+
+=== Other configuration properties
+
+Other configuration properties are mentioned in the relevant parts of this documentation.
+You can find a full reference of available properties in the Hibernate Search javadoc:
+link:{hibernateSearchJavadocUrl}/org/hibernate/search/mapper/orm/cfg/HibernateOrmMapperSettings.html[org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings].
 
 [[mapper-orm-entityindexmapping]]
 == Entity/index mapping
