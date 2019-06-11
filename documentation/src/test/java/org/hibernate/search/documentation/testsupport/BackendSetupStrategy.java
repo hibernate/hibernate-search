@@ -25,36 +25,40 @@ public interface BackendSetupStrategy {
 
 	static List<BackendSetupStrategy> simple() {
 		return Arrays.asList(
-				new BackendSetupStrategy() {
-					@Override
-					public String toString() {
-						return "lucene";
-					}
-					@Override
-					public OrmSetupHelper.SetupContext withBackend(OrmSetupHelper.SetupContext setupContext, String backendName) {
-						return setupContext.withBackend( "backend-lucene", backendName )
-								.withBackendProperty(
-										backendName,
-										LuceneBackendSettings.ANALYSIS_CONFIGURER,
-										new LuceneSimpleMappingAnalysisConfigurer()
-								);
-					}
-				},
-				new BackendSetupStrategy() {
-					@Override
-					public String toString() {
-						return "elasticsearch";
-					}
-					@Override
-					public OrmSetupHelper.SetupContext withBackend(OrmSetupHelper.SetupContext setupContext, String backendName) {
-						return setupContext.withBackend( "backend-elasticsearch", backendName )
-								.withBackendProperty(
-										backendName,
-										ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-										new ElasticsearchSimpleMappingAnalysisConfigurer()
-								);
-					}
-				}
+				LUCENE,
+				ELASTICSEARCH
 		);
 	}
+
+	BackendSetupStrategy LUCENE = new BackendSetupStrategy() {
+		@Override
+		public String toString() {
+			return "lucene";
+		}
+		@Override
+		public OrmSetupHelper.SetupContext withBackend(OrmSetupHelper.SetupContext setupContext, String backendName) {
+			return setupContext.withBackend( "backend-lucene", backendName )
+					.withBackendProperty(
+							backendName,
+							LuceneBackendSettings.ANALYSIS_CONFIGURER,
+							new LuceneSimpleMappingAnalysisConfigurer()
+					);
+		}
+	};
+
+	BackendSetupStrategy ELASTICSEARCH = new BackendSetupStrategy() {
+		@Override
+		public String toString() {
+			return "elasticsearch";
+		}
+		@Override
+		public OrmSetupHelper.SetupContext withBackend(OrmSetupHelper.SetupContext setupContext, String backendName) {
+			return setupContext.withBackend( "backend-elasticsearch", backendName )
+					.withBackendProperty(
+							backendName,
+							ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
+							new ElasticsearchSimpleMappingAnalysisConfigurer()
+					);
+		}
+	};
 }

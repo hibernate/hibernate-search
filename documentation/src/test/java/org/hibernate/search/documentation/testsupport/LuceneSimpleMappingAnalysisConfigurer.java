@@ -11,13 +11,45 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefi
 
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory;
+import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 
 class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
 	public void configure(LuceneAnalysisDefinitionContainerContext context) {
-		context.analyzer( "english" ).instance( new StandardAnalyzer() );
-		context.analyzer( "name" ).instance( new StandardAnalyzer() );
+		context.analyzer( "english" ).custom()
+				.tokenizer( StandardTokenizerFactory.class )
+				.tokenFilter( ASCIIFoldingFilterFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( SnowballPorterFilterFactory.class )
+						.param( "language", "English" );
+
+		context.analyzer( "name" ).custom()
+				.tokenizer( StandardTokenizerFactory.class )
+				.tokenFilter( ASCIIFoldingFilterFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class );
+
+		context.analyzer( "autocomplete_indexing" ).custom()
+				.tokenizer( StandardTokenizerFactory.class )
+				.tokenFilter( ASCIIFoldingFilterFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( SnowballPorterFilterFactory.class )
+						.param( "language", "English" )
+				.tokenFilter( EdgeNGramFilterFactory.class )
+						.param( "minGramSize", "3" )
+						.param( "maxGramSize", "7" );
+
+		// Same as "autocomplete-indexing", but without the edge-ngram filter
+		context.analyzer( "autocomplete_query" ).custom()
+				.tokenizer( StandardTokenizerFactory.class )
+				.tokenFilter( ASCIIFoldingFilterFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( SnowballPorterFilterFactory.class )
+						.param( "language", "English" );
+
+		// Normalizers
+
 		context.normalizer( "english" ).custom()
 				.tokenFilter( ASCIIFoldingFilterFactory.class )
 				.tokenFilter( LowerCaseFilterFactory.class );
