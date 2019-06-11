@@ -229,7 +229,7 @@ You may want to change it in particular when mapping a single property to multip
 Value: `String`. Defaults to the name of the property.
 
 [[mapper-orm-directfieldmapping-sortable]] `sortable`::
-Whether the field can be <<mapper-orm-query-sort, sorted on>>,
+Whether the field can be <<search-dsl-sort, sorted on>>,
 i.e. whether a specific data structure is added to the index to allow efficient sorts when querying.
 +
 Value: `Sortable.YES`, `Sortable.NO`, `Sortable.DEFAULT`.
@@ -241,7 +241,7 @@ See <<mapper-orm-directfieldmapping-annotations-fulltextfield,here>> for an expl
 ====
 
 [[mapper-orm-directfieldmapping-projectable]] `projectable`::
-Whether the field can be <<mapper-orm-query-projection, projected on>>,
+Whether the field can be <<search-dsl-projection, projected on>>,
 i.e. whether the field value is stored in the index to allow later retrieval when querying.
 +
 Value: `Projectable.YES`, `Projectable.NO`, `Projectable.DEFAULT`.

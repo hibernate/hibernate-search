@@ -474,7 +474,7 @@ were analysis configuration (<<concepts-analysis>>) and bridges (<<mapper-orm-br
 Both are important features required for more fine-grained indexing.
 
 Other features that you will probably want to use include
-<<mapper-orm-query-sort,sorts>> and <<mapper-orm-query-projection,projections>>.
+<<search-dsl-sort,sorts>> and <<search-dsl-projection,projections>>.
 
 If you want to see an example project using Hibernate Search,
 you can also have a look at the link:https://github.com/hibernate/hibernate-search/tree/master/integrationtest/showcase/library["Library" showcase],
