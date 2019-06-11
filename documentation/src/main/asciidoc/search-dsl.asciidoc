@@ -274,7 +274,7 @@ As a result, any call to the DSL will be expected to pass an `AuthenticationOutc
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/DslConverterIT.java[tags=dsl-converter-enabled]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/converter/DslConverterIT.java[tags=dsl-converter-enabled]
 ----
 ====
 
@@ -296,7 +296,7 @@ and pass `DslConverter.DISABLED`:
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/DslConverterIT.java[tags=dsl-converter-disabled]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/converter/DslConverterIT.java[tags=dsl-converter-disabled]
 ----
 ====
 
@@ -345,7 +345,7 @@ As a result, any projection on the `status` field will return an `OrderStatus` i
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/ProjectionConverterIT.java[tags=projection-converter-enabled]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/converter/ProjectionConverterIT.java[tags=projection-converter-enabled]
 ----
 ====
 
@@ -361,7 +361,7 @@ and pass `ProjectionConverter.DISABLED`:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/ProjectionConverterIT.java[tags=projection-converter-disabled]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/converter/ProjectionConverterIT.java[tags=projection-converter-disabled]
 ----
 ====
 
