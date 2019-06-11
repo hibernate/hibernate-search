@@ -6,21 +6,14 @@
  */
 package org.hibernate.search.mapper.javabean.model.impl;
 
-import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
-import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
@@ -29,7 +22,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandleFactory;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
-import org.hibernate.search.util.common.impl.StreamHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -39,21 +31,19 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Yoann Rodiere
  */
-public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector {
+public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PropertyHandleFactory propertyHandleFactory;
-	private final AnnotationHelper annotationHelper;
 	private final JavaBeanGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
-	private final JavaReflectionManager reflectionManager = new JavaReflectionManager();
 
 	public JavaBeanBootstrapIntrospector(MethodHandles.Lookup lookup) {
+		super( new JavaReflectionManager(), new AnnotationHelper( lookup ) );
 		this.propertyHandleFactory = PropertyHandleFactory.usingMethodHandle( lookup );
-		this.annotationHelper = new AnnotationHelper( lookup );
 		this.genericContextHelper = new JavaBeanGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
 				genericContextHelper, Object.class
@@ -78,21 +68,6 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
 	}
 
-	<A extends Annotation> Optional<A> getAnnotationByType(AnnotatedElement annotatedElement,
-			Class<A> annotationType) {
-		return annotationHelper.getAnnotationByType( annotatedElement, annotationType );
-	}
-
-	<A extends Annotation> Stream<A> getAnnotationsByType(AnnotatedElement annotatedElement,
-			Class<A> annotationType) {
-		return annotationHelper.getAnnotationsByType( annotatedElement, annotationType );
-	}
-
-	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(AnnotatedElement annotatedElement,
-			Class<? extends Annotation> metaAnnotationType) {
-		return annotationHelper.getAnnotationsByMetaAnnotationType( annotatedElement, metaAnnotationType );
-	}
-
 	PropertyHandle<?> createPropertyHandle(String name, Method method) throws IllegalAccessException {
 		return propertyHandleFactory.createForMethod( name, method );
 	}
@@ -107,10 +82,5 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 		catch (RuntimeException e) {
 			throw log.errorRetrievingTypeModel( clazz, e );
 		}
-	}
-
-	public Map<String, XProperty> getDeclaredProperties(Class<?> clazz) {
-		return reflectionManager.toXClass( clazz ).getDeclaredProperties( XClass.ACCESS_PROPERTY ).stream()
-				.collect( StreamHelper.toMap( XProperty::getName, Function.identity(), LinkedHashMap::new ) );
 	}
 }

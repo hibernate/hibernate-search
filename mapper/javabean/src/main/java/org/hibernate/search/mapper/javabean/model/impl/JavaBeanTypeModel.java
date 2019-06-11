@@ -8,17 +8,16 @@ package org.hibernate.search.mapper.javabean.model.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoCommonsAnnotationsHelper;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
@@ -35,6 +34,7 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	private final Class<T> clazz;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 	private final PojoCaster<T> caster;
+	private final XClass xClass;
 	private final Map<String, XProperty> declaredProperties;
 
 	JavaBeanTypeModel(JavaBeanBootstrapIntrospector introspector, Class<T> clazz, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
@@ -42,7 +42,8 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 		this.clazz = clazz;
 		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
 		this.caster = new JavaClassPojoCaster<>( clazz );
-		this.declaredProperties = introspector.getDeclaredProperties( clazz );
+		this.xClass = introspector.toXClass( clazz );
+		this.declaredProperties = introspector.getDeclaredMethodAccessXPropertiesByName( xClass );
 	}
 
 	@Override
@@ -110,17 +111,17 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 
 	@Override
 	public <A extends Annotation> Optional<A> getAnnotationByType(Class<A> annotationType) {
-		return introspector.getAnnotationByType( clazz, annotationType );
+		return introspector.getAnnotationByType( xClass, annotationType );
 	}
 
 	@Override
 	public <A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType) {
-		return introspector.getAnnotationsByType( clazz, annotationType );
+		return introspector.getAnnotationsByType( xClass, annotationType );
 	}
 
 	@Override
 	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType) {
-		return introspector.getAnnotationsByMetaAnnotationType( clazz, metaAnnotationType );
+		return introspector.getAnnotationsByMetaAnnotationType( xClass, metaAnnotationType );
 	}
 
 	@Override
@@ -153,7 +154,6 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	private PojoPropertyModel<?> createProperty(XProperty property) {
-		Method readMethod = PojoCommonsAnnotationsHelper.getUnderlyingMethod( property );
-		return new JavaBeanPropertyModel<>( introspector, this, property.getName(), readMethod );
+		return new JavaBeanPropertyModel<>( introspector, this, property );
 	}
 }
