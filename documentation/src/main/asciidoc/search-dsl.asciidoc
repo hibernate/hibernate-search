@@ -7,8 +7,17 @@ include::todo-placeholder.asciidoc[]
 
 [[search-dsl-predicate]]
 == Predicate DSL
+// Search 5 anchors backward compatibility
+[[query-predicate]]
 
 include::todo-placeholder.asciidoc[]
+
+[[search-dsl-predicate-concepts]]
+=== Generality
+
+include::todo-placeholder.asciidoc[]
+
+// TODO introduction, common concepts, entry point, ...
 
 ////
 TODO Include a detailed description of all available predicates.
@@ -21,8 +30,50 @@ include::todo-placeholder.asciidoc[]
 
 [[search-dsl-sort]]
 == Sort DSL
+// Search 5 anchors backward compatibility
+[[query-sorting]]
 
 include::todo-placeholder.asciidoc[]
+
+[[search-dsl-sort-concepts]]
+=== Generality
+
+By default, query results are sorted by relevance.
+Other sorts, including the sort by field value, can be configured when building the search query:
+
+.Using custom sorts
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=sort-simple-lambdas]
+----
+<1> Start building the query as usual.
+<2> Mention that the results of the query are expected to be sorted on field "pageCount" in descending order,
+then (for those with the same page count) on field "title_sort" in ascending order.
+If the field does not exist or cannot be sorted on, an exception will be thrown.
+<3> The results are sorted according to instructions.
+====
+
+Or alternatively, if you don't want to use lambdas:
+
+.Using custom sorts - object-based syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=sort-simple-objects]
+----
+====
+
+[NOTE]
+====
+There are a few constraints regarding sorts by field.
+In particular, in order for a field to be "sortable", it must be <<mapper-orm-directfieldmapping-sortable,marked as such in the mapping>>,
+so that the correct data structures are available in the index.
+====
+
+The sort DSL offers more sort types, and multiple options for each type of sort.
+To learn more about the field sort, and all the other types of sort,
+refer to the following sections.
 
 ////
 TODO The ORM mapper query section has a link pointing here and expects the section to
@@ -31,8 +82,74 @@ include a detailed description of all available sorts.
 
 [[search-dsl-projection]]
 == Projection DSL
+// Search 5 anchors backward compatibility
+[[projections]]
 
 include::todo-placeholder.asciidoc[]
+
+[[search-dsl-projection-concepts]]
+=== Generality
+
+For some use cases, you only need the query to return a small subset of the data contained in your domain object.
+In these cases, returning managed entities and extracting data from these entities may be overkill:
+extracting the data from the index itself would avoid the database round-trip.
+
+Projections do just that: they allow the query to return something more precise than just "the matching entities".
+Projections can be configured when building the search query:
+
+.Using projections to extract data from the index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=projection-simple-lambdas]
+----
+<1> Start building the query as usual.
+<2> Mention that the expected result of the query is a projection on field "title", of type String.
+If that type is not appropriate or if the field does not exist, an exception will be thrown.
+<3> The query is type-safe and will return results of the expected type.
+====
+
+Or alternatively, if you don't want to use lambdas:
+
+.Using projections to extract data from the index - object-based syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=projection-simple-objects]
+----
+====
+
+[NOTE]
+====
+There are a few constraints regarding field projections.
+In particular, in order for a field to be "projectable", it must be <<mapper-orm-directfieldmapping-projectable,marked as such in the mapping>>,
+so that it is correctly stored in the index.
+====
+
+While field projections are certainly the most common,
+they are not the only type of projection.
+Other projections allow to compose custom beans containing extracted data,
+get references to the extracted documents or the corresponding entities,
+or get information about the search query itself (score, ...).
+
+The following example shows how to retrieve the managed entity corresponding to each matched document
+along with the score of that document, and wraps this information into a custom bean:
+
+.Using advanced projection types
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=projection-advanced-bean]
+----
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=projection-advanced]
+----
+====
+
+The projection DSL offers more projection types, and multiple options for each type of projection.
+To learn more about the field projection, and all the other types of projection,
+refer to the following sections.
 
 ////
 TODO The ORM mapper query section has a link pointing here and expects the section to
