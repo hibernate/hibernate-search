@@ -1,5 +1,7 @@
 [[mapper-orm-indexing-automatic]]
 = Automatic indexing
+// Search 5 anchors backward compatibility
+[[_automatic_indexing]]
 
 By default, every time an entity is changed through a Hibernate ORM Session,
 if that entity is <<mapper-orm-entityindexmapping,mapped to an index>>,

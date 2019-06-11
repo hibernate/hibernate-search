@@ -1,5 +1,7 @@
 [[search-dsl]]
 = Search DSLs
+// Search 5 anchors backward compatibility
+[[search-query-querydsl]]
 
 include::todo-placeholder.asciidoc[]
 
