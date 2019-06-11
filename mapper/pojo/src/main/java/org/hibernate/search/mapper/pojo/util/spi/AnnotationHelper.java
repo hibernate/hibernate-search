@@ -10,12 +10,10 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -31,23 +29,6 @@ public final class AnnotationHelper {
 
 	public AnnotationHelper(MethodHandles.Lookup lookup) {
 		this.lookup = lookup;
-	}
-
-	public <A extends Annotation> Optional<A> getAnnotationByType(
-			AnnotatedElement annotatedElement, Class<A> annotationType) {
-		return Optional.ofNullable( annotatedElement.getAnnotation( annotationType ) );
-	}
-
-	public <A extends Annotation> Stream<A> getAnnotationsByType(
-			AnnotatedElement annotatedElement, Class<A> annotationType) {
-		return Arrays.stream( annotatedElement.getAnnotationsByType( annotationType ) );
-	}
-
-	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(
-			AnnotatedElement annotatedElement, Class<? extends Annotation> metaAnnotationType) {
-		return Arrays.stream( annotatedElement.getAnnotations() )
-				.flatMap( this::expandRepeatableContainingAnnotation )
-				.filter( annotation -> isMetaAnnotated( annotation, metaAnnotationType ) );
 	}
 
 	public boolean isMetaAnnotated(Annotation annotation, Class<? extends Annotation> metaAnnotationType) {
