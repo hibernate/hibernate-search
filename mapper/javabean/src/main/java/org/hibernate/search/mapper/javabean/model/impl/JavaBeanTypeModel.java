@@ -6,20 +6,19 @@
  */
 package org.hibernate.search.mapper.javabean.model.impl;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoCommonsAnnotationsHelper;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
@@ -34,19 +33,16 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 
 	private final JavaBeanBootstrapIntrospector introspector;
 	private final Class<T> clazz;
-	private final BeanInfo beanInfo;
-	private final BeanInfo declaredBeanInfo;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 	private final PojoCaster<T> caster;
+	private final Map<String, XProperty> declaredProperties;
 
-	JavaBeanTypeModel(JavaBeanBootstrapIntrospector introspector, Class<T> clazz,
-			RawTypeDeclaringContext<T> rawTypeDeclaringContext) throws IntrospectionException {
+	JavaBeanTypeModel(JavaBeanBootstrapIntrospector introspector, Class<T> clazz, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		this.introspector = introspector;
 		this.clazz = clazz;
-		this.beanInfo = Introspector.getBeanInfo( clazz );
-		this.declaredBeanInfo = Introspector.getBeanInfo( clazz, clazz.getSuperclass() );
 		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
 		this.caster = new JavaClassPojoCaster<>( clazz );
+		this.declaredProperties = introspector.getDeclaredProperties( clazz );
 	}
 
 	@Override
@@ -100,7 +96,7 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 
 	@Override
 	@SuppressWarnings( "unchecked" )
-	public Stream<? extends PojoRawTypeModel<? super T>> getAscendingSuperTypes() {
+	public Stream<JavaBeanTypeModel<? super T>> getAscendingSuperTypes() {
 		return JavaClassOrdering.get().getAscendingSuperTypes( clazz )
 				.map( clazz -> introspector.getTypeModel( (Class<? super T>) clazz ) );
 	}
@@ -129,16 +125,16 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 
 	@Override
 	public PojoPropertyModel<?> getProperty(String propertyName) {
-		String normalizedName = Introspector.decapitalize( propertyName );
-		// The methods below may throw SearchExceptions, which include all the necessary context in their message
-		PropertyDescriptor propertyDescriptor = getPropertyDescriptor( normalizedName );
-		return createProperty( propertyDescriptor );
+		return getAscendingSuperTypes()
+				.map( model -> model.declaredProperties.get( propertyName ) )
+				.filter( Objects::nonNull )
+				.findFirst().map( this::createProperty )
+				.orElseThrow( () -> log.cannotFindProperty( this, propertyName ) );
 	}
 
 	@Override
 	public Stream<PojoPropertyModel<?>> getDeclaredProperties() {
-		return Arrays.stream( declaredBeanInfo.getPropertyDescriptors() )
-				.filter( descriptor -> descriptor.getReadMethod() != null )
+		return declaredProperties.values().stream()
 				.map( this::createProperty );
 	}
 
@@ -156,20 +152,8 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 		return rawTypeDeclaringContext;
 	}
 
-	private PropertyDescriptor getPropertyDescriptor(String normalizedName) {
-		PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-		for ( PropertyDescriptor descriptor : propertyDescriptors ) {
-			if ( normalizedName.equals( descriptor.getName() ) ) {
-				return descriptor;
-			}
-		}
-		throw log.cannotFindProperty( this, normalizedName );
-	}
-
-	private PojoPropertyModel<?> createProperty(PropertyDescriptor propertyDescriptor) {
-		if ( propertyDescriptor.getReadMethod() == null ) {
-			throw log.cannotReadProperty( this, propertyDescriptor.getName() );
-		}
-		return new JavaBeanPropertyModel<>( introspector, this, propertyDescriptor );
+	private PojoPropertyModel<?> createProperty(XProperty property) {
+		Method readMethod = PojoCommonsAnnotationsHelper.getUnderlyingMethod( property );
+		return new JavaBeanPropertyModel<>( introspector, this, property.getName(), readMethod );
 	}
 }

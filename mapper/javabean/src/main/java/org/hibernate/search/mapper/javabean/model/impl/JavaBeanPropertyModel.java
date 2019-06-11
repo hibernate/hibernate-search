@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.mapper.javabean.model.impl;
 
-import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -26,16 +26,17 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	private final JavaBeanBootstrapIntrospector introspector;
 	private final JavaBeanTypeModel<?> parentTypeModel;
 
-	private final PropertyDescriptor descriptor;
+	private final String propertyName;
+	private final Method readMethod;
 
 	private PojoGenericTypeModel<T> typeModel;
 	private PropertyHandle<T> handle;
 
-	JavaBeanPropertyModel(JavaBeanBootstrapIntrospector introspector, JavaBeanTypeModel<?> parentTypeModel,
-			PropertyDescriptor descriptor) {
+	JavaBeanPropertyModel(JavaBeanBootstrapIntrospector introspector, JavaBeanTypeModel<?> parentTypeModel, String propertyName, Method readMethod) {
 		this.introspector = introspector;
 		this.parentTypeModel = parentTypeModel;
-		this.descriptor = descriptor;
+		this.propertyName = propertyName;
+		this.readMethod = readMethod;
 	}
 
 	/**
@@ -69,17 +70,17 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@Override
 	public String getName() {
-		return descriptor.getName();
+		return propertyName;
 	}
 
 	@Override
 	public <A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType) {
-		return introspector.getAnnotationsByType( descriptor.getReadMethod(), annotationType );
+		return introspector.getAnnotationsByType( readMethod, annotationType );
 	}
 
 	@Override
 	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType) {
-		return introspector.getAnnotationsByMetaAnnotationType( descriptor.getReadMethod(), metaAnnotationType );
+		return introspector.getAnnotationsByMetaAnnotationType( readMethod, metaAnnotationType );
 	}
 
 	@Override
@@ -106,7 +107,7 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	public PropertyHandle<T> getHandle() {
 		if ( handle == null ) {
 			try {
-				handle = (PropertyHandle<T>) introspector.createPropertyHandle( getName(), descriptor.getReadMethod() );
+				handle = (PropertyHandle<T>) introspector.createPropertyHandle( getName(), readMethod );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( getName(), parentTypeModel, e );
@@ -116,6 +117,6 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	Type getGetterGenericReturnType() {
-		return descriptor.getReadMethod().getGenericReturnType();
+		return readMethod.getGenericReturnType();
 	}
 }

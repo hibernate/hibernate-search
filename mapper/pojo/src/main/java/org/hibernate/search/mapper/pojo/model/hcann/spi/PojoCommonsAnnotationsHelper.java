@@ -69,4 +69,13 @@ public class PojoCommonsAnnotationsHelper {
 			);
 		}
 	}
+
+	public static Method getUnderlyingMethod(XProperty xProperty) {
+		Member member = getUnderlyingMember( xProperty );
+		if ( !( member instanceof Method ) ) {
+			throw log.cannotAccessPropertyMethod( xProperty.getName() );
+		}
+
+		return (Method) member;
+	}
 }

@@ -6,16 +6,20 @@
  */
 package org.hibernate.search.mapper.javabean.model.impl;
 
-import java.beans.IntrospectionException;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.hibernate.annotations.common.reflection.XClass;
+import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -24,8 +28,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandleFactory;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
+import org.hibernate.search.util.common.impl.StreamHelper;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A very simple introspector roughly following Java Beans conventions.
@@ -44,6 +49,7 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
+	private final JavaReflectionManager reflectionManager = new JavaReflectionManager();
 
 	public JavaBeanBootstrapIntrospector(MethodHandles.Lookup lookup) {
 		this.propertyHandleFactory = PropertyHandleFactory.usingMethodHandle( lookup );
@@ -56,7 +62,7 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> PojoRawTypeModel<T> getTypeModel(Class<T> clazz) {
+	public <T> JavaBeanTypeModel<T> getTypeModel(Class<T> clazz) {
 		if ( clazz.isPrimitive() ) {
 			/*
 			 * We'll never manipulate the primitive type, as we're using generics everywhere,
@@ -64,7 +70,7 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 			 */
 			clazz = (Class<T>) ReflectionHelper.getPrimitiveWrapperType( clazz );
 		}
-		return (PojoRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
+		return (JavaBeanTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
 	}
 
 	@Override
@@ -98,8 +104,13 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 					new RawTypeDeclaringContext<>( genericContextHelper, clazz )
 			);
 		}
-		catch (IntrospectionException | RuntimeException e) {
+		catch (RuntimeException e) {
 			throw log.errorRetrievingTypeModel( clazz, e );
 		}
+	}
+
+	public Map<String, XProperty> getDeclaredProperties(Class<?> clazz) {
+		return reflectionManager.toXClass( clazz ).getDeclaredProperties( XClass.ACCESS_PROPERTY ).stream()
+				.collect( StreamHelper.toMap( XProperty::getName, Function.identity(), LinkedHashMap::new ) );
 	}
 }
