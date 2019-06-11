@@ -229,8 +229,11 @@ TODO The ORM mapper query section has a link pointing here and expects the secti
 include a detailed description of all available projections.
 ////
 
+[[search-dsl-type-compatibility]]
+== Field types and compatibility
+
 [[search-dsl-argument-type]]
-== Type of arguments passed to the DSL
+=== Type of arguments passed to the DSL
 
 Some predicates, such as the `match` predicate or the `range` predicate,
 require a parameter of type `Object` at some point (`matching(Object)`, `above(Object)`, ...).
@@ -309,7 +312,7 @@ See <<mapper-orm-bridge-typeandpropertybridge>> for more information.
 ====
 
 [[search-dsl-projected-value-type]]
-== Type of projected values
+=== Type of projected values
 
 Generally the type of values returned by projections argument should be rather obvious:
 for example if you created a field by mapping an `Integer` property,
@@ -370,7 +373,7 @@ See <<mapper-orm-bridge-valuebridge>> and <<mapper-orm-bridge-typeandpropertybri
 ====
 
 [[search-dsl-multiple-fields]]
-== Targeting multiple fields
+=== Targeting multiple fields
 
 Sometimes a predicate/sort/projection targets *multiple* field, which may have conflicting definitions:
 
@@ -401,7 +404,7 @@ or they are both `LocalDate` with the same date format, etc.
 
 The following sections describe all the possible incompatibilities, and how to solve them.
 
-=== Incompatible codec
+==== Incompatible codec
 
 In a search query targeting multiple indexes,
 if a field is encoded differently in each index,
@@ -426,7 +429,7 @@ to the two fields in a single query:
 you will have to create one predicate per field
 and combine them with a <<search-dsl-predicate-boolean,boolean junction>>.
 
-=== Incompatible DSL converters
+==== Incompatible DSL converters
 
 Incompatible DSL converters are only a problem when you need to pass an argument to the DSL in certain methods:
 `matching(Object)`/`to(Object)`/`above(Object)`/`below(Object)`/etc. in the predicate DSL,
@@ -439,7 +442,7 @@ you can still use these methods, but you will need to disable the DSL converter
 as explained in <<search-dsl-argument-type>>:
 you will just pass the "index" value to the DSL (using the same example, a `String`).
 
-=== Incompatible projection converters
+==== Incompatible projection converters
 
 If, in a search query targeting multiple indexes,
 a field is encoded in a compatible way in every indexes (for example both as `String`),
@@ -449,7 +452,7 @@ you can still project on this field, but you will need to disable the projection
 as explained in <<search-dsl-projected-value-type>>:
 the projection will return the "index", unconverted value (using the same example, a `String`).
 
-=== Incompatible analyzer
+==== Incompatible analyzer
 
 Incompatible analyzers are only a problem with full-text predicates:
 match predicate on a text field, phrase predicate, simple query string predicate, ...
