@@ -5,7 +5,7 @@
 
 include::todo-placeholder.asciidoc[]
 
-[[backend-elasticsearch-configuration]]
+[[backend-elasticsearch-compatibility]]
 == Compatibility
 
 include::todo-placeholder.asciidoc[]
