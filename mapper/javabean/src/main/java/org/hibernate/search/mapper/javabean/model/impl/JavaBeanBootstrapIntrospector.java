@@ -10,7 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
+import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
@@ -66,6 +68,14 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 	@Override
 	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
 		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
+	}
+
+	<T> Stream<JavaBeanTypeModel<? super T>> getAscendingSuperTypes(XClass xClass) {
+		return getAscendingSuperClasses( xClass ).map( this::getTypeModel );
+	}
+
+	<T> Stream<JavaBeanTypeModel<? super T>> getDescendingSuperTypes(XClass xClass) {
+		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
 	PropertyHandle<?> createPropertyHandle(String name, Method method) throws IllegalAccessException {
