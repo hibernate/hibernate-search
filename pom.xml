@@ -1665,6 +1665,16 @@
                     <groupId>org.asciidoctor</groupId>
                     <artifactId>asciidoctor-maven-plugin</artifactId>
                     <version>${version.asciidoctor.plugin}</version>
+                    <configuration>
+                        <!-- Enabled to validate internal links -->
+                        <enableVerbose>true</enableVerbose>
+                        <!-- Abort the build if something seems wrong -->
+                        <logHandler>
+                            <failIf>
+                                <severity>WARN</severity>
+                            </failIf>
+                        </logHandler>
+                    </configuration>
                     <dependencies>
                         <dependency>
                             <groupId>org.jruby</groupId>
