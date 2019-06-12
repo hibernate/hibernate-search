@@ -1,9 +1,82 @@
 [[search-dsl]]
-= Search DSLs
+= Searching
 // Search 5 anchors backward compatibility
 [[search-query-querydsl]]
 
 include::todo-placeholder.asciidoc[]
+
+[[search-dsl-query]]
+== Query DSL
+// Search 5 anchors backward compatibility
+[[search-query]]
+
+[[search-dsl-query-generality]]
+=== Generality
+// Search 5 anchors backward compatibility
+[[_building_a_hibernate_search_query]]
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO explain the general concepts around querying the index.
+It's not as obvious as it seems, in particular in the Hibernate Search / ORM integration:
+we're querying the index, but getting the results from the database...
+See the Search 5 docs, it's probably explained in detail there.
+Also briefly explain the main features (predicate, sort, projection, ...)
+and point to the various other sections (predicate DSL, sort DSL, projection DSL, ...) where relevant.
+////
+
+[[search-dsl-query-fetching-results]]
+=== Fetching results
+// Search 5 anchors backward compatibility
+[[_retrieving_the_results]]
+
+include::todo-placeholder.asciidoc[]
+
+// TODO [[_pagination]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_pagination
+// TODO [[_performance_considerations]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_performance_considerations
+// TODO [[_result_size]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_result_size
+
+[[search-dsl-query-timeout]]
+=== Timeout
+// Search 5 anchors backward compatibility
+[[_limiting_the_time_of_a_query]]
+
+include::todo-placeholder.asciidoc[]
+
+// TODO [[]]:
+// TODO [[_raise_an_exception_on_time_limit]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_raise_an_exception_on_time_limit
+// TODO [[_limit_the_number_of_results_when_the_time_limit_is_reached]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_limit_the_number_of_results_when_the_time_limit_is_reached
+
+[[search-dsl-query-entity-loading-options]]
+=== Entity loading options
+// Search 5 anchors backward compatibility
+[[_fetching_strategy]]
+//[[_customizing_object_initialization_strategies]] // There can only be one anchor per paragraph, unfortunately...
+
+include::todo-placeholder.asciidoc[]
+
+// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_fetching_strategy
+// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_customizing_object_initialization_strategies
+
+[[search-dsl-query-turning-into-jpa-query]]
+=== Turning the `SearchQuery` into a JPA or Hibernate ORM query
+
+include::todo-placeholder.asciidoc[]
+
+// TODO turning a SearchQuery into a JPA/ORM query
+
+// TODO [[_resulttransformer]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_resulttransformer
+
+[[search-dsl-query-debugging]]
+=== Debugging a query
+// Search 5 anchors backward compatibility
+[[_understanding_results]]
+
+include::todo-placeholder.asciidoc[]
+
+// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_understanding_results
+// TODO toString(), getQueryString(), and logging, too?
 
 [[search-dsl-predicate]]
 == Predicate DSL
