@@ -909,26 +909,13 @@ so that it is correctly stored in the index.
 
 While field projections are certainly the most common,
 they are not the only type of projection.
-Other projections allow to compose custom beans containing extracted data,
-get references to the extracted documents or the corresponding entities,
-or get information about the search query itself (score, ...).
+Other projections allow to
+<<search-dsl-projection-composite,compose custom beans containing extracted data>>,
+get references to the <<search-dsl-projection-documentReference,extracted documents>>
+or the <<search-dsl-projection-reference,corresponding entities>>,
+or get information related to the search query itself
+(<<search-dsl-projection-score,score>>, ...).
 
-The following example shows how to retrieve the managed entity corresponding to each matched document
-along with the score of that document, and wraps this information into a custom bean:
-
-.Using advanced projection types
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=projection-advanced-bean]
-----
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=projection-advanced]
-----
-====
-
-The projection DSL offers more projection types, and multiple options for each type of projection.
 To learn more about the field projection, and all the other types of projection,
 refer to the following sections.
 
