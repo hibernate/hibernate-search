@@ -46,7 +46,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public SearchSort toSearchSort(List<ElasticsearchSearchSortBuilder> builders) {
-		return new ElasticsearchSearchSort( builders );
+		return new ElasticsearchSearchSort( builders, scopeModel.getHibernateSearchIndexNames() );
 	}
 
 	@Override
@@ -54,7 +54,11 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 		if ( !( sort instanceof ElasticsearchSearchSort ) ) {
 			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( sort );
 		}
-		return (ElasticsearchSearchSort) sort;
+		ElasticsearchSearchSort casted = (ElasticsearchSearchSort) sort;
+		if ( !scopeModel.getHibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.getIndexNames(), scopeModel.getHibernateSearchIndexNames() );
+		}
+		return casted;
 	}
 
 	@Override

@@ -7,15 +7,18 @@
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.engine.search.SearchSort;
 
 class ElasticsearchSearchSort implements SearchSort, ElasticsearchSearchSortBuilder {
 
 	private final List<ElasticsearchSearchSortBuilder> delegates;
+	private final Set<String> indexNames;
 
-	ElasticsearchSearchSort(List<ElasticsearchSearchSortBuilder> delegates) {
+	ElasticsearchSearchSort(List<ElasticsearchSearchSortBuilder> delegates, Set<String> indexName) {
 		this.delegates = delegates;
+		this.indexNames = indexName;
 	}
 
 	@Override
@@ -25,4 +28,7 @@ class ElasticsearchSearchSort implements SearchSort, ElasticsearchSearchSortBuil
 		}
 	}
 
+	public Set<String> getIndexNames() {
+		return indexNames;
+	}
 }
