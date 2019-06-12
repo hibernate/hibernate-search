@@ -24,6 +24,7 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -75,6 +76,41 @@ public class PredicateDslIT {
 				.setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();
 	}
+
+	@Test
+	public void entryPoint() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// tag::entryPoint-lambdas[]
+			SearchSession searchSession = Search.getSearchSession( entityManager );
+
+			List<Book> result = searchSession.search( Book.class ) // <1>
+					.predicate( f -> f.match().onField( "title" ) // <2>
+							.matching( "robot" ) )
+					.fetchHits(); // <3>
+			// end::entryPoint-lambdas[]
+			assertThat( result )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// tag::entryPoint-objects[]
+			SearchSession searchSession = Search.getSearchSession( entityManager );
+
+			SearchScope<Book> scope = searchSession.scope( Book.class );
+
+			List<Book> result = scope.search()
+					.predicate( scope.predicate().match().onField( "title" )
+							.matching( "robot" )
+							.toPredicate() )
+					.fetchHits();
+			// end::entryPoint-objects[]
+			assertThat( result )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+	}
+
 
 	@Test
 	public void matchAll() {

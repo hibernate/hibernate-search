@@ -16,7 +16,6 @@ import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -27,6 +26,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+/**
+ * Test that the simple mapping defined in Book works as expected.
+ */
 @RunWith(Parameterized.class)
 public class HibernateOrmSimpleMappingIT {
 	private static final String BOOK1_TITLE = "I, Robot";
@@ -66,67 +68,8 @@ public class HibernateOrmSimpleMappingIT {
 	}
 
 	@Test
-	public void predicate_simple() {
+	public void sort() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			// tag::predicate-simple-objects[]
-			SearchSession searchSession = Search.getSearchSession( entityManager );
-
-			SearchScope<Book> scope = searchSession.scope( Book.class );
-
-			List<Book> result = scope.search()
-					.predicate( scope.predicate().match().onField( "title" )
-							.matching( "robot" )
-							.toPredicate() )
-					.fetchHits();
-			// end::predicate-simple-objects[]
-
-			assertThat( result )
-					.extracting( "title" )
-					.containsExactlyInAnyOrder( BOOK1_TITLE, BOOK3_TITLE );
-		} );
-
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			// tag::predicate-simple-lambdas[]
-			SearchSession searchSession = Search.getSearchSession( entityManager );
-
-			List<Book> result = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.match().onField( "title" ) // <2>
-							.matching( "robot" ) )
-					.fetchHits(); // <3>
-			// end::predicate-simple-lambdas[]
-
-			assertThat( result )
-					.extracting( "title" )
-					.containsExactlyInAnyOrder( BOOK1_TITLE, BOOK3_TITLE );
-		} );
-	}
-
-	@Test
-	public void sort_simple() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			// tag::sort-simple-objects[]
-			SearchSession searchSession = Search.getSearchSession( entityManager );
-
-			SearchScope<Book> scope = searchSession.scope( Book.class );
-
-			List<Book> result = scope.search()
-					.predicate( scope.predicate().matchAll().toPredicate() )
-					.sort(
-							scope.sort()
-							.byField( "pageCount" ).desc()
-							.then().byField( "title_sort" )
-							.toSort()
-					)
-					.fetchHits();
-			// end::sort-simple-objects[]
-
-			assertThat( result )
-					.extracting( "title" )
-					.containsExactly( BOOK3_TITLE, BOOK1_TITLE, BOOK2_TITLE );
-		} );
-
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			// tag::sort-simple-lambdas[]
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			List<Book> result = searchSession.search( Book.class ) // <1>
@@ -135,7 +78,6 @@ public class HibernateOrmSimpleMappingIT {
 							.then().byField( "title_sort" )
 					)
 					.fetchHits(); // <3>
-			// end::sort-simple-lambdas[]
 
 			assertThat( result )
 					.extracting( "title" )
@@ -146,30 +88,12 @@ public class HibernateOrmSimpleMappingIT {
 	@Test
 	public void projection_simple() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			// tag::projection-simple-objects[]
-			SearchSession searchSession = Search.getSearchSession( entityManager );
-
-			SearchScope<Book> scope = searchSession.scope( Book.class );
-
-			List<String> result = scope.search()
-					.asProjection( scope.projection().field( "title", String.class ).toProjection() )
-					.predicate( scope.predicate().matchAll().toPredicate() )
-					.fetchHits();
-			// end::projection-simple-objects[]
-
-			assertThat( result )
-					.containsExactlyInAnyOrder( BOOK1_TITLE, BOOK2_TITLE, BOOK3_TITLE );
-		} );
-
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			// tag::projection-simple-lambdas[]
 			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			List<String> result = searchSession.search( Book.class ) // <1>
 					.asProjection( f -> f.field( "title", String.class ) ) // <2>
 					.predicate( f -> f.matchAll() )
 					.fetchHits(); // <3>
-			// end::projection-simple-lambdas[]
 
 			assertThat( result )
 					.containsExactlyInAnyOrder( BOOK1_TITLE, BOOK2_TITLE, BOOK3_TITLE );

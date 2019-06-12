@@ -99,7 +99,7 @@ The predicate is configured when building the search query:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=predicate-simple-lambdas]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/PredicateDslIT.java[tags=entryPoint-lambdas]
 ----
 <1> Start building the query.
 <2> Mention that the results of the query are expected to have a `title` field matching the value `robot`.
@@ -113,7 +113,7 @@ Or alternatively, if you don't want to use lambdas:
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=predicate-simple-objects]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/PredicateDslIT.java[tags=entryPoint-objects]
 ----
 ====
 
@@ -673,7 +673,7 @@ Other sorts, including the sort by field value, can be configured when building 
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=sort-simple-lambdas]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=entryPoint-lambdas]
 ----
 <1> Start building the query as usual.
 <2> Mention that the results of the query are expected to be sorted on field "pageCount" in descending order,
@@ -688,7 +688,7 @@ Or alternatively, if you don't want to use lambdas:
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=sort-simple-objects]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=entryPoint-objects]
 ----
 ====
 
@@ -882,7 +882,7 @@ Projections can be configured when building the search query:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=projection-simple-lambdas]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=entryPoint-lambdas]
 ----
 <1> Start building the query as usual.
 <2> Mention that the expected result of the query is a projection on field "title", of type String.
@@ -896,7 +896,7 @@ Or alternatively, if you don't want to use lambdas:
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=projection-simple-objects]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=entryPoint-objects]
 ----
 ====
 

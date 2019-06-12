@@ -26,6 +26,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -80,6 +81,46 @@ public class ProjectionDslIT {
 				)
 				.setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();
+	}
+
+	@Test
+	public void entryPoint() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// tag::entryPoint-lambdas[]
+			SearchSession searchSession = Search.getSearchSession( entityManager );
+
+			List<String> result = searchSession.search( Book.class ) // <1>
+					.asProjection( f -> f.field( "title", String.class ) ) // <2>
+					.predicate( f -> f.matchAll() )
+					.fetchHits(); // <3>
+			// end::entryPoint-lambdas[]
+			assertThat( result ).containsExactlyInAnyOrder(
+					entityManager.getReference( Book.class, BOOK1_ID ).getTitle(),
+					entityManager.getReference( Book.class, BOOK2_ID ).getTitle(),
+					entityManager.getReference( Book.class, BOOK3_ID ).getTitle(),
+					entityManager.getReference( Book.class, BOOK4_ID ).getTitle()
+			);
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// tag::entryPoint-objects[]
+			SearchSession searchSession = Search.getSearchSession( entityManager );
+
+			SearchScope<Book> scope = searchSession.scope( Book.class );
+
+			List<String> result = scope.search()
+					.asProjection( scope.projection().field( "title", String.class )
+							.toProjection() )
+					.predicate( scope.predicate().matchAll().toPredicate() )
+					.fetchHits();
+			// end::entryPoint-objects[]
+			assertThat( result ).containsExactlyInAnyOrder(
+					entityManager.getReference( Book.class, BOOK1_ID ).getTitle(),
+					entityManager.getReference( Book.class, BOOK2_ID ).getTitle(),
+					entityManager.getReference( Book.class, BOOK3_ID ).getTitle(),
+					entityManager.getReference( Book.class, BOOK4_ID ).getTitle()
+			);
+		} );
 	}
 
 	@Test
