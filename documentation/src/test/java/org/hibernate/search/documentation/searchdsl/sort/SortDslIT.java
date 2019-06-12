@@ -1,0 +1,396 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.documentation.searchdsl.sort;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import javax.persistence.EntityManagerFactory;
+
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
+import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+
+@RunWith(Parameterized.class)
+public class SortDslIT {
+
+	private static final int ASIMOV_ID = 1;
+	private static final int MARTINEZ_ID = 2;
+
+	private static final int BOOK1_ID = 1;
+	private static final int BOOK2_ID = 2;
+	private static final int BOOK3_ID = 3;
+	private static final int BOOK4_ID = 4;
+
+	@Parameterized.Parameters(name = "{0}")
+	public static Object[] backendSetups() {
+		return BackendSetupStrategy.simple().toArray();
+	}
+
+	@Rule
+	public OrmSetupHelper setupHelper = new OrmSetupHelper();
+
+	private final BackendSetupStrategy backendSetupStrategy;
+
+	private EntityManagerFactory entityManagerFactory;
+
+	public SortDslIT(BackendSetupStrategy backendSetupStrategy) {
+		this.backendSetupStrategy = backendSetupStrategy;
+	}
+
+	@Before
+	public void setup() {
+		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper )
+				.withProperty(
+						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
+						HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+				)
+				.setup( Book.class, Author.class, EmbeddableGeoPoint.class );
+		initData();
+	}
+
+	@Test
+	public void byScore() {
+		withinSearchSession( searchSession -> {
+			// tag::byScore[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.match().onField( "title" )
+							.matching( "robot dawn" ) )
+					.sort( f -> f.byScore() )
+					.fetchHits();
+			// end::byScore[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK3_ID, BOOK1_ID );
+		} );
+	}
+
+	@Test
+	public void byIndexOrder() {
+		withinSearchSession( searchSession -> {
+			// tag::byIndexOrder[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.byIndexOrder() )
+					.fetchHits();
+			// end::byIndexOrder[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					// Not checking the order here, it's implementation-dependent
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+	}
+
+	@Test
+	public void byField() {
+		withinSearchSession( searchSession -> {
+			// tag::byField[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.byField( "title_sort" ) )
+					.fetchHits();
+			// end::byField[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::byField_onMissingValue_sortFirst[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.byField( "pageCount" ).onMissingValue().sortFirst() )
+					.fetchHits();
+			// end::byField_onMissingValue_sortFirst[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK4_ID, BOOK2_ID, BOOK1_ID, BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::byField_onMissingValue_sortLast[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.byField( "pageCount" ).onMissingValue().sortLast() )
+					.fetchHits();
+			// end::byField_onMissingValue_sortLast[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK3_ID, BOOK4_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::byField_onMissingValue_use[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.byField( "pageCount" ).onMissingValue().use( 300 ) )
+					.fetchHits();
+			// end::byField_onMissingValue_use[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK4_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void byComposite() {
+		withinSearchSession( searchSession -> {
+			// tag::byComposite[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.byComposite() // <1>
+							.add( f.byField( "genre_sort" ) ) // <2>
+							.add( f.byField( "title_sort" ) ) ) // <3>
+					.fetchHits(); // <4>
+			// end::byComposite[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::byComposite_dynamicParameters[]
+			MySearchParameters searchParameters = getSearchParameters(); // <1>
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.byComposite( b -> { // <2>
+						for ( MySort mySort : searchParameters.getSorts() ) { // <3>
+							switch ( mySort.getType() ) {
+								case GENRE:
+									b.add( f.byField( "genre_sort" ).order( mySort.getOrder() ) );
+									break;
+								case TITLE:
+									b.add( f.byField( "title_sort" ).order( mySort.getOrder() ) );
+									break;
+								case PAGE_COUNT:
+									b.add( f.byField( "pageCount" ).order( mySort.getOrder() ) );
+									break;
+							}
+						}
+					} ) )
+					.fetchHits(); // <4>
+			// end::byComposite_dynamicParameters[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK4_ID, BOOK3_ID, BOOK2_ID, BOOK1_ID );
+		} );
+	}
+
+	@Test
+	public void then() {
+		withinSearchSession( searchSession -> {
+			// tag::then[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.byField( "genre_sort" ) // <2>
+							.then().byField( "title_sort" ) ) // <3>
+					.fetchHits(); // <4>
+			// end::then[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void byDistance() {
+		withinSearchSession( searchSession -> {
+			// tag::byDistance[]
+			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
+			List<Author> hits = searchSession.search( Author.class )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.byDistance( "placeOfBirth", center ) )
+					.fetchHits();
+			// end::byDistance[]
+			assertThat( hits )
+					.extracting( Author::getId )
+					.containsExactly( ASIMOV_ID, MARTINEZ_ID );
+		} );
+	}
+
+	@Test
+	public void lucene() {
+		Assume.assumeTrue( BackendSetupStrategy.LUCENE.equals( backendSetupStrategy ) );
+
+		withinSearchSession( searchSession -> {
+			// tag::lucene-fromLuceneSort[]
+			List<Book> hits = searchSession.search( Book.class )
+					.extension( LuceneExtension.get() )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.fromLuceneSort(
+							new Sort(
+									new SortField( "genre_sort", SortField.Type.STRING ),
+									new SortField( "pageCount", SortField.Type.INT )
+							)
+					) )
+					.fetchHits();
+			// end::lucene-fromLuceneSort[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK4_ID, BOOK2_ID, BOOK1_ID, BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::lucene-fromLuceneSortField[]
+			List<Book> hits = searchSession.search( Book.class )
+					.extension( LuceneExtension.get() )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.fromLuceneSortField(
+							new SortField( "title_sort", SortField.Type.STRING )
+					) )
+					.fetchHits();
+			// end::lucene-fromLuceneSortField[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void elasticsearch() {
+		Assume.assumeTrue( BackendSetupStrategy.ELASTICSEARCH.equals( backendSetupStrategy ) );
+
+		withinSearchSession( searchSession -> {
+			// tag::elasticsearch-fromJson[]
+			List<Book> hits = searchSession.search( Book.class )
+					.extension( ElasticsearchExtension.get() )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.fromJson( "{"
+									+ "\"title_sort\": \"asc\""
+							+ "}" ) )
+					.fetchHits();
+			// end::elasticsearch-fromJson[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
+		} );
+	}
+
+	private MySearchParameters getSearchParameters() {
+		return new MySearchParameters() {
+			@Override
+			public List<MySort> getSorts() {
+				return Arrays.asList(
+						new MySort( MySortType.GENRE, SortOrder.ASC ),
+						new MySort( MySortType.TITLE, SortOrder.DESC ),
+						new MySort( MySortType.PAGE_COUNT, SortOrder.DESC )
+				);
+			}
+		};
+	}
+
+	private void withinSearchSession(Consumer<SearchSession> action) {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.getSearchSession( entityManager );
+			action.accept( searchSession );
+		} );
+	}
+
+	private void initData() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			Author isaacAsimov = new Author();
+			isaacAsimov.setId( ASIMOV_ID );
+			isaacAsimov.setFirstName( "Isaac" );
+			isaacAsimov.setLastName( "Asimov" );
+			isaacAsimov.setPlaceOfBirth( EmbeddableGeoPoint.of( 53.976177, 32.158627 ) );
+
+			Author aLeeMartinez = new Author();
+			aLeeMartinez.setId( MARTINEZ_ID );
+			aLeeMartinez.setFirstName( "A. Lee" );
+			aLeeMartinez.setLastName( "Martinez" );
+			aLeeMartinez.setPlaceOfBirth( EmbeddableGeoPoint.of( 31.814315, -106.475524 ) );
+
+			Book book1 = new Book();
+			book1.setId( BOOK1_ID );
+			book1.setTitle( "I, Robot" );
+			book1.setPageCount( 250 );
+			book1.setGenre( Genre.SCIENCE_FICTION );
+			book1.getAuthors().add( isaacAsimov );
+			isaacAsimov.getBooks().add( book1 );
+
+			Book book2 = new Book();
+			book2.setId( BOOK2_ID );
+			book2.setTitle( "The Caves of Steel" );
+			book2.setPageCount( 206 );
+			book2.setGenre( Genre.SCIENCE_FICTION );
+			book2.getAuthors().add( isaacAsimov );
+			isaacAsimov.getBooks().add( book2 );
+
+			Book book3 = new Book();
+			book3.setId( BOOK3_ID );
+			book3.setTitle( "The Robots of Dawn" );
+			book3.setPageCount( 435 );
+			book3.setGenre( Genre.SCIENCE_FICTION );
+			book3.getAuthors().add( isaacAsimov );
+			isaacAsimov.getBooks().add( book3 );
+
+			Book book4 = new Book();
+			book4.setId( BOOK4_ID );
+			book4.setTitle( "The Automatic Detective" );
+			book4.setPageCount( null ); // Missing page count: this is on purpose
+			book4.setGenre( Genre.CRIME_FICTION );
+			book4.getAuthors().add( aLeeMartinez );
+			aLeeMartinez.getBooks().add( book3 );
+
+			entityManager.persist( isaacAsimov );
+			entityManager.persist( aLeeMartinez );
+
+			entityManager.persist( book1 );
+			entityManager.persist( book2 );
+			entityManager.persist( book3 );
+			entityManager.persist( book4 );
+		} );
+	}
+
+	private interface MySearchParameters {
+		List<MySort> getSorts();
+	}
+
+	private static final class MySort {
+		private final MySortType type;
+		private final SortOrder order;
+
+		public MySort(MySortType type, SortOrder order) {
+			this.type = type;
+			this.order = order;
+		}
+
+		public MySortType getType() {
+			return type;
+		}
+
+		public SortOrder getOrder() {
+			return order;
+		}
+	}
+
+	private enum MySortType {
+		GENRE,
+		TITLE,
+		PAGE_COUNT
+	}
+}

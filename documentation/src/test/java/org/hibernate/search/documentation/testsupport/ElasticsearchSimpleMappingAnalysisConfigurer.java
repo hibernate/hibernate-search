@@ -42,5 +42,8 @@ class ElasticsearchSimpleMappingAnalysisConfigurer implements ElasticsearchAnaly
 
 		context.normalizer( "english" ).custom()
 				.withTokenFilters( "asciifolding", "lowercase" );
+
+		context.normalizer( "name" ).custom()
+				.withTokenFilters( "asciifolding", "lowercase" );
 	}
 }
