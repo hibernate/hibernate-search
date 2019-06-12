@@ -60,6 +60,7 @@ import org.easymock.EasyMockSupport;
 public class SearchProjectionIT extends EasyMockSupport {
 
 	private static final String INDEX_NAME = "IndexName";
+	private static final String ANOTHER_INDEX_NAME = "AnotherIndexName";
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -75,6 +76,8 @@ public class SearchProjectionIT extends EasyMockSupport {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
+	private StubMappingIndexManager anotherIndexManager;
+
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
@@ -82,6 +85,13 @@ public class SearchProjectionIT extends EasyMockSupport {
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
+				)
+				.withIndex(
+						ANOTHER_INDEX_NAME,
+						// Using the same mapping here. But a different mapping would work the same.
+						// What matters here is that is a different index.
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.anotherIndexManager = indexManager
 				)
 				.setup();
 
@@ -304,6 +314,53 @@ public class SearchProjectionIT extends EasyMockSupport {
 					null
 			);
 		} );
+	}
+
+	@Test
+	public void reuseProjectionInstance_onScopeTargetingSameIndexes() {
+		StubMappingScope scope = indexManager.createScope();
+		SearchProjection<String> projection = scope.projection()
+				.field( indexMapping.string1Field.relativeFieldName, String.class ).toProjection();
+
+		String value1 = indexMapping.string1Field.document1Value.indexedValue;
+		String value2 = indexMapping.string1Field.document2Value.indexedValue;
+		String value3 = indexMapping.string1Field.document3Value.indexedValue;
+
+		SearchQuery<String> query = scope.query()
+				.asProjection( projection )
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+
+		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
+
+		// reuse the same projection instance on the same scope
+		query = scope.query()
+				.asProjection( projection )
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+
+		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
+
+		// reuse the same projection instance on a different scope,
+		// targeting the same index
+		query = indexManager.createScope().query()
+				.asProjection( projection )
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+
+		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
+
+		projection = indexManager.createScope( anotherIndexManager ).projection()
+				.field( indexMapping.string1Field.relativeFieldName, String.class ).toProjection();
+
+		// reuse the same projection instance on a different scope,
+		// targeting same indexes
+		query = anotherIndexManager.createScope( indexManager ).query()
+				.asProjection( projection )
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+
+		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
 	}
 
 	@Test
