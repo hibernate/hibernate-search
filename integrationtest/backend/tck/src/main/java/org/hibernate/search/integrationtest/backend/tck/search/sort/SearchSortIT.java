@@ -166,13 +166,6 @@ public class SearchSortIT {
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		query = scope.query()
-				.predicate( f -> f.matchAll() )
-				.sort( f -> f.by( sortAsc ) )
-				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
 		SearchSort sortDesc = scope.sort()
 				.byField( "string" ).desc().onMissingValue().sortLast()
 				.toSort();
@@ -183,39 +176,37 @@ public class SearchSortIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = scope.query()
-				.predicate( f -> f.matchAll() )
-				.sort( f -> f.by( sortDesc ) )
-				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 
 	@Test
 	public void lambda_caching() {
 		AtomicReference<SearchSort> cache = new AtomicReference<>();
 
-		Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> cachingContributor = c -> {
+		Function<? super SearchSortFactoryContext, ? extends SearchSort> cachingContributor = c -> {
 			SearchSort result = cache.get();
 			if ( cache.get() == null ) {
 				result = c.byField( "string" ).onMissingValue().sortLast().toSort();
 				cache.set( result );
 			}
-			return c.by( result );
+			return result;
 		};
 
 		Assertions.assertThat( cache ).hasValue( null );
 
+		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query;
 
-		query = simpleQuery( cachingContributor );
+		query = scope.query().predicate( f -> f.matchAll() )
+				.sort( cachingContributor.apply( scope.sort() ) )
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
-		query = simpleQuery( cachingContributor );
+		query = scope.query().predicate( f -> f.matchAll() )
+				.sort( cachingContributor.apply( scope.sort() ) )
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
