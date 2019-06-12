@@ -90,9 +90,36 @@ include::todo-placeholder.asciidoc[]
 [[search-dsl-predicate-concepts]]
 === Generality
 
-include::todo-placeholder.asciidoc[]
+The main component of a search query is the _predicate_,
+i.e. the condition that every document must satisfy in order to be included in search results.
 
-// TODO introduction, common concepts, entry point, ...
+The predicate is configured when building the search query:
+
+.Defining the predicate of a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=predicate-simple-lambdas]
+----
+<1> Start building the query.
+<2> Mention that the results of the query are expected to have a `title` field matching the value `robot`.
+If the field does not exist or cannot be searched on, an exception will be thrown.
+<3> The results match the given predicate.
+====
+
+Or alternatively, if you don't want to use lambdas:
+
+.Defining the predicate of a search query - object-based syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=predicate-simple-objects]
+----
+====
+
+The predicate DSL offers more predicate types, and multiple options for each type of predicate.
+To learn more about the `match` predicate, and all the other types of predicate,
+refer to the following sections.
 
 [[search-dsl-predicate-common]]
 === Options common to multiple predicate types

@@ -66,6 +66,42 @@ public class HibernateOrmSimpleMappingIT {
 	}
 
 	@Test
+	public void predicate_simple() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// tag::predicate-simple-objects[]
+			SearchSession searchSession = Search.getSearchSession( entityManager );
+
+			SearchScope<Book> scope = searchSession.scope( Book.class );
+
+			List<Book> result = scope.search()
+					.predicate( scope.predicate().match().onField( "title" )
+							.matching( "robot" )
+							.toPredicate() )
+					.fetchHits();
+			// end::predicate-simple-objects[]
+
+			assertThat( result )
+					.extracting( "title" )
+					.containsExactlyInAnyOrder( BOOK1_TITLE, BOOK3_TITLE );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// tag::predicate-simple-lambdas[]
+			SearchSession searchSession = Search.getSearchSession( entityManager );
+
+			List<Book> result = searchSession.search( Book.class ) // <1>
+					.predicate( f -> f.match().onField( "title" ) // <2>
+							.matching( "robot" ) )
+					.fetchHits(); // <3>
+			// end::predicate-simple-lambdas[]
+
+			assertThat( result )
+					.extracting( "title" )
+					.containsExactlyInAnyOrder( BOOK1_TITLE, BOOK3_TITLE );
+		} );
+	}
+
+	@Test
 	public void sort_simple() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::sort-simple-objects[]
