@@ -54,7 +54,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public SearchPredicate toSearchPredicate(ElasticsearchSearchPredicateBuilder builder) {
-		return new ElasticsearchSearchPredicate( builder );
+		return new ElasticsearchSearchPredicate( builder, scopeModel.getHibernateSearchIndexNames() );
 	}
 
 	@Override
@@ -62,7 +62,12 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 		if ( !( predicate instanceof ElasticsearchSearchPredicate ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherPredicates( predicate );
 		}
-		return (ElasticsearchSearchPredicate) predicate;
+
+		ElasticsearchSearchPredicate casted = (ElasticsearchSearchPredicate) predicate;
+		if ( !scopeModel.getHibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.getIndexNames(), scopeModel.getHibernateSearchIndexNames() );
+		}
+		return casted;
 	}
 
 	@Override
