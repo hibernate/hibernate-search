@@ -11,7 +11,6 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -55,6 +54,7 @@ import org.assertj.core.api.Assertions;
 public class SearchSortIT {
 
 	private static final String INDEX_NAME = "IndexName";
+	private static final String ANOTHER_INDEX_NAME = "AnotherIndexName";
 
 	private static final int INDEX_ORDER_CHECKS = 10;
 
@@ -72,6 +72,8 @@ public class SearchSortIT {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
+	private StubMappingIndexManager anotherIndexManager;
+
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
@@ -79,6 +81,13 @@ public class SearchSortIT {
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
+				)
+				.withIndex(
+						ANOTHER_INDEX_NAME,
+						// Using the same mapping here. But a different mapping would work the same.
+						// What matters here is that is a different index.
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.anotherIndexManager = indexManager
 				)
 				.setup();
 
@@ -179,36 +188,46 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void lambda_caching() {
-		AtomicReference<SearchSort> cache = new AtomicReference<>();
-
-		Function<? super SearchSortFactoryContext, ? extends SearchSort> cachingContributor = c -> {
-			SearchSort result = cache.get();
-			if ( cache.get() == null ) {
-				result = c.byField( "string" ).onMissingValue().sortLast().toSort();
-				cache.set( result );
-			}
-			return result;
-		};
-
-		Assertions.assertThat( cache ).hasValue( null );
-
+	public void reuseSortInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = indexManager.createScope();
-		SearchQuery<DocumentReference> query;
+		SearchSort sort = scope
+				.sort().byField( "string" ).asc().onMissingValue().sortLast().toSort();
 
-		query = scope.query().predicate( f -> f.matchAll() )
-				.sort( cachingContributor.apply( scope.sort() ) )
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.matchAll() )
+				.sort( sort )
 				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		Assertions.assertThat( cache ).doesNotHaveValue( null );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		query = scope.query().predicate( f -> f.matchAll() )
-				.sort( cachingContributor.apply( scope.sort() ) )
+		// reuse the same sort instance on the same scope
+		query = scope.query()
+				.predicate( f -> f.matchAll() )
+				.sort( sort )
 				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+
+		// reuse the same sort instance on a different scope,
+		// targeting the same index
+		query = indexManager.createScope().query()
+				.predicate( f -> f.matchAll() )
+				.sort( sort )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+
+		sort = indexManager.createScope( anotherIndexManager )
+				.sort().byField( "string" ).asc().onMissingValue().sortLast().toSort();
+
+		// reuse the same sort instance on a different scope,
+		// targeting same indexes
+		query = anotherIndexManager.createScope( indexManager ).query()
+				.predicate( f -> f.matchAll() )
+				.sort( sort )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
 	@Test
