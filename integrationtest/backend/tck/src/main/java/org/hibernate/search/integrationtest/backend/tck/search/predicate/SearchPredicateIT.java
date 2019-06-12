@@ -10,7 +10,6 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -39,6 +38,7 @@ import org.assertj.core.api.Assertions;
 public class SearchPredicateIT {
 
 	private static final String INDEX_NAME = "IndexName";
+	private static final String ANOTHER_INDEX_NAME = "AnotherIndexName";
 
 	private static final String DOCUMENT_1 = "doc1";
 	private static final String DOCUMENT_2 = "doc2";
@@ -53,6 +53,8 @@ public class SearchPredicateIT {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
+	private StubMappingIndexManager anotherIndexManager;
+
 	@Before
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
@@ -60,6 +62,13 @@ public class SearchPredicateIT {
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
+				)
+				.withIndex(
+						ANOTHER_INDEX_NAME,
+						// Using the same mapping here. But a different mapping would work the same.
+						// What matters here is that is a different index.
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.anotherIndexManager = indexManager
 				)
 				.setup();
 
@@ -105,78 +114,90 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void match_caching_root() {
+	public void reuseRootPredicateInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = indexManager.createScope();
-
-		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
-
-		Function<? super SearchPredicateFactoryContext, SearchPredicate> cachingPredicateProducer = c -> {
-			if ( cache.get() == null ) {
-				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
-				cache.set( result );
-				return result;
-			}
-			else {
-				return cache.get();
-			}
-		};
-
-		Assertions.assertThat( cache ).hasValue( null );
+		SearchPredicate predicate = scope
+				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( cachingPredicateProducer.apply( scope.predicate() ) )
+				.predicate( predicate )
 				.toQuery();
 
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
 
-		Assertions.assertThat( cache ).doesNotHaveValue( null );
-
+		// reuse the same predicate instance on the same scope
 		query = scope.query()
-				.predicate( cachingPredicateProducer.apply( scope.predicate() ) )
+				.predicate( predicate )
 				.toQuery();
 
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// reuse the same predicate instance on a different scope,
+		// targeting the same index
+		query = indexManager.createScope().query()
+				.predicate( predicate )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+
+		predicate = indexManager.createScope( anotherIndexManager )
+				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+
+		// reuse the same predicate instance on a different scope,
+		// targeting same indexes
+		query = anotherIndexManager.createScope( indexManager ).query()
+				.predicate( predicate )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
-	public void match_caching_nonRoot() {
+	public void reuseNonRootPredicateInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = indexManager.createScope();
-
-		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
-
-		Function<? super SearchPredicateFactoryContext, SearchPredicate> cachingPredicateProducer = c -> {
-			if ( cache.get() == null ) {
-				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
-				cache.set( result );
-				return result;
-			}
-			else {
-				return cache.get();
-			}
-		};
-
-		Assertions.assertThat( cache ).hasValue( null );
+		final SearchPredicate predicate = scope
+				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool().must( cachingPredicateProducer.apply( f ) ) )
+				.predicate( f -> f.bool().must( predicate ) )
 				.toQuery();
 
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
 
-		Assertions.assertThat( cache ).doesNotHaveValue( null );
-
+		// reuse the same predicate instance on the same scope
 		query = scope.query()
+				.predicate( f -> f.bool().must( predicate ) )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// reuse the same predicate instance on a different scope,
+		// targeting the same index
+		query = indexManager.createScope().query()
+				.predicate( f -> f.bool().must( predicate ) )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+
+		final SearchPredicate multiIndexScopedPredicate = indexManager.createScope( anotherIndexManager )
+				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+
+		// reuse the same predicate instance on a different scope,
+		// targeting same indexes
+		query = anotherIndexManager.createScope( indexManager ).query()
+				.predicate( f -> f.bool().must( multiIndexScopedPredicate ) )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+
+		query = anotherIndexManager.createScope( indexManager ).query()
 				.predicate( f -> f.bool()
-						.should( cachingPredicateProducer.apply( f ) )
+						.should( multiIndexScopedPredicate )
 						.should( f.match().onField( "string" ).matching( STRING_2 ) )
 				)
 				.toQuery();
 
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
