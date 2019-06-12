@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.dsl.sort.impl;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.CompositeSortContext;
 import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
@@ -29,11 +28,6 @@ public class DefaultSearchSortFactoryContext<B> implements SearchSortFactoryCont
 
 	public DefaultSearchSortFactoryContext(SearchSortDslContext<?, B> dslContext) {
 		this.dslContext = dslContext;
-	}
-
-	@Override
-	public NonEmptySortContext by(SearchSort sort) {
-		return staticNonEmptyContext( dslContext.getFactory().toImplementation( sort ) );
 	}
 
 	@Override

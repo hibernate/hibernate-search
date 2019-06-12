@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -96,6 +97,52 @@ public class CompositeSearchSortIT {
 	}
 
 	@Test
+	public void byComposite_separateSort() {
+		StubMappingScope scope = indexManager.createScope();
+		SearchQuery<DocumentReference> query;
+
+		query = simpleQuery(
+				scope,
+				scope.sort().byComposite()
+						.add( scope.sort().byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() )
+						.add( scope.sort().byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc() )
+						.toSort()
+		);
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+		query = simpleQuery(
+				scope,
+				scope.sort().byComposite()
+						.add( scope.sort().byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() )
+						.add( scope.sort().byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc() )
+						.toSort()
+		);
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+
+		query = simpleQuery(
+				scope,
+				scope.sort().byComposite()
+						.add( scope.sort().byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() )
+						.add( scope.sort().byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc() )
+						.toSort()
+		);
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
+
+		query = simpleQuery(
+				scope,
+				scope.sort().byComposite()
+						.add( scope.sort().byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() )
+						.add( scope.sort().byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc() )
+						.toSort()
+		);
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
 	public void byComposite_empty() {
 		SearchQuery<DocumentReference> query;
 
@@ -141,15 +188,21 @@ public class CompositeSearchSortIT {
 
 	private SearchQuery<DocumentReference> simpleQuery(
 			Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor) {
-		return simpleQuery( sortContributor, indexManager.createScope() );
+		return simpleQuery( indexManager.createScope(), sortContributor );
 	}
 
-	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor,
-			StubMappingScope scope) {
+	private SearchQuery<DocumentReference> simpleQuery(StubMappingScope scope,
+			Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor) {
 		return scope.query()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
+				.toQuery();
+	}
+
+	private SearchQuery<DocumentReference> simpleQuery(StubMappingScope scope, SearchSort sort) {
+		return scope.query()
+				.predicate( f -> f.matchAll() )
+				.sort( sort )
 				.toQuery();
 	}
 

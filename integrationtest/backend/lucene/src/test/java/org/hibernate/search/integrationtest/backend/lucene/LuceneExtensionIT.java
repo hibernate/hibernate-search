@@ -392,7 +392,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.by( sort1 ).then().by( sort2 ).then().by( sort3 ) )
+				.sort( f -> f.byComposite().add( sort1 ).add( sort2 ).add( sort3 ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
@@ -408,7 +408,7 @@ public class LuceneExtensionIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.by( sort ) )
+				.sort( sort )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );

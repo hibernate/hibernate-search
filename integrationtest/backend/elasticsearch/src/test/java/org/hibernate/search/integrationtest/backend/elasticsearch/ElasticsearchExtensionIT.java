@@ -418,7 +418,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
+				.sort( f -> f.byComposite().add( sort1Asc ).add( sort2Asc ).add( sort3Asc ).add( sort4Asc ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
@@ -439,7 +439,7 @@ public class ElasticsearchExtensionIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
+				.sort( f -> f.byComposite().add( sort1Desc ).add( sort2Desc ).add( sort3Desc ).add( sort4Desc ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );

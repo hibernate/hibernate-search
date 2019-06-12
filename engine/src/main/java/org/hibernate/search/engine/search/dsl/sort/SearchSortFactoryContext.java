@@ -8,7 +8,6 @@ package org.hibernate.search.engine.search.dsl.sort;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 
@@ -78,15 +77,6 @@ public interface SearchSortFactoryContext {
 	default DistanceSortContext byDistance(String absoluteFieldPath, double latitude, double longitude) {
 		return byDistance( absoluteFieldPath, GeoPoint.of( latitude, longitude ) );
 	}
-
-	/**
-	 * Order by the given sort.
-	 *
-	 * @param sort A previously-built {@link SearchSort} object.
-	 * @return A context allowing to {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
-	 */
-	NonEmptySortContext by(SearchSort sort);
 
 	/**
 	 * Order by a sort composed of several elements.
