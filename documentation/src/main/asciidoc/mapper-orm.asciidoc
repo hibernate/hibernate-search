@@ -13,6 +13,4 @@ include::mapper-orm-indexing-automatic.asciidoc[]
 
 include::mapper-orm-indexing-explicit.asciidoc[]
 
-include::mapper-orm-query.asciidoc[]
-
 :leveloffset: -1

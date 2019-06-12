@@ -332,7 +332,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 
 Note that, while the examples above retrieved hits as managed entities,
 it is just one of the possible hit types.
-See <<mapper-orm-query-concept, the section about Search Queries>> for more information.
+See <<search-dsl-query>> for more information.
 
 [[getting-started-analysis]]
 == Analysis
