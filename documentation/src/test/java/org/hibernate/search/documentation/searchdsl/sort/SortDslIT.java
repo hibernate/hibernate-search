@@ -21,6 +21,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -71,6 +72,43 @@ public class SortDslIT {
 				)
 				.setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();
+	}
+
+	@Test
+	public void entryPoint() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// tag::entryPoint-lambdas[]
+			SearchSession searchSession = Search.getSearchSession( entityManager );
+
+			List<Book> result = searchSession.search( Book.class ) // <1>
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.byField( "pageCount" ).desc() // <2>
+							.then().byField( "title_sort" ) )
+					.fetchHits(); // <3>
+			// end::entryPoint-lambdas[]
+			assertThat( result )
+					.extracting( Book::getId )
+					.containsExactly( BOOK3_ID, BOOK1_ID, BOOK2_ID, BOOK4_ID );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// tag::entryPoint-objects[]
+			SearchSession searchSession = Search.getSearchSession( entityManager );
+
+			SearchScope<Book> scope = searchSession.scope( Book.class );
+
+			List<Book> result = scope.search()
+					.predicate( scope.predicate().matchAll().toPredicate() )
+					.sort( scope.sort()
+							.byField( "pageCount" ).desc()
+							.then().byField( "title_sort" )
+							.toSort() )
+					.fetchHits();
+			// end::entryPoint-objects[]
+			assertThat( result )
+					.extracting( Book::getId )
+					.containsExactly( BOOK3_ID, BOOK1_ID, BOOK2_ID, BOOK4_ID );
+		} );
 	}
 
 	@Test
