@@ -176,29 +176,6 @@ public class HibernateOrmSimpleMappingIT {
 		} );
 	}
 
-	@Test
-	public void projection_advanced() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			// tag::projection-advanced[]
-			SearchSession searchSession = Search.getSearchSession( entityManager );
-
-			List<MyEntityAndScoreBean<Book>> result = searchSession.search( Book.class )
-					.asProjection( f -> f.composite(
-							MyEntityAndScoreBean::new,
-							f.entity(),
-							f.score()
-					) )
-					.predicate( f -> f.matchAll() )
-					.fetchHits();
-			// end::projection-advanced[]
-
-			assertThat( result )
-					.extracting( "entity" )
-					.extracting( "title", String.class )
-					.containsExactlyInAnyOrder( BOOK1_TITLE, BOOK2_TITLE, BOOK3_TITLE );
-		} );
-	}
-
 	private void initData() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book1 = new Book();
@@ -216,17 +193,5 @@ public class HibernateOrmSimpleMappingIT {
 			entityManager.persist( book3 );
 		} );
 	}
-
-	// Note: ideally we should use "static" here, but it looks better without it in the documentation.
-	// tag::projection-advanced-bean[]
-	public class MyEntityAndScoreBean<T> {
-		public final T entity;
-		public final float score;
-		public MyEntityAndScoreBean(T entity, float score) {
-			this.entity = entity;
-			this.score = score;
-		}
-	}
-	// end::projection-advanced-bean[]
 
 }
