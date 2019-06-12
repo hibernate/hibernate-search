@@ -634,6 +634,8 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/Pred
 
 include::todo-placeholder.asciidoc[]
 
+// TODO add more than just examples in the sub-sections
+
 [[search-dsl-sort-concepts]]
 === Generality
 
@@ -674,10 +676,161 @@ The sort DSL offers more sort types, and multiple options for each type of sort.
 To learn more about the field sort, and all the other types of sort,
 refer to the following sections.
 
-////
-TODO The ORM mapper query section has a link pointing here and expects the section to
-include a detailed description of all available sorts.
-////
+[[search-dsl-sort-common]]
+=== Options common to multiple sort types
+
+include::todo-placeholder.asciidoc[]
+
+// TODO asc(), desc(), order(SortOrder), ...
+
+[[search-dsl-sort-score]]
+=== `byScore`: sort by matching score (relevance)
+
+.Sorting by relevance
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byScore]
+----
+====
+
+[[search-dsl-sort-index-order]]
+=== `byIndexOrder`: sort according to the order of documents on storage
+
+.Sorting according to the order of documents on storage
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byIndexOrder]
+----
+====
+
+[[search-dsl-sort-field]]
+=== `byField`: sort by field values
+
+.Sorting by field values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byField]
+----
+====
+
+// Search 5 anchors backward compatibility
+[[_handling_missing_values]]
+
+.Sorting by field values, with missing values in first position
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byField_onMissingValue_sortFirst]
+----
+====
+
+.Sorting by field values, with missing values in last position
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byField_onMissingValue_sortLast]
+----
+====
+
+.Sorting by field values, with missing values replaced by a given value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byField_onMissingValue_use]
+----
+====
+
+[[search-dsl-sort-distance]]
+=== `byDistance`: sort by distance to a point
+
+.Sorting by distance to a point
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byDistance]
+----
+====
+
+// TODO alternative syntaxes?
+
+[[search-dsl-sort-composite]]
+=== `byComposite`: combine sorts
+
+.Sorting by multiple composed sorts using `byComposite()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byComposite]
+----
+====
+
+.Sorting by multiple composed sorts using `then()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=then]
+----
+====
+
+.Easily composing sorts dynamically with the lambda syntax
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byComposite_dynamicParameters]
+----
+<1> Get a custom object holding the search parameters provided by the user through a web form, for example.
+<2> Call `.byComposite(Consumer)`.
+The consumer, implemented by a lambda expression, will receive a builder as an argument
+and will add sorts to that builder as necessary.
+<3> Inside the lambda, the code is free to do whatever is necessary before adding sorts.
+In this case, we iterate over user-selected sorts and add sorts accordingly.
+<4> The hits will be sorted according to sorts added by the lambda expression.
+====
+
+[[search-dsl-sort-extensions]]
+=== Backend-specific extensions
+
+include::todo-placeholder.asciidoc[]
+
+// TODO introduction to extensions or links to that introduction
+
+[[search-dsl-sort-extensions-lucene-from-lucene-sort]]
+==== Lucene: `fromLuceneSort`
+
+.Matching a native `org.apache.lucene.search.Sort`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=lucene-fromLuceneSort]
+----
+====
+
+[[search-dsl-sort-extensions-lucene-from-lucene-sort-field]]
+==== Lucene: `fromLuceneSortField`
+// Search 5 anchors backward compatibility
+[[_using_native_sorts_within_the_sort_dsl]]
+
+.Matching a native `org.apache.lucene.search.SortField`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=lucene-fromLuceneSortField]
+----
+====
+
+[[search-dsl-sort-extensions-elasticsearch-from-json]]
+==== Elasticsearch: `fromJson`
+
+.Matching a native Elasticsearch JSON sort
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=elasticsearch-fromJson]
+----
+====
 
 [[search-dsl-projection]]
 == Projection DSL

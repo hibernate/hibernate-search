@@ -53,5 +53,9 @@ class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConfigurer 
 		context.normalizer( "english" ).custom()
 				.tokenFilter( ASCIIFoldingFilterFactory.class )
 				.tokenFilter( LowerCaseFilterFactory.class );
+
+		context.normalizer( "name" ).custom()
+				.tokenFilter( ASCIIFoldingFilterFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class );
 	}
 }
