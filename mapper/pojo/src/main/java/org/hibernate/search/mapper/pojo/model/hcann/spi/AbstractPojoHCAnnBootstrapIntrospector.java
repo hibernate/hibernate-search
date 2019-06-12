@@ -19,10 +19,11 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.StreamHelper;
 
-public abstract class AbstractPojoHCAnnBootstrapIntrospector {
+public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private final ReflectionManager reflectionManager;
 	private final AnnotationHelper annotationHelper;
@@ -66,7 +67,15 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector {
 				.collect( xPropertiesByNameNoDuplicate() );
 	}
 
-	protected Class toClass(XClass xClass) {
+	protected <T> Stream<? extends Class<T>> getAscendingSuperClasses(XClass xClass) {
+		return PojoXClassOrdering.get().getAscendingSuperTypes( xClass ).map( this::toClass );
+	}
+
+	protected <T> Stream<? extends Class<T>> getDescendingSuperClasses(XClass xClass) {
+		return PojoXClassOrdering.get().getDescendingSuperTypes( xClass ).map( this::toClass );
+	}
+
+	private <T> Class<T> toClass(XClass xClass) {
 		return reflectionManager.toClass( xClass );
 	}
 

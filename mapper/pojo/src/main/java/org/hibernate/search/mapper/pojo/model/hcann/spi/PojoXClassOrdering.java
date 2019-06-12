@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.util.impl;
+package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -12,15 +12,15 @@ import java.util.stream.Stream;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.mapper.pojo.util.spi.AbstractPojoTypeOrdering;
 
-public final class HibernateOrmXClassOrdering extends AbstractPojoTypeOrdering<XClass> {
+final class PojoXClassOrdering extends AbstractPojoTypeOrdering<XClass> {
 
-	private static final HibernateOrmXClassOrdering INSTANCE = new HibernateOrmXClassOrdering();
+	private static final PojoXClassOrdering INSTANCE = new PojoXClassOrdering();
 
-	public static HibernateOrmXClassOrdering get() {
+	public static PojoXClassOrdering get() {
 		return INSTANCE;
 	}
 
-	private HibernateOrmXClassOrdering() {
+	private PojoXClassOrdering() {
 	}
 
 	@Override

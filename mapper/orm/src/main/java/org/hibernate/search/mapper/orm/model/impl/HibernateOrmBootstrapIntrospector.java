@@ -33,7 +33,6 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmPropertyHandleFactoryName;
-import org.hibernate.search.mapper.orm.util.impl.HibernateOrmXClassOrdering;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -160,7 +159,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> PojoRawTypeModel<T> getTypeModel(Class<T> clazz) {
+	public <T> HibernateOrmRawTypeModel<T> getTypeModel(Class<T> clazz) {
 		if ( clazz.isPrimitive() ) {
 			/*
 			 * We'll never manipulate the primitive type, as we're using generics everywhere,
@@ -168,7 +167,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 			 */
 			clazz = (Class<T>) ReflectionHelper.getPrimitiveWrapperType( clazz );
 		}
-		return (PojoRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
+		return (HibernateOrmRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
 	}
 
 	@Override
@@ -176,16 +175,12 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
 	}
 
-	@SuppressWarnings( "unchecked" )
 	<T> Stream<HibernateOrmRawTypeModel<? super T>> getAscendingSuperTypes(XClass xClass) {
-		return HibernateOrmXClassOrdering.get().getAscendingSuperTypes( xClass )
-				.map( superType -> (HibernateOrmRawTypeModel<? super T>) getTypeModel( superType ) );
+		return getAscendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
-	@SuppressWarnings( "unchecked" )
 	<T> Stream<HibernateOrmRawTypeModel<? super T>> getDescendingSuperTypes(XClass xClass) {
-		return HibernateOrmXClassOrdering.get().getDescendingSuperTypes( xClass )
-				.map( superType -> (HibernateOrmRawTypeModel<? super T>) getTypeModel( superType ) );
+		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
 	PropertyHandle<?> createPropertyHandle(String name, Member member,
@@ -211,11 +206,6 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		else {
 			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );
 		}
-	}
-
-	@SuppressWarnings( "unchecked" )
-	private PojoTypeModel<?> getTypeModel(XClass xClass) {
-		return getTypeModel( toClass( xClass ) );
 	}
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> type) {
