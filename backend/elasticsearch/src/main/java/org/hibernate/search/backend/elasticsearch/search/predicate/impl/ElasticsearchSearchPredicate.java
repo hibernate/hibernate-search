@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchPredicate;
 
 import com.google.gson.JsonObject;
@@ -14,9 +16,11 @@ class ElasticsearchSearchPredicate
 		implements SearchPredicate, ElasticsearchSearchPredicateBuilder {
 
 	private final ElasticsearchSearchPredicateBuilder delegate;
+	private final Set<String> indexNames;
 
-	ElasticsearchSearchPredicate(ElasticsearchSearchPredicateBuilder delegate) {
+	ElasticsearchSearchPredicate(ElasticsearchSearchPredicateBuilder delegate, Set<String> indexNames) {
 		this.delegate = delegate;
+		this.indexNames = indexNames;
 	}
 
 	@Override
@@ -24,4 +28,7 @@ class ElasticsearchSearchPredicate
 		return delegate.build( context );
 	}
 
+	public Set<String> getIndexNames() {
+		return indexNames;
+	}
 }
