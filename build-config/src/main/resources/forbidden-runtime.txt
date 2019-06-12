@@ -14,6 +14,7 @@ java.awt.**
 sun.**
 org.slf4j.**
 junit.framework.** @ Use the classes from org.junit, junit.framework is deprecated
+java.beans.** @ It will be removed from future versions of the JDK
 
 ################################################################################################################
 # Nobody should be using StringBuffer anymore
