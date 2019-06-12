@@ -23,7 +23,6 @@ import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.util.spi.JavaClassOrdering;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
@@ -96,17 +95,13 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	@SuppressWarnings( "unchecked" )
 	public Stream<JavaBeanTypeModel<? super T>> getAscendingSuperTypes() {
-		return JavaClassOrdering.get().getAscendingSuperTypes( clazz )
-				.map( clazz -> introspector.getTypeModel( (Class<? super T>) clazz ) );
+		return introspector.getAscendingSuperTypes( xClass );
 	}
 
 	@Override
-	@SuppressWarnings( "unchecked" )
 	public Stream<? extends PojoRawTypeModel<? super T>> getDescendingSuperTypes() {
-		return JavaClassOrdering.get().getDescendingSuperTypes( clazz )
-				.map( clazz -> introspector.getTypeModel( (Class<? super T>) clazz ) );
+		return introspector.getDescendingSuperTypes( xClass );
 	}
 
 	@Override
