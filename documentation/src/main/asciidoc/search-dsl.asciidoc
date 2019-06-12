@@ -3,28 +3,63 @@
 // Search 5 anchors backward compatibility
 [[search-query-querydsl]]
 
-include::todo-placeholder.asciidoc[]
+Beyond simply indexing, Hibernate Search also exposes high-level APIs to search these indexes
+without having to resort to native APIs.
+
+One key feature of these search APIs is the ability to use indexes to perform the search,
+but to return entities loaded *from the database*,
+effectively offering a new type of query for Hibernate ORM entities.
 
 [[search-dsl-query]]
 == Query DSL
 // Search 5 anchors backward compatibility
 [[search-query]]
 
+include::todo-placeholder.asciidoc[]
+
 [[search-dsl-query-generality]]
 === Generality
 // Search 5 anchors backward compatibility
 [[_building_a_hibernate_search_query]]
 
-include::todo-placeholder.asciidoc[]
+Preparing and executing a query requires just a few lines:
 
-////
-TODO explain the general concepts around querying the index.
-It's not as obvious as it seems, in particular in the Hibernate Search / ORM integration:
-we're querying the index, but getting the results from the database...
-See the Search 5 docs, it's probably explained in detail there.
-Also briefly explain the main features (predicate, sort, projection, ...)
-and point to the various other sections (predicate DSL, sort DSL, projection DSL, ...) where relevant.
-////
+.Executing a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=entryPoint]
+----
+<1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
+<2> Initiate a search query on the index mapped to the `Book` entity.
+<3> Define that only documents matching the given predicate should be returned.
+The predicate is created using a factory `f` passed as an argument to the lambda expression.
+See <<search-dsl-predicate>> for more information about predicates.
+<4> Build the query and fetch the results.
+<5> Retrieve the total number of matching entities.
+<6> Retrieve matching entities.
+====
+
+By default, the hits of a search query will be managed Hibernate ORM entities,
+bound to the entity manager used to create the search session.
+This provides all the benefits of Hibernate ORM,
+in particular the ability to navigate the entity graph to retrieve associated entities if necessary.
+
+The query DSL offers many features, detailed in the following sections.
+Some commonly used features include:
+
+* <<search-dsl-predicate,predicates>>,
+to define which documents must be included in the search results.
+* <<search-dsl-query-fetching-results,fetching the results differently>>:
+getting the hits directly as a list,
+using pagination, scrolling, etc.
+* <<search-dsl-sort,sorts>>,
+to order the hits in various ways:
+by score, by the value of a field, by distance to a point, etc.
+* <<search-dsl-projection,projections>>,
+to retrieve hits that are not just managed entities:
+data can be extracted from the index (field values),
+or even from both the index and the database.
 
 [[search-dsl-query-fetching-results]]
 === Fetching results
