@@ -586,7 +586,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/Pred
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/PredicateDslIT.java[tags=within-box]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/PredicateDslIT.java[tags=within-polygon]
 ----
 ====
 
@@ -839,6 +839,8 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT
 
 include::todo-placeholder.asciidoc[]
 
+// TODO add more than just examples in the sub-sections
+
 [[search-dsl-projection-concepts]]
 === Generality
 
@@ -903,10 +905,195 @@ The projection DSL offers more projection types, and multiple options for each t
 To learn more about the field projection, and all the other types of projection,
 refer to the following sections.
 
-////
-TODO The ORM mapper query section has a link pointing here and expects the section to
-include a detailed description of all available projections.
-////
+[[search-dsl-projection-common]]
+=== Options common to multiple projection types
+
+include::todo-placeholder.asciidoc[]
+
+// TODO common options, if there are any?
+
+[[search-dsl-projection-documentReference]]
+=== `documentReference`: return references to matched documents
+
+.Returning references to matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=documentReference]
+----
+====
+
+[[search-dsl-projection-reference]]
+=== `reference`: return references to matched entities
+
+.Returning references to matched entities
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=reference]
+----
+====
+
+[[search-dsl-projection-entity]]
+=== `entity`: return matched entities loaded from the database
+
+.Returning matched entities loaded from the database
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=entity]
+----
+====
+
+[[search-dsl-projection-field]]
+=== `field`: return field values from matched documents
+
+.Returning field values from matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=field]
+----
+====
+
+.Returning field values from matched documents, without specifying the field type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=field-noType]
+----
+====
+
+.Returning field values from matched documents, without converting the field value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=field-noProjectionConverter]
+----
+====
+
+[[search-dsl-projection-score]]
+=== `score`: return the score of matched documents
+
+.Returning the score of matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=score]
+----
+====
+
+[[search-dsl-projection-distance]]
+=== `distance`: return the distance to a point
+
+.Returning the distance to a point
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=distance]
+----
+====
+
+.Returning the distance to a point with a given distance unit
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=distance-unit]
+----
+====
+
+[[search-dsl-projection-composite]]
+=== `composite`: combine projections
+
+.Returning custom objects created from multiple projected values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=composite-customObject]
+----
+<1> Call `.composite(...)`.
+<2> Use the constructor of a custom object, `MyPair`, as the combining function.
+The combining function can be a `Function`, a `BiFunction`,
+or a `org.hibernate.search.util.common.function.TriFunction`.
+It will combine values returned by other projections and create an object returned by the composite projection.
+Depending on the type of function,
+either one, two, or three additional arguments are expected.
+<3> Define the first projection to combine as a projection on the `title` field,
+meaning the constructor of `MyPair` will be called for each matched document
+with the value of the `title` field as its first argument.
+<4> Define the second projection to combine as a projection on the `genre` field,
+meaning the constructor of `MyPair` will be called for each matched document
+with the value of the `genre` field as its second argument.
+<5> The hits will be the result of calling the combining function for each matched document,
+in this case `MyPair` instances.
+====
+
+.Returning a `List` of projected values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=composite-list]
+----
+<1> Call `.composite(...)`.
+<2> Define the first projection to combine as a projection on the `title` field,
+meaning the hits will be `List` instances with the value of the `title` field of the matched document at index `0`.
+<3> Define the second projection to combine as a projection on the `genre` field,
+meaning the hits will be `List` instances with the value of the `genre` field of the matched document at index `1`.
+<4> The hits will be `List` instances holding the result of the given projections, in order for each matched document.
+====
+
+[[search-dsl-projection-extensions]]
+=== Backend-specific extensions
+
+include::todo-placeholder.asciidoc[]
+
+// TODO introduction to extensions or links to that introduction
+
+[[search-dsl-projection-extensions-lucene-document]]
+==== Lucene: `document`
+
+.Returning the matched document as a native `org.apache.lucene.document.Document`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=lucene-document]
+----
+====
+
+// TODO explain limitations: not the original documents, fields reconstructed from what we find, not all fields presents, ...
+
+[[search-dsl-projection-extensions-lucene-explanation]]
+==== Lucene: `explanation`
+
+.Returning the score explanation as a native `org.apache.lucene.search.Explanation`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=lucene-explanation]
+----
+====
+
+[[search-dsl-projection-extensions-elasticsearch-source]]
+==== Elasticsearch: `source`
+
+.Returning the matched document source as a JSON-formatted String
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=elasticsearch-source]
+----
+====
+
+[[search-dsl-projection-extensions-elasticsearch-explanation]]
+==== Elasticsearch: `explanation`
+
+.Returning the score explanation as a JSON-formatted String
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/ProjectionDslIT.java[tags=elasticsearch-explanation]
+----
+====
 
 [[search-dsl-type-compatibility]]
 == Field types and compatibility
