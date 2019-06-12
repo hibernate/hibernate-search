@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
-import java.beans.Transient;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -77,7 +76,6 @@ public class DependencyIT {
 			public Integer getId() {
 				return id;
 			}
-			@Transient
 			@GenericField
 			@IndexingDependency(derivedFrom = @ObjectPath({}))
 			public String getDerived() {
@@ -112,7 +110,6 @@ public class DependencyIT {
 			public Integer getId() {
 				return id;
 			}
-			@Transient
 			@GenericField
 			@IndexingDependency(derivedFrom = @ObjectPath(@PropertyValue(propertyName = "invalidPath")))
 			public String getDerived() {
@@ -149,7 +146,6 @@ public class DependencyIT {
 				public B getB() {
 					return b;
 				}
-				@Transient
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "b"),
@@ -164,7 +160,6 @@ public class DependencyIT {
 				public C getC() {
 					return c;
 				}
-				@Transient
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "c"),
@@ -179,7 +174,6 @@ public class DependencyIT {
 				public A getA() {
 					return a;
 				}
-				@Transient
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "a"),
