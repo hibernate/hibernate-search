@@ -8,20 +8,27 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 
 class StubMapper implements Mapper<StubMappingPartialBuildState> {
 
+	private final ContextualFailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider;
 
 	private final Map<StubTypeModel, IndexManagerBuildingState<?>> indexManagerBuildingStates = new HashMap<>();
 
-	StubMapper(TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider) {
+	StubMapper(MappingBuildContext buildContext,
+			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider) {
+		this.failureCollector = buildContext.getFailureCollector();
 		this.contributorProvider = contributorProvider;
 	}
 
@@ -37,12 +44,26 @@ class StubMapper implements Mapper<StubMappingPartialBuildState> {
 	}
 
 	@Override
-	public StubMappingPartialBuildState prepareBuild() {
-		Map<String, StubMappingIndexManager> indexMappingsByTypeIdentifier = indexManagerBuildingStates.entrySet().stream()
-				.collect( Collectors.toMap(
-						e -> e.getKey().asString(),
-						e -> new StubMappingIndexManager( e.getValue().build() )
-				) );
+	public StubMappingPartialBuildState prepareBuild() throws MappingAbortedException {
+		Map<String, StubMappingIndexManager> indexMappingsByTypeIdentifier = new HashMap<>();
+		for ( Map.Entry<StubTypeModel, IndexManagerBuildingState<?>> entry : indexManagerBuildingStates.entrySet() ) {
+			StubTypeModel typeModel = entry.getKey();
+			try {
+				MappedIndexManager<?> indexManager = entry.getValue().build();
+				indexMappingsByTypeIdentifier.put(
+						typeModel.asString(),
+						new StubMappingIndexManager( indexManager )
+				);
+			}
+			catch (RuntimeException e) {
+				failureCollector.withContext( EventContexts.fromType( typeModel ) ).add( e );
+			}
+		}
+
+		if ( failureCollector.hasFailure() ) {
+			throw new MappingAbortedException();
+		}
+
 		return new StubMappingPartialBuildState( indexMappingsByTypeIdentifier );
 	}
 }
