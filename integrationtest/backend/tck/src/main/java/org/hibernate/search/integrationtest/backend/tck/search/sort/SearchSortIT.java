@@ -231,6 +231,39 @@ public class SearchSortIT {
 	}
 
 	@Test
+	public void reuseSortInstance_onScopeTargetingDifferentIndexes() {
+		StubMappingScope scope = indexManager.createScope();
+		SearchSort sort = scope
+				.sort().byField( "string" ).asc().onMissingValue().sortLast().toSort();
+
+		// reuse the same sort instance on a different scope,
+		// targeting a different index
+		SubTest.expectException( () ->
+				anotherIndexManager.createScope().query()
+						.predicate( f -> f.matchAll() )
+						.sort( sort )
+						.toQuery() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "scope targeting different indexes" )
+				.hasMessageContaining( INDEX_NAME )
+				.hasMessageContaining( ANOTHER_INDEX_NAME );
+
+		// reuse the same sort instance on a different scope,
+		// targeting different indexes
+		SubTest.expectException( () ->
+				indexManager.createScope( anotherIndexManager ).query()
+						.predicate( f -> f.matchAll() )
+						.sort( sort )
+						.toQuery() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "scope targeting different indexes" )
+				.hasMessageContaining( INDEX_NAME )
+				.hasMessageContaining( ANOTHER_INDEX_NAME );
+	}
+
+	@Test
 	public void byDistance_asc() {
 		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
 		assertThat( query )
