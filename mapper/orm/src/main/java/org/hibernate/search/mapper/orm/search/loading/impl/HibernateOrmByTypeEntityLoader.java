@@ -24,7 +24,7 @@ public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<PojoRe
 
 	private final Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType;
 
-	public HibernateOrmByTypeEntityLoader(Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType) {
+	HibernateOrmByTypeEntityLoader(Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType) {
 		this.delegatesByConcreteType = delegatesByConcreteType;
 	}
 
@@ -51,14 +51,13 @@ public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<PojoRe
 
 		// Re-create the list of objects in the same order
 		List<T> result = new ArrayList<>( references.size() );
-
-		for ( T value : objectsByReference.values() ) {
+		for ( PojoReference reference : references ) {
 			/*
 			 * TODO HSEARCH-3349 remove null values? We used to do it in Search 5...
-			 * Note that if we do, we have to change the javadoc
-			 * for this method and also change the other EntityLoader implementations.
+			 *  Note that if we do, we have to change the javadoc
+			 *  for this method and also change the other EntityLoader implementations.
 			 */
-			result.add( value );
+			result.add( objectsByReference.get( reference ) );
 		}
 		return result;
 	}

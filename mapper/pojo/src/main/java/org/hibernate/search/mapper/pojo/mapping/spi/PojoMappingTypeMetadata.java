@@ -6,17 +6,26 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
+import java.util.Optional;
+
 // FIXME HSEARCH-3203 Replace this temporary solution with an object-oriented one.
 public final class PojoMappingTypeMetadata {
 
 	private final boolean documentIdMappedToEntityId;
+	private final Optional<String> documentIdSourcePropertyName;
 
-	public PojoMappingTypeMetadata(boolean documentIdMappedToEntityId) {
+	public PojoMappingTypeMetadata(boolean documentIdMappedToEntityId,
+			Optional<String> documentIdSourcePropertyName) {
 		this.documentIdMappedToEntityId = documentIdMappedToEntityId;
+		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
 	}
 
 	public boolean isDocumentIdMappedToEntityId() {
 		return documentIdMappedToEntityId;
+	}
+
+	public Optional<String> getDocumentIdSourcePropertyName() {
+		return documentIdSourcePropertyName;
 	}
 
 }

@@ -7,15 +7,16 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
@@ -27,6 +28,7 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoScopeWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.StreamHelper;
 
 class PojoScopeDelegateImpl<E, E2> implements PojoScopeDelegate<E, E2> {
 
@@ -45,10 +47,13 @@ class PojoScopeDelegateImpl<E, E2> implements PojoScopeDelegate<E, E2> {
 	}
 
 	@Override
-	public Set<Class<? extends E>> getIncludedIndexedTypes() {
+	public Map<Class<? extends E>, PojoMappingTypeMetadata> getIncludedIndexedTypes() {
 		return targetedTypeManagers.stream()
-				.map( PojoIndexedTypeManager::getIndexedJavaClass )
-				.collect( Collectors.toCollection( LinkedHashSet::new ) );
+				.collect( StreamHelper.toMap(
+						PojoIndexedTypeManager::getIndexedJavaClass,
+						PojoIndexedTypeManager::getMappingMetadata,
+						LinkedHashMap::new
+				) );
 	}
 
 	@Override
