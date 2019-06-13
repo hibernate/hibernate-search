@@ -64,7 +64,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 			fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
 		}
 		return fieldComponent.getComponent()
-				.createFieldValueProjectionBuilder( absoluteFieldPath, expectedType, projectionConverter );
+				.createFieldValueProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, expectedType, projectionConverter );
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceProjectionBuilder( absoluteFieldPath, center );
+				.getComponent().createDistanceProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, center );
 	}
 
 	@Override

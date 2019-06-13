@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
@@ -23,10 +25,10 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  */
 public interface LuceneFieldProjectionBuilderFactory {
 
-	<U> FieldProjectionBuilder<U> createFieldValueProjectionBuilder(String absoluteFieldPath,
+	<U> FieldProjectionBuilder<U> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
 			Class<U> expectedType, ProjectionConverter projectionConverter);
 
-	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath, GeoPoint center);
+	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, GeoPoint center);
 
 	boolean hasCompatibleCodec(LuceneFieldProjectionBuilderFactory other);
 

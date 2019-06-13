@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -13,13 +15,15 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class LuceneDistanceToFieldProjectionBuilder implements DistanceToFieldProjectionBuilder {
 
+	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 
 	private final GeoPoint center;
 
 	private DistanceUnit unit = DistanceUnit.METERS;
 
-	public LuceneDistanceToFieldProjectionBuilder(String absoluteFieldPath, GeoPoint center) {
+	public LuceneDistanceToFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, GeoPoint center) {
+		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.center = center;
 	}
@@ -32,6 +36,6 @@ public class LuceneDistanceToFieldProjectionBuilder implements DistanceToFieldPr
 
 	@Override
 	public SearchProjection<Double> build() {
-		return new LuceneDistanceToFieldProjection( absoluteFieldPath, center, unit );
+		return new LuceneDistanceToFieldProjection( indexNames, absoluteFieldPath, center, unit );
 	}
 }
