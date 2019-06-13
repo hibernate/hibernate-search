@@ -133,7 +133,11 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		if ( !( projection instanceof LuceneSearchProjection ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
 		}
-		return (LuceneSearchProjection<?, T>) projection;
+		LuceneSearchProjection<?, T> casted = (LuceneSearchProjection<?, T>) projection;
+		if ( !scopeModel.getIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.projectionDefinedOnDifferentIndexes( projection, casted.getIndexNames(), scopeModel.getIndexNames() );
+		}
+		return casted;
 	}
 
 	public SearchProjectionBuilder<Document> document() {
