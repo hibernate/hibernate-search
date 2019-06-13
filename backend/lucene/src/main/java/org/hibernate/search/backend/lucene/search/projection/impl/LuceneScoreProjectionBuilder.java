@@ -12,13 +12,7 @@ import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 public class LuceneScoreProjectionBuilder implements ScoreProjectionBuilder {
 
-	private static final LuceneScoreProjectionBuilder INSTANCE = new LuceneScoreProjectionBuilder();
-
-	public static LuceneScoreProjectionBuilder get() {
-		return INSTANCE;
-	}
-
-	private LuceneScoreProjectionBuilder() {
+	public LuceneScoreProjectionBuilder() {
 	}
 
 	@Override

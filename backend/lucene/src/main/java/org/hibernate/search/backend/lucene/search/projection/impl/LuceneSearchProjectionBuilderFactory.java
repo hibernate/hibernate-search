@@ -53,7 +53,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
-		return LuceneDocumentReferenceProjectionBuilder.get();
+		return new LuceneDocumentReferenceProjectionBuilder();
 	}
 
 	@Override
@@ -69,17 +69,17 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return LuceneEntityProjectionBuilder.get();
+		return new LuceneEntityProjectionBuilder();
 	}
 
 	@Override
 	public <R> ReferenceProjectionBuilder<R> reference() {
-		return LuceneReferenceProjectionBuilder.get();
+		return new LuceneReferenceProjectionBuilder();
 	}
 
 	@Override
 	public ScoreProjectionBuilder score() {
-		return LuceneScoreProjectionBuilder.get();
+		return new LuceneScoreProjectionBuilder();
 	}
 
 	@Override
@@ -137,11 +137,11 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	}
 
 	public SearchProjectionBuilder<Document> document() {
-		return LuceneDocumentProjectionBuilder.get();
+		return new LuceneDocumentProjectionBuilder();
 	}
 
 	public SearchProjectionBuilder<Explanation> explanation() {
-		return LuceneExplanationProjectionBuilder.get();
+		return new LuceneExplanationProjectionBuilder();
 	}
 
 	private static class ProjectionBuilderFactoryRetrievalStrategy

@@ -14,13 +14,7 @@ import org.apache.lucene.search.Explanation;
 
 public class LuceneExplanationProjectionBuilder implements SearchProjectionBuilder<Explanation> {
 
-	private static final LuceneExplanationProjectionBuilder INSTANCE = new LuceneExplanationProjectionBuilder();
-
-	public static LuceneExplanationProjectionBuilder get() {
-		return INSTANCE;
-	}
-
-	private LuceneExplanationProjectionBuilder() {
+	public LuceneExplanationProjectionBuilder() {
 	}
 
 	@Override
