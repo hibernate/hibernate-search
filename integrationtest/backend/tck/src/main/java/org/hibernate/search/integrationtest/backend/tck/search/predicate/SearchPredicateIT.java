@@ -153,6 +153,37 @@ public class SearchPredicateIT {
 	}
 
 	@Test
+	public void reuseRootPredicateInstance_onScopeTargetingDifferentIndexes() {
+		StubMappingScope scope = indexManager.createScope();
+		SearchPredicate predicate = scope
+				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+
+		// reuse the same predicate instance on a different scope,
+		// targeting a different index
+		SubTest.expectException( () ->
+				anotherIndexManager.createScope().query()
+						.predicate( predicate )
+						.toQuery() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "scope targeting different indexes" )
+				.hasMessageContaining( INDEX_NAME )
+				.hasMessageContaining( ANOTHER_INDEX_NAME );
+
+		// reuse the same predicate instance on a different scope,
+		// targeting different indexes
+		SubTest.expectException( () ->
+				indexManager.createScope( anotherIndexManager ).query()
+						.predicate( predicate )
+						.toQuery() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "scope targeting different indexes" )
+				.hasMessageContaining( INDEX_NAME )
+				.hasMessageContaining( ANOTHER_INDEX_NAME );
+	}
+
+	@Test
 	public void reuseNonRootPredicateInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = indexManager.createScope();
 		final SearchPredicate predicate = scope
@@ -198,6 +229,37 @@ public class SearchPredicateIT {
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
+	public void reuseNonRootPredicateInstance_onScopeTargetingDifferentIndexes() {
+		StubMappingScope scope = indexManager.createScope();
+		SearchPredicate predicate = scope
+				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+
+		// reuse the same predicate instance on a different scope,
+		// targeting a different index
+		SubTest.expectException( () ->
+				anotherIndexManager.createScope().query()
+						.predicate( f -> f.bool().must( predicate ) )
+						.toQuery() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "scope targeting different indexes" )
+				.hasMessageContaining( INDEX_NAME )
+				.hasMessageContaining( ANOTHER_INDEX_NAME );
+
+		// reuse the same predicate instance on a different scope,
+		// targeting different indexes
+		SubTest.expectException( () ->
+				indexManager.createScope( anotherIndexManager ).query()
+						.predicate( f -> f.bool().must( predicate ) )
+						.toQuery() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "scope targeting different indexes" )
+				.hasMessageContaining( INDEX_NAME )
+				.hasMessageContaining( ANOTHER_INDEX_NAME );
 	}
 
 	@Test

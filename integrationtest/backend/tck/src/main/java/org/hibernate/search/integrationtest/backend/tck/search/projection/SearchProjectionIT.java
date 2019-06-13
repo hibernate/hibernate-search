@@ -364,6 +364,39 @@ public class SearchProjectionIT extends EasyMockSupport {
 	}
 
 	@Test
+	public void reuseProjectionInstance_onScopeTargetingDifferentIndexes() {
+		StubMappingScope scope = indexManager.createScope();
+		SearchProjection<String> projection = scope.projection()
+				.field( indexMapping.string1Field.relativeFieldName, String.class ).toProjection();
+
+		// reuse the same projection instance on a different scope,
+		// targeting a different index
+		SubTest.expectException( () ->
+				anotherIndexManager.createScope().query()
+						.asProjection( projection )
+						.predicate( f -> f.matchAll() )
+						.toQuery() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "scope targeting different indexes" )
+				.hasMessageContaining( INDEX_NAME )
+				.hasMessageContaining( ANOTHER_INDEX_NAME );
+
+		// reuse the same projection instance on a different scope,
+		// targeting different indexes
+		SubTest.expectException( () ->
+				indexManager.createScope( anotherIndexManager ).query()
+						.asProjection( projection )
+						.predicate( f -> f.matchAll() )
+						.toQuery() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "scope targeting different indexes" )
+				.hasMessageContaining( INDEX_NAME )
+				.hasMessageContaining( ANOTHER_INDEX_NAME );
+	}
+
+	@Test
 	public void extension() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<String> query;
