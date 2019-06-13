@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.projection.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjectionBuilder;
@@ -41,7 +42,7 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 
 	@Override
 	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
-	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
+	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
 			Class<T> expectedType, ProjectionConverter projectionConverter) {
 		checkProjectable( absoluteFieldPath, projectable );
 
@@ -51,11 +52,11 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
-		return (FieldProjectionBuilder<T>) new ElasticsearchFieldProjectionBuilder<>( absoluteFieldPath, requestConverter, codec );
+		return (FieldProjectionBuilder<T>) new ElasticsearchFieldProjectionBuilder<>( indexNames, absoluteFieldPath, requestConverter, codec );
 	}
 
 	@Override
-	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath,
+	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
 			GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )

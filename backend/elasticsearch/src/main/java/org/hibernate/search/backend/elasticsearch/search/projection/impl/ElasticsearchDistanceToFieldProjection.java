@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -28,6 +29,7 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 
 	private static final Pattern NON_DIGITS_PATTERN = Pattern.compile( "\\D" );
 
+	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 
 	private final GeoPoint center;
@@ -36,7 +38,8 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 
 	private final String scriptFieldName;
 
-	ElasticsearchDistanceToFieldProjection(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
+	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
+		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.center = center;
 		this.unit = unit;
@@ -92,6 +95,11 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	public Double transform(LoadingResult<?> loadingResult, Double extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
 
@@ -14,8 +16,8 @@ class ElasticsearchReferenceProjectionBuilder<R> implements ReferenceProjectionB
 
 	private final ElasticsearchReferenceProjection<R> projection;
 
-	ElasticsearchReferenceProjectionBuilder(DocumentReferenceExtractorHelper helper) {
-		this.projection = new ElasticsearchReferenceProjection<>( helper );
+	ElasticsearchReferenceProjectionBuilder(Set<String> indexNames, DocumentReferenceExtractorHelper helper) {
+		this.projection = new ElasticsearchReferenceProjection<>( indexNames, helper );
 	}
 
 	@Override

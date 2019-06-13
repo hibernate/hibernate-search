@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
@@ -23,10 +25,11 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  */
 public interface ElasticsearchFieldProjectionBuilderFactory {
 
-	<T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
+	<T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
 			Class<T> expectedType, ProjectionConverter projectionConverter);
 
-	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath, GeoPoint center);
+	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
+			GeoPoint center);
 
 	boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory other);
 

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -19,9 +21,11 @@ class ElasticsearchExplanationProjection implements ElasticsearchSearchProjectio
 	private static final JsonAccessor<Boolean> REQUEST_EXPLAIN_ACCESSOR = JsonAccessor.root().property( "explain" ).asBoolean();
 	private static final JsonObjectAccessor HIT_EXPLANATION_ACCESSOR = JsonAccessor.root().property( "_explanation" ).asObject();
 
+	private final Set<String> indexNames;
 	private final Gson gson;
 
-	ElasticsearchExplanationProjection(Gson gson) {
+	ElasticsearchExplanationProjection(Set<String> indexNames, Gson gson) {
+		this.indexNames = indexNames;
 		this.gson = gson;
 	}
 
@@ -41,6 +45,11 @@ class ElasticsearchExplanationProjection implements ElasticsearchSearchProjectio
 	public String transform(LoadingResult<?> loadingResult, String extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

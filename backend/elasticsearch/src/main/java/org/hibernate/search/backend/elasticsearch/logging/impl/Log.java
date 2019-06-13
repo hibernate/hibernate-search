@@ -523,4 +523,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 73, value = "The sort '%1$s' is defined on a scope targeting different indexes."
 			+ " Sort is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
 	SearchException sortDefinedOnDifferentIndexes(SearchSort predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
+
+	@Message(id = ID_OFFSET_3 + 74, value = "The projection '%1$s' is defined on a scope targeting different indexes."
+			+ " Projection is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
 }

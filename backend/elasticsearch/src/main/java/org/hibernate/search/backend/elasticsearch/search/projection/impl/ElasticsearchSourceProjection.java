@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
@@ -25,9 +26,11 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Str
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 	private static final JsonPrimitive WILDCARD_ALL = new JsonPrimitive( "*" );
 
+	private final Set<String> indexNames;
 	private final Gson gson;
 
-	ElasticsearchSourceProjection(Gson gson) {
+	ElasticsearchSourceProjection(Set<String> indexNames, Gson gson) {
+		this.indexNames = indexNames;
 		this.gson = gson;
 	}
 
@@ -55,6 +58,11 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Str
 	public String transform(LoadingResult<?> loadingResult, String extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override
