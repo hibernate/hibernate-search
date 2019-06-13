@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.mapping.impl;
+package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.function.Supplier;
 
@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionC
  * @param <E> The entity type mapped to the index.
  * @param <D> The document type for the index.
  */
-class PojoDocumentContributor<D extends DocumentElement, E> implements DocumentContributor<D> {
+public final class PojoDocumentContributor<D extends DocumentElement, E> implements DocumentContributor<D> {
 
 	private final PojoIndexingProcessor<E> processor;
 
@@ -25,7 +25,7 @@ class PojoDocumentContributor<D extends DocumentElement, E> implements DocumentC
 
 	private final Supplier<E> entitySupplier;
 
-	PojoDocumentContributor(PojoIndexingProcessor<E> processor, AbstractPojoSessionContextImplementor sessionContext,
+	public PojoDocumentContributor(PojoIndexingProcessor<E> processor, AbstractPojoSessionContextImplementor sessionContext,
 			Supplier<E> entitySupplier) {
 		this.processor = processor;
 		this.sessionContext = sessionContext;

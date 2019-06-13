@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.mapping.impl;
+package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 public class PojoTypeDocumentWorkExecutor<I, E, D extends DocumentElement> {
@@ -27,7 +28,7 @@ public class PojoTypeDocumentWorkExecutor<I, E, D extends DocumentElement> {
 		this.delegate = delegate;
 	}
 
-	public CompletableFuture<?> add(Object providedId, Object entity) {
+	CompletableFuture<?> add(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
 		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		DocumentReferenceProvider referenceProvider = typeManager.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );

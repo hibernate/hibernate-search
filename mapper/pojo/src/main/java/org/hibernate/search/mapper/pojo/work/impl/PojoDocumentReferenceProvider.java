@@ -4,17 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.mapping.impl;
+package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
+import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 /**
  * @param <E> The entity type mapped to an index.
  */
-class PojoDocumentReferenceProvider<E> implements DocumentReferenceProvider {
+public final class PojoDocumentReferenceProvider<E> implements DocumentReferenceProvider {
 
 	private final RoutingKeyProvider<E> routingKeyProvider;
 
@@ -23,7 +24,7 @@ class PojoDocumentReferenceProvider<E> implements DocumentReferenceProvider {
 	private final String documentIdentifier;
 	private final Supplier<E> entitySupplier;
 
-	PojoDocumentReferenceProvider(
+	public PojoDocumentReferenceProvider(
 			RoutingKeyProvider<E> routingKeyProvider,
 			AbstractPojoSessionContextImplementor sessionContext,
 			Object identifier,
