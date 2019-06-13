@@ -56,11 +56,8 @@ public interface SearchSessionWritePlan {
 	 * until they are re-indexed manually.
 	 *
 	 * @param entityClass The class of the entity to delete from the index.
-	 * @param providedId An identifier value used to generate the identifier of the document to delete from the index.
-	 * Generally this should be the entity identifier.
-	 * If the document identifier is not generated from the JPA identifier,
-	 * i.e. if a @DocumentId annotation was added on a property that is not the JPA identifier,
-	 * then the value of that property should be passed instead.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * @throws org.hibernate.search.util.common.SearchException If the entity type is not indexed directly
 	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
 	 */

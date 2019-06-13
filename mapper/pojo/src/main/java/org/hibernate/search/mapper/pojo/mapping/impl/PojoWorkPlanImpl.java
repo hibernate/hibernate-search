@@ -58,10 +58,10 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	}
 
 	@Override
-	public void add(Object id, Object entity) {
+	public void add(Object providedId, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
 		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
-		delegate.add( id, entity );
+		delegate.add( providedId, entity );
 	}
 
 	@Override
@@ -70,10 +70,10 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	}
 
 	@Override
-	public void update(Object id, Object entity) {
+	public void update(Object providedId, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
 		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
-		delegate.update( id, entity );
+		delegate.update( providedId, entity );
 	}
 
 	@Override
@@ -82,10 +82,10 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	}
 
 	@Override
-	public void update(Object id, Object entity, String... dirtyPaths) {
+	public void update(Object providedId, Object entity, String... dirtyPaths) {
 		Class<?> clazz = getIntrospector().getClass( entity );
 		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
-		delegate.update( id, entity, dirtyPaths );
+		delegate.update( providedId, entity, dirtyPaths );
 	}
 
 	@Override
@@ -94,16 +94,16 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	}
 
 	@Override
-	public void delete(Object id, Object entity) {
+	public void delete(Object providedId, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
 		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
-		delegate.delete( id, entity );
+		delegate.delete( providedId, entity );
 	}
 
 	@Override
-	public void purge(Class<?> clazz, Object id) {
+	public void purge(Class<?> clazz, Object providedId) {
 		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
-		delegate.purge( id );
+		delegate.purge( providedId );
 	}
 
 	@Override

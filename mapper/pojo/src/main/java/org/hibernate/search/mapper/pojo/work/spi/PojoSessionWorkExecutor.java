@@ -10,8 +10,28 @@ import java.util.concurrent.CompletableFuture;
 
 public interface PojoSessionWorkExecutor {
 
-	CompletableFuture<?> add(Object id, Object entity);
+	/**
+	 * Add an entity to the index, assuming that the entity is absent from the index.
+	 * <p>
+	 * <strong>Note:</strong> depending on the backend, this may lead to errors or duplicate entries in the index
+	 * if the entity was actually already present in the index before this call.
+	 *
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param entity The entity to add to the index.
+	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 */
+	CompletableFuture<?> add(Object providedId, Object entity);
 
+	/**
+	 * Add an entity to the index, assuming that the entity is absent from the index.
+	 * <p>
+	 * Shorthand for {@code add(null, entity)}; see {@link #add(Object, Object)}.
+	 *
+	 * @param entity The entity to add to the index.
+	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 */
 	CompletableFuture<?> add(Object entity);
 
 }

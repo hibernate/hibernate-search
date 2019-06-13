@@ -48,7 +48,7 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 	}
 
 	@Override
-	public CompletableFuture<?> add(Object id, Object entity) {
+	public CompletableFuture<?> add(Object providedId, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
 		PojoTypeDocumentWorkExecutor<?, ?, ?> typeExecutor = this.typeExecutors.get( clazz );
 		if ( typeExecutor == null ) {
@@ -56,7 +56,7 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 			typeExecutors.put( clazz, typeExecutor );
 		}
 
-		return typeExecutor.add( id, entity );
+		return typeExecutor.add( providedId, entity );
 	}
 
 	private PojoTypeDocumentWorkExecutor<?, ?, ?> createTypeDocumentExecutor(Class<?> clazz) {

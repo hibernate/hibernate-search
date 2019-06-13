@@ -25,8 +25,8 @@ public class SearchWorkPlanImpl implements SearchWorkPlan {
 	}
 
 	@Override
-	public void add(Object id, Object entity) {
-		delegate.add( id, entity );
+	public void add(Object providedId, Object entity) {
+		delegate.add( providedId, entity );
 	}
 
 	@Override
@@ -35,8 +35,8 @@ public class SearchWorkPlanImpl implements SearchWorkPlan {
 	}
 
 	@Override
-	public void update(Object id, Object entity) {
-		delegate.update( id, entity );
+	public void update(Object providedId, Object entity) {
+		delegate.update( providedId, entity );
 	}
 
 	@Override
@@ -45,8 +45,8 @@ public class SearchWorkPlanImpl implements SearchWorkPlan {
 	}
 
 	@Override
-	public void update(Object id, Object entity, String... dirtyPaths) {
-		delegate.update( id, entity, dirtyPaths );
+	public void update(Object providedId, Object entity, String... dirtyPaths) {
+		delegate.update( providedId, entity, dirtyPaths );
 	}
 
 	@Override
@@ -55,8 +55,8 @@ public class SearchWorkPlanImpl implements SearchWorkPlan {
 	}
 
 	@Override
-	public void delete(Object id, Object entity) {
-		delegate.delete( id, entity );
+	public void delete(Object providedId, Object entity) {
+		delegate.delete( providedId, entity );
 	}
 
 	public void prepare() {
