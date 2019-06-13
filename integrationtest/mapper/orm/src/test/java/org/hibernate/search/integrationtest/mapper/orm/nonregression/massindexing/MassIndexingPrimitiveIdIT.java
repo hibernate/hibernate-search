@@ -31,7 +31,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-3529")
-public class PrimitiveIdMassIndexingIT {
+public class MassIndexingPrimitiveIdIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );

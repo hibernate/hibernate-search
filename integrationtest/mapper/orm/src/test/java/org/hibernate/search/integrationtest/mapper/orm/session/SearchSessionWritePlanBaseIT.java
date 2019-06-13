@@ -33,7 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-3049")
-public class SearchSessionWritePlanIT {
+public class SearchSessionWritePlanBaseIT {
 
 	private static final String BACKEND1_NAME = "stubBackend1";
 	private static final String BACKEND2_NAME = "stubBackend2";
