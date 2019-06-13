@@ -252,7 +252,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		}
 
 		void createMapper(IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
-
 			TypeMetadataContributorProviderImpl contributorProvider = new TypeMetadataContributorProviderImpl();
 			mapper = mappingInitiator.createMapper( buildContext, contributorProvider );
 
@@ -276,10 +275,17 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 								.add( e );
 						continue;
 					}
-					mapper.addIndexed(
-							typeModel,
-							indexManagerBuildingState
-					);
+					try {
+						mapper.addIndexed(
+								typeModel,
+								indexManagerBuildingState
+						);
+					}
+					catch (RuntimeException e) {
+						buildContext.getFailureCollector()
+								.withContext( EventContexts.fromType( typeModel ) )
+								.add( e );
+					}
 				}
 			}
 		}

@@ -46,7 +46,7 @@ public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataCo
 	@Override
 	public Mapper<StubMappingPartialBuildState> createMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider) {
-		return new StubMapper( contributorProvider );
+		return new StubMapper( buildContext, contributorProvider );
 	}
 
 }

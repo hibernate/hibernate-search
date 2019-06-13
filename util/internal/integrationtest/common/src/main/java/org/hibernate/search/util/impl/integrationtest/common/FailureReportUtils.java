@@ -87,6 +87,10 @@ public final class FailureReportUtils {
 			return contextLiteral( "index '" + exactIndexName + "'" );
 		}
 
+		public FailureReportPatternBuilder indexSchemaRootContext() {
+			return contextLiteral( "index schema root" );
+		}
+
 		public FailureReportPatternBuilder backendContext(String exactBackendName) {
 			return contextLiteral( "backend '" + exactBackendName + "'" );
 		}
