@@ -6,17 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 
 
 public class LuceneEntityProjectionBuilder<E> implements EntityProjectionBuilder<E> {
 
-	public LuceneEntityProjectionBuilder() {
+	private final Set<String> indexNames;
+
+	public LuceneEntityProjectionBuilder(Set<String> indexNames) {
+		this.indexNames = indexNames;
 	}
 
 	@Override
 	public SearchProjection<E> build() {
-		return new LuceneEntityProjection();
+		return new LuceneEntityProjection( indexNames );
 	}
 }

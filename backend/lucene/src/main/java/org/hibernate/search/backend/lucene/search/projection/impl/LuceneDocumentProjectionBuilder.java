@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
@@ -14,11 +16,14 @@ import org.apache.lucene.document.Document;
 
 public class LuceneDocumentProjectionBuilder implements SearchProjectionBuilder<Document> {
 
-	public LuceneDocumentProjectionBuilder() {
+	private final Set<String> indexNames;
+
+	public LuceneDocumentProjectionBuilder(Set<String> indexNames) {
+		this.indexNames = indexNames;
 	}
 
 	@Override
 	public SearchProjection<Document> build() {
-		return new LuceneDocumentProjection();
+		return new LuceneDocumentProjection( indexNames );
 	}
 }

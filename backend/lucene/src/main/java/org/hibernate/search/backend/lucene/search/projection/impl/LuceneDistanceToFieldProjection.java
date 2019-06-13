@@ -57,6 +57,7 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 		return extractedData;
 	}
 
+	@Override
 	public Set<String> getIndexNames() {
 		return indexNames;
 	}

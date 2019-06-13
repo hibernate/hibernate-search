@@ -6,17 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
 
 
 public class LuceneReferenceProjectionBuilder<R> implements ReferenceProjectionBuilder<R> {
 
-	public LuceneReferenceProjectionBuilder() {
+	private final Set<String> indexNames;
+
+	public LuceneReferenceProjectionBuilder(Set<String> indexNames) {
+		this.indexNames = indexNames;
 	}
 
 	@Override
 	public SearchProjection<R> build() {
-		return new LuceneReferenceProjection();
+		return new LuceneReferenceProjection( indexNames );
 	}
 }

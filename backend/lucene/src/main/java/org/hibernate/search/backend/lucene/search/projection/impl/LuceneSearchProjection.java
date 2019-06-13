@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
@@ -63,4 +65,6 @@ public interface LuceneSearchProjection<E, P> extends SearchProjection<P>, Lucen
 			Object extractedData, SearchProjectionTransformContext context) {
 		return (Z) ( (LuceneSearchProjection) projection ).transform( loadingResult, extractedData, context );
 	}
+
+	Set<String> getIndexNames();
 }
