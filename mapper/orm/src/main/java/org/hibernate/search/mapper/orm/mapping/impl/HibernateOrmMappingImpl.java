@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import java.lang.invoke.MethodHandles;
 import javax.persistence.EntityManager;
 
-import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -22,6 +21,7 @@ import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<HibernateOrmMapping>
@@ -55,13 +55,8 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	}
 
 	@Override
-	public boolean isWorkable(Class<?> type) {
-		return getDelegate().isWorkable( type );
-	}
-
-	@Override
-	public boolean isWorkable(Object entity) {
-		return isWorkable( Hibernate.getClass( entity ) );
+	public PojoMappingTypeMetadata getMappingTypeMetadata(Class<?> type) {
+		return getDelegate().getMappingTypeMetadata( type );
 	}
 
 	private SearchSessionBuilder createSessionBuilder(EntityManager entityManager) {

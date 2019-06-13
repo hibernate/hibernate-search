@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.event.impl;
 
+import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.Hibernate;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.event.spi.AbstractCollectionEvent;
 import org.hibernate.event.spi.FlushEvent;
@@ -28,6 +30,7 @@ import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -69,11 +72,13 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostDelete(PostDeleteEvent event) {
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		if ( isWorkable( context, entity ) ) {
+		PojoMappingTypeMetadata metadata = getMappingTypeMetadata( context, entity );
+		if ( metadata != null ) {
+			Object providedId = toProvidedId( metadata, event.getId() );
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
 			context.getCurrentWorkPlan( event.getSession() )
-					.delete( event.getId(), entity );
+					.delete( providedId, entity );
 		}
 	}
 
@@ -81,9 +86,11 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostInsert(PostInsertEvent event) {
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		if ( isWorkable( context, entity ) ) {
+		PojoMappingTypeMetadata metadata = getMappingTypeMetadata( context, entity );
+		if ( metadata != null ) {
+			Object providedId = toProvidedId( metadata, event.getId() );
 			context.getCurrentWorkPlan( event.getSession() )
-					.add( event.getId(), entity );
+					.add( providedId, entity );
 		}
 	}
 
@@ -91,14 +98,25 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostUpdate(PostUpdateEvent event) {
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		if ( isWorkable( context, entity ) ) {
+		PojoMappingTypeMetadata metadata = getMappingTypeMetadata( context, entity );
+		if ( metadata != null ) {
 			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
+			Object providedId = toProvidedId( metadata, event.getId() );
 			if ( dirtyCheckingEnabled ) {
-				workPlan.update( event.getId(), entity, getDirtyPropertyNames( event ) );
+				workPlan.update( providedId, entity, getDirtyPropertyNames( event ) );
 			}
 			else {
-				workPlan.update( event.getId(), entity );
+				workPlan.update( providedId, entity );
 			}
+		}
+	}
+
+	private Object toProvidedId(PojoMappingTypeMetadata metadata, Serializable entityId) {
+		if ( metadata.isDocumentIdMappedToEntityId() ) {
+			return entityId;
+		}
+		else {
+			return null;
 		}
 	}
 
@@ -142,8 +160,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		return context;
 	}
 
-	private boolean isWorkable(HibernateSearchContextService context, Object entity) {
-		return context.getMapping().isWorkable( entity );
+	private PojoMappingTypeMetadata getMappingTypeMetadata(HibernateSearchContextService context, Object entity) {
+		return context.getMapping().getMappingTypeMetadata( Hibernate.getClass( entity ) );
 	}
 
 	// TODO HSEARCH-3068 handle the "simulated" transaction when a Flush listener is registered
@@ -172,8 +190,11 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 
-		if ( isWorkable( context, entity ) ) {
+		PojoMappingTypeMetadata metadata = getMappingTypeMetadata( context, entity );
+		if ( metadata != null ) {
 			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
+			Object providedId = toProvidedId( metadata, event.getAffectedOwnerIdOrNull() );
+
 			if ( dirtyCheckingEnabled ) {
 				PersistentCollection persistentCollection = event.getCollection();
 				String collectionRole = null;
@@ -187,18 +208,18 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 					 * which can then decide whether to reindex based on whether the collection
 					 * has any impact on indexing.
 					 */
-					workPlan.update( event.getAffectedOwnerIdOrNull(), entity, collectionRole );
+					workPlan.update( providedId, entity, collectionRole );
 				}
 				else {
 					/*
 					 * We don't know which collection is being changed,
 					 * so we have to default to reindexing, just in case.
 					 */
-					workPlan.update( event.getAffectedOwnerIdOrNull(), entity );
+					workPlan.update( providedId, entity );
 				}
 			}
 			else {
-				workPlan.update( event.getAffectedOwnerIdOrNull(), entity );
+				workPlan.update( providedId, entity );
 			}
 		}
 	}

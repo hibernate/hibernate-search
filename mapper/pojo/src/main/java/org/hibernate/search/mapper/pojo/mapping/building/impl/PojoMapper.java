@@ -37,8 +37,8 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
-import org.hibernate.search.mapper.pojo.mapping.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -121,7 +121,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				typeAdditionalMetadataProvider.get( entityTypeModel ),
 				mappingHelper,
 				indexManagerBuildingState,
-				implicitProvidedId ? ProvidedStringIdentifierMapping.get() : null
+				implicitProvidedId
 		);
 		// Put the builder in the map before anything else, so it will be closed on error
 		indexedTypeManagerBuilders.put( entityTypeModel, builder );
@@ -242,7 +242,10 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				reindexingResolverBuildingHelper.build( entityType, pathFilterFactory );
 		if ( reindexingResolverOptional.isPresent() ) {
 			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
-					entityType.getJavaClass(), entityType.getCaster(), reindexingResolverOptional.get()
+					entityType.getJavaClass(), entityType.getCaster(),
+					// the ID is not relevant for contained types
+					new PojoMappingTypeMetadata( false ),
+					reindexingResolverOptional.get()
 			);
 			log.createdPojoContainedTypeManager( typeManager );
 			containedTypeManagerContainerBuilder.add( entityType, typeManager );

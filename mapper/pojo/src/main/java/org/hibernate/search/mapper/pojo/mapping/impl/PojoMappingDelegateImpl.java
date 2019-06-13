@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.common.impl.Closer;
@@ -32,9 +35,20 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public boolean isWorkable(Class<?> type) {
-		return indexedTypeManagers.getByExactClass( type ).isPresent()
-				|| containedTypeManagers.getByExactClass( type ).isPresent();
+	public PojoMappingTypeMetadata getMappingTypeMetadata(Class<?> type) {
+		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
+				indexedTypeManagers.getByExactClass( type );
+		if ( indexedTypeManagerOptional.isPresent() ) {
+			return indexedTypeManagerOptional.get().getMappingMetadata();
+		}
+
+		Optional<? extends PojoContainedTypeManager<?>> containedTypeManagerOptional =
+				containedTypeManagers.getByExactClass( type );
+		if ( containedTypeManagerOptional.isPresent() ) {
+			return containedTypeManagerOptional.get().getMappingMetadata();
+		}
+
+		return null;
 	}
 
 	@Override
