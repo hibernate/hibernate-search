@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
@@ -17,14 +19,16 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 
+	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 
 	private final LuceneFieldCodec<F> codec;
 
 	private final FromDocumentFieldValueConverter<? super F, V> converter;
 
-	LuceneFieldProjection(String absoluteFieldPath, LuceneFieldCodec<F> codec,
+	LuceneFieldProjection(Set<String> indexNames, String absoluteFieldPath, LuceneFieldCodec<F> codec,
 			FromDocumentFieldValueConverter<? super F, V> converter) {
+		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 		this.converter = converter;
@@ -51,6 +55,10 @@ class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 			SearchProjectionTransformContext context) {
 		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
 		return converter.convert( extractedData, convertContext );
+	}
+
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.projection.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjectionBuilder;
@@ -45,7 +46,7 @@ public class LuceneStandardFieldProjectionBuilderFactory<F> implements LuceneFie
 
 	@Override
 	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
-	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
+	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
 			Class<T> expectedType, ProjectionConverter projectionConverter) {
 		checkProjectable( absoluteFieldPath, projectable );
 
@@ -55,11 +56,11 @@ public class LuceneStandardFieldProjectionBuilderFactory<F> implements LuceneFie
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
-		return (FieldProjectionBuilder<T>) new LuceneFieldProjectionBuilder<>( absoluteFieldPath, requestConverter, codec );
+		return (FieldProjectionBuilder<T>) new LuceneFieldProjectionBuilder<>( indexNames, absoluteFieldPath, requestConverter, codec );
 	}
 
 	@Override
-	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath,
+	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
 			GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
