@@ -17,6 +17,6 @@ public class LuceneEntityProjectionBuilder<E> implements EntityProjectionBuilder
 
 	@Override
 	public SearchProjection<E> build() {
-		return LuceneEntityProjection.get();
+		return new LuceneEntityProjection();
 	}
 }

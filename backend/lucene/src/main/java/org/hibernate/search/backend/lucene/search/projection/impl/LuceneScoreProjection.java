@@ -14,13 +14,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 class LuceneScoreProjection implements LuceneSearchProjection<Float, Float> {
 
-	private static final LuceneScoreProjection INSTANCE = new LuceneScoreProjection();
-
-	static LuceneScoreProjection get() {
-		return INSTANCE;
-	}
-
-	private LuceneScoreProjection() {
+	public LuceneScoreProjection() {
 	}
 
 	@Override

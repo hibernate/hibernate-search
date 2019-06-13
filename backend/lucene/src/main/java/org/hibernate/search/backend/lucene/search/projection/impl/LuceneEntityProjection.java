@@ -15,15 +15,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 public class LuceneEntityProjection<E> implements LuceneSearchProjection<Object, E> {
 
-	@SuppressWarnings("rawtypes")
-	private static final LuceneEntityProjection INSTANCE = new LuceneEntityProjection();
-
-	@SuppressWarnings("unchecked")
-	public static <T> LuceneEntityProjection<T> get() {
-		return INSTANCE;
-	}
-
-	private LuceneEntityProjection() {
+	public LuceneEntityProjection() {
 	}
 
 	@Override

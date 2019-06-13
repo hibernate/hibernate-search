@@ -18,6 +18,6 @@ public class LuceneDocumentReferenceProjectionBuilder implements DocumentReferen
 
 	@Override
 	public SearchProjection<DocumentReference> build() {
-		return LuceneDocumentReferenceProjection.get();
+		return new LuceneDocumentReferenceProjection();
 	}
 }
