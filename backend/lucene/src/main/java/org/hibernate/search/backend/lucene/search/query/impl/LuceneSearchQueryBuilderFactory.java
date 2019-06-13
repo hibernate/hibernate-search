@@ -42,13 +42,13 @@ public class LuceneSearchQueryBuilderFactory
 	@Override
 	public <E> LuceneSearchQueryBuilder<E> asEntity(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, E> loadingContextBuilder) {
-		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, new LuceneEntityProjection() );
+		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, new LuceneEntityProjection( searchContext.getIndexNames() ) );
 	}
 
 	@Override
 	public <R> LuceneSearchQueryBuilder<R> asReference(
 			SessionContextImplementor sessionContext, LoadingContextBuilder<R, ?> loadingContextBuilder) {
-		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, new LuceneReferenceProjection() );
+		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, new LuceneReferenceProjection( searchContext.getIndexNames() ) );
 	}
 
 	@Override

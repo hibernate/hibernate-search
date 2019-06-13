@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
@@ -16,7 +18,10 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 class LuceneDocumentReferenceProjection implements LuceneSearchProjection<DocumentReference, DocumentReference> {
 
-	public LuceneDocumentReferenceProjection() {
+	private final Set<String> indexNames;
+
+	public LuceneDocumentReferenceProjection(Set<String> indexNames) {
+		this.indexNames = indexNames;
 	}
 
 	@Override
@@ -39,6 +44,11 @@ class LuceneDocumentReferenceProjection implements LuceneSearchProjection<Docume
 	public DocumentReference transform(LoadingResult<?> loadingResult, DocumentReference extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
@@ -16,7 +18,10 @@ import org.apache.lucene.document.Document;
 
 class LuceneDocumentProjection implements LuceneSearchProjection<Document, Document> {
 
-	public LuceneDocumentProjection() {
+	private final Set<String> indexNames;
+
+	public LuceneDocumentProjection(Set<String> indexNames) {
+		this.indexNames = indexNames;
 	}
 
 	@Override
@@ -39,6 +44,11 @@ class LuceneDocumentProjection implements LuceneSearchProjection<Document, Docum
 	public Document transform(LoadingResult<?> loadingResult, Document extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

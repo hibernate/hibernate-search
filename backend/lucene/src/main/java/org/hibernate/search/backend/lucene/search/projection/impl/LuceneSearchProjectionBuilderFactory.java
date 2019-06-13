@@ -53,7 +53,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
-		return new LuceneDocumentReferenceProjectionBuilder();
+		return new LuceneDocumentReferenceProjectionBuilder( scopeModel.getIndexNames() );
 	}
 
 	@Override
@@ -69,17 +69,17 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return new LuceneEntityProjectionBuilder();
+		return new LuceneEntityProjectionBuilder( scopeModel.getIndexNames() );
 	}
 
 	@Override
 	public <R> ReferenceProjectionBuilder<R> reference() {
-		return new LuceneReferenceProjectionBuilder();
+		return new LuceneReferenceProjectionBuilder( scopeModel.getIndexNames() );
 	}
 
 	@Override
 	public ScoreProjectionBuilder score() {
-		return new LuceneScoreProjectionBuilder();
+		return new LuceneScoreProjectionBuilder( scopeModel.getIndexNames() );
 	}
 
 	@Override
@@ -137,11 +137,11 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	}
 
 	public SearchProjectionBuilder<Document> document() {
-		return new LuceneDocumentProjectionBuilder();
+		return new LuceneDocumentProjectionBuilder( scopeModel.getIndexNames() );
 	}
 
 	public SearchProjectionBuilder<Explanation> explanation() {
-		return new LuceneExplanationProjectionBuilder();
+		return new LuceneExplanationProjectionBuilder( scopeModel.getIndexNames() );
 	}
 
 	private static class ProjectionBuilderFactoryRetrievalStrategy

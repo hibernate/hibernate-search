@@ -57,6 +57,7 @@ class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 		return converter.convert( extractedData, convertContext );
 	}
 
+	@Override
 	public Set<String> getIndexNames() {
 		return indexNames;
 	}

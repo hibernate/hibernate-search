@@ -6,6 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
+
 public interface LuceneCompositeProjection<E, P> extends LuceneSearchProjection<E, P> {
+
+	@Override
+	default Set<String> getIndexNames() {
+		// TODO handle composite in a subsequent commit
+		return null;
+	}
 
 }

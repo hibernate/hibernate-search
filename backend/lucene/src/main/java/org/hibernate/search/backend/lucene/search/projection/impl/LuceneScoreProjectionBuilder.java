@@ -6,17 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 
 public class LuceneScoreProjectionBuilder implements ScoreProjectionBuilder {
 
-	public LuceneScoreProjectionBuilder() {
+	private final Set<String> indexNames;
+
+	public LuceneScoreProjectionBuilder(Set<String> indexNames) {
+		this.indexNames = indexNames;
 	}
 
 	@Override
 	public SearchProjection<Float> build() {
-		return new LuceneScoreProjection();
+		return new LuceneScoreProjection( indexNames );
 	}
 }
