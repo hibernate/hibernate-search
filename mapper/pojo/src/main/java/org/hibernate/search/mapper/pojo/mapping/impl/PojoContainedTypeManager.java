@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -24,13 +25,16 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 
 	private final Class<E> javaClass;
 	private final PojoCaster<E> caster;
+	private final PojoMappingTypeMetadata mappingMetadata;
 	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
 
 	public PojoContainedTypeManager(Class<E> javaClass,
 			PojoCaster<E> caster,
+			PojoMappingTypeMetadata mappingMetadata,
 			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
 		this.javaClass = javaClass;
 		this.caster = caster;
+		this.mappingMetadata = mappingMetadata;
 		this.reindexingResolver = reindexingResolver;
 	}
 
@@ -47,6 +51,10 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 
 	Class<E> getJavaClass() {
 		return javaClass;
+	}
+
+	PojoMappingTypeMetadata getMappingMetadata() {
+		return mappingMetadata;
 	}
 
 	Supplier<E> toEntitySupplier(AbstractPojoSessionContextImplementor sessionContext, Object entity) {

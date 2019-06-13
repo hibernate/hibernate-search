@@ -19,10 +19,9 @@ public interface PojoMappingDelegate extends AutoCloseable {
 
 	/**
 	 * @param type A Java type.
-	 * @return {@code true} if this type can be the subject of a work (i.e. it can be passed to
-	 * {@link PojoWorkPlan#add(Object)} for instance), {@code false} if it cannot.
-	 * Workable types include both indexable types and contained entity types.
+	 * @return The metadata for the given type if this type can be the subject of a work (i.e. it can be passed to
+	 * {@link PojoWorkPlan#add(Object)} for instance), {@code null} otherwise.
 	 */
-	boolean isWorkable(Class<?> type);
+	PojoMappingTypeMetadata getMappingTypeMetadata(Class<?> type);
 
 }

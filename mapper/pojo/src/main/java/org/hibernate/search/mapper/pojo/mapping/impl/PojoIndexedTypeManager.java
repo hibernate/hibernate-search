@@ -18,6 +18,7 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
@@ -37,6 +38,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 
 	private final Class<E> indexedJavaClass;
 	private final PojoCaster<E> caster;
+	private final PojoMappingTypeMetadata mappingMetadata;
 	private final IdentifierMapping<I, E> identifierMapping;
 	private final RoutingKeyProvider<E> routingKeyProvider;
 	private final PojoIndexingProcessor<E> processor;
@@ -45,12 +47,14 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 
 	public PojoIndexedTypeManager(Class<E> indexedJavaClass,
 			PojoCaster<E> caster,
+			PojoMappingTypeMetadata mappingMetadata,
 			IdentifierMapping<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
 			PojoIndexingProcessor<E> processor, MappedIndexManager<D> indexManager,
 			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
 		this.indexedJavaClass = indexedJavaClass;
 		this.caster = caster;
+		this.mappingMetadata = mappingMetadata;
 		this.identifierMapping = identifierMapping;
 		this.routingKeyProvider = routingKeyProvider;
 		this.processor = processor;
@@ -102,6 +106,10 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 
 	Class<E> getIndexedJavaClass() {
 		return indexedJavaClass;
+	}
+
+	PojoMappingTypeMetadata getMappingMetadata() {
+		return mappingMetadata;
 	}
 
 	Supplier<E> toEntitySupplier(AbstractPojoSessionContextImplementor sessionContext, Object entity) {

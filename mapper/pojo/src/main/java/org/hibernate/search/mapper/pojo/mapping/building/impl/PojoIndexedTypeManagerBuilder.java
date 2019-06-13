@@ -27,8 +27,10 @@ import org.hibernate.search.mapper.pojo.mapping.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.impl.PropertyIdentifierMapping;
+import org.hibernate.search.mapper.pojo.mapping.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyBridgeRoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyProvider;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
@@ -61,12 +63,14 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			PojoTypeAdditionalMetadata typeAdditionalMetadata,
 			PojoMappingHelper mappingHelper,
 			IndexManagerBuildingState<D> indexManagerBuildingState,
-			IdentifierMapping<?, E> defaultIdentifierMapping) {
+			boolean implicitProvidedId) {
 		this.typeModel = typeModel;
 		this.typeAdditionalMetadata = typeAdditionalMetadata;
 		this.mappingHelper = mappingHelper;
 		this.indexManagerBuildingState = indexManagerBuildingState;
-		this.identityMappingCollector = new PojoIdentityMappingCollectorImpl( defaultIdentifierMapping );
+		this.identityMappingCollector = new PojoIdentityMappingCollectorImpl(
+				implicitProvidedId
+		);
 		IndexBindingContext bindingContext = indexManagerBuildingState.getIndexedEntityBindingContext();
 		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
@@ -111,26 +115,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			throw new AssertionFailure( "Internal error - preBuild should be called before buildAndAddTo" );
 		}
 
-		IdentifierMapping<?, E> identifierMapping = identityMappingCollector.identifierMapping;
-		if ( identifierMapping == null ) {
-			// Fall back to the entity ID, if possible
-			Optional<BoundPojoModelPathPropertyNode<E, ?>> entityIdPathOptional = getEntityIdentifierPath();
-			if ( entityIdPathOptional.isPresent() ) {
-				BoundPojoModelPathPropertyNode<E, ?> entityIdPath = entityIdPathOptional.get();
-				identityMappingCollector.defaultIdentifierBridge(
-						entityIdPath
-				);
-				identifierMapping = identityMappingCollector.identifierMapping;
-			}
-			else {
-				throw log.missingIdentifierMapping( typeModel );
-			}
-		}
-
-		RoutingKeyProvider<E> routingKeyProvider = identityMappingCollector.routingKeyProvider;
-		if ( routingKeyProvider == null ) {
-			routingKeyProvider = RoutingKeyProvider.alwaysNull();
-		}
+		identityMappingCollector.applyDefaults();
 
 		/*
 		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?
@@ -144,7 +129,9 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 		PojoIndexedTypeManager<?, E, D> typeManager = new PojoIndexedTypeManager<>(
 				typeModel.getJavaClass(), typeModel.getCaster(),
-				identifierMapping, routingKeyProvider,
+				new PojoMappingTypeMetadata( identityMappingCollector.documentIdMappedToEntityId ),
+				identityMappingCollector.identifierMapping,
+				identityMappingCollector.routingKeyProvider,
 				preBuiltIndexingProcessor,
 				indexManagerBuildingState.build(),
 				reindexingResolverOptional.orElseGet( PojoImplicitReindexingResolver::noOp )
@@ -156,30 +143,32 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		closed = true;
 	}
 
-	private Optional<BoundPojoModelPathPropertyNode<E, ?>> getEntityIdentifierPath() {
-		Optional<String> entityIdPropertyName = typeAdditionalMetadata.getEntityTypeMetadata()
-				.orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
-				.getEntityIdPropertyName();
-		if ( entityIdPropertyName.isPresent() ) {
-			return Optional.of( BoundPojoModelPath.root( typeModel ).property( entityIdPropertyName.get() ) );
-		}
-		else {
-			return Optional.empty();
-		}
-	}
-
 	private class PojoIdentityMappingCollectorImpl implements PojoIdentityMappingCollector {
-		private IdentifierMapping<?, E> identifierMapping;
-		private RoutingKeyBridgeRoutingKeyProvider<E> routingKeyProvider;
+		private final boolean implicitProvidedId;
+		private final BoundPojoModelPathPropertyNode<?, ?> entityIdPropertyPath;
 
-		PojoIdentityMappingCollectorImpl(IdentifierMapping<?, E> identifierMapping) {
-			this.identifierMapping = identifierMapping;
+		private IdentifierMapping<?, E> identifierMapping;
+		private boolean documentIdMappedToEntityId;
+		private RoutingKeyProvider<E> routingKeyProvider;
+
+		PojoIdentityMappingCollectorImpl(boolean implicitProvidedId) {
+			this.implicitProvidedId = implicitProvidedId;
+
+			Optional<String> entityIdPropertyName = typeAdditionalMetadata.getEntityTypeMetadata()
+					.orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
+					.getEntityIdPropertyName();
+			if ( entityIdPropertyName.isPresent() ) {
+				this.entityIdPropertyPath = BoundPojoModelPath.root( typeModel ).property( entityIdPropertyName.get() );
+			}
+			else {
+				this.entityIdPropertyPath = null;
+			}
 		}
 
 		void closeOnFailure() {
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
 				closer.push( IdentifierMapping::close, identifierMapping );
-				closer.push( RoutingKeyBridgeRoutingKeyProvider::close, routingKeyProvider );
+				closer.push( RoutingKeyProvider::close, routingKeyProvider );
 			}
 		}
 
@@ -194,6 +183,10 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 					propertyModel.getHandle(),
 					bridgeHolder
 			);
+			this.documentIdMappedToEntityId =
+					entityIdPropertyPath == null
+							? false
+							: entityIdPropertyPath.toUnboundPath().equals( modelPath.toUnboundPath() );
 		}
 
 		@Override
@@ -205,8 +198,25 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			return boundRoutingKeyBridge;
 		}
 
-		<T> void defaultIdentifierBridge(BoundPojoModelPathPropertyNode<?, T> entityIdPath) {
-			identifierBridge( entityIdPath, null );
+		void applyDefaults() {
+			if ( identifierMapping == null ) {
+				// Assume a provided ID if requested
+				if ( implicitProvidedId ) {
+					identifierMapping = ProvidedStringIdentifierMapping.get();
+					documentIdMappedToEntityId = false;
+				}
+				// Fall back to the entity ID if possible
+				else if ( entityIdPropertyPath != null ) {
+					identifierBridge( entityIdPropertyPath, null );
+				}
+				else {
+					throw log.missingIdentifierMapping( typeModel );
+				}
+			}
+
+			if ( routingKeyProvider == null ) {
+				routingKeyProvider = RoutingKeyProvider.alwaysNull();
+			}
 		}
 
 	}

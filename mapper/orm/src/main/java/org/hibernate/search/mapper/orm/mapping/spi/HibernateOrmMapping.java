@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 public interface HibernateOrmMapping {
@@ -20,17 +21,9 @@ public interface HibernateOrmMapping {
 
 	/**
 	 * @param type A Java type.
-	 * @return {@code true} if this type can be the subject of a work (i.e. it can be passed to
-	 * {@link PojoWorkPlan#add(Object)} for instance), {@code false} if it cannot.
-	 * Workable types include both indexable types and contained entity types.
+	 * @return The metadata for the given type if this type can be the subject of a work (i.e. it can be passed to
+	 * {@link PojoWorkPlan#add(Object)} for instance), {@code null} otherwise.
 	 */
-	boolean isWorkable(Class<?> type);
-
-	/**
-	 * @param entity An entity.
-	 * @return {@code true} if this entity can be the subject of a work (i.e. it can be passed to
-	 * {@link PojoWorkPlan#add(Object)} for instance), {@code false} if it cannot.
-	 */
-	boolean isWorkable(Object entity);
+	PojoMappingTypeMetadata getMappingTypeMetadata(Class<?> type);
 
 }
