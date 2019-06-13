@@ -16,12 +16,12 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapper<R, E> {
 
 	private final Function<DocumentReference, R> documentReferenceTransformer;
-	private final EntityLoader<R, E> objectLoader;
+	private final EntityLoader<R, ? extends E> objectLoader;
 
 	private final List<R> referencesToLoad = new ArrayList<>();
 
 	public DefaultProjectionHitMapper(Function<DocumentReference, R> documentReferenceTransformer,
-			EntityLoader<R, E> objectLoader) {
+			EntityLoader<R, ? extends E> objectLoader) {
 		this.documentReferenceTransformer = documentReferenceTransformer;
 		this.objectLoader = objectLoader;
 	}

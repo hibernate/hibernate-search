@@ -24,7 +24,7 @@ public class EntityLoaderBuilder<E> {
 		this.concreteIndexedClasses = concreteIndexedClasses;
 	}
 
-	public EntityLoader<PojoReference, E> build(MutableEntityLoadingOptions mutableLoadingOptions) {
+	public EntityLoader<PojoReference, ? extends E> build(MutableEntityLoadingOptions mutableLoadingOptions) {
 		if ( concreteIndexedClasses.size() == 1 ) {
 			Class<? extends E> concreteIndexedType = concreteIndexedClasses.iterator().next();
 			return buildForSingleType( mutableLoadingOptions, concreteIndexedType );
@@ -34,7 +34,7 @@ public class EntityLoaderBuilder<E> {
 		}
 	}
 
-	private HibernateOrmComposableEntityLoader<PojoReference, E> buildForSingleType(
+	private HibernateOrmComposableEntityLoader<PojoReference, ? extends E> buildForSingleType(
 			MutableEntityLoadingOptions mutableLoadingOptions, Class<? extends E> concreteIndexedType) {
 		// TODO HSEARCH-3203 Add support for entities whose document ID is not the entity ID (natural ID, or other)
 		// TODO HSEARCH-3349 Add support for other types of database retrieval and object lookup? See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.EntityLoaderBuilder#getObjectInitializer
@@ -49,7 +49,7 @@ public class EntityLoaderBuilder<E> {
 		Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends E>> delegateByConcreteType =
 				new HashMap<>( concreteIndexedClasses.size() );
 		for ( Class<? extends E> concreteIndexedClass : concreteIndexedClasses ) {
-			HibernateOrmComposableEntityLoader<PojoReference, E> delegate =
+			HibernateOrmComposableEntityLoader<PojoReference, ? extends E> delegate =
 					buildForSingleType( mutableLoadingOptions, concreteIndexedClass );
 			delegateByConcreteType.put( concreteIndexedClass, delegate );
 		}

@@ -18,14 +18,14 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<PojoReference, E> {
 	private final Session session;
-	private final Class<? extends E> entityType;
+	private final Class<E> entityType;
 	private final MutableEntityLoadingOptions loadingOptions;
 
-	private MultiIdentifierLoadAccess<? extends E> multiAccess;
+	private MultiIdentifierLoadAccess<E> multiAccess;
 
-	public HibernateOrmSingleTypeByIdEntityLoader(
+	HibernateOrmSingleTypeByIdEntityLoader(
 			Session session,
-			Class<? extends E> entityType,
+			Class<E> entityType,
 			MutableEntityLoadingOptions loadingOptions) {
 		this.session = session;
 		this.entityType = entityType;
@@ -33,7 +33,7 @@ class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposabl
 	}
 
 	@Override
-	public List<? extends E> loadBlocking(List<PojoReference> references) {
+	public List<E> loadBlocking(List<PojoReference> references) {
 		return loadEntities( references );
 	}
 
@@ -51,7 +51,7 @@ class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposabl
 		}
 	}
 
-	private List<? extends E> loadEntities(List<PojoReference> references) {
+	private List<E> loadEntities(List<PojoReference> references) {
 		List<Serializable> ids = new ArrayList<>( references.size() );
 		for ( PojoReference reference : references ) {
 			ids.add( (Serializable) reference.getId() );
@@ -60,7 +60,7 @@ class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposabl
 		return getMultiAccess().multiLoad( ids );
 	}
 
-	private MultiIdentifierLoadAccess<? extends E> getMultiAccess() {
+	private MultiIdentifierLoadAccess<E> getMultiAccess() {
 		if ( multiAccess == null ) {
 			multiAccess = session.byMultipleIds( entityType );
 		}
