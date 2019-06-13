@@ -19,6 +19,6 @@ public class LuceneDocumentProjectionBuilder implements SearchProjectionBuilder<
 
 	@Override
 	public SearchProjection<Document> build() {
-		return LuceneDocumentProjection.get();
+		return new LuceneDocumentProjection();
 	}
 }

@@ -16,13 +16,7 @@ import org.apache.lucene.search.Explanation;
 
 class LuceneExplanationProjection implements LuceneSearchProjection<Explanation, Explanation> {
 
-	private static final LuceneExplanationProjection INSTANCE = new LuceneExplanationProjection();
-
-	static LuceneExplanationProjection get() {
-		return INSTANCE;
-	}
-
-	private LuceneExplanationProjection() {
+	public LuceneExplanationProjection() {
 	}
 
 	@Override

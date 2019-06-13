@@ -19,6 +19,6 @@ public class LuceneExplanationProjectionBuilder implements SearchProjectionBuild
 
 	@Override
 	public SearchProjection<Explanation> build() {
-		return LuceneExplanationProjection.get();
+		return new LuceneExplanationProjection();
 	}
 }

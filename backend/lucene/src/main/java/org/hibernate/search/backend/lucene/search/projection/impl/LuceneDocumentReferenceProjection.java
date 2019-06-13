@@ -16,13 +16,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 class LuceneDocumentReferenceProjection implements LuceneSearchProjection<DocumentReference, DocumentReference> {
 
-	private static final LuceneDocumentReferenceProjection INSTANCE = new LuceneDocumentReferenceProjection();
-
-	static LuceneDocumentReferenceProjection get() {
-		return INSTANCE;
-	}
-
-	private LuceneDocumentReferenceProjection() {
+	public LuceneDocumentReferenceProjection() {
 	}
 
 	@Override

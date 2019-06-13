@@ -17,6 +17,6 @@ public class LuceneScoreProjectionBuilder implements ScoreProjectionBuilder {
 
 	@Override
 	public SearchProjection<Float> build() {
-		return LuceneScoreProjection.get();
+		return new LuceneScoreProjection();
 	}
 }
