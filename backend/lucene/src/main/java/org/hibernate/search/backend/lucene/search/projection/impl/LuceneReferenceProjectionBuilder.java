@@ -12,15 +12,7 @@ import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuil
 
 public class LuceneReferenceProjectionBuilder<R> implements ReferenceProjectionBuilder<R> {
 
-	@SuppressWarnings("rawtypes")
-	private static final LuceneReferenceProjectionBuilder INSTANCE = new LuceneReferenceProjectionBuilder();
-
-	@SuppressWarnings("unchecked")
-	public static <T> LuceneReferenceProjectionBuilder<T> get() {
-		return INSTANCE;
-	}
-
-	private LuceneReferenceProjectionBuilder() {
+	public LuceneReferenceProjectionBuilder() {
 	}
 
 	@Override

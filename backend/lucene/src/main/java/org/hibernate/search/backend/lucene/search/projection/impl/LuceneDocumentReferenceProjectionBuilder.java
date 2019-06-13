@@ -13,13 +13,7 @@ import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjec
 
 public class LuceneDocumentReferenceProjectionBuilder implements DocumentReferenceProjectionBuilder {
 
-	private static final LuceneDocumentReferenceProjectionBuilder INSTANCE = new LuceneDocumentReferenceProjectionBuilder();
-
-	public static LuceneDocumentReferenceProjectionBuilder get() {
-		return INSTANCE;
-	}
-
-	private LuceneDocumentReferenceProjectionBuilder() {
+	public LuceneDocumentReferenceProjectionBuilder() {
 	}
 
 	@Override

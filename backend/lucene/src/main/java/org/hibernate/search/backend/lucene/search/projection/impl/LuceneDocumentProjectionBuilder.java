@@ -14,13 +14,7 @@ import org.apache.lucene.document.Document;
 
 public class LuceneDocumentProjectionBuilder implements SearchProjectionBuilder<Document> {
 
-	private static final LuceneDocumentProjectionBuilder INSTANCE = new LuceneDocumentProjectionBuilder();
-
-	public static LuceneDocumentProjectionBuilder get() {
-		return INSTANCE;
-	}
-
-	private LuceneDocumentProjectionBuilder() {
+	public LuceneDocumentProjectionBuilder() {
 	}
 
 	@Override

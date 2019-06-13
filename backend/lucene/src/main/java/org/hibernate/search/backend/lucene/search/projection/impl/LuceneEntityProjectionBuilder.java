@@ -12,15 +12,7 @@ import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder
 
 public class LuceneEntityProjectionBuilder<E> implements EntityProjectionBuilder<E> {
 
-	@SuppressWarnings("rawtypes")
-	private static final LuceneEntityProjectionBuilder INSTANCE = new LuceneEntityProjectionBuilder();
-
-	@SuppressWarnings("unchecked")
-	public static <T> LuceneEntityProjectionBuilder<T> get() {
-		return INSTANCE;
-	}
-
-	private LuceneEntityProjectionBuilder() {
+	public LuceneEntityProjectionBuilder() {
 	}
 
 	@Override
