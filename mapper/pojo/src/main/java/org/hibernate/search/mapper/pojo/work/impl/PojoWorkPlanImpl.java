@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.mapping.impl;
+package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -18,13 +18,17 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManagerContainer;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class PojoWorkPlanImpl implements PojoWorkPlan {
+public class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -39,7 +43,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	private final Map<Class<?>, PojoIndexedTypeWorkPlan<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
 	private final Map<Class<?>, PojoContainedTypeWorkPlan<?>> containedTypeDelegates = new HashMap<>();
 
-	PojoWorkPlanImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
+	public PojoWorkPlanImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers,
 			AbstractPojoSessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy,

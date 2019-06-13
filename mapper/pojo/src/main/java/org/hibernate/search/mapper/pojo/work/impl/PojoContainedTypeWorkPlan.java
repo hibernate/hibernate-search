@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.mapping.impl;
+package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
@@ -15,13 +15,14 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @param <E> The contained entity type.
  */
-class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
+public class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -30,7 +31,7 @@ class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<Object, ContainedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
 
-	PojoContainedTypeWorkPlan(PojoContainedTypeManager<E> typeManager, AbstractPojoSessionContextImplementor sessionContext) {
+	public PojoContainedTypeWorkPlan(PojoContainedTypeManager<E> typeManager, AbstractPojoSessionContextImplementor sessionContext) {
 		super( sessionContext );
 		this.typeManager = typeManager;
 	}

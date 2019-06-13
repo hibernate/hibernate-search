@@ -15,6 +15,8 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
+import org.hibernate.search.mapper.pojo.work.impl.PojoContainedTypeWorkPlan;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -49,7 +51,7 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
 
-	Class<E> getJavaClass() {
+	public Class<E> getJavaClass() {
 		return javaClass;
 	}
 
@@ -57,19 +59,19 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 		return mappingMetadata;
 	}
 
-	Supplier<E> toEntitySupplier(AbstractPojoSessionContextImplementor sessionContext, Object entity) {
+	public Supplier<E> toEntitySupplier(AbstractPojoSessionContextImplementor sessionContext, Object entity) {
 		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
 	}
 
-	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
+	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths) {
 		reindexingResolver.resolveEntitiesToReindex(
 				collector, runtimeIntrospector, entitySupplier.get(), dirtyPaths
 		);
 	}
 
-	PojoContainedTypeWorkPlan<E> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext) {
+	public PojoContainedTypeWorkPlan<E> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext) {
 		return new PojoContainedTypeWorkPlan<>(
 				this, sessionContext
 		);

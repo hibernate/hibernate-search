@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.mapping.impl;
+package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 /**
@@ -24,7 +25,7 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionC
  * @param <E> The entity type mapped to the index.
  * @param <D> The document type for the index.
  */
-class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractPojoTypeWorkPlan {
+public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractPojoTypeWorkPlan {
 
 	private final PojoIndexedTypeManager<I, E, D> typeManager;
 	private final IndexWorkPlan<D> delegate;
@@ -32,7 +33,7 @@ class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractP
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<I, IndexedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
 
-	PojoIndexedTypeWorkPlan(PojoIndexedTypeManager<I, E, D> typeManager, AbstractPojoSessionContextImplementor sessionContext,
+	public PojoIndexedTypeWorkPlan(PojoIndexedTypeManager<I, E, D> typeManager, AbstractPojoSessionContextImplementor sessionContext,
 			IndexWorkPlan<D> delegate) {
 		super( sessionContext );
 		this.typeManager = typeManager;

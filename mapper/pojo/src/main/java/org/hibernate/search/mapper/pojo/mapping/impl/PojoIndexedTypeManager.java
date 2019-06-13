@@ -25,6 +25,11 @@ import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
+import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentContributor;
+import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentReferenceProvider;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexedTypeWorkPlan;
+import org.hibernate.search.mapper.pojo.work.impl.PojoTypeDocumentWorkExecutor;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -100,7 +105,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		return indexManager.createWorkExecutor( sessionContext );
 	}
 
-	IdentifierMapping<I, E> getIdentifierMapping() {
+	public IdentifierMapping<I, E> getIdentifierMapping() {
 		return identifierMapping;
 	}
 
@@ -112,12 +117,12 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		return mappingMetadata;
 	}
 
-	Supplier<E> toEntitySupplier(AbstractPojoSessionContextImplementor sessionContext, Object entity) {
+	public Supplier<E> toEntitySupplier(AbstractPojoSessionContextImplementor sessionContext, Object entity) {
 		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
 	}
 
-	DocumentReferenceProvider toDocumentReferenceProvider(AbstractPojoSessionContextImplementor sessionContext,
+	public DocumentReferenceProvider toDocumentReferenceProvider(AbstractPojoSessionContextImplementor sessionContext,
 			I identifier, Supplier<E> entitySupplier) {
 		String documentIdentifier = identifierMapping.toDocumentIdentifier(
 				identifier, sessionContext.getMappingContext()
@@ -128,22 +133,22 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier, AbstractPojoSessionContextImplementor sessionContext) {
+	public PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier, AbstractPojoSessionContextImplementor sessionContext) {
 		return new PojoDocumentContributor<>( processor, sessionContext, entitySupplier );
 	}
 
-	boolean requiresSelfReindexing(Set<String> dirtyPaths) {
+	public boolean requiresSelfReindexing(Set<String> dirtyPaths) {
 		return reindexingResolver.requiresSelfReindexing( dirtyPaths );
 	}
 
-	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
+	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths) {
 		reindexingResolver.resolveEntitiesToReindex(
 				collector, runtimeIntrospector, entitySupplier.get(), dirtyPaths
 		);
 	}
 
-	PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext,
+	public PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new PojoIndexedTypeWorkPlan<>(
 				this, sessionContext,
