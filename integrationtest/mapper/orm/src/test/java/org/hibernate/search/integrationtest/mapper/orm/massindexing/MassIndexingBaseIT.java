@@ -36,7 +36,7 @@ import org.junit.Test;
 /**
  * Very basic test to probe an use of {@link MassIndexer} api.
  */
-public class BasicMassIndexingIT {
+public class MassIndexingBaseIT {
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";

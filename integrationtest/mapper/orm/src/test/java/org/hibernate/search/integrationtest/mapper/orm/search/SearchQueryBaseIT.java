@@ -41,7 +41,7 @@ import org.junit.Test;
  * Does not test sorts and predicates, or other features that only involve the backend.
  * Those should be tested in the backend integration tests.
  */
-public class SearchQueryIT {
+public class SearchQueryBaseIT {
 
 	private static final String TITLE_4_3_2_1 = "4 3 2 1";
 	private static final String AUTHOR_4_3_2_1 = "Paul Auster";
