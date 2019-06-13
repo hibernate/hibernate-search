@@ -498,4 +498,12 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 83, value = "Field '%1$s' is not searchable. Make sure the field is marked as searchable.")
 	SearchException nonSearchableField(String absoluteFieldPath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 84, value = "The predicate '%1$s' is defined on a scope targeting different indexes."
+			+ " Predicate is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	SearchException predicateDefinedOnDifferentIndexes(SearchPredicate predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
+
+	@Message(id = ID_OFFSET_2 + 85, value = "The sort '%1$s' is defined on a scope targeting different indexes."
+			+ " Sort is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	SearchException sortDefinedOnDifferentIndexes(SearchSort predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
 }

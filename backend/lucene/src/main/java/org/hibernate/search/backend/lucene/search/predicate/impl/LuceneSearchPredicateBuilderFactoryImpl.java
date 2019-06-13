@@ -53,7 +53,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public SearchPredicate toSearchPredicate(LuceneSearchPredicateBuilder builder) {
-		return new LuceneSearchPredicate( builder );
+		return new LuceneSearchPredicate( scopeModel.getIndexNames(), builder );
 	}
 
 	@Override
@@ -61,7 +61,11 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 		if ( !( predicate instanceof LuceneSearchPredicate ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherPredicates( predicate );
 		}
-		return (LuceneSearchPredicate) predicate;
+		LuceneSearchPredicate casted = (LuceneSearchPredicate) predicate;
+		if ( !scopeModel.getIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.getIndexNames(), scopeModel.getIndexNames() );
+		}
+		return casted;
 	}
 
 	@Override

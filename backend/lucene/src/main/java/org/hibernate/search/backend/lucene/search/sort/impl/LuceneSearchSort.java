@@ -7,14 +7,17 @@
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.engine.search.SearchSort;
 
 class LuceneSearchSort implements SearchSort, LuceneSearchSortBuilder {
 
+	private final Set<String> indexNames;
 	private final List<LuceneSearchSortBuilder> builders;
 
-	LuceneSearchSort(List<LuceneSearchSortBuilder> builders) {
+	LuceneSearchSort(Set<String> indexNames, List<LuceneSearchSortBuilder> builders) {
+		this.indexNames = indexNames;
 		this.builders = builders;
 	}
 
@@ -23,5 +26,9 @@ class LuceneSearchSort implements SearchSort, LuceneSearchSortBuilder {
 		for ( LuceneSearchSortBuilder builder : builders ) {
 			builder.buildAndContribute( collector );
 		}
+	}
+
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 }

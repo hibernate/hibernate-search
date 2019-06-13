@@ -6,15 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchPredicate;
 
 import org.apache.lucene.search.Query;
 
 class LuceneSearchPredicate implements SearchPredicate, LuceneSearchPredicateBuilder {
 
+	private final Set<String> indexNames;
 	private final LuceneSearchPredicateBuilder delegate;
 
-	LuceneSearchPredicate(LuceneSearchPredicateBuilder delegate) {
+	LuceneSearchPredicate(Set<String> indexNames, LuceneSearchPredicateBuilder delegate) {
+		this.indexNames = indexNames;
 		this.delegate = delegate;
 	}
 
@@ -23,4 +27,7 @@ class LuceneSearchPredicate implements SearchPredicate, LuceneSearchPredicateBui
 		return delegate.build( context );
 	}
 
+	public Set<String> getIndexNames() {
+		return indexNames;
+	}
 }

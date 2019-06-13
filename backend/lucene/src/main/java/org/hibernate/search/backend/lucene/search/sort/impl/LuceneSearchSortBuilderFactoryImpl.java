@@ -46,7 +46,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 	@Override
 	public SearchSort toSearchSort(List<LuceneSearchSortBuilder> builders) {
-		return new LuceneSearchSort( builders );
+		return new LuceneSearchSort( scopeModel.getIndexNames(), builders );
 	}
 
 	@Override
@@ -54,7 +54,11 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 		if ( !( sort instanceof LuceneSearchSort ) ) {
 			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}
-		return ((LuceneSearchSort) sort);
+		LuceneSearchSort casted = (LuceneSearchSort) sort;
+		if ( !scopeModel.getIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.getIndexNames(), scopeModel.getIndexNames() );
+		}
+		return casted;
 	}
 
 	@Override
