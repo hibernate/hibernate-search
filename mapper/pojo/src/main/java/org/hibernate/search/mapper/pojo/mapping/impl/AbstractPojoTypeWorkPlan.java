@@ -16,14 +16,14 @@ abstract class AbstractPojoTypeWorkPlan {
 		this.sessionContext = sessionContext;
 	}
 
-	abstract void add(Object id, Object entity);
+	abstract void add(Object providedId, Object entity);
 
-	abstract void update(Object id, Object entity);
+	abstract void update(Object providedId, Object entity);
 
-	abstract void update(Object id, Object entity, String... dirtyPaths);
+	abstract void update(Object providedId, Object entity, String... dirtyPaths);
 
-	abstract void delete(Object id, Object entity);
+	abstract void delete(Object providedId, Object entity);
 
-	abstract void purge(Object id);
+	abstract void purge(Object providedId);
 
 }

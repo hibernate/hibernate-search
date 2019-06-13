@@ -37,11 +37,12 @@ public interface PojoWorkPlan {
 	 * if the entity was actually already present in the index before this call.
 	 * When in doubt, you should rather use {@link #update(Object, Object)} or {@link #update(Object)}.
 	 *
-	 * @param id The provided ID for the entity.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to add to the index.
 	 */
-	void add(Object id, Object entity);
+	void add(Object providedId, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
@@ -55,11 +56,12 @@ public interface PojoWorkPlan {
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
 	 *
-	 * @param id The provided ID for the entity.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to update in the index.
 	 */
-	void update(Object id, Object entity);
+	void update(Object providedId, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index,
@@ -81,13 +83,14 @@ public interface PojoWorkPlan {
 	 * but try to avoid reindexing if the given dirty paths
 	 * are known not to impact the indexed form of that entity.
 	 *
-	 * @param id The provided ID for the entity.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to update in the index.
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
 	 * ("directEntityProperty.nestedPropery").
 	 */
-	void update(Object id, Object entity, String... dirtyPaths);
+	void update(Object providedId, Object entity, String... dirtyPaths);
 
 	/**
 	 * Delete an entity from the index.
@@ -103,11 +106,12 @@ public interface PojoWorkPlan {
 	 * <p>
 	 * No effect on the index if the entity is not in the index.
 	 *
-	 * @param id The provided ID for the entity.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to delete from the index.
 	 */
-	void delete(Object id, Object entity);
+	void delete(Object providedId, Object entity);
 
 	/**
 	 * Purge an entity from the index.
@@ -117,9 +121,10 @@ public interface PojoWorkPlan {
 	 * No effect on the index if the entity is not in the index.
 	 *
 	 * @param clazz The type of the entity.
-	 * @param id The provided ID for the entity.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 */
-	void purge(Class<?> clazz, Object id);
+	void purge(Class<?> clazz, Object providedId);
 
 	/**
 	 * Prepare the work plan execution, i.e. execute as much as possible without writing to the index.
