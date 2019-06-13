@@ -129,7 +129,10 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 		PojoIndexedTypeManager<?, E, D> typeManager = new PojoIndexedTypeManager<>(
 				typeModel.getJavaClass(), typeModel.getCaster(),
-				new PojoMappingTypeMetadata( identityMappingCollector.documentIdMappedToEntityId ),
+				new PojoMappingTypeMetadata(
+						identityMappingCollector.documentIdMappedToEntityId,
+						identityMappingCollector.documentIdSourcePropertyName
+				),
 				identityMappingCollector.identifierMapping,
 				identityMappingCollector.routingKeyProvider,
 				preBuiltIndexingProcessor,
@@ -149,6 +152,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 		private IdentifierMapping<?, E> identifierMapping;
 		private boolean documentIdMappedToEntityId;
+		private Optional<String> documentIdSourcePropertyName;
 		private RoutingKeyProvider<E> routingKeyProvider;
 
 		PojoIdentityMappingCollectorImpl(boolean implicitProvidedId) {
@@ -183,6 +187,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 					propertyModel.getHandle(),
 					bridgeHolder
 			);
+			this.documentIdSourcePropertyName = Optional.of( propertyModel.getName() );
 			this.documentIdMappedToEntityId =
 					entityIdPropertyPath == null
 							? false
@@ -203,6 +208,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 				// Assume a provided ID if requested
 				if ( implicitProvidedId ) {
 					identifierMapping = ProvidedStringIdentifierMapping.get();
+					documentIdSourcePropertyName = Optional.empty();
 					documentIdMappedToEntityId = false;
 				}
 				// Fall back to the entity ID if possible

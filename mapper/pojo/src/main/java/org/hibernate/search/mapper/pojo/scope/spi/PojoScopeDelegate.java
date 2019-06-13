@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.scope.spi;
 
-import java.util.Set;
+import java.util.Map;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
@@ -14,6 +14,7 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 
@@ -24,7 +25,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
  * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
  */
 public interface PojoScopeDelegate<E, E2> {
-	Set<Class<? extends E>> getIncludedIndexedTypes();
+	Map<Class<? extends E>, PojoMappingTypeMetadata> getIncludedIndexedTypes();
 
 	PojoReference toPojoReference(DocumentReference documentReference);
 

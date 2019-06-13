@@ -244,7 +244,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
 					entityType.getJavaClass(), entityType.getCaster(),
 					// the ID is not relevant for contained types
-					new PojoMappingTypeMetadata( false ),
+					new PojoMappingTypeMetadata(
+							false, Optional.empty()
+					),
 					reindexingResolverOptional.get()
 			);
 			log.createdPojoContainedTypeManager( typeManager );
