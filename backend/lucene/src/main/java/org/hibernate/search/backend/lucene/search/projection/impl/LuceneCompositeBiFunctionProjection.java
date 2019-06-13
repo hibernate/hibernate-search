@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
 
+import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
@@ -18,14 +19,16 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 public class LuceneCompositeBiFunctionProjection<P1, P2, P> implements LuceneCompositeProjection<Object[], P> {
 
+	private final Set<String> indexNames;
+
 	private final BiFunction<P1, P2, P> transformer;
 
 	private final LuceneSearchProjection<?, P1> projection1;
-
 	private final LuceneSearchProjection<?, P2> projection2;
 
-	public LuceneCompositeBiFunctionProjection(BiFunction<P1, P2, P> transformer,
+	public LuceneCompositeBiFunctionProjection(Set<String> indexNames, BiFunction<P1, P2, P> transformer,
 			LuceneSearchProjection<?, P1> projection1, LuceneSearchProjection<?, P2> projection2) {
+		this.indexNames = indexNames;
 		this.transformer = transformer;
 		this.projection1 = projection1;
 		this.projection2 = projection2;
@@ -59,6 +62,11 @@ public class LuceneCompositeBiFunctionProjection<P1, P2, P> implements LuceneCom
 				transformUnsafe( projection1, loadingResult, extractedData[0], context ),
 				transformUnsafe( projection2, loadingResult, extractedData[1], context )
 		);
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override
