@@ -98,7 +98,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		}
 
 		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeListProjection<>( transformer, typedProjections )
+				new LuceneCompositeListProjection<>( scopeModel.getIndexNames(), transformer, typedProjections )
 		);
 	}
 
@@ -106,7 +106,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public <P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer,
 			SearchProjection<P1> projection) {
 		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeFunctionProjection<>( transformer, toImplementation( projection ) )
+				new LuceneCompositeFunctionProjection<>( scopeModel.getIndexNames(), transformer, toImplementation( projection ) )
 		);
 	}
 
@@ -114,7 +114,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public <P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeBiFunctionProjection<>( transformer, toImplementation( projection1 ),
+				new LuceneCompositeBiFunctionProjection<>( scopeModel.getIndexNames(), transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ) )
 		);
 	}
@@ -123,7 +123,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public <P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeTriFunctionProjection<>( transformer, toImplementation( projection1 ),
+				new LuceneCompositeTriFunctionProjection<>( scopeModel.getIndexNames(), transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ), toImplementation( projection3 ) )
 		);
 	}

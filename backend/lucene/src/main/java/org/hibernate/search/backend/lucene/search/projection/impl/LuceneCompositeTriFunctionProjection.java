@@ -9,6 +9,8 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
@@ -18,17 +20,18 @@ import org.hibernate.search.util.common.function.TriFunction;
 
 public class LuceneCompositeTriFunctionProjection<P1, P2, P3, P> implements LuceneCompositeProjection<Object[], P> {
 
+	private final Set<String> indexNames;
+
 	private final TriFunction<P1, P2, P3, P> transformer;
 
 	private final LuceneSearchProjection<?, P1> projection1;
-
 	private final LuceneSearchProjection<?, P2> projection2;
-
 	private final LuceneSearchProjection<?, P3> projection3;
 
-	public LuceneCompositeTriFunctionProjection(TriFunction<P1, P2, P3, P> transformer,
+	public LuceneCompositeTriFunctionProjection(Set<String> indexNames, TriFunction<P1, P2, P3, P> transformer,
 			LuceneSearchProjection<?, P1> projection1, LuceneSearchProjection<?, P2> projection2,
 			LuceneSearchProjection<?, P3> projection3) {
+		this.indexNames = indexNames;
 		this.transformer = transformer;
 		this.projection1 = projection1;
 		this.projection2 = projection2;
@@ -67,6 +70,11 @@ public class LuceneCompositeTriFunctionProjection<P1, P2, P3, P> implements Luce
 				transformUnsafe( projection2, loadingResult, extractedData[1], context ),
 				transformUnsafe( projection3, loadingResult, extractedData[2], context )
 		);
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

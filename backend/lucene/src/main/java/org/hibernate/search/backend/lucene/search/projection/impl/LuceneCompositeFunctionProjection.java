@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
@@ -16,12 +17,15 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 public class LuceneCompositeFunctionProjection<E, P1, P> implements LuceneCompositeProjection<E, P> {
 
+	private final Set<String> indexNames;
+
 	private final Function<P1, P> transformer;
 
 	private final LuceneSearchProjection<E, P1> projection;
 
-	public LuceneCompositeFunctionProjection(Function<P1, P> transformer,
+	public LuceneCompositeFunctionProjection(Set<String> indexNames, Function<P1, P> transformer,
 			LuceneSearchProjection<E, P1> projection) {
+		this.indexNames = indexNames;
 		this.transformer = transformer;
 		this.projection = projection;
 	}
@@ -46,6 +50,11 @@ public class LuceneCompositeFunctionProjection<E, P1, P> implements LuceneCompos
 	public P transform(LoadingResult<?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context) {
 		return transformer.apply( projection.transform( loadingResult, extractedData, context ) );
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override
