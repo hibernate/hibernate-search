@@ -8,6 +8,9 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -19,6 +22,7 @@ import org.easymock.EasyMockSupport;
 
 public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 
+	private static final Set<String> INDEX_NAMES = Collections.singleton( "myIndexName" );
 	private static final String FIELD = "myField";
 
 	private static final GeoPoint LOCATION = GeoPoint.of( 43, 4 );
@@ -28,7 +32,7 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 		SessionContextImplementor sessionContext = createMock( SessionContextImplementor.class );
 		ElasticsearchSearchQueryElementCollector elementCollector = new ElasticsearchSearchQueryElementCollector( sessionContext );
 
-		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( FIELD,
+		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD,
 				LOCATION, DistanceUnit.METERS );
 
 		JsonObject requestBody = new JsonObject();
@@ -51,7 +55,7 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 		elementCollector.collectSort( new JsonObject() );
 		elementCollector.collectDistanceSort( new JsonObject(), FIELD, LOCATION );
 
-		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( FIELD,
+		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD,
 				LOCATION, DistanceUnit.METERS );
 
 		JsonObject requestBody = new JsonObject();

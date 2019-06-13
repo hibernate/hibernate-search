@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -17,7 +19,10 @@ class ElasticsearchScoreProjection implements ElasticsearchSearchProjection<Floa
 	private static final JsonAccessor<Boolean> TRACK_SCORES_ACCESSOR = JsonAccessor.root().property( "track_scores" )
 			.asBoolean();
 
-	ElasticsearchScoreProjection() {
+	private final Set<String> indexNames;
+
+	ElasticsearchScoreProjection(Set<String> indexNames) {
+		this.indexNames = indexNames;
 	}
 
 	@Override
@@ -35,6 +40,11 @@ class ElasticsearchScoreProjection implements ElasticsearchSearchProjection<Floa
 	public Float transform(LoadingResult<?> loadingResult, Float extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

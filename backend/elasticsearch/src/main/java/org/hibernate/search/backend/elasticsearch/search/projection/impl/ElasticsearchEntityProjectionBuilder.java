@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 
@@ -14,8 +16,8 @@ class ElasticsearchEntityProjectionBuilder<E> implements EntityProjectionBuilder
 
 	private final ElasticsearchEntityProjection<E> projection;
 
-	ElasticsearchEntityProjectionBuilder(DocumentReferenceExtractorHelper helper) {
-		this.projection = new ElasticsearchEntityProjection<>( helper );
+	ElasticsearchEntityProjectionBuilder(Set<String> indexNames, DocumentReferenceExtractorHelper helper) {
+		this.projection = new ElasticsearchEntityProjection<>( indexNames, helper );
 	}
 
 	@Override

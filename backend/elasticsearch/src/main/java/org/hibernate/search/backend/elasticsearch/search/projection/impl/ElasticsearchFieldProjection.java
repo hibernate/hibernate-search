@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
@@ -28,15 +29,17 @@ class ElasticsearchFieldProjection<F, V> implements ElasticsearchSearchProjectio
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 
+	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
 
 	private final FromDocumentFieldValueConverter<? super F, V> converter;
 	private final ElasticsearchFieldCodec<F> codec;
 
-	ElasticsearchFieldProjection(String absoluteFieldPath,
+	ElasticsearchFieldProjection(Set<String> indexNames, String absoluteFieldPath,
 			FromDocumentFieldValueConverter<? super F, V> converter,
 			ElasticsearchFieldCodec<F> codec) {
+		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.path( absoluteFieldPath );
 		this.converter = converter;
@@ -68,6 +71,11 @@ class ElasticsearchFieldProjection<F, V> implements ElasticsearchSearchProjectio
 	public V transform(LoadingResult<?> loadingResult, F extractedData, SearchProjectionTransformContext context) {
 		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
 		return converter.convert( extractedData, convertContext );
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

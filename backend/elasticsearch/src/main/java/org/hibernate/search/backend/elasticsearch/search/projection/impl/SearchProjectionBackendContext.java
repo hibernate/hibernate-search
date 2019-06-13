@@ -6,55 +6,45 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
 import com.google.gson.Gson;
 
 public class SearchProjectionBackendContext {
 
-	private final ElasticsearchDocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
-	@SuppressWarnings("rawtypes")
-	private final ElasticsearchEntityProjectionBuilder objectProjectionBuilder;
-	@SuppressWarnings("rawtypes")
-	private final ElasticsearchReferenceProjectionBuilder referenceProjectionBuilder;
-	private final ElasticsearchScoreProjectionBuilder scoreProjectionBuilder;
-	private final ElasticsearchSourceProjectionBuilder sourceProjectionBuilder;
-	private final ElasticsearchExplanationProjectionBuilder explanationProjectionBuilder;
+	private final DocumentReferenceExtractorHelper documentReferenceExtractorHelper;
+	private final Gson userFacingGson;
 
 	@SuppressWarnings("rawtypes")
 	public SearchProjectionBackendContext(DocumentReferenceExtractorHelper documentReferenceExtractorHelper,
 			Gson userFacingGson) {
-		this.documentReferenceProjectionBuilder = new ElasticsearchDocumentReferenceProjectionBuilder( documentReferenceExtractorHelper );
-		this.objectProjectionBuilder = new ElasticsearchEntityProjectionBuilder( documentReferenceExtractorHelper );
-		this.referenceProjectionBuilder = new ElasticsearchReferenceProjectionBuilder( documentReferenceExtractorHelper );
-		this.scoreProjectionBuilder = new ElasticsearchScoreProjectionBuilder();
-		this.sourceProjectionBuilder = new ElasticsearchSourceProjectionBuilder( userFacingGson );
-		this.explanationProjectionBuilder = new ElasticsearchExplanationProjectionBuilder( userFacingGson );
+		this.documentReferenceExtractorHelper = documentReferenceExtractorHelper;
+		this.userFacingGson = userFacingGson;
 	}
 
-	ElasticsearchDocumentReferenceProjectionBuilder getDocumentReferenceProjectionBuilder() {
-		return documentReferenceProjectionBuilder;
+	ElasticsearchDocumentReferenceProjectionBuilder createDocumentReferenceProjectionBuilder(Set<String> indexNames) {
+		return new ElasticsearchDocumentReferenceProjectionBuilder( indexNames, documentReferenceExtractorHelper );
 	}
 
-	@SuppressWarnings("unchecked")
-	<E> ElasticsearchEntityProjectionBuilder<E> getEntityProjectionBuilder() {
-		return objectProjectionBuilder;
+	<E> ElasticsearchEntityProjectionBuilder<E> createEntityProjectionBuilder(Set<String> indexNames) {
+		return new ElasticsearchEntityProjectionBuilder<>( indexNames, documentReferenceExtractorHelper );
 	}
 
-	@SuppressWarnings("unchecked")
-	<R> ElasticsearchReferenceProjectionBuilder<R> getReferenceProjectionBuilder() {
-		return referenceProjectionBuilder;
+	<R> ElasticsearchReferenceProjectionBuilder<R> createReferenceProjectionBuilder(Set<String> indexNames) {
+		return new ElasticsearchReferenceProjectionBuilder<>( indexNames, documentReferenceExtractorHelper );
 	}
 
-	ElasticsearchScoreProjectionBuilder getScoreProjectionBuilder() {
-		return scoreProjectionBuilder;
+	ElasticsearchScoreProjectionBuilder createScoreProjectionBuilder(Set<String> indexNames) {
+		return new ElasticsearchScoreProjectionBuilder( indexNames );
 	}
 
-	ElasticsearchSourceProjectionBuilder getSourceProjectionBuilder() {
-		return sourceProjectionBuilder;
+	ElasticsearchSourceProjectionBuilder createSourceProjectionBuilder(Set<String> indexNames) {
+		return new ElasticsearchSourceProjectionBuilder( indexNames, userFacingGson );
 	}
 
-	public SearchProjectionBuilder<String> getExplanationProjectionBuilder() {
-		return explanationProjectionBuilder;
+	public SearchProjectionBuilder<String> createExplanationProjectionBuilder(Set<String> indexNames) {
+		return new ElasticsearchExplanationProjectionBuilder( indexNames, userFacingGson );
 	}
 }

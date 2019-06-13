@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
@@ -13,9 +15,11 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchReferenceProjection<R> implements ElasticsearchSearchProjection<R, R> {
 
+	private final Set<String> indexNames;
 	private final DocumentReferenceExtractorHelper helper;
 
-	public ElasticsearchReferenceProjection(DocumentReferenceExtractorHelper helper) {
+	public ElasticsearchReferenceProjection(Set<String> indexNames, DocumentReferenceExtractorHelper helper) {
+		this.indexNames = indexNames;
 		this.helper = helper;
 	}
 
@@ -35,6 +39,11 @@ public class ElasticsearchReferenceProjection<R> implements ElasticsearchSearchP
 	public R transform(LoadingResult<?> loadingResult, R extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

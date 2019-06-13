@@ -61,4 +61,8 @@ public final class ElasticsearchSearchContext {
 	public Set<URLEncodedString> getIndexNames() {
 		return scopeModel.getElasticsearchIndexNames();
 	}
+
+	public Set<String> getHibernateSearchIndexNames() {
+		return scopeModel.getHibernateSearchIndexNames();
+	}
 }

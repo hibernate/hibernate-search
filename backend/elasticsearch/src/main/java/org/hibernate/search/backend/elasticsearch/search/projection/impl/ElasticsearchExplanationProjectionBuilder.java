@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
@@ -16,8 +18,8 @@ class ElasticsearchExplanationProjectionBuilder implements SearchProjectionBuild
 
 	private final ElasticsearchExplanationProjection projection;
 
-	ElasticsearchExplanationProjectionBuilder(Gson gson) {
-		this.projection = new ElasticsearchExplanationProjection( gson );
+	ElasticsearchExplanationProjectionBuilder(Set<String> indexNames, Gson gson) {
+		this.projection = new ElasticsearchExplanationProjection( indexNames, gson );
 	}
 
 	@Override

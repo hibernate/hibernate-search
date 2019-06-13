@@ -10,6 +10,7 @@ import static org.hibernate.search.backend.elasticsearch.search.projection.impl.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -19,12 +20,15 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchCompositeListProjection<P> implements ElasticsearchCompositeProjection<List<Object>, P> {
 
+	private final Set<String> indexNames;
+
 	private final Function<List<?>, P> transformer;
 
 	private final List<ElasticsearchSearchProjection<?, ?>> children;
 
-	public ElasticsearchCompositeListProjection(Function<List<?>, P> transformer,
+	public ElasticsearchCompositeListProjection(Set<String> indexNames, Function<List<?>, P> transformer,
 			List<ElasticsearchSearchProjection<?, ?>> children) {
+		this.indexNames = indexNames;
 		this.transformer = transformer;
 		this.children = children;
 	}
@@ -58,6 +62,11 @@ public class ElasticsearchCompositeListProjection<P> implements ElasticsearchCom
 		}
 
 		return transformer.apply( extractedData );
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

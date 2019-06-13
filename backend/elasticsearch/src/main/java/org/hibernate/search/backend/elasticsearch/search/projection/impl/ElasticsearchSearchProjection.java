@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -63,4 +65,6 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 			Object extractedData, SearchProjectionTransformContext context) {
 		return (Z) ( (ElasticsearchSearchProjection) projection ).transform( loadingResult, extractedData, context );
 	}
+
+	Set<String> getIndexNames();
 }

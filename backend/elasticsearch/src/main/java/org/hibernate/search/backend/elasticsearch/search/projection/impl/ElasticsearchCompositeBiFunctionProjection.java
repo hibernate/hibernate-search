@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import static org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection.transformUnsafe;
 
+import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -18,14 +19,16 @@ import com.google.gson.JsonObject;
 public class ElasticsearchCompositeBiFunctionProjection<P1, P2, P> implements
 		ElasticsearchCompositeProjection<Object[], P> {
 
+	private final Set<String> indexNames;
+
 	private final BiFunction<P1, P2, P> transformer;
 
 	private final ElasticsearchSearchProjection<?, P1> projection1;
-
 	private final ElasticsearchSearchProjection<?, P2> projection2;
 
-	public ElasticsearchCompositeBiFunctionProjection(BiFunction<P1, P2, P> transformer,
+	public ElasticsearchCompositeBiFunctionProjection(Set<String> indexNames, BiFunction<P1, P2, P> transformer,
 			ElasticsearchSearchProjection<?, P1> projection1, ElasticsearchSearchProjection<?, P2> projection2) {
+		this.indexNames = indexNames;
 		this.transformer = transformer;
 		this.projection1 = projection1;
 		this.projection2 = projection2;
@@ -54,6 +57,11 @@ public class ElasticsearchCompositeBiFunctionProjection<P1, P2, P> implements
 				transformUnsafe( projection1, loadingResult, extractedData[0], context ),
 				transformUnsafe( projection2, loadingResult, extractedData[1], context )
 		);
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override

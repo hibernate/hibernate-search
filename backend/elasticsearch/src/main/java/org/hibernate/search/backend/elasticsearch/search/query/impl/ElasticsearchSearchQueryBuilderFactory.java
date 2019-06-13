@@ -43,7 +43,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 			SessionContextImplementor sessionContext, LoadingContextBuilder<?, E> loadingContextBuilder) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
-				new ElasticsearchEntityProjection<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
+				new ElasticsearchEntityProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractorHelper() )
 		);
 	}
 
@@ -52,7 +52,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 			SessionContextImplementor sessionContext, LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
-				new ElasticsearchReferenceProjection<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
+				new ElasticsearchReferenceProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractorHelper() )
 		);
 	}
 
@@ -80,7 +80,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 			children.add( searchProjectionFactory.toImplementation( projection ) );
 		}
 
-		return new ElasticsearchCompositeListProjection<>( Function.identity(), children );
+		return new ElasticsearchCompositeListProjection<>( searchContext.getHibernateSearchIndexNames(), Function.identity(), children );
 	}
 
 	private <H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(

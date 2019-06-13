@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
@@ -14,8 +16,8 @@ class ElasticsearchScoreProjectionBuilder implements ScoreProjectionBuilder {
 
 	private final ElasticsearchScoreProjection projection;
 
-	ElasticsearchScoreProjectionBuilder() {
-		this.projection = new ElasticsearchScoreProjection();
+	ElasticsearchScoreProjectionBuilder(Set<String> indexNames) {
+		this.projection = new ElasticsearchScoreProjection( indexNames );
 	}
 
 	@Override

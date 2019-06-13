@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import static org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection.transformUnsafe;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.function.TriFunction;
@@ -17,17 +19,18 @@ import com.google.gson.JsonObject;
 public class ElasticsearchCompositeTriFunctionProjection<P1, P2, P3, P> implements
 		ElasticsearchCompositeProjection<Object[], P> {
 
+	private final Set<String> indexNames;
+
 	private final TriFunction<P1, P2, P3, P> transformer;
 
 	private final ElasticsearchSearchProjection<?, P1> projection1;
-
 	private final ElasticsearchSearchProjection<?, P2> projection2;
-
 	private final ElasticsearchSearchProjection<?, P3> projection3;
 
-	public ElasticsearchCompositeTriFunctionProjection(TriFunction<P1, P2, P3, P> transformer,
+	public ElasticsearchCompositeTriFunctionProjection(Set<String> indexNames, TriFunction<P1, P2, P3, P> transformer,
 			ElasticsearchSearchProjection<?, P1> projection1, ElasticsearchSearchProjection<?, P2> projection2,
 			ElasticsearchSearchProjection<?, P3> projection3) {
+		this.indexNames = indexNames;
 		this.transformer = transformer;
 		this.projection1 = projection1;
 		this.projection2 = projection2;
@@ -60,6 +63,11 @@ public class ElasticsearchCompositeTriFunctionProjection<P1, P2, P3, P> implemen
 				transformUnsafe( projection2, loadingResult, extractedData[1], context ),
 				transformUnsafe( projection3, loadingResult, extractedData[2], context )
 		);
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	@Override
