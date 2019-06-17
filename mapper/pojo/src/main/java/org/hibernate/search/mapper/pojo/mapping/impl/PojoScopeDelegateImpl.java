@@ -69,22 +69,22 @@ class PojoScopeDelegateImpl<E, E2> implements PojoScopeDelegate<E, E2> {
 	@Override
 	public SearchQueryResultDefinitionContext<?, PojoReference, E2, SearchProjectionFactoryContext<PojoReference, E2>, ?> search(
 			LoadingContextBuilder<PojoReference, E2> loadingContextBuilder) {
-		return getDelegate().search( sessionContext, loadingContextBuilder );
+		return getIndexScope().search( sessionContext, loadingContextBuilder );
 	}
 
 	@Override
 	public SearchPredicateFactoryContext predicate() {
-		return getDelegate().predicate();
+		return getIndexScope().predicate();
 	}
 
 	@Override
 	public SearchSortFactoryContext sort() {
-		return getDelegate().sort();
+		return getIndexScope().sort();
 	}
 
 	@Override
 	public SearchProjectionFactoryContext<PojoReference, E2> projection() {
-		return getDelegate().projection();
+		return getIndexScope().projection();
 	}
 
 	@Override
@@ -97,7 +97,7 @@ class PojoScopeDelegateImpl<E, E2> implements PojoScopeDelegate<E, E2> {
 		return executor;
 	}
 
-	private MappedIndexScope<PojoReference, E2> getDelegate() {
+	private MappedIndexScope<PojoReference, E2> getIndexScope() {
 		AbstractPojoMappingContextImplementor mappingContext = sessionContext.getMappingContext();
 		if ( delegate == null ) {
 			Iterator<PojoIndexedTypeManager<?, ? extends E, ?>> iterator = targetedTypeManagers.iterator();
