@@ -21,9 +21,9 @@ public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<PojoRefe
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoScopeDelegate<?, ?> scopeDelegate;
+	private final PojoScopeDelegate<?, Void> scopeDelegate;
 
-	public JavaBeanProjectionHitMapper(PojoScopeDelegate<?, ?> scopeDelegate) {
+	public JavaBeanProjectionHitMapper(PojoScopeDelegate<?, Void> scopeDelegate) {
 		this.scopeDelegate = scopeDelegate;
 	}
 

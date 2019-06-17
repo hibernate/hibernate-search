@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.scope.impl;
 
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeContainedTypeContext;
+import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
 
 /**
  * @param <E> The entity type mapped to the index.
  */
-public interface PojoScopeContainedTypeContextImplementor<E>
-		extends PojoScopeContainedTypeContext<E> {
+public interface PojoScopeContainedTypeContext<E>
+		extends PojoWorkContainedTypeContext<E> {
 
 }

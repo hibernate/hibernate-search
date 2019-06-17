@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropert
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
@@ -68,10 +69,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	private HibernateOrmMappingInitiator(Metadata metadata,
 			HibernateOrmConfigurationPropertySource propertySource,
 			HibernateOrmBootstrapIntrospector introspector) {
-		super(
-				new HibernateOrmMappingFactory(),
-				introspector
-		);
+		super( introspector );
 
 		this.metadata = metadata;
 		this.propertySource = propertySource;
@@ -132,5 +130,10 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 				} );
 
 		super.configure( buildContext, configurationCollector );
+	}
+
+	@Override
+	protected PojoMapperDelegate<HibernateOrmMappingPartialBuildState> createMapperDelegate() {
+		return new HibernateOrmMapperDelegate();
 	}
 }

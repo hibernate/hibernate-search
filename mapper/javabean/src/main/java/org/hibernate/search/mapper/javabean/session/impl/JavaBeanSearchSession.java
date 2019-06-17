@@ -46,7 +46,11 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession implements 
 	@Override
 	public SearchScope scope(Collection<? extends Class<?>> targetedTypes) {
 		return new SearchScopeImpl(
-				getDelegate().createPojoScope( targetedTypes )
+				getDelegate().createPojoScope(
+						targetedTypes,
+						// We don't load anything, so we don't need any additional type context
+						ignored -> null
+				)
 		);
 	}
 

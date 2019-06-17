@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDepe
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
@@ -37,6 +38,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 	private final PojoRawTypeModel<E> typeModel;
 	private final IndexManagerBuildingState<D> indexManagerBuildingState;
+	private final PojoIndexedTypeExtendedMappingCollector extendedMappingCollector;
 
 	private final PojoIdentityMappingCollectorImpl<E> identityMappingCollector;
 	private final PojoIndexingProcessorTypeNodeBuilder<E> processorBuilder;
@@ -49,9 +51,11 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			PojoTypeAdditionalMetadata typeAdditionalMetadata,
 			PojoMappingHelper mappingHelper,
 			IndexManagerBuildingState<D> indexManagerBuildingState,
+			PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
 			boolean implicitProvidedId) {
 		this.typeModel = typeModel;
 		this.indexManagerBuildingState = indexManagerBuildingState;
+		this.extendedMappingCollector = extendedMappingCollector;
 		this.identityMappingCollector = new PojoIdentityMappingCollectorImpl<>(
 				typeModel,
 				typeAdditionalMetadata,
@@ -105,6 +109,11 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 		identityMappingCollector.applyDefaults();
 
+		extendedMappingCollector.metadata( new PojoMappingTypeMetadata(
+				identityMappingCollector.documentIdMappedToEntityId,
+				identityMappingCollector.documentIdSourcePropertyName
+		) );
+
 		/*
 		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?
 		 * Note this will require to allow them to define their own work plan APIs.
@@ -117,10 +126,6 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 		PojoIndexedTypeManager<?, E, D> typeManager = new PojoIndexedTypeManager<>(
 				typeModel.getJavaClass(), typeModel.getCaster(),
-				new PojoMappingTypeMetadata(
-						identityMappingCollector.documentIdMappedToEntityId,
-						identityMappingCollector.documentIdSourcePropertyName
-				),
 				identityMappingCollector.identifierMapping,
 				identityMappingCollector.routingKeyProvider,
 				preBuiltIndexingProcessor,

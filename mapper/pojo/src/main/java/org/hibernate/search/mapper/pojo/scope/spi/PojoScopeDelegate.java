@@ -18,25 +18,27 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 
 /**
- * @param <E> A common supertype of the indexed types included in this scope.
- * @param <E2> The type of loaded entities, i.e. the type of hits returned by
+ * @param <E> The type of loaded entities, i.e. the type of hits returned by
  * {@link SearchQueryResultDefinitionContext#asEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
+ * @param <C> The type of indexed type extended contexts; i.e. the type of elements in the set returned by
+ * {@link #getIncludedIndexedTypes()}.
+ * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
  */
-public interface PojoScopeDelegate<E, E2> {
+public interface PojoScopeDelegate<E, C> {
 
-	Set<? extends PojoScopeIndexedTypeContext<? extends E>> getIncludedIndexedTypes();
+	Set<C> getIncludedIndexedTypes();
 
 	PojoReference toPojoReference(DocumentReference documentReference);
 
-	SearchQueryResultDefinitionContext<?, PojoReference, E2, SearchProjectionFactoryContext<PojoReference, E2>, ?> search(
-			LoadingContextBuilder<PojoReference, E2> loadingContextBuilder);
+	SearchQueryResultDefinitionContext<?, PojoReference, E, SearchProjectionFactoryContext<PojoReference, E>, ?> search(
+			LoadingContextBuilder<PojoReference, E> loadingContextBuilder);
 
 	SearchPredicateFactoryContext predicate();
 
 	SearchSortFactoryContext sort();
 
-	SearchProjectionFactoryContext<PojoReference, E2> projection();
+	SearchProjectionFactoryContext<PojoReference, E> projection();
 
 	PojoScopeWorkExecutor executor();
 

@@ -6,10 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.util.Optional;
-
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeContext;
 import org.hibernate.search.mapper.pojo.session.impl.PojoSearchSessionDelegateImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
@@ -33,23 +30,6 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 			closer.pushAll( PojoIndexedTypeManager::close, indexedTypeManagers.getAll() );
 			closer.pushAll( PojoContainedTypeManager::close, containedTypeManagers.getAll() );
 		}
-	}
-
-	@Override
-	public <E> PojoScopeTypeContext<E> getTypeContext(Class<E> type) {
-		Optional<? extends PojoIndexedTypeManager<?, E, ?>> indexedTypeManagerOptional =
-				indexedTypeManagers.getByExactClass( type );
-		if ( indexedTypeManagerOptional.isPresent() ) {
-			return indexedTypeManagerOptional.get();
-		}
-
-		Optional<? extends PojoContainedTypeManager<E>> containedTypeManagerOptional =
-				containedTypeManagers.getByExactClass( type );
-		if ( containedTypeManagerOptional.isPresent() ) {
-			return containedTypeManagerOptional.get();
-		}
-
-		return null;
 	}
 
 	@Override
