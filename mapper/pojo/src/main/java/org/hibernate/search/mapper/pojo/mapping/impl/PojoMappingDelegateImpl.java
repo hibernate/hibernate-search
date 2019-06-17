@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
+import org.hibernate.search.mapper.pojo.session.impl.PojoSearchSessionDelegateImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.common.impl.Closer;
