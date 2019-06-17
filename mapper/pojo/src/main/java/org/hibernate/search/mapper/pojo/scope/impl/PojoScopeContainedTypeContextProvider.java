@@ -6,8 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.scope.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContextProvider;
 
 public interface PojoScopeContainedTypeContextProvider extends PojoWorkContainedTypeContextProvider {
+
+	@Override
+	<E> Optional<? extends PojoScopeContainedTypeContext<E>> getByExactClass(Class<E> clazz);
 
 }

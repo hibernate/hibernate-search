@@ -17,9 +17,9 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl implements SearchScope {
 
-	private final PojoScopeDelegate<?, Void> delegate;
+	private final PojoScopeDelegate<Void, Void> delegate;
 
-	public SearchScopeImpl(PojoScopeDelegate<?, Void> delegate) {
+	public SearchScopeImpl(PojoScopeDelegate<Void, Void> delegate) {
 		this.delegate = delegate;
 	}
 

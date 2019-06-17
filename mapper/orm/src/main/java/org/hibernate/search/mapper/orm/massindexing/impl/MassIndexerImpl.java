@@ -21,7 +21,6 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.orm.massindexing.monitor.impl.SimpleIndexingProgressMonitor;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -58,7 +57,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private Integer idLoadingTransactionTimeout;
 
 	public MassIndexerImpl(SessionFactoryImplementor sessionFactory,
-			Set<? extends PojoScopeTypeContext<?>> targetedIndexedTypes,
+			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			DetachedSessionContextImplementor sessionContext,
 			PojoScopeWorkExecutor scopeWorkExecutor) {
 		this.sessionFactory = sessionFactory;
@@ -75,11 +74,12 @@ public class MassIndexerImpl implements MassIndexer {
 	 * From the set of classes a new set is built containing all indexed
 	 * subclasses, but removing then all subtypes of indexed entities.
 	 */
-	private static Set<Class<?>> toRootEntities(Set<? extends PojoScopeTypeContext<?>> targetedIndexedTypeContexts) {
+	private static Set<Class<?>> toRootEntities(
+			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> targetedIndexedTypeContexts) {
 		Set<Class<?>> cleaned = new LinkedHashSet<>();
 		Set<Class<?>> toRemove = new HashSet<>();
 		//now remove all repeated types to avoid duplicate loading by polymorphic query loading
-		for ( PojoScopeTypeContext<?> typeContext : targetedIndexedTypeContexts ) {
+		for ( HibernateOrmMassIndexingIndexedTypeContext<?> typeContext : targetedIndexedTypeContexts ) {
 			Class<?> type = typeContext.getJavaClass();
 			boolean typeIsOk = true;
 			for ( Class<?> existing : cleaned ) {

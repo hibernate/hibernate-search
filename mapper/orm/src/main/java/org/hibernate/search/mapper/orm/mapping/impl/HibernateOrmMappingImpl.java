@@ -12,16 +12,15 @@ import javax.persistence.EntityManager;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
-import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
-import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
+import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
+import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeContext;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<HibernateOrmMapping>
@@ -30,11 +29,15 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmMappingContextImpl mappingContext;
+	private final HibernateOrmTypeContextContainer typeContextContainer;
 	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
-	HibernateOrmMappingImpl(PojoMappingDelegate mappingDelegate, SessionFactoryImplementor sessionFactoryImplementor,
+	HibernateOrmMappingImpl(PojoMappingDelegate mappingDelegate,
+			HibernateOrmTypeContextContainer typeContextContainer,
+			SessionFactoryImplementor sessionFactoryImplementor,
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		super( mappingDelegate );
+		this.typeContextContainer = typeContextContainer;
 		this.mappingContext = new HibernateOrmMappingContextImpl( sessionFactoryImplementor );
 		this.synchronizationStrategy = synchronizationStrategy;
 	}
@@ -55,8 +58,8 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	}
 
 	@Override
-	public <E> PojoScopeTypeContext<E> getTypeContext(Class<E> type) {
-		return getDelegate().getTypeContext( type );
+	public <E> AbstractHibernateOrmTypeContext<E> getTypeContext(Class<E> type) {
+		return typeContextContainer.getByExactClass( type );
 	}
 
 	private SearchSessionBuilder createSessionBuilder(EntityManager entityManager) {
@@ -76,7 +79,8 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 		}
 
 		return new HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder(
-				getDelegate(), mappingContext, sessionImplementor,
+				getDelegate(), mappingContext, typeContextContainer,
+				sessionImplementor,
 				synchronizationStrategy
 		);
 	}

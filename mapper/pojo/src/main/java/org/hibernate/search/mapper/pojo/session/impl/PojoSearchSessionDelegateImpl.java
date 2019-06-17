@@ -14,6 +14,7 @@ import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContextProvider;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.work.impl.PojoSessionWorkExecutorImpl;
@@ -41,11 +42,13 @@ public final class PojoSearchSessionDelegateImpl implements PojoSearchSessionDel
 	}
 
 	@Override
-	public <E, E2> PojoScopeDelegate<E, E2> createPojoScope(Collection<? extends Class<? extends E>> targetedTypes) {
+	public <E, E2, C> PojoScopeDelegate<E2, C> createPojoScope(Collection<? extends Class<? extends E>> targetedTypes,
+			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		return PojoScopeDelegateImpl.create(
 				indexedTypeContextProvider,
 				containedTypeContextProvider,
 				targetedTypes,
+				indexedTypeExtendedContextProvider,
 				sessionContext
 		);
 	}

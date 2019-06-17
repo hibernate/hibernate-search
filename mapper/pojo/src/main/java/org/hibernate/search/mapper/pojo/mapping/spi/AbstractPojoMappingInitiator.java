@@ -18,6 +18,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorDefinitionContext;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingDefinitionContextImpl;
@@ -28,7 +29,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBuildState>
 		implements MappingInitiator<PojoTypeMetadataContributor, MPBS> {
 
-	private final PojoMappingFactory<MPBS> mappingFactory;
 	private final PojoBootstrapIntrospector introspector;
 
 	private boolean implicitProvidedId;
@@ -40,9 +40,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 
 	private final List<PojoMappingConfigurationContributor> delegates = new ArrayList<>();
 
-	protected AbstractPojoMappingInitiator(PojoMappingFactory<MPBS> mappingFactory,
-			PojoBootstrapIntrospector introspector) {
-		this.mappingFactory = mappingFactory;
+	protected AbstractPojoMappingInitiator(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
 
 		/*
@@ -103,9 +101,11 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 				introspector,
 				containerExtractorRegistryBuilder.build(),
 				implicitProvidedId,
-				mappingFactory::createMapping
+				createMapperDelegate()
 		);
 	}
+
+	protected abstract PojoMapperDelegate<MPBS> createMapperDelegate();
 
 	protected final void addConfigurationContributor(PojoMappingConfigurationContributor contributor) {
 		delegates.add( contributor );

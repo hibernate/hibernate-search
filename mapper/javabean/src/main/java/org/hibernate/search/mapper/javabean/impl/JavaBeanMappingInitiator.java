@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.mapper.javabean.impl;
 
-import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingFactory;
+import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMapperDelegate;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingPartialBuildState;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
 
 public class JavaBeanMappingInitiator extends AbstractPojoMappingInitiator<JavaBeanMappingPartialBuildState> {
@@ -16,15 +17,17 @@ public class JavaBeanMappingInitiator extends AbstractPojoMappingInitiator<JavaB
 	private final JavaBeanTypeConfigurationContributor typeConfigurationContributor;
 
 	public JavaBeanMappingInitiator(JavaBeanBootstrapIntrospector introspector) {
-		super(
-				new JavaBeanMappingFactory(),
-				introspector
-		);
+		super( introspector );
 		typeConfigurationContributor = new JavaBeanTypeConfigurationContributor( introspector );
 		addConfigurationContributor( typeConfigurationContributor );
 	}
 
 	public void addEntityType(Class<?> type) {
 		typeConfigurationContributor.addEntityType( type );
+	}
+
+	@Override
+	protected PojoMapperDelegate<JavaBeanMappingPartialBuildState> createMapperDelegate() {
+		return new JavaBeanMapperDelegate();
 	}
 }

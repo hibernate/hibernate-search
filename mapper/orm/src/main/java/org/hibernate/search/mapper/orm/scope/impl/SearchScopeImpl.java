@@ -27,10 +27,11 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.mapper.orm.search.SearchScope<E> {
 
-	private final PojoScopeDelegate<E, E> delegate;
+	private final PojoScopeDelegate<E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
 	private final HibernateOrmSessionContextImpl sessionContext;
 
-	public SearchScopeImpl(PojoScopeDelegate<E, E> delegate, HibernateOrmSessionContextImpl sessionContext) {
+	public SearchScopeImpl(PojoScopeDelegate<E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate,
+			HibernateOrmSessionContextImpl sessionContext) {
 		this.delegate = delegate;
 		this.sessionContext = sessionContext;
 	}

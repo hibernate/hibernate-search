@@ -27,9 +27,9 @@ public final class JavaBeanLoadingContext implements LoadingContext<PojoReferenc
 	}
 
 	public static final class Builder implements LoadingContextBuilder<PojoReference, Void> {
-		private final PojoScopeDelegate<?, ?> scopeDelegate;
+		private final PojoScopeDelegate<?, Void> scopeDelegate;
 
-		public Builder(PojoScopeDelegate<?, ?> scopeDelegate) {
+		public Builder(PojoScopeDelegate<?, Void> scopeDelegate) {
 			this.scopeDelegate = scopeDelegate;
 		}
 

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeContext;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 
@@ -17,12 +15,5 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	void close();
 
 	PojoSearchSessionDelegate createSearchSessionDelegate(AbstractPojoSessionContextImplementor sessionContext);
-
-	/**
-	 * @param type A Java type.
-	 * @return The metadata for the given type if this type can be the subject of a work (i.e. it can be passed to
-	 * {@link PojoWorkPlan#add(Object)} for instance), {@code null} otherwise.
-	 */
-	<E> PojoScopeTypeContext<E> getTypeContext(Class<E> type);
 
 }

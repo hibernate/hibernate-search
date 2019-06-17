@@ -14,8 +14,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
@@ -31,12 +31,14 @@ import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingRes
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
@@ -57,7 +59,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final ContextualFailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final boolean implicitProvidedId;
-	private final Function<PojoMappingDelegate, MPBS> wrapperFactory;
+	private final PojoMapperDelegate<MPBS> delegate;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final ContainerExtractorBinder extractorBinder;
 	private final PojoMappingHelper mappingHelper;
@@ -73,11 +75,11 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			PojoBootstrapIntrospector introspector,
 			ContainerExtractorRegistry containerExtractorRegistry,
 			boolean implicitProvidedId,
-			Function<PojoMappingDelegate, MPBS> wrapperFactory) {
+			PojoMapperDelegate<MPBS> delegate) {
 		this.failureCollector = buildContext.getFailureCollector();
 		this.contributorProvider = contributorProvider;
 		this.implicitProvidedId = implicitProvidedId;
-		this.wrapperFactory = wrapperFactory;
+		this.delegate = delegate;
 
 		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider(
 				new MarkerBuildContextImpl( buildContext ), failureCollector, contributorProvider
@@ -102,6 +104,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			closed = true;
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
 				closer.pushAll( PojoIndexedTypeManagerBuilder::closeOnFailure, indexedTypeManagerBuilders.values() );
+				closer.push( PojoMapperDelegate::closeOnFailure, delegate );
 			}
 		}
 	}
@@ -116,12 +119,8 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		}
 
 		PojoRawTypeModel<?> entityTypeModel = (PojoRawTypeModel<?>) typeModel;
-		PojoIndexedTypeManagerBuilder<?, ?> builder = new PojoIndexedTypeManagerBuilder<>(
-				entityTypeModel,
-				typeAdditionalMetadataProvider.get( entityTypeModel ),
-				mappingHelper,
-				indexManagerBuildingState,
-				implicitProvidedId
+		PojoIndexedTypeManagerBuilder<?, ?> builder = createIndexedTypeManagerBuilder(
+				entityTypeModel, indexManagerBuildingState
 		);
 		// Put the builder in the map before anything else, so it will be closed on error
 		indexedTypeManagerBuilders.put( entityTypeModel, builder );
@@ -213,16 +212,19 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					.push(
 							PojoContainedTypeManagerContainer.Builder::closeOnFailure,
 							containedTypeManagerContainerBuilder
-					);
+					)
+					.push( PojoMapperDelegate::closeOnFailure, delegate );
 			throw e;
 		}
 		closed = true;
 
 		try {
-			return wrapperFactory.apply( mappingDelegate );
+			return delegate.prepareBuild( mappingDelegate );
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e ).push( mappingDelegate );
+			new SuppressingCloser( e )
+					.push( PojoMapperDelegate::closeOnFailure, delegate )
+					.push( mappingDelegate );
 			throw e;
 		}
 	}
@@ -241,12 +243,17 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		Optional<? extends PojoImplicitReindexingResolver<T, Set<String>>> reindexingResolverOptional =
 				reindexingResolverBuildingHelper.build( entityType, pathFilterFactory );
 		if ( reindexingResolverOptional.isPresent() ) {
-			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
-					entityType.getJavaClass(), entityType.getCaster(),
-					// the ID is not relevant for contained types
+			PojoContainedTypeExtendedMappingCollector extendedMappingCollector = delegate
+					.createContainedTypeExtendedMappingCollector( entityType );
+			extendedMappingCollector.metadata(
+					// The ID is not relevant for contained types
 					new PojoMappingTypeMetadata(
 							false, Optional.empty()
-					),
+					)
+			);
+
+			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
+					entityType.getJavaClass(), entityType.getCaster(),
 					reindexingResolverOptional.get()
 			);
 			log.createdPojoContainedTypeManager( typeManager );
@@ -265,6 +272,18 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 		}
 		return Collections.unmodifiableSet( entityTypes );
+	}
+
+	private <E, D extends DocumentElement> PojoIndexedTypeManagerBuilder<E, D> createIndexedTypeManagerBuilder(
+			PojoRawTypeModel<E> entityTypeModel, IndexManagerBuildingState<D> indexManagerBuildingState) {
+		return new PojoIndexedTypeManagerBuilder<>(
+				entityTypeModel,
+				typeAdditionalMetadataProvider.get( entityTypeModel ),
+				mappingHelper,
+				indexManagerBuildingState,
+				delegate.createIndexedTypeExtendedMappingCollector( entityTypeModel ),
+				implicitProvidedId
+		);
 	}
 
 }

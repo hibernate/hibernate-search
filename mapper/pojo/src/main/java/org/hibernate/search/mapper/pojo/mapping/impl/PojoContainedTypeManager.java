@@ -11,14 +11,13 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
-import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContextImplementor;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
+import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoContainedTypeWorkPlan;
+import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -27,20 +26,17 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoContainedTypeManager<E>
 		implements AutoCloseable, ToStringTreeAppendable,
-		PojoWorkContainedTypeContext<E>, PojoScopeContainedTypeContextImplementor<E> {
+		PojoWorkContainedTypeContext<E>, PojoScopeContainedTypeContext<E> {
 
 	private final Class<E> javaClass;
 	private final PojoCaster<E> caster;
-	private final PojoMappingTypeMetadata mappingMetadata;
 	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
 
 	public PojoContainedTypeManager(Class<E> javaClass,
 			PojoCaster<E> caster,
-			PojoMappingTypeMetadata mappingMetadata,
 			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
 		this.javaClass = javaClass;
 		this.caster = caster;
-		this.mappingMetadata = mappingMetadata;
 		this.reindexingResolver = reindexingResolver;
 	}
 
@@ -86,8 +82,4 @@ public class PojoContainedTypeManager<E>
 		);
 	}
 
-	@Override
-	public PojoMappingTypeMetadata getMappingMetadata() {
-		return mappingMetadata;
-	}
 }

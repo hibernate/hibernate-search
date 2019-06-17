@@ -17,6 +17,8 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
+import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContextProvider;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
@@ -41,6 +43,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final HibernateOrmScopeTypeContextProvider typeContextProvider;
 	private final HibernateOrmSessionContextImpl sessionContext;
 	private AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
@@ -53,6 +56,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder,
 			HibernateOrmSessionContextImpl sessionContext) {
 		super( builder, sessionContext );
+		this.typeContextProvider = builder.typeContextProvider;
 		this.sessionContext = sessionContext;
 		this.synchronizationStrategy = builder.synchronizationStrategy;
 	}
@@ -76,7 +80,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
 		checkOrmSessionIsOpen();
 
-		PojoScopeDelegate<T, T> scopeDelegate = getDelegate().createPojoScope( types );
+		PojoScopeDelegate<T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
+				getDelegate().createPojoScope(
+						types,
+						typeContextProvider::getIndexedByExactClass
+				);
 		return new SearchScopeImpl<>( scopeDelegate, sessionContext );
 	}
 
@@ -124,15 +132,18 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	public static class HibernateOrmSearchSessionBuilder extends AbstractBuilder<HibernateOrmSearchSession>
 			implements SearchSessionBuilder {
 		private final HibernateOrmMappingContextImpl mappingContext;
+		private final HibernateOrmScopeTypeContextProvider typeContextProvider;
 		private final SessionImplementor sessionImplementor;
 		private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
 		public HibernateOrmSearchSessionBuilder(PojoMappingDelegate mappingDelegate,
 				HibernateOrmMappingContextImpl mappingContext,
+				HibernateOrmScopeTypeContextProvider typeContextProvider,
 				SessionImplementor sessionImplementor,
 				AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 			super( mappingDelegate );
 			this.mappingContext = mappingContext;
+			this.typeContextProvider = typeContextProvider;
 			this.sessionImplementor = sessionImplementor;
 			this.synchronizationStrategy = synchronizationStrategy;
 		}

@@ -30,7 +30,7 @@ import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeContext;
+import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -72,7 +72,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostDelete(PostDeleteEvent event) {
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		PojoScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
 			Object providedId = toProvidedId( typeContext, event.getId() );
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
@@ -86,7 +86,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostInsert(PostInsertEvent event) {
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		PojoScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
 			Object providedId = toProvidedId( typeContext, event.getId() );
 			context.getCurrentWorkPlan( event.getSession() )
@@ -98,7 +98,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostUpdate(PostUpdateEvent event) {
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		PojoScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
 			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
 			Object providedId = toProvidedId( typeContext, event.getId() );
@@ -111,7 +111,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		}
 	}
 
-	private Object toProvidedId(PojoScopeTypeContext<?> typeContext, Serializable entityId) {
+	private Object toProvidedId(HibernateOrmScopeTypeContext<?> typeContext, Serializable entityId) {
 		if ( typeContext.getMappingMetadata().isDocumentIdMappedToEntityId() ) {
 			return entityId;
 		}
@@ -160,7 +160,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		return context;
 	}
 
-	private PojoScopeTypeContext<?> getTypeContext(HibernateSearchContextService context, Object entity) {
+	private HibernateOrmScopeTypeContext<?> getTypeContext(HibernateSearchContextService context, Object entity) {
 		return context.getMapping().getTypeContext( Hibernate.getClass( entity ) );
 	}
 
@@ -190,7 +190,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 
-		PojoScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
 			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
 			Object providedId = toProvidedId( typeContext, event.getAffectedOwnerIdOrNull() );
