@@ -17,7 +17,6 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 /**
@@ -27,56 +26,57 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionC
  */
 public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractPojoTypeWorkPlan {
 
-	private final PojoIndexedTypeManager<I, E, D> typeManager;
+	private final PojoWorkIndexedTypeContext<I, E, D> typeContext;
 	private final IndexWorkPlan<D> delegate;
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<I, IndexedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
 
-	public PojoIndexedTypeWorkPlan(PojoIndexedTypeManager<I, E, D> typeManager, AbstractPojoSessionContextImplementor sessionContext,
+	public PojoIndexedTypeWorkPlan(PojoWorkIndexedTypeContext<I, E, D> typeContext,
+			AbstractPojoSessionContextImplementor sessionContext,
 			IndexWorkPlan<D> delegate) {
 		super( sessionContext );
-		this.typeManager = typeManager;
+		this.typeContext = typeContext;
 		this.delegate = delegate;
 	}
 
 	@Override
 	void add(Object providedId, Object entity) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
-		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
+		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getWork( identifier ).add( entitySupplier );
 	}
 
 	@Override
 	void update(Object providedId, Object entity) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
-		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
+		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getWork( identifier ).update( entitySupplier );
 	}
 
 	@Override
 	void update(Object providedId, Object entity, String... dirtyPaths) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
-		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
+		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getWork( identifier ).update( entitySupplier, dirtyPaths );
 	}
 
 	@Override
 	void delete(Object providedId, Object entity) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
-		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
+		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		getWork( identifier ).delete( entitySupplier );
 	}
 
 	@Override
 	void purge(Object providedId) {
-		I identifier = typeManager.getIdentifierMapping().getIdentifier( providedId );
+		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId );
 		getWork( identifier ).purge();
 	}
 
 	void updateBecauseOfContained(Object entity) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
-		I identifier = typeManager.getIdentifierMapping().getIdentifier( null, entitySupplier );
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
+		I identifier = typeContext.getIdentifierMapping().getIdentifier( null, entitySupplier );
 		if ( !workPlansPerId.containsKey( identifier ) ) {
 			getWork( identifier ).updateBecauseOfContained( entitySupplier );
 		}
@@ -208,7 +208,7 @@ public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends Ab
 		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
-				typeManager.resolveEntitiesToReindex(
+				typeContext.resolveEntitiesToReindex(
 						containingEntityCollector, sessionContext.getRuntimeIntrospector(), entitySupplier,
 						considerAllDirty ? null : dirtyPaths
 				);
@@ -217,20 +217,20 @@ public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends Ab
 
 		void sendWorkToDelegate() {
 			DocumentReferenceProvider referenceProvider =
-					typeManager.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
+					typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
 			if ( add ) {
 				if ( delete ) {
-					if ( considerAllDirty || updatedBecauseOfContained || typeManager.requiresSelfReindexing( dirtyPaths ) ) {
+					if ( considerAllDirty || updatedBecauseOfContained || typeContext.requiresSelfReindexing( dirtyPaths ) ) {
 						delegate.update(
 								referenceProvider,
-								typeManager.toDocumentContributor( entitySupplier, sessionContext )
+								typeContext.toDocumentContributor( entitySupplier, sessionContext )
 						);
 					}
 				}
 				else {
 					delegate.add(
 							referenceProvider,
-							typeManager.toDocumentContributor( entitySupplier, sessionContext )
+							typeContext.toDocumentContributor( entitySupplier, sessionContext )
 					);
 				}
 			}

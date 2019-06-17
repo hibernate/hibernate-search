@@ -14,8 +14,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
@@ -25,17 +23,17 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
+	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
 	private final AbstractPojoSessionContextImplementor sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 	private final DocumentCommitStrategy commitStrategy;
 
 	private final Map<Class<?>, PojoTypeDocumentWorkExecutor<?, ?, ?>> typeExecutors = new HashMap<>();
 
-	public PojoSessionWorkExecutorImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
+	public PojoSessionWorkExecutorImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			AbstractPojoSessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy) {
-		this.indexedTypeManagers = indexedTypeManagers;
+		this.indexedTypeContextProvider = indexedTypeContextProvider;
 		this.sessionContext = sessionContext;
 		this.introspector = sessionContext.getRuntimeIntrospector();
 		this.commitStrategy = commitStrategy;
@@ -59,11 +57,12 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 	}
 
 	private PojoTypeDocumentWorkExecutor<?, ?, ?> createTypeDocumentExecutor(Class<?> clazz) {
-		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> exactClass = indexedTypeManagers.getByExactClass( clazz );
-		if ( !exactClass.isPresent() ) {
+		Optional<? extends PojoWorkIndexedTypeContext<?, ?, ?>> typeContext =
+				indexedTypeContextProvider.getByExactClass( clazz );
+		if ( !typeContext.isPresent() ) {
 			throw log.notDirectlyIndexedType( clazz );
 		}
 
-		return exactClass.get().createDocumentWorkExecutor( sessionContext, commitStrategy );
+		return typeContext.get().createDocumentWorkExecutor( sessionContext, commitStrategy );
 	}
 }

@@ -15,7 +15,6 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -26,43 +25,44 @@ public class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoContainedTypeManager<E> typeManager;
+	private final PojoWorkContainedTypeContext<E> typeContext;
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<Object, ContainedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
 
-	public PojoContainedTypeWorkPlan(PojoContainedTypeManager<E> typeManager, AbstractPojoSessionContextImplementor sessionContext) {
+	public PojoContainedTypeWorkPlan(PojoWorkContainedTypeContext<E> typeContext,
+			AbstractPojoSessionContextImplementor sessionContext) {
 		super( sessionContext );
-		this.typeManager = typeManager;
+		this.typeContext = typeContext;
 	}
 
 	@Override
 	void add(Object providedId, Object entity) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		getWork( providedId ).add( entitySupplier );
 	}
 
 	@Override
 	void update(Object providedId, Object entity) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		getWork( providedId ).update( entitySupplier );
 	}
 
 	@Override
 	void update(Object providedId, Object entity, String... dirtyPaths) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		getWork( providedId ).update( entitySupplier, dirtyPaths );
 	}
 
 	@Override
 	void delete(Object providedId, Object entity) {
-		Supplier<E> entitySupplier = typeManager.toEntitySupplier( sessionContext, entity );
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		getWork( providedId ).delete( entitySupplier );
 	}
 
 	@Override
 	void purge(Object providedId) {
-		throw log.cannotPurgeNonIndexedContainedType( typeManager.getJavaClass(), providedId );
+		throw log.cannotPurgeNonIndexedContainedType( typeContext.getJavaClass(), providedId );
 	}
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
@@ -137,7 +137,7 @@ public class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
 		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
-				typeManager.resolveEntitiesToReindex(
+				typeContext.resolveEntitiesToReindex(
 						containingEntityCollector, sessionContext.getRuntimeIntrospector(), entitySupplier,
 						considerAllDirty ? null : dirtyPaths
 				);
