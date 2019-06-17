@@ -1,6 +1,33 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.2.Final (17-06-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3562 Reporting errors about duplicate fields fails with an AssertionFailure when field is declared by a class bridge or class-level @Spatial
+    * HSEARCH-3561 "transpositions" setting is ignored for FuzzyQuery in the Elasticsearch integration
+    * HSEARCH-3545 .withPrefixLength is ignored for .keyword().fuzzy() queries in the Elasticsearch integration
+    * HSEARCH-3537 Maximum number of facets is limited to 100 by default, related Javadoc is wrong
+    * HSEARCH-3535 Parameters are inverted in minimumShouldMatch error message
+    * HSEARCH-1467 indexEmbedded depth parameter shared across class
+
+** Improvement
+    * HSEARCH-3595 Upgrade to Hibernate ORM 5.4.3.Final
+
+** Task
+    * HSEARCH-3620 Add experimental build environments for JDK14
+    * HSEARCH-3582 Ensure the code is compatible with the Eclipse compiler as part of integration tests
+    * HSEARCH-3580 Upgrade to Byteman 4.0.7
+    * HSEARCH-3569 Adapt the build to JDK11.0.3
+    * HSEARCH-3533 Upgrade to Hibernate ORM 5.4.2
+    * HSEARCH-3502 Upgrade to Byteman 4.0.6
+    * HSEARCH-3494 Allow to build the javadoc with JDK12
+    * HSEARCH-3493 Test compatibility with JDK13
+    * HSEARCH-3491 Upgrade to Byteman 4.0.5
+    * HSEARCH-3485 Test compatibility with JDK12
+    * HSEARCH-3484 Use Maven 3.6.0 in the Jenkinsfile
+
 5.11.1.Final (31-01-2019)
 -------------------------
 
