@@ -1,6 +1,25 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.6.Final (17-06-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3562 Reporting errors about duplicate fields fails with an AssertionFailure when field is declared by a class bridge or class-level @Spatial
+    * HSEARCH-3561 "transpositions" setting is ignored for FuzzyQuery in the Elasticsearch integration
+    * HSEARCH-3545 .withPrefixLength is ignored for .keyword().fuzzy() queries in the Elasticsearch integration
+    * HSEARCH-3537 Maximum number of facets is limited to 100 by default, related Javadoc is wrong
+
+** Task
+    * HSEARCH-3569 Adapt the build to JDK11.0.3
+    * HSEARCH-3565 Upgrade to Hibernate ORM 5.3.10.Final
+    * HSEARCH-3508 Update build configuration to regularly test 5.10 against JDK11
+    * HSEARCH-3504 Upgrade to Hibernate ORM 5.3.9.Final
+    * HSEARCH-3501 Remove byte-buddy dependency management following ORM upgrade to 5.3.9
+    * HSEARCH-3500 Manage bytebuddy version following HHH-13283
+    * HSEARCH-3495 Upgrade to Hibernate ORM 5.3.8.Final
+    * HSEARCH-3417 Remove the snapshot dependencies trigger from the Jenkinsfile
+
 5.10.5.Final (21-11-2018)
 -------------------------
 
