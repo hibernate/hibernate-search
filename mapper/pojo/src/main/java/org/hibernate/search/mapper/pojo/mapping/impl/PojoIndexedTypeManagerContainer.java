@@ -50,8 +50,9 @@ public class PojoIndexedTypeManagerContainer
 		return Optional.ofNullable( byIndexName.get( indexName ) );
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
-	<E> Optional<Set<PojoIndexedTypeManager<?, ? extends E, ?>>> getAllBySuperClass(Class<E> clazz) {
+	public <E> Optional<Set<PojoIndexedTypeManager<?, ? extends E, ?>>> getAllBySuperClass(Class<E> clazz) {
 		return Optional.ofNullable( (Set<PojoIndexedTypeManager<?, ? extends E, ?>>) bySuperClass.get( clazz ) );
 	}
 

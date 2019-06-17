@@ -7,9 +7,14 @@
 package org.hibernate.search.mapper.pojo.scope.impl;
 
 import java.util.Optional;
+import java.util.Set;
 
-public interface PojoScopeIndexedTypeContextProvider {
+import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContextProvider;
+
+public interface PojoScopeIndexedTypeContextProvider extends PojoWorkIndexedTypeContextProvider {
 
 	Optional<? extends PojoScopeIndexedTypeContext<?, ?, ?>> getByIndexName(String indexName);
+
+	<E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>>> getAllBySuperClass(Class<E> clazz);
 
 }

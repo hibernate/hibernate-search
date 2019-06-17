@@ -15,10 +15,12 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContextProvider;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContextProvider;
 import org.hibernate.search.util.common.impl.Closer;
 
-public class PojoContainedTypeManagerContainer implements PojoWorkContainedTypeContextProvider {
+public class PojoContainedTypeManagerContainer
+		implements PojoWorkContainedTypeContextProvider, PojoScopeContainedTypeContextProvider {
 
 	public static Builder builder() {
 		return new Builder();
