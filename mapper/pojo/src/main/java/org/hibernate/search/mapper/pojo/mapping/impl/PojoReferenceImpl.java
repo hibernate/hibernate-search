@@ -11,9 +11,7 @@ import java.util.Objects;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class PojoReferenceImpl implements PojoReference {
 
 	private final Class<?> type;

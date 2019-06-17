@@ -11,9 +11,7 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final ElasticsearchIndexSchemaObjectNode parent;

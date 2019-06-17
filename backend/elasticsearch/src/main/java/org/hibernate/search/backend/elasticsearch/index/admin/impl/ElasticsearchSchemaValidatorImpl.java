@@ -46,7 +46,6 @@ import com.google.gson.JsonPrimitive;
  * are totally ignored. This allows users to leverage Elasticsearch features that are not supported in
  * Hibernate Search, by setting those attributes manually.
  *
- * @author Yoann Rodiere
  */
 public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaValidator {
 

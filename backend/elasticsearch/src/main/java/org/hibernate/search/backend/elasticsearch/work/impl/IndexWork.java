@@ -14,9 +14,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBui
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 
 	public IndexWork(Builder builder) {

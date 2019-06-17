@@ -18,7 +18,6 @@ import com.google.gson.JsonPrimitive;
 /**
  * Determines whether two {@link JsonElement}s should be considered equivalent.
  *
- * @author Yoann Rodiere
  */
 public class AnalysisJsonElementEquivalence {
 

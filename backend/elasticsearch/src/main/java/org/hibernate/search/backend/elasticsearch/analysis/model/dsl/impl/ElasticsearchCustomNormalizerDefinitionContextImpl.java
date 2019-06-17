@@ -12,9 +12,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.N
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchCustomNormalizerDefinitionContext;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchCustomNormalizerDefinitionContextImpl
 		implements ElasticsearchCustomNormalizerDefinitionContext,
 		ElasticsearchAnalysisDefinitionContributor {

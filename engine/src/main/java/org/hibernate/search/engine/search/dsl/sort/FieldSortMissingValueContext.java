@@ -15,7 +15,6 @@ import org.hibernate.search.util.common.SearchException;
  * @param <N> The type of the next context (returned by {@link FieldSortMissingValueContext#sortFirst()}, for example).
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
- * @author Yoann Rodiere
  */
 public interface FieldSortMissingValueContext<N> {
 

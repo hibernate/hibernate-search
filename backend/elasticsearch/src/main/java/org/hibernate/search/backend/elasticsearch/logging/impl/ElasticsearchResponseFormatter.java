@@ -13,7 +13,6 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
  * to display {@link ElasticsearchResponse}s in log messages.
  *
- * @author Yoann Rodiere
  */
 public class ElasticsearchResponseFormatter {
 

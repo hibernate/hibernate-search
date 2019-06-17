@@ -16,9 +16,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.util.common.AssertionFailure;
 
-/**
- * @author Yoann Rodiere
- */
+
 public final class StreamHelper {
 
 	private StreamHelper() {

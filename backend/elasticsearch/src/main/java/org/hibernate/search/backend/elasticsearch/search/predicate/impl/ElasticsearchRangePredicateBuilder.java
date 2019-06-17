@@ -23,9 +23,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearchSearchPredicateBuilder
 		implements RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 

@@ -16,9 +16,7 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-/**
- * @author Guillaume Smet
- */
+
 class LuceneGeoPointIndexFieldTypeContext
 		extends AbstractLuceneStandardIndexFieldTypeContext<LuceneGeoPointIndexFieldTypeContext, GeoPoint> {
 

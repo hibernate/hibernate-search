@@ -17,7 +17,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * The default {@link ElasticsearchSchemaMigrator} implementation.
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
 public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigrator {
 

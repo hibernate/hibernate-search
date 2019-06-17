@@ -15,7 +15,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * The default {@link ElasticsearchSchemaCreator} implementation.
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
 public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreator {
 

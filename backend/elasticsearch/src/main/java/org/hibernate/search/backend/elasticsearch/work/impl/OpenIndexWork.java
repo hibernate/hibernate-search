@@ -12,9 +12,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class OpenIndexWork extends AbstractSimpleElasticsearchWork<Void> {
 
 	protected OpenIndexWork(Builder builder) {

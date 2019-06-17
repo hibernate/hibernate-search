@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
  * from this module's directory.
  *
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({ ".*\\.tck\\..*" })

@@ -23,9 +23,7 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 
-/**
- * @author Guillaume Smet
- */
+
 class LuceneBooleanJunctionPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		implements BooleanJunctionPredicateBuilder<LuceneSearchPredicateBuilder> {
 

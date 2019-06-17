@@ -21,9 +21,7 @@ import org.hibernate.search.util.common.impl.Throwables;
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 		extends AbstractSimpleElasticsearchWork<R>
 		implements BulkableElasticsearchWork<R> {

@@ -23,9 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.http.HttpEntity;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchClientUtils {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

@@ -16,9 +16,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.util.common.impl.Closer;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> {
 
 	private final PojoCaster<? super I> caster;

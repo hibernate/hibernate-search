@@ -11,7 +11,6 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 /**
  * The default {@link ElasticsearchSchemaDropper} implementation.
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
 public class ElasticsearchSchemaDropperImpl implements ElasticsearchSchemaDropper {
 

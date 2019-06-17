@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.analysis.model.impl;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface ElasticsearchAnalysisDefinitionContributor {
 
 	void contribute(ElasticsearchAnalysisDefinitionCollector collector);

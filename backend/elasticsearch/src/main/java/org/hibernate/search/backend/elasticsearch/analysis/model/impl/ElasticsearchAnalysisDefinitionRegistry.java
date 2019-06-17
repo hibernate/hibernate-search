@@ -25,7 +25,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * This class provides access to the full mapping from names to definitions
  * (see {@link #getAnalyzerDefinitions} for instance).
  *
- * @author Yoann Rodiere
  */
 public final class ElasticsearchAnalysisDefinitionRegistry {
 

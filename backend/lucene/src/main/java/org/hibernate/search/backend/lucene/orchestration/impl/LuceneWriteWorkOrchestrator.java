@@ -13,9 +13,7 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneWriteWorkOrchestrator {
 
 	<T> CompletableFuture<T> submit(LuceneWriteWork<T> work,

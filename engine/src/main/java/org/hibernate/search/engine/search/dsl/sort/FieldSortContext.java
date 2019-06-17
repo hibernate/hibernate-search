@@ -10,7 +10,6 @@ package org.hibernate.search.engine.search.dsl.sort;
  * The context used when defining a field sort.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
- * @author Yoann Rodiere
  */
 public interface FieldSortContext
 		extends NonEmptySortContext, SortOrderContext<FieldSortContext> {

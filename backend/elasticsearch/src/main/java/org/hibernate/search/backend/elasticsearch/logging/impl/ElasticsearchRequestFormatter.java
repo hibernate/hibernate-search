@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
  * to display {@link ElasticsearchRequest}s in log messages.
  *
- * @author Yoann Rodiere
  */
 public class ElasticsearchRequestFormatter {
 

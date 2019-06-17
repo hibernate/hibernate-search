@@ -31,10 +31,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
-/**
- * @author Yoann Rodiere
- * @author Guillaume Smet
- */
+
 class ElasticsearchStringIndexFieldTypeContext
 		extends AbstractElasticsearchStandardIndexFieldTypeContext<ElasticsearchStringIndexFieldTypeContext, String>
 		implements StringIndexFieldTypeContext<ElasticsearchStringIndexFieldTypeContext> {

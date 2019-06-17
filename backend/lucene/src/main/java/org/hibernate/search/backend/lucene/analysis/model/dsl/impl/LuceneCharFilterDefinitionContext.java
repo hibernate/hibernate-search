@@ -14,9 +14,7 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalys
 import org.apache.lucene.analysis.util.CharFilterFactory;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class LuceneCharFilterDefinitionContext
 		extends AbstractLuceneAnalysisComponentDefinitionContext<CharFilterFactory> {
 

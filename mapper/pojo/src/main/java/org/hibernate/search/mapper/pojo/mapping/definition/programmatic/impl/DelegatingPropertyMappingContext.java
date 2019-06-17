@@ -22,9 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 class DelegatingPropertyMappingContext implements PropertyMappingContext {
 
 	private final PropertyMappingContext delegate;

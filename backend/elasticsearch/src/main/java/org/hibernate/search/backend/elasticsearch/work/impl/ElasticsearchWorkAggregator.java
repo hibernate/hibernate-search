@@ -8,9 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface ElasticsearchWorkAggregator {
 
 	<T> CompletableFuture<T> addBulkable(BulkableElasticsearchWork<T> work);

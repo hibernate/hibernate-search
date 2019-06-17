@@ -17,9 +17,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMapp
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class PutIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Void> {
 
 	protected PutIndexTypeMappingWork(Builder builder) {

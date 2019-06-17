@@ -16,9 +16,7 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchRoutingTypeJsonAdapter extends TypeAdapter<RoutingType> {
 
 	@Override

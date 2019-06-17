@@ -12,9 +12,7 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import com.google.gson.JsonObject;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 class ElasticsearchNestedPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements NestedPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 

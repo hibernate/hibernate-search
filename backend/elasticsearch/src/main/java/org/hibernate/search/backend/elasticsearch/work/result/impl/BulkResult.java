@@ -8,9 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.result.impl;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface BulkResult {
 
 	BulkResultItemExtractor withContext(ElasticsearchWorkExecutionContext context);

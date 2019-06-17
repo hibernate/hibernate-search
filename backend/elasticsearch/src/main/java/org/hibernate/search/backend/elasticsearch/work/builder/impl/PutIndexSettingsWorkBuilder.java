@@ -8,9 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface PutIndexSettingsWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>> {
 
 }

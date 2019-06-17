@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
- * @author Yoann Rodiere
  */
 public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector {
 

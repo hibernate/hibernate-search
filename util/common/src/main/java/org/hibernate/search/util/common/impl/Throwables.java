@@ -11,7 +11,6 @@ import org.hibernate.search.util.common.AssertionFailure;
 /**
  * Throwable-related utils.
  *
- * @author Yoann Rodiere
  */
 public final class Throwables {
 

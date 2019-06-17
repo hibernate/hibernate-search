@@ -35,9 +35,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearchResult<H>>
 		implements LuceneSearchQuery<H> {
 

@@ -11,7 +11,6 @@ package org.hibernate.search.util.common.logging.impl;
  * Log category to be used with {@link LoggerFactory#make(Class, LogCategory)}.
  *
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
 public final class LogCategory {
 

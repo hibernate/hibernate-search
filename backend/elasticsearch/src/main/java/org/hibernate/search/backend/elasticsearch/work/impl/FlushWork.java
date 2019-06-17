@@ -24,7 +24,6 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkB
  * This is necessary because the "refresh" parameter in the Flush API has been removed
  * in ES5 (elasticsearch/elasticsearch:7cc48c8e8723d3b31fbcb371070bc2a8d87b1f7e).
  *
- * @author Yoann Rodiere
  */
 public class FlushWork extends AbstractSimpleElasticsearchWork<Void> {
 

@@ -11,9 +11,7 @@ import org.hibernate.search.util.common.SearchException;
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface ElasticsearchRequestSuccessAssessor {
 
 	/**

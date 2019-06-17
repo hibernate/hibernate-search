@@ -10,7 +10,6 @@ package org.hibernate.search.engine.search.dsl.sort;
  * A superinterface for contexts allowing to define sorts.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
- * @author Yoann Rodiere
  */
 public interface NonEmptySortContext extends SearchSortTerminalContext {
 

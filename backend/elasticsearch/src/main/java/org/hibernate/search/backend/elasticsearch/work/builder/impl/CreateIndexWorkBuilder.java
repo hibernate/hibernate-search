@@ -11,9 +11,7 @@ import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.I
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface CreateIndexWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<CreateIndexResult>> {
 
 	CreateIndexWorkBuilder ignoreExisting();

@@ -11,9 +11,7 @@ import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponent
 
 import org.apache.lucene.analysis.Analyzer;
 
-/**
- * @author Yoann Rodiere
- */
+
 interface LuceneAnalyzerBuilder extends LuceneAnalysisComponentBuilder<Analyzer> {
 
 	@Override

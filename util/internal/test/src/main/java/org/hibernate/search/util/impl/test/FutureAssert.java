@@ -19,9 +19,7 @@ import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matcher;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Future<T>> {
 
 	public static <T> FutureAssert<T> assertThat(Future<T> future) {

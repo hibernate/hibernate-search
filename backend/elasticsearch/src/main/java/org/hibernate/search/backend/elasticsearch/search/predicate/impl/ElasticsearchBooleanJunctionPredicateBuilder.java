@@ -21,9 +21,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements BooleanJunctionPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 

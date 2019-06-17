@@ -19,9 +19,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.hamcrest.TypeSafeMatcher;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ExceptionMatcherBuilder {
 
 	public static ExceptionMatcherBuilder isException(Class<? extends Throwable> clazz) {

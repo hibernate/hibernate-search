@@ -8,9 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface ElasticsearchWorkBuilder<W extends ElasticsearchWork<?>> {
 
 	W build();

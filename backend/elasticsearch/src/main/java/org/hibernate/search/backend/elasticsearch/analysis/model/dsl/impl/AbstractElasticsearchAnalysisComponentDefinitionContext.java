@@ -21,9 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
-/**
- * @author Yoann Rodiere
- */
+
 public abstract class AbstractElasticsearchAnalysisComponentDefinitionContext<D extends AnalysisDefinition>
 		implements ElasticsearchTypedAnalysisComponentDefinitionContext,
 		ElasticsearchAnalysisComponentDefinitionContext,

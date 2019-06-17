@@ -26,9 +26,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearchSearchPredicateBuilder
 		implements MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 

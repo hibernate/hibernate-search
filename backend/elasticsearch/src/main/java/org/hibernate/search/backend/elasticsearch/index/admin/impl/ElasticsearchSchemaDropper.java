@@ -12,7 +12,6 @@ import org.hibernate.search.util.common.SearchException;
 /**
  * An object responsible for dropping an indexes.
  *
- * @author Yoann Rodiere
  */
 public interface ElasticsearchSchemaDropper {
 

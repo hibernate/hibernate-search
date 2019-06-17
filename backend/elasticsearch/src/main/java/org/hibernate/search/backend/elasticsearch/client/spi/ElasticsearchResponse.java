@@ -8,9 +8,7 @@ package org.hibernate.search.backend.elasticsearch.client.spi;
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public final class ElasticsearchResponse {
 
 	private final int statusCode;

@@ -17,7 +17,6 @@ import com.google.gson.JsonObject;
  * A {@link JsonAccessor} whose purpose is to get access to a new node
  * in the data structure (object property, array element, ...).
  *
- * @author Yoann Rodiere
  */
 abstract class AbstractCrawlingJsonAccessor<P extends JsonElement> extends AbstractNonRootJsonAccessor<P, JsonElement>
 		implements UnknownTypeJsonAccessor {

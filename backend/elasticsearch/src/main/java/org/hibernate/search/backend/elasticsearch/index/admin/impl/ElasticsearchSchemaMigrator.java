@@ -11,7 +11,6 @@ import org.hibernate.search.util.common.SearchException;
 /**
  * An object responsible for updating an existing index to match provided metadata.
  *
- * @author Yoann Rodiere
  */
 public interface ElasticsearchSchemaMigrator {
 

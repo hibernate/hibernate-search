@@ -12,9 +12,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneQueryBasedUpdateEntryWork extends AbstractLuceneUpdateEntryWork {
 
 	public LuceneQueryBasedUpdateEntryWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {

@@ -22,7 +22,6 @@ import org.hibernate.search.util.common.impl.Contracts;
  * @param <S> The concrete type of this context.
  * @param <F> The type of field values.
  *
- * @author Guillaume Smet
  */
 abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuceneStandardIndexFieldTypeContext<? extends S, F>, F>
 		implements LuceneStandardIndexFieldTypeContext<S, F> {

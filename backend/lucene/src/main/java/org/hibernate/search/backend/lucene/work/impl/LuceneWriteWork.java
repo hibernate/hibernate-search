@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneWriteWork<T> {
 
 	T execute(LuceneWriteWorkExecutionContext context);

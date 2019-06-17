@@ -14,7 +14,6 @@ import com.google.gson.JsonObject;
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith}
  * to display {@link JsonObject}s in log messages.
  *
- * @author Yoann Rodiere
  */
 public class ElasticsearchJsonObjectFormatter {
 

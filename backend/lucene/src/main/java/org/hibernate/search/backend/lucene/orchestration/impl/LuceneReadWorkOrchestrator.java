@@ -11,9 +11,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneReadWorkOrchestrator {
 
 	<T> T submit(Set<String> indexNames, Set<ReaderProvider> readerProviders, LuceneReadWork<T> work);

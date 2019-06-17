@@ -11,9 +11,7 @@ import java.util.List;
 
 import org.apache.lucene.document.Document;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneIndexEntry implements Iterable<Document> {
 
 	private final String indexName;

@@ -13,7 +13,6 @@ import java.util.Map;
  * Stores the knowledge of how to compare values for a given parameter
  * for a given analysis type (analyzer type, char filter type, etc.).
  *
- * @author Yoann Rodiere
  */
 public class AnalysisParameterEquivalenceRegistry {
 

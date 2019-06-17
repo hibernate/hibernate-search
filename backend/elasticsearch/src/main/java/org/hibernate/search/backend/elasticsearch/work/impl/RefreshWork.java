@@ -15,9 +15,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class RefreshWork extends AbstractSimpleElasticsearchWork<Void> {
 
 	protected RefreshWork(Builder builder) {

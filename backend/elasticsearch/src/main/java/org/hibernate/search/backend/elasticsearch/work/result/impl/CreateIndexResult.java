@@ -7,9 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.work.result.impl;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public enum CreateIndexResult {
 
 	CREATED,

@@ -35,9 +35,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.Gson;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		implements ElasticsearchIndexFieldTypeFactoryContext, ElasticsearchIndexFieldTypeBuildContext {
 

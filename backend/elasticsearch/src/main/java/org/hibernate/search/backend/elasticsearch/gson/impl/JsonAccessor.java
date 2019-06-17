@@ -20,7 +20,6 @@ import com.google.gson.JsonObject;
  * @see JsonArrayAccessor
  * @see UnknownTypeJsonAccessor
  *
- * @author Yoann Rodiere
  */
 public interface JsonAccessor<T> {
 

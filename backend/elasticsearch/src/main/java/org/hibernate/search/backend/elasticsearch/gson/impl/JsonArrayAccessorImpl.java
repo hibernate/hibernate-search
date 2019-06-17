@@ -11,9 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class JsonArrayAccessorImpl extends AbstractTypingJsonAccessor<JsonArray>
 		implements JsonArrayAccessor, JsonCompositeAccessor<JsonArray> {
 

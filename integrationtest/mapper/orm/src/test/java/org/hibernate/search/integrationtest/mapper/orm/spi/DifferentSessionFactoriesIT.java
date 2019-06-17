@@ -28,8 +28,6 @@ import org.junit.rules.ExpectedException;
 
 /**
  * Tests the creation of a {@link SearchSessionImplementor}, using a {@link HibernateOrmMapping} with an {@link EntityManager} owned by a different {@link SessionFactory}.
- *
- * @author Fabio Massimo Ercoli
  */
 public class DifferentSessionFactoriesIT {
 

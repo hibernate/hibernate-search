@@ -20,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.OptimizeWork
  * <p>
  * The ForceMerge API replaces the removed Optimize API in ES5.
  *
- * @author Yoann Rodiere
  */
 public class OptimizeWork extends AbstractSimpleElasticsearchWork<Void> {
 

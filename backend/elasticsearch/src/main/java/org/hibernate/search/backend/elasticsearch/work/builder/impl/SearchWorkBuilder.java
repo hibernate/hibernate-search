@@ -13,9 +13,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface SearchWorkBuilder<T> extends ElasticsearchWorkBuilder<ElasticsearchWork<ElasticsearchLoadableSearchResult<T>>> {
 
 	SearchWorkBuilder<T> indexes(Collection<URLEncodedString> indexNames);

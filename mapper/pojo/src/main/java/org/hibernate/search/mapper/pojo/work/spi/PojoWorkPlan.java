@@ -18,7 +18,6 @@ import java.util.concurrent.CompletableFuture;
  * <p>
  * Implementations may not be thread-safe.
  *
- * @author Yoann Rodiere
  */
 public interface PojoWorkPlan {
 

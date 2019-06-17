@@ -19,9 +19,7 @@ import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexRe
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndexResult> {
 
 	private static final String MAPPINGS_PROPERTY = "mappings";

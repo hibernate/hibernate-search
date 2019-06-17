@@ -19,9 +19,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.Explanation;
 
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 
 	private final MultiTenancyStrategy multiTenancyStrategy;

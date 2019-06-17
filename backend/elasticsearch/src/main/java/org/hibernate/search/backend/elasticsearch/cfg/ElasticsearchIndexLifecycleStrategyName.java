@@ -16,7 +16,6 @@ import org.hibernate.search.util.common.impl.StringHelper;
  * Strategy for creating/deleting the indexes in Elasticsearch upon Hibernate Search initialization and shut-down.
  *
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
 public enum ElasticsearchIndexLifecycleStrategyName {
 

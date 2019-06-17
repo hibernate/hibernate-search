@@ -27,7 +27,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
  * <p>
  * Implementations are mutable and unlikely to be thread-safe.
  *
- * @author Yoann Rodiere
  */
 interface ElasticsearchWorkSequenceBuilder {
 

@@ -19,10 +19,7 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 import com.google.gson.Gson;
 
-/**
- * @author Yoann Rodiere
- * @author Guillaume Smet
- */
+
 class ElasticsearchNativeIndexFieldTypeContextImpl
 		extends AbstractElasticsearchIndexFieldTypeConverterContext<ElasticsearchNativeIndexFieldTypeContextImpl, String>
 		implements ElasticsearchNativeIndexFieldTypeContext<ElasticsearchNativeIndexFieldTypeContextImpl> {

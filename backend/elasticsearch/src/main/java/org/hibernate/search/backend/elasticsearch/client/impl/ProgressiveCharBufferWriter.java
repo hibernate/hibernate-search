@@ -28,7 +28,6 @@ import org.apache.http.nio.ContentEncoder;
  * reactive output to some extent.
  *
  * @author Sanne Grinovero
- * @author Yoann Rodiere
  */
 class ProgressiveCharBufferWriter extends Writer {
 

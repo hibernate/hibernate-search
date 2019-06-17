@@ -9,9 +9,7 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface OptimizeWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>> {
 
 	OptimizeWorkBuilder index(URLEncodedString indexName);

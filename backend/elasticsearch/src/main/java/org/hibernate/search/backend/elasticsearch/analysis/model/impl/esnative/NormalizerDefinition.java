@@ -11,7 +11,6 @@ import com.google.gson.annotations.JsonAdapter;
 /**
  * A definition of an Elasticsearch normalizer, to be included in index settings.
  *
- * @author Yoann Rodiere
  */
 @JsonAdapter(NormalizerDefinitionJsonAdapterFactory.class)
 public class NormalizerDefinition extends AbstractCompositeAnalysisDefinition {

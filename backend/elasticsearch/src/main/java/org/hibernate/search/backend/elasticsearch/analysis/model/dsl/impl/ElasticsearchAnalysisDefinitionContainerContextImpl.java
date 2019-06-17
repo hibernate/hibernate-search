@@ -20,9 +20,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchAnalysisDefinitionContainerContextImpl
 		implements ElasticsearchAnalysisDefinitionContainerContext, ElasticsearchAnalysisDefinitionContributor {
 

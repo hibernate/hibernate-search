@@ -19,7 +19,6 @@ import org.apache.lucene.analysis.Analyzer;
 /**
  * A registry of analysis-related definitions for Lucene.
  *
- * @author Yoann Rodiere
  */
 public final class LuceneAnalysisDefinitionRegistry {
 

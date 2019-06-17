@@ -15,9 +15,7 @@ import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-/**
- * @author Guillaume Smet
- */
+
 public final class ScopedAnalyzer extends DelegatingAnalyzerWrapper {
 
 	private final Map<String, Analyzer> scopedAnalyzers;

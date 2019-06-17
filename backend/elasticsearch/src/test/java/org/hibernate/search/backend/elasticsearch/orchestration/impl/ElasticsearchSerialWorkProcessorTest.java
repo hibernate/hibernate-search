@@ -26,9 +26,7 @@ import org.junit.Test;
 import org.easymock.EasyMockSupport;
 import org.easymock.IAnswer;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 
 	/**

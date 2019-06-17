@@ -68,7 +68,6 @@ package org.hibernate.search.util.common.impl;
  * @param <E> The supertype of exceptions this closer can catch and re-throw,
  * besides {@link RuntimeException} and {@link Error}.
  *
- * @author Yoann Rodiere
  */
 public final class Closer<E extends Exception> extends AbstractCloser<Closer<E>, E> implements AutoCloseable {
 

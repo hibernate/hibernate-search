@@ -16,9 +16,7 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneSearchQueryElementCollector
 		implements LuceneSearchPredicateCollector, LuceneSearchSortCollector {
 

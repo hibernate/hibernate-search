@@ -18,7 +18,6 @@ import com.google.gson.JsonObject;
  * <p>
  * The node being accessed is provided by the "parent" accessor.
  *
- * @author Yoann Rodiere
  */
 abstract class AbstractTypingJsonAccessor<T> extends AbstractNonRootJsonAccessor<JsonElement, T> {
 

@@ -16,10 +16,7 @@ import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchG
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-/**
- * @author Yoann Rodiere
- * @author Guillaume Smet
- */
+
 class ElasticsearchGeoPointIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchGeoPointIndexFieldTypeContext, GeoPoint> {
 

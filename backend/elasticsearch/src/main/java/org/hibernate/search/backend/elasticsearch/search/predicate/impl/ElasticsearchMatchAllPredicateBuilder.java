@@ -12,9 +12,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 class ElasticsearchMatchAllPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements MatchAllPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 

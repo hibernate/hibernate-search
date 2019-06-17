@@ -17,9 +17,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public final class ElasticsearchRequest {
 
 	public static Builder put() {

@@ -14,9 +14,7 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 
-/**
- * @author Yoann Rodiere
- */
+
 abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractElasticsearchScalarFieldTypeContext<? extends S, F>, F>
 		extends AbstractElasticsearchStandardIndexFieldTypeContext<S, F> {
 

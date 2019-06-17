@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
  *<p>Adapt the classpath filter as needed to run a single test or an entire test package.
  *
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({ ".*\\.tck\\..*" })

@@ -23,7 +23,6 @@ import java.util.Set;
  *
  * @author Gunnar Morling
  * @author Hardy Ferentschik
- * @author Guillaume Smet
  */
 public final class CollectionHelper {
 

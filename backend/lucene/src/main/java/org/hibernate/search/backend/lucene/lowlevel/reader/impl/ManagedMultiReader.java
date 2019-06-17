@@ -23,7 +23,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
- * @author Guillaume Smet
  */
 public class ManagedMultiReader extends MultiReader {
 

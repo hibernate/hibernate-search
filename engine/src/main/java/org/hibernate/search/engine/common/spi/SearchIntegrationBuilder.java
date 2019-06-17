@@ -13,9 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface SearchIntegrationBuilder {
 
 	SearchIntegrationBuilder setClassResolver(ClassResolver classResolver);

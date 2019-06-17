@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 
 /**
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
 public class ElasticsearchIndexLifecycleExecutionOptions {
 

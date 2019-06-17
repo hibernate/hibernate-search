@@ -44,9 +44,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.util.Version;
 
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneBackendFactory implements BackendFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

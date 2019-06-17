@@ -13,7 +13,6 @@ import org.hibernate.search.util.common.SearchException;
 /**
  * An Elasticsearch client, allowing to perform requests to a remote cluster.
  *
- * @author Yoann Rodiere
  */
 public interface ElasticsearchClient {
 

@@ -13,9 +13,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.IndexSettings;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface BackendImplementor<D extends DocumentElement> extends AutoCloseable {
 
 	/**

@@ -13,9 +13,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 class RoutingKeyBridgeMappingContributor implements PojoTypeMetadataContributor {
 
 	private final BridgeBuilder<? extends RoutingKeyBridge> routingKeyBridgeBuilder;

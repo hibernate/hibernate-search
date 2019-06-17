@@ -14,9 +14,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBu
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 
 	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =

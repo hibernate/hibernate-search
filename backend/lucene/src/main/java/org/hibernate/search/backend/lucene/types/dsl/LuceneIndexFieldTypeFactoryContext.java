@@ -16,9 +16,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneIndexFieldTypeFactoryContext extends IndexFieldTypeFactoryContext {
 
 	/**

@@ -11,9 +11,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWorkBuilder;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class DropIndexWork extends AbstractSimpleElasticsearchWork<Void> {
 
 	protected DropIndexWork(Builder builder) {

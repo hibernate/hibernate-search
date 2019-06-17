@@ -11,7 +11,6 @@ import com.google.gson.annotations.JsonAdapter;
 /**
  * A definition of an Elasticsearch analyzer, to be included in index settings.
  *
- * @author Yoann Rodiere
  */
 @JsonAdapter(AnalyzerDefinitionJsonAdapterFactory.class)
 public class AnalyzerDefinition extends AbstractCompositeAnalysisDefinition {

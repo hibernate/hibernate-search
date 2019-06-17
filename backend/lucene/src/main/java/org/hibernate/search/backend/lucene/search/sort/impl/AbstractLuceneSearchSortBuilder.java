@@ -10,9 +10,7 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 
 
-/**
- * @author Guillaume Smet
- */
+
 public abstract class AbstractLuceneSearchSortBuilder implements SearchSortBuilder<LuceneSearchSortBuilder>,
 		LuceneSearchSortBuilder {
 

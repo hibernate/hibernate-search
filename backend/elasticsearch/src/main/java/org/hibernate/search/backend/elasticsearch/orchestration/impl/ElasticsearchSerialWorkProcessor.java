@@ -22,7 +22,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAgg
  * <p>
  * This class is mutable and not thread-safe.
  *
- * @author Yoann Rodiere
  */
 class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 

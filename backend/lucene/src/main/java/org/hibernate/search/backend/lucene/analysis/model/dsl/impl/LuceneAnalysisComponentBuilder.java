@@ -13,9 +13,7 @@ import java.util.function.IntFunction;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 
-/**
- * @author Yoann Rodiere
- */
+
 interface LuceneAnalysisComponentBuilder<T> {
 
 	T build(LuceneAnalysisComponentFactory factory) throws IOException;

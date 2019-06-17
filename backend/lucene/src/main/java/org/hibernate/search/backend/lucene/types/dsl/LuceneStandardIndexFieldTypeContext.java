@@ -9,9 +9,7 @@ package org.hibernate.search.backend.lucene.types.dsl;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneStandardIndexFieldTypeContext<S extends LuceneStandardIndexFieldTypeContext<? extends S, F>, F>
 		extends StandardIndexFieldTypeContext<S, F> {
 

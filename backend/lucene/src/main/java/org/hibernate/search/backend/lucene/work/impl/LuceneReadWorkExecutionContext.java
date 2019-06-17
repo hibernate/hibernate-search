@@ -10,9 +10,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.IndexReader;
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneReadWorkExecutionContext {
 
 	IndexReader getIndexReader();

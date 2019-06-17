@@ -10,9 +10,7 @@ import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.A
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchIndexSettingsBuilder {
 
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;

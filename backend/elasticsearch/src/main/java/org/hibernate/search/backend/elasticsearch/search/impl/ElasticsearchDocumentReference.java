@@ -11,9 +11,7 @@ import java.util.Objects;
 import org.hibernate.search.engine.search.DocumentReference;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchDocumentReference implements DocumentReference {
 
 	private final String indexName;

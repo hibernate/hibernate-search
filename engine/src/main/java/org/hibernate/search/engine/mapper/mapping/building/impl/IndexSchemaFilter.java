@@ -63,7 +63,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * For more information about how filters are composed, see
  * {@link #composeWithNested(MappableTypeModel, String, Integer, Set)}.
  *
- * @author Yoann Rodiere
  */
 class IndexSchemaFilter {
 

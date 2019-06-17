@@ -13,9 +13,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollW
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ClearScrollWork extends AbstractSimpleElasticsearchWork<Void> {
 
 	protected ClearScrollWork(Builder builder) {

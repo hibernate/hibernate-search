@@ -16,9 +16,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDo
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
-/**
- * @author Guillaume Smet
- */
+
 class LuceneNativeIndexFieldTypeContext<F>
 		implements IndexFieldTypeTerminalContext<F> {
 

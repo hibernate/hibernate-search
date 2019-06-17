@@ -9,9 +9,7 @@ package org.hibernate.search.engine.backend.document.model.dsl.impl;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface IndexSchemaNestingContext {
 
 	<T> T nest(String relativeFieldName, Function<String, T> nestedElementFactoryIfIncluded,

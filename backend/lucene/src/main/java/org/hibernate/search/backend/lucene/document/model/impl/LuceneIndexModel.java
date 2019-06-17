@@ -14,9 +14,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneIndexModel implements AutoCloseable {
 
 	private final String indexName;

@@ -35,9 +35,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneIndexFieldTypeFactoryContextImpl
 		implements LuceneIndexFieldTypeFactoryContext, LuceneIndexFieldTypeBuildContext {
 

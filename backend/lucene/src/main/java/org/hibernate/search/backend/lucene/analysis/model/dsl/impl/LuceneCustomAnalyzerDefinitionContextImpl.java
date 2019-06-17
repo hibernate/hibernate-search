@@ -24,9 +24,7 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class LuceneCustomAnalyzerDefinitionContextImpl
 		extends DelegatingAnalysisDefinitionContainerContext
 		implements LuceneCustomAnalyzerDefinitionContext, LuceneAnalyzerDefinitionWithTokenizerContext,

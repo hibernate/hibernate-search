@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.impl;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface LuceneAnalysisDefinitionContributor {
 
 	void contribute(LuceneAnalysisDefinitionCollector collector);

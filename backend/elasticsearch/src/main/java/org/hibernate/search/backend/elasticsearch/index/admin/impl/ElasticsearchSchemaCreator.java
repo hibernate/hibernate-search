@@ -12,7 +12,6 @@ import org.hibernate.search.util.common.SearchException;
 /**
  * An object responsible for creating an index and its mappings based on provided metadata.
  *
- * @author Yoann Rodiere
  */
 public interface ElasticsearchSchemaCreator {
 

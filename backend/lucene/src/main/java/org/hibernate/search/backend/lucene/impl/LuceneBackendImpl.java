@@ -33,9 +33,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentBuilder>, LuceneBackend {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

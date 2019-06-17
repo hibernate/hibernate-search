@@ -15,9 +15,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneIndexManagerBuilder implements IndexManagerBuilder<LuceneRootDocumentBuilder> {
 
 	private final IndexingBackendContext indexingBackendContext;

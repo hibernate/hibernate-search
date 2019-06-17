@@ -12,7 +12,6 @@ import com.google.gson.JsonObject;
 /**
  * A {@link JsonAccessor} that can be crawled by a {@link AbstractCrawlingJsonAccessor}.
  *
- * @author Yoann Rodiere
  */
 interface JsonCompositeAccessor<T extends JsonElement> extends JsonAccessor<T> {
 

@@ -15,7 +15,6 @@ import org.hibernate.search.util.common.SearchException;
  * A context allowing to specify the type of a sort.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
- * @author Yoann Rodiere
  */
 public interface SearchSortFactoryContext {
 

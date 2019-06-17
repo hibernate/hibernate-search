@@ -29,9 +29,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-/**
- * @author Yoann Rodiere
- */
+
 public abstract class AbstractConfiguredExtraPropertiesJsonAdapterFactory implements TypeAdapterFactory {
 
 	@Override

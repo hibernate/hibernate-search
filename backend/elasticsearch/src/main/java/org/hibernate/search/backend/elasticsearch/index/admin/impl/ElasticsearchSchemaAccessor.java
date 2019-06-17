@@ -26,7 +26,6 @@ import org.hibernate.search.util.common.impl.Throwables;
 /**
  * A utility implementing primitives for the various {@code ElasticsearchSchema*Impl}.
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
 public class ElasticsearchSchemaAccessor {
 

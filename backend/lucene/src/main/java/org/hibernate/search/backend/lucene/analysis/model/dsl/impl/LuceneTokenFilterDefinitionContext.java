@@ -14,9 +14,7 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalys
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class LuceneTokenFilterDefinitionContext
 		extends AbstractLuceneAnalysisComponentDefinitionContext<TokenFilterFactory> {
 

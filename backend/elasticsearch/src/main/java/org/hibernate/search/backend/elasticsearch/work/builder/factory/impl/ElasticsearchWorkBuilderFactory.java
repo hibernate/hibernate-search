@@ -40,9 +40,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchR
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface ElasticsearchWorkBuilderFactory {
 
 	IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString id, String routingKey, JsonObject document);

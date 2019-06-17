@@ -11,9 +11,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public abstract class AbstractPojoTypeOrdering<T> {
 
 	protected AbstractPojoTypeOrdering() {

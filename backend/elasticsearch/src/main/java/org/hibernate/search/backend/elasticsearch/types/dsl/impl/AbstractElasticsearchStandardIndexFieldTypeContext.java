@@ -12,9 +12,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.util.common.AssertionFailure;
 
-/**
- * @author Yoann Rodiere
- */
+
 abstract class AbstractElasticsearchStandardIndexFieldTypeContext<S extends AbstractElasticsearchStandardIndexFieldTypeContext<? extends S, F>, F>
 		extends AbstractElasticsearchIndexFieldTypeConverterContext<S, F>
 		implements ElasticsearchStandardIndexFieldTypeContext<S, F> {

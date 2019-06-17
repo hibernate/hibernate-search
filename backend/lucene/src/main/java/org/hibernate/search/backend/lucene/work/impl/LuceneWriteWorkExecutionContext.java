@@ -10,9 +10,7 @@ import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneWriteWorkExecutionContext {
 
 	IndexWriterDelegator getIndexWriterDelegator() throws IOException;

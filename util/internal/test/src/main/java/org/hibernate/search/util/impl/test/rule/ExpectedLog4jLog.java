@@ -28,9 +28,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
 import org.hamcrest.TypeSafeMatcher;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ExpectedLog4jLog implements TestRule {
 
 	/**

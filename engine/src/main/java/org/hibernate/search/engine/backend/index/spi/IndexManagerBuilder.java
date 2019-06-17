@@ -9,9 +9,7 @@ package org.hibernate.search.engine.backend.index.spi;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface IndexManagerBuilder<D extends DocumentElement> {
 
 	/**

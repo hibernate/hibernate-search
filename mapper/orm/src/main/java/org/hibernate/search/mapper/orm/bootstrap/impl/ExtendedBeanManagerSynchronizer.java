@@ -13,9 +13,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import org.hibernate.resource.beans.container.spi.ExtendedBeanManager;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 
-/**
- * @author Yoann Rodiere
- */
+
 class ExtendedBeanManagerSynchronizer
 		implements EnvironmentSynchronizer, ExtendedBeanManager.LifecycleListener {
 

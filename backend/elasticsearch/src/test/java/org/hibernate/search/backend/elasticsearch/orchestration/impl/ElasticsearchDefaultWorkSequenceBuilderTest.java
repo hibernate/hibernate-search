@@ -27,9 +27,7 @@ import org.junit.Test;
 
 import org.easymock.EasyMockSupport;
 
-/**
- * @author Yoann Rodiere
- */
+
 @SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types with EasyMock
 public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport {
 

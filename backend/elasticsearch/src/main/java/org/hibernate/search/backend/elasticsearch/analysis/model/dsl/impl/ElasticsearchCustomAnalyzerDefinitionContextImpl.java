@@ -18,9 +18,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.StringHelper;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchCustomAnalyzerDefinitionContextImpl
 		implements ElasticsearchCustomAnalyzerDefinitionContext,
 		ElasticsearchAnalyzerDefinitionWithTokenizerContext,

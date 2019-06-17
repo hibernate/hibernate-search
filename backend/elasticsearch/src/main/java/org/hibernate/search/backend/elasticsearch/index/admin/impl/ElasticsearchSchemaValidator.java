@@ -12,7 +12,6 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
  * An object responsible for validating type mappings retrieved from an existing Elasticsearch instance
  * against Hibernate Search-generated type mappings.
  *
- * @author Yoann Rodiere
  */
 public interface ElasticsearchSchemaValidator {
 

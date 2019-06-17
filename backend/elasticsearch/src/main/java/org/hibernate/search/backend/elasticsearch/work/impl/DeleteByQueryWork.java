@@ -23,7 +23,6 @@ import com.google.gson.JsonObject;
 /**
  * A delete by query work for ES5, using the core delete-by-query API.
  *
- * @author Yoann Rodiere
  */
 public class DeleteByQueryWork extends AbstractSimpleElasticsearchWork<Void> {
 

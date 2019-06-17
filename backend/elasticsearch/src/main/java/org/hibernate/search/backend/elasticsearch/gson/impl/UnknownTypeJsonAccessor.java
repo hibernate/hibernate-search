@@ -8,9 +8,7 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 
 import com.google.gson.JsonElement;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface UnknownTypeJsonAccessor extends JsonAccessor<JsonElement> {
 
 	JsonObjectAccessor asObject();

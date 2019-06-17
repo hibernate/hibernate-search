@@ -8,9 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.result.impl;
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface ExplainResult {
 
 	JsonObject getJsonObject();

@@ -38,9 +38,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 class IndexManagerBuildingStateHolder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

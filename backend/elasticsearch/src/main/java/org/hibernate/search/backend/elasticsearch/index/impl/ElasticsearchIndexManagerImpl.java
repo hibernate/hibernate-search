@@ -43,9 +43,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<ElasticsearchDocumentObjectBuilder>,
 		ElasticsearchIndexManager {
 

@@ -13,7 +13,6 @@ import com.google.gson.JsonElement;
 /**
  * An {@link AnalysisJsonElementEquivalence} that considers that arrays are unordered containers.
  *
- * @author Yoann Rodiere
  */
 public class AnalysisJsonElementUnorderedArrayEquivalence extends AnalysisJsonElementEquivalence {
 

@@ -14,9 +14,7 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-/**
- * @author Guillaume Smet
- */
+
 public class DefaultGsonProvider implements GsonProvider {
 
 	public static GsonProvider create(Supplier<GsonBuilder> builderBaseSupplier, boolean logPrettyPrinting) {

@@ -39,9 +39,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.Gson;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocumentObjectBuilder>,
 		ElasticsearchBackend {
 

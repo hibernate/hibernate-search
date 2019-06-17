@@ -8,9 +8,7 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.AbstractConfiguredExtraPropertiesJsonAdapterFactory;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class AnalysisDefinitionJsonAdapterFactory extends AbstractConfiguredExtraPropertiesJsonAdapterFactory {
 
 	@Override

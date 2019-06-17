@@ -11,7 +11,6 @@ import com.google.gson.GsonBuilder;
 /**
  * Settings for an Elasticsearch index.
  *
- * @author Yoann Rodiere
  */
 public class IndexSettings {
 

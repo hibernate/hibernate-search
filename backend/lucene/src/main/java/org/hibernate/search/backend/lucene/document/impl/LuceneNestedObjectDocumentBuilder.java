@@ -15,9 +15,7 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 
-/**
- * @author Guillaume Smet
- */
+
 class LuceneNestedObjectDocumentBuilder extends AbstractLuceneNonFlattenedDocumentBuilder {
 
 	LuceneNestedObjectDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode) {

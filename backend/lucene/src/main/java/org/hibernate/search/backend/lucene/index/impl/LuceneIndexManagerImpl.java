@@ -37,9 +37,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.index.IndexReader;
 
 
-/**
- * @author Guillaume Smet
- */
+
 // TODO HSEARCH-3117 in the end the IndexManager won't implement ReaderProvider as it's far more complex than that
 class LuceneIndexManagerImpl
 		implements IndexManagerImplementor<LuceneRootDocumentBuilder>, LuceneIndexManager, ReaderProvider {

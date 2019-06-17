@@ -12,9 +12,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import com.google.gson.JsonObject;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public abstract class AbstractElasticsearchSearchPredicateBuilder
 		implements SearchPredicateBuilder<ElasticsearchSearchPredicateBuilder>,
 				ElasticsearchSearchPredicateBuilder {

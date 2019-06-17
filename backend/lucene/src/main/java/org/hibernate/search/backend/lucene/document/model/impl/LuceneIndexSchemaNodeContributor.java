@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneIndexSchemaNodeContributor {
 
 	void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode);

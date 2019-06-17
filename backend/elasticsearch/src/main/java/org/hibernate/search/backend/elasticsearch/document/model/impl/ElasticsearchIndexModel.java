@@ -16,9 +16,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchIndexModel {
 
 	private final String hibernateSearchIndexName;

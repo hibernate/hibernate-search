@@ -12,7 +12,6 @@ import com.google.gson.annotations.JsonAdapter;
  * An enum for Elasticsearch "_routing" attribute values.
  *
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
- * @author Yoann Rodiere
  */
 @JsonAdapter( ElasticsearchRoutingTypeJsonAdapter.class )
 public enum RoutingType {

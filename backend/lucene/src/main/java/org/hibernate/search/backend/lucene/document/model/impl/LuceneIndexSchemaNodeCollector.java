@@ -8,9 +8,7 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 
 import org.apache.lucene.analysis.Analyzer;
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneIndexSchemaNodeCollector {
 
 	void collectObjectNode(String absolutePath, LuceneIndexSchemaObjectNode schemaObjectNode);

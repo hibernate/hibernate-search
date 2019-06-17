@@ -24,9 +24,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.analysis.Analyzer;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAnalysisDefinitionContainerContext,
 		LuceneAnalysisDefinitionContributor {
 

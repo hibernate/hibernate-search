@@ -22,9 +22,7 @@ import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class LuceneCustomNormalizerDefinitionContextImpl
 		extends DelegatingAnalysisDefinitionContainerContext
 		implements LuceneCustomNormalizerDefinitionContext, LuceneAnalyzerBuilder {

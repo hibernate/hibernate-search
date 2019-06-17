@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface ElasticsearchIndexSchemaNodeCollector {
 
 	void collect(String absolutePath, ElasticsearchIndexSchemaObjectNode node);

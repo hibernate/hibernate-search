@@ -12,7 +12,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * Log categories to be used with {@link LoggerFactory#make(Class, LogCategory)}.
  *
- * @author Yoann Rodiere
  */
 public final class ElasticsearchLogCategories {
 

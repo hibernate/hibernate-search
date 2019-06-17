@@ -17,9 +17,7 @@ import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.search.join.ToParentBlockJoinQuery;
 
 
-/**
- * @author Guillaume Smet
- */
+
 class LuceneNestedPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		implements NestedPredicateBuilder<LuceneSearchPredicateBuilder> {
 

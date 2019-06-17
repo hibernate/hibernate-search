@@ -29,9 +29,7 @@ import org.junit.Test;
 import org.easymock.Capture;
 import org.easymock.EasyMockSupport;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 
 	private static final int DEFAULT_MIN_BULK_SIZE = 1;

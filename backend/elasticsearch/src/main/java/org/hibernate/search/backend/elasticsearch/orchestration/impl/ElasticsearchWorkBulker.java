@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearc
  * <p>
  * Implementations are mutable and unlikely to be thread-safe.
  *
- * @author Yoann Rodiere
  */
 public interface ElasticsearchWorkBulker {
 

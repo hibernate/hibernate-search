@@ -30,9 +30,7 @@ import java.lang.invoke.MethodHandles;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class BulkWork implements ElasticsearchWork<BulkResult> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

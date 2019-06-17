@@ -19,7 +19,6 @@ package org.hibernate.search.util.common.impl;
  * See the {@link AbstractCloser} superclass for a list of methods
  * allowing to close objects while catching exceptions.
  *
- * @author Yoann Rodiere
  */
 public final class SuppressingCloser extends AbstractCloser<SuppressingCloser, Exception> {
 

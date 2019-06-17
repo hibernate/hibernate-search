@@ -9,9 +9,7 @@ package org.hibernate.search.engine.backend.spi;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.BackendSettings;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface BackendFactory {
 
 	/**

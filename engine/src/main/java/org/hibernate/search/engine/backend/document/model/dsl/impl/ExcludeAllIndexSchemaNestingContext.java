@@ -10,9 +10,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 class ExcludeAllIndexSchemaNestingContext implements IndexSchemaNestingContext {
 
 	static final ExcludeAllIndexSchemaNestingContext INSTANCE = new ExcludeAllIndexSchemaNestingContext();

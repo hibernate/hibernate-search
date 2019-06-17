@@ -14,9 +14,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ProvidedStringIdentifierMapping implements IdentifierMapping<String, Object> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

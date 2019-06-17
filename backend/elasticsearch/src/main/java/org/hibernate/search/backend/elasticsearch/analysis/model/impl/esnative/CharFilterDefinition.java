@@ -12,7 +12,6 @@ import com.google.gson.annotations.JsonAdapter;
 /**
  * A definition of an Elasticsearch char filter, to be included in index settings.
  *
- * @author Yoann Rodiere
  */
 /*
  * CAUTION: JSON serialization is controlled by a specific adapter, which must be

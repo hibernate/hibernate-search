@@ -13,7 +13,6 @@ import com.google.gson.annotations.SerializedName;
  * An object representing Elasticsearch type mappings.
  *
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-type
- * @author Yoann Rodiere
  */
 /*
  * CAUTION: JSON serialization is controlled by a specific adapter, which must be

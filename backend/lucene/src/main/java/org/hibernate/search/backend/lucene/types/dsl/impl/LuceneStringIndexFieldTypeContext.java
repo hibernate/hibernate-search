@@ -27,9 +27,7 @@ import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-/**
- * @author Guillaume Smet
- */
+
 class LuceneStringIndexFieldTypeContext
 		extends AbstractLuceneStandardIndexFieldTypeContext<LuceneStringIndexFieldTypeContext, String>
 		implements StringIndexFieldTypeContext<LuceneStringIndexFieldTypeContext> {

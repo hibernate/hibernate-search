@@ -16,7 +16,6 @@ import com.google.gson.JsonObject;
 /**
  * Helpers allowing to log JSON.
  *
- * @author Yoann Rodiere
  */
 public final class JsonLogHelper {
 

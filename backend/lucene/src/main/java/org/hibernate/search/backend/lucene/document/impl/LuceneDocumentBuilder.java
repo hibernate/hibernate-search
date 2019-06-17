@@ -10,9 +10,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 
 import org.apache.lucene.index.IndexableField;
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneDocumentBuilder extends DocumentElement {
 
 	/**

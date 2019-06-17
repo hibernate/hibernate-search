@@ -31,7 +31,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * <p>
  * As per JavaBeans conventions, only public getters are supported, and field access is not.
  *
- * @author Yoann Rodiere
  */
 public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
 

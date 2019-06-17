@@ -15,9 +15,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class SuppressingCloserTest {
 
 	@Test

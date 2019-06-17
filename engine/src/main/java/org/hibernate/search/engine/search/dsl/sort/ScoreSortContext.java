@@ -10,7 +10,6 @@ package org.hibernate.search.engine.search.dsl.sort;
  * The context used when defining a score sort.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
- * @author Yoann Rodiere
  */
 public interface ScoreSortContext
 		extends NonEmptySortContext, SortOrderContext<ScoreSortContext> {

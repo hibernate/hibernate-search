@@ -15,7 +15,6 @@ import com.google.gson.GsonBuilder;
 /**
  * An object representing an Elasticsearch index.
  *
- * @author Yoann Rodiere
  */
 public class IndexMetadata {
 

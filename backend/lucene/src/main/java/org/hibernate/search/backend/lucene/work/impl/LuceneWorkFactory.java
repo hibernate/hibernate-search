@@ -17,9 +17,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.Explanation;
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneWorkFactory {
 
 	LuceneWriteWork<?> add(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry);

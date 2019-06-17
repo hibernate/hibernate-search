@@ -11,7 +11,6 @@ package org.hibernate.search.util.common.impl;
  *
  * @param <E> The supertype of exceptions this object can catch.
  *
- * @author Yoann Rodiere
  */
 public abstract class AbstractCloser<S, E extends Exception> {
 

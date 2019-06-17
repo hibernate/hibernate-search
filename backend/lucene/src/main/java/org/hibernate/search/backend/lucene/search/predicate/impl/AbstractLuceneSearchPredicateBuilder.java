@@ -13,9 +13,7 @@ import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
 
 
-/**
- * @author Guillaume Smet
- */
+
 public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPredicateBuilder<LuceneSearchPredicateBuilder>,
 		LuceneSearchPredicateBuilder {
 

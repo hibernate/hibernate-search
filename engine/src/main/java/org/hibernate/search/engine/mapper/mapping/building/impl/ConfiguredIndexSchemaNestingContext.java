@@ -16,9 +16,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
-/**
- * @author Yoann Rodiere
- */
+
 class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 
 	private static final ConfiguredIndexSchemaNestingContext ROOT =

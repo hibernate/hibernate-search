@@ -34,9 +34,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.StreamHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

@@ -44,9 +44,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

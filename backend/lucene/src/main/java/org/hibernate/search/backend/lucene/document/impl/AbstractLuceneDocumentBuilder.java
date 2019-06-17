@@ -23,9 +23,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
 
-/**
- * @author Guillaume Smet
- */
+
 abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

@@ -8,9 +8,7 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 
 import com.google.gson.JsonElement;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class JsonBooleanAccessor extends AbstractTypingJsonAccessor<Boolean> {
 
 	public JsonBooleanAccessor(JsonAccessor<JsonElement> parentAccessor) {

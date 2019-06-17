@@ -10,9 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 
-/**
- * @author Yoann Rodiere
- */
+
 interface ElasticsearchRefreshableWorkExecutionContext extends ElasticsearchWorkExecutionContext {
 
 	CompletableFuture<Void> executePendingRefreshes();

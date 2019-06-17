@@ -13,9 +13,7 @@ import org.apache.lucene.index.Term;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneTermBasedDeleteEntryWork extends AbstractLuceneDeleteEntryWork {
 
 	public LuceneTermBasedDeleteEntryWork(String indexName, String tenantId, String id) {

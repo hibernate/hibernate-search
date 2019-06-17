@@ -15,7 +15,6 @@ import com.google.gson.JsonElement;
 /**
  * An abstract base class for analysis-related definitions.
  *
- * @author Yoann Rodiere
  */
 public abstract class AnalysisDefinition {
 

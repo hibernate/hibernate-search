@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
-/**
- * @author Guillaume Smet
- */
+
 public interface LuceneReadWorkOrchestratorImplementor extends AutoCloseable, LuceneReadWorkOrchestrator {
 	@Override
 	default void close() {

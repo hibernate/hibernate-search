@@ -17,9 +17,7 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuil
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneIndexScope
 		implements IndexScope<LuceneSearchQueryElementCollector> {
 

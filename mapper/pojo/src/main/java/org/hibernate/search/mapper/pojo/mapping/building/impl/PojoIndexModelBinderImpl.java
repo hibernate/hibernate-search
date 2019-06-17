@@ -59,9 +59,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

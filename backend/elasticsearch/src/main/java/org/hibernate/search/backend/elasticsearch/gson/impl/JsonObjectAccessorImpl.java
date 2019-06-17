@@ -17,7 +17,6 @@ import com.google.gson.JsonObject;
 /**
  * A {@link JsonAccessor} that ensures the accessed object is a {@link JsonObject}.
  *
- * @author Yoann Rodiere
  */
 public class JsonObjectAccessorImpl extends AbstractTypingJsonAccessor<JsonObject>
 		implements JsonObjectAccessor, JsonCompositeAccessor<JsonObject> {

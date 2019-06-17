@@ -12,9 +12,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadat
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 class MarkerMappingContributor implements PojoPropertyMetadataContributor {
 
 	private final MarkerBuilder markerBuilder;

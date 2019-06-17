@@ -20,9 +20,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class IndexingDependencyMappingContextImpl
 		extends DelegatingPropertyMappingContext
 		implements IndexingDependencyMappingContext, PojoPropertyMetadataContributor {

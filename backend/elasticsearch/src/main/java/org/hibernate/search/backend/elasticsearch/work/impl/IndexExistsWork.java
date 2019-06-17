@@ -12,9 +12,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class IndexExistsWork extends AbstractSimpleElasticsearchWork<Boolean> {
 
 	private static final ElasticsearchRequestSuccessAssessor RESULT_ASSESSOR =

@@ -16,10 +16,7 @@ import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchS
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
-/**
- * @author Yoann Rodiere
- * @author Guillaume Smet
- */
+
 class ElasticsearchIntegerIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchIntegerIndexFieldTypeContext, Integer> {
 

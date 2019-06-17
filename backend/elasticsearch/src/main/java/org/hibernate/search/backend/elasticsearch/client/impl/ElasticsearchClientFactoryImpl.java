@@ -37,7 +37,6 @@ import org.hibernate.search.util.common.impl.SearchThreadFactory;
 
 /**
  * @author Gunnar Morling
- * @author Yoann Rodiere
  */
 public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
 

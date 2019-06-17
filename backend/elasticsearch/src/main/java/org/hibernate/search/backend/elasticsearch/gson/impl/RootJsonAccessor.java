@@ -14,9 +14,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 class RootJsonAccessor implements JsonCompositeAccessor<JsonElement> {
 
 	// Wrap the instance in a JsonObjectAccessor, because we know the root is an object

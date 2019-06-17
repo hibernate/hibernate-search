@@ -14,7 +14,6 @@ import java.lang.annotation.Target;
 /**
  * A marker annotation for the field containing a map of extra properties, when using {@link AbstractExtraPropertiesJsonAdapter}.
  *
- * @author Yoann Rodiere
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})

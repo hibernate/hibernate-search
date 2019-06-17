@@ -11,9 +11,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
-/**
- * @author Guillaume Smet
- */
+
 class LuceneMatchAllPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		implements MatchAllPredicateBuilder<LuceneSearchPredicateBuilder> {
 

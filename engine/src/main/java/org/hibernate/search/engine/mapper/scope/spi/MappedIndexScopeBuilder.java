@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.scope.spi;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface MappedIndexScopeBuilder<R, E> {
 
 	MappedIndexScope<R, E> build();

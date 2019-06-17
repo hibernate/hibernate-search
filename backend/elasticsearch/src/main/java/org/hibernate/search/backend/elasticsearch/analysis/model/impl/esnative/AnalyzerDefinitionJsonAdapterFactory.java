@@ -10,9 +10,7 @@ import java.util.List;
 
 import com.google.gson.reflect.TypeToken;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class AnalyzerDefinitionJsonAdapterFactory extends AnalysisDefinitionJsonAdapterFactory {
 
 	private static final TypeToken<List<String>> STRING_LIST_TYPE_TOKEN =

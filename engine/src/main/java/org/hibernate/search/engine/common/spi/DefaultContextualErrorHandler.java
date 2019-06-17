@@ -11,7 +11,6 @@ package org.hibernate.search.engine.common.spi;
  * <p>
  * This context is mutable and is not thread-safe.
  *
- * @author Yoann Rodiere
  */
 class DefaultContextualErrorHandler implements ContextualErrorHandler {
 

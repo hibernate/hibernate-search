@@ -21,9 +21,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

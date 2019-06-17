@@ -24,9 +24,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchResult<H>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

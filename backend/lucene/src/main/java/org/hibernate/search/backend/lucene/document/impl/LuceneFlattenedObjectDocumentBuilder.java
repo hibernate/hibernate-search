@@ -16,9 +16,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexableField;
 
-/**
- * @author Guillaume Smet
- */
+
 class LuceneFlattenedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

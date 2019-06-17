@@ -24,9 +24,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class DefaultElasticsearchRequestSuccessAssessor implements ElasticsearchRequestSuccessAssessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

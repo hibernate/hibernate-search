@@ -12,7 +12,6 @@ package org.hibernate.search.engine.backend.document;
  * Instances may represent the document root as well as a <em>partial</em> view of the document,
  * for instance a view on a specific "object" field nested inside the document.
  *
- * @author Yoann Rodiere
  */
 public interface DocumentElement {
 

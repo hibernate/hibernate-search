@@ -15,9 +15,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
-/**
- * @author Guillaume Smet
- */
+
 class LuceneIntegerIndexFieldTypeContext
 		extends AbstractLuceneStandardIndexFieldTypeContext<LuceneIntegerIndexFieldTypeContext, Integer> {
 

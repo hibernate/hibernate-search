@@ -42,7 +42,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
  * Incidentally, this will also generate the index model,
  * due to bridges contributing to the index model as we bind them.
  *
- * @author Yoann Rodiere
  */
 public interface PojoIndexModelBinder {
 

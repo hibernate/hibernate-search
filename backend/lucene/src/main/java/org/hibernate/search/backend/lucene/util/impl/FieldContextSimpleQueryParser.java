@@ -23,7 +23,6 @@ import org.apache.lucene.search.Query;
  * An implementation of {@link SimpleQueryParser} that allows to wrap created queries
  * to add boosts, constant score, ...
  *
- * @author Guillaume Smet
  */
 public class FieldContextSimpleQueryParser extends SimpleQueryParser {
 

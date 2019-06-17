@@ -14,9 +14,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-/**
- * @author Yoann Rodiere
- */
+
 public final class Futures {
 
 	private Futures() {

@@ -24,9 +24,7 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 
 	private final LuceneWorkFactory factory;

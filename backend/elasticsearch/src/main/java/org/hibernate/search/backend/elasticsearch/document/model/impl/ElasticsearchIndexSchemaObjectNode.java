@@ -8,9 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchIndexSchemaObjectNode {
 
 	private static final ElasticsearchIndexSchemaObjectNode ROOT =

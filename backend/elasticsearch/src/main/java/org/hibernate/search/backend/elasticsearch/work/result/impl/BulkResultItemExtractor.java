@@ -10,9 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
 
-/**
- * @author Yoann Rodiere
- */
+
 public interface BulkResultItemExtractor {
 
 	<T> CompletableFuture<T> extract(BulkableElasticsearchWork<T> work, int index);

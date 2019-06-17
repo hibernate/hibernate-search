@@ -11,7 +11,6 @@ import com.google.gson.Gson;
 /**
  * Centralizes the configuration of the Gson objects.
  *
- * @author Guillaume Smet
  */
 public interface GsonProvider {
 

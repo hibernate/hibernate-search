@@ -14,7 +14,6 @@ import org.jboss.logging.annotations.MessageBundle;
 /**
  * Message bundle for Elasticsearch mapping validation.
  *
- * @author Yoann Rodiere
  */
 @MessageBundle(projectCode = "HSEARCH")
 public interface ElasticsearchValidationMessages {

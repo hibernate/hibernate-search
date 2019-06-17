@@ -17,9 +17,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 final class HibernateSearchNormalizerCheckingFilter extends TokenFilter {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

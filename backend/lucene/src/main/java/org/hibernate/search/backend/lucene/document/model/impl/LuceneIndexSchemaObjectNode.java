@@ -9,9 +9,7 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneIndexSchemaObjectNode {
 
 	private static final LuceneIndexSchemaObjectNode ROOT =

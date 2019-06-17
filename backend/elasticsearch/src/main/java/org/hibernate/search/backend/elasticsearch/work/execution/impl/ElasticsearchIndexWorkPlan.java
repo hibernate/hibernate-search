@@ -25,9 +25,7 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import com.google.gson.JsonObject;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDocumentObjectBuilder> {
 
 	private final ElasticsearchWorkBuilderFactory builderFactory;

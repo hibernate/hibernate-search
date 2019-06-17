@@ -46,9 +46,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchBackendFactory implements BackendFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

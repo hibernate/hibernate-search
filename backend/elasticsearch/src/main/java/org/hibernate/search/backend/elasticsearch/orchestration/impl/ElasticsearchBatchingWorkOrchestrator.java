@@ -24,7 +24,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * This allows to process more works when orchestrating, which allows to use bulk works
  * more extensively.
  *
- * @author Yoann Rodiere
  */
 class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
 		implements ElasticsearchWorkOrchestratorImplementor, AutoCloseable {

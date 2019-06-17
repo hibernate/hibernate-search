@@ -12,9 +12,7 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 
 
-/**
- * @author Yoann Rodiere
- */
+
 public final class ReflectionBeanResolver implements BeanResolver {
 
 	private final ClassResolver classResolver;

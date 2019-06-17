@@ -11,9 +11,7 @@ import java.io.IOException;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 
-/**
- * @author Guillaume Smet
- */
+
 public class LuceneQueryBasedDeleteEntryWork extends AbstractLuceneDeleteEntryWork {
 
 	public LuceneQueryBasedDeleteEntryWork(String indexName, String tenantId, String id) {

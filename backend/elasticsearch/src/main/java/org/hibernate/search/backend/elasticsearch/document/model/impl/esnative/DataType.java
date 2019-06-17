@@ -13,7 +13,6 @@ import com.google.gson.annotations.SerializedName;
  * <p>Only provides values for the types we actually use.
  *
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
- * @author Yoann Rodiere
  */
 public enum DataType {
 

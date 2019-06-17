@@ -30,9 +30,7 @@ import org.junit.Test;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class SmokeIT {
 
 	private static final String INDEX_NAME = "IndexName";

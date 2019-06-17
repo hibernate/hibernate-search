@@ -12,7 +12,6 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 /**
  * Creates the Elasticsearch client.
  *
- * @author Yoann Rodiere
  */
 public interface ElasticsearchClientFactory {
 

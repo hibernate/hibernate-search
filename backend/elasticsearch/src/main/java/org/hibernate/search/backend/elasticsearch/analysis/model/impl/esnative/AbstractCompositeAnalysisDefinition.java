@@ -15,7 +15,6 @@ import com.google.gson.annotations.SerializedName;
 /**
  * A superclass to both {@link AnalyzerDefinition} and {@link NormalizerDefinition}.
  *
- * @author Yoann Rodiere
  */
 public abstract class AbstractCompositeAnalysisDefinition extends AnalysisDefinition {
 

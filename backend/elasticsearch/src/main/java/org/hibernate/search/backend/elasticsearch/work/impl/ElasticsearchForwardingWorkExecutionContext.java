@@ -11,9 +11,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
-/**
- * @author Yoann Rodiere
- */
+
 public class ElasticsearchForwardingWorkExecutionContext implements ElasticsearchWorkExecutionContext {
 
 	private final ElasticsearchWorkExecutionContext delegate;
