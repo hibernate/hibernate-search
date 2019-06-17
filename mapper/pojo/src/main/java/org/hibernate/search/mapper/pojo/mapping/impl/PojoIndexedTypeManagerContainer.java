@@ -15,10 +15,12 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContextProvider;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContextProvider;
 import org.hibernate.search.util.common.impl.Closer;
 
-public class PojoIndexedTypeManagerContainer implements PojoWorkIndexedTypeContextProvider {
+public class PojoIndexedTypeManagerContainer
+		implements PojoWorkIndexedTypeContextProvider, PojoScopeIndexedTypeContextProvider {
 
 	public static Builder builder() {
 		return new Builder();
@@ -43,7 +45,8 @@ public class PojoIndexedTypeManagerContainer implements PojoWorkIndexedTypeConte
 		return Optional.ofNullable( (PojoIndexedTypeManager<?, E, ?>) byExactClass.get( clazz ) );
 	}
 
-	Optional<PojoIndexedTypeManager<?, ?, ?>> getByIndexName(String indexName) {
+	@Override
+	public Optional<PojoIndexedTypeManager<?, ?, ?>> getByIndexName(String indexName) {
 		return Optional.ofNullable( byIndexName.get( indexName ) );
 	}
 
