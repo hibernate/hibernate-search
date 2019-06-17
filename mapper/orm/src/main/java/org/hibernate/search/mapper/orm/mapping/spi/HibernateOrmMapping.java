@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 public interface HibernateOrmMapping {
@@ -24,6 +25,6 @@ public interface HibernateOrmMapping {
 	 * @return The metadata for the given type if this type can be the subject of a work (i.e. it can be passed to
 	 * {@link PojoWorkPlan#add(Object)} for instance), {@code null} otherwise.
 	 */
-	PojoMappingTypeMetadata getMappingTypeMetadata(Class<?> type);
+	<E> PojoScopeTypeContext<E> getTypeContext(Class<E> type);
 
 }

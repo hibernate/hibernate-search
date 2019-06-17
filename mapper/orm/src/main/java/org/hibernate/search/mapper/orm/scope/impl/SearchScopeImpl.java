@@ -74,7 +74,7 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 	public MassIndexer massIndexer() {
 		return new MassIndexerImpl(
 				sessionContext.getSession().getFactory(),
-				delegate.getIncludedIndexedTypes().keySet(),
+				delegate.getIncludedIndexedTypes(),
 				DetachedSessionContextImplementor.of( sessionContext ),
 				delegate.executor()
 		);

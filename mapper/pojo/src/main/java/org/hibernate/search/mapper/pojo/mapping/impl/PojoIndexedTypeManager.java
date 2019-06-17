@@ -21,7 +21,7 @@ import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionCon
 import org.hibernate.search.mapper.pojo.bridge.impl.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.bridge.impl.RoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
-import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
+import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContextImplementor;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
@@ -45,7 +45,7 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 		implements AutoCloseable, ToStringTreeAppendable,
-		PojoWorkIndexedTypeContext<I, E, D>, PojoScopeIndexedTypeContext<I, E, D> {
+		PojoWorkIndexedTypeContext<I, E, D>, PojoScopeIndexedTypeContextImplementor<I, E, D> {
 
 	private final Class<E> indexedJavaClass;
 	private final PojoCaster<E> caster;
@@ -75,7 +75,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return getClass().getSimpleName() + "[javaType = " + indexedJavaClass + "]";
 	}
 
 	@Override

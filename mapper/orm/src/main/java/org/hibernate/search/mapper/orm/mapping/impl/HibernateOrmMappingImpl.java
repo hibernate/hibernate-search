@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<HibernateOrmMapping>
@@ -55,8 +55,8 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	}
 
 	@Override
-	public PojoMappingTypeMetadata getMappingTypeMetadata(Class<?> type) {
-		return getDelegate().getMappingTypeMetadata( type );
+	public <E> PojoScopeTypeContext<E> getTypeContext(Class<E> type) {
+		return getDelegate().getTypeContext( type );
 	}
 
 	private SearchSessionBuilder createSessionBuilder(EntityManager entityManager) {

@@ -30,7 +30,7 @@ import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -72,9 +72,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostDelete(PostDeleteEvent event) {
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		PojoMappingTypeMetadata metadata = getMappingTypeMetadata( context, entity );
-		if ( metadata != null ) {
-			Object providedId = toProvidedId( metadata, event.getId() );
+		PojoScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		if ( typeContext != null ) {
+			Object providedId = toProvidedId( typeContext, event.getId() );
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
 			context.getCurrentWorkPlan( event.getSession() )
@@ -86,9 +86,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostInsert(PostInsertEvent event) {
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		PojoMappingTypeMetadata metadata = getMappingTypeMetadata( context, entity );
-		if ( metadata != null ) {
-			Object providedId = toProvidedId( metadata, event.getId() );
+		PojoScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		if ( typeContext != null ) {
+			Object providedId = toProvidedId( typeContext, event.getId() );
 			context.getCurrentWorkPlan( event.getSession() )
 					.add( providedId, entity );
 		}
@@ -98,10 +98,10 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostUpdate(PostUpdateEvent event) {
 		HibernateSearchContextService context = state.getHibernateSearchContext();
 		final Object entity = event.getEntity();
-		PojoMappingTypeMetadata metadata = getMappingTypeMetadata( context, entity );
-		if ( metadata != null ) {
+		PojoScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		if ( typeContext != null ) {
 			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
-			Object providedId = toProvidedId( metadata, event.getId() );
+			Object providedId = toProvidedId( typeContext, event.getId() );
 			if ( dirtyCheckingEnabled ) {
 				workPlan.update( providedId, entity, getDirtyPropertyNames( event ) );
 			}
@@ -111,8 +111,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		}
 	}
 
-	private Object toProvidedId(PojoMappingTypeMetadata metadata, Serializable entityId) {
-		if ( metadata.isDocumentIdMappedToEntityId() ) {
+	private Object toProvidedId(PojoScopeTypeContext<?> typeContext, Serializable entityId) {
+		if ( typeContext.getMappingMetadata().isDocumentIdMappedToEntityId() ) {
 			return entityId;
 		}
 		else {
@@ -160,8 +160,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		return context;
 	}
 
-	private PojoMappingTypeMetadata getMappingTypeMetadata(HibernateSearchContextService context, Object entity) {
-		return context.getMapping().getMappingTypeMetadata( Hibernate.getClass( entity ) );
+	private PojoScopeTypeContext<?> getTypeContext(HibernateSearchContextService context, Object entity) {
+		return context.getMapping().getTypeContext( Hibernate.getClass( entity ) );
 	}
 
 	// TODO HSEARCH-3068 handle the "simulated" transaction when a Flush listener is registered
@@ -190,10 +190,10 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 
-		PojoMappingTypeMetadata metadata = getMappingTypeMetadata( context, entity );
-		if ( metadata != null ) {
+		PojoScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		if ( typeContext != null ) {
 			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
-			Object providedId = toProvidedId( metadata, event.getAffectedOwnerIdOrNull() );
+			Object providedId = toProvidedId( typeContext, event.getAffectedOwnerIdOrNull() );
 
 			if ( dirtyCheckingEnabled ) {
 				PersistentCollection persistentCollection = event.getCollection();
