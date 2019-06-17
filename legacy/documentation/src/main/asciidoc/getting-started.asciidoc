@@ -286,7 +286,7 @@ public class Author {
   // standard getters/setters follow here
   ...
 }
-====
+----
 
 
 === Indexing
@@ -492,6 +492,7 @@ public class Book {
   // standard getters/setters follow here
   ...
 }
+----
 ====
 
 Using `@AnalyzerDef` only defines an Analyzer, you still have to apply it to entities and or

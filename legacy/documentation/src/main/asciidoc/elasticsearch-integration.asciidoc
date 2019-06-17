@@ -116,7 +116,7 @@ and for that reason, some upgrades will require you to delete your indexes manua
 The upgrades that require such changes are the following:
 
 * upgrading from 2.x to 5.x, because Hibernate Search does not support the `string` datatype on Elasticsearch 5.x;
-* upgrading from 5.0/5.1 to 5.2+ if you used <<section-normalizer,normalizers>>,
+* upgrading from 5.0/5.1 to 5.2+ if you used <<section-normalizers,normalizers>>,
 because Hibernate Search normalizers are mapped to native Elasticsearch normalizers starting from Elasticsearch 5.2,
 thereby changing the datatype of fields using normalizers from `text` to `keyword`.
 

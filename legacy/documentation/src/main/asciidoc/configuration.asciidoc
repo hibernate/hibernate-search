@@ -149,10 +149,8 @@ public class Rule { ... }
 public class Action { ... }
 ----
 
-====
-[[example-configuring-directory-providers]]
 .Configuring directory providers
-
+[[example-configuring-directory-providers]]
 ====
 ----
 hibernate.search.default.directory_provider = filesystem
@@ -160,7 +158,6 @@ hibernate.search.default.indexBase = /usr/lucene/indexes
 hibernate.search.Rules.directory_provider = local-heap
 hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectoryProvider
 ----
-
 ====
 
 [TIP]
@@ -878,8 +875,8 @@ configuration details.
 
 The default cluster name is `Hibernate Search Cluster` which can be configured as seen in <<example-jgroups-cluster-name>>.
 
-[[example-jgroups-cluster-name]]
 .JGroups cluster name configuration
+[[example-jgroups-cluster-name]]
 ====
 ----
 hibernate.search.services.jgroups.clusterName = My-Custom-Cluster-Id
@@ -1083,8 +1080,8 @@ hibernate.search.[default|<indexname>].indexwriter.<parameter_name>
 If no value is set for an `indexwriter` value in a specific shard configuration, Hibernate Search
 will look at the index section, then at the default section.
 
-[[example-performance-option-configuration]]
 .Example performance option configuration
+[[example-performance-option-configuration]]
 ====
 ----
 hibernate.search.Animals.2.indexwriter.max_merge_docs = 10
@@ -1481,6 +1478,7 @@ to create a custom WildFly server including the Hibernate Search modules:
 		</execution>
 	</executions>
 </plugin>
+----
 ====
 
 You will also need a `server-provisioning.xml` in the root of your project:
@@ -1504,6 +1502,7 @@ You will also need a `server-provisioning.xml` in the root of your project:
 
 	</feature-packs>
 </server-provisioning>
+----
 ====
 
 This will populate the server with the Hibernate Search ORM integration,
@@ -1642,6 +1641,7 @@ This version of Hibernate Search expects Apache Tika version `{tikaModuleVersion
 [subs="verbatim,attributes"]
 ----
 <module xmlns="urn:jboss:module:1.1" name="org.apache.tika" slot="{tikaModuleVersion}">
+----
 ====
 
 Include Apache Tika {tikaModuleVersion} and any extensions and dependencies from Tika that you might need in the module.
