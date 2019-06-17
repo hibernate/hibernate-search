@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeContext;
 import org.hibernate.search.mapper.pojo.session.impl.PojoSearchSessionDelegateImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
@@ -36,17 +36,17 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public PojoMappingTypeMetadata getMappingTypeMetadata(Class<?> type) {
-		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
+	public <E> PojoScopeTypeContext<E> getTypeContext(Class<E> type) {
+		Optional<? extends PojoIndexedTypeManager<?, E, ?>> indexedTypeManagerOptional =
 				indexedTypeManagers.getByExactClass( type );
 		if ( indexedTypeManagerOptional.isPresent() ) {
-			return indexedTypeManagerOptional.get().getMappingMetadata();
+			return indexedTypeManagerOptional.get();
 		}
 
-		Optional<? extends PojoContainedTypeManager<?>> containedTypeManagerOptional =
+		Optional<? extends PojoContainedTypeManager<E>> containedTypeManagerOptional =
 				containedTypeManagers.getByExactClass( type );
 		if ( containedTypeManagerOptional.isPresent() ) {
-			return containedTypeManagerOptional.get().getMappingMetadata();
+			return containedTypeManagerOptional.get();
 		}
 
 		return null;

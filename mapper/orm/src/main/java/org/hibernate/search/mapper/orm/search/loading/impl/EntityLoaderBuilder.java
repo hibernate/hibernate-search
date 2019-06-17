@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.search.loading.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.SingularAttribute;
@@ -15,24 +16,24 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public class EntityLoaderBuilder<E> {
 
 	private final Session session;
-	private final Map<Class<? extends E>, PojoMappingTypeMetadata> concreteIndexedClassesToMetadata;
+	private final Set<? extends PojoScopeTypeContext<? extends E>> concreteIndexedTypes;
 
 	public EntityLoaderBuilder(Session session,
-			Map<Class<? extends E>, PojoMappingTypeMetadata> concreteIndexedClassesToMetadata) {
+			Set<? extends PojoScopeTypeContext<? extends E>> concreteIndexedTypes) {
 		this.session = session;
-		this.concreteIndexedClassesToMetadata = concreteIndexedClassesToMetadata;
+		this.concreteIndexedTypes = concreteIndexedTypes;
 	}
 
 	public EntityLoader<PojoReference, ? extends E> build(MutableEntityLoadingOptions mutableLoadingOptions) {
-		if ( concreteIndexedClassesToMetadata.size() == 1 ) {
-			Map.Entry<Class<? extends E>, PojoMappingTypeMetadata> entry =
-					concreteIndexedClassesToMetadata.entrySet().iterator().next();
-			return buildForSingleType( mutableLoadingOptions, entry.getKey(), entry.getValue() );
+		if ( concreteIndexedTypes.size() == 1 ) {
+			PojoScopeTypeContext<? extends E> typeContext = concreteIndexedTypes.iterator().next();
+			return buildForSingleType( mutableLoadingOptions, typeContext );
 		}
 		else {
 			return buildForMultipleTypes( mutableLoadingOptions );
@@ -41,24 +42,26 @@ public class EntityLoaderBuilder<E> {
 
 	private <E2 extends E> HibernateOrmComposableEntityLoader<PojoReference, E2> buildForSingleType(
 			MutableEntityLoadingOptions mutableLoadingOptions,
-			Class<E2> concreteIndexedType, PojoMappingTypeMetadata metadata) {
+			PojoScopeTypeContext<E2> typeContext) {
 		// TODO HSEARCH-3349 Add support for other types of database retrieval and object lookup?
 		//  See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.EntityLoaderBuilder#getObjectInitializer
 
+		Class<E2> javaClass = typeContext.getJavaClass();
+		PojoMappingTypeMetadata metadata = typeContext.getMappingMetadata();
 		if ( metadata.isDocumentIdMappedToEntityId() ) {
 			return new HibernateOrmSingleTypeByIdEntityLoader<>(
 					session,
-					concreteIndexedType,
+					javaClass,
 					mutableLoadingOptions
 			);
 		}
 		else {
-			IdentifiableType<E2> indexTypeModel = session.getSessionFactory().getMetamodel().entity( concreteIndexedType );
+			IdentifiableType<E2> indexTypeModel = session.getSessionFactory().getMetamodel().entity( javaClass );
 			SingularAttribute<? super E2, ?> documentIdSourceProperty =
 					indexTypeModel.getSingularAttribute( metadata.getDocumentIdSourcePropertyName().get() );
 			return new HibernateOrmSingleTypeCriteriaEntityLoader<>(
 					session,
-					concreteIndexedType,
+					javaClass,
 					documentIdSourceProperty,
 					mutableLoadingOptions
 			);
@@ -75,12 +78,11 @@ public class EntityLoaderBuilder<E> {
 		 *  (all by ID, or all by query on a property defined in the common parent entity type)
 		 */
 		Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends E>> delegateByConcreteType =
-				new HashMap<>( concreteIndexedClassesToMetadata.size() );
-		for ( Map.Entry<Class<? extends E>, PojoMappingTypeMetadata> entry :
-				concreteIndexedClassesToMetadata.entrySet() ) {
+				new HashMap<>( concreteIndexedTypes.size() );
+		for ( PojoScopeTypeContext<? extends E> typeContext : concreteIndexedTypes ) {
 			HibernateOrmComposableEntityLoader<PojoReference, ? extends E> delegate =
-					buildForSingleType( mutableLoadingOptions, entry.getKey(), entry.getValue() );
-			delegateByConcreteType.put( entry.getKey(), delegate );
+					buildForSingleType( mutableLoadingOptions, typeContext );
+			delegateByConcreteType.put( typeContext.getJavaClass(), delegate );
 		}
 		return new HibernateOrmByTypeEntityLoader<>( delegateByConcreteType );
 	}

@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
+import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContextImplementor;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -25,7 +26,8 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * @param <E> The contained entity type.
  */
 public class PojoContainedTypeManager<E>
-		implements AutoCloseable, ToStringTreeAppendable, PojoWorkContainedTypeContext<E> {
+		implements AutoCloseable, ToStringTreeAppendable,
+		PojoWorkContainedTypeContext<E>, PojoScopeContainedTypeContextImplementor<E> {
 
 	private final Class<E> javaClass;
 	private final PojoCaster<E> caster;
@@ -40,6 +42,11 @@ public class PojoContainedTypeManager<E>
 		this.caster = caster;
 		this.mappingMetadata = mappingMetadata;
 		this.reindexingResolver = reindexingResolver;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[javaType = " + javaClass + "]";
 	}
 
 	@Override
@@ -79,7 +86,8 @@ public class PojoContainedTypeManager<E>
 		);
 	}
 
-	PojoMappingTypeMetadata getMappingMetadata() {
+	@Override
+	public PojoMappingTypeMetadata getMappingMetadata() {
 		return mappingMetadata;
 	}
 }
