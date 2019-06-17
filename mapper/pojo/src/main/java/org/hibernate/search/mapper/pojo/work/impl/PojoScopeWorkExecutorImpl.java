@@ -14,17 +14,16 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 
 public class PojoScopeWorkExecutorImpl implements PojoScopeWorkExecutor {
 
 	private final List<IndexWorkExecutor> workExecutors = new ArrayList<>();
 
-	public PojoScopeWorkExecutorImpl(Set<? extends PojoIndexedTypeManager<?, ?, ?>> targetedTypeManagers,
+	public PojoScopeWorkExecutorImpl(Set<? extends PojoWorkIndexedTypeContext<?, ?, ?>> targetedTypeContexts,
 			DetachedSessionContextImplementor sessionContext) {
-		for ( PojoIndexedTypeManager<?, ?, ?> targetedTypeManager : targetedTypeManagers ) {
-			workExecutors.add( targetedTypeManager.createWorkExecutor( sessionContext ) );
+		for ( PojoWorkIndexedTypeContext<?, ?, ?> targetedTypeContext : targetedTypeContexts ) {
+			workExecutors.add( targetedTypeContext.createWorkExecutor( sessionContext ) );
 		}
 	}
 

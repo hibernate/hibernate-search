@@ -50,7 +50,7 @@ class PojoScopeDelegateImpl<E, E2> implements PojoScopeDelegate<E, E2> {
 	public Map<Class<? extends E>, PojoMappingTypeMetadata> getIncludedIndexedTypes() {
 		return targetedTypeManagers.stream()
 				.collect( StreamHelper.toMap(
-						PojoIndexedTypeManager::getIndexedJavaClass,
+						PojoIndexedTypeManager::getJavaClass,
 						PojoIndexedTypeManager::getMappingMetadata,
 						LinkedHashMap::new
 				) );
@@ -63,7 +63,7 @@ class PojoScopeDelegateImpl<E, E2> implements PojoScopeDelegate<E, E2> {
 						"Document reference " + documentReference + " could not be converted to a PojoReference"
 				) );
 		Object id = typeManager.getIdentifierMapping().fromDocumentIdentifier( documentReference.getId(), sessionContext );
-		return new PojoReferenceImpl( typeManager.getIndexedJavaClass(), id );
+		return new PojoReferenceImpl( typeManager.getJavaClass(), id );
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoContainedTypeWorkPlan;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
@@ -23,7 +24,8 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 /**
  * @param <E> The contained entity type.
  */
-public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeAppendable {
+public class PojoContainedTypeManager<E>
+		implements AutoCloseable, ToStringTreeAppendable, PojoWorkContainedTypeContext<E> {
 
 	private final Class<E> javaClass;
 	private final PojoCaster<E> caster;
@@ -51,19 +53,18 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
 
+	@Override
 	public Class<E> getJavaClass() {
 		return javaClass;
 	}
 
-	PojoMappingTypeMetadata getMappingMetadata() {
-		return mappingMetadata;
-	}
-
+	@Override
 	public Supplier<E> toEntitySupplier(AbstractPojoSessionContextImplementor sessionContext, Object entity) {
 		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
 	}
 
+	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths) {
 		reindexingResolver.resolveEntitiesToReindex(
@@ -71,9 +72,14 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 		);
 	}
 
+	@Override
 	public PojoContainedTypeWorkPlan<E> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext) {
 		return new PojoContainedTypeWorkPlan<>(
 				this, sessionContext
 		);
+	}
+
+	PojoMappingTypeMetadata getMappingMetadata() {
+		return mappingMetadata;
 	}
 }

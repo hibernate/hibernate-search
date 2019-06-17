@@ -18,10 +18,6 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManagerContainer;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -32,8 +28,8 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
-	private final PojoContainedTypeManagerContainer containedTypeManagers;
+	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
+	private final PojoWorkContainedTypeContextProvider containedTypeContextProvider;
 	private final AbstractPojoSessionContextImplementor sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 	private final DocumentCommitStrategy commitStrategy;
@@ -43,13 +39,13 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	private final Map<Class<?>, PojoIndexedTypeWorkPlan<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
 	private final Map<Class<?>, PojoContainedTypeWorkPlan<?>> containedTypeDelegates = new HashMap<>();
 
-	public PojoWorkPlanImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
-			PojoContainedTypeManagerContainer containedTypeManagers,
+	public PojoWorkPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
+			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
 			AbstractPojoSessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
-		this.indexedTypeManagers = indexedTypeManagers;
-		this.containedTypeManagers = containedTypeManagers;
+		this.indexedTypeContextProvider = indexedTypeContextProvider;
+		this.containedTypeContextProvider = containedTypeContextProvider;
 		this.sessionContext = sessionContext;
 		this.introspector = sessionContext.getRuntimeIntrospector();
 		this.commitStrategy = commitStrategy;
@@ -154,19 +150,19 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	}
 
 	private AbstractPojoTypeWorkPlan createDelegate(Class<?> clazz) {
-		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
-				indexedTypeManagers.getByExactClass( clazz );
-		if ( indexedTypeManagerOptional.isPresent() ) {
-			PojoIndexedTypeWorkPlan<?, ?, ?> delegate = indexedTypeManagerOptional.get()
+		Optional<? extends PojoWorkIndexedTypeContext<?, ?, ?>> indexedTypeContextOptional =
+				indexedTypeContextProvider.getByExactClass( clazz );
+		if ( indexedTypeContextOptional.isPresent() ) {
+			PojoIndexedTypeWorkPlan<?, ?, ?> delegate = indexedTypeContextOptional.get()
 					.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );
 			indexedTypeDelegates.put( clazz, delegate );
 			return delegate;
 		}
 		else {
-			Optional<? extends PojoContainedTypeManager<?>> containedTypeManagerOptional =
-					containedTypeManagers.getByExactClass( clazz );
-			if ( containedTypeManagerOptional.isPresent() ) {
-				PojoContainedTypeWorkPlan<?> delegate = containedTypeManagerOptional.get()
+			Optional<? extends PojoWorkContainedTypeContext<?>> containedTypeContextOptional =
+					containedTypeContextProvider.getByExactClass( clazz );
+			if ( containedTypeContextOptional.isPresent() ) {
+				PojoContainedTypeWorkPlan<?> delegate = containedTypeContextOptional.get()
 						.createWorkPlan( sessionContext );
 				containedTypeDelegates.put( clazz, delegate );
 				return delegate;
@@ -181,8 +177,8 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 			return delegate;
 		}
 
-		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
-				indexedTypeManagers.getByExactClass( clazz );
+		Optional<? extends PojoWorkIndexedTypeContext<?, ?, ?>> indexedTypeManagerOptional =
+				indexedTypeContextProvider.getByExactClass( clazz );
 		if ( indexedTypeManagerOptional.isPresent() ) {
 			delegate = indexedTypeManagerOptional.get()
 					.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );

@@ -15,9 +15,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContextProvider;
 import org.hibernate.search.util.common.impl.Closer;
 
-public class PojoContainedTypeManagerContainer {
+public class PojoContainedTypeManagerContainer implements PojoWorkContainedTypeContextProvider {
 
 	public static Builder builder() {
 		return new Builder();
@@ -31,12 +32,13 @@ public class PojoContainedTypeManagerContainer {
 		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactClass.values() ) );
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> Optional<PojoContainedTypeManager<E>> getByExactClass(Class<E> clazz) {
 		return Optional.ofNullable( (PojoContainedTypeManager<E>) byExactClass.get( clazz ) );
 	}
 
-	public Set<PojoContainedTypeManager<?>> getAll() {
+	Set<PojoContainedTypeManager<?>> getAll() {
 		return all;
 	}
 

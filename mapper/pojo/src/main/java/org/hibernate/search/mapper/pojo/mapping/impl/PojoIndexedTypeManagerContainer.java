@@ -15,9 +15,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContextProvider;
 import org.hibernate.search.util.common.impl.Closer;
 
-public class PojoIndexedTypeManagerContainer {
+public class PojoIndexedTypeManagerContainer implements PojoWorkIndexedTypeContextProvider {
 
 	public static Builder builder() {
 		return new Builder();
@@ -36,21 +37,22 @@ public class PojoIndexedTypeManagerContainer {
 		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactClass.values() ) );
 	}
 
-	public Optional<PojoIndexedTypeManager<?, ?, ?>> getByIndexName(String indexName) {
-		return Optional.ofNullable( byIndexName.get( indexName ) );
-	}
-
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> Optional<PojoIndexedTypeManager<?, E, ?>> getByExactClass(Class<E> clazz) {
 		return Optional.ofNullable( (PojoIndexedTypeManager<?, E, ?>) byExactClass.get( clazz ) );
 	}
 
+	Optional<PojoIndexedTypeManager<?, ?, ?>> getByIndexName(String indexName) {
+		return Optional.ofNullable( byIndexName.get( indexName ) );
+	}
+
 	@SuppressWarnings("unchecked")
-	public <E> Optional<Set<PojoIndexedTypeManager<?, ? extends E, ?>>> getAllBySuperClass(Class<E> clazz) {
+	<E> Optional<Set<PojoIndexedTypeManager<?, ? extends E, ?>>> getAllBySuperClass(Class<E> clazz) {
 		return Optional.ofNullable( (Set<PojoIndexedTypeManager<?, ? extends E, ?>>) bySuperClass.get( clazz ) );
 	}
 
-	public Set<PojoIndexedTypeManager<?, ?, ?>> getAll() {
+	Set<PojoIndexedTypeManager<?, ?, ?>> getAll() {
 		return all;
 	}
 
