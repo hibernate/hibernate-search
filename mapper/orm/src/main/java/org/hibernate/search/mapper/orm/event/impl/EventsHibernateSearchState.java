@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.event.impl;
 
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
-
 /**
  * Internal contract to allow switching different strategies
  * to access some configured state from the EventListener, of
@@ -17,8 +15,8 @@ import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextServic
 public interface EventsHibernateSearchState {
 
 	/**
-	 * @return the initialized Hibernate Search context
+	 * @return the initialized Hibernate Search context provider
 	 */
-	HibernateSearchContextService getHibernateSearchContext();
+	HibernateOrmListenerContextProvider getContextProvider();
 
 }

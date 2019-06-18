@@ -13,7 +13,6 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 /**
  * A mapper-specific indexed type context,
  * accessible through {@link PojoScopeDelegate#getIncludedIndexedTypes()}
- * and {@link org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping#getTypeContext(Class)}
  * in particular.
  *
  * @param <E> The entity type mapped to the index.

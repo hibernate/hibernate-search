@@ -8,27 +8,24 @@ package org.hibernate.search.mapper.orm.event.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-
 /**
  * This EventsHibernateSearchState is useful to hold for requests
- * onto the actual {@link HibernateOrmMapping}
+ * onto the actual {@link HibernateOrmListenerContextProvider}
  * until the initialization of Hibernate Search has been completed.
  *
  * @author Sanne Grinovero
  */
 final class InitializingHibernateSearchState implements EventsHibernateSearchState {
 
-	private final CompletableFuture<HibernateSearchContextService> contextFuture;
+	private final CompletableFuture<HibernateOrmListenerContextProvider> contextProviderFuture;
 
-	public InitializingHibernateSearchState(CompletableFuture<HibernateSearchContextService> contextFuture) {
-		this.contextFuture = contextFuture;
+	InitializingHibernateSearchState(CompletableFuture<HibernateOrmListenerContextProvider> contextProviderFuture) {
+		this.contextProviderFuture = contextProviderFuture;
 	}
 
 	@Override
-	public HibernateSearchContextService getHibernateSearchContext() {
-		return contextFuture.join();
+	public HibernateOrmListenerContextProvider getContextProvider() {
+		return contextProviderFuture.join();
 	}
 
 }

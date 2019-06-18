@@ -11,7 +11,6 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 /**
  * A mapper-specific type context,
  * accessible through {@link PojoScopeDelegate#getIncludedIndexedTypes()}
- * and {@link org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping#getTypeContext(Class)}
  * in particular.
  *
  * @param <E> The entity type.
@@ -22,7 +21,5 @@ public interface HibernateOrmScopeTypeContext<E> {
 	 * @return The entity type as a {@link Class}.
 	 */
 	Class<E> getJavaClass();
-
-	Object toWorkPlanProvidedId(Object entityId);
 
 }

@@ -9,13 +9,18 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
+import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
 
-public final class HibernateSearchContextService implements Service, AutoCloseable {
+public final class HibernateSearchContextService
+		implements Service, AutoCloseable,
+		HibernateOrmListenerContextProvider {
 
 	public static HibernateSearchContextService get(SessionFactoryImplementor sessionFactory) {
 		return sessionFactory.getServiceRegistry().getService( HibernateSearchContextService.class );
@@ -45,7 +50,17 @@ public final class HibernateSearchContextService implements Service, AutoCloseab
 		}
 	}
 
-	public HibernateOrmMapping getMapping() {
+	@Override
+	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor session) {
+		return getMapping().getSearchSession( session ).getCurrentWorkPlan();
+	}
+
+	@Override
+	public <E> HibernateOrmListenerTypeContext getTypeContext(Class<E> type) {
+		return getMapping().getTypeContext( type );
+	}
+
+	public HibernateOrmMappingImpl getMapping() {
 		if ( mapping != null ) {
 			return mapping;
 		}
