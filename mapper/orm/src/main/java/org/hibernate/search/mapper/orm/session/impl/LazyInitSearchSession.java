@@ -64,7 +64,7 @@ public class LazyInitSearchSession implements SearchSession {
 		if ( delegate == null ) {
 			HibernateSearchContextService contextService =
 					HibernateSearchContextService.get( sessionImplementor.getSessionFactory() );
-			delegate = contextService.getSearchSession( sessionImplementor );
+			delegate = contextService.getMapping().getSearchSession( sessionImplementor );
 		}
 		return delegate;
 	}

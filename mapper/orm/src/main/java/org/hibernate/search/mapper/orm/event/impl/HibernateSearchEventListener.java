@@ -153,7 +153,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	private PojoWorkPlan getCurrentWorkPlan(HibernateSearchContextService context,
 			SessionImplementor sessionImplementor) {
-		return context.getSearchSession( sessionImplementor ).getCurrentWorkPlan();
+		return context.getMapping().getSearchSession( sessionImplementor ).getCurrentWorkPlan();
 	}
 
 	private HibernateOrmScopeTypeContext<?> getTypeContext(HibernateSearchContextService context, Object entity) {

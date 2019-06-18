@@ -115,7 +115,9 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	}
 
 	private void loadAllFromQueue(SessionImplementor session) throws Exception {
-		try ( SearchSessionImplementor searchSession = mapping.createSession( session ) ) {
+		// The search session will be closed automatically with the ORM session
+		SearchSessionImplementor searchSession = mapping.getSearchSession( session );
+		try {
 			PojoSessionWorkExecutor workExecutor =
 					searchSession.createSessionWorkExecutor( DocumentCommitStrategy.NONE );
 			List<Serializable> idList;
