@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.event.impl;
 
-import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
 
 /**
  * Internal contract to allow switching different strategies
