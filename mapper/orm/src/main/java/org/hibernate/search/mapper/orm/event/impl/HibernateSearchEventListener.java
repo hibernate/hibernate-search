@@ -28,9 +28,7 @@ import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -57,9 +55,10 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	private volatile EventsHibernateSearchState state;
 
-	public HibernateSearchEventListener(CompletableFuture<HibernateSearchContextService> contextFuture,
+	public HibernateSearchEventListener(
+			CompletableFuture<? extends HibernateOrmListenerContextProvider> contextProviderFuture,
 			boolean dirtyCheckingEnabled) {
-		this.state = new InitializingHibernateSearchState( contextFuture.thenApply( this::doInitialize ) );
+		this.state = new InitializingHibernateSearchState( contextProviderFuture.thenApply( this::doInitialize ) );
 		this.dirtyCheckingEnabled = dirtyCheckingEnabled;
 	}
 
@@ -70,37 +69,37 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
-		HibernateSearchContextService context = state.getHibernateSearchContext();
+		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		final Object entity = event.getEntity();
-		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
 		if ( typeContext != null ) {
 			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
-			getCurrentWorkPlan( context, event.getSession() )
+			getCurrentWorkPlan( contextProvider, event.getSession() )
 					.delete( providedId, entity );
 		}
 	}
 
 	@Override
 	public void onPostInsert(PostInsertEvent event) {
-		HibernateSearchContextService context = state.getHibernateSearchContext();
+		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		final Object entity = event.getEntity();
-		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
 		if ( typeContext != null ) {
 			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
-			getCurrentWorkPlan( context, event.getSession() )
+			getCurrentWorkPlan( contextProvider, event.getSession() )
 					.add( providedId, entity );
 		}
 	}
 
 	@Override
 	public void onPostUpdate(PostUpdateEvent event) {
-		HibernateSearchContextService context = state.getHibernateSearchContext();
+		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		final Object entity = event.getEntity();
-		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
 		if ( typeContext != null ) {
-			PojoWorkPlan workPlan = getCurrentWorkPlan( context, event.getSession() );
+			PojoWorkPlan workPlan = getCurrentWorkPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
 			if ( dirtyCheckingEnabled ) {
 				workPlan.update( providedId, entity, getDirtyPropertyNames( event ) );
@@ -144,20 +143,22 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 //		}
 	}
 
-	private HibernateSearchContextService doInitialize(HibernateSearchContextService context) {
+	private HibernateOrmListenerContextProvider doInitialize(
+			HibernateOrmListenerContextProvider contextProvider) {
 		log.debug( "Hibernate Search dirty checks " + ( dirtyCheckingEnabled ? "enabled" : "disabled" ) );
 		// discard the suboptimal EventsHibernateSearchState instances
-		this.state = new OptimalEventsHibernateSearchState( context );
-		return context;
+		this.state = new OptimalEventsHibernateSearchState( contextProvider );
+		return contextProvider;
 	}
 
-	private PojoWorkPlan getCurrentWorkPlan(HibernateSearchContextService context,
+	private PojoWorkPlan getCurrentWorkPlan(HibernateOrmListenerContextProvider contextProvider,
 			SessionImplementor sessionImplementor) {
-		return context.getMapping().getSearchSession( sessionImplementor ).getCurrentWorkPlan();
+		return contextProvider.getCurrentWorkPlan( sessionImplementor );
 	}
 
-	private HibernateOrmScopeTypeContext<?> getTypeContext(HibernateSearchContextService context, Object entity) {
-		return context.getMapping().getTypeContext( Hibernate.getClass( entity ) );
+	private HibernateOrmListenerTypeContext getTypeContext(HibernateOrmListenerContextProvider contextProvider,
+			Object entity) {
+		return contextProvider.getTypeContext( Hibernate.getClass( entity ) );
 	}
 
 	// TODO HSEARCH-3068 handle the "simulated" transaction when a Flush listener is registered
@@ -177,7 +178,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 //	}
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
-		HibernateSearchContextService context = state.getHibernateSearchContext();
+		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		Object entity = event.getAffectedOwnerOrNull();
 		if ( entity == null ) {
 			//Hibernate cannot determine every single time the owner especially in case detached objects are involved
@@ -186,9 +187,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 
-		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
+		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
 		if ( typeContext != null ) {
-			PojoWorkPlan workPlan = getCurrentWorkPlan( context, event.getSession() );
+			PojoWorkPlan workPlan = getCurrentWorkPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toWorkPlanProvidedId( event.getAffectedOwnerIdOrNull() );
 
 			if ( dirtyCheckingEnabled ) {

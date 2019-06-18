@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContext;
 
-abstract class AbstractHibernateOrmTypeContext<E> implements HibernateOrmScopeTypeContext<E> {
+abstract class AbstractHibernateOrmTypeContext<E>
+		implements HibernateOrmScopeTypeContext<E>, HibernateOrmListenerTypeContext {
 	private final Class<E> javaClass;
 
 	AbstractHibernateOrmTypeContext(Class<E> javaClass) {

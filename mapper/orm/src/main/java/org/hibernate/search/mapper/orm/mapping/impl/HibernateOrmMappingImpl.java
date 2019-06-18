@@ -75,8 +75,7 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 		return searchSession;
 	}
 
-	@Override
-	public <E> AbstractHibernateOrmTypeContext<E> getTypeContext(Class<E> type) {
+	<E> AbstractHibernateOrmTypeContext<E> getTypeContext(Class<E> type) {
 		return typeContextContainer.getByExactClass( type );
 	}
 

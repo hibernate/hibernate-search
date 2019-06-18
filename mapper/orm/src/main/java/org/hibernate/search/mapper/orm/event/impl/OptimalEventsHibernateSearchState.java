@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.event.impl;
 
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
 import org.hibernate.search.util.common.impl.Contracts;
 
 /**
@@ -18,16 +17,16 @@ import org.hibernate.search.util.common.impl.Contracts;
  */
 final class OptimalEventsHibernateSearchState implements EventsHibernateSearchState {
 
-	private final HibernateSearchContextService context;
+	private final HibernateOrmListenerContextProvider contextProvider;
 
-	public OptimalEventsHibernateSearchState(HibernateSearchContextService context) {
-		Contracts.assertNotNull( context, "context" );
-		this.context = context;
+	OptimalEventsHibernateSearchState(HibernateOrmListenerContextProvider contextProvider) {
+		Contracts.assertNotNull( contextProvider, "contextProvider" );
+		this.contextProvider = contextProvider;
 	}
 
 	@Override
-	public HibernateSearchContextService getHibernateSearchContext() {
-		return context;
+	public HibernateOrmListenerContextProvider getContextProvider() {
+		return contextProvider;
 	}
 
 }
