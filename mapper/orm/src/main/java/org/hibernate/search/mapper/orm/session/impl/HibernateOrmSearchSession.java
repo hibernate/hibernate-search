@@ -31,7 +31,6 @@ import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
-import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
@@ -46,7 +45,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * The actual implementation of {@link SearchSession}.
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
-		implements SearchSessionImplementor, SearchSession {
+		implements SearchSession {
 
 	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
 			HibernateOrmSearchSession.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
@@ -79,7 +78,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		this.synchronizationStrategy = builder.synchronizationStrategy;
 	}
 
-	@Override
 	public void close() {
 		// Nothing to do
 	}
@@ -114,7 +112,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return writePlan;
 	}
 
-	@Override
 	public PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy) {
 		return getDelegate().createSessionWorkExecutor( commitStrategy );
 	}
@@ -125,7 +122,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		this.synchronizationStrategy = synchronizationStrategy;
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
 	public PojoWorkPlan getCurrentWorkPlan() {
 		SessionImplementor sessionImplementor = sessionContext.getSession();

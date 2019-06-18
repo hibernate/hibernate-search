@@ -29,7 +29,7 @@ public final class HibernateSearchContextService
 	}
 
 	private volatile SearchIntegration integration;
-	private volatile HibernateOrmMappingImpl mapping;
+	private volatile HibernateOrmMapping mapping;
 
 	@Override
 	public void close() {
@@ -38,7 +38,7 @@ public final class HibernateSearchContextService
 		}
 	}
 
-	public void initialize(SearchIntegration integration, HibernateOrmMappingImpl mapping) {
+	public void initialize(SearchIntegration integration, HibernateOrmMapping mapping) {
 		this.integration = integration;
 		this.mapping = mapping;
 	}
@@ -67,7 +67,7 @@ public final class HibernateSearchContextService
 		return getMapping().getSearchSession( sessionImplementor );
 	}
 
-	public HibernateOrmMappingImpl getMapping() {
+	public HibernateOrmMapping getMapping() {
 		if ( mapping != null ) {
 			return mapping;
 		}

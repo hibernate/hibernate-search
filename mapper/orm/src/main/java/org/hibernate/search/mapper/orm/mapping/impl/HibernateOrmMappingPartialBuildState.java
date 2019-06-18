@@ -34,12 +34,12 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 		this.typeContextContainerBuilder = typeContextContainerBuilder;
 	}
 
-	public MappingImplementor<HibernateOrmMappingImpl> bindToSessionFactory(
+	public MappingImplementor<HibernateOrmMapping> bindToSessionFactory(
 			SessionFactoryImplementor sessionFactoryImplementor,
 			ConfigurationPropertySource propertySource) {
 		AutomaticIndexingSynchronizationStrategy synchronizationStrategy =
 				getAutomaticIndexingSynchronizationStrategy( propertySource );
-		return new HibernateOrmMappingImpl(
+		return new HibernateOrmMapping(
 				mappingDelegate, typeContextContainerBuilder.build( sessionFactoryImplementor ),
 				sessionFactoryImplementor, synchronizationStrategy
 		);

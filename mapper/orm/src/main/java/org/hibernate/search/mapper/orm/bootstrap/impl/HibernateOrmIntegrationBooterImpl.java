@@ -32,7 +32,7 @@ import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBoot
 import org.hibernate.search.mapper.orm.cfg.impl.ConsumedPropertyKeysReport;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingImpl;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
@@ -234,7 +234,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private HibernateSearchContextService doBootSecondPhase(
 			HibernateOrmIntegrationPartialBuildState partialBuildState,
 			SessionFactoryImplementor sessionFactoryImplementor) {
-		HibernateOrmMappingImpl mapping = partialBuildState.integrationBuildState.finalizeMapping(
+		HibernateOrmMapping mapping = partialBuildState.integrationBuildState.finalizeMapping(
 				partialBuildState.mappingKey,
 				mappingPartialBuildState -> mappingPartialBuildState.bindToSessionFactory( sessionFactoryImplementor, propertySource )
 		);
