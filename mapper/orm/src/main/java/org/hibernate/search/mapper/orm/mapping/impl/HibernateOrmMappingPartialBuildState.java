@@ -14,7 +14,6 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -35,7 +34,7 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 		this.typeContextContainerBuilder = typeContextContainerBuilder;
 	}
 
-	public MappingImplementor<HibernateOrmMapping> bindToSessionFactory(
+	public MappingImplementor<HibernateOrmMappingImpl> bindToSessionFactory(
 			SessionFactoryImplementor sessionFactoryImplementor,
 			ConfigurationPropertySource propertySource) {
 		AutomaticIndexingSynchronizationStrategy synchronizationStrategy =

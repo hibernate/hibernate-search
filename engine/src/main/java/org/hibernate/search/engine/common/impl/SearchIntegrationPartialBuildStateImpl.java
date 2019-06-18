@@ -77,7 +77,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 		fullyBuiltMappings.put( mappingKey, mapping );
 		partiallyBuiltMappings.remove( mappingKey );
 
-		return mapping.toAPI();
+		return mapping.toConcreteType();
 	}
 
 	@Override

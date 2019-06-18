@@ -22,7 +22,7 @@ public final class HibernateSearchContextService implements Service, AutoCloseab
 	}
 
 	private volatile SearchIntegration integration;
-	private volatile HibernateOrmMapping mapping;
+	private volatile HibernateOrmMappingImpl mapping;
 
 	@Override
 	public void close() {
@@ -31,7 +31,7 @@ public final class HibernateSearchContextService implements Service, AutoCloseab
 		}
 	}
 
-	public void initialize(SearchIntegration integration, HibernateOrmMapping mapping) {
+	public void initialize(SearchIntegration integration, HibernateOrmMappingImpl mapping) {
 		this.integration = integration;
 		this.mapping = mapping;
 	}

@@ -49,7 +49,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 		if ( mappingImplementor == null ) {
 			throw log.noMappingRegistered( mappingKey );
 		}
-		return mappingImplementor.toAPI();
+		return mappingImplementor.toConcreteType();
 	}
 
 	@Override

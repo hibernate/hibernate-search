@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.util.common.impl.TransientReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<HibernateOrmMapping>
+public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<HibernateOrmMappingImpl>
 		implements HibernateOrmMapping {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -46,7 +46,7 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	}
 
 	@Override
-	public HibernateOrmMapping toAPI() {
+	public HibernateOrmMappingImpl toConcreteType() {
 		return this;
 	}
 
