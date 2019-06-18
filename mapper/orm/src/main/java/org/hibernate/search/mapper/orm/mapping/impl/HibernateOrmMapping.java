@@ -52,13 +52,19 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		return this;
 	}
 
+	@Override
+	public PojoSessionWorkExecutor createSessionWorkExecutor(SessionImplementor sessionImplementor,
+			DocumentCommitStrategy commitStrategy) {
+		return getSearchSession( sessionImplementor ).createSessionWorkExecutor( commitStrategy );
+	}
+
 	/**
 	 * @param sessionImplementor A Hibernate session
 	 *
 	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
 	 */
 	@SuppressWarnings("unchecked")
-	public HibernateOrmSearchSession getSearchSession(SessionImplementor sessionImplementor) {
+	HibernateOrmSearchSession getSearchSession(SessionImplementor sessionImplementor) {
 		TransientReference<HibernateOrmSearchSession> reference =
 				(TransientReference<HibernateOrmSearchSession>) sessionImplementor.getProperties()
 						.get( SEARCH_SESSION_KEY );
@@ -76,18 +82,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		return searchSession;
 	}
 
-	@Override
-	public PojoSessionWorkExecutor createSessionWorkExecutor(SessionImplementor sessionImplementor,
-			DocumentCommitStrategy commitStrategy) {
-		return getSearchSession( sessionImplementor ).createSessionWorkExecutor( commitStrategy );
-	}
-
 	<E> AbstractHibernateOrmTypeContext<E> getTypeContext(Class<E> type) {
 		return typeContextContainer.getByExactClass( type );
 	}
 
 	private HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder createSessionBuilder(EntityManager entityManager) {
-		SessionImplementor sessionImplementor = null;
+		SessionImplementor sessionImplementor;
 		try {
 			sessionImplementor = entityManager.unwrap( SessionImplementor.class );
 		}
