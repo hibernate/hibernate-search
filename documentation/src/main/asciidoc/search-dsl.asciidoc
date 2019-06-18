@@ -40,7 +40,7 @@ See <<search-dsl-predicate>> for more information about predicates.
 <6> Retrieve matching entities.
 ====
 
-By default, the hits of a search query will be managed Hibernate ORM entities,
+By default, the hits of a search query will be entities managed by Hibernate ORM,
 bound to the entity manager used to create the search session.
 This provides all the benefits of Hibernate ORM,
 in particular the ability to navigate the entity graph to retrieve associated entities if necessary.
@@ -49,7 +49,8 @@ The query DSL offers many features, detailed in the following sections.
 Some commonly used features include:
 
 * <<search-dsl-predicate,predicates>>,
-to define which documents must be included in the search results.
+the main component of a search query,
+i.e. the condition that every document must satisfy in order to be included in search results.
 * <<search-dsl-query-fetching-results,fetching the results differently>>:
 getting the hits directly as a list,
 using pagination, scrolling, etc.
@@ -139,7 +140,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/Pred
 <1> Start building the query.
 <2> Mention that the results of the query are expected to have a `title` field matching the value `robot`.
 If the field does not exist or cannot be searched on, an exception will be thrown.
-<3> The results match the given predicate.
+<3> Fetch the results, which will match the given predicate.
 ====
 
 Or alternatively, if you don't want to use lambdas:
@@ -714,7 +715,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT
 <2> Mention that the results of the query are expected to be sorted on field "pageCount" in descending order,
 then (for those with the same page count) on field "title_sort" in ascending order.
 If the field does not exist or cannot be sorted on, an exception will be thrown.
-<3> The results are sorted according to instructions.
+<3> Fetch the results, which will be sorted according to instructions.
 ====
 
 Or alternatively, if you don't want to use lambdas:
@@ -922,7 +923,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/Pro
 <1> Start building the query as usual.
 <2> Mention that the expected result of the query is a projection on field "title", of type String.
 If that type is not appropriate or if the field does not exist, an exception will be thrown.
-<3> The query is type-safe and will return results of the expected type.
+<3> Fetch the results, which will have the expected type.
 ====
 
 Or alternatively, if you don't want to use lambdas:
