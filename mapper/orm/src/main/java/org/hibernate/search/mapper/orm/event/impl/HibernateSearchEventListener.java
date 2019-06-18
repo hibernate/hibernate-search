@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.Hibernate;
 import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.AbstractCollectionEvent;
 import org.hibernate.event.spi.FlushEvent;
 import org.hibernate.event.spi.FlushEventListener;
@@ -76,7 +77,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
-			context.getCurrentWorkPlan( event.getSession() )
+			getCurrentWorkPlan( context, event.getSession() )
 					.delete( providedId, entity );
 		}
 	}
@@ -88,7 +89,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
 			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
-			context.getCurrentWorkPlan( event.getSession() )
+			getCurrentWorkPlan( context, event.getSession() )
 					.add( providedId, entity );
 		}
 	}
@@ -99,7 +100,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		final Object entity = event.getEntity();
 		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
-			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
+			PojoWorkPlan workPlan = getCurrentWorkPlan( context, event.getSession() );
 			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
 			if ( dirtyCheckingEnabled ) {
 				workPlan.update( providedId, entity, getDirtyPropertyNames( event ) );
@@ -150,6 +151,11 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		return context;
 	}
 
+	private PojoWorkPlan getCurrentWorkPlan(HibernateSearchContextService context,
+			SessionImplementor sessionImplementor) {
+		return context.getSearchSession( sessionImplementor ).getCurrentWorkPlan();
+	}
+
 	private HibernateOrmScopeTypeContext<?> getTypeContext(HibernateSearchContextService context, Object entity) {
 		return context.getMapping().getTypeContext( Hibernate.getClass( entity ) );
 	}
@@ -182,7 +188,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
-			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
+			PojoWorkPlan workPlan = getCurrentWorkPlan( context, event.getSession() );
 			Object providedId = typeContext.toWorkPlanProvidedId( event.getAffectedOwnerIdOrNull() );
 
 			if ( dirtyCheckingEnabled ) {
