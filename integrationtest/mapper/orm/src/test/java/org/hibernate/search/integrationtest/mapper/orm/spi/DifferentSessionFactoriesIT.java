@@ -13,9 +13,8 @@ import javax.persistence.Id;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionContextProvider;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -28,7 +27,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Tests the creation of a {@link SearchSessionImplementor}, using a {@link HibernateOrmMapping} with an {@link EntityManager} owned by a different {@link SessionFactory}.
+ * Tests the creation of a {@link HibernateOrmSearchSession}
+ * using a {@link HibernateOrmSearchSessionContextProvider}
+ * with an {@link EntityManager} owned by a different {@link SessionFactory}.
  */
 public class DifferentSessionFactoriesIT {
 
@@ -56,12 +57,13 @@ public class DifferentSessionFactoriesIT {
 		thrown.expectMessage( "Mapping service cannot create a SearchSession using a different session factory." );
 
 		// mapping is taken from the alternative session factory
-		HibernateOrmMapping mapping = sessionFactoryAlt.unwrap( SessionFactoryImplementor.class )
-				.getServiceRegistry().getService( HibernateSearchContextService.class ).getMapping();
+		HibernateOrmSearchSessionContextProvider contextProvider =
+				sessionFactoryAlt.unwrap( SessionFactoryImplementor.class )
+						.getServiceRegistry().getService( HibernateOrmSearchSessionContextProvider.class );
 
 		// try to use an entityManager owned by the original session factory instead
 		OrmUtils.withinSession( sessionFactory, session -> {
-			mapping.getSearchSession( (SessionImplementor) session );
+			contextProvider.getSearchSession( (SessionImplementor) session );
 		} );
 	}
 
