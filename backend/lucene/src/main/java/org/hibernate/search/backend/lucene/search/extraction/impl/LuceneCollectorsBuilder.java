@@ -55,6 +55,7 @@ public class LuceneCollectorsBuilder {
 	}
 
 	public DistanceCollector addDistanceCollector(String absoluteFieldPath, GeoPoint center) {
+		this.requireTopDocs = true; // We can't collect distances if we don't know from which documents it should be collected
 		DistanceCollector distanceCollector = new DistanceCollector( absoluteFieldPath, center, maxDocs );
 		luceneCollectors.add( distanceCollector );
 		distanceCollectors.put( new DistanceCollectorKey( absoluteFieldPath, center ), distanceCollector );
