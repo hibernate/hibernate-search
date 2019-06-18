@@ -90,6 +90,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			document.addValue( indexMapping.geoPoint_2, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 2 ) );
 			document.addValue( indexMapping.geoPoint_with_longName, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( indexMapping.projectableUnsortableGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
 			document.addValue( indexMapping.string, IMOUTO_STRING );
@@ -99,6 +100,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			document.addValue( indexMapping.geoPoint_2, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
 					IMOUTO_GEO_POINT.getLongitude() - 2 ) );
 			document.addValue( indexMapping.geoPoint_with_longName, IMOUTO_GEO_POINT );
+			document.addValue( indexMapping.projectableUnsortableGeoPoint, IMOUTO_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
 			document.addValue( indexMapping.string, CHEZ_MARGOTTE_STRING );
@@ -108,6 +110,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			document.addValue( indexMapping.geoPoint_2, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 2 ) );
 			document.addValue( indexMapping.geoPoint_with_longName, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( indexMapping.projectableUnsortableGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -128,6 +131,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		final IndexFieldReference<GeoPoint> geoPoint_with_longName;
 		final IndexFieldReference<GeoPoint> nonProjectableGeoPoint;
 		final IndexFieldReference<GeoPoint> unsortableGeoPoint;
+		final IndexFieldReference<GeoPoint> projectableUnsortableGeoPoint;
 		final IndexFieldReference<String> string;
 
 		IndexMapping(IndexSchemaElement root) {
@@ -156,6 +160,11 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			unsortableGeoPoint = root.field(
 					"unsortableGeoPoint",
 					f -> f.asGeoPoint().sortable( Sortable.NO )
+			)
+					.toReference();
+			projectableUnsortableGeoPoint = root.field(
+					"projectableUnsortableGeoPoint",
+					f -> f.asGeoPoint().projectable( Projectable.YES ).sortable( Sortable.NO )
 			)
 					.toReference();
 			string = root.field(

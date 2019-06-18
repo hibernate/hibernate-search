@@ -30,7 +30,27 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3618")
-	public void distanceProjection() {
+	public void distanceProjection_unsortable() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<Double> query = scope.query()
+				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
+				.asProjection( f ->
+						f.distance( "projectableUnsortableGeoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
+				)
+				.predicate( f -> f.matchAll() )
+				.sort( f -> f.byField( "string" ).onMissingValue().sortLast().asc() )
+				.toQuery();
+		SearchResult<Double> results = query.fetch();
+
+		checkResult( results.getHits().get( 0 ), 430d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 1 ), 1300d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 2 ), 2730d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 3 ), null, null );
+	}
+
+	@Test
+	public void distanceProjection_sortable() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Double> query = scope.query()
