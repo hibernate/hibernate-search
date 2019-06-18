@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.event.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 
 /**

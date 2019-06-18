@@ -4,12 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-
-package org.hibernate.search.mapper.orm.impl;
+package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -18,11 +18,11 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * Execute final work inside a transaction.
+ * Execute final work in the after transaction synchronization.
  *
  * @author Emmanuel Bernard
  */
-class InTransactionWorkQueueSynchronization implements Synchronization {
+public class PostTransactionWorkQueueSynchronization implements Synchronization {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -31,7 +31,7 @@ class InTransactionWorkQueueSynchronization implements Synchronization {
 	private final Object transactionIdentifier;
 	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
-	InTransactionWorkQueueSynchronization(PojoWorkPlan workPlan,
+	public PostTransactionWorkQueueSynchronization(PojoWorkPlan workPlan,
 			Map<?, ?> workPlanPerTransaction, Object transactionIdentifier,
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		this.workPlan = workPlan;
@@ -42,23 +42,30 @@ class InTransactionWorkQueueSynchronization implements Synchronization {
 
 	@Override
 	public void beforeCompletion() {
-		// we are doing all the work in the before completion phase so that it is part of the transaction
+		log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this );
+		workPlan.prepare();
+	}
+
+	@Override
+	public void afterCompletion(int i) {
 		try {
-			log.tracef(
-					"Processing Transaction's beforeCompletion() phase for %s. Performing work.", this
-			);
-			CompletableFuture<?> future = workPlan.execute();
-			synchronizationStrategy.handleFuture( future );
+			if ( Status.STATUS_COMMITTED == i ) {
+				log.tracef( "Processing Transaction's afterCompletion() phase for %s. Performing work.", this );
+				CompletableFuture<?> future = workPlan.execute();
+				synchronizationStrategy.handleFuture( future );
+			}
+			else {
+				log.tracef(
+						"Processing Transaction's afterCompletion() phase for %s. Cancelling work due to transaction status %d",
+						this,
+						i
+				);
+				// TODO HSEARCH-3075 send some signal to the workPlan to release resources if necessary?
+			}
 		}
 		finally {
 			//clean the Synchronization per Transaction
 			workPlanPerTransaction.remove( transactionIdentifier );
 		}
 	}
-
-	@Override
-	public void afterCompletion(int status) {
-		// nothing to do, everything was done in beforeCompletion
-	}
-
 }
