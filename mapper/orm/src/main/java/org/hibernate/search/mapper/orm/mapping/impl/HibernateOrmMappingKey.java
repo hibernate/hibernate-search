@@ -8,11 +8,12 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.mapper.orm.logging.impl.HibernateOrmEventContextMessages;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 
 import org.jboss.logging.Messages;
 
-public final class HibernateOrmMappingKey implements MappingKey<HibernateOrmMappingPartialBuildState, HibernateOrmMapping> {
+public final class HibernateOrmMappingKey
+		implements MappingKey<HibernateOrmMappingPartialBuildState, HibernateOrmMappingImpl> {
+
 	private static final HibernateOrmEventContextMessages MESSAGES =
 			Messages.getBundle( HibernateOrmEventContextMessages.class );
 

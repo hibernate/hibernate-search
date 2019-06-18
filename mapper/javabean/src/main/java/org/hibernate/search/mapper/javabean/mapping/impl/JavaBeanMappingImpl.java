@@ -25,7 +25,7 @@ public class JavaBeanMappingImpl extends AbstractPojoMappingImplementor<JavaBean
 	}
 
 	@Override
-	public JavaBeanMapping toAPI() {
+	public JavaBeanMapping toConcreteType() {
 		return this;
 	}
 

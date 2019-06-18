@@ -19,7 +19,7 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 	}
 
 	@Override
-	public StubMapping toAPI() {
+	public StubMapping toConcreteType() {
 		return this;
 	}
 
