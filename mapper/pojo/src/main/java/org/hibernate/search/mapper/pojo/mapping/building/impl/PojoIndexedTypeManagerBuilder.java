@@ -22,7 +22,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollecto
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
@@ -109,10 +108,11 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 		identityMappingCollector.applyDefaults();
 
-		extendedMappingCollector.metadata( new PojoMappingTypeMetadata(
-				identityMappingCollector.documentIdMappedToEntityId,
-				identityMappingCollector.documentIdSourcePropertyName
-		) );
+		if ( identityMappingCollector.documentIdSourcePropertyName.isPresent() ) {
+			extendedMappingCollector.documentIdSourcePropertyName(
+					identityMappingCollector.documentIdSourcePropertyName.get()
+			);
+		}
 
 		/*
 		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?

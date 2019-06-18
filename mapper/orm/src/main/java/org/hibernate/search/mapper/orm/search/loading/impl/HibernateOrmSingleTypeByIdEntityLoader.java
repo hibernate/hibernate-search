@@ -16,14 +16,14 @@ import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<PojoReference, E> {
+public class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<PojoReference, E> {
 	private final Session session;
 	private final Class<E> entityType;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private MultiIdentifierLoadAccess<E> multiAccess;
 
-	HibernateOrmSingleTypeByIdEntityLoader(
+	public HibernateOrmSingleTypeByIdEntityLoader(
 			Session session,
 			Class<E> entityType,
 			MutableEntityLoadingOptions loadingOptions) {

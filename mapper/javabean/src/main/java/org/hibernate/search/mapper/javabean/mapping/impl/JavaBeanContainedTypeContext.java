@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 
 /*
  * TODO HSEARCH-1800 There's nothing here at the moment, just a placeholder.
@@ -20,11 +19,6 @@ class JavaBeanContainedTypeContext {
 
 	static class Builder<E> implements PojoContainedTypeExtendedMappingCollector {
 		Builder() {
-		}
-
-		@Override
-		public void metadata(PojoMappingTypeMetadata metadata) {
-			// Nothing to do
 		}
 	}
 }

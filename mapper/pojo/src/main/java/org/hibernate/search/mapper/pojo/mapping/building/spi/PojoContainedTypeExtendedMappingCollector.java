@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
-
 /**
  * A collector of extended mapping information.
  * <p>
@@ -15,7 +13,5 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
  * necessary to implement their {@link org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider}.
  */
 public interface PojoContainedTypeExtendedMappingCollector {
-
-	void metadata(PojoMappingTypeMetadata metadata);
 
 }

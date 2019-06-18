@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 /**
@@ -24,7 +23,6 @@ public interface HibernateOrmScopeTypeContext<E> {
 	 */
 	Class<E> getJavaClass();
 
-	// FIXME HSEARCH-3203 Replace this temporary solution with an object-oriented one.
-	PojoMappingTypeMetadata getMappingMetadata();
+	Object toWorkPlanProvidedId(Object entityId);
 
 }

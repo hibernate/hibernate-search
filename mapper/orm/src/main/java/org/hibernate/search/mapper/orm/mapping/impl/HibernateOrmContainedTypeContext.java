@@ -8,34 +8,26 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeContainedTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 
 class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmScopeContainedTypeContext<E> {
-	private final PojoMappingTypeMetadata metadata;
 
 	private HibernateOrmContainedTypeContext(HibernateOrmContainedTypeContext.Builder<E> builder) {
 		super( builder.javaClass );
-		this.metadata = builder.metadata;
 	}
 
 	@Override
-	public PojoMappingTypeMetadata getMappingMetadata() {
-		return metadata;
+	public Object toWorkPlanProvidedId(Object entityId) {
+		// The concept of document ID is not relevant for contained types,
+		// so we always provide the entity ID to work plans
+		return entityId;
 	}
 
 	static class Builder<E> implements PojoContainedTypeExtendedMappingCollector {
 		private final Class<E> javaClass;
 
-		private PojoMappingTypeMetadata metadata;
-
 		Builder(Class<E> javaClass) {
 			this.javaClass = javaClass;
-		}
-
-		@Override
-		public void metadata(PojoMappingTypeMetadata metadata) {
-			this.metadata = metadata;
 		}
 
 		HibernateOrmContainedTypeContext<E> build() {

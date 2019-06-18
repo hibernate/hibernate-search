@@ -40,6 +40,6 @@ public final class HibernateOrmMapperDelegate
 
 	@Override
 	public HibernateOrmMappingPartialBuildState prepareBuild(PojoMappingDelegate mappingDelegate) {
-		return new HibernateOrmMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder.build() );
+		return new HibernateOrmMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder );
 	}
 }
