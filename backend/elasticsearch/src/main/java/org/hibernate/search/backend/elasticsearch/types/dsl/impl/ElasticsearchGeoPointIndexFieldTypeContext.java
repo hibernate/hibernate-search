@@ -30,6 +30,9 @@ class ElasticsearchGeoPointIndexFieldTypeContext
 				createIndexToProjectionConverter();
 		ElasticsearchGeoPointFieldCodec codec = ElasticsearchGeoPointFieldCodec.INSTANCE;
 
+		// We need doc values for the projection script when not sorting on the same field
+		mapping.setDocValues( resolvedSortable || resolvedProjectable );
+
 		return new ElasticsearchIndexFieldType<>(
 				codec,
 				new ElasticsearchGeoPointFieldPredicateBuilderFactory( resolvedSearchable ),
