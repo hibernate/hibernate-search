@@ -12,12 +12,10 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
-import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 
 /**
  * A lazily initializing {@link SearchSession}.
@@ -28,7 +26,7 @@ import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 public class LazyInitSearchSession implements SearchSession {
 
 	private final SessionImplementor sessionImplementor;
-	private SearchSessionImplementor delegate;
+	private HibernateOrmSearchSession delegate;
 
 	public LazyInitSearchSession(SessionImplementor sessionImplementor) {
 		this.sessionImplementor = sessionImplementor;
@@ -60,11 +58,12 @@ public class LazyInitSearchSession implements SearchSession {
 		getDelegate().setAutomaticIndexingSynchronizationStrategy( synchronizationStrategy );
 	}
 
-	private SearchSessionImplementor getDelegate() {
+	private HibernateOrmSearchSession getDelegate() {
 		if ( delegate == null ) {
-			HibernateSearchContextService contextService =
-					HibernateSearchContextService.get( sessionImplementor.getSessionFactory() );
-			delegate = contextService.getMapping().getSearchSession( sessionImplementor );
+			HibernateOrmSearchSessionContextProvider contextProvider =
+					sessionImplementor.getSessionFactory().getServiceRegistry()
+							.getService( HibernateOrmSearchSessionContextProvider.class );
+			delegate = contextProvider.getSearchSession( sessionImplementor );
 		}
 		return delegate;
 	}

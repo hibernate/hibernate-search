@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionContextProvider;
 import org.hibernate.service.spi.ServiceContributor;
 
 /**
@@ -20,7 +21,11 @@ public final class HibernateSearchContextServiceContributor implements ServiceCo
 
 	@Override
 	public void contribute(StandardServiceRegistryBuilder serviceRegistryBuilder) {
-		serviceRegistryBuilder.addService( HibernateSearchContextService.class, new HibernateSearchContextService() );
+		HibernateSearchContextService service = new HibernateSearchContextService();
+		// For initialization
+		serviceRegistryBuilder.addService( HibernateSearchContextService.class, service );
+		// For retrieval of the search session for a given session
+		serviceRegistryBuilder.addService( HibernateOrmSearchSessionContextProvider.class, service );
 	}
 
 }
