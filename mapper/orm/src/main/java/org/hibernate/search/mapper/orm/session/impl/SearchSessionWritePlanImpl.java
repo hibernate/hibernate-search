@@ -6,23 +6,15 @@
  */
 package org.hibernate.search.mapper.orm.session.impl;
 
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 final class SearchSessionWritePlanImpl implements SearchSessionWritePlan {
 
-	private final HibernateSearchContextService contextService;
 	private final HibernateOrmSearchSession searchSession;
-	private final SessionImplementor ormSession;
 
-	SearchSessionWritePlanImpl(HibernateSearchContextService contextService,
-			HibernateOrmSearchSession searchSession,
-			SessionImplementor ormSession) {
-		this.contextService = contextService;
+	SearchSessionWritePlanImpl(HibernateOrmSearchSession searchSession) {
 		this.searchSession = searchSession;
-		this.ormSession = ormSession;
 	}
 
 	@Override
@@ -54,6 +46,6 @@ final class SearchSessionWritePlanImpl implements SearchSessionWritePlan {
 
 	private PojoWorkPlan getCurrentWorkPlan() {
 		searchSession.checkOrmSessionIsOpen();
-		return contextService.getCurrentWorkPlan( ormSession );
+		return searchSession.getCurrentWorkPlan();
 	}
 }
