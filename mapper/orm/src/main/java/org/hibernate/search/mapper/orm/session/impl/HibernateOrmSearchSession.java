@@ -112,14 +112,14 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return writePlan;
 	}
 
-	public PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy) {
-		return getDelegate().createSessionWorkExecutor( commitStrategy );
-	}
-
 	@Override
 	public void setAutomaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		this.synchronizationStrategy = synchronizationStrategy;
+	}
+
+	public PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy) {
+		return getDelegate().createSessionWorkExecutor( commitStrategy );
 	}
 
 	@SuppressWarnings("unchecked")
