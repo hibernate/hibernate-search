@@ -17,6 +17,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,48 +29,44 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3618")
 	public void distanceProjection() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SearchQuery<List<?>> query = scope.query()
+		SearchQuery<Double> query = scope.query()
+				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
 				.asProjection( f ->
-						f.composite(
-								f.field( "string", String.class ),
-								f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
-						)
+						f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
 				)
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.byField( "string" ).onMissingValue().sortLast().asc() )
 				.toQuery();
-		SearchResult<List<?>> results = query.fetch();
+		SearchResult<Double> results = query.fetch();
 
-		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 2 ), "L'ourson qui boit", 1, 2730d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 3 ), null, 1, null, null );
+		checkResult( results.getHits().get( 0 ), 430d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 1 ), 1300d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 2 ), 2730d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 3 ), null, null );
 	}
 
 	@Test
 	public void distanceProjection_unit() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SearchQuery<List<?>> query = scope.query()
+		SearchQuery<Double> query = scope.query()
 				.asProjection( f ->
-						f.composite(
-								f.field( "string", String.class ),
-								f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
-										.unit( DistanceUnit.KILOMETERS )
-						)
+						f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
+								.unit( DistanceUnit.KILOMETERS )
 				)
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.byField( "string" ).onMissingValue().sortLast().asc() )
 				.toQuery();
-		SearchResult<List<?>> results = query.fetch();
+		SearchResult<Double> results = query.fetch();
 
-		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 0.430d, Offset.offset( 0.010d ) );
-		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1.300d, Offset.offset( 0.010d ) );
-		checkResult( results.getHits().get( 2 ), "L'ourson qui boit", 1, 2.730d, Offset.offset( 0.010d ) );
-		checkResult( results.getHits().get( 3 ), null, 1, null, null );
+		checkResult( results.getHits().get( 0 ), 0.430d, Offset.offset( 0.010d ) );
+		checkResult( results.getHits().get( 1 ), 1.300d, Offset.offset( 0.010d ) );
+		checkResult( results.getHits().get( 2 ), 2.730d, Offset.offset( 0.010d ) );
+		checkResult( results.getHits().get( 3 ), null, null );
 	}
 
 	@Test
@@ -79,7 +76,6 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		SearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
 						f.composite(
-								f.field( "string", String.class ),
 								f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ),
 								f.distance( "geoPoint", GeoPoint.of( 45.763363, 4.833527 ) ),
 								f.distance( "geoPoint_1", GeoPoint.of( 45.749828, 4.854172 ) )
@@ -91,20 +87,20 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.toQuery();
 		SearchResult<List<?>> results = query.fetch();
 
-		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 2 ), "L'ourson qui boit", 1, 2730d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 3 ), null, 1, null, null );
+		checkResult( (Double) results.getHits().get( 0 ).get( 0 ), 430d, Offset.offset( 10d ) );
+		checkResult( (Double) results.getHits().get( 1 ).get( 0 ), 1300d, Offset.offset( 10d ) );
+		checkResult( (Double) results.getHits().get( 2 ).get( 0 ), 2730d, Offset.offset( 10d ) );
+		checkResult( (Double) results.getHits().get( 3 ).get( 0 ), null, null );
 
-		checkResult( results.getHits().get( 0 ), "Chez Margotte", 2, 1780d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 1 ), "Imouto", 2, 1095d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 2 ), "L'ourson qui boit", 2, 812d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 3 ), null, 2, null, null );
+		checkResult( (Double) results.getHits().get( 0 ).get( 1 ), 1780d, Offset.offset( 10d ) );
+		checkResult( (Double) results.getHits().get( 1 ).get( 1 ), 1095d, Offset.offset( 10d ) );
+		checkResult( (Double) results.getHits().get( 2 ).get( 1 ), 812d, Offset.offset( 10d ) );
+		checkResult( (Double) results.getHits().get( 3 ).get( 1 ), null, null );
 
-		checkResult( results.getHits().get( 0 ), "Chez Margotte", 3, 136d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 1 ), "Imouto", 3, 136d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 2 ), "L'ourson qui boit", 3, 136d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 3 ), null, 3, null, null );
+		checkResult( (Double) results.getHits().get( 0 ).get( 2 ), 136d, Offset.offset( 10d ) );
+		checkResult( (Double) results.getHits().get( 1 ).get( 2 ), 136d, Offset.offset( 10d ) );
+		checkResult( (Double) results.getHits().get( 2 ).get( 2 ), 136d, Offset.offset( 10d ) );
+		checkResult( (Double) results.getHits().get( 3 ).get( 2 ), null, null );
 	}
 
 	@Test
@@ -113,51 +109,44 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
 
-		SearchQuery<List<?>> query = scope.query()
+		SearchQuery<Double> query = scope.query()
 				.asProjection( f ->
-						f.composite(
-								f.field( "string", String.class ),
-								f.distance( "geoPoint", center )
-						)
+						f.distance( "geoPoint", center )
 				)
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f
-						.byField( "string" ).onMissingValue().sortLast().asc().then()
 						.byDistance( "geoPoint", GeoPoint.of( 43.749828, 1.854172 ) ).then()
 						.byDistance( "geoPoint", center )
 				)
 				.toQuery();
-		SearchResult<List<?>> results = query.fetch();
+		SearchResult<Double> results = query.fetch();
 
-		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 2 ), "L'ourson qui boit", 1, 2730d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 3 ), null, 1, null, null );
+		checkResult( results.getHits().get( 0 ), 1300d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 1 ), 430d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 2 ), 2730d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 3 ), null, null );
 	}
 
 	@Test
 	public void distanceProjection_longCalculatedField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SearchQuery<List<?>> query = scope.query()
+		SearchQuery<Double> query = scope.query()
 				.asProjection( f ->
-						f.composite(
-								f.field( "string", String.class ),
-								f.distance(
-										"geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
-										GeoPoint.of( 45.74982800099999888371, 4.85417200099999888371 )
-								)
+						f.distance(
+								"geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
+								GeoPoint.of( 45.74982800099999888371, 4.85417200099999888371 )
 						)
 				)
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.byField( "string" ).onMissingValue().sortLast().asc() )
 				.toQuery();
-		SearchResult<List<?>> results = query.fetch();
+		SearchResult<Double> results = query.fetch();
 
-		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 2 ), "L'ourson qui boit", 1, 2730d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 3 ), null, 1, null, null );
+		checkResult( results.getHits().get( 0 ), 430d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 1 ), 1300d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 2 ), 2730d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 3 ), null, null );
 	}
 
 	@Test
@@ -227,15 +216,13 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.hasMessageContaining( "unsortableGeoPoint" );
 	}
 
-	private void checkResult(List<?> result, String name, int distanceIndex, Double distance, Offset<Double> offset) {
-		Assertions.assertThat( result.get( 0 ) ).as( name + " - name" ).isEqualTo( name );
-		if ( distance == null ) {
-			Assertions.assertThat( result.get( distanceIndex ) ).as( name + " - distance" ).isNull();
+	private void checkResult(Double actual, Double expected, Offset<Double> offset) {
+		if ( expected == null ) {
+			Assertions.assertThat( actual ).isNull();
 		}
 		else {
-			Assertions.assertThat( (Double) result.get( distanceIndex ) )
-					.as( name + " - distance" )
-					.isCloseTo( distance, offset );
+			Assertions.assertThat( actual )
+					.isCloseTo( expected, offset );
 		}
 	}
 }
