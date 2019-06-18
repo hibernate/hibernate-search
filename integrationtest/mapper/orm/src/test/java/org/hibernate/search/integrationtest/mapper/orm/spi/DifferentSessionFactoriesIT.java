@@ -12,6 +12,7 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
@@ -54,13 +55,13 @@ public class DifferentSessionFactoriesIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Mapping service cannot create a SearchSession using a different session factory." );
 
-		// service mapping is taken from the alternative session factory
-		HibernateOrmMapping serviceMapping = sessionFactoryAlt.unwrap( SessionFactoryImplementor.class )
+		// mapping is taken from the alternative session factory
+		HibernateOrmMapping mapping = sessionFactoryAlt.unwrap( SessionFactoryImplementor.class )
 				.getServiceRegistry().getService( HibernateSearchContextService.class ).getMapping();
 
 		// try to use an entityManager owned by the original session factory instead
 		OrmUtils.withinSession( sessionFactory, session -> {
-			serviceMapping.createSession( session );
+			mapping.getSearchSession( (SessionImplementor) session );
 		} );
 	}
 

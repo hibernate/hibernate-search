@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.mapper.orm.mapping.spi;
 
-import javax.persistence.EntityManager;
-
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContext;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
-import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 public interface HibernateOrmMapping {
 
-	SearchSessionImplementor createSession(EntityManager entityManager);
-
-	SearchSessionBuilder createSessionWithOptions(EntityManager entityManager);
+	/**
+	 * @param sessionImplementor A Hibernate session
+	 * @return The {@link SearchSessionImplementor} to use within the context of the given session.
+	 */
+	SearchSessionImplementor getSearchSession(SessionImplementor sessionImplementor);
 
 	/**
 	 * @param type A Java type.

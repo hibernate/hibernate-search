@@ -31,7 +31,6 @@ import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationS
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
-import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
@@ -249,8 +248,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		}
 	}
 
-	public static class HibernateOrmSearchSessionBuilder extends AbstractBuilder<HibernateOrmSearchSession>
-			implements SearchSessionBuilder {
+	public static class HibernateOrmSearchSessionBuilder extends AbstractBuilder<HibernateOrmSearchSession> {
 		private final HibernateOrmMappingContextImpl mappingContext;
 		private final HibernateOrmScopeTypeContextProvider typeContextProvider;
 		private final SessionImplementor sessionImplementor;
