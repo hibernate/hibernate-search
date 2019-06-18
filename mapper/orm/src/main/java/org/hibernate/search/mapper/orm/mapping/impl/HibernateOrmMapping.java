@@ -16,7 +16,6 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
@@ -26,19 +25,19 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.common.impl.TransientReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<HibernateOrmMappingImpl>
-		implements HibernateOrmMapping, HibernateOrmMassIndexingMappingContext {
+public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
+		implements HibernateOrmMassIndexingMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String SEARCH_SESSION_KEY =
-			HibernateOrmMappingImpl.class.getName() + "#SEARCH_SESSION_KEY";
+			HibernateOrmMapping.class.getName() + "#SEARCH_SESSION_KEY";
 
 	private final HibernateOrmMappingContextImpl mappingContext;
 	private final HibernateOrmTypeContextContainer typeContextContainer;
 	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
-	HibernateOrmMappingImpl(PojoMappingDelegate mappingDelegate,
+	HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactoryImplementor,
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
@@ -49,7 +48,7 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	}
 
 	@Override
-	public HibernateOrmMappingImpl toConcreteType() {
+	public HibernateOrmMapping toConcreteType() {
 		return this;
 	}
 
@@ -58,7 +57,6 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	 *
 	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public HibernateOrmSearchSession getSearchSession(SessionImplementor sessionImplementor) {
 		TransientReference<HibernateOrmSearchSession> reference =

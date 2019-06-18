@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.orm.logging.impl.HibernateOrmEventContextMess
 import org.jboss.logging.Messages;
 
 public final class HibernateOrmMappingKey
-		implements MappingKey<HibernateOrmMappingPartialBuildState, HibernateOrmMappingImpl> {
+		implements MappingKey<HibernateOrmMappingPartialBuildState, HibernateOrmMapping> {
 
 	private static final HibernateOrmEventContextMessages MESSAGES =
 			Messages.getBundle( HibernateOrmEventContextMessages.class );
