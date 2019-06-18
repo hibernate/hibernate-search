@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -17,8 +18,8 @@ class HibernateOrmTypeContextContainer implements HibernateOrmScopeTypeContextPr
 	private final Map<Class<?>, HibernateOrmIndexedTypeContext<?>> indexedTypeContexts;
 	private final Map<Class<?>, HibernateOrmContainedTypeContext<?>> containedTypeContexts;
 
-	private HibernateOrmTypeContextContainer(Builder builder) {
-		this.indexedTypeContexts = builder.buildIndexedTypeContexts();
+	private HibernateOrmTypeContextContainer(Builder builder, SessionFactory sessionFactory) {
+		this.indexedTypeContexts = builder.buildIndexedTypeContexts( sessionFactory );
 		this.containedTypeContexts = builder.buildContainedTypeContexts();
 	}
 
@@ -69,15 +70,15 @@ class HibernateOrmTypeContextContainer implements HibernateOrmScopeTypeContextPr
 			return builder;
 		}
 
-		HibernateOrmTypeContextContainer build() {
-			return new HibernateOrmTypeContextContainer( this );
+		HibernateOrmTypeContextContainer build(SessionFactory sessionFactory) {
+			return new HibernateOrmTypeContextContainer( this, sessionFactory );
 		}
 
-		private Map<Class<?>, HibernateOrmIndexedTypeContext<?>> buildIndexedTypeContexts() {
+		private Map<Class<?>, HibernateOrmIndexedTypeContext<?>> buildIndexedTypeContexts(SessionFactory sessionFactory) {
 			Map<Class<?>, HibernateOrmIndexedTypeContext<?>> typeContexts = new LinkedHashMap<>();
 			for ( Map.Entry<Class<?>, HibernateOrmIndexedTypeContext.Builder<?>> entry :
 					indexedTypeContextBuilders.entrySet() ) {
-				typeContexts.put( entry.getKey(), entry.getValue().build() );
+				typeContexts.put( entry.getKey(), entry.getValue().build( sessionFactory ) );
 			}
 			return typeContexts;
 		}

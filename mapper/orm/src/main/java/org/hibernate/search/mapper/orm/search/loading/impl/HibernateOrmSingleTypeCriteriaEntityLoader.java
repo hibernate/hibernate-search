@@ -21,13 +21,13 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-class HibernateOrmSingleTypeCriteriaEntityLoader<E> implements HibernateOrmComposableEntityLoader<PojoReference, E> {
+public class HibernateOrmSingleTypeCriteriaEntityLoader<E> implements HibernateOrmComposableEntityLoader<PojoReference, E> {
 	private final Session session;
 	private final Class<? extends E> entityType;
 	private final SingularAttribute<? super E, ?> documentIdSourceProperty;
 	private final MutableEntityLoadingOptions loadingOptions;
 
-	HibernateOrmSingleTypeCriteriaEntityLoader(
+	public HibernateOrmSingleTypeCriteriaEntityLoader(
 			Session session,
 			Class<? extends E> entityType,
 			SingularAttribute<? super E, ?> documentIdSourceProperty,

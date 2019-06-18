@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.event.impl;
 
-import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
@@ -74,7 +73,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		final Object entity = event.getEntity();
 		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
-			Object providedId = toProvidedId( typeContext, event.getId() );
+			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
 			context.getCurrentWorkPlan( event.getSession() )
@@ -88,7 +87,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		final Object entity = event.getEntity();
 		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
-			Object providedId = toProvidedId( typeContext, event.getId() );
+			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
 			context.getCurrentWorkPlan( event.getSession() )
 					.add( providedId, entity );
 		}
@@ -101,22 +100,13 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
 			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
-			Object providedId = toProvidedId( typeContext, event.getId() );
+			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
 			if ( dirtyCheckingEnabled ) {
 				workPlan.update( providedId, entity, getDirtyPropertyNames( event ) );
 			}
 			else {
 				workPlan.update( providedId, entity );
 			}
-		}
-	}
-
-	private Object toProvidedId(HibernateOrmScopeTypeContext<?> typeContext, Serializable entityId) {
-		if ( typeContext.getMappingMetadata().isDocumentIdMappedToEntityId() ) {
-			return entityId;
-		}
-		else {
-			return null;
 		}
 	}
 
@@ -193,7 +183,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		HibernateOrmScopeTypeContext<?> typeContext = getTypeContext( context, entity );
 		if ( typeContext != null ) {
 			PojoWorkPlan workPlan = context.getCurrentWorkPlan( event.getSession() );
-			Object providedId = toProvidedId( typeContext, event.getAffectedOwnerIdOrNull() );
+			Object providedId = typeContext.toWorkPlanProvidedId( event.getAffectedOwnerIdOrNull() );
 
 			if ( dirtyCheckingEnabled ) {
 				PersistentCollection persistentCollection = event.getCollection();

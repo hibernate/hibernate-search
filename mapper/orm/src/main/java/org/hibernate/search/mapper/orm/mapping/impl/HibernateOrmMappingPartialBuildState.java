@@ -27,12 +27,12 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 					.build();
 
 	private final PojoMappingDelegate mappingDelegate;
-	private final HibernateOrmTypeContextContainer typeContextContainer;
+	private final HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder;
 
 	HibernateOrmMappingPartialBuildState(PojoMappingDelegate mappingDelegate,
-			HibernateOrmTypeContextContainer typeContextContainer) {
+			HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder) {
 		this.mappingDelegate = mappingDelegate;
-		this.typeContextContainer = typeContextContainer;
+		this.typeContextContainerBuilder = typeContextContainerBuilder;
 	}
 
 	public MappingImplementor<HibernateOrmMapping> bindToSessionFactory(
@@ -41,7 +41,7 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 		AutomaticIndexingSynchronizationStrategy synchronizationStrategy =
 				getAutomaticIndexingSynchronizationStrategy( propertySource );
 		return new HibernateOrmMappingImpl(
-				mappingDelegate, typeContextContainer,
+				mappingDelegate, typeContextContainerBuilder.build( sessionFactoryImplementor ),
 				sessionFactoryImplementor, synchronizationStrategy
 		);
 	}

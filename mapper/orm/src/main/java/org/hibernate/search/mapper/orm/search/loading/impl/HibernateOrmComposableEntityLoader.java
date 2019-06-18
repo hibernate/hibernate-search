@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.loading.spi.EntityLoader;
  * @param <R>
  * @param <E>
  */
-interface HibernateOrmComposableEntityLoader<R, E> extends EntityLoader<R, E> {
+public interface HibernateOrmComposableEntityLoader<R, E> extends EntityLoader<R, E> {
 
 	/**
 	 * For each reference in the given list,

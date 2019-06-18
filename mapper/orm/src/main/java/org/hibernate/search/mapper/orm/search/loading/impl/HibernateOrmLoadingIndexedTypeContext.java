@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
+import org.hibernate.Session;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface HibernateOrmLoadingIndexedTypeContext<E> {
 
@@ -15,7 +16,7 @@ public interface HibernateOrmLoadingIndexedTypeContext<E> {
 	 */
 	Class<E> getJavaClass();
 
-	// FIXME HSEARCH-3203 Replace this temporary solution with an object-oriented one.
-	PojoMappingTypeMetadata getMappingMetadata();
+	HibernateOrmComposableEntityLoader<PojoReference, E> createLoader(
+			Session session, MutableEntityLoadingOptions mutableLoadingOptions);
 
 }

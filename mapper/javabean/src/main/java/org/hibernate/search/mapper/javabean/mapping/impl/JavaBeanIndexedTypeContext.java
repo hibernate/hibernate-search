@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 
 /*
  * TODO HSEARCH-1800 There's nothing here at the moment, just a placeholder.
@@ -23,7 +22,7 @@ class JavaBeanIndexedTypeContext {
 		}
 
 		@Override
-		public void metadata(PojoMappingTypeMetadata metadata) {
+		public void documentIdSourcePropertyName(String documentIdSourcePropertyName) {
 			// Nothing to do
 		}
 	}

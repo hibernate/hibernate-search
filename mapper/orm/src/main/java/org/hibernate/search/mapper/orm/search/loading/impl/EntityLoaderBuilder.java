@@ -10,12 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.metamodel.IdentifiableType;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public class EntityLoaderBuilder<E> {
@@ -32,41 +28,11 @@ public class EntityLoaderBuilder<E> {
 	public EntityLoader<PojoReference, ? extends E> build(MutableEntityLoadingOptions mutableLoadingOptions) {
 		if ( concreteIndexedTypes.size() == 1 ) {
 			HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext = concreteIndexedTypes.iterator().next();
-			return buildForSingleType( mutableLoadingOptions, typeContext );
+			return typeContext.createLoader( session, mutableLoadingOptions );
 		}
 		else {
 			return buildForMultipleTypes( mutableLoadingOptions );
 		}
-	}
-
-	private <E2 extends E> HibernateOrmComposableEntityLoader<PojoReference, E2> buildForSingleType(
-			MutableEntityLoadingOptions mutableLoadingOptions,
-			HibernateOrmLoadingIndexedTypeContext<E2> typeContext) {
-		// TODO HSEARCH-3349 Add support for other types of database retrieval and object lookup?
-		//  See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.EntityLoaderBuilder#getObjectInitializer
-
-		Class<E2> javaClass = typeContext.getJavaClass();
-		PojoMappingTypeMetadata metadata = typeContext.getMappingMetadata();
-		if ( metadata.isDocumentIdMappedToEntityId() ) {
-			return new HibernateOrmSingleTypeByIdEntityLoader<>(
-					session,
-					javaClass,
-					mutableLoadingOptions
-			);
-		}
-		else {
-			IdentifiableType<E2> indexTypeModel = session.getSessionFactory().getMetamodel().entity( javaClass );
-			SingularAttribute<? super E2, ?> documentIdSourceProperty =
-					indexTypeModel.getSingularAttribute( metadata.getDocumentIdSourcePropertyName().get() );
-			return new HibernateOrmSingleTypeCriteriaEntityLoader<>(
-					session,
-					javaClass,
-					documentIdSourceProperty,
-					mutableLoadingOptions
-			);
-		}
-
-		// TODO HSEARCH-3203 Add support for entities whose document ID is not the entity ID (natural ID, or other)
 	}
 
 	private EntityLoader<PojoReference, E> buildForMultipleTypes(MutableEntityLoadingOptions mutableLoadingOptions) {
@@ -80,7 +46,7 @@ public class EntityLoaderBuilder<E> {
 				new HashMap<>( concreteIndexedTypes.size() );
 		for ( HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext : concreteIndexedTypes ) {
 			HibernateOrmComposableEntityLoader<PojoReference, ? extends E> delegate =
-					buildForSingleType( mutableLoadingOptions, typeContext );
+					typeContext.createLoader( session, mutableLoadingOptions );
 			delegateByConcreteType.put( typeContext.getJavaClass(), delegate );
 		}
 		return new HibernateOrmByTypeEntityLoader<>( delegateByConcreteType );

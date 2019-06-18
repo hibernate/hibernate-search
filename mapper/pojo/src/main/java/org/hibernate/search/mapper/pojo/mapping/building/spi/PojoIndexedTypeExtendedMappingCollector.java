@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
-
 /**
  * A collector of extended mapping information.
  * <p>
@@ -16,6 +14,6 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
  */
 public interface PojoIndexedTypeExtendedMappingCollector {
 
-	void metadata(PojoMappingTypeMetadata metadata);
+	void documentIdSourcePropertyName(String documentIdSourcePropertyName);
 
 }

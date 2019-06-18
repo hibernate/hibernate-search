@@ -31,7 +31,6 @@ import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingRes
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
@@ -40,7 +39,6 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerConta
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingTypeMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -243,14 +241,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		Optional<? extends PojoImplicitReindexingResolver<T, Set<String>>> reindexingResolverOptional =
 				reindexingResolverBuildingHelper.build( entityType, pathFilterFactory );
 		if ( reindexingResolverOptional.isPresent() ) {
-			PojoContainedTypeExtendedMappingCollector extendedMappingCollector = delegate
-					.createContainedTypeExtendedMappingCollector( entityType );
-			extendedMappingCollector.metadata(
-					// The ID is not relevant for contained types
-					new PojoMappingTypeMetadata(
-							false, Optional.empty()
-					)
-			);
+			// Nothing to contribute to contained types at the moment,
+			// but create the collector just so the mapper knows the type is contained
+			delegate.createContainedTypeExtendedMappingCollector( entityType );
 
 			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
 					entityType.getJavaClass(), entityType.getCaster(),
