@@ -252,11 +252,6 @@ public class ProjectionDslIT {
 
 	@Test
 	public void distance() {
-		Assume.assumeTrue(
-				"TODO HSEARCH-3618 Distance projection may lead to missing hits",
-				false
-		);
-
 		withinSearchSession( searchSession -> {
 			// tag::distance[]
 			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
