@@ -338,11 +338,9 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::match-orField[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate(
-							f -> f.match()
-									.onField( "title" ).orField( "description" )
-									.matching( "robot" )
-					)
+					.predicate( f -> f.match()
+							.onField( "title" ).orField( "description" )
+							.matching( "robot" ) )
 					.fetchHits();
 			// end::match-orField[]
 			assertThat( hits )
@@ -353,11 +351,9 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::match-fields[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate(
-							f -> f.match()
-									.onFields( "title", "description" )
-									.matching( "robot" )
-					)
+					.predicate( f -> f.match()
+							.onFields( "title", "description" )
+							.matching( "robot" ) )
 					.fetchHits();
 			// end::match-fields[]
 			assertThat( hits )
@@ -368,12 +364,10 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::match-fuzzy[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate(
-							f -> f.match()
-									.onField( "title" )
-									.matching( "robto" )
-									.fuzzy()
-					)
+					.predicate( f -> f.match()
+							.onField( "title" )
+							.matching( "robto" )
+							.fuzzy() )
 					.fetchHits();
 			// end::match-fuzzy[]
 			assertThat( hits )
@@ -384,12 +378,10 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::match-analyzer[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate(
-							f -> f.match()
-									.onField( "title_autocomplete" )
-									.matching( "robo" )
-									.analyzer( "autocomplete_query" )
-					)
+					.predicate( f -> f.match()
+							.onField( "title_autocomplete" )
+							.matching( "robo" )
+							.analyzer( "autocomplete_query" ) )
 					.fetchHits();
 			// end::match-analyzer[]
 			assertThat( hits )
@@ -400,12 +392,10 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::match-skipAnalysis[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate(
-							f -> f.match()
-									.onField( "title" )
-									.matching( "robot" )
-									.skipAnalysis()
-					)
+					.predicate( f -> f.match()
+							.onField( "title" )
+							.matching( "robot" )
+							.skipAnalysis() )
 					.fetchHits();
 			// end::match-skipAnalysis[]
 			assertThat( hits )
