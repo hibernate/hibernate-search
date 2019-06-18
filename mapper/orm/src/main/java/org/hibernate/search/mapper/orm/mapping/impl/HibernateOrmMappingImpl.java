@@ -13,18 +13,21 @@ import org.hibernate.BaseSessionEventListener;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.common.impl.TransientReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<HibernateOrmMappingImpl>
-		implements HibernateOrmMapping {
+		implements HibernateOrmMapping, HibernateOrmMassIndexingMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -75,6 +78,12 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 		return searchSession;
 	}
 
+	@Override
+	public PojoSessionWorkExecutor createSessionWorkExecutor(SessionImplementor sessionImplementor,
+			DocumentCommitStrategy commitStrategy) {
+		return getSearchSession( sessionImplementor ).createSessionWorkExecutor( commitStrategy );
+	}
+
 	<E> AbstractHibernateOrmTypeContext<E> getTypeContext(Class<E> type) {
 		return typeContextContainer.getByExactClass( type );
 	}
@@ -96,7 +105,7 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 		}
 
 		return new HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder(
-				getDelegate(), mappingContext, typeContextContainer,
+				getDelegate(), mappingContext, this, typeContextContainer,
 				sessionImplementor,
 				synchronizationStrategy
 		);

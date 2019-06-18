@@ -27,9 +27,7 @@ import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
-import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -49,6 +47,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 
 	private final ProducerConsumerQueue<List<Serializable>> source;
 	private final SessionFactory sessionFactory;
+	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final CacheMode cacheMode;
 	private final Class<?> type;
 	private final MassIndexingMonitor monitor;
@@ -56,20 +55,21 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	private final CountDownLatch producerEndSignal;
 	private final Integer transactionTimeout;
 	private final String tenantId;
-	private final HibernateOrmMapping mapping;
 
 	/**
 	 * The JTA transaction manager or {@code null} if not in a JTA environment
 	 */
 	private final TransactionManager transactionManager;
 
-	public IdentifierConsumerDocumentProducer(
+	IdentifierConsumerDocumentProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities, MassIndexingMonitor monitor,
-			SessionFactory sessionFactory, CountDownLatch producerEndSignal, CacheMode cacheMode,
+			SessionFactory sessionFactory, HibernateOrmMassIndexingMappingContext mappingContext,
+			CountDownLatch producerEndSignal, CacheMode cacheMode,
 			Class<?> indexedType, String idName, Integer transactionTimeout,
-			String tenantId, HibernateOrmMapping mapping) {
+			String tenantId) {
 		this.source = fromIdentifierListToEntities;
 		this.sessionFactory = sessionFactory;
+		this.mappingContext = mappingContext;
 		this.cacheMode = cacheMode;
 		this.type = indexedType;
 		this.monitor = monitor;
@@ -77,7 +77,6 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		this.producerEndSignal = producerEndSignal;
 		this.transactionTimeout = transactionTimeout;
 		this.tenantId = tenantId;
-		this.mapping = mapping;
 		this.transactionManager = ( (SessionFactoryImplementor) sessionFactory )
 				.getServiceRegistry()
 				.getService( JtaPlatform.class )
@@ -116,10 +115,10 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 
 	private void loadAllFromQueue(SessionImplementor session) throws Exception {
 		// The search session will be closed automatically with the ORM session
-		SearchSessionImplementor searchSession = mapping.getSearchSession( session );
+		PojoSessionWorkExecutor workExecutor = mappingContext.createSessionWorkExecutor(
+				session, DocumentCommitStrategy.NONE
+		);
 		try {
-			PojoSessionWorkExecutor workExecutor =
-					searchSession.createSessionWorkExecutor( DocumentCommitStrategy.NONE );
 			List<Serializable> idList;
 			do {
 				idList = source.take();

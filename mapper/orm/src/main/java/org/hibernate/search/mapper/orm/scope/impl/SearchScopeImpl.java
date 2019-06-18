@@ -12,6 +12,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.writing.impl.SearchWriterImpl;
@@ -27,11 +28,14 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.mapper.orm.search.SearchScope<E> {
 
+	private final HibernateOrmMassIndexingMappingContext massIndexingMappingContext;
 	private final PojoScopeDelegate<E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
 	private final HibernateOrmSessionContextImpl sessionContext;
 
-	public SearchScopeImpl(PojoScopeDelegate<E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate,
+	public SearchScopeImpl(HibernateOrmMassIndexingMappingContext massIndexingMappingContext,
+			PojoScopeDelegate<E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate,
 			HibernateOrmSessionContextImpl sessionContext) {
+		this.massIndexingMappingContext = massIndexingMappingContext;
 		this.delegate = delegate;
 		this.sessionContext = sessionContext;
 	}
@@ -75,6 +79,7 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 	public MassIndexer massIndexer() {
 		return new MassIndexerImpl(
 				sessionContext.getSession().getFactory(),
+				massIndexingMappingContext,
 				delegate.getIncludedIndexedTypes(),
 				DetachedSessionContextImplementor.of( sessionContext ),
 				delegate.executor()

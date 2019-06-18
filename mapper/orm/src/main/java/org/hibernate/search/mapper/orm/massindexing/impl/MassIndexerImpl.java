@@ -16,9 +16,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.orm.massindexing.monitor.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
@@ -36,7 +34,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final HibernateOrmMapping mapping;
+	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final SessionFactoryImplementor sessionFactory;
 	private final DetachedSessionContextImplementor sessionContext;
 
@@ -57,11 +55,12 @@ public class MassIndexerImpl implements MassIndexer {
 	private Integer idLoadingTransactionTimeout;
 
 	public MassIndexerImpl(SessionFactoryImplementor sessionFactory,
+			HibernateOrmMassIndexingMappingContext mappingContext,
 			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			DetachedSessionContextImplementor sessionContext,
 			PojoScopeWorkExecutor scopeWorkExecutor) {
 		this.sessionFactory = sessionFactory;
-		this.mapping = sessionFactory.getServiceRegistry().getService( HibernateSearchContextService.class ).getMapping();
+		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntities = toRootEntities( targetedIndexedTypes );
 		this.scopeWorkExecutor = scopeWorkExecutor;
@@ -176,7 +175,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	protected BatchCoordinator createCoordinator() {
 		return new BatchCoordinator(
-				sessionFactory, mapping, sessionContext,
+				sessionFactory, mappingContext, sessionContext,
 				rootEntities, scopeWorkExecutor,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,

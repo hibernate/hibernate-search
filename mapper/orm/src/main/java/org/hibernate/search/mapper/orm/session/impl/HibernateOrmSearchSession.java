@@ -23,6 +23,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContextProvider;
 import org.hibernate.search.mapper.orm.search.SearchScope;
@@ -52,6 +53,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final HibernateOrmMassIndexingMappingContext massIndexingMappingContext;
 	private final HibernateOrmScopeTypeContextProvider typeContextProvider;
 	private final HibernateOrmSessionContextImpl sessionContext;
 	private AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
@@ -71,6 +73,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder,
 			HibernateOrmSessionContextImpl sessionContext) {
 		super( builder, sessionContext );
+		this.massIndexingMappingContext = builder.massIndexingMappingContext;
 		this.typeContextProvider = builder.typeContextProvider;
 		this.sessionContext = sessionContext;
 		this.synchronizationStrategy = builder.synchronizationStrategy;
@@ -100,7 +103,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 						types,
 						typeContextProvider::getIndexedByExactClass
 				);
-		return new SearchScopeImpl<>( scopeDelegate, sessionContext );
+		return new SearchScopeImpl<>( massIndexingMappingContext, scopeDelegate, sessionContext );
 	}
 
 	@Override
@@ -250,17 +253,20 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	public static class HibernateOrmSearchSessionBuilder extends AbstractBuilder<HibernateOrmSearchSession> {
 		private final HibernateOrmMappingContextImpl mappingContext;
+		private final HibernateOrmMassIndexingMappingContext massIndexingMappingContext;
 		private final HibernateOrmScopeTypeContextProvider typeContextProvider;
 		private final SessionImplementor sessionImplementor;
 		private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
 		public HibernateOrmSearchSessionBuilder(PojoMappingDelegate mappingDelegate,
 				HibernateOrmMappingContextImpl mappingContext,
+				HibernateOrmMassIndexingMappingContext massIndexingMappingContext,
 				HibernateOrmScopeTypeContextProvider typeContextProvider,
 				SessionImplementor sessionImplementor,
 				AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 			super( mappingDelegate );
 			this.mappingContext = mappingContext;
+			this.massIndexingMappingContext = massIndexingMappingContext;
 			this.typeContextProvider = typeContextProvider;
 			this.sessionImplementor = sessionImplementor;
 			this.synchronizationStrategy = synchronizationStrategy;

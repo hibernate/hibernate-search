@@ -17,7 +17,6 @@ import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -37,7 +36,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SessionFactoryImplementor sessionFactory;
-	private final HibernateOrmMapping mapping;
+	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedSessionContextImplementor sessionContext;
 	private final Set<Class<?>> rootEntities; //entity types to reindex excluding all subtypes of each-other
 	private final PojoScopeWorkExecutor scopeWorkExecutor;
@@ -56,7 +55,8 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final Integer transactionTimeout;
 	private final List<Future<?>> indexingTasks = new ArrayList<>();
 
-	public BatchCoordinator(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping,
+	public BatchCoordinator(SessionFactoryImplementor sessionFactory,
+			HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedSessionContextImplementor sessionContext,
 			Set<Class<?>> rootEntities, PojoScopeWorkExecutor scopeWorkExecutor,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
@@ -64,7 +64,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 			boolean purgeAtStart, boolean optimizeAfterPurge, MassIndexingMonitor monitor,
 			int idFetchSize, Integer transactionTimeout) {
 		this.sessionFactory = sessionFactory;
-		this.mapping = mapping;
+		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntities = rootEntities;
 		this.scopeWorkExecutor = scopeWorkExecutor;
@@ -124,7 +124,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 		ExecutorService executor = Executors.newFixedThreadPool( typesToIndexInParallel, "BatchIndexingWorkspace" );
 		for ( Class<?> type : rootEntities ) {
 			indexingTasks.add( executor.submit( new BatchIndexingWorkspace(
-					sessionFactory, mapping, sessionContext, type,
+					sessionFactory, mappingContext, sessionContext, type,
 					documentBuilderThreads, cacheMode,
 					objectLoadingBatchSize, endAllSignal, monitor, objectsLimit, idFetchSize, transactionTimeout
 			) ) );
