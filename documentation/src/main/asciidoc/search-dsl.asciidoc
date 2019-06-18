@@ -15,8 +15,6 @@ effectively offering a new type of query for Hibernate ORM entities.
 // Search 5 anchors backward compatibility
 [[search-query]]
 
-include::todo-placeholder.asciidoc[]
-
 [[search-dsl-query-generality]]
 === Generality
 // Search 5 anchors backward compatibility
@@ -118,8 +116,6 @@ include::todo-placeholder.asciidoc[]
 == Predicate DSL
 // Search 5 anchors backward compatibility
 [[query-predicate]]
-
-include::todo-placeholder.asciidoc[]
 
 // TODO add more than just examples in the sub-sections
 
@@ -695,8 +691,6 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/Pred
 // Search 5 anchors backward compatibility
 [[query-sorting]]
 
-include::todo-placeholder.asciidoc[]
-
 // TODO add more than just examples in the sub-sections
 
 [[search-dsl-sort-concepts]]
@@ -899,8 +893,6 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT
 == Projection DSL
 // Search 5 anchors backward compatibility
 [[projections]]
-
-include::todo-placeholder.asciidoc[]
 
 // TODO add more than just examples in the sub-sections
 
