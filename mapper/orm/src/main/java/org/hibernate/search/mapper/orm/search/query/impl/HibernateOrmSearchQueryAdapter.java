@@ -21,10 +21,10 @@ import javax.persistence.TemporalType;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
+import org.hibernate.QueryException;
 import org.hibernate.ScrollMode;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.hql.internal.QueryExecutionRequestException;
 import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.internal.ParameterMetadataImpl;
@@ -86,7 +86,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 		try {
 			return doList();
 		}
-		catch (QueryExecutionRequestException he) {
+		catch (QueryException he) {
 			throw new IllegalStateException( he );
 		}
 		catch (TypeMismatchException e) {
