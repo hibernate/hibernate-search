@@ -32,7 +32,7 @@ import org.hibernate.mapping.Value;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
-import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmPropertyHandleFactoryName;
+import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmReflectionStrategyName;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -47,10 +47,10 @@ import org.hibernate.search.util.common.impl.ReflectionHelper;
 
 public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
 
-	private static final ConfigurationProperty<HibernateOrmPropertyHandleFactoryName> PROPERTY_HANDLE_FACTORY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.Radicals.PROPERTY_HANDLE_FACTORY )
-					.as( HibernateOrmPropertyHandleFactoryName.class, HibernateOrmPropertyHandleFactoryName::of )
-					.withDefault( HibernateOrmMapperSpiSettings.Defaults.PROPERTY_HANDLE_FACTORY )
+	private static final ConfigurationProperty<HibernateOrmReflectionStrategyName> REFLECTION_STRATEGY =
+			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.Radicals.REFLECTION_STRATEGY )
+					.as( HibernateOrmReflectionStrategyName.class, HibernateOrmReflectionStrategyName::of )
+					.withDefault( HibernateOrmMapperSpiSettings.Defaults.REFLECTION_STRATEGY )
 					.build();
 
 	public static HibernateOrmBootstrapIntrospector create(Metadata metadata,
@@ -67,9 +67,9 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		MethodHandles.Lookup lookup = MethodHandles.publicLookup();
 		AnnotationHelper annotationHelper = new AnnotationHelper( lookup );
 
-		HibernateOrmPropertyHandleFactoryName propertyHandleFactoryName = PROPERTY_HANDLE_FACTORY.get( propertySource );
+		HibernateOrmReflectionStrategyName reflectionStrategyName = REFLECTION_STRATEGY.get( propertySource );
 		PropertyHandleFactory propertyHandleFactory;
-		switch ( propertyHandleFactoryName ) {
+		switch ( reflectionStrategyName ) {
 			case JAVA_LANG_REFLECT:
 				propertyHandleFactory = PropertyHandleFactory.usingJavaLangReflect();
 				break;
@@ -77,7 +77,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 				propertyHandleFactory = PropertyHandleFactory.usingMethodHandle( lookup );
 				break;
 			default:
-				throw new AssertionFailure( "Unexpected property handle factory name: " + propertyHandleFactoryName );
+				throw new AssertionFailure( "Unexpected reflection strategy name: " + reflectionStrategyName );
 		}
 
 		return new HibernateOrmBootstrapIntrospector(
