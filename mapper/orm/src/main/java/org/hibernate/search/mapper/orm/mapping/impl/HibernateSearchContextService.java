@@ -43,15 +43,6 @@ public final class HibernateSearchContextService
 		this.mapping = mapping;
 	}
 
-	public SearchIntegration getIntegration() {
-		if ( integration != null ) {
-			return integration;
-		}
-		else {
-			throw LoggerFactory.make( Log.class, MethodHandles.lookup() ).hibernateSearchNotInitialized();
-		}
-	}
-
 	@Override
 	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor session) {
 		return getMapping().getSearchSession( session ).getCurrentWorkPlan();
@@ -67,7 +58,7 @@ public final class HibernateSearchContextService
 		return getMapping().getSearchSession( sessionImplementor );
 	}
 
-	public HibernateOrmMapping getMapping() {
+	private HibernateOrmMapping getMapping() {
 		if ( mapping != null ) {
 			return mapping;
 		}
