@@ -23,7 +23,6 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationCont
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 public class TypeMappingContextImpl
 		implements TypeMappingContext, PojoMappingConfigurationContributor, PojoTypeMetadataContributor {
@@ -118,8 +117,7 @@ public class TypeMappingContextImpl
 	@Override
 	public PropertyMappingContext property(String propertyName) {
 		PojoPropertyModel<?> propertyModel = typeModel.getProperty( propertyName );
-		PropertyHandle<?> propertyHandle = propertyModel.getHandle();
-		InitialPropertyMappingContext child = new InitialPropertyMappingContext( this, propertyHandle );
+		InitialPropertyMappingContext child = new InitialPropertyMappingContext( this, propertyModel );
 		children.add( child );
 		return child;
 	}

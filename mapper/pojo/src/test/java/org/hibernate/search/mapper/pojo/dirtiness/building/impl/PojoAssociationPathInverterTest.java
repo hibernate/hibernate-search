@@ -197,7 +197,6 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 				createMock( propertyName + "ModelMock", PojoPropertyModel.class );
 		EasyMock.expect( holdingTypeMock.getProperty( propertyName ) )
 				.andStubReturn( (PojoPropertyModel) propertyModelMock );
-		EasyMock.expect( propertyHandleMock.getName() ).andStubReturn( propertyName );
 		EasyMock.expect( propertyModelMock.getName() ).andStubReturn( propertyName );
 		EasyMock.expect( propertyModelMock.getHandle() ).andStubReturn( (PropertyHandle) propertyHandleMock );
 		EasyMock.expect( propertyModelMock.getTypeModel() )

@@ -18,12 +18,10 @@ public final class MethodHandlePropertyHandle<T> implements PropertyHandle<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String name;
 	private final Member member;
 	private final MethodHandle getter;
 
-	public MethodHandlePropertyHandle(String name, Member member, MethodHandle getter) {
-		this.name = name;
+	public MethodHandlePropertyHandle(Member member, MethodHandle getter) {
 		this.member = member;
 		this.getter = getter;
 	}
@@ -31,11 +29,6 @@ public final class MethodHandlePropertyHandle<T> implements PropertyHandle<T> {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[" + member + "]";
-	}
-
-	@Override
-	public String getName() {
-		return name;
 	}
 
 	@Override
@@ -65,7 +58,7 @@ public final class MethodHandlePropertyHandle<T> implements PropertyHandle<T> {
 			return false;
 		}
 		MethodHandlePropertyHandle<?> other = (MethodHandlePropertyHandle) obj;
-		return name.equals( other.name ) && member.equals( other.member );
+		return member.equals( other.member );
 	}
 
 }

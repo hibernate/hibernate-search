@@ -67,7 +67,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 			FieldModelContributor fieldModelContributor) {
 		String defaultedRelativeFieldName = relativeFieldName;
 		if ( defaultedRelativeFieldName == null ) {
-			defaultedRelativeFieldName = modelPath.getParent().getPropertyHandle().getName();
+			defaultedRelativeFieldName = modelPath.getParent().getPropertyModel().getName();
 		}
 
 		mappingHelper.getIndexModelBinder().addValueBridge(
@@ -83,7 +83,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 			Integer maxDepth, Set<String> includePaths) {
 		String defaultedRelativePrefix = relativePrefix;
 		if ( defaultedRelativePrefix == null ) {
-			defaultedRelativePrefix = modelPath.getParent().getPropertyHandle().getName() + ".";
+			defaultedRelativePrefix = modelPath.getParent().getPropertyModel().getName() + ".";
 		}
 
 		BoundPojoModelPathTypeNode<?> holderTypePath = modelPath.getParent().getParent();

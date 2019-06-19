@@ -12,9 +12,9 @@ import java.lang.reflect.Method;
 
 public interface PropertyHandleFactory {
 
-	PropertyHandle<?> createForField(String propertyName, Field field) throws IllegalAccessException;
+	PropertyHandle<?> createForField(Field field) throws IllegalAccessException;
 
-	PropertyHandle<?> createForMethod(String propertyName, Method method) throws IllegalAccessException;
+	PropertyHandle<?> createForMethod(Method method) throws IllegalAccessException;
 
 	/**
 	 * @return A factory producing property handles that rely on {@code java.lang.reflect} to get the value of a property,
