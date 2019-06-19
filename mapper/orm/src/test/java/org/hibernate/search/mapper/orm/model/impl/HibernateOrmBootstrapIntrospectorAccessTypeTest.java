@@ -288,10 +288,16 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest {
 
 		Map<String, Object> properties = new HashMap<>();
 		if ( propertyHandleFactoryName != null ) {
-			properties.put( HibernateOrmMapperSpiSettings.PROPERTY_HANDLE_FACTORY, propertyHandleFactoryName );
+			properties.put(
+					HibernateOrmMapperSpiSettings.Radicals.PROPERTY_HANDLE_FACTORY,
+					propertyHandleFactoryName
+			);
 		}
 
-		return HibernateOrmBootstrapIntrospector.create( metadata, reflectionManager, ConfigurationPropertySource.fromMap( properties ) );
+		return HibernateOrmBootstrapIntrospector.create(
+				metadata, reflectionManager,
+				ConfigurationPropertySource.fromMap( properties )
+		);
 	}
 
 	private static <T> T methodShouldNotBeCalled() {
