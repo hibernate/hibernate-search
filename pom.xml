@@ -2239,11 +2239,7 @@
         <!--
             A profile executing jqassistant scanning and analysis for all relevant modules.
             Our rules are in jqassistant/rules.xml.
-            To run the analysis on the engine module:
-                mvn clean install -pl engine -Pjqassistant -DskipTests=true
-            To launch a Neo4j server accessible at http://localhost:7474/ based on the previous analysis,
-            use the jqassistant-debug profile (see below):
-                mvn jqassistant:server -pl reports -Pjqassistant-debug
+            See README.md for usage.
         -->
         <profile>
             <id>jqassistant</id>
@@ -2264,7 +2260,7 @@
 
                             An unfortunate side-effect is that commands such as
                                 mvn jqassistant:server -Pjqassistant -pl reports
-                            will not work anymore, so we need to use a different profile for that (see jqassistant-debug).
+                            will not work anymore, so we need to use a different profile for that (see jqassistant-server).
                          -->
                         <extensions>true</extensions>
                         <executions>
