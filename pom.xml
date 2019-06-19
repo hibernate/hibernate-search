@@ -1413,6 +1413,11 @@
                                     <exclude>**/HibernateOrmSearchQueryAdapter.class</exclude>
                                     <!-- The following class uses a legal SPI that strangely has an internal as method parameter -->
                                     <exclude>**/SimpleSessionFactoryBuilder.class</exclude>
+                                    <!--
+                                        Classes allowed to use MethodHandles because we expose options to integrators
+                                        so that they can opt out
+                                     -->
+                                    <exclude>**/MethodHandlePropertyHandleFactory.class</exclude>
                                 </excludes>
                                 <bundledSignatures>
                                     <!-- These signatures on the top are not specific to any JDK version -->
