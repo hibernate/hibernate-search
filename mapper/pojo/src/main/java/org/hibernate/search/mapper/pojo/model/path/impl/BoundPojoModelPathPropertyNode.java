@@ -64,11 +64,11 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 
 	@Override
 	void appendSelfPath(StringBuilder builder) {
-		builder.append( "." ).append( propertyHandle.getName() );
+		builder.append( "." ).append( propertyModel.getName() );
 	}
 
 	@Override
 	void appendSelfPath(PojoModelPath.Builder builder) {
-		builder.property( propertyHandle.getName() );
+		builder.property( propertyModel.getName() );
 	}
 }

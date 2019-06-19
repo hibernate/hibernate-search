@@ -90,7 +90,7 @@ public final class PojoAssociationPathInverter {
 			BoundPojoModelPathValueNode<?, ?, ?> boundPathToInvert) {
 		BoundPojoModelPathPropertyNode<?, ?> parentPath = boundPathToInvert.getParent();
 		BoundPojoModelPathValueNode<?, ?, ?> parentValuePath = parentPath.getParent().getParent();
-		String propertyName = parentPath.getPropertyHandle().getName();
+		String propertyName = parentPath.getPropertyModel().getName();
 		ContainerExtractorPath extractorPath = boundPathToInvert.getExtractorPath();
 		boolean isDefaultExtractorPath = isDefaultExtractorPath(
 				parentPath.getPropertyModel(), boundPathToInvert.getBoundExtractorPath()

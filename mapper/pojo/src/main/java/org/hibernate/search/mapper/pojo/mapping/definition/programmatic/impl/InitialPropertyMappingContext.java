@@ -28,32 +28,32 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 public class InitialPropertyMappingContext
 		implements PropertyMappingContext, PojoTypeMetadataContributor {
 
 	private final TypeMappingContext parent;
-	private final PropertyHandle<?> propertyHandle;
+	private final PojoPropertyModel<?> propertyModel;
 
 	private final ErrorCollectingPojoPropertyMetadataContributor children =
 			new ErrorCollectingPojoPropertyMetadataContributor();
 
-	InitialPropertyMappingContext(TypeMappingContext parent, PropertyHandle<?> propertyHandle) {
+	InitialPropertyMappingContext(TypeMappingContext parent, PojoPropertyModel<?> propertyModel) {
 		this.parent = parent;
-		this.propertyHandle = propertyHandle;
+		this.propertyModel = propertyModel;
 	}
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		PojoAdditionalMetadataCollectorPropertyNode collectorPropertyNode =
-				collector.property( propertyHandle.getName() );
+				collector.property( propertyModel.getName() );
 		children.contributeAdditionalMetadata( collectorPropertyNode );
 	}
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		PojoMappingCollectorPropertyNode collectorPropertyNode = collector.property( propertyHandle.getName() );
+		PojoMappingCollectorPropertyNode collectorPropertyNode = collector.property( propertyModel.getName() );
 		children.contributeMapping( collectorPropertyNode );
 	}
 

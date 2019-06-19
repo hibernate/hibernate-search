@@ -16,22 +16,15 @@ final class FieldPropertyHandle<T> implements PropertyHandle<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String name;
 	private final Field field;
 
-	public FieldPropertyHandle(String name, Field field) {
-		this.name = name;
+	public FieldPropertyHandle(Field field) {
 		this.field = field;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[" + field + "]";
-	}
-
-	@Override
-	public String getName() {
-		return name;
 	}
 
 	@Override
@@ -61,7 +54,7 @@ final class FieldPropertyHandle<T> implements PropertyHandle<T> {
 			return false;
 		}
 		FieldPropertyHandle<?> other = (FieldPropertyHandle) obj;
-		return name.equals( other.name ) && field.equals( other.field );
+		return field.equals( other.field );
 	}
 
 }

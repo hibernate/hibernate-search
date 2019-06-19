@@ -13,8 +13,6 @@ package org.hibernate.search.mapper.pojo.model.spi;
  */
 public interface PropertyHandle<T> {
 
-	String getName();
-
 	T get(Object thiz);
 
 	/**

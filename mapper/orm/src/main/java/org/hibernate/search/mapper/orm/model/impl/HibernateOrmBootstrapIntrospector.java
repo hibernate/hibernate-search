@@ -183,12 +183,12 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
-	PropertyHandle<?> createPropertyHandle(String name, Member member,
+	PropertyHandle<?> createPropertyHandle(Member member,
 			HibernateOrmBasicPropertyMetadata ormPropertyMetadata) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			setAccessible( method );
-			return propertyHandleFactory.createForMethod( name, method );
+			return propertyHandleFactory.createForMethod( method );
 		}
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
@@ -196,12 +196,12 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 				Method bytecodeEnhancerReaderMethod = getBytecodeEnhancerReaderMethod( field );
 				if ( bytecodeEnhancerReaderMethod != null ) {
 					setAccessible( bytecodeEnhancerReaderMethod );
-					return propertyHandleFactory.createForMethod( name, bytecodeEnhancerReaderMethod );
+					return propertyHandleFactory.createForMethod( bytecodeEnhancerReaderMethod );
 				}
 			}
 
 			setAccessible( field );
-			return propertyHandleFactory.createForField( name, field );
+			return propertyHandleFactory.createForField( field );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );

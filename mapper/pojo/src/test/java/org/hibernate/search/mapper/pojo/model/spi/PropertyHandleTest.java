@@ -100,53 +100,45 @@ public class PropertyHandleTest {
 	}
 
 	private void testFieldPropertyHandle(String fieldName) throws IllegalAccessException, NoSuchFieldException {
-		String propertyName = fieldName + "PropertyName";
 		String expectedValue = fieldName + "Value";
 		Field field = EntityType.class.getDeclaredField( fieldName );
 		setAccessible( field );
 		Field otherField = EntityType.class.getDeclaredField( "otherField" );
 		setAccessible( otherField );
 
-		PropertyHandle<?> propertyHandle = factory.createForField( propertyName, field );
+		PropertyHandle<?> propertyHandle = factory.createForField( field );
 
-		assertThat( propertyHandle.getName() ).isEqualTo( propertyName );
 		assertThat( propertyHandle.get( new EntityType() ) ).isEqualTo( expectedValue );
 
 		assertThat( propertyHandle.toString() )
 				.contains( propertyHandle.getClass().getSimpleName() )
 				.contains( field.toString() );
 
-		PropertyHandle<?> equalPropertyHandle = factory.createForField( propertyName, field );
-		PropertyHandle<?> differentNamePropertyHandle = factory.createForField( propertyName + "foo", field );
-		PropertyHandle<?> differentFieldPropertyHandle = factory.createForField( propertyName, otherField );
+		PropertyHandle<?> equalPropertyHandle = factory.createForField( field );
+		PropertyHandle<?> differentFieldPropertyHandle = factory.createForField( otherField );
 		assertThat( propertyHandle ).isEqualTo( equalPropertyHandle );
 		assertThat( propertyHandle.hashCode() ).isEqualTo( equalPropertyHandle.hashCode() );
-		assertThat( propertyHandle ).isNotEqualTo( differentNamePropertyHandle );
 		assertThat( propertyHandle ).isNotEqualTo( differentFieldPropertyHandle );
 	}
 
 	private void testMethodPropertyHandle(String methodName) throws IllegalAccessException, NoSuchMethodException {
-		String propertyName = methodName + "PropertyName";
 		String expectedValue = methodName + "Value";
 		Method method = EntityType.class.getDeclaredMethod( methodName );
 		setAccessible( method );
 		Method otherMethod = EntityType.class.getDeclaredMethod( "otherMethod" );
 		setAccessible( otherMethod );
 
-		PropertyHandle<?> propertyHandle = factory.createForMethod( propertyName, method );
-		assertThat( propertyHandle.getName() ).isEqualTo( propertyName );
+		PropertyHandle<?> propertyHandle = factory.createForMethod( method );
 		assertThat( propertyHandle.get( new EntityType() ) ).isEqualTo( expectedValue );
 
 		assertThat( propertyHandle.toString() )
 				.contains( propertyHandle.getClass().getSimpleName() )
 				.contains( method.toString() );
 
-		PropertyHandle<?> equalPropertyHandle = factory.createForMethod( propertyName, method );
-		PropertyHandle<?> differentNamePropertyHandle = factory.createForMethod( propertyName + "foo", method );
-		PropertyHandle<?> differentMethodPropertyHandle = factory.createForMethod( propertyName + "foo", otherMethod );
+		PropertyHandle<?> equalPropertyHandle = factory.createForMethod( method );
+		PropertyHandle<?> differentMethodPropertyHandle = factory.createForMethod( otherMethod );
 		assertThat( propertyHandle ).isEqualTo( equalPropertyHandle );
 		assertThat( propertyHandle.hashCode() ).isEqualTo( equalPropertyHandle.hashCode() );
-		assertThat( propertyHandle ).isNotEqualTo( differentNamePropertyHandle );
 		assertThat( propertyHandle ).isNotEqualTo( differentMethodPropertyHandle );
 	}
 
