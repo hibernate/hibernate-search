@@ -36,15 +36,20 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public static JavaBeanBootstrapIntrospector create(MethodHandles.Lookup lookup) {
+		ValueReadHandleFactory valueReadHandleFactory = ValueReadHandleFactory.usingMethodHandle( lookup );
+		return new JavaBeanBootstrapIntrospector( valueReadHandleFactory );
+	}
+
 	private final ValueReadHandleFactory valueReadHandleFactory;
 	private final JavaBeanGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
-	public JavaBeanBootstrapIntrospector(MethodHandles.Lookup lookup) {
-		super( new JavaReflectionManager(), new AnnotationHelper( lookup ) );
-		this.valueReadHandleFactory = ValueReadHandleFactory.usingMethodHandle( lookup );
+	private JavaBeanBootstrapIntrospector(ValueReadHandleFactory valueReadHandleFactory) {
+		super( new JavaReflectionManager(), new AnnotationHelper( valueReadHandleFactory ) );
+		this.valueReadHandleFactory = valueReadHandleFactory;
 		this.genericContextHelper = new JavaBeanGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
 				genericContextHelper, Object.class

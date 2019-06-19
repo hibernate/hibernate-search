@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.util.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -18,17 +17,20 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
 public final class AnnotationHelper {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final MethodHandles.Lookup lookup;
+	private final ValueReadHandleFactory handleFactory;
 
-	private final Map<Class<? extends Annotation>, MethodHandle> containedAnnotationsHandleCache = new HashMap<>();
+	private final Map<Class<? extends Annotation>, ValueReadHandle<Annotation[]>> containedAnnotationsHandleCache =
+			new HashMap<>();
 
-	public AnnotationHelper(MethodHandles.Lookup lookup) {
-		this.lookup = lookup;
+	public AnnotationHelper(ValueReadHandleFactory handleFactory) {
+		this.handleFactory = handleFactory;
 	}
 
 	public boolean isMetaAnnotated(Annotation annotation, Class<? extends Annotation> metaAnnotationType) {
@@ -37,12 +39,12 @@ public final class AnnotationHelper {
 
 	public Stream<? extends Annotation> expandRepeatableContainingAnnotation(Annotation containingAnnotationCandidate) {
 		Class<? extends Annotation> containingAnnotationCandidateType = containingAnnotationCandidate.annotationType();
-		MethodHandle containedAnnotationsHandle = containedAnnotationsHandleCache.computeIfAbsent(
+		ValueReadHandle<Annotation[]> containedAnnotationsHandle = containedAnnotationsHandleCache.computeIfAbsent(
 				containingAnnotationCandidateType, this::createContainedAnnotationsHandle
 		);
 		if ( containedAnnotationsHandle != null ) {
 			try {
-				Annotation[] annotationArray = (Annotation[]) containedAnnotationsHandle.invoke( containingAnnotationCandidate );
+				Annotation[] annotationArray = containedAnnotationsHandle.get( containingAnnotationCandidate );
 				return Arrays.stream( annotationArray );
 			}
 			catch (Throwable e) {
@@ -55,7 +57,8 @@ public final class AnnotationHelper {
 		return Stream.of( containingAnnotationCandidate );
 	}
 
-	private MethodHandle createContainedAnnotationsHandle(Class<? extends Annotation> containingAnnotationCandidateType) {
+	private ValueReadHandle<Annotation[]> createContainedAnnotationsHandle(
+			Class<? extends Annotation> containingAnnotationCandidateType) {
 		Method valueMethod;
 		try {
 			valueMethod = containingAnnotationCandidateType.getDeclaredMethod( "value" );
@@ -71,7 +74,10 @@ public final class AnnotationHelper {
 				Repeatable repeatable = elementType.getAnnotation( Repeatable.class );
 				if ( repeatable != null && containingAnnotationCandidateType.equals( repeatable.value() ) ) {
 					try {
-						return lookup.unreflect( valueMethod );
+						@SuppressWarnings("unchecked") // Checked using reflection just above
+						ValueReadHandle<Annotation[]> result =
+								(ValueReadHandle<Annotation[]>) handleFactory.createForMethod( valueMethod );
+						return result;
 					}
 					catch (IllegalAccessException e) {
 						log.cannotAccessRepeateableContainingAnnotationValue(

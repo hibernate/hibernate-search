@@ -65,7 +65,6 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		}
 
 		MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-		AnnotationHelper annotationHelper = new AnnotationHelper( lookup );
 
 		HibernateOrmReflectionStrategyName reflectionStrategyName = REFLECTION_STRATEGY.get( propertySource );
 		ValueReadHandleFactory valueReadHandleFactory;
@@ -81,7 +80,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		}
 
 		return new HibernateOrmBootstrapIntrospector(
-				typeMetadata, ormReflectionManager, annotationHelper, valueReadHandleFactory
+				typeMetadata, ormReflectionManager, valueReadHandleFactory
 		);
 	}
 
@@ -146,9 +145,8 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	private HibernateOrmBootstrapIntrospector(
 			Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata,
 			ReflectionManager reflectionManager,
-			AnnotationHelper annotationHelper,
 			ValueReadHandleFactory valueReadHandleFactory) {
-		super( reflectionManager, annotationHelper );
+		super( reflectionManager, new AnnotationHelper( valueReadHandleFactory ) );
 		this.typeMetadata = typeMetadata;
 		this.valueReadHandleFactory = valueReadHandleFactory;
 		this.genericContextHelper = new HibernateOrmGenericContextHelper( this );
