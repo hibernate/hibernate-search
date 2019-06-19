@@ -11,20 +11,21 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import javax.persistence.LockModeType;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.transaction.TransactionManager;
 
 import org.hibernate.CacheMode;
-import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
-import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
-import org.hibernate.internal.CriteriaImpl;
+import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
@@ -148,17 +149,20 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		try {
 			beginTransaction( session );
 
-			Criteria criteria = new CriteriaImpl( type.getName(), session )
-					.setCacheMode( cacheMode )
-					.setLockMode( LockMode.NONE )
-					.setCacheable( false )
-					.setFlushMode( FlushMode.MANUAL )
-					.setFetchSize( listIds.size() )
-					.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY )
-					.add( Restrictions.in( idName, listIds ) );
-			List<?> list = criteria.list();
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<?> criteria = builder.createQuery( type );
+			Root<?> root = criteria.from( type );
+			criteria.where( root.get( idName ).in( listIds ) );
 
-			indexAllQueue( workExecutor, list );
+			Query<?> query = session.createQuery( criteria )
+					.setCacheMode( cacheMode )
+					.setLockMode( LockModeType.NONE )
+					.setCacheable( false )
+					.setHibernateFlushMode( FlushMode.MANUAL )
+					.setFetchSize( listIds.size() )
+					.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY );
+
+			indexAllQueue( workExecutor, query.getResultList() );
 			session.clear();
 		}
 		finally {
