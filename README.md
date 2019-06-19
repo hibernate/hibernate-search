@@ -136,6 +136,20 @@ This can be done by setting a property
 
     > mvn clean install -Dtest.elasticsearch.java_home=/path/to/my/jdk
 
+## JQAssistant
+
+You can request static analysis and sanity checks with the `jqassistant` profile.
+Tests do not need to be run for these checks.
+
+    > mvn clean install -Pjqassistant -DskipTests
+
+You can also inspect the created Neo4j datastore after a build,
+provided that build had the `jqassistant` profile enabled:
+
+    > mvn jqassistant:server -Pjqassistant-server -pl reports
+
+The Neo4j web UI will be accessible from http://localhost:7474/.
+
 ## Contributing
 
 New contributors are always welcome. We collected some helpful hints on how to get started
