@@ -17,8 +17,8 @@ junit.framework.** @ Use the classes from org.junit, junit.framework is deprecat
 java.beans.** @ It will be removed from future versions of the JDK
 
 ################################################################################################################
-# Nobody should be using StringBuffer anymore
-java.lang.StringBuffer @ Do not use StringBuffer: use StringBuilder
+# Nobody should be using java.lang.StringBuffer anymore
+java.lang.StringBuffer @ Do not use java.lang.StringBuffer: use java.lang.StringBuilder
 
 ################################################################################################################
 # Probably meant the other Objects:
@@ -54,3 +54,22 @@ java.time.ZonedDateTime#parse(java.lang.CharSequence, java.time.format.DateTimeF
 @defaultMessage Avoid to use Hibernate ORM internals
 org.hibernate.internal.**
 org.hibernate.**.internal.**
+
+################################################################################################################
+@defaultMessage MethodHandles do not work on GraalVM. Make sure to expose configuration options so that integrators can force the use of java.reflect instead. Once it's done, add your class to the forbiddenApis whitelist.
+java.lang.invoke.MethodHandles$Lookup#in(java.lang.Class)
+java.lang.invoke.MethodHandles$Lookup#findVirtual(java.lang.Class, java.lang.String, java.lang.invoke.MethodType)
+java.lang.invoke.MethodHandles$Lookup#findConstructor(java.lang.Class, java.lang.invoke.MethodType)
+java.lang.invoke.MethodHandles$Lookup#findSpecial(java.lang.Class, java.lang.String, java.lang.invoke.MethodType, java.lang.Class)
+java.lang.invoke.MethodHandles$Lookup#findGetter(java.lang.Class, java.lang.String, java.lang.Class)
+java.lang.invoke.MethodHandles$Lookup#findSetter(java.lang.Class, java.lang.String, java.lang.Class)
+java.lang.invoke.MethodHandles$Lookup#findStaticGetter(java.lang.Class, java.lang.String, java.lang.Class)
+java.lang.invoke.MethodHandles$Lookup#findStaticSetter(java.lang.Class, java.lang.String, java.lang.Class)
+java.lang.invoke.MethodHandles$Lookup#bind(java.lang.Object, java.lang.String, java.lang.invoke.MethodType)
+java.lang.invoke.MethodHandles$Lookup#unreflect(java.lang.reflect.Method)
+java.lang.invoke.MethodHandles$Lookup#unreflectSpecial(java.lang.reflect.Method, java.lang.Class)
+java.lang.invoke.MethodHandles$Lookup#unreflectConstructor(java.lang.reflect.Constructor)
+java.lang.invoke.MethodHandles$Lookup#unreflectGetter(java.lang.reflect.Field)
+java.lang.invoke.MethodHandles$Lookup#unreflectSetter(java.lang.reflect.Field)
+java.lang.invoke.MethodHandles$Lookup#revealDirect(java.lang.invoke.MethodHandle)
+java.lang.invoke.MethodHandles$Lookup#findStatic(java.lang.Class, java.lang.String, java.lang.invoke.MethodType)
