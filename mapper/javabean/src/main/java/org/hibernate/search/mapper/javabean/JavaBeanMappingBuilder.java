@@ -37,7 +37,7 @@ public final class JavaBeanMappingBuilder {
 	JavaBeanMappingBuilder(ConfigurationPropertySource basePropertySource, MethodHandles.Lookup lookup) {
 		propertySource = basePropertySource.withOverride( ConfigurationPropertySource.fromMap( overriddenProperties ) );
 		integrationBuilder = SearchIntegration.builder( propertySource );
-		JavaBeanBootstrapIntrospector introspector = new JavaBeanBootstrapIntrospector( lookup );
+		JavaBeanBootstrapIntrospector introspector = JavaBeanBootstrapIntrospector.create( lookup );
 		mappingKey = new JavaBeanMappingKey();
 		mappingInitiator = new JavaBeanMappingInitiator( introspector );
 		integrationBuilder.addMappingInitiator( mappingKey, mappingInitiator );
