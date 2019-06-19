@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasti
 import com.google.gson.Gson;
 
 /**
- * The model dialect for Elasticsearch 6.0 to 6.7.
+ * The model dialect for Elasticsearch 6.
  */
 public class Elasticsearch6ModelDialect extends Elasticsearch7ModelDialect implements ElasticsearchModelDialect {
 

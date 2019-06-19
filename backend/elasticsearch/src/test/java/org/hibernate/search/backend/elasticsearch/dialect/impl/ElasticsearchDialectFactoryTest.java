@@ -164,8 +164,16 @@ public class ElasticsearchDialectFactoryTest {
 
 	@Test
 	public void es680() {
-		testSuccessWithWarning(
+		testSuccess(
 				"6.8.0", "6.8.0",
+				Elasticsearch6ModelDialect.class, Elasticsearch67ProtocolDialect.class
+		);
+	}
+
+	@Test
+	public void es690() {
+		testSuccessWithWarning(
+				"6.9.0", "6.9.0",
 				Elasticsearch6ModelDialect.class, Elasticsearch67ProtocolDialect.class
 		);
 	}

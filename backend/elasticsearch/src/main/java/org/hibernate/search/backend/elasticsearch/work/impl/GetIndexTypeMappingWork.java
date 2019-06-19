@@ -97,7 +97,7 @@ public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Roo
 					ElasticsearchRequest.get()
 					.pathComponent( indexName )
 					.pathComponent( Paths._MAPPING );
-			// ES6.7 only
+			// ES6.7 and later 6.x only
 			if ( includeTypeName != null ) {
 				builder.param( "include_type_name", includeTypeName );
 			}

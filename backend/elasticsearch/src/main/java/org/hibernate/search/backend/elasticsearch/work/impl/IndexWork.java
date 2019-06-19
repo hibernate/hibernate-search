@@ -79,7 +79,7 @@ public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 		protected JsonObject buildBulkableActionMetadata() {
 			JsonObject index = new JsonObject();
 			index.addProperty( "_index", indexName.original );
-			if ( typeName != null ) { // ES6.7 and below only
+			if ( typeName != null ) { // ES6.x and below only
 				index.addProperty( "_type", typeName.original );
 			}
 			index.addProperty( "_id", id.original );

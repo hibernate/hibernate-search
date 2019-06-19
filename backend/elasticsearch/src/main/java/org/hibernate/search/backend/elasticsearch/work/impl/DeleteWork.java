@@ -79,7 +79,7 @@ public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 		protected JsonObject buildBulkableActionMetadata() {
 			JsonObject delete = new JsonObject();
 			delete.addProperty( "_index", indexName.original );
-			if ( typeName != null ) { // ES6.7 and below only
+			if ( typeName != null ) { // ES6.x and below only
 				delete.addProperty( "_type", typeName.original );
 			}
 			delete.addProperty( "_id", id.original );
