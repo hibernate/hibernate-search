@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
 /**
- * The protocol dialect for Elasticsearch 6.7.
+ * The protocol dialect for Elasticsearch 6.7 and later 6.x.
  */
 public class Elasticsearch67ProtocolDialect extends Elasticsearch70ProtocolDialect
 		implements ElasticsearchProtocolDialect {

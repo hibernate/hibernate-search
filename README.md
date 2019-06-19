@@ -103,7 +103,7 @@ The following profiles are available:
 
  * `elasticsearch-5.6` for 5.6.x and later 5.x
  * `elasticsearch-6.0` for 6.0.x to 6.6.x
- * `elasticsearch-6.7` for 6.7
+ * `elasticsearch-6.7` for 6.7 and later 6.x
  * `elasticsearch-7.0` for 7.x (the default)
 
 A list of available versions for `test.elasticsearch.host.version` can be found on

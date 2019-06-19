@@ -85,7 +85,7 @@ public class ElasticsearchDialectFactory {
 				return new Elasticsearch60ProtocolDialect();
 			}
 			// Either the latest supported version, or a newer/unknown one
-			if ( minor != 7 ) {
+			if ( minor > 8 ) {
 				log.unknownElasticsearchVersion( version );
 			}
 			return new Elasticsearch67ProtocolDialect();
