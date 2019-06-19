@@ -99,6 +99,31 @@ public class DistanceSearchSearchableSortableIT {
 	}
 
 	@Test
+	public void searchableDefaultSortable() {
+		StubMappingScope scope = indexManager.createScope();
+		String fieldPath = "searchableDefaultSortable";
+
+		SubTest.expectException( () ->
+				scope.query()
+						.predicate( f -> f.spatial().within().onField( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+						.sort( f -> f.byDistance( fieldPath, METRO_GARIBALDI ) )
+						.toQuery()
+
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Sorting is not enabled for field" )
+				.hasMessageContaining( "Make sure the field is marked as sortable" )
+				.hasMessageContaining( fieldPath );
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.spatial().within().onField( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+	}
+
+	@Test
 	public void notSearchableSortable() {
 		StubMappingScope scope = indexManager.createScope();
 		String fieldPath = "notSearchableSortable";
@@ -124,22 +149,39 @@ public class DistanceSearchSearchableSortableIT {
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID, OURSON_QUI_BOIT_ID );
 	}
 
+	@Test
+	public void defaultSearchableSortable() {
+		StubMappingScope scope = indexManager.createScope();
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.spatial().within().onField( "defaultSearchableSortable" ).circle( METRO_GARIBALDI, 1_500 ) )
+				.sort( f -> f.byDistance( "defaultSearchableSortable", METRO_GARIBALDI ) )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			document.addValue( indexMapping.searchableSortable, OURSON_QUI_BOIT_GEO_POINT );
 			document.addValue( indexMapping.searchableNotSortable, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( indexMapping.searchableDefaultSortable, OURSON_QUI_BOIT_GEO_POINT );
 			document.addValue( indexMapping.notSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( indexMapping.defaultSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
 			document.addValue( indexMapping.searchableSortable, IMOUTO_GEO_POINT );
 			document.addValue( indexMapping.searchableNotSortable, IMOUTO_GEO_POINT );
+			document.addValue( indexMapping.searchableDefaultSortable, IMOUTO_GEO_POINT );
 			document.addValue( indexMapping.notSearchableSortable, IMOUTO_GEO_POINT );
+			document.addValue( indexMapping.defaultSearchableSortable, IMOUTO_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
 			document.addValue( indexMapping.searchableSortable, CHEZ_MARGOTTE_GEO_POINT );
 			document.addValue( indexMapping.searchableNotSortable, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( indexMapping.searchableDefaultSortable, CHEZ_MARGOTTE_GEO_POINT );
 			document.addValue( indexMapping.notSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( indexMapping.defaultSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
 		} );
 		workPlan.execute().join();
 
@@ -154,12 +196,16 @@ public class DistanceSearchSearchableSortableIT {
 	protected static class IndexMapping {
 		final IndexFieldReference<GeoPoint> searchableSortable;
 		final IndexFieldReference<GeoPoint> searchableNotSortable;
+		final IndexFieldReference<GeoPoint> searchableDefaultSortable;
 		final IndexFieldReference<GeoPoint> notSearchableSortable;
+		final IndexFieldReference<GeoPoint> defaultSearchableSortable;
 
 		IndexMapping(IndexSchemaElement root) {
 			searchableSortable = root.field( "searchableSortable", f -> f.asGeoPoint().searchable( Searchable.YES ).sortable( Sortable.YES ) ).toReference();
 			searchableNotSortable = root.field( "searchableNotSortable", f -> f.asGeoPoint().searchable( Searchable.YES ).sortable( Sortable.NO ) ).toReference();
+			searchableDefaultSortable = root.field( "searchableDefaultSortable", f -> f.asGeoPoint().searchable( Searchable.YES ) ).toReference();
 			notSearchableSortable = root.field( "notSearchableSortable", f -> f.asGeoPoint().searchable( Searchable.NO ).sortable( Sortable.YES ) ).toReference();
+			defaultSearchableSortable = root.field( "defaultSearchableSortable", f -> f.asGeoPoint().sortable( Sortable.YES ) ).toReference();
 		}
 	}
 
