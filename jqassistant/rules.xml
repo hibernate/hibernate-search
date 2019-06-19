@@ -131,15 +131,16 @@
 
     <concept id="my-rules:HibernateSearch">
         <description>
-            Contributes the :HibernateSearch label to :Maven:Artifact and :Type nodes from Hibernate Search.
+            Contributes the :HibernateSearch label to :Maven:Artifact, :Package and :Type nodes from Hibernate Search.
         </description>
         <cypher><![CDATA[
             MATCH
-                (type:Type)<-[:CONTAINS]-(artifact:Maven:Artifact)
+                (package:Package)-[:CONTAINS]->(type:Type)<-[:CONTAINS]-(artifact:Maven:Artifact)
             WHERE
                 artifact.name =~ "hibernate-search-.*"
             SET
                 artifact:HibernateSearch,
+                package:HibernateSearch,
                 type:HibernateSearch
             RETURN
                 type
@@ -448,6 +449,54 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="my-rules:PackagesShouldNotHaveCyclicDependencies">
+        <requiresConcept refId="dependency:Package" />
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <description>
+            Packages should not have cyclic dependencies.
+            The following types are ignored when computing dependency paths:
+            - logging-related types.
+        </description>
+        <cypher><![CDATA[
+            // First pass to compute inter-package dependencies, which is faster than inter-type dependencies
+            MATCH
+                (a1:Maven:Artifact)-[:CONTAINS]->(p1:Package:HibernateSearch)
+                        -[:DEPENDS_ON]->
+                        (p2:Package:HibernateSearch)<-[:CONTAINS]-(a2:Maven:Artifact),
+                packagePath=allShortestPaths((p2)-[:DEPENDS_ON*..20]->(p1)) // Optimize: only look for path with 20 hops or less
+            WHERE
+                p1<>p2
+                AND a1=a2 // Optimize: we consider there are no cyclic dependencies between artifacts
+                AND NOT p1.fqn CONTAINS "logging"
+                AND NOT p2.fqn CONTAINS "logging"
+                AND ALL (
+                    p IN nodes(packagePath)
+                    WHERE
+                        NOT p.fqn CONTAINS "logging"
+                        AND ((a1)-[:CONTAINS]->(p)) // Optimize: we consider there are no cyclic dependencies between artifacts
+                )
+            // Second pass to compute inter-type dependencies, which are easier to understand
+            MATCH
+                (p1)-[:CONTAINS]->(t1:Type:HibernateSearch)-[:DEPENDS_ON]->(t2:Type:HibernateSearch)<-[:CONTAINS]-(p2:Package),
+                typePath=allShortestPaths((t2)-[:DEPENDS_ON*..20]->(t1)) // Optimize: only look for path with 20 hops or less
+            WHERE
+                t1<>t2
+                AND ALL (
+                    t IN nodes(typePath)
+                    WHERE
+                        ANY (
+                            p IN nodes(packagePath)
+                            WHERE
+                            ((p)-[:CONTAINS]->(t)) // Optimize: only consider types from packages in the cyclic path
+                        )
+                )
+            RETURN DISTINCT
+                a1.name AS Artifact, p1.fqn AS Package, EXTRACT(t IN nodes(typePath) | t.fqn) AS Cycle
+            ORDER BY
+                Package
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
         <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
@@ -460,6 +509,10 @@
         <includeConstraint refId="my-rules:AbstractTypesShouldUseAbstractPrefix" />
         <includeConstraint refId="my-rules:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName" />
         <includeConstraint refId="my-rules:TypeNamesShouldBeUniqueInInterdependentModules" />
+    </group>
+
+    <group id="cycles">
+        <includeConstraint refId="my-rules:PackagesShouldNotHaveCyclicDependencies" />
     </group>
 
 </jqa:jqassistant-rules>
