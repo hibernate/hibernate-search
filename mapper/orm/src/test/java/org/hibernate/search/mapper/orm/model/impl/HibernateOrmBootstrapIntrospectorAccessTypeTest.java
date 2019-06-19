@@ -49,7 +49,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class HibernateOrmBootstrapIntrospectorAccessTypeTest {
 
-	@Parameterized.Parameters(name = "PropertyHandleFactoryName = {0}")
+	@Parameterized.Parameters(name = "Reflection strategy = {0}")
 	public static List<Object[]> data() {
 		return Arrays.asList( new Object[][] {
 				{ null },
@@ -60,10 +60,10 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest {
 
 	private final List<AutoCloseable> toClose = new ArrayList<>();
 
-	private final String propertyHandleFactoryName;
+	private final String reflectionStrategyName;
 
-	public HibernateOrmBootstrapIntrospectorAccessTypeTest(String propertyHandleFactoryName) {
-		this.propertyHandleFactoryName = propertyHandleFactoryName;
+	public HibernateOrmBootstrapIntrospectorAccessTypeTest(String reflectionStrategyName) {
+		this.reflectionStrategyName = reflectionStrategyName;
 	}
 
 	@After
@@ -287,10 +287,10 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest {
 				.getMetadataBuildingContext().getBootstrapContext().getReflectionManager();
 
 		Map<String, Object> properties = new HashMap<>();
-		if ( propertyHandleFactoryName != null ) {
+		if ( reflectionStrategyName != null ) {
 			properties.put(
-					HibernateOrmMapperSpiSettings.Radicals.PROPERTY_HANDLE_FACTORY,
-					propertyHandleFactoryName
+					HibernateOrmMapperSpiSettings.Radicals.REFLECTION_STRATEGY,
+					reflectionStrategyName
 			);
 		}
 

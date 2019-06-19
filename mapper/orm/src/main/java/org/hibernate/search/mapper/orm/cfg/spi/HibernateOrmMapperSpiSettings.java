@@ -16,13 +16,14 @@ public final class HibernateOrmMapperSpiSettings {
 	public static final String PREFIX = HibernateOrmMapperSettings.PREFIX;
 
 	/**
-	 * The factory to use to create {@link org.hibernate.search.mapper.pojo.model.spi.PropertyHandle} instances.
+	 * The strategy to follow when performing reflection operations,
+	 * in particular when calling methods or accessing field dynamically.
 	 * <p>
-	 * Expects a {@link HibernateOrmPropertyHandleFactoryName} value, or a String representation of such value.
+	 * Expects a {@link HibernateOrmReflectionStrategyName} value, or a String representation of such value.
 	 * <p>
-	 * Defaults to {@link Defaults#PROPERTY_HANDLE_FACTORY}.
+	 * Defaults to {@link Defaults#REFLECTION_STRATEGY}.
 	 */
-	public static final String PROPERTY_HANDLE_FACTORY = PREFIX + Radicals.PROPERTY_HANDLE_FACTORY;
+	public static final String REFLECTION_STRATEGY = PREFIX + Radicals.REFLECTION_STRATEGY;
 
 	public static final String INTEGRATION_PARTIAL_BUILD_STATE =
 			PREFIX + Radicals.INTEGRATION_PARTIAL_BUILD_STATE;
@@ -32,7 +33,7 @@ public final class HibernateOrmMapperSpiSettings {
 		private Radicals() {
 		}
 
-		public static final String PROPERTY_HANDLE_FACTORY = "property_handle_factory";
+		public static final String REFLECTION_STRATEGY = "reflection_strategy";
 
 		public static final String INTEGRATION_PARTIAL_BUILD_STATE = "integration_partial_build_state";
 	}
@@ -45,7 +46,8 @@ public final class HibernateOrmMapperSpiSettings {
 		private Defaults() {
 		}
 
-		public static final HibernateOrmPropertyHandleFactoryName PROPERTY_HANDLE_FACTORY = HibernateOrmPropertyHandleFactoryName.METHOD_HANDLE;
+		public static final HibernateOrmReflectionStrategyName REFLECTION_STRATEGY =
+				HibernateOrmReflectionStrategyName.METHOD_HANDLE;
 	}
 
 }

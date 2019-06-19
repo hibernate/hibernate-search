@@ -170,8 +170,8 @@ public interface Log extends BasicLogger {
 	SearchException interruptedBatchIndexingException(@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 15,
-			value = "Invalid property handle factory name: '%1$s'. Valid names are: %2$s.")
-	SearchException invalidPropertyHandleFactoryName(String invalidRepresentation, List<String> validRepresentations);
+			value = "Invalid reflection strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidReflectionStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET_2 + 16, value = "Error trying to access Hibernate ORM session." )
 	SearchException hibernateSessionAccessError(@Cause IllegalStateException cause);
