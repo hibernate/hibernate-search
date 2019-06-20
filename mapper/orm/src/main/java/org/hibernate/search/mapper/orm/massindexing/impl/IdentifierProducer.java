@@ -18,7 +18,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
-import org.hibernate.internal.StatelessSessionImpl;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -77,7 +77,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	public void run(StatelessSession upperSession) {
 		log.trace( "started" );
 		try {
-			inTransactionWrapper( (StatelessSessionImpl) upperSession );
+			inTransactionWrapper( upperSession );
 		}
 		catch (Exception exception) {
 			String errorMessage = log.massIndexerExceptionWhileFetchingIds();
@@ -92,18 +92,18 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		log.trace( "finished" );
 	}
 
-	private void inTransactionWrapper(StatelessSessionImpl upperSession) {
-		StatelessSessionImpl session = upperSession;
+	private void inTransactionWrapper(StatelessSession upperSession) {
+		StatelessSession session = upperSession;
 		if ( upperSession == null ) {
 			if ( tenantId == null ) {
-				session = (StatelessSessionImpl) sessionFactory.openStatelessSession();
+				session = sessionFactory.openStatelessSession();
 			}
 			else {
-				session = (StatelessSessionImpl) sessionFactory.withStatelessOptions().tenantIdentifier( tenantId ).openStatelessSession();
+				session = sessionFactory.withStatelessOptions().tenantIdentifier( tenantId ).openStatelessSession();
 			}
 		}
 		try {
-			Transaction transaction = session.accessTransaction();
+			Transaction transaction = ( (SharedSessionContractImplementor) session ).accessTransaction();
 			final boolean controlTransactions = ! transaction.isActive();
 			if ( controlTransactions ) {
 				transaction.begin();
@@ -160,7 +160,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 				if ( destinationList.size() == batchSize ) {
 					// Explicitly checking whether the TX is still open; Depending on the driver implementation new ids
 					// might be produced otherwise if the driver fetches all rows up-front
-					StatelessSessionImpl sessionImpl = (StatelessSessionImpl) session;
+					SharedSessionContractImplementor sessionImpl = (SharedSessionContractImplementor) session;
 					if ( !sessionImpl.isTransactionInProgress() ) {
 						throw log.transactionNotActiveWhileProducingIdsForBatchIndexing( indexedType );
 					}
