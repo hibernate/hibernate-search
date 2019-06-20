@@ -15,6 +15,7 @@ import java.lang.reflect.Type;
 import org.hibernate.search.util.common.SearchException;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
@@ -96,5 +97,12 @@ public interface Log extends BasicLogger {
 					+ " in implementing type %1$s should be 0 or greater")
 	IllegalArgumentException invalidTypeParameterIndex(@FormatWith(TypeFormatter.class) Type type,
 			@FormatWith(ClassFormatter.class) Class<?> rawSuperType, int typeArgumentIndex);
+
+	@LogMessage(level = Logger.Level.INFO)
+	@Message(id = ID_OFFSET_2 + 9,
+			value = "Cannot access the value of containing annotation '%1$s'."
+					+ " Ignoring annotation.")
+	void cannotAccessRepeateableContainingAnnotationValue(
+			@FormatWith(ClassFormatter.class) Class<?> containingAnnotationType, @Cause Throwable e);
 
 }

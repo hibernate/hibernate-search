@@ -42,7 +42,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
-import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 
 public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {

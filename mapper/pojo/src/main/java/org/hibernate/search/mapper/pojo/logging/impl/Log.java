@@ -213,13 +213,6 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
 
-	@LogMessage(level = Logger.Level.INFO)
-	@Message(id = ID_OFFSET_2 + 25,
-			value = "Cannot access the value of containing annotation '%1$s'."
-					+ " Ignoring annotation.")
-	void cannotAccessRepeateableContainingAnnotationValue(
-			@FormatWith(ClassFormatter.class) Class<?> containingAnnotationType, @Cause Throwable e);
-
 	@Message(id = ID_OFFSET_2 + 26,
 			value = "Annotation type '%2$s' is annotated with '%1$s',"
 					+ " but both a bridge reference and a bridge builder reference were provided."
