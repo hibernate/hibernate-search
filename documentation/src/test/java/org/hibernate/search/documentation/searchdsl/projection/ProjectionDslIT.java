@@ -26,10 +26,10 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.pojo.search.spi.PojoReferenceImpl;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -146,16 +146,16 @@ public class ProjectionDslIT {
 	public void reference() {
 		withinSearchSession( searchSession -> {
 			// tag::reference[]
-			List<PojoReference> hits = searchSession.search( Book.class )
+			List<EntityReference> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.reference() )
 					.predicate( f -> f.matchAll() )
 					.fetchHits();
 			// end::reference[]
 			assertThat( hits ).containsExactlyInAnyOrder(
-					new PojoReferenceImpl( Book.class, BOOK1_ID ),
-					new PojoReferenceImpl( Book.class, BOOK2_ID ),
-					new PojoReferenceImpl( Book.class, BOOK3_ID ),
-					new PojoReferenceImpl( Book.class, BOOK4_ID )
+					new EntityReferenceImpl( Book.class, BOOK1_ID ),
+					new EntityReferenceImpl( Book.class, BOOK2_ID ),
+					new EntityReferenceImpl( Book.class, BOOK3_ID ),
+					new EntityReferenceImpl( Book.class, BOOK4_ID )
 			);
 		} );
 	}

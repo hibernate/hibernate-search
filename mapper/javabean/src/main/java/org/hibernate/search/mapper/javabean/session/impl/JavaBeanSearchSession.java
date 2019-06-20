@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
@@ -21,16 +22,15 @@ import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
 import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
 import org.hibernate.search.mapper.javabean.work.impl.SearchWorkPlanImpl;
-import org.hibernate.search.mapper.pojo.search.spi.PojoReferenceImpl;
+import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.util.common.AssertionFailure;
 
 public class JavaBeanSearchSession extends AbstractPojoSearchSession
-		implements SearchSession, ReferenceHitMapper<PojoReference> {
+		implements SearchSession, ReferenceHitMapper<EntityReference> {
 
 	private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
 
@@ -74,17 +74,17 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public PojoReference fromDocumentReference(DocumentReference reference) {
+	public EntityReference fromDocumentReference(DocumentReference reference) {
 		JavaBeanSessionIndexedTypeContext<?> typeContext =
 				typeContextProvider.getByIndexName( reference.getIndexName() );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
-					"Document reference " + reference + " could not be converted to a PojoReference"
+					"Document reference " + reference + " refers to an unknown index"
 			);
 		}
 		Object id = typeContext.getIdentifierMapping()
 				.fromDocumentIdentifier( reference.getId(), getDelegate().getSessionContext() );
-		return new PojoReferenceImpl( typeContext.getJavaClass(), id );
+		return new EntityReferenceImpl( typeContext.getJavaClass(), id );
 	}
 
 	public static class JavaBeanSearchSessionBuilder extends AbstractBuilder<JavaBeanSearchSession>

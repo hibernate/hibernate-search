@@ -11,14 +11,14 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public interface HibernateOrmSearchQueryResultDefinitionContext<E>
 		extends SearchQueryResultDefinitionContext<
 				SearchQueryContext<?, E, ?>,
-				PojoReference,
+				EntityReference,
 				E,
-				SearchProjectionFactoryContext<PojoReference, E>,
+				SearchProjectionFactoryContext<EntityReference, E>,
 				SearchPredicateFactoryContext
 		> {
 

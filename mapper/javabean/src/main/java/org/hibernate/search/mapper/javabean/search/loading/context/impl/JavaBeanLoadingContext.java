@@ -11,31 +11,31 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.mapper.javabean.search.loading.impl.JavaBeanProjectionHitMapper;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
 
-public final class JavaBeanLoadingContext implements LoadingContext<PojoReference, Void> {
+public final class JavaBeanLoadingContext implements LoadingContext<EntityReference, Void> {
 
-	private final ProjectionHitMapper<PojoReference, Void> projectionHitMapper;
+	private final ProjectionHitMapper<EntityReference, Void> projectionHitMapper;
 
-	private JavaBeanLoadingContext(ProjectionHitMapper<PojoReference, Void> projectionHitMapper) {
+	private JavaBeanLoadingContext(ProjectionHitMapper<EntityReference, Void> projectionHitMapper) {
 		this.projectionHitMapper = projectionHitMapper;
 	}
 
 	@Override
-	public ProjectionHitMapper<PojoReference, Void> getProjectionHitMapper() {
+	public ProjectionHitMapper<EntityReference, Void> getProjectionHitMapper() {
 		return projectionHitMapper;
 	}
 
-	public static final class Builder implements LoadingContextBuilder<PojoReference, Void> {
-		private final ReferenceHitMapper<PojoReference> referenceHitMapper;
+	public static final class Builder implements LoadingContextBuilder<EntityReference, Void> {
+		private final ReferenceHitMapper<EntityReference> referenceHitMapper;
 
-		public Builder(ReferenceHitMapper<PojoReference> referenceHitMapper) {
+		public Builder(ReferenceHitMapper<EntityReference> referenceHitMapper) {
 			this.referenceHitMapper = referenceHitMapper;
 		}
 
 		@Override
-		public LoadingContext<PojoReference, Void> build() {
-			ProjectionHitMapper<PojoReference, Void> projectionHitMapper =
+		public LoadingContext<EntityReference, Void> build() {
+			ProjectionHitMapper<EntityReference, Void> projectionHitMapper =
 					new JavaBeanProjectionHitMapper( referenceHitMapper );
 			return new JavaBeanLoadingContext( projectionHitMapper );
 		}

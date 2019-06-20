@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
 import org.hibernate.Session;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public interface HibernateOrmLoadingIndexedTypeContext<E> {
 
@@ -16,7 +16,7 @@ public interface HibernateOrmLoadingIndexedTypeContext<E> {
 	 */
 	Class<E> getJavaClass();
 
-	HibernateOrmComposableEntityLoader<PojoReference, E> createLoader(
+	HibernateOrmComposableEntityLoader<EntityReference, E> createLoader(
 			Session session, MutableEntityLoadingOptions mutableLoadingOptions);
 
 }

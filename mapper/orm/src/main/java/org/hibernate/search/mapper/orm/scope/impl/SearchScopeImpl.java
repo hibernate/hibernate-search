@@ -21,17 +21,17 @@ import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingO
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.writing.impl.SearchWriterImpl;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.mapper.orm.search.SearchScope<E> {
 
 	private final HibernateOrmScopeMappingContext mappingContext;
 	private final HibernateOrmScopeSessionContext sessionContext;
-	private final PojoScopeDelegate<PojoReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
+	private final PojoScopeDelegate<EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
 
 	public SearchScopeImpl(HibernateOrmScopeMappingContext mappingContext,
 			HibernateOrmScopeSessionContext sessionContext,
-			PojoScopeDelegate<PojoReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
+			PojoScopeDelegate<EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.delegate = delegate;
@@ -63,7 +63,7 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 	}
 
 	@Override
-	public SearchProjectionFactoryContext<PojoReference, E> projection() {
+	public SearchProjectionFactoryContext<EntityReference, E> projection() {
 		return delegate.projection();
 	}
 

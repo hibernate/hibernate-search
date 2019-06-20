@@ -4,21 +4,19 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.search.spi;
+package org.hibernate.search.mapper.orm.common.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
-
-
-public class PojoReferenceImpl implements PojoReference {
+public class EntityReferenceImpl implements EntityReference {
 
 	private final Class<?> type;
 
 	private final Object id;
 
-	public PojoReferenceImpl(Class<?> type, Object id) {
+	public EntityReferenceImpl(Class<?> type, Object id) {
 		this.type = type;
 		this.id = id;
 	}
@@ -38,7 +36,7 @@ public class PojoReferenceImpl implements PojoReference {
 		if ( obj == null || obj.getClass() != getClass() ) {
 			return false;
 		}
-		PojoReferenceImpl other = (PojoReferenceImpl) obj;
+		EntityReferenceImpl other = (EntityReferenceImpl) obj;
 		return type.equals( other.type ) && Objects.equals( id, other.id );
 	}
 

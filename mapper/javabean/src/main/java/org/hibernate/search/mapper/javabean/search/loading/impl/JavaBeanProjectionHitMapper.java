@@ -12,23 +12,23 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<PojoReference, Void> {
+public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<EntityReference, Void> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ReferenceHitMapper<PojoReference> referenceHitMapper;
+	private final ReferenceHitMapper<EntityReference> referenceHitMapper;
 
-	public JavaBeanProjectionHitMapper(ReferenceHitMapper<PojoReference> referenceHitMapper) {
+	public JavaBeanProjectionHitMapper(ReferenceHitMapper<EntityReference> referenceHitMapper) {
 		this.referenceHitMapper = referenceHitMapper;
 	}
 
 	@Override
-	public PojoReference convertReference(DocumentReference reference) {
+	public EntityReference convertReference(DocumentReference reference) {
 		return referenceHitMapper.fromDocumentReference( reference );
 	}
 
