@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 
 public interface PojoAdditionalMetadataCollectorPropertyNode extends PojoAdditionalMetadataCollector {
 

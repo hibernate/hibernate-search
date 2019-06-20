@@ -12,6 +12,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
+
 /**
  * Given an association on a entity type A to entity type B, defines the inverse side of an association,
  * i.e. the path from B to A.

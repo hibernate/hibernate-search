@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
 
 public abstract class PojoIndexingDependencyCollectorNode {

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.model.path;
 
 import java.util.Objects;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.util.common.impl.Contracts;
 
 /**

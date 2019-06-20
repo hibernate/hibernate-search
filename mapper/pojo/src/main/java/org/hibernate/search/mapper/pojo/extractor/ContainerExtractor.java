@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.extractor;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 
 /**
  * An extractor of values from a container.
