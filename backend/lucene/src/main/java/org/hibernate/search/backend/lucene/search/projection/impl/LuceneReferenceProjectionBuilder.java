@@ -22,6 +22,6 @@ public class LuceneReferenceProjectionBuilder<R> implements ReferenceProjectionB
 
 	@Override
 	public SearchProjection<R> build() {
-		return new LuceneReferenceProjection( indexNames );
+		return new LuceneReferenceProjection<>( indexNames );
 	}
 }
