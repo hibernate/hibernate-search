@@ -16,7 +16,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
-import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
+import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
@@ -26,7 +26,7 @@ import org.hibernate.search.util.common.impl.TransientReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
-		implements HibernateOrmMassIndexingMappingContext {
+		implements HibernateOrmScopeMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
