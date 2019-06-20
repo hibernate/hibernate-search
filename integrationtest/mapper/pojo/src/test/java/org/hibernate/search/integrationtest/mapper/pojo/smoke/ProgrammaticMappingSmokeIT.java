@@ -29,9 +29,9 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdenti
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
-import org.hibernate.search.mapper.pojo.search.spi.PojoReferenceImpl;
+import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
@@ -413,7 +413,7 @@ public class ProgrammaticMappingSmokeIT {
 	@Test
 	public void search() {
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchQuery<PojoReference> query = session.search(
+			SearchQuery<EntityReference> query = session.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
 					.asReference()
@@ -433,11 +433,11 @@ public class ProgrammaticMappingSmokeIT {
 			);
 
 
-			SearchResult<PojoReference> result = query.fetch( 2, 3 );
+			SearchResult<EntityReference> result = query.fetch( 2, 3 );
 			assertThat( result.getHits() )
 					.containsExactly(
-							new PojoReferenceImpl( IndexedEntity.class, 0 ),
-							new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 )
+							new EntityReferenceImpl( IndexedEntity.class, 0 ),
+							new EntityReferenceImpl( YetAnotherIndexedEntity.class, 1 )
 					);
 			assertThat( result.getTotalHitCount() ).isEqualTo( 6L );
 
@@ -524,14 +524,14 @@ public class ProgrammaticMappingSmokeIT {
 					.containsExactly(
 							Arrays.asList(
 									"text1",
-									new PojoReferenceImpl( IndexedEntity.class, 0 ),
+									new EntityReferenceImpl( IndexedEntity.class, 0 ),
 									LocalDate.of( 2017, 11, 1 ),
 									reference( IndexedEntity.INDEX, "0" ),
 									"text2"
 							),
 							Arrays.asList(
 									null,
-									new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 ),
+									new EntityReferenceImpl( YetAnotherIndexedEntity.class, 1 ),
 									LocalDate.of( 2017, 11, 2 ),
 									reference( YetAnotherIndexedEntity.INDEX, "1" ),
 									null

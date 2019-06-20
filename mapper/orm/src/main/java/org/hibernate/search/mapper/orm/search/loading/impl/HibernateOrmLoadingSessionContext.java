@@ -8,12 +8,12 @@ package org.hibernate.search.mapper.orm.search.loading.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public interface HibernateOrmLoadingSessionContext {
 
 	SessionImplementor getSession();
 
-	ReferenceHitMapper<PojoReference> getReferenceHitMapper();
+	ReferenceHitMapper<EntityReference> getReferenceHitMapper();
 
 }

@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
 /**
  * Represents a set of types and the corresponding indexes,
@@ -90,7 +90,7 @@ public interface SearchScope<E> {
 	 * and ultimately {@link SearchProjectionTerminalContext#toProjection() get the resulting projection}.
 	 * @see SearchProjectionFactoryContext
 	 */
-	SearchProjectionFactoryContext<PojoReference, E> projection();
+	SearchProjectionFactoryContext<EntityReference, E> projection();
 
 	/**
 	 * Create a {@link SearchWriter} for the indexes mapped to types in this scope, or to any of their sub-types.

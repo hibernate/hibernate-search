@@ -11,9 +11,9 @@ import java.util.Collections;
 
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface SearchSession extends AutoCloseable {
 
@@ -34,7 +34,7 @@ public interface SearchSession extends AutoCloseable {
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see SearchQueryResultDefinitionContext
 	 */
-	default SearchQueryResultDefinitionContext<?, PojoReference, ?, ?, ?> search(Class<?> type) {
+	default SearchQueryResultDefinitionContext<?, EntityReference, ?, ?, ?> search(Class<?> type) {
 		return scope( type ).search();
 	}
 
@@ -48,7 +48,7 @@ public interface SearchSession extends AutoCloseable {
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see SearchQueryResultDefinitionContext
 	 */
-	default SearchQueryResultDefinitionContext<?, PojoReference, ?, ?, ?> search(Collection<? extends Class<?>> types) {
+	default SearchQueryResultDefinitionContext<?, EntityReference, ?, ?, ?> search(Collection<? extends Class<?>> types) {
 		return scope( types ).search();
 	}
 

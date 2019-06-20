@@ -10,15 +10,15 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionC
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public class HibernateOrmSearchQueryResultDefinitionContextImpl<E>
-		extends AbstractDelegatingSearchQueryResultDefinitionContext<PojoReference, E>
+		extends AbstractDelegatingSearchQueryResultDefinitionContext<EntityReference, E>
 		implements HibernateOrmSearchQueryResultDefinitionContext<E> {
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	public HibernateOrmSearchQueryResultDefinitionContextImpl(
-			SearchQueryResultDefinitionContext<?, PojoReference, E, ?, ?> delegate,
+			SearchQueryResultDefinitionContext<?, EntityReference, E, ?, ?> delegate,
 			MutableEntityLoadingOptions loadingOptions) {
 		super( delegate );
 		this.loadingOptions = loadingOptions;

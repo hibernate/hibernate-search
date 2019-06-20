@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public class EntityLoaderBuilder<E> {
 
@@ -25,7 +25,7 @@ public class EntityLoaderBuilder<E> {
 		this.concreteIndexedTypes = concreteIndexedTypes;
 	}
 
-	public EntityLoader<PojoReference, ? extends E> build(MutableEntityLoadingOptions mutableLoadingOptions) {
+	public EntityLoader<EntityReference, ? extends E> build(MutableEntityLoadingOptions mutableLoadingOptions) {
 		if ( concreteIndexedTypes.size() == 1 ) {
 			HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext = concreteIndexedTypes.iterator().next();
 			return typeContext.createLoader( session, mutableLoadingOptions );
@@ -35,17 +35,17 @@ public class EntityLoaderBuilder<E> {
 		}
 	}
 
-	private EntityLoader<PojoReference, E> buildForMultipleTypes(MutableEntityLoadingOptions mutableLoadingOptions) {
+	private EntityLoader<EntityReference, E> buildForMultipleTypes(MutableEntityLoadingOptions mutableLoadingOptions) {
 		/*
 		 * TODO HSEARCH-3349 Group together entity types from a same hierarchy, so as to optimize loads
 		 *  (one query per entity hierarchy, and not one query per index).
 		 *  WARNING: Only do that if the entity types are loaded in a compatible way
 		 *  (all by ID, or all by query on a property defined in the common parent entity type)
 		 */
-		Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends E>> delegateByConcreteType =
+		Map<Class<? extends E>, HibernateOrmComposableEntityLoader<EntityReference, ? extends E>> delegateByConcreteType =
 				new HashMap<>( concreteIndexedTypes.size() );
 		for ( HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext : concreteIndexedTypes ) {
-			HibernateOrmComposableEntityLoader<PojoReference, ? extends E> delegate =
+			HibernateOrmComposableEntityLoader<EntityReference, ? extends E> delegate =
 					typeContext.createLoader( session, mutableLoadingOptions );
 			delegateByConcreteType.put( typeContext.getJavaClass(), delegate );
 		}

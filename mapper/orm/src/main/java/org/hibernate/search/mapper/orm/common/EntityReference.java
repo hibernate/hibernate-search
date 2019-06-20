@@ -4,13 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.search;
-
+package org.hibernate.search.mapper.orm.common;
 
 /**
- * A reference to a POJO entity.
+ * A reference to an indexed entity.
  */
-public interface PojoReference {
+public interface EntityReference {
 
 	/**
 	 * @return The type of the referenced entity.
@@ -18,7 +17,9 @@ public interface PojoReference {
 	Class<?> getType();
 
 	/**
-	 * @return The identifier of the referenced entity.
+	 * @return The identifier of the referenced entity,
+	 * Generally this is the entity ID,
+	 * but a different value may be returned if another property than the entity ID is defined as {@code @DocumentId}.
 	 */
 	Object getId();
 

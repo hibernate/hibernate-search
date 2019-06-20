@@ -19,9 +19,9 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
-public class HibernateOrmSingleTypeCriteriaEntityLoader<E> implements HibernateOrmComposableEntityLoader<PojoReference, E> {
+public class HibernateOrmSingleTypeCriteriaEntityLoader<E> implements HibernateOrmComposableEntityLoader<EntityReference, E> {
 	private final Session session;
 	private final Class<? extends E> entityType;
 	private final SingularAttribute<? super E, ?> documentIdSourceProperty;
@@ -39,14 +39,14 @@ public class HibernateOrmSingleTypeCriteriaEntityLoader<E> implements HibernateO
 	}
 
 	@Override
-	public List<E> loadBlocking(List<PojoReference> references) {
+	public List<E> loadBlocking(List<EntityReference> references) {
 		// Load all references
-		Map<PojoReference, E> objectsByReference = new HashMap<>();
+		Map<EntityReference, E> objectsByReference = new HashMap<>();
 		loadBlocking( references, objectsByReference );
 
 		// Re-create the list of objects in the same order
 		List<E> result = new ArrayList<>( references.size() );
-		for ( PojoReference reference : references ) {
+		for ( EntityReference reference : references ) {
 			/*
 			 * TODO HSEARCH-3349 remove null values? We used to do it in Search 5...
 			 *  Note that if we do, we have to change the javadoc
@@ -58,9 +58,9 @@ public class HibernateOrmSingleTypeCriteriaEntityLoader<E> implements HibernateO
 	}
 
 	@Override
-	public void loadBlocking(List<PojoReference> references, Map<? super PojoReference, ? super E> objectsByReference) {
-		Map<Object, PojoReference> documentIdSourceValueToReference = new HashMap<>();
-		for ( PojoReference reference : references ) {
+	public void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> objectsByReference) {
+		Map<Object, EntityReference> documentIdSourceValueToReference = new HashMap<>();
+		for ( EntityReference reference : references ) {
 			documentIdSourceValueToReference.put( reference.getId(), reference );
 		}
 
@@ -68,7 +68,7 @@ public class HibernateOrmSingleTypeCriteriaEntityLoader<E> implements HibernateO
 
 		for ( EntityLoadingResult loadingResult : loadingResults ) {
 			Object documentIdSourceValue = loadingResult.documentIdSourceValue;
-			PojoReference reference = documentIdSourceValueToReference.get( documentIdSourceValue );
+			EntityReference reference = documentIdSourceValueToReference.get( documentIdSourceValue );
 
 			@SuppressWarnings("unchecked") // Safe because "root" has the type "? extends E"
 			E loadedEntity = (E) loadingResult.loadedEntity;

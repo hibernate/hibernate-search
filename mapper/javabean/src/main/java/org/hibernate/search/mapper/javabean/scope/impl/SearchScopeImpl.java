@@ -11,24 +11,24 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl implements SearchScope {
 
-	private final ReferenceHitMapper<PojoReference> referenceHitMapper;
-	private final PojoScopeDelegate<PojoReference, Void, Void> delegate;
+	private final ReferenceHitMapper<EntityReference> referenceHitMapper;
+	private final PojoScopeDelegate<EntityReference, Void, Void> delegate;
 
-	public SearchScopeImpl(ReferenceHitMapper<PojoReference> referenceHitMapper,
-			PojoScopeDelegate<PojoReference, Void, Void> delegate) {
+	public SearchScopeImpl(ReferenceHitMapper<EntityReference> referenceHitMapper,
+			PojoScopeDelegate<EntityReference, Void, Void> delegate) {
 		this.referenceHitMapper = referenceHitMapper;
 		this.delegate = delegate;
 	}
 
 	@Override
-	public SearchQueryResultDefinitionContext<?, PojoReference, ?, ?, ?> search() {
+	public SearchQueryResultDefinitionContext<?, EntityReference, ?, ?, ?> search() {
 		return delegate.search( new JavaBeanLoadingContext.Builder( referenceHitMapper ) );
 	}
 
@@ -43,7 +43,7 @@ public class SearchScopeImpl implements SearchScope {
 	}
 
 	@Override
-	public SearchProjectionFactoryContext<PojoReference, ?> projection() {
+	public SearchProjectionFactoryContext<EntityReference, ?> projection() {
 		return delegate.projection();
 	}
 }

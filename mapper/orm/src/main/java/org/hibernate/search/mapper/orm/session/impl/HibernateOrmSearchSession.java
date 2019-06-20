@@ -25,6 +25,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
@@ -36,8 +37,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
-import org.hibernate.search.mapper.pojo.search.spi.PojoReferenceImpl;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
@@ -51,7 +51,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * The actual implementation of {@link SearchSession}.
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
-		implements SearchSession, HibernateOrmScopeSessionContext, ReferenceHitMapper<PojoReference> {
+		implements SearchSession, HibernateOrmScopeSessionContext, ReferenceHitMapper<EntityReference> {
 
 	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
 			HibernateOrmSearchSession.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
@@ -102,7 +102,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
 		checkOrmSessionIsOpen();
 
-		PojoScopeDelegate<PojoReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
+		PojoScopeDelegate<EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
 				getDelegate().createPojoScope(
 						types,
 						typeContextProvider::getIndexedByExactClass
@@ -135,22 +135,22 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public ReferenceHitMapper<PojoReference> getReferenceHitMapper() {
+	public ReferenceHitMapper<EntityReference> getReferenceHitMapper() {
 		return this;
 	}
 
 	@Override
-	public PojoReference fromDocumentReference(DocumentReference reference) {
+	public EntityReference fromDocumentReference(DocumentReference reference) {
 		HibernateOrmSessionIndexedTypeContext<?> typeContext =
 				typeContextProvider.getByIndexName( reference.getIndexName() );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
-					"Document reference " + reference + " could not be converted to a PojoReference"
+					"Document reference " + reference + " refers to an unknown index"
 			);
 		}
 		Object id = typeContext.getIdentifierMapping()
 				.fromDocumentIdentifier( reference.getId(), sessionContext );
-		return new PojoReferenceImpl( typeContext.getJavaClass(), id );
+		return new EntityReferenceImpl( typeContext.getJavaClass(), id );
 	}
 
 	public PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy) {

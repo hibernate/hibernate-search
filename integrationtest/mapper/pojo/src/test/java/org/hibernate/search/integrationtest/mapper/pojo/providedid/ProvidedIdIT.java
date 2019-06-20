@@ -16,8 +16,8 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.search.spi.PojoReferenceImpl;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
@@ -71,13 +71,13 @@ public class ProvidedIdIT {
 					)
 			);
 
-			SearchQuery<PojoReference> query = session.search( IndexedEntity.class )
+			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
 					.asReference()
 					.predicate( f -> f.matchAll() )
 					.toQuery();
 
 			assertThat( query.fetch().getHits() )
-					.containsExactly( new PojoReferenceImpl( IndexedEntity.class, "42" ) );
+					.containsExactly( new EntityReferenceImpl( IndexedEntity.class, "42" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}

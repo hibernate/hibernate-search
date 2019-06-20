@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
 
 /**
  * Represents a set of types and the corresponding indexes,
@@ -35,7 +35,7 @@ public interface SearchScope {
 	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
 	 * @see SearchQueryResultDefinitionContext
 	 */
-	SearchQueryResultDefinitionContext<?, PojoReference, ?, ?, ?> search();
+	SearchQueryResultDefinitionContext<?, EntityReference, ?, ?, ?> search();
 
 	/**
 	 * Initiate the building of a search predicate.
@@ -86,6 +86,6 @@ public interface SearchScope {
 	 * and ultimately {@link SearchProjectionTerminalContext#toProjection() get the resulting projection}.
 	 * @see SearchProjectionFactoryContext
 	 */
-	SearchProjectionFactoryContext<PojoReference, ?> projection();
+	SearchProjectionFactoryContext<EntityReference, ?> projection();
 
 }

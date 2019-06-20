@@ -14,6 +14,7 @@ import java.util.Collections;
 
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
@@ -24,7 +25,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
@@ -109,7 +109,7 @@ public class AnnotationMappingRoutingIT {
 	@Test
 	public void search() {
 		try ( SearchSession session = mapping.createSession() ) {
-			SearchQuery<PojoReference> query = session.search( IndexedEntity.class )
+			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
 					.asReference()
 					.predicate( f -> f.match().onField( "value" ).matching( "val1" ) )
 					.routing( "category_2" )

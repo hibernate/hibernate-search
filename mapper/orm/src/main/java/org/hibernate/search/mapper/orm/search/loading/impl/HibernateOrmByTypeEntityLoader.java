@@ -14,44 +14,44 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<PojoReference, T> {
+public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<EntityReference, T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType;
+	private final Map<Class<? extends E>, HibernateOrmComposableEntityLoader<EntityReference, ? extends T>> delegatesByConcreteType;
 
-	HibernateOrmByTypeEntityLoader(Map<Class<? extends E>, HibernateOrmComposableEntityLoader<PojoReference, ? extends T>> delegatesByConcreteType) {
+	HibernateOrmByTypeEntityLoader(Map<Class<? extends E>, HibernateOrmComposableEntityLoader<EntityReference, ? extends T>> delegatesByConcreteType) {
 		this.delegatesByConcreteType = delegatesByConcreteType;
 	}
 
 	@Override
-	public List<T> loadBlocking(List<PojoReference> references) {
-		LinkedHashMap<PojoReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
-		Map<HibernateOrmComposableEntityLoader<PojoReference, ? extends T>, List<PojoReference>> referencesByDelegate = new HashMap<>();
+	public List<T> loadBlocking(List<EntityReference> references) {
+		LinkedHashMap<EntityReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
+		Map<HibernateOrmComposableEntityLoader<EntityReference, ? extends T>, List<EntityReference>> referencesByDelegate = new HashMap<>();
 
 		// Split references by delegate (by entity type)
-		for ( PojoReference reference : references ) {
+		for ( EntityReference reference : references ) {
 			objectsByReference.put( reference, null );
-			HibernateOrmComposableEntityLoader<PojoReference, ? extends T> delegate = getDelegate( reference.getType() );
+			HibernateOrmComposableEntityLoader<EntityReference, ? extends T> delegate = getDelegate( reference.getType() );
 			referencesByDelegate.computeIfAbsent( delegate, ignored -> new ArrayList<>() )
 					.add( reference );
 		}
 
 		// Load all references
-		for ( Map.Entry<HibernateOrmComposableEntityLoader<PojoReference, ? extends T>, List<PojoReference>> entry :
+		for ( Map.Entry<HibernateOrmComposableEntityLoader<EntityReference, ? extends T>, List<EntityReference>> entry :
 				referencesByDelegate.entrySet() ) {
-			HibernateOrmComposableEntityLoader<PojoReference, ? extends T> delegate = entry.getKey();
-			List<PojoReference> referencesForDelegate = entry.getValue();
+			HibernateOrmComposableEntityLoader<EntityReference, ? extends T> delegate = entry.getKey();
+			List<EntityReference> referencesForDelegate = entry.getValue();
 			delegate.loadBlocking( referencesForDelegate, objectsByReference );
 		}
 
 		// Re-create the list of objects in the same order
 		List<T> result = new ArrayList<>( references.size() );
-		for ( PojoReference reference : references ) {
+		for ( EntityReference reference : references ) {
 			/*
 			 * TODO HSEARCH-3349 remove null values? We used to do it in Search 5...
 			 *  Note that if we do, we have to change the javadoc
@@ -62,8 +62,8 @@ public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<PojoRe
 		return result;
 	}
 
-	private HibernateOrmComposableEntityLoader<PojoReference, ? extends T> getDelegate(Class<?> entityType) {
-		HibernateOrmComposableEntityLoader<PojoReference, ? extends T> delegate = delegatesByConcreteType.get( entityType );
+	private HibernateOrmComposableEntityLoader<EntityReference, ? extends T> getDelegate(Class<?> entityType) {
+		HibernateOrmComposableEntityLoader<EntityReference, ? extends T> delegate = delegatesByConcreteType.get( entityType );
 		if ( delegate == null ) {
 			throw log.unexpectedSearchHitType( entityType, delegatesByConcreteType.keySet() );
 		}

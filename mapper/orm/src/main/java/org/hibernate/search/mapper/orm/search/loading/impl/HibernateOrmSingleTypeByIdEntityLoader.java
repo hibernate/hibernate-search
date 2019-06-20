@@ -14,9 +14,9 @@ import java.util.Map;
 
 import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
-public class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<PojoReference, E> {
+public class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<EntityReference, E> {
 	private final Session session;
 	private final Class<E> entityType;
 	private final MutableEntityLoadingOptions loadingOptions;
@@ -33,17 +33,17 @@ public class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmCo
 	}
 
 	@Override
-	public List<E> loadBlocking(List<PojoReference> references) {
+	public List<E> loadBlocking(List<EntityReference> references) {
 		return loadEntities( references );
 	}
 
 	@Override
-	public void loadBlocking(List<PojoReference> references, Map<? super PojoReference, ? super E> objectsByReference) {
+	public void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> objectsByReference) {
 		List<? extends E> loadedObjects = loadEntities( references );
-		Iterator<PojoReference> referencesIterator = references.iterator();
+		Iterator<EntityReference> referencesIterator = references.iterator();
 		Iterator<? extends E> loadedObjectIterator = loadedObjects.iterator();
 		while ( referencesIterator.hasNext() ) {
-			PojoReference reference = referencesIterator.next();
+			EntityReference reference = referencesIterator.next();
 			E loadedObject = loadedObjectIterator.next();
 			if ( loadedObject != null ) {
 				objectsByReference.put( reference, loadedObject );
@@ -51,9 +51,9 @@ public class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmCo
 		}
 	}
 
-	private List<E> loadEntities(List<PojoReference> references) {
+	private List<E> loadEntities(List<EntityReference> references) {
 		List<Serializable> ids = new ArrayList<>( references.size() );
-		for ( PojoReference reference : references ) {
+		for ( EntityReference reference : references ) {
 			ids.add( (Serializable) reference.getId() );
 		}
 

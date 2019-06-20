@@ -20,11 +20,11 @@ import org.assertj.core.api.Assertions;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.search.spi.PojoReferenceImpl;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
@@ -180,19 +180,19 @@ public class SearchQueryBaseIT {
 			Assertions.assertThat( query.fetchHits() ).containsExactly(
 					Arrays.asList(
 							TITLE_4_3_2_1,
-							new PojoReferenceImpl( Book.class, 1 ),
+							new EntityReferenceImpl( Book.class, 1 ),
 							reference( Book.INDEX, "1" ),
 							AUTHOR_4_3_2_1
 					),
 					Arrays.asList(
 							TITLE_CIDER_HOUSE,
-							new PojoReferenceImpl( Book.class, 2 ),
+							new EntityReferenceImpl( Book.class, 2 ),
 							reference( Book.INDEX, "2" ),
 							AUTHOR_CIDER_HOUSE
 					),
 					Arrays.asList(
 							TITLE_AVENUE_OF_MYSTERIES,
-							new PojoReferenceImpl( Book.class, 3 ),
+							new EntityReferenceImpl( Book.class, 3 ),
 							reference( Book.INDEX, "3" ),
 							AUTHOR_AVENUE_OF_MYSTERIES
 					)
