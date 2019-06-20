@@ -32,8 +32,8 @@ public class SearchProjectionBackendContext {
 		return new ElasticsearchEntityProjectionBuilder<>( indexNames, documentReferenceExtractorHelper );
 	}
 
-	<R> ElasticsearchReferenceProjectionBuilder<R> createReferenceProjectionBuilder(Set<String> indexNames) {
-		return new ElasticsearchReferenceProjectionBuilder<>( indexNames, documentReferenceExtractorHelper );
+	<R> ElasticsearchEntityReferenceProjectionBuilder<R> createReferenceProjectionBuilder(Set<String> indexNames) {
+		return new ElasticsearchEntityReferenceProjectionBuilder<>( indexNames, documentReferenceExtractorHelper );
 	}
 
 	ElasticsearchScoreProjectionBuilder createScoreProjectionBuilder(Set<String> indexNames) {

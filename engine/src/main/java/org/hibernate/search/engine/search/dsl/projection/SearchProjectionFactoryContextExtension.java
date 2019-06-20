@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
  *
  * @param <T> The type of extended search factory contexts. Should generally extend
  * {@link SearchProjectionFactoryContext}.
- * @param <R> The type of references in the original {@link SearchProjectionFactoryContext}.
+ * @param <R> The type of entity references in the original {@link SearchProjectionFactoryContext}.
  * @param <E> The type of entities in the original {@link SearchProjectionFactoryContext}.
  *
  * @see SearchProjectionFactoryContext#extension(SearchProjectionFactoryContextExtension)

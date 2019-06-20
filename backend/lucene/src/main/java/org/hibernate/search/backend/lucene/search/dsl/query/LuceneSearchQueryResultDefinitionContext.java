@@ -29,7 +29,7 @@ public interface LuceneSearchQueryResultDefinitionContext<R, E>
 	LuceneSearchQueryResultContext<E> asEntity();
 
 	@Override
-	LuceneSearchQueryResultContext<R> asReference();
+	LuceneSearchQueryResultContext<R> asEntityReference();
 
 	@Override
 	<P> LuceneSearchQueryResultContext<P> asProjection(

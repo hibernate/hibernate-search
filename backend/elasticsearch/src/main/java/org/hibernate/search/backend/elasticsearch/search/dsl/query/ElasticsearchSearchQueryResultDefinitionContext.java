@@ -29,7 +29,7 @@ public interface ElasticsearchSearchQueryResultDefinitionContext<R, E>
 	ElasticsearchSearchQueryResultContext<E> asEntity();
 
 	@Override
-	ElasticsearchSearchQueryResultContext<R> asReference();
+	ElasticsearchSearchQueryResultContext<R> asEntityReference();
 
 	@Override
 	<P> ElasticsearchSearchQueryResultContext<P> asProjection(

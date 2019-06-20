@@ -9,15 +9,15 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import java.util.Set;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
 
 
-class ElasticsearchReferenceProjectionBuilder<R> implements ReferenceProjectionBuilder<R> {
+class ElasticsearchEntityReferenceProjectionBuilder<R> implements EntityReferenceProjectionBuilder<R> {
 
-	private final ElasticsearchReferenceProjection<R> projection;
+	private final ElasticsearchEntityReferenceProjection<R> projection;
 
-	ElasticsearchReferenceProjectionBuilder(Set<String> indexNames, DocumentReferenceExtractorHelper helper) {
-		this.projection = new ElasticsearchReferenceProjection<>( indexNames, helper );
+	ElasticsearchEntityReferenceProjectionBuilder(Set<String> indexNames, DocumentReferenceExtractorHelper helper) {
+		this.projection = new ElasticsearchEntityReferenceProjection<>( indexNames, helper );
 	}
 
 	@Override

@@ -127,15 +127,15 @@ public class SearchProjectionIT extends EasyMockSupport {
 		 */
 		SearchProjection<DocumentReference> documentReferenceProjection =
 				scope.projection().documentReference().toProjection();
-		SearchProjection<DocumentReference> referenceProjection =
-				scope.projection().reference().toProjection();
+		SearchProjection<DocumentReference> entityReferenceProjection =
+				scope.projection().entityReference().toProjection();
 		SearchProjection<DocumentReference> objectProjection =
 				scope.projection().entity().toProjection();
 
 		query = scope.query()
 				.asProjections(
 						documentReferenceProjection,
-						referenceProjection,
+						entityReferenceProjection,
 						objectProjection
 				)
 				.predicate( f -> f.matchAll() )
@@ -149,7 +149,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 	}
 
 	/**
-	 * Test documentReference/reference/entity projections as they are likely to be used by mappers,
+	 * Test documentReference/entityReference/entity projections as they are likely to be used by mappers,
 	 * i.e. with a custom reference transformer and a custom entity loader.
 	 */
 	@Test
@@ -187,14 +187,14 @@ public class SearchProjectionIT extends EasyMockSupport {
 		 */
 		SearchProjection<DocumentReference> documentReferenceProjection =
 				scope.projection().documentReference().toProjection();
-		SearchProjection<StubTransformedReference> referenceProjection =
-				scope.projection().reference().toProjection();
+		SearchProjection<StubTransformedReference> entityReferenceProjection =
+				scope.projection().entityReference().toProjection();
 		SearchProjection<StubLoadedObject> objectProjection =
 				scope.projection().entity().toProjection();
 		query = scope.query( loadingContextMock )
 				.asProjections(
 						documentReferenceProjection,
-						referenceProjection,
+						entityReferenceProjection,
 						objectProjection
 				)
 				.predicate( f -> f.matchAll() )
@@ -209,13 +209,13 @@ public class SearchProjectionIT extends EasyMockSupport {
 				 * but also loaded because of the entity projection.
 				 */
 				c -> c
-						.reference( document1Reference, document1TransformedReference )
+						.entityReference( document1Reference, document1TransformedReference )
 						.load( document1Reference, document1TransformedReference, document1LoadedObject )
-						.reference( document2Reference, document2TransformedReference )
+						.entityReference( document2Reference, document2TransformedReference )
 						.load( document2Reference, document2TransformedReference, document2LoadedObject )
-						.reference( document3Reference, document3TransformedReference )
+						.entityReference( document3Reference, document3TransformedReference )
 						.load( document3Reference, document3TransformedReference, document3LoadedObject )
-						.reference( emptyReference, emptyTransformedReference )
+						.entityReference( emptyReference, emptyTransformedReference )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();

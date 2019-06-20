@@ -144,7 +144,7 @@ public class SearchQueryBaseIT {
 			SearchQuery<List<?>> query = scope.search()
 					.asProjections(
 							scope.projection().field( "title", String.class ).toProjection(),
-							scope.projection().reference().toProjection(),
+							scope.projection().entityReference().toProjection(),
 							scope.projection().documentReference().toProjection(),
 							scope.projection().field( "author", String.class ).toProjection()
 					)

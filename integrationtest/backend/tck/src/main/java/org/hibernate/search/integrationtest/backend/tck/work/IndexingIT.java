@@ -109,7 +109,7 @@ public class IndexingIT<F> {
 			SearchQuery<IdAndValue<F>> query = scope.query()
 					.asProjection( f -> f.composite(
 							(ref, val) -> new IdAndValue<>( ref.getId(), val ),
-							f.reference(),
+							f.entityReference(),
 							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
 					) )
 					.predicate( f -> f.matchAll() )

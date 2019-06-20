@@ -88,7 +88,7 @@ public final class StubMapperUtils {
 		private final Map<DocumentReference, List<R>> referenceMap = new HashMap<>();
 		private final Map<R, E> loadingMap = new HashMap<>();
 
-		public HitMappingDefinitionContext<R, E> reference(DocumentReference documentReference, R transformedReference) {
+		public HitMappingDefinitionContext<R, E> entityReference(DocumentReference documentReference, R transformedReference) {
 			referenceMap.computeIfAbsent( documentReference, ignored -> new ArrayList<>() )
 					.add( transformedReference );
 			return this;
@@ -96,7 +96,7 @@ public final class StubMapperUtils {
 
 		public HitMappingDefinitionContext<R, E> load(DocumentReference documentReference, R transformedReference, E loadedObject) {
 			// For each load, the backend must first transform the reference
-			reference( documentReference, transformedReference );
+			entityReference( documentReference, transformedReference );
 			// Then it will need to trigger loading
 			loadingMap.put( transformedReference, loadedObject );
 			return this;

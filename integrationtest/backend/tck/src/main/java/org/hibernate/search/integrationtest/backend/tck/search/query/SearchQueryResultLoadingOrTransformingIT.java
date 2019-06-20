@@ -179,7 +179,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createGenericScope();
 		SearchQuery<StubTransformedReference> referencesQuery = scope.query( loadingContextMock )
-				.asReference()
+				.asEntityReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
@@ -193,8 +193,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubMapperUtils.expectHitMapping(
 				loadingContextMock, referenceHitMapperMock, objectLoaderMock,
 				c -> c
-						.reference( mainReference, mainTransformedReference )
-						.reference( emptyReference, emptyTransformedReference )
+						.entityReference( mainReference, mainTransformedReference )
+						.entityReference( emptyReference, emptyTransformedReference )
 		);
 		replayAll();
 		assertThat( referencesQuery ).hasHitsAnyOrder( mainTransformedReference, emptyTransformedReference );
@@ -271,7 +271,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						f.composite(
 								f.field( "string", String.class ),
 								f.documentReference(),
-								f.reference(),
+								f.entityReference(),
 								f.entity()
 						)
 				)
@@ -288,13 +288,13 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubMapperUtils.expectHitMapping(
 				loadingContextMock, referenceHitMapperMock, objectLoaderMock,
 				/*
-				 * Expect each reference to be transformed because of the reference projection,
+				 * Expect each reference to be transformed because of the entity reference projection,
 				 * but also loaded because of the entity projection.
 				 */
 				c -> c
-						.reference( mainReference, mainTransformedReference )
+						.entityReference( mainReference, mainTransformedReference )
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
-						.reference( emptyReference, emptyTransformedReference )
+						.entityReference( emptyReference, emptyTransformedReference )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
@@ -328,7 +328,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 								f.field( "localDate", LocalDate.class ).toProjection(),
 								f.field( "geoPoint", GeoPoint.class ).toProjection(),
 								f.documentReference().toProjection(),
-								f.reference().toProjection(),
+								f.entityReference().toProjection(),
 								f.entity().toProjection()
 						)
 				)
@@ -382,7 +382,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 								hitTransformerMock,
 								f.field( "string", String.class ).toProjection(),
 								f.documentReference().toProjection(),
-								f.reference().toProjection(),
+								f.entityReference().toProjection(),
 								f.entity().toProjection()
 						)
 				)
@@ -399,13 +399,13 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubMapperUtils.expectHitMapping(
 				loadingContextMock, referenceHitMapperMock, objectLoaderMock,
 				/*
-				 * Expect each reference to be transformed because of the reference projection,
+				 * Expect each reference to be transformed because of the entity reference projection,
 				 * but also loaded because of the entity projection.
 				 */
 				c -> c
-						.reference( mainReference, mainTransformedReference )
+						.entityReference( mainReference, mainTransformedReference )
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
-						.reference( emptyReference, emptyTransformedReference )
+						.entityReference( emptyReference, emptyTransformedReference )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		expect( hitTransformerMock.apply( projectionMatcher(

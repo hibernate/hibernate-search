@@ -195,7 +195,7 @@ public class SearchQueryBaseIT {
 			Assertions.assertThat( indexScope ).isNotNull();
 			Assertions.assertThat( sessionContext ).isNotNull();
 			Assertions.assertThat( loadingContextBuilder ).isNotNull();
-			return Optional.of( new MyExtendedDslContext<R>( original.asReference() ) );
+			return Optional.of( new MyExtendedDslContext<R>( original.asEntityReference() ) );
 		}
 	}
 

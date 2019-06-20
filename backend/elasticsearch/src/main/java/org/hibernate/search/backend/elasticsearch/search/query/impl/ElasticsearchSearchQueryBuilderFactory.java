@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchCompositeListProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchEntityProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchReferenceProjection;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchEntityReferenceProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -52,7 +52,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 			SessionContextImplementor sessionContext, LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
-				new ElasticsearchReferenceProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractorHelper() )
+				new ElasticsearchEntityReferenceProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractorHelper() )
 		);
 	}
 

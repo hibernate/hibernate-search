@@ -53,7 +53,7 @@ public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
 	}
 
 	@Override
-	public SearchQueryResultContext<?, R, ?> asReference() {
+	public SearchQueryResultContext<?, R, ?> asEntityReference() {
 		SearchQueryBuilder<R, C> builder = indexScope.getSearchQueryBuilderFactory()
 				.asReference( sessionContext, loadingContextBuilder );
 		return new DefaultSearchQueryContext<>( indexScope, builder );

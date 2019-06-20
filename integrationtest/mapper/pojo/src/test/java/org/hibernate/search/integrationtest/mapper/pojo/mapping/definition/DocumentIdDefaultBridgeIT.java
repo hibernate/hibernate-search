@@ -136,7 +136,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 				);
 
 				SearchQuery<EntityReference> query = session.search( expectations.getTypeWithIdentifierBridge1() )
-						.asReference()
+						.asEntityReference()
 						.predicate( f -> f.matchAll() )
 						.toQuery();
 

@@ -144,7 +144,7 @@ public class LuceneExtensionIT {
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
 		LuceneSearchQueryResultContext<DocumentReference> asReferenceContext =
-				scope.query().extension( LuceneExtension.get() ).asReference();
+				scope.query().extension( LuceneExtension.get() ).asEntityReference();
 		LuceneSearchQueryResultContext<DocumentReference> asEntityContext =
 				scope.query().extension( LuceneExtension.get() ).asEntity();
 		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();

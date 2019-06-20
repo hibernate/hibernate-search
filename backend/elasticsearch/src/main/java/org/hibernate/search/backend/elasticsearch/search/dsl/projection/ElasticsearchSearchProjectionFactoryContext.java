@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTermina
 /**
  * A DSL context allowing to create a projection, with some Elasticsearch-specific methods.
  *
- * @param <R> The type of references.
+ * @param <R> The type of entity references.
  * @param <E> The type of entities.
  * @see SearchProjectionFactoryContext
  */

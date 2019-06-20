@@ -29,7 +29,7 @@ public interface SearchProjectionBuilderFactory {
 
 	<E> EntityProjectionBuilder<E> entity();
 
-	<R> ReferenceProjectionBuilder<R> reference();
+	<R> EntityReferenceProjectionBuilder<R> entityReference();
 
 	ScoreProjectionBuilder score();
 

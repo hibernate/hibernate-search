@@ -9,14 +9,14 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Set;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
 
 
-public class LuceneReferenceProjectionBuilder<R> implements ReferenceProjectionBuilder<R> {
+public class LuceneEntityReferenceProjectionBuilder<R> implements EntityReferenceProjectionBuilder<R> {
 
 	private final Set<String> indexNames;
 
-	public LuceneReferenceProjectionBuilder(Set<String> indexNames) {
+	public LuceneEntityReferenceProjectionBuilder(Set<String> indexNames) {
 		this.indexNames = indexNames;
 	}
 

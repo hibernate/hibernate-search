@@ -16,8 +16,8 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 
 /**
- * @param <R> The type of references, i.e. the type of hits returned by
- * {@link SearchQueryResultDefinitionContext#asReference()} reference queries},
+ * @param <R> The type of entity references, i.e. the type of hits returned by
+ * {@link SearchQueryResultDefinitionContext#asEntityReference()} reference queries},
  * @param <E> The type of loaded entities, i.e. the type of hits returned by
  * {@link SearchQueryResultDefinitionContext#asEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.

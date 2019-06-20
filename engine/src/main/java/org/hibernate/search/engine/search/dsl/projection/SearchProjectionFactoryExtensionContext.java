@@ -14,7 +14,7 @@ import org.hibernate.search.util.common.SearchException;
  * The context used when attempting to apply multiple extensions
  * to a {@link SearchProjectionFactoryContext}.
  *
- * @param <R> The type of references in the parent {@link SearchProjectionFactoryContext}.
+ * @param <R> The type of entity references in the parent {@link SearchProjectionFactoryContext}.
  * @param <E> The type of entities in the parent {@link SearchProjectionFactoryContext}.
  * @param <P> The resulting projection type.
  *

@@ -114,7 +114,7 @@ public class ProgrammaticMappingRoutingIT {
 	public void search() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
-					.asReference()
+					.asEntityReference()
 					.predicate( f -> f.match().onField( "value" ).matching( "val1" ) )
 					.routing( "category_2" )
 					.toQuery();

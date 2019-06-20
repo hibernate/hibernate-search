@@ -1299,7 +1299,7 @@ public class MatchSearchPredicateIT {
 
 		SubTest.expectException(
 				() -> {
-					scope.query().asReference()
+					scope.query().asEntityReference()
 							.predicate( f -> f.match().onField( absoluteFieldPath ).matching( new BigDecimal( "739.739" ) ) )
 							.toQuery();
 				}
@@ -1426,7 +1426,7 @@ public class MatchSearchPredicateIT {
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
 		query = incompatibleDecimalScaleIndexManager.createScope().query()
-				.asReference()
+				.asEntityReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 );
