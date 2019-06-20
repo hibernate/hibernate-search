@@ -18,8 +18,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
@@ -130,11 +128,15 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		}
 	}
 
+	// Criteria on a stateless session will be un-deprecated soon.
+	// See https://hibernate.atlassian.net/browse/HHH-13154.
+	@SuppressWarnings("deprecation")
 	private void loadAllIdentifiers(final StatelessSession session) throws InterruptedException {
-		Number countAsNumber = (Number) createCriteria( session )
-			.setProjection( Projections.rowCount() )
-			.setCacheable( false )
-			.uniqueResult();
+		Number countAsNumber = (Number) session.createCriteria( indexedType.getName() )
+				.setProjection( Projections.rowCount() )
+				.setCacheable( false )
+				.uniqueResult();
+
 		long totalCount = countAsNumber.longValue();
 		if ( objectsLimit != 0 && objectsLimit < totalCount ) {
 			totalCount = objectsLimit;
@@ -144,10 +146,10 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		}
 		monitor.addToTotalCount( totalCount );
 
-		Criteria criteria = createCriteria( session )
-			.setProjection( Projections.id() )
-			.setCacheable( false )
-			.setFetchSize( idFetchSize );
+		Criteria criteria = session.createCriteria( indexedType.getName() )
+				.setProjection( Projections.id() )
+				.setCacheable( false )
+				.setFetchSize( idFetchSize );
 
 		ArrayList<Serializable> destinationList = new ArrayList<>( batchSize );
 		long counter = 0;
@@ -173,10 +175,6 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			}
 		}
 		enqueueList( destinationList );
-	}
-
-	private Criteria createCriteria(final StatelessSession session) {
-		return new CriteriaImpl( indexedType.getName(), (SharedSessionContractImplementor) session );
 	}
 
 	private void enqueueList(final List<Serializable> idsList) throws InterruptedException {
