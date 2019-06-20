@@ -161,7 +161,7 @@ public class LuceneBackendFactory implements BackendFactory {
 		try {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanResolver beanResolver = buildContext.getBeanResolver();
-			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::getBean )
+			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 					.map( holder -> {
 						try ( BeanHolder<? extends LuceneAnalysisConfigurer> configurerHolder = holder ) {
 							LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(

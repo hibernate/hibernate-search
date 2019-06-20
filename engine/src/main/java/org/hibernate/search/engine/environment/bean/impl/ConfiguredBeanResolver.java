@@ -50,7 +50,7 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 		}
 		BeanProviderOnlyBeanResolver beanResolverForConfigurers = new BeanProviderOnlyBeanResolver( beanProvider );
 		try ( BeanHolder<List<BeanConfigurer>> beanConfigurersFromConfigurationProperties =
-				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanResolverForConfigurers::getBeans ) ) {
+				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanResolverForConfigurers::resolve ) ) {
 			for ( BeanConfigurer beanConfigurer : beanConfigurersFromConfigurationProperties.get() ) {
 				beanConfigurer.configure( configurationContext );
 			}
@@ -62,10 +62,10 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> BeanHolder<T> getBean(Class<T> typeReference) {
+	public <T> BeanHolder<T> resolve(Class<T> typeReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		try {
-			return beanProvider.resolve( typeReference );
+			return beanProvider.getBean( typeReference );
 		}
 		catch (SearchException e) {
 			return fallbackToConfiguredBeans( e, typeReference, null );
@@ -73,11 +73,11 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> BeanHolder<T> getBean(Class<T> typeReference, String nameReference) {
+	public <T> BeanHolder<T> resolve(Class<T> typeReference, String nameReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
 		try {
-			return beanProvider.resolve( typeReference, nameReference );
+			return beanProvider.getBean( typeReference, nameReference );
 		}
 		catch (SearchException e) {
 			return fallbackToConfiguredBeans( e, typeReference, nameReference );
@@ -85,7 +85,7 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> BeanHolder<List<T>> getBeansWithRole(Class<T> role) {
+	public <T> BeanHolder<List<T>> resolveRole(Class<T> role) {
 		Contracts.assertNotNull( role, "role" );
 		@SuppressWarnings("unchecked") // We know the references have the correct type, see BeanConfigurationContextImpl
 		List<BeanReference<? extends T>> references = (List<BeanReference<? extends T>>) roleMap.get( role );
@@ -93,7 +93,7 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 			return BeanHolder.of( Collections.emptyList() );
 		}
 		else {
-			return getBeans( references );
+			return resolve( references );
 		}
 	}
 

@@ -481,7 +481,7 @@ public class TestElasticsearchClient implements TestRule {
 		 * (using the hibernate-search-elasticsearch-aws module).
 		 */
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
-				beanResolver.getBean( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
+				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			client = factoryHolder.get().create(
 					backendProperties, DefaultGsonProvider.create( GsonBuilder::new, true )
 			);
