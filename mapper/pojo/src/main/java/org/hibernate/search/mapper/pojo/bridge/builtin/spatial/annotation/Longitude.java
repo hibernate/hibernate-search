@@ -13,8 +13,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
-import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
 
 /**
  * Mark the property hosting the longitude of a specific spatial coordinate.

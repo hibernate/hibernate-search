@@ -32,8 +32,8 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingKeyBridgeBind
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.TypeBridgeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBridgeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;

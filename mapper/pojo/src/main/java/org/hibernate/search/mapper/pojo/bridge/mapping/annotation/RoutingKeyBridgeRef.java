@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.bridge.declaration;
+package org.hibernate.search.mapper.pojo.bridge.mapping.annotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
@@ -13,8 +13,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 
 /**
  * Reference a bridge for a {@link RoutingKeyBridgeMapping}.
@@ -32,7 +34,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
  * If an <b>annotation bridge builder</b> is provided, using the methods {@link #builderName()} or {@link #builderType()},
  * each time the mapped annotation is encountered, an instance of the routing key bridge builder will be created.
  * The builder will be passed the annotation through its {@link AnnotationBridgeBuilder#initialize(Annotation)} method,
- * and then the bridge will be retrieved by calling {@link BridgeBuilder#build(org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext)}.
+ * and then the bridge will be retrieved by calling {@link BridgeBuilder#build(BridgeBuildContext)}.
  * <p>
  * Routing key bridges mapped this way can be parameterized:
  * the bridge will be able to take any attribute of the mapped annotation into account

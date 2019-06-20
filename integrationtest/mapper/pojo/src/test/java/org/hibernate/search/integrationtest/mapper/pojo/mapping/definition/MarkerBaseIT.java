@@ -13,10 +13,10 @@ import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuildContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;

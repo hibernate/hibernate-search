@@ -15,11 +15,11 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
 
 /**
  * Defines a {@link GeoPoint} bridge, mapping a type or a property

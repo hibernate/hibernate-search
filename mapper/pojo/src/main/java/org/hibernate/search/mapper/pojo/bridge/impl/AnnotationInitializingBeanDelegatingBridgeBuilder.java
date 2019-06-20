@@ -11,9 +11,9 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
