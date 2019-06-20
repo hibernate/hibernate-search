@@ -15,10 +15,13 @@ import org.apache.lucene.document.LatLonDocValuesField;
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocValuesFieldExistsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
@@ -54,10 +57,14 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 			documentBuilder.addField( new StoredField( getLongitudeAbsoluteFieldPath( absoluteFieldPath ), value.getLongitude() ) );
 		}
 
-		if ( sortable || searchable ) {
-			// Generally the LatLonDocValuesField field is required only for sorting,
-			// but we rely on this field to support exists predicate too.
+		if ( sortable || projectable ) {
+			// The projectable term here is present only to support distance projections.
+			// Since distances are derived from a DocValuesField, see DistanceCollector.
 			documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
+		}
+		else {
+			// For createExistsQuery()
+			documentBuilder.addFieldName( absoluteFieldPath );
 		}
 
 		if ( searchable ) {
@@ -85,7 +92,12 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 
 	@Override
 	public Query createExistsQuery(String absoluteFieldPath) {
-		return new DocValuesFieldExistsQuery( absoluteFieldPath );
+		if ( sortable ) {
+			return new DocValuesFieldExistsQuery( absoluteFieldPath );
+		}
+		else {
+			return new TermQuery( new Term( LuceneFields.fieldNamesFieldName(), absoluteFieldPath ) );
+		}
 	}
 
 	@Override
