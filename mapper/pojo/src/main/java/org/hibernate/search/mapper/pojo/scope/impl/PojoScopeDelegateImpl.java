@@ -20,19 +20,16 @@ import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionCon
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoScopeWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoScopeDelegateImpl<E, E2, C> implements PojoScopeDelegate<E2, C> {
@@ -103,16 +100,6 @@ public final class PojoScopeDelegateImpl<E, E2, C> implements PojoScopeDelegate<
 	@Override
 	public Set<C> getIncludedIndexedTypes() {
 		return targetedTypeExtendedContexts;
-	}
-
-	@Override
-	public PojoReference toPojoReference(DocumentReference documentReference) {
-		PojoScopeIndexedTypeContext<?, ?, ?> typeContext = typeContextProvider.getByIndexName( documentReference.getIndexName() )
-				.orElseThrow( () -> new AssertionFailure(
-						"Document reference " + documentReference + " could not be converted to a PojoReference"
-				) );
-		Object id = typeContext.getIdentifierMapping().fromDocumentIdentifier( documentReference.getId(), sessionContext );
-		return new PojoReferenceImpl( typeContext.getJavaClass(), id );
 	}
 
 	@Override

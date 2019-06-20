@@ -10,6 +10,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -17,15 +18,18 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl implements SearchScope {
 
+	private final ReferenceHitMapper<PojoReference> referenceHitMapper;
 	private final PojoScopeDelegate<Void, Void> delegate;
 
-	public SearchScopeImpl(PojoScopeDelegate<Void, Void> delegate) {
+	public SearchScopeImpl(ReferenceHitMapper<PojoReference> referenceHitMapper,
+			PojoScopeDelegate<Void, Void> delegate) {
+		this.referenceHitMapper = referenceHitMapper;
 		this.delegate = delegate;
 	}
 
 	@Override
 	public SearchQueryResultDefinitionContext<?, PojoReference, ?, ?, ?> search() {
-		return delegate.search( new JavaBeanLoadingContext.Builder( delegate ) );
+		return delegate.search( new JavaBeanLoadingContext.Builder( referenceHitMapper ) );
 	}
 
 	@Override

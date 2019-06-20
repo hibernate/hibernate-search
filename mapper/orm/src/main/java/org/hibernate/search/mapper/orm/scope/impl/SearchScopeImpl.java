@@ -44,7 +44,7 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 				new EntityLoaderBuilder<>( sessionImplementor, delegate.getIncludedIndexedTypes() );
 		MutableEntityLoadingOptions loadingOptions = new MutableEntityLoadingOptions();
 		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
-				sessionImplementor, delegate, entityLoaderBuilder, loadingOptions
+				sessionContext, entityLoaderBuilder, loadingOptions
 		);
 		return new HibernateOrmSearchQueryResultDefinitionContextImpl<>(
 				delegate.search( loadingContextBuilder ),

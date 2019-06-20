@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.scope.spi;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -28,8 +27,6 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 public interface PojoScopeDelegate<E, C> {
 
 	Set<C> getIncludedIndexedTypes();
-
-	PojoReference toPojoReference(DocumentReference documentReference);
 
 	SearchQueryResultDefinitionContext<?, PojoReference, E, SearchProjectionFactoryContext<PojoReference, E>, ?> search(
 			LoadingContextBuilder<PojoReference, E> loadingContextBuilder);
