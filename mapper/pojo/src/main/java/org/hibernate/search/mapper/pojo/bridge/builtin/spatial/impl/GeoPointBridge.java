@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
@@ -40,7 +40,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static class Builder implements GeoPointBridgeBuilder<GeoPointBridge>,
-			AnnotationBridgeBuilder<GeoPointBridge, org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge> {
+			AnnotationBridgeBuilder<GeoPointBridge, org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge> {
 
 		private String fieldName;
 		private Projectable projectable = Projectable.DEFAULT;
@@ -49,7 +49,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 		@Override
 		public void initialize(
-				org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge annotation) {
+				org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge annotation) {
 			fieldName( annotation.fieldName() );
 			markerSet( annotation.markerSet() );
 			projectable( annotation.projectable() );

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.bridge.builtin.spatial;
+package org.hibernate.search.mapper.pojo.bridge.builtin.programmatic;
 
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
  * sorts by distance to another point, ...
  *
  * @param <B> The type of the bridge.
- * @see org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge
+ * @see org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge
  * @see #forType()
  * @see #forProperty()
  * @see #latitude()
