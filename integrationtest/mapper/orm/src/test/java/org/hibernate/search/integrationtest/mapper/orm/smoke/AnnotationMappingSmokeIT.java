@@ -297,7 +297,7 @@ public class AnnotationMappingSmokeIT {
 	@Test
 	public void search() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 			SearchQuery<ParentIndexedEntity> query = searchSession.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)

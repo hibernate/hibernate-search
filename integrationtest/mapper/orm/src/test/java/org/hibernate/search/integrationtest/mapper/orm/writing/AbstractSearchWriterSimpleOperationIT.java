@@ -44,7 +44,7 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		SessionFactory sessionFactory = setup();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchWriter writer = Search.getSearchSession( session ).writer( IndexedEntity1.class );
+			SearchWriter writer = Search.session( session ).writer( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
@@ -63,7 +63,7 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		SessionFactory sessionFactory = setup();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchWriter writer = Search.getSearchSession( session ).writer( IndexedEntity1.class );
+			SearchWriter writer = Search.session( session ).writer( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
@@ -83,7 +83,7 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		SessionFactory sessionFactory = setup();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchWriter writer = Search.getSearchSession( session ).writer( IndexedEntity1.class );
+			SearchWriter writer = Search.session( session ).writer( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
@@ -99,7 +99,7 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		SessionFactory sessionFactory = setup();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchWriter writer = Search.getSearchSession( session ).writer( IndexedEntity1.class );
+			SearchWriter writer = Search.session( session ).writer( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
@@ -120,7 +120,7 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		SessionFactory sessionFactory = setup();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchWriter writer = Search.getSearchSession( session ).writer();
+			SearchWriter writer = Search.session( session ).writer();
 
 			CompletableFuture<Object> future1FromBackend = new CompletableFuture<>();
 			CompletableFuture<Object> future2FromBackend = new CompletableFuture<>();
@@ -146,7 +146,7 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 
 		SearchWriter writer;
 		try ( Session session = sessionFactory.openSession() ) {
-			writer = Search.getSearchSession( session ).writer( IndexedEntity1.class );
+			writer = Search.session( session ).writer( IndexedEntity1.class );
 		}
 
 		CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();

@@ -57,7 +57,7 @@ public class MassIndexingPrimitiveIdIT {
 	@Test
 	public void entityWithPrimitiveId() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
 			// add operations on indexes can follow any random order,

@@ -53,7 +53,7 @@ public class SearchSessionWritePlanNonEntityIdDocumentIdIT {
 			session.persist( entity2 );
 			session.persist( entity3 );
 
-			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 			writePlan.addOrUpdate( entity1 );
 			writePlan.addOrUpdate( entity2 );
 			writePlan.delete( entity3 );

@@ -87,7 +87,7 @@ public class ProjectionDslIT {
 	public void entryPoint() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::entryPoint-lambdas[]
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			List<String> result = searchSession.search( Book.class ) // <1>
 					.asProjection( f -> f.field( "title", String.class ) ) // <2>
@@ -104,7 +104,7 @@ public class ProjectionDslIT {
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::entryPoint-objects[]
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
@@ -406,7 +406,7 @@ public class ProjectionDslIT {
 
 	private void withinSearchSession(Consumer<SearchSession> action) {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 			action.accept( searchSession );
 		} );
 	}

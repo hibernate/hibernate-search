@@ -77,7 +77,7 @@ public class MassIndexingEmbeddedIdIT {
 	@Test
 	public void defaultMassIndexerStartAndWait() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
 			// add operations on indexes can follow any random order,

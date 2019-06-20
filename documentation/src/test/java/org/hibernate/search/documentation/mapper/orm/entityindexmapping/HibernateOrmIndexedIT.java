@@ -63,7 +63,7 @@ public class HibernateOrmIndexedIT {
 	@Test
 	public void search_separateQueries() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			List<Author> authorResult = searchSession.search( Author.class )
 					.predicate( f -> f.matchAll() )
@@ -81,7 +81,7 @@ public class HibernateOrmIndexedIT {
 	public void search_singleQuery() {
 		SubTest.expectException(
 				() -> OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-					SearchSession searchSession = Search.getSearchSession( entityManager );
+					SearchSession searchSession = Search.session( entityManager );
 
 					// tag::cross-backend-search[]
 					// This will fail because Author and User are indexed in different backends

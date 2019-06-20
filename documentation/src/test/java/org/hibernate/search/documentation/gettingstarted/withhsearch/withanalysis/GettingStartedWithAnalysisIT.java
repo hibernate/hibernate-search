@@ -76,7 +76,7 @@ public class GettingStartedWithAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching[]
 			// Not shown: get the entity manager and open a transaction
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.predicate( factory -> factory.match()
@@ -93,7 +93,7 @@ public class GettingStartedWithAnalysisIT {
 
 		// Also test the other terms mentioned in the getting started guide
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			for ( String term : new String[] { "Refactor", "refactors", "refactored", "refactoring" } ) {
 				SearchResult<Book> result = searchSession.search( Book.class )

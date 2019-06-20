@@ -69,7 +69,7 @@ public class MassIndexingBaseIT {
 	@Test
 	public void defaultMassIndexerStartAndWait() throws Exception {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
 			// add operations on indexes can follow any random order,
@@ -114,7 +114,7 @@ public class MassIndexingBaseIT {
 	@Test
 	public void reuseSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
 		Session session = sessionFactory.openSession();
-		SearchSession searchSession = Search.getSearchSession( session );
+		SearchSession searchSession = Search.session( session );
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
 		searchSession.massIndexer();
@@ -132,7 +132,7 @@ public class MassIndexingBaseIT {
 	public void lazyCrateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
 		Session session = sessionFactory.openSession();
 		// Search session is not created, since we don't use it
-		SearchSession searchSession = Search.getSearchSession( session );
+		SearchSession searchSession = Search.session( session );
 		session.close();
 
 		SubTest.expectException( () -> {

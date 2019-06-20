@@ -85,7 +85,7 @@ public class ToJpaIT {
 	@Test
 	public void toJpaEntityManager() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 			assertThat( searchSession.toEntityManager() ).isSameAs( entityManager );
 		} );
 	}
@@ -104,7 +104,7 @@ public class ToJpaIT {
 
 		EntityManager closedEntityManager = entityManager;
 		SubTest.expectException( () -> {
-			Search.getSearchSession( closedEntityManager );
+			Search.session( closedEntityManager );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -114,7 +114,7 @@ public class ToJpaIT {
 	@Test
 	public void toJpaQuery() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
 		} );
@@ -123,7 +123,7 @@ public class ToJpaIT {
 	@Test
 	public void getResultList() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
@@ -148,7 +148,7 @@ public class ToJpaIT {
 	@Test
 	public void getSingleResult() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
@@ -211,7 +211,7 @@ public class ToJpaIT {
 	@Test
 	public void pagination() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
 			assertThat( query.getFirstResult() ).isEqualTo( 0 );
@@ -239,7 +239,7 @@ public class ToJpaIT {
 	@TestForIssue( jiraKey = "HSEARCH-1857" )
 	public void reuseSearchSessionAfterEntityManagerIsClosed_noMatching() {
 		EntityManager entityManager = sessionFactory.createEntityManager();
-		SearchSession searchSession = Search.getSearchSession( entityManager );
+		SearchSession searchSession = Search.session( entityManager );
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
 		createSimpleQuery( searchSession );
@@ -257,7 +257,7 @@ public class ToJpaIT {
 	public void lazyCrateSearchSessionAfterEntityManagerIsClosed() {
 		EntityManager entityManager = sessionFactory.createEntityManager();
 		// Search session is not created, since we don't use it
-		SearchSession searchSession = Search.getSearchSession( entityManager );
+		SearchSession searchSession = Search.session( entityManager );
 		entityManager.close();
 
 		SubTest.expectException( () -> {

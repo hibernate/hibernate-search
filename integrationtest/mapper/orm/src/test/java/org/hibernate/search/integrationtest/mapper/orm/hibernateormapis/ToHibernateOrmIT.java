@@ -81,7 +81,7 @@ public class ToHibernateOrmIT {
 	@Test
 	public void toHibernateOrmSession() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 			assertThat( searchSession.toOrmSession() ).isSameAs( session );
 		} );
 	}
@@ -100,7 +100,7 @@ public class ToHibernateOrmIT {
 
 		Session closedSession = session;
 		SubTest.expectException( () -> {
-			Search.getSearchSession( closedSession );
+			Search.session( closedSession );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -110,7 +110,7 @@ public class ToHibernateOrmIT {
 	@Test
 	public void toHibernateOrmQuery() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
 		} );
@@ -119,7 +119,7 @@ public class ToHibernateOrmIT {
 	@Test
 	public void list() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
@@ -144,7 +144,7 @@ public class ToHibernateOrmIT {
 	@Test
 	public void uniqueResult() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
@@ -204,7 +204,7 @@ public class ToHibernateOrmIT {
 	@Test
 	public void pagination() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			assertThat( query.getFirstResult() ).isEqualTo( 0 );
@@ -232,7 +232,7 @@ public class ToHibernateOrmIT {
 	@TestForIssue( jiraKey = "HSEARCH-1857" )
 	public void reuseSearchSessionAfterOrmSessionIsClosed_noMatching() {
 		Session session = sessionFactory.openSession();
-		SearchSession searchSession = Search.getSearchSession( session );
+		SearchSession searchSession = Search.session( session );
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
 		createSimpleQuery( searchSession );
@@ -250,7 +250,7 @@ public class ToHibernateOrmIT {
 	public void lazyCrateSearchSessionAfterOrmSessionIsClosed() {
 		Session session = sessionFactory.openSession();
 		// Search session is not created, since we don't use it
-		SearchSession searchSession = Search.getSearchSession( session );
+		SearchSession searchSession = Search.session( session );
 		session.close();
 
 		SubTest.expectException( () -> {
@@ -265,7 +265,7 @@ public class ToHibernateOrmIT {
 	@TestForIssue( jiraKey = "HSEARCH-1857" )
 	public void reuseSearchQueryAfterOrmSessionIsClosed_noMatching() {
 		Session session = sessionFactory.openSession();
-		SearchSession searchSession = Search.getSearchSession( session );
+		SearchSession searchSession = Search.session( session );
 		SearchQuery<IndexedEntity> query = createSimpleQuery( searchSession );
 		session.close();
 

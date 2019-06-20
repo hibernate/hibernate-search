@@ -85,7 +85,7 @@ public class HibernateOrmExplicitIndexingIT {
 			assertBookCount( entityManager, 0 );
 
 			// tag::persist-automatic-indexing-periodic-process[]
-			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
+			SearchSession searchSession = Search.session( entityManager ); // <1>
 			SearchSessionWritePlan searchWritePlan = searchSession.writePlan(); // <2>
 
 			entityManager.getTransaction().begin();
@@ -119,7 +119,7 @@ public class HibernateOrmExplicitIndexingIT {
 			assertBookCount( entityManager, 0 );
 
 			// tag::persist-automatic-indexing-periodic-execute[]
-			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
+			SearchSession searchSession = Search.session( entityManager ); // <1>
 			SearchSessionWritePlan searchWritePlan = searchSession.writePlan(); // <2>
 
 			entityManager.getTransaction().begin();
@@ -184,7 +184,7 @@ public class HibernateOrmExplicitIndexingIT {
 			assertBookCount( entityManager, 0 );
 
 			// tag::write-plan-addOrUpdate[]
-			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
+			SearchSession searchSession = Search.session( entityManager ); // <1>
 			SearchSessionWritePlan searchWritePlan = searchSession.writePlan(); // <2>
 
 			entityManager.getTransaction().begin();
@@ -214,7 +214,7 @@ public class HibernateOrmExplicitIndexingIT {
 			assertBookCount( entityManager, numberOfBooks );
 
 			// tag::write-plan-delete[]
-			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
+			SearchSession searchSession = Search.session( entityManager ); // <1>
 			SearchSessionWritePlan searchWritePlan = searchSession.writePlan(); // <2>
 
 			entityManager.getTransaction().begin();
@@ -242,7 +242,7 @@ public class HibernateOrmExplicitIndexingIT {
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			// tag::writer-retrieval[]
-			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
+			SearchSession searchSession = Search.session( entityManager ); // <1>
 			SearchWriter writer1 = searchSession.writer(); // <2>
 			SearchWriter writer2 = searchSession.writer( Book.class ); // <3>
 			SearchWriter writer3 = searchSession.writer( Book.class, Author.class ); // <4>
@@ -254,7 +254,7 @@ public class HibernateOrmExplicitIndexingIT {
 			assertAuthorCount( entityManager, numberOfBooks );
 
 			// tag::writer-purge[]
-			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
+			SearchSession searchSession = Search.session( entityManager ); // <1>
 			SearchWriter writer = searchSession.writer( Book.class, Author.class ); // <2>
 			writer.purge(); // <3>
 			// end::writer-purge[]
@@ -306,7 +306,7 @@ public class HibernateOrmExplicitIndexingIT {
 	}
 
 	private void assertBookCount(EntityManager entityManager, int expectedCount) {
-		SearchSession searchSession = Search.getSearchSession( entityManager );
+		SearchSession searchSession = Search.session( entityManager );
 		// Ensure every committed work is searchable: flush also executes a refresh on Elasticsearch
 		searchSession.writer().flush();
 		assertThat(
@@ -318,7 +318,7 @@ public class HibernateOrmExplicitIndexingIT {
 	}
 
 	private void assertAuthorCount(EntityManager entityManager, int expectedCount) {
-		SearchSession searchSession = Search.getSearchSession( entityManager );
+		SearchSession searchSession = Search.session( entityManager );
 		// Ensure every committed work is searchable: flush also executes a refresh on Elasticsearch
 		searchSession.writer().flush();
 		assertThat(
