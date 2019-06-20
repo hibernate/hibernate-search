@@ -30,7 +30,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResp
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -472,7 +472,7 @@ public class TestElasticsearchClient implements TestRule {
 		ConfigurationPropertySource backendProperties =
 				TckConfiguration.get().getBackendProperties( configurationProvider, null );
 
-		BeanProvider beanProvider = configurationProvider.createBeanProviderForTest();
+		BeanResolver beanResolver = configurationProvider.createBeanResolverForTest();
 		/*
 		 * We use a {@link ElasticsearchClientFactoryImpl} to create our low-level client.
 		 *
@@ -481,7 +481,7 @@ public class TestElasticsearchClient implements TestRule {
 		 * (using the hibernate-search-elasticsearch-aws module).
 		 */
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
-				beanProvider.getBean( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
+				beanResolver.getBean( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			client = factoryHolder.get().create(
 					backendProperties, DefaultGsonProvider.create( GsonBuilder::new, true )
 			);

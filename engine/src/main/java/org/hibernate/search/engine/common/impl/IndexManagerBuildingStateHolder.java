@@ -28,7 +28,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.IndexedEntityBindingContextImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
@@ -50,7 +50,7 @@ class IndexManagerBuildingStateHolder {
 			ConfigurationProperty.forKey( BackendSettings.TYPE ).asBeanReference( BackendFactory.class )
 					.build();
 
-	private final BeanProvider beanProvider;
+	private final BeanResolver beanResolver;
 	private final ConfigurationPropertySource propertySource;
 	private final RootBuildContext rootBuildContext;
 
@@ -59,9 +59,9 @@ class IndexManagerBuildingStateHolder {
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, IndexManagerInitialBuildState<?>> indexManagerBuildStateByName = new LinkedHashMap<>();
 
-	IndexManagerBuildingStateHolder(BeanProvider beanProvider, ConfigurationPropertySource propertySource,
+	IndexManagerBuildingStateHolder(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			RootBuildContext rootBuildContext) {
-		this.beanProvider = beanProvider;
+		this.beanResolver = beanResolver;
 		this.propertySource = propertySource;
 		this.rootBuildContext = rootBuildContext;
 	}
@@ -115,7 +115,7 @@ class IndexManagerBuildingStateHolder {
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.getAndMapOrThrow(
 						backendPropertySource,
-						beanProvider::getBean,
+						beanResolver::getBean,
 						key -> log.backendTypeCannotBeNullOrEmpty( backendName, key )
 				) ) {
 			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
@@ -15,15 +15,15 @@ class RootBuildContext {
 
 	private final ClassResolver classResolver;
 	private final ResourceResolver resourceResolver;
-	private final BeanProvider beanProvider;
+	private final BeanResolver beanResolver;
 
 	private final FailureCollector failureCollector;
 
 	RootBuildContext(ClassResolver classResolver, ResourceResolver resourceResolver,
-			BeanProvider beanProvider, FailureCollector failureCollector) {
+			BeanResolver beanResolver, FailureCollector failureCollector) {
 		this.classResolver = classResolver;
 		this.resourceResolver = resourceResolver;
-		this.beanProvider = beanProvider;
+		this.beanResolver = beanResolver;
 		this.failureCollector = failureCollector;
 	}
 
@@ -35,8 +35,8 @@ class RootBuildContext {
 		return resourceResolver;
 	}
 
-	BeanProvider getBeanProvider() {
-		return beanProvider;
+	BeanResolver getBeanResolver() {
+		return beanResolver;
 	}
 
 	FailureCollector getFailureCollector() {

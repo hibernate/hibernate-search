@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanCreationContext;
 
 final class BeanCreationContextImpl implements BeanCreationContext {
-	private final BeanProvider beanProvider;
+	private final BeanResolver beanResolver;
 
-	BeanCreationContextImpl(BeanProvider beanProvider) {
-		this.beanProvider = beanProvider;
+	BeanCreationContextImpl(BeanResolver beanResolver) {
+		this.beanResolver = beanResolver;
 	}
 
 	@Override
-	public BeanProvider getBeanProvider() {
-		return beanProvider;
+	public BeanResolver getBeanResolver() {
+		return beanResolver;
 	}
 }

@@ -24,10 +24,10 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
-import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanProvider;
-import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
-import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanResolver;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassAndResourceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
@@ -62,7 +62,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 	private ClassResolver classResolver;
 	private ResourceResolver resourceResolver;
-	private BeanResolver beanResolver;
+	private BeanProvider beanProvider;
 	private boolean frozen = false;
 
 	public SearchIntegrationBuilderImpl(ConfigurationPropertySource mainPropertySource) {
@@ -82,8 +82,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	}
 
 	@Override
-	public SearchIntegrationBuilder setBeanResolver(BeanResolver beanResolver) {
-		this.beanResolver = beanResolver;
+	public SearchIntegrationBuilder setBeanProvider(BeanProvider beanProvider) {
+		this.beanProvider = beanProvider;
 		return this;
 	}
 
@@ -136,16 +136,16 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				resourceResolver = defaultClassAndResourceResolver;
 			}
 
-			if ( beanResolver == null ) {
-				beanResolver = new ReflectionBeanResolver( classResolver );
+			if ( beanProvider == null ) {
+				beanProvider = new ReflectionBeanProvider( classResolver );
 			}
 
 			ConfigurationPropertySource propertySource = mainPropertySource;
 
-			BeanProvider beanProvider = new ConfiguredBeanProvider( classResolver, beanResolver, propertySource );
-			RootBuildContext rootBuildContext = new RootBuildContext( classResolver, resourceResolver, beanProvider, failureCollector );
+			BeanResolver beanResolver = new ConfiguredBeanResolver( classResolver, beanProvider, propertySource );
+			RootBuildContext rootBuildContext = new RootBuildContext( classResolver, resourceResolver, beanResolver, failureCollector );
 
-			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanProvider, propertySource, rootBuildContext );
+			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanResolver, propertySource, rootBuildContext );
 
 			// First step: collect configuration for all mappings
 			for ( Map.Entry<MappingKey<?, ?>, MappingInitiator<?, ?>> entry : mappingInitiators.entrySet() ) {
@@ -179,7 +179,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			checkingRootFailures = false;
 
 			return new SearchIntegrationPartialBuildStateImpl(
-					beanResolver,
+					beanProvider,
 					partiallyBuiltMappings,
 					indexManagerBuildingStateHolder.getBackendPartialBuildStates(),
 					indexManagerBuildingStateHolder.getIndexManagersByName()
@@ -219,7 +219,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			// Close the resources contained in the index manager building state before aborting
 			closer.pushAll( holder -> holder.closeOnFailure( closer ), indexManagerBuildingStateHolder );
 			// Close the bean resolver before aborting
-			closer.pushAll( BeanResolver::close, beanResolver );
+			closer.pushAll( BeanProvider::close, beanProvider );
 
 			throw rethrownException;
 		}

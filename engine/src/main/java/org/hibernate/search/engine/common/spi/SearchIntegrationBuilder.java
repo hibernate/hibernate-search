@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.common.spi;
 
-import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
@@ -20,7 +20,7 @@ public interface SearchIntegrationBuilder {
 
 	SearchIntegrationBuilder setResourceResolver(ResourceResolver resourceResolver);
 
-	SearchIntegrationBuilder setBeanResolver(BeanResolver beanResolver);
+	SearchIntegrationBuilder setBeanProvider(BeanProvider beanProvider);
 
 	<PBM extends MappingPartialBuildState> SearchIntegrationBuilder addMappingInitiator(
 			MappingKey<PBM, ?> mappingKey, MappingInitiator<?, PBM> initiator);

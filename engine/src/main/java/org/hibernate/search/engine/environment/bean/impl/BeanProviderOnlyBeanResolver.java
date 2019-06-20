@@ -9,33 +9,33 @@ package org.hibernate.search.engine.environment.bean.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
-import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
 
 /**
- * A BeanProvider that ignores the explicitly configured beans.
- * Used in the ConfiguredBeanProvider constructor to retrieve bean configurers.
+ * A BeanResolver that ignores the explicitly configured beans.
+ * Used in the ConfiguredBeanResolver constructor to retrieve bean configurers.
  */
-final class BeanResolverOnlyBeanProvider implements BeanProvider {
-	private final BeanResolver beanResolver;
+final class BeanProviderOnlyBeanResolver implements BeanResolver {
+	private final BeanProvider beanProvider;
 
-	BeanResolverOnlyBeanProvider(BeanResolver beanResolver) {
-		this.beanResolver = beanResolver;
+	BeanProviderOnlyBeanResolver(BeanProvider beanProvider) {
+		this.beanProvider = beanProvider;
 	}
 
 	@Override
 	public <T> BeanHolder<T> getBean(Class<T> typeReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
-		return beanResolver.resolve( typeReference );
+		return beanProvider.resolve( typeReference );
 	}
 
 	@Override
 	public <T> BeanHolder<T> getBean(Class<T> typeReference, String nameReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
-		return beanResolver.resolve( typeReference, nameReference );
+		return beanProvider.resolve( typeReference, nameReference );
 	}
 
 	@Override

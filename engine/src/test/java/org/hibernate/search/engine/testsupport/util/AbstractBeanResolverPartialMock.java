@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.testsupport.util;
 
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 /**
  * Used for partial mocks, to benefit from default methods and mock the rest.
@@ -14,5 +14,5 @@ import org.hibernate.search.engine.environment.bean.BeanProvider;
  * We have to base partial mocks on an abstract class,
  * otherwise we get an exception with message "Partial mocking doesn't make sense for interface"
  */
-public abstract class AbstractBeanProviderPartialMock implements BeanProvider {
+public abstract class AbstractBeanResolverPartialMock implements BeanResolver {
 }
