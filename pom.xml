@@ -1409,6 +1409,10 @@
                                     <exclude>**/SearchException.class</exclude>
                                     <exclude>**/ClassLoadingException.class</exclude>
                                     <exclude>**/ElasticsearchSchemaValidationException.class</exclude>
+                                    <!-- The following class requires AbstractProducedQuery to implement a org.hibernate.query.Query -->
+                                    <exclude>**/HibernateOrmSearchQueryAdapter.class</exclude>
+                                    <!-- The following class uses a legal SPI that strangely has an internal as method parameter -->
+                                    <exclude>**/SimpleSessionFactoryBuilder.class</exclude>
                                 </excludes>
                                 <bundledSignatures>
                                     <!-- These signatures on the top are not specific to any JDK version -->
