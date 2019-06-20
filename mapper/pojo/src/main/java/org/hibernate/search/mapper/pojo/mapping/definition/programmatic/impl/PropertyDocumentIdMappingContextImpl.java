@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.impl.BeanBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;

@@ -26,10 +26,10 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.Ro
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.impl.AnnotationInitializingBeanDelegatingBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.impl.AnnotationInitializingBeanDelegatingMarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.impl.BeanBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.impl.BeanDelegatingBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingMarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
