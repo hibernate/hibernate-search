@@ -26,7 +26,6 @@ import javax.persistence.Transient;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.LazyGroup;
-import org.hibernate.boot.registry.classloading.internal.TcclLookupPrecedence;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -87,7 +86,7 @@ public class BytecodeEnhancementIT {
 				 * Otherwise classes can be successfully loaded from the application classloader
 				 * and the "bytecode-enhancing" TCCL won't even be tried.
 				 */
-				.withTcclLookupPrecedence( TcclLookupPrecedence.BEFORE )
+				.withTcclLookupPrecedenceBefore()
 				.setup(
 						/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 						IndexedMappedSuperClass.class,
