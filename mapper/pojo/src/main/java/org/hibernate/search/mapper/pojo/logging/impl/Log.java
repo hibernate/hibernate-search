@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.logging.impl;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -297,9 +296,6 @@ public interface Log extends BasicLogger {
 	)
 	SearchException invalidFieldEncodingForKeywordFieldMapping(StandardIndexFieldTypeContext<?, ?> context,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
-
-	@Message(id = ID_OFFSET_2 + 33, value = "Exception while invoking '%1$s' on '%2$s'.")
-	SearchException errorInvokingMember(Member member, Object component, @Cause Throwable e);
 
 	@Message(id = ID_OFFSET_2 + 34, value = "Could not find a property with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
 	SearchException propertyMarkerNotFound(String markerName, String fieldName, String markerSet);

@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Rule;
@@ -191,14 +191,14 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 
 	private void setupPropertyStub(PojoTypeModel<?> holdingTypeMock, String propertyName,
 			PojoGenericTypeModel<?> propertyTypeMock) {
-		PropertyHandle<?> propertyHandleMock =
-				createMock( propertyName + "HandleMock", PropertyHandle.class );
+		ValueReadHandle<?> valueReadHandleMock =
+				createMock( propertyName + "HandleMock", ValueReadHandle.class );
 		PojoPropertyModel<?> propertyModelMock =
 				createMock( propertyName + "ModelMock", PojoPropertyModel.class );
 		EasyMock.expect( holdingTypeMock.getProperty( propertyName ) )
 				.andStubReturn( (PojoPropertyModel) propertyModelMock );
 		EasyMock.expect( propertyModelMock.getName() ).andStubReturn( propertyName );
-		EasyMock.expect( propertyModelMock.getHandle() ).andStubReturn( (PropertyHandle) propertyHandleMock );
+		EasyMock.expect( propertyModelMock.getHandle() ).andStubReturn( (ValueReadHandle) valueReadHandleMock );
 		EasyMock.expect( propertyModelMock.getTypeModel() )
 				.andStubReturn( (PojoGenericTypeModel) propertyTypeMock );
 	}

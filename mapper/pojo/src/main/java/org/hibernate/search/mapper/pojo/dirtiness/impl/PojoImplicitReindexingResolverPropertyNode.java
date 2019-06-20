@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.impl;
 import java.util.Collection;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -28,10 +28,10 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImplicitReindexingResolverNode<T, S> {
 
-	private final PropertyHandle<P> handle;
+	private final ValueReadHandle<P> handle;
 	private final Collection<PojoImplicitReindexingResolverNode<? super P, S>> nestedNodes;
 
-	public PojoImplicitReindexingResolverPropertyNode(PropertyHandle<P> handle,
+	public PojoImplicitReindexingResolverPropertyNode(ValueReadHandle<P> handle,
 			Collection<PojoImplicitReindexingResolverNode<? super P, S>> nestedNodes) {
 		this.handle = handle;
 		this.nestedNodes = nestedNodes;

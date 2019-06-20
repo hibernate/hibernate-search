@@ -4,33 +4,38 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.model.spi;
+package org.hibernate.search.util.common.reflect.impl;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-final class FieldPropertyHandle<T> implements PropertyHandle<T> {
+
+public final class MethodHandleValueReadHandle<T> implements ValueReadHandle<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Field field;
+	private final Member member;
+	private final MethodHandle getter;
 
-	public FieldPropertyHandle(Field field) {
-		this.field = field;
+	public MethodHandleValueReadHandle(Member member, MethodHandle getter) {
+		this.member = member;
+		this.getter = getter;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + field + "]";
+		return getClass().getSimpleName() + "[" + member + "]";
 	}
 
 	@Override
 	public T get(Object thiz) {
 		try {
-			return (T) field.get( thiz );
+			return (T) getter.invoke( thiz );
 		}
 		catch (Error e) {
 			throw e;
@@ -39,13 +44,13 @@ final class FieldPropertyHandle<T> implements PropertyHandle<T> {
 			if ( e instanceof InterruptedException ) {
 				Thread.currentThread().interrupt();
 			}
-			throw log.errorInvokingMember( field, thiz, e );
+			throw log.errorInvokingMember( member, thiz, e );
 		}
 	}
 
 	@Override
 	public int hashCode() {
-		return field.hashCode();
+		return member.hashCode();
 	}
 
 	@Override
@@ -53,8 +58,8 @@ final class FieldPropertyHandle<T> implements PropertyHandle<T> {
 		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
 			return false;
 		}
-		FieldPropertyHandle<?> other = (FieldPropertyHandle) obj;
-		return field.equals( other.field );
+		MethodHandleValueReadHandle<?> other = (MethodHandleValueReadHandle) obj;
+		return member.equals( other.member );
 	}
 
 }

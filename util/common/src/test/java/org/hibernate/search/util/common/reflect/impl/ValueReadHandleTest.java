@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.model.spi;
+package org.hibernate.search.util.common.reflect.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,129 +17,132 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class PropertyHandleTest {
+public class ValueReadHandleTest {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<Object[]> data() {
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
 		return Arrays.asList( new Object[][] {
-				{ PropertyHandleFactory.usingMethodHandle( lookup ) },
-				{ PropertyHandleFactory.usingJavaLangReflect() }
+				{ ValueReadHandleFactory.usingMethodHandle( lookup ) },
+				{ ValueReadHandleFactory.usingJavaLangReflect() }
 		} );
 	}
 
-	private final PropertyHandleFactory factory;
+	private final ValueReadHandleFactory factory;
 
-	public PropertyHandleTest(PropertyHandleFactory factory) {
+	public ValueReadHandleTest(ValueReadHandleFactory factory) {
 		this.factory = factory;
 	}
 
 	@Test
 	public void privateField() throws Exception {
-		testFieldPropertyHandle( "privateField" );
+		testFieldValueReadHandle( "privateField" );
 	}
 
 	@Test
 	public void privateFinalField() throws Exception {
-		testFieldPropertyHandle( "privateFinalField" );
+		testFieldValueReadHandle( "privateFinalField" );
 	}
 
 	@Test
 	public void packagePrivateField() throws Exception {
-		testFieldPropertyHandle( "packagePrivateField" );
+		testFieldValueReadHandle( "packagePrivateField" );
 	}
 
 	@Test
 	public void packagePrivateFinalField() throws Exception {
-		testFieldPropertyHandle( "packagePrivateFinalField" );
+		testFieldValueReadHandle( "packagePrivateFinalField" );
 	}
 
 	@Test
 	public void protectedField() throws Exception {
-		testFieldPropertyHandle( "protectedField" );
+		testFieldValueReadHandle( "protectedField" );
 	}
 
 	@Test
 	public void protectedFinalField() throws Exception {
-		testFieldPropertyHandle( "protectedFinalField" );
+		testFieldValueReadHandle( "protectedFinalField" );
 	}
 
 	@Test
 	public void publicField() throws Exception {
-		testFieldPropertyHandle( "publicField" );
+		testFieldValueReadHandle( "publicField" );
 	}
 
 	@Test
 	public void publicFinalField() throws Exception {
-		testFieldPropertyHandle( "publicFinalField" );
+		testFieldValueReadHandle( "publicFinalField" );
 	}
 
 	@Test
 	public void privateMethod() throws Exception {
-		testMethodPropertyHandle( "privateMethod" );
+		testMethodValueReadHandle( "privateMethod" );
 	}
 
 	@Test
 	public void packagePrivateMethod() throws Exception {
-		testMethodPropertyHandle( "packagePrivateMethod" );
+		testMethodValueReadHandle( "packagePrivateMethod" );
 	}
 
 	@Test
 	public void protectedMethod() throws Exception {
-		testMethodPropertyHandle( "protectedMethod" );
+		testMethodValueReadHandle( "protectedMethod" );
 	}
 
 	@Test
 	public void publicMethod() throws Exception {
-		testMethodPropertyHandle( "publicMethod" );
+		testMethodValueReadHandle( "publicMethod" );
 	}
 
-	private void testFieldPropertyHandle(String fieldName) throws IllegalAccessException, NoSuchFieldException {
+	private void testFieldValueReadHandle(String fieldName) throws IllegalAccessException, NoSuchFieldException {
 		String expectedValue = fieldName + "Value";
 		Field field = EntityType.class.getDeclaredField( fieldName );
 		setAccessible( field );
 		Field otherField = EntityType.class.getDeclaredField( "otherField" );
 		setAccessible( otherField );
 
-		PropertyHandle<?> propertyHandle = factory.createForField( field );
+		ValueReadHandle<?> valueReadHandle = factory.createForField( field );
 
-		assertThat( propertyHandle.get( new EntityType() ) ).isEqualTo( expectedValue );
+		assertThat( valueReadHandle.get( new EntityType() ) ).isEqualTo( expectedValue );
 
-		assertThat( propertyHandle.toString() )
-				.contains( propertyHandle.getClass().getSimpleName() )
+		assertThat( valueReadHandle.toString() )
+				.contains( valueReadHandle.getClass().getSimpleName() )
 				.contains( field.toString() );
 
-		PropertyHandle<?> equalPropertyHandle = factory.createForField( field );
-		PropertyHandle<?> differentFieldPropertyHandle = factory.createForField( otherField );
-		assertThat( propertyHandle ).isEqualTo( equalPropertyHandle );
-		assertThat( propertyHandle.hashCode() ).isEqualTo( equalPropertyHandle.hashCode() );
-		assertThat( propertyHandle ).isNotEqualTo( differentFieldPropertyHandle );
+		ValueReadHandle<?> equalValueReadHandle = factory.createForField( field );
+		ValueReadHandle<?> differentFieldValueReadHandle = factory.createForField( otherField );
+		assertThat( valueReadHandle ).isEqualTo( equalValueReadHandle );
+		assertThat( valueReadHandle.hashCode() ).isEqualTo( equalValueReadHandle.hashCode() );
+		assertThat( valueReadHandle ).isNotEqualTo( differentFieldValueReadHandle );
 	}
 
-	private void testMethodPropertyHandle(String methodName) throws IllegalAccessException, NoSuchMethodException {
+	private void testMethodValueReadHandle(String methodName) throws IllegalAccessException, NoSuchMethodException {
 		String expectedValue = methodName + "Value";
 		Method method = EntityType.class.getDeclaredMethod( methodName );
 		setAccessible( method );
 		Method otherMethod = EntityType.class.getDeclaredMethod( "otherMethod" );
 		setAccessible( otherMethod );
 
-		PropertyHandle<?> propertyHandle = factory.createForMethod( method );
-		assertThat( propertyHandle.get( new EntityType() ) ).isEqualTo( expectedValue );
+		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
+		assertThat( valueReadHandle.get( new EntityType() ) ).isEqualTo( expectedValue );
 
-		assertThat( propertyHandle.toString() )
-				.contains( propertyHandle.getClass().getSimpleName() )
+		assertThat( valueReadHandle.toString() )
+				.contains( valueReadHandle.getClass().getSimpleName() )
 				.contains( method.toString() );
 
-		PropertyHandle<?> equalPropertyHandle = factory.createForMethod( method );
-		PropertyHandle<?> differentMethodPropertyHandle = factory.createForMethod( otherMethod );
-		assertThat( propertyHandle ).isEqualTo( equalPropertyHandle );
-		assertThat( propertyHandle.hashCode() ).isEqualTo( equalPropertyHandle.hashCode() );
-		assertThat( propertyHandle ).isNotEqualTo( differentMethodPropertyHandle );
+		ValueReadHandle<?> equalValueReadHandle = factory.createForMethod( method );
+		ValueReadHandle<?> differentMethodValueReadHandle = factory.createForMethod( otherMethod );
+		assertThat( valueReadHandle ).isEqualTo( equalValueReadHandle );
+		assertThat( valueReadHandle.hashCode() ).isEqualTo( equalValueReadHandle.hashCode() );
+		assertThat( valueReadHandle ).isNotEqualTo( differentMethodValueReadHandle );
 	}
 
 	private static void setAccessible(Member member) {

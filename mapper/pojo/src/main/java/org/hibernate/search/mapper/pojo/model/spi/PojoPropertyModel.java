@@ -9,6 +9,8 @@ package org.hibernate.search.mapper.pojo.model.spi;
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+
 public interface PojoPropertyModel<T> {
 
 	String getName();
@@ -23,6 +25,6 @@ public interface PojoPropertyModel<T> {
 	 */
 	PojoGenericTypeModel<T> getTypeModel();
 
-	PropertyHandle<T> getHandle();
+	ValueReadHandle<T> getHandle();
 
 }

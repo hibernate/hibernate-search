@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoCommonsAnnotationsHelper;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
@@ -32,7 +32,7 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	private final Method readMethod;
 
 	private PojoGenericTypeModel<T> typeModel;
-	private PropertyHandle<T> handle;
+	private ValueReadHandle<T> handle;
 
 	JavaBeanPropertyModel(JavaBeanBootstrapIntrospector introspector, JavaBeanTypeModel<?> parentTypeModel, XProperty property) {
 		this.introspector = introspector;
@@ -106,10 +106,10 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // By construction, we know the member returns values of type T
-	public PropertyHandle<T> getHandle() {
+	public ValueReadHandle<T> getHandle() {
 		if ( handle == null ) {
 			try {
-				handle = (PropertyHandle<T>) introspector.createPropertyHandle( getName(), readMethod );
+				handle = (ValueReadHandle<T>) introspector.createValueReadHandle( readMethod );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( getName(), parentTypeModel, e );

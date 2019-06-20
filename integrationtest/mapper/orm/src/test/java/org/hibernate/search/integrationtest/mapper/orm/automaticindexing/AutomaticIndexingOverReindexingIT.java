@@ -59,7 +59,7 @@ import org.junit.Test;
  				PojoImplicitReindexingResolverDirtinessFilterNode {
 					dirtyPropertiesTriggeringReindexing=[property1]
 					delegate=PojoImplicitReindexingResolverPropertyNode {
-						handle=GetterPropertyHandle[level1]
+						handle=MethodHandleValueReadHandle[level1]
 						nestedNodes=[
  							PojoImplicitReindexingResolverOriginalTypeNode { // This is type node #2
 								shouldMarkForReindexing=true

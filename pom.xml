@@ -1417,7 +1417,7 @@
                                         Classes allowed to use MethodHandles because we expose options to integrators
                                         so that they can opt out
                                      -->
-                                    <exclude>**/MethodHandlePropertyHandleFactory.class</exclude>
+                                    <exclude>**/MethodHandleValueReadHandleFactory.class</exclude>
                                 </excludes>
                                 <bundledSignatures>
                                     <!-- These signatures on the top are not specific to any JDK version -->

@@ -20,8 +20,8 @@ import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGeneric
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandleFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -36,7 +36,7 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PropertyHandleFactory propertyHandleFactory;
+	private final ValueReadHandleFactory valueReadHandleFactory;
 	private final JavaBeanGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
@@ -44,7 +44,7 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 
 	public JavaBeanBootstrapIntrospector(MethodHandles.Lookup lookup) {
 		super( new JavaReflectionManager(), new AnnotationHelper( lookup ) );
-		this.propertyHandleFactory = PropertyHandleFactory.usingMethodHandle( lookup );
+		this.valueReadHandleFactory = ValueReadHandleFactory.usingMethodHandle( lookup );
 		this.genericContextHelper = new JavaBeanGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
 				genericContextHelper, Object.class
@@ -77,8 +77,8 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
-	PropertyHandle<?> createPropertyHandle(String name, Method method) throws IllegalAccessException {
-		return propertyHandleFactory.createForMethod( method );
+	ValueReadHandle<?> createValueReadHandle(Method method) throws IllegalAccessException {
+		return valueReadHandleFactory.createForMethod( method );
 	}
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> clazz) {

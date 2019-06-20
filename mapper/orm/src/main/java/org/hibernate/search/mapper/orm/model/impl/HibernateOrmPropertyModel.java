@@ -20,7 +20,7 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
@@ -41,7 +41,7 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 
 	private final Member member;
 
-	private PropertyHandle<T> handle;
+	private ValueReadHandle<T> handle;
 	private PojoGenericTypeModel<T> typeModel;
 
 	HibernateOrmPropertyModel(HibernateOrmBootstrapIntrospector introspector, HibernateOrmRawTypeModel<?> holderTypeModel,
@@ -96,10 +96,10 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // By construction, we know the member returns values of type T
-	public PropertyHandle<T> getHandle() {
+	public ValueReadHandle<T> getHandle() {
 		if ( handle == null ) {
 			try {
-				handle = (PropertyHandle<T>) introspector.createPropertyHandle( member, ormPropertyMetadata );
+				handle = (ValueReadHandle<T>) introspector.createValueReadHandle( member, ormPropertyMetadata );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );

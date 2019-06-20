@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoProper
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 /**
  * @param <T> The type holding the property.
@@ -71,7 +71,7 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 		return modelPath.type();
 	}
 
-	PropertyHandle<P> getHandle() {
-		return modelPath.getParent().getPropertyHandle();
+	ValueReadHandle<P> getHandle() {
+		return modelPath.getParent().getValueReadHandle();
 	}
 }
