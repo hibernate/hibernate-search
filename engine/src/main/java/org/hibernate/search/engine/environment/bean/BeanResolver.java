@@ -68,7 +68,7 @@ public interface BeanResolver {
 	 */
 	default <T> BeanHolder<T> resolve(BeanReference<T> reference) {
 		Contracts.assertNotNull( reference, "reference" );
-		return reference.getBean( this );
+		return reference.resolve( this );
 	}
 
 	/**
@@ -94,7 +94,7 @@ public interface BeanResolver {
 		List<BeanHolder<? extends T>> beanHolders = new ArrayList<>();
 		try {
 			for ( BeanReference<? extends T> reference : references ) {
-				beanHolders.add( reference.getBean( this ) );
+				beanHolders.add( reference.resolve( this ) );
 			}
 			return BeanHolder.of( beanHolders );
 		}

@@ -10,22 +10,22 @@ import org.hibernate.search.util.common.impl.StringHelper;
 
 /**
  * A reference to a bean, allowing the retrieval of that bean
- * when {@link #getBean(BeanResolver) passed} a {@link BeanResolver}.
+ * when {@link #resolve(BeanResolver) passed} a {@link BeanResolver}.
  *
  * @param <T> The type of the referenced bean.
  */
 public interface BeanReference<T> {
 
 	/**
-	 * Get the bean this reference points to using the given provider.
+	 * Resolve this reference into a bean using the given resolver.
 	 *
-	 * @param beanResolver A provider to get the bean from.
+	 * @param beanResolver A resolver to resolve this reference with.
 	 * @return The bean instance.
 	 */
-	BeanHolder<T> getBean(BeanResolver beanResolver);
+	BeanHolder<T> resolve(BeanResolver beanResolver);
 
 	/**
-	 * Cast this reference into a reference whose {@link #getBean(BeanResolver)} method is is guaranteed to
+	 * Cast this reference into a reference whose {@link #resolve(BeanResolver)} method is is guaranteed to
 	 * either fail or return an instance of the given type.
 	 *
 	 * @param expectedType The expected bean type.

@@ -55,7 +55,7 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<B, A extend
 	public BeanHolder<? extends B> build(BridgeBuildContext buildContext) {
 		BeanHolder<?> bridgeHolder;
 		try ( BeanHolder<? extends AnnotationBridgeBuilder> delegateHolder =
-				delegateReference.getBean( buildContext.getBeanResolver() ) ) {
+				delegateReference.resolve( buildContext.getBeanResolver() ) ) {
 			bridgeHolder = doBuild( buildContext, delegateHolder.get() );
 		}
 

@@ -33,6 +33,6 @@ public final class BeanBridgeBuilder<B> implements BridgeBuilder<B> {
 	@Override
 	public BeanHolder<B> build(BridgeBuildContext buildContext) {
 		BeanResolver beanResolver = buildContext.getBeanResolver();
-		return beanReference.getBean( beanResolver );
+		return beanReference.resolve( beanResolver );
 	}
 }

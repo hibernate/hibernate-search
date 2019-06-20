@@ -51,7 +51,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "theDefault" ) )
 				.andReturn( expectedAsStubBean );
 		replayAll();
-		result = property.get( sourceMock ).getBean( beanResolverMock );
+		result = property.get( sourceMock ).resolve( beanResolverMock );
 		verifyAll();
 		assertThat( result ).isEqualTo( expectedAsStubBean );
 
@@ -61,7 +61,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name" ) )
 				.andReturn( expectedAsStubBean );
 		replayAll();
-		result = property.get( sourceMock ).getBean( beanResolverMock );
+		result = property.get( sourceMock ).resolve( beanResolverMock );
 		verifyAll();
 		assertThat( result ).isEqualTo( expectedAsStubBean );
 
@@ -71,7 +71,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl1.class ) )
 				.andReturn( expected );
 		replayAll();
-		result = property.get( sourceMock ).getBean( beanResolverMock );
+		result = property.get( sourceMock ).resolve( beanResolverMock );
 		verifyAll();
 		assertThat( result ).isEqualTo( expected );
 
@@ -81,7 +81,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl1.class, "name" ) )
 				.andReturn( expected );
 		replayAll();
-		result = property.get( sourceMock ).getBean( beanResolverMock );
+		result = property.get( sourceMock ).resolve( beanResolverMock );
 		verifyAll();
 		assertThat( result ).isEqualTo( expected );
 	}
@@ -114,7 +114,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		replayAll();
 		reference = property.get( sourceMock );
 		assertThat( reference ).isNotEmpty();
-		result = reference.get().getBean( beanResolverMock );
+		result = reference.get().resolve( beanResolverMock );
 		verifyAll();
 		assertThat( result ).isEqualTo( expectedAsStubBean );
 
@@ -126,7 +126,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		replayAll();
 		reference = property.get( sourceMock );
 		assertThat( reference ).isNotEmpty();
-		result = reference.get().getBean( beanResolverMock );
+		result = reference.get().resolve( beanResolverMock );
 		verifyAll();
 		assertThat( result ).isEqualTo( expected );
 
@@ -138,7 +138,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		replayAll();
 		reference = property.get( sourceMock );
 		assertThat( reference ).isNotEmpty();
-		result = reference.get().getBean( beanResolverMock );
+		result = reference.get().resolve( beanResolverMock );
 		verifyAll();
 		assertThat( result ).isEqualTo( expected );
 	}
