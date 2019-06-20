@@ -114,6 +114,8 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			);
 		}
 
+		extendedMappingCollector.identifierMapping( identityMappingCollector.identifierMapping );
+
 		/*
 		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?
 		 * Note this will require to allow them to define their own work plan APIs.
@@ -134,7 +136,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		);
 		log.createdPojoIndexedTypeManager( typeManager );
 
-		typeManagersBuilder.add( indexManagerBuildingState.getIndexName(), typeModel, typeManager );
+		typeManagersBuilder.add( typeModel, typeManager );
 
 		closed = true;
 	}

@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
@@ -19,18 +21,26 @@ import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
 import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
 import org.hibernate.search.mapper.javabean.work.impl.SearchWorkPlanImpl;
+import org.hibernate.search.mapper.pojo.search.spi.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
+import org.hibernate.search.util.common.AssertionFailure;
 
-public class JavaBeanSearchSession extends AbstractPojoSearchSession implements SearchSession {
+public class JavaBeanSearchSession extends AbstractPojoSearchSession
+		implements SearchSession, ReferenceHitMapper<PojoReference> {
+
+	private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
+
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 	private SearchWorkPlanImpl workPlan;
 
 	private JavaBeanSearchSession(JavaBeanSearchSessionBuilder builder) {
 		super( builder, builder.buildSessionContext() );
+		this.typeContextProvider = builder.typeContextProvider;
 		this.commitStrategy = builder.commitStrategy;
 		this.refreshStrategy = builder.refreshStrategy;
 	}
@@ -46,7 +56,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession implements 
 	@Override
 	public SearchScope scope(Collection<? extends Class<?>> targetedTypes) {
 		return new SearchScopeImpl(
-				getDelegate().getReferenceHitMapper(),
+				this,
 				getDelegate().createPojoScope(
 						targetedTypes,
 						// We don't load anything, so we don't need any additional type context
@@ -63,16 +73,33 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession implements 
 		return workPlan;
 	}
 
+	@Override
+	public PojoReference fromDocumentReference(DocumentReference reference) {
+		JavaBeanSessionIndexedTypeContext<?> typeContext =
+				typeContextProvider.getByIndexName( reference.getIndexName() );
+		if ( typeContext == null ) {
+			throw new AssertionFailure(
+					"Document reference " + reference + " could not be converted to a PojoReference"
+			);
+		}
+		Object id = typeContext.getIdentifierMapping()
+				.fromDocumentIdentifier( reference.getId(), getDelegate().getSessionContext() );
+		return new PojoReferenceImpl( typeContext.getJavaClass(), id );
+	}
+
 	public static class JavaBeanSearchSessionBuilder extends AbstractBuilder<JavaBeanSearchSession>
 			implements SearchSessionBuilder {
 		private final JavaBeanMappingContext mappingContext;
+		private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
 		private String tenantId;
 		private DocumentCommitStrategy commitStrategy = DocumentCommitStrategy.FORCE;
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
-		public JavaBeanSearchSessionBuilder(PojoMappingDelegate mappingDelegate, JavaBeanMappingContext mappingContext) {
+		public JavaBeanSearchSessionBuilder(PojoMappingDelegate mappingDelegate, JavaBeanMappingContext mappingContext,
+				JavaBeanSearchSessionTypeContextProvider typeContextProvider) {
 			super( mappingDelegate );
 			this.mappingContext = mappingContext;
+			this.typeContextProvider = typeContextProvider;
 		}
 
 		@Override

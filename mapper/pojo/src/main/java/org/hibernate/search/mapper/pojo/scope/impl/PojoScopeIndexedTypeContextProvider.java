@@ -13,8 +13,6 @@ import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContextProv
 
 public interface PojoScopeIndexedTypeContextProvider extends PojoWorkIndexedTypeContextProvider {
 
-	Optional<? extends PojoScopeIndexedTypeContext<?, ?, ?>> getByIndexName(String indexName);
-
 	<E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>>> getAllBySuperClass(
 			Class<E> clazz);
 

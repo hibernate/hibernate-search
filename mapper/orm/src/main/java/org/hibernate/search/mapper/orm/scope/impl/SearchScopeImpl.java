@@ -27,11 +27,11 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 
 	private final HibernateOrmScopeMappingContext mappingContext;
 	private final HibernateOrmScopeSessionContext sessionContext;
-	private final PojoScopeDelegate<E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
+	private final PojoScopeDelegate<PojoReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
 
 	public SearchScopeImpl(HibernateOrmScopeMappingContext mappingContext,
 			HibernateOrmScopeSessionContext sessionContext,
-			PojoScopeDelegate<E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
+			PojoScopeDelegate<PojoReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.delegate = delegate;

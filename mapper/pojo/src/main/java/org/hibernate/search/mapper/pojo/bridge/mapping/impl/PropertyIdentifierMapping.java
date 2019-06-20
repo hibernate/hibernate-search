@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.impl.Closer;
 
 
-public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> {
+public class PropertyIdentifierMapping<I, E> implements IdentifierMappingImplementor<I, E> {
 
 	private final PojoCaster<? super I> caster;
 	private final ValueReadHandle<I> property;

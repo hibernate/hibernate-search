@@ -19,10 +19,10 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 public class SearchScopeImpl implements SearchScope {
 
 	private final ReferenceHitMapper<PojoReference> referenceHitMapper;
-	private final PojoScopeDelegate<Void, Void> delegate;
+	private final PojoScopeDelegate<PojoReference, Void, Void> delegate;
 
 	public SearchScopeImpl(ReferenceHitMapper<PojoReference> referenceHitMapper,
-			PojoScopeDelegate<Void, Void> delegate) {
+			PojoScopeDelegate<PojoReference, Void, Void> delegate) {
 		this.referenceHitMapper = referenceHitMapper;
 		this.delegate = delegate;
 	}

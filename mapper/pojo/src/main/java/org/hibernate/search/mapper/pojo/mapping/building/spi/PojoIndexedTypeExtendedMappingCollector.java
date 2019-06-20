@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
+
 /**
  * A collector of extended mapping information.
  * <p>
@@ -15,5 +17,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.spi;
 public interface PojoIndexedTypeExtendedMappingCollector {
 
 	void documentIdSourcePropertyName(String documentIdSourcePropertyName);
+
+	void identifierMapping(IdentifierMapping identifierMapping);
 
 }

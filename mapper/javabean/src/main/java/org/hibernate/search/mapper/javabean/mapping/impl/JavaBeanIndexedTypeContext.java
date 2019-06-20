@@ -6,24 +6,57 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
+import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSessionIndexedTypeContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 
-/*
- * TODO HSEARCH-1800 There's nothing here at the moment, just a placeholder.
- *  We may want to use an actual implementation once we allow users to plug in their own loading.
- */
-class JavaBeanIndexedTypeContext {
+class JavaBeanIndexedTypeContext<E> implements JavaBeanSessionIndexedTypeContext<E> {
+	private final Class<E> javaClass;
+	private final String indexName;
+	private IdentifierMapping identifierMapping;
 
-	private JavaBeanIndexedTypeContext() {
+	private JavaBeanIndexedTypeContext(Builder<E> builder) {
+		this.javaClass = builder.javaClass;
+		this.indexName = builder.indexName;
+		this.identifierMapping = builder.identifierMapping;
+	}
+
+	@Override
+	public Class<E> getJavaClass() {
+		return javaClass;
+	}
+
+	String getIndexName() {
+		return indexName;
+	}
+
+	@Override
+	public IdentifierMapping getIdentifierMapping() {
+		return identifierMapping;
 	}
 
 	static class Builder<E> implements PojoIndexedTypeExtendedMappingCollector {
-		Builder() {
+		private final Class<E> javaClass;
+		private final String indexName;
+		private IdentifierMapping identifierMapping;
+
+		Builder(Class<E> javaClass, String indexName) {
+			this.javaClass = javaClass;
+			this.indexName = indexName;
 		}
 
 		@Override
 		public void documentIdSourcePropertyName(String documentIdSourcePropertyName) {
 			// Nothing to do
+		}
+
+		@Override
+		public void identifierMapping(IdentifierMapping identifierMapping) {
+			this.identifierMapping = identifierMapping;
+		}
+
+		JavaBeanIndexedTypeContext<E> build() {
+			return new JavaBeanIndexedTypeContext<>( this );
 		}
 	}
 }

@@ -15,6 +15,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 public final class JavaBeanMapperDelegate
 		implements PojoMapperDelegate<JavaBeanMappingPartialBuildState> {
 
+	private final JavaBeanTypeContextContainer.Builder typeContextContainerBuilder =
+			new JavaBeanTypeContextContainer.Builder();
+
 	@Override
 	public void closeOnFailure() {
 		// Nothing to do
@@ -22,19 +25,20 @@ public final class JavaBeanMapperDelegate
 
 	@Override
 	public <E> PojoIndexedTypeExtendedMappingCollector createIndexedTypeExtendedMappingCollector(
-			PojoRawTypeModel<E> rawTypeModel) {
-		return new JavaBeanIndexedTypeContext.Builder<>();
+			PojoRawTypeModel<E> rawTypeModel, String indexName) {
+		return typeContextContainerBuilder.addIndexed( rawTypeModel, indexName );
 	}
 
 	@Override
 	public <E> PojoContainedTypeExtendedMappingCollector createContainedTypeExtendedMappingCollector(
 			PojoRawTypeModel<E> rawTypeModel) {
+		// This is a placeholder: we don't care about contained types at the moment.
 		return new JavaBeanContainedTypeContext.Builder<>();
 	}
 
 	@Override
 	public JavaBeanMappingPartialBuildState prepareBuild(PojoMappingDelegate mappingDelegate) {
-		return new JavaBeanMappingPartialBuildState( mappingDelegate );
+		return new JavaBeanMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder.build() );
 	}
 
 }
