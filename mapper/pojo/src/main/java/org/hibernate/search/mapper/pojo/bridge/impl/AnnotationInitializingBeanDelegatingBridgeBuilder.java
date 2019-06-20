@@ -15,8 +15,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
-import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
+import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
+import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 

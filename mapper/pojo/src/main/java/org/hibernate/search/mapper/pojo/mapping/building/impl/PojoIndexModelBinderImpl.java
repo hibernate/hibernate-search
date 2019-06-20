@@ -52,8 +52,8 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
-import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
+import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
+import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

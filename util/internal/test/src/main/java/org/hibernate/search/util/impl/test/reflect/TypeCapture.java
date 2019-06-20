@@ -4,12 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.testsupport.util;
+package org.hibernate.search.util.impl.test.reflect;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-
-import org.hibernate.search.util.common.AssertionFailure;
 
 @SuppressWarnings("unused")
 public abstract class TypeCapture<T> {
@@ -38,7 +36,7 @@ public abstract class TypeCapture<T> {
 			}
 		}
 		if ( captureParameterizedType == null ) {
-			throw new AssertionFailure( clazz + " doesn't extend or implement " + superType
+			throw new IllegalArgumentException( clazz + " doesn't extend or implement " + superType
 					+ " directly with a type argument" );
 		}
 		return captureParameterizedType.getActualTypeArguments()[0];

@@ -16,9 +16,9 @@ import java.util.Optional;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.testsupport.util.TypeCapture;
-import org.hibernate.search.mapper.pojo.testsupport.util.WildcardTypeCapture;
-import org.hibernate.search.mapper.pojo.testsupport.util.WildcardTypeCapture.Of;
+import org.hibernate.search.util.impl.test.reflect.TypeCapture;
+import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture;
+import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture.Of;
 
 import org.junit.Rule;
 import org.junit.Test;

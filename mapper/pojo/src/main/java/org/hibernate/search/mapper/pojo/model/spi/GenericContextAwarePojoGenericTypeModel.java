@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
-import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
+import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
+import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 
 /**
  * An abstract base for implementations of {@link PojoGenericTypeModel} that take advantage of the context
