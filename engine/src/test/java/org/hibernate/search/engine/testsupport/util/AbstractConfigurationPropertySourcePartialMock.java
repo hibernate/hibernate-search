@@ -11,7 +11,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 /**
  * Used for partial mocks, to benefit from default methods and mock the rest.
  *
- * @see AbstractBeanProviderPartialMock
+ * @see AbstractBeanResolverPartialMock
  */
 public abstract class AbstractConfigurationPropertySourcePartialMock implements ConfigurationPropertySource {
 }

@@ -26,8 +26,8 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
-import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
-import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
 import org.hibernate.search.mapper.orm.cfg.impl.ConsumedPropertyKeysReport;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
@@ -177,8 +177,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	 * that the first phase of boot is never executed in the native binary.
 	 */
 	private HibernateOrmIntegrationPartialBuildState doBootFirstPhase() {
-		ReflectionBeanResolver reflectionBeanResolver = null;
-		BeanResolver beanResolver = null;
+		ReflectionBeanProvider reflectionBeanProvider = null;
+		BeanProvider beanProvider = null;
 		SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
 		try {
 			propertySource.beforeBoot();
@@ -198,19 +198,19 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			builder.setClassResolver( classAndResourceResolver );
 			builder.setResourceResolver( classAndResourceResolver );
 
-			reflectionBeanResolver = new ReflectionBeanResolver( classAndResourceResolver );
+			reflectionBeanProvider = new ReflectionBeanProvider( classAndResourceResolver );
 			if ( managedBeanRegistryService.isPresent() ) {
 				BeanContainer beanContainer = managedBeanRegistryService.get().getBeanContainer();
 				if ( beanContainer != null ) {
 					// Only use the primary registry, so that we can implement our own fallback when beans are not found
-					beanResolver = new HibernateOrmBeanContainerBeanResolver( beanContainer, reflectionBeanResolver );
+					beanProvider = new HibernateOrmBeanContainerBeanProvider( beanContainer, reflectionBeanProvider );
 				}
 				// else: The given ManagedBeanRegistry only implements fallback: let's ignore it
 			}
-			if ( beanResolver == null ) {
-				beanResolver = reflectionBeanResolver;
+			if ( beanProvider == null ) {
+				beanProvider = reflectionBeanProvider;
 			}
-			builder.setBeanResolver( beanResolver );
+			builder.setBeanProvider( beanProvider );
 
 			// TODO HSEARCH-3057 namingService (JMX)? Or maybe in second phase?
 
@@ -225,8 +225,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( SearchIntegrationPartialBuildState::closeOnFailure, searchIntegrationPartialBuildState )
-					.push( BeanResolver::close, reflectionBeanResolver )
-					.push( BeanResolver::close, beanResolver );
+					.push( BeanProvider::close, reflectionBeanProvider )
+					.push( BeanProvider::close, beanProvider );
 			throw e;
 		}
 	}

@@ -10,14 +10,14 @@ import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.container.spi.ContainedBean;
 import org.hibernate.resource.beans.spi.BeanInstanceProducer;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
-import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.util.common.impl.Contracts;
 
 /**
- * A {@link BeanResolver} relying on a Hibernate ORM {@link BeanContainer} to resolve beans.
+ * A {@link BeanProvider} relying on a Hibernate ORM {@link BeanContainer} to resolve beans.
  */
-final class HibernateOrmBeanContainerBeanResolver implements BeanResolver {
+final class HibernateOrmBeanContainerBeanProvider implements BeanProvider {
 
 	private static final BeanContainer.LifecycleOptions LIFECYCLE_OPTIONS = new BeanContainer.LifecycleOptions() {
 		@Override
@@ -33,15 +33,15 @@ final class HibernateOrmBeanContainerBeanResolver implements BeanResolver {
 
 	private final BeanContainer beanContainer;
 
-	private final ReflectionBeanResolver fallback;
+	private final ReflectionBeanProvider fallback;
 	private final BeanInstanceProducer fallbackInstanceProducer;
 
-	HibernateOrmBeanContainerBeanResolver(BeanContainer beanContainer, ReflectionBeanResolver fallback) {
+	HibernateOrmBeanContainerBeanProvider(BeanContainer beanContainer, ReflectionBeanProvider fallback) {
 		Contracts.assertNotNull( beanContainer, "beanContainer" );
 		this.beanContainer = beanContainer;
 		this.fallback = fallback;
 		this.fallbackInstanceProducer = new BeanInstanceProducer() {
-			private final ReflectionBeanResolver delegate = fallback;
+			private final ReflectionBeanProvider delegate = fallback;
 
 			@Override
 			public <B> B produceBeanInstance(Class<B> aClass) {

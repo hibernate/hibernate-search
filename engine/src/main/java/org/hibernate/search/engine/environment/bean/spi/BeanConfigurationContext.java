@@ -7,13 +7,14 @@
 package org.hibernate.search.engine.environment.bean.spi;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 public interface BeanConfigurationContext {
 
 	/**
 	 * Define a way to resolve a bean referenced by its {@code exposedType}.
 	 * <p>
-	 * Affects the behavior of {@link org.hibernate.search.engine.environment.bean.BeanProvider#getBean(Class)}
+	 * Affects the behavior of {@link BeanResolver#getBean(Class)}
 	 * in particular.
 	 *
 	 * @param exposedType The type that this definition will match (exact match: inheritance is ignored).
@@ -25,7 +26,7 @@ public interface BeanConfigurationContext {
 	/**
 	 * Define a way to resolve a bean referenced by its {@code exposedType} and {@code name}.
 	 * <p>
-	 * Affects the behavior of {@link org.hibernate.search.engine.environment.bean.BeanProvider#getBean(Class, String)}
+	 * Affects the behavior of {@link BeanResolver#getBean(Class, String)}
 	 * in particular.
 	 *
 	 * @param exposedType The type that this definition will match (exact match: inheritance is ignored).
@@ -38,7 +39,7 @@ public interface BeanConfigurationContext {
 	/**
 	 * Assign a role to a bean reference.
 	 * <p>
-	 * Affects the behavior of {@link org.hibernate.search.engine.environment.bean.BeanProvider#getBeansWithRole(Class)}
+	 * Affects the behavior of {@link BeanResolver#getBeansWithRole(Class)}
 	 * in particular.
 	 * <p>
 	 * Roles allow to overcome limitations of the Spring/CDI integrations,

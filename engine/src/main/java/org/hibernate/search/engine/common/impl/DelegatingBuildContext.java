@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 
@@ -26,8 +26,8 @@ class DelegatingBuildContext {
 		return delegate.getResourceResolver();
 	}
 
-	public BeanProvider getBeanProvider() {
-		return delegate.getBeanProvider();
+	public BeanResolver getBeanResolver() {
+		return delegate.getBeanResolver();
 	}
 
 }

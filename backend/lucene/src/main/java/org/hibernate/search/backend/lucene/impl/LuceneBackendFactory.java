@@ -34,7 +34,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -160,8 +160,8 @@ public class LuceneBackendFactory implements BackendFactory {
 			Version luceneVersion) {
 		try {
 			// Apply the user-provided analysis configurer if necessary
-			final BeanProvider beanProvider = buildContext.getBeanProvider();
-			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanProvider::getBean )
+			final BeanResolver beanResolver = buildContext.getBeanResolver();
+			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::getBean )
 					.map( holder -> {
 						try ( BeanHolder<? extends LuceneAnalysisConfigurer> configurerHolder = holder ) {
 							LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(

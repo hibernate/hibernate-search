@@ -33,7 +33,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoRequestPostProcessing;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresRequestPostProcessing;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -178,9 +178,9 @@ public class ElasticsearchContentLengthIT {
 		ConfigurationPropertySource backendProperties =
 				defaultBackendProperties.withOverride( ConfigurationPropertySource.fromMap( configurationOverride ) );
 
-		BeanProvider beanProvider = testConfigurationProvider.createBeanProviderForTest();
+		BeanResolver beanResolver = testConfigurationProvider.createBeanResolverForTest();
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
-				beanProvider.getBean( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
+				beanResolver.getBean( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			return factoryHolder.get().create(
 					backendProperties, DefaultGsonProvider.create( GsonBuilder::new, true )
 			);

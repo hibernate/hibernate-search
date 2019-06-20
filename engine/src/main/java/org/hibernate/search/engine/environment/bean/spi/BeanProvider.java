@@ -8,7 +8,7 @@ package org.hibernate.search.engine.environment.bean.spi;
 
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -16,9 +16,9 @@ import org.hibernate.search.util.common.SearchException;
  * <p>
  * This interface should only be called by the Hibernate Search engine itself;
  * if you are looking for retrieving beans from another module,
- * you should use {@link BeanProvider} instead.
+ * you should use {@link BeanResolver} instead.
  */
-public interface BeanResolver extends AutoCloseable {
+public interface BeanProvider extends AutoCloseable {
 
 	/**
 	 * Release any internal resource created while resolving beans.

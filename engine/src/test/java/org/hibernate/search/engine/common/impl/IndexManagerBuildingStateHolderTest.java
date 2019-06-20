@@ -17,8 +17,8 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
-import org.hibernate.search.engine.testsupport.util.AbstractBeanProviderPartialMock;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.testsupport.util.AbstractBeanResolverPartialMock;
 import org.hibernate.search.engine.testsupport.util.AbstractConfigurationPropertySourcePartialMock;
 import org.hibernate.search.util.common.SearchException;
 
@@ -40,11 +40,11 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 	private RootBuildContext rootBuildContextMock = createMock( RootBuildContext.class );
 	private ConfigurationPropertySource configurationSourceMock =
 			partialMockBuilder( AbstractConfigurationPropertySourcePartialMock.class ).mock();
-	private BeanProvider beanProviderMock =
-			partialMockBuilder( AbstractBeanProviderPartialMock.class ).mock();
+	private BeanResolver beanResolverMock =
+			partialMockBuilder( AbstractBeanResolverPartialMock.class ).mock();
 
 	private IndexManagerBuildingStateHolder holder =
-			new IndexManagerBuildingStateHolder( beanProviderMock, configurationSourceMock, rootBuildContextMock );
+			new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
 
 	@Test
 	public void success() {
@@ -59,7 +59,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.type" ) )
 				.andReturn( (Optional) Optional.of( "someBackendType" ) );
-		EasyMock.expect( beanProviderMock.getBean( BackendFactory.class, "someBackendType" ) )
+		EasyMock.expect( beanResolverMock.getBean( BackendFactory.class, "someBackendType" ) )
 				.andReturn( BeanHolder.of( backendFactoryMock ) );
 		EasyMock.expect( backendFactoryMock.create(
 				EasyMock.eq( "myBackend" ),

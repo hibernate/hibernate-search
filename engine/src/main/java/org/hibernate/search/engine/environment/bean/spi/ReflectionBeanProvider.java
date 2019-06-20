@@ -13,11 +13,11 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 
 
 
-public final class ReflectionBeanResolver implements BeanResolver {
+public final class ReflectionBeanProvider implements BeanProvider {
 
 	private final ClassResolver classResolver;
 
-	public ReflectionBeanResolver(ClassResolver classResolver) {
+	public ReflectionBeanProvider(ClassResolver classResolver) {
 		this.classResolver = classResolver;
 	}
 

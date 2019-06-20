@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.spi;
 
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 
@@ -19,6 +19,6 @@ public interface BackendBuildContext {
 
 	ResourceResolver getResourceResolver();
 
-	BeanProvider getBeanProvider();
+	BeanResolver getBeanResolver();
 
 }

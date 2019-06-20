@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -28,9 +28,9 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
  * This interface may be used by any Hibernate Search module,
  * but should only be implemented by the Hibernate Search engine itself;
  * if you are looking for implementing your own bean resolver,
- * you should implement {@link BeanResolver} instead.
+ * you should implement {@link BeanProvider} instead.
  */
-public interface BeanProvider {
+public interface BeanResolver {
 
 	/**
 	 * Retrieve a bean referenced by its type.

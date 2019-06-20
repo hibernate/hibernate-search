@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -61,7 +61,7 @@ public class ContainerExtractorBinder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final BeanProvider beanProvider;
+	private final BeanResolver beanResolver;
 	private final ContainerExtractorRegistry containerExtractorRegistry;
 	private final TypePatternMatcherFactory typePatternMatcherFactory;
 	private final FirstMatchingExtractorContributor firstMatchingExtractorContributor =
@@ -71,7 +71,7 @@ public class ContainerExtractorBinder {
 	public ContainerExtractorBinder(MappingBuildContext buildContext,
 			ContainerExtractorRegistry containerExtractorRegistry,
 			TypePatternMatcherFactory typePatternMatcherFactory) {
-		this.beanProvider = buildContext.getBeanProvider();
+		this.beanResolver = buildContext.getBeanResolver();
 		this.containerExtractorRegistry = containerExtractorRegistry;
 		this.typePatternMatcherFactory = typePatternMatcherFactory;
 		for ( String extractorName : containerExtractorRegistry.getDefaults() ) {
@@ -164,7 +164,7 @@ public class ContainerExtractorBinder {
 				Class<? extends ContainerExtractor> extractorClass =
 						containerExtractorRegistry.getForName( extractorName );
 				BeanHolder<? extends ContainerExtractor> newExtractorHolder =
-						beanProvider.getBean( extractorClass );
+						beanResolver.getBean( extractorClass );
 				beanHolders.add( newExtractorHolder );
 				if ( extractor == null ) {
 					// First extractor: must be able to process type C

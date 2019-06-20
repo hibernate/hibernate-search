@@ -15,17 +15,17 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanCreationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
-import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public final class ConfiguredBeanProvider implements BeanProvider {
+public final class ConfiguredBeanResolver implements BeanResolver {
 
 	private static final ConfigurationProperty<List<BeanReference<? extends BeanConfigurer>>> BEAN_CONFIGURERS =
 			ConfigurationProperty.forKey( EngineSpiSettings.BEAN_CONFIGURERS )
@@ -34,23 +34,23 @@ public final class ConfiguredBeanProvider implements BeanProvider {
 					.withDefault( EngineSpiSettings.Defaults.BEAN_CONFIGURERS )
 					.build();
 
-	private final BeanResolver beanResolver;
+	private final BeanProvider beanProvider;
 	private final Map<ConfiguredBeanKey<?>, BeanFactory<?>> explicitlyConfiguredBeans;
 	private final Map<Class<?>, List<? extends BeanReference<?>>> roleMap;
 
 	private final BeanCreationContext beanCreationContext;
 
-	public ConfiguredBeanProvider(ClassResolver classResolver, BeanResolver beanResolver,
+	public ConfiguredBeanResolver(ClassResolver classResolver, BeanProvider beanProvider,
 			ConfigurationPropertySource configurationPropertySource) {
-		this.beanResolver = beanResolver;
+		this.beanProvider = beanProvider;
 
 		BeanConfigurationContextImpl configurationContext = new BeanConfigurationContextImpl();
 		for ( BeanConfigurer beanConfigurer : classResolver.loadJavaServices( BeanConfigurer.class ) ) {
 			beanConfigurer.configure( configurationContext );
 		}
-		BeanResolverOnlyBeanProvider beanProviderForConfigurers = new BeanResolverOnlyBeanProvider( beanResolver );
+		BeanProviderOnlyBeanResolver beanResolverForConfigurers = new BeanProviderOnlyBeanResolver( beanProvider );
 		try ( BeanHolder<List<BeanConfigurer>> beanConfigurersFromConfigurationProperties =
-				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanProviderForConfigurers::getBeans ) ) {
+				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanResolverForConfigurers::getBeans ) ) {
 			for ( BeanConfigurer beanConfigurer : beanConfigurersFromConfigurationProperties.get() ) {
 				beanConfigurer.configure( configurationContext );
 			}
@@ -65,7 +65,7 @@ public final class ConfiguredBeanProvider implements BeanProvider {
 	public <T> BeanHolder<T> getBean(Class<T> typeReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		try {
-			return beanResolver.resolve( typeReference );
+			return beanProvider.resolve( typeReference );
 		}
 		catch (SearchException e) {
 			return fallbackToConfiguredBeans( e, typeReference, null );
@@ -77,7 +77,7 @@ public final class ConfiguredBeanProvider implements BeanProvider {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
 		try {
-			return beanResolver.resolve( typeReference, nameReference );
+			return beanProvider.resolve( typeReference, nameReference );
 		}
 		catch (SearchException e) {
 			return fallbackToConfiguredBeans( e, typeReference, nameReference );

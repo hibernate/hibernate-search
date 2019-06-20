@@ -31,7 +31,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.common.impl.SearchThreadFactory;
 
@@ -42,9 +42,9 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	public static final BeanReference<ElasticsearchClientFactory> REFERENCE = new BeanReference<ElasticsearchClientFactory>() {
 		@Override
-		public BeanHolder<ElasticsearchClientFactory> getBean(BeanProvider beanProvider) {
+		public BeanHolder<ElasticsearchClientFactory> getBean(BeanResolver beanResolver) {
 			BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurerHolders =
-					beanProvider.getBeansWithRole( ElasticsearchHttpClientConfigurer.class );
+					beanResolver.getBeansWithRole( ElasticsearchHttpClientConfigurer.class );
 			ElasticsearchClientFactoryImpl factory = new ElasticsearchClientFactoryImpl( httpClientConfigurerHolders.get() );
 			return BeanHolder.<ElasticsearchClientFactory>of( factory )
 					.withDependencyAutoClosing( httpClientConfigurerHolders );

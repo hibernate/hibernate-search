@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 
@@ -19,7 +19,7 @@ public class BridgeBuildContextImpl implements BridgeBuildContext {
 	}
 
 	@Override
-	public BeanProvider getBeanProvider() {
-		return buildContext.getBeanProvider();
+	public BeanResolver getBeanResolver() {
+		return buildContext.getBeanResolver();
 	}
 }

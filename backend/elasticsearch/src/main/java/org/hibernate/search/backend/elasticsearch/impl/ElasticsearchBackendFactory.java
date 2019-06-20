@@ -34,7 +34,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -93,11 +93,11 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 		Optional<ElasticsearchVersion> configuredVersion = VERSION.get( propertySource );
 
-		BeanProvider beanProvider = buildContext.getBeanProvider();
+		BeanResolver beanResolver = buildContext.getBeanResolver();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
 		ElasticsearchLinkImpl link = null;
 		try {
-			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanProvider::getBean );
+			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanResolver::getBean );
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(
@@ -163,8 +163,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		try {
 			// Apply the user-provided analysis configurer if necessary
-			final BeanProvider beanProvider = buildContext.getBeanProvider();
-			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanProvider::getBean )
+			final BeanResolver beanResolver = buildContext.getBeanResolver();
+			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::getBean )
 					.map( holder -> {
 						try ( BeanHolder<? extends ElasticsearchAnalysisConfigurer> configurerHolder = holder ) {
 							ElasticsearchAnalysisDefinitionContainerContextImpl collector =

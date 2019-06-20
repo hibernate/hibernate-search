@@ -19,8 +19,8 @@ final class CastingBeanReference<T> implements BeanReference<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // Checked using reflection
-	public BeanHolder<T> getBean(BeanProvider beanProvider) {
-		BeanHolder<?> beanHolder = casted.getBean( beanProvider );
+	public BeanHolder<T> getBean(BeanResolver beanResolver) {
+		BeanHolder<?> beanHolder = casted.getBean( beanResolver );
 		try {
 			// Just let the type throw an exception if something is wrong
 			expectedType.cast( beanHolder.get() );

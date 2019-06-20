@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.engine.environment.bean.spi;
 
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 public interface BeanCreationContext {
 
-	BeanProvider getBeanProvider();
+	BeanResolver getBeanResolver();
 
 }

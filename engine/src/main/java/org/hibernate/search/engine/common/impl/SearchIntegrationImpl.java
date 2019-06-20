@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
@@ -25,17 +25,17 @@ public class SearchIntegrationImpl implements SearchIntegration {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final BeanResolver beanResolver;
+	private final BeanProvider beanProvider;
 
 	private final Map<MappingKey<?, ?>, MappingImplementor<?>> mappings;
 	private final Map<String, BackendImplementor<?>> backends;
 	private final Map<String, IndexManagerImplementor<?>> indexManagers;
 
-	SearchIntegrationImpl(BeanResolver beanResolver,
+	SearchIntegrationImpl(BeanProvider beanProvider,
 			Map<MappingKey<?, ?>, MappingImplementor<?>> mappings,
 			Map<String, BackendImplementor<?>> backends,
 			Map<String, IndexManagerImplementor<?>> indexManagers) {
-		this.beanResolver = beanResolver;
+		this.beanProvider = beanProvider;
 		this.mappings = mappings;
 		this.backends = backends;
 		this.indexManagers = indexManagers;
@@ -76,7 +76,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 			closer.pushAll( MappingImplementor::close, mappings.values() );
 			closer.pushAll( IndexManagerImplementor::close, indexManagers.values() );
 			closer.pushAll( BackendImplementor::close, backends.values() );
-			closer.pushAll( BeanResolver::close, beanResolver );
+			closer.pushAll( BeanProvider::close, beanProvider );
 		}
 	}
 }

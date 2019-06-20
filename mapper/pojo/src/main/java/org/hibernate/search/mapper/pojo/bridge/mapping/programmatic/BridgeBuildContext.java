@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping.programmatic;
 
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 public interface BridgeBuildContext {
 
@@ -14,6 +14,6 @@ public interface BridgeBuildContext {
 	 * @return A bean provider, allowing the retrieval of beans,
 	 * including CDI/Spring DI beans when in the appropriate environment.
 	 */
-	BeanProvider getBeanProvider();
+	BeanResolver getBeanResolver();
 
 }
