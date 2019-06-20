@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.util.spi;
+package org.hibernate.search.util.common.reflect.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
@@ -15,10 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
 public final class AnnotationHelper {
 

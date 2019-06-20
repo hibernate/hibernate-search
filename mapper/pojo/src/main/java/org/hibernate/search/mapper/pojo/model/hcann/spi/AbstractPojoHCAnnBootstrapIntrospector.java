@@ -20,7 +20,7 @@ import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.StreamHelper;
 
 public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {

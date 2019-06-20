@@ -10,9 +10,9 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.search.mapper.pojo.util.spi.AbstractPojoTypeOrdering;
+import org.hibernate.search.util.common.reflect.spi.AbstractTypeOrdering;
 
-final class PojoXClassOrdering extends AbstractPojoTypeOrdering<XClass> {
+final class PojoXClassOrdering extends AbstractTypeOrdering<XClass> {
 
 	private static final PojoXClassOrdering INSTANCE = new PojoXClassOrdering();
 
