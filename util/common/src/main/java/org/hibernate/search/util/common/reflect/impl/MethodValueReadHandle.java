@@ -4,21 +4,22 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.model.spi;
+package org.hibernate.search.util.common.reflect.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-final class MethodPropertyHandle<T> implements PropertyHandle<T> {
+public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Method method;
 
-	public MethodPropertyHandle(Method method) {
+	public MethodValueReadHandle(Method method) {
 		this.method = method;
 	}
 
@@ -53,7 +54,7 @@ final class MethodPropertyHandle<T> implements PropertyHandle<T> {
 		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
 			return false;
 		}
-		MethodPropertyHandle<?> other = (MethodPropertyHandle) obj;
+		MethodValueReadHandle<?> other = (MethodValueReadHandle) obj;
 		return method.equals( other.method );
 	}
 

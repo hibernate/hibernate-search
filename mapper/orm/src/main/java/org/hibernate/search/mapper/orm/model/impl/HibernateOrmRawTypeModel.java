@@ -197,7 +197,7 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 
 	private HibernateOrmPropertyModel<?> createPropertyModel(String propertyName) {
 		List<XProperty> declaredXProperties = new ArrayList<>( 2 );
-		// Add the method first on purpose: the first XProperty may be used as a default to create the property handle
+		// Add the method first on purpose: the first XProperty may be used as a default to create the value accessor handle
 		XProperty methodAccessXProperty = getDeclaredMethodAccessXPropertiesByName().get( propertyName );
 		if ( methodAccessXProperty != null ) {
 			declaredXProperties.add( methodAccessXProperty );

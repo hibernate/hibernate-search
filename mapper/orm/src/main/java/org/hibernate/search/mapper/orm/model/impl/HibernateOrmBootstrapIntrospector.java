@@ -40,8 +40,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandleFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 
@@ -68,20 +68,20 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		AnnotationHelper annotationHelper = new AnnotationHelper( lookup );
 
 		HibernateOrmReflectionStrategyName reflectionStrategyName = REFLECTION_STRATEGY.get( propertySource );
-		PropertyHandleFactory propertyHandleFactory;
+		ValueReadHandleFactory valueReadHandleFactory;
 		switch ( reflectionStrategyName ) {
 			case JAVA_LANG_REFLECT:
-				propertyHandleFactory = PropertyHandleFactory.usingJavaLangReflect();
+				valueReadHandleFactory = ValueReadHandleFactory.usingJavaLangReflect();
 				break;
 			case METHOD_HANDLE:
-				propertyHandleFactory = PropertyHandleFactory.usingMethodHandle( lookup );
+				valueReadHandleFactory = ValueReadHandleFactory.usingMethodHandle( lookup );
 				break;
 			default:
 				throw new AssertionFailure( "Unexpected reflection strategy name: " + reflectionStrategyName );
 		}
 
 		return new HibernateOrmBootstrapIntrospector(
-				typeMetadata, ormReflectionManager, annotationHelper, propertyHandleFactory
+				typeMetadata, ormReflectionManager, annotationHelper, valueReadHandleFactory
 		);
 	}
 
@@ -126,7 +126,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	}
 
 	private final Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata;
-	private final PropertyHandleFactory propertyHandleFactory;
+	private final ValueReadHandleFactory valueReadHandleFactory;
 	private final HibernateOrmGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
@@ -134,7 +134,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	 * Note: the main purpose of this cache is not to improve performance,
 	 * but to ensure the unicity of the returned {@link PojoTypeModel}s.
 	 * so as to ensure the unicity of {@link PojoPropertyModel}s,
-	 * which lowers the risk of generating duplicate {@link org.hibernate.search.mapper.pojo.model.spi.PropertyHandle}s.
+	 * which lowers the risk of generating duplicate {@link ValueReadHandle}s.
 	 * <p>
 	 * Also, this cache allows to not care at all about implementing equals and hashcode,
 	 * since type models are presumably instantiated only once per type.
@@ -147,10 +147,10 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 			Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata,
 			ReflectionManager reflectionManager,
 			AnnotationHelper annotationHelper,
-			PropertyHandleFactory propertyHandleFactory) {
+			ValueReadHandleFactory valueReadHandleFactory) {
 		super( reflectionManager, annotationHelper );
 		this.typeMetadata = typeMetadata;
-		this.propertyHandleFactory = propertyHandleFactory;
+		this.valueReadHandleFactory = valueReadHandleFactory;
 		this.genericContextHelper = new HibernateOrmGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
 				genericContextHelper, Object.class
@@ -183,12 +183,12 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
-	PropertyHandle<?> createPropertyHandle(Member member,
+	ValueReadHandle<?> createValueReadHandle(Member member,
 			HibernateOrmBasicPropertyMetadata ormPropertyMetadata) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			setAccessible( method );
-			return propertyHandleFactory.createForMethod( method );
+			return valueReadHandleFactory.createForMethod( method );
 		}
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
@@ -196,12 +196,12 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 				Method bytecodeEnhancerReaderMethod = getBytecodeEnhancerReaderMethod( field );
 				if ( bytecodeEnhancerReaderMethod != null ) {
 					setAccessible( bytecodeEnhancerReaderMethod );
-					return propertyHandleFactory.createForMethod( bytecodeEnhancerReaderMethod );
+					return valueReadHandleFactory.createForMethod( bytecodeEnhancerReaderMethod );
 				}
 			}
 
 			setAccessible( field );
-			return propertyHandleFactory.createForField( field );
+			return valueReadHandleFactory.createForField( field );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );

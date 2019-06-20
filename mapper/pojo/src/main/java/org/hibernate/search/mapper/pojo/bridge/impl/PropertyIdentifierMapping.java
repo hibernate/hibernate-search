@@ -13,17 +13,17 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.impl.Closer;
 
 
 public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> {
 
 	private final PojoCaster<? super I> caster;
-	private final PropertyHandle<I> property;
+	private final ValueReadHandle<I> property;
 	private final BeanHolder<? extends IdentifierBridge<I>> bridgeHolder;
 
-	public PropertyIdentifierMapping(PojoCaster<? super I> caster, PropertyHandle<I> property,
+	public PropertyIdentifierMapping(PojoCaster<? super I> caster, ValueReadHandle<I> property,
 			BeanHolder<? extends IdentifierBridge<I>> bridgeHolder) {
 		this.caster = caster;
 		this.property = property;

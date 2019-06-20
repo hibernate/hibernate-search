@@ -9,6 +9,10 @@ package org.hibernate.search.util.common.logging.impl;
 
 import static org.jboss.logging.Logger.Level.ERROR;
 
+import java.lang.reflect.Member;
+
+import org.hibernate.search.util.common.SearchException;
+
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
@@ -68,4 +72,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 4,
 			value = "'%1$s' must not be null or empty.")
 	IllegalArgumentException arrayMustNotBeNullNorEmpty(String objectDescription);
+
+	@Message(id = ID_OFFSET_2 + 5, value = "Exception while invoking '%1$s' on '%2$s'.")
+	SearchException errorInvokingMember(Member member, Object component, @Cause Throwable e);
 }

@@ -11,7 +11,7 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 /**
  * @param <T> The property holder type of this node, i.e. the type from which the property is retrieved.
@@ -20,13 +20,13 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 
 	private final BoundPojoModelPathTypeNode<T> parent;
-	private final PropertyHandle<P> propertyHandle;
+	private final ValueReadHandle<P> valueReadHandle;
 	private final PojoPropertyModel<P> propertyModel;
 
 	BoundPojoModelPathPropertyNode(BoundPojoModelPathTypeNode<T> parent, PojoPropertyModel<P> propertyModel) {
 		this.parent = parent;
 		this.propertyModel = propertyModel;
-		this.propertyHandle = propertyModel.getHandle();
+		this.valueReadHandle = propertyModel.getHandle();
 	}
 
 	@Override
@@ -54,8 +54,8 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 		return new BoundPojoModelPathValueNode<>( this, extractorPath );
 	}
 
-	public PropertyHandle<P> getPropertyHandle() {
-		return propertyHandle;
+	public ValueReadHandle<P> getValueReadHandle() {
+		return valueReadHandle;
 	}
 
 	public PojoPropertyModel<P> getPropertyModel() {

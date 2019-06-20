@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.impl;
 
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 /**
  * @param <P> The type of the property.
@@ -15,9 +15,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 class PojoPropertyElementAccessor<P> implements PojoElementAccessor<P> {
 
 	private final PojoElementAccessor<?> parent;
-	private final PropertyHandle<P> handle;
+	private final ValueReadHandle<P> handle;
 
-	PojoPropertyElementAccessor(PojoElementAccessor<?> parent, PropertyHandle<P> handle) {
+	PojoPropertyElementAccessor(PojoElementAccessor<?> parent, ValueReadHandle<P> handle) {
 		this.parent = parent;
 		this.handle = handle;
 	}

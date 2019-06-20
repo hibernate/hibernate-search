@@ -11,7 +11,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -25,11 +25,11 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcessor<T> {
 
-	private final PropertyHandle<P> handle;
+	private final ValueReadHandle<P> handle;
 	private final Collection<BeanHolder<? extends PropertyBridge>> propertyBridgeHolders;
 	private final Collection<PojoIndexingProcessor<? super P>> nestedNodes;
 
-	public PojoIndexingProcessorPropertyNode(PropertyHandle<P> handle,
+	public PojoIndexingProcessorPropertyNode(ValueReadHandle<P> handle,
 			Collection<BeanHolder<? extends PropertyBridge>> propertyBridgeHolders,
 			Collection<PojoIndexingProcessor<? super P>> nestedNodes) {
 		this.handle = handle;
