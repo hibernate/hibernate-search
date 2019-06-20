@@ -32,7 +32,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 
 	@Override
 	public List<Book> findAllIndexed() {
-		return Search.getSearchSession( entityManager )
+		return Search.session( entityManager )
 				.search( Book.class )
 				.predicate( p -> p.matchAll() )
 				.fetchHits();
@@ -44,7 +44,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 			return Optional.empty();
 		}
 
-		return Search.getSearchSession( entityManager ).search( Book.class )
+		return Search.session( entityManager ).search( Book.class )
 				// onRawField option allows to bypass the bridge in the DSL
 				.predicate( f -> f.match().onField( "isbn" ).matching( isbnAsString, DslConverter.DISABLED ) )
 				.fetchSingleHit();
@@ -52,7 +52,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 
 	@Override
 	public List<Book> searchByMedium(String terms, BookMedium medium, int limit, int offset) {
-		return Search.getSearchSession( entityManager ).search( Book.class )
+		return Search.session( entityManager ).search( Book.class )
 				.predicate( f -> f.bool( b -> {
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
@@ -74,7 +74,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 			GeoPoint myLocation, Double maxDistanceInKilometers,
 			List<LibraryServiceOption> libraryServices,
 			int limit, int offset) {
-		return Search.getSearchSession( entityManager ).search( DOCUMENT_CLASS )
+		return Search.session( entityManager ).search( DOCUMENT_CLASS )
 				.predicate( f -> f.bool( b -> {
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {
@@ -133,7 +133,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 
 	@Override
 	public List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order) {
-		return Search.getSearchSession( entityManager ).search( Document.class )
+		return Search.session( entityManager ).search( Document.class )
 				.asProjection( f -> f.field( "author", String.class ) )
 				.predicate( f -> f.match()
 						.onField( "title" ).boostedTo( 2.0f )

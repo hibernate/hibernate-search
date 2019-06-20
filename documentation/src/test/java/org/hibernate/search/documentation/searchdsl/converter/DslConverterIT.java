@@ -68,7 +68,7 @@ public class DslConverterIT {
 	@Test
 	public void dslConverterEnabled() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::dsl-converter-enabled[]
 			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
@@ -86,7 +86,7 @@ public class DslConverterIT {
 	@Test
 	public void dslConverterDisabled() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::dsl-converter-disabled[]
 			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )

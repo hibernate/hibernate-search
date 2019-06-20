@@ -75,7 +75,7 @@ public class SearchQueryBaseIT {
 	@Test
 	public void asEntity() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( Book.class )
 					.asEntity()
@@ -104,7 +104,7 @@ public class SearchQueryBaseIT {
 	@Test
 	public void asProjection_searchProjectionObject_single() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
@@ -137,7 +137,7 @@ public class SearchQueryBaseIT {
 	@Test
 	public void asProjection_searchProjectionObject_multiple() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
@@ -203,7 +203,7 @@ public class SearchQueryBaseIT {
 	@Test
 	public void asProjection_lambda() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
 					.asProjection( f ->
@@ -251,7 +251,7 @@ public class SearchQueryBaseIT {
 	@Test
 	public void asProjection_compositeAndLoading() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
 					.asProjection( f ->

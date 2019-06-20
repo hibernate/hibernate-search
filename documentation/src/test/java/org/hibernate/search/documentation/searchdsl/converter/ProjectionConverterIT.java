@@ -68,7 +68,7 @@ public class ProjectionConverterIT {
 	@Test
 	public void projectionConverterEnabled() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::projection-converter-enabled[]
 			List<OrderStatus> result = searchSession.search( Order.class )
@@ -85,7 +85,7 @@ public class ProjectionConverterIT {
 	@Test
 	public void projectionConverterDisabled() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::projection-converter-disabled[]
 			List<String> result = searchSession.search( Order.class )

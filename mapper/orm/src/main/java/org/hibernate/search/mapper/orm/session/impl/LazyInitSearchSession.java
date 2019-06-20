@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 /**
  * A lazily initializing {@link SearchSession}.
  * <p>
- * This implementation allows to call {@link org.hibernate.search.mapper.orm.Search#getSearchSession(Session)}
+ * This implementation allows to call {@link org.hibernate.search.mapper.orm.Search#session(Session)}
  * before Hibernate Search is fully initialized, which can be useful in CDI/Spring environments.
  */
 public class LazyInitSearchSession implements SearchSession {

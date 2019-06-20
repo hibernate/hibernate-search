@@ -55,7 +55,7 @@ public class SearchSessionWritePlanPersistBatchIndexingIT {
 		SessionFactory sessionFactory = setup();
 
 		withinTransaction( sessionFactory, session -> {
-			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 
 			// This is for test only and wouldn't be present in real code
 			int firstIdOfThisBatch = 0;
@@ -100,7 +100,7 @@ public class SearchSessionWritePlanPersistBatchIndexingIT {
 		SessionFactory sessionFactory = setup();
 
 		withinTransaction( sessionFactory, session -> {
-			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 
 			// This is for test only and wouldn't be present in real code
 			int firstIdOfThisBatch = 0;

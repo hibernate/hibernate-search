@@ -66,7 +66,7 @@ public class QueryDslIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::entryPoint[]
 			// Not shown: get the entity manager and open a transaction
-			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
+			SearchSession searchSession = Search.session( entityManager ); // <1>
 
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
 					.predicate( f -> f.match() // <3>

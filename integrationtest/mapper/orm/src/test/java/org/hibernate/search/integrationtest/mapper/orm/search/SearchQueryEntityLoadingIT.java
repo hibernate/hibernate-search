@@ -64,7 +64,7 @@ public class SearchQueryEntityLoadingIT {
 	@Test
 	public void entityIdDocumentId() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<EntityIdDocumentIdIndexedEntity> query = searchSession.search( EntityIdDocumentIdIndexedEntity.class )
 					.predicate( f -> f.matchAll() )
@@ -93,7 +93,7 @@ public class SearchQueryEntityLoadingIT {
 	@TestForIssue(jiraKey = "HSEARCH-3203")
 	public void nonEntityIdDocumentId() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<NonEntityIdDocumentIdIndexedEntity> query = searchSession.search( NonEntityIdDocumentIdIndexedEntity.class )
 					.predicate( f -> f.matchAll() )
@@ -122,7 +122,7 @@ public class SearchQueryEntityLoadingIT {
 	@TestForIssue(jiraKey = "HSEARCH-3203")
 	public void mixed() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
+			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search( Arrays.asList(
 							EntityIdDocumentIdIndexedEntity.class,

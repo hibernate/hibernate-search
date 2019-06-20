@@ -84,7 +84,7 @@ public class GettingStartedWithoutAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			try {
 			// tag::manual-index[]
-				SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
+				SearchSession searchSession = Search.session( entityManager ); // <1>
 
 				MassIndexer indexer = searchSession.massIndexer( Book.class ) // <2>
 						.threadsToLoadObjects( 7 ); // <3>
@@ -100,7 +100,7 @@ public class GettingStartedWithoutAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching-objects[]
 			// Not shown: get the entity manager and open a transaction
-			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
+			SearchSession searchSession = Search.session( entityManager ); // <1>
 
 			SearchScope<Book> scope = searchSession.scope( Book.class ); // <2>
 
@@ -139,7 +139,7 @@ public class GettingStartedWithoutAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching-lambdas[]
 			// Not shown: get the entity manager and open a transaction
-			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
+			SearchSession searchSession = Search.session( entityManager ); // <1>
 
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
 					.predicate( f -> f.match() // <3>
@@ -174,7 +174,7 @@ public class GettingStartedWithoutAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::counting[]
 			// Not shown: get the entity manager and open a transaction
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			long totalHitCount = searchSession.search( Book.class )
 					.predicate( f -> f.match()

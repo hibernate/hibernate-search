@@ -221,7 +221,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		CompletableFuture<?> transactionFuture = CompletableFuture.runAsync( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				if ( customStrategy != null ) {
-					Search.getSearchSession( session ).setAutomaticIndexingSynchronizationStrategy( customStrategy );
+					Search.session( session ).setAutomaticIndexingSynchronizationStrategy( customStrategy );
 				}
 				IndexedEntity entity1 = new IndexedEntity();
 				entity1.setId( 1 );

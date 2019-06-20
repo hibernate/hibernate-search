@@ -25,7 +25,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 		if ( terms == null || terms.isEmpty() ) {
 			return Collections.emptyList();
 		}
-		return Search.getSearchSession( entityManager )
+		return Search.session( entityManager )
 				.search( Library.class )
 				.predicate( f -> f.match().onField( "name" ).matching( terms ) )
 				.sort( f -> f.byField( "collectionSize" ).desc()

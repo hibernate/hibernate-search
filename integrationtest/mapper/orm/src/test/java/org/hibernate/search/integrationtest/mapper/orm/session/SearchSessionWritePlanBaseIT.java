@@ -60,7 +60,7 @@ public class SearchSessionWritePlanBaseIT {
 			session.persist( entity2 );
 			session.persist( entity3 );
 
-			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 			writePlan.addOrUpdate( entity1 );
 			writePlan.addOrUpdate( entity2 );
 			writePlan.delete( entity3 );
@@ -99,7 +99,7 @@ public class SearchSessionWritePlanBaseIT {
 			session.persist( entity7 );
 			session.persist( entity8 );
 
-			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 
 			writePlan.addOrUpdate( entity1 );
 			writePlan.addOrUpdate( entity1 );
@@ -157,7 +157,7 @@ public class SearchSessionWritePlanBaseIT {
 		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
 
 		withinTransaction( sessionFactory, session -> {
-			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 			SubTest.expectException(
 					() -> writePlan.purge( ContainedEntity.class, 42 )
 			)
@@ -180,7 +180,7 @@ public class SearchSessionWritePlanBaseIT {
 			session.persist( entity2 );
 			session.flush();
 
-			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
@@ -224,7 +224,7 @@ public class SearchSessionWritePlanBaseIT {
 			session.persist( entity2 );
 			session.flush();
 
-			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
@@ -265,7 +265,7 @@ public class SearchSessionWritePlanBaseIT {
 
 			session.persist( entity3 );
 
-			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 			writePlan.addOrUpdate( entity1 );
 			writePlan.delete( entity2 );
 
@@ -293,7 +293,7 @@ public class SearchSessionWritePlanBaseIT {
 			session.persist( entity2 );
 			session.persist( entity3 );
 
-			SearchSessionWritePlan writePlan = Search.getSearchSession( session ).writePlan();
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 			writePlan.addOrUpdate( entity1 );
 			writePlan.addOrUpdate( entity2 );
 			writePlan.delete( entity3 );
@@ -319,7 +319,7 @@ public class SearchSessionWritePlanBaseIT {
 		try ( Session session = sessionFactory.openSession() ) {
 			entity = new IndexedEntity1( 1, "number1" );
 			session.persist( entity );
-			writePlan = Search.getSearchSession( session ).writePlan();
+			writePlan = Search.session( session ).writePlan();
 		}
 
 		SubTest.expectException(

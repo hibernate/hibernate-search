@@ -70,7 +70,7 @@ public class HibernateOrmSimpleMappingIT {
 	@Test
 	public void sort() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class ) // <1>
 					.predicate( f -> f.matchAll() )
@@ -88,7 +88,7 @@ public class HibernateOrmSimpleMappingIT {
 	@Test
 	public void projection_simple() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			List<String> result = searchSession.search( Book.class ) // <1>
 					.asProjection( f -> f.field( "title", String.class ) ) // <2>

@@ -78,7 +78,7 @@ public class SortDslIT {
 	public void entryPoint() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::entryPoint-lambdas[]
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class ) // <1>
 					.predicate( f -> f.matchAll() )
@@ -93,7 +93,7 @@ public class SortDslIT {
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::entryPoint-objects[]
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
@@ -343,7 +343,7 @@ public class SortDslIT {
 
 	private void withinSearchSession(Consumer<SearchSession> action) {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.getSearchSession( entityManager );
+			SearchSession searchSession = Search.session( entityManager );
 			action.accept( searchSession );
 		} );
 	}
