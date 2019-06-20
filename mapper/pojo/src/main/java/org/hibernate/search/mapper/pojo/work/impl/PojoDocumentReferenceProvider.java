@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.work.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
-import org.hibernate.search.mapper.pojo.bridge.impl.RoutingKeyProvider;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.RoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 /**
