@@ -49,3 +49,8 @@ org.hibernate.search.util.SearchException#<init>(java.lang.Throwable, org.hibern
 @defaultMessage ZonedDateTime.parse is buggy, use TimeHelper.parseZoneDateTime instead. See https://bugs.openjdk.java.net/browse/JDK-8066982
 java.time.ZonedDateTime#parse(java.lang.CharSequence)
 java.time.ZonedDateTime#parse(java.lang.CharSequence, java.time.format.DateTimeFormatter)
+
+################################################################################################################
+@defaultMessage Avoid to use Hibernate ORM internals
+org.hibernate.internal.**
+org.hibernate.**.internal.**
