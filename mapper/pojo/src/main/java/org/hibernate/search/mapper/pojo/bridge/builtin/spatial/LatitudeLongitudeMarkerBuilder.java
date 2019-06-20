@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.spatial;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
 
 /**
  * A builder of markers that mark a property as the latitude or longitude

@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.pojo.bridge.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
 
 /**
  * A bridge builder that upon building retrieves a {@link BridgeBuilder} from the bean provider,
