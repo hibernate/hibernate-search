@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.javabean.search.loading.context.impl;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.mapper.javabean.search.loading.impl.JavaBeanProjectionHitMapper;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public final class JavaBeanLoadingContext implements LoadingContext<PojoReference, Void> {
 
@@ -27,16 +27,16 @@ public final class JavaBeanLoadingContext implements LoadingContext<PojoReferenc
 	}
 
 	public static final class Builder implements LoadingContextBuilder<PojoReference, Void> {
-		private final PojoScopeDelegate<?, Void> scopeDelegate;
+		private final ReferenceHitMapper<PojoReference> referenceHitMapper;
 
-		public Builder(PojoScopeDelegate<?, Void> scopeDelegate) {
-			this.scopeDelegate = scopeDelegate;
+		public Builder(ReferenceHitMapper<PojoReference> referenceHitMapper) {
+			this.referenceHitMapper = referenceHitMapper;
 		}
 
 		@Override
 		public LoadingContext<PojoReference, Void> build() {
 			ProjectionHitMapper<PojoReference, Void> projectionHitMapper =
-					new JavaBeanProjectionHitMapper( scopeDelegate );
+					new JavaBeanProjectionHitMapper( referenceHitMapper );
 			return new JavaBeanLoadingContext( projectionHitMapper );
 		}
 	}

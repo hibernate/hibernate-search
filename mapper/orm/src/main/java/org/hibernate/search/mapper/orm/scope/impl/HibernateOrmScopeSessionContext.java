@@ -8,8 +8,10 @@ package org.hibernate.search.mapper.orm.scope.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
+import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingSessionContext;
 
-public interface HibernateOrmScopeSessionContext {
+public interface HibernateOrmScopeSessionContext
+		extends HibernateOrmLoadingSessionContext {
 
 	SessionImplementor getSession();
 

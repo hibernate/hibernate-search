@@ -15,8 +15,8 @@ import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
+import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -59,17 +59,14 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<PojoR
 	}
 
 	public static final class Builder<E> implements LoadingContextBuilder<PojoReference, E> {
-		private final SessionImplementor sessionImplementor;
-		private final PojoScopeDelegate<?, ?> scopeDelegate;
+		private final HibernateOrmLoadingSessionContext sessionContext;
 		private final EntityLoaderBuilder<E> entityLoaderBuilder;
 		private final MutableEntityLoadingOptions loadingOptions;
 
-		public Builder(SessionImplementor sessionImplementor,
-				PojoScopeDelegate<?, ?> scopeDelegate,
+		public Builder(HibernateOrmLoadingSessionContext sessionContext,
 				EntityLoaderBuilder<E> entityLoaderBuilder,
 				MutableEntityLoadingOptions loadingOptions) {
-			this.sessionImplementor = sessionImplementor;
-			this.scopeDelegate = scopeDelegate;
+			this.sessionContext = sessionContext;
 			this.entityLoaderBuilder = entityLoaderBuilder;
 			this.loadingOptions = loadingOptions;
 		}
@@ -77,10 +74,14 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<PojoR
 		@Override
 		public LoadingContext<PojoReference, E> build() {
 			ProjectionHitMapper<PojoReference, E> projectionHitMapper = new DefaultProjectionHitMapper<>(
-					scopeDelegate::toPojoReference,
+					sessionContext.getReferenceHitMapper(),
 					entityLoaderBuilder.build( loadingOptions )
 			);
-			return new HibernateOrmLoadingContext<>( sessionImplementor, projectionHitMapper, loadingOptions );
+			return new HibernateOrmLoadingContext<>(
+					sessionContext.getSession(),
+					projectionHitMapper,
+					loadingOptions
+			);
 		}
 	}
 }
