@@ -29,9 +29,10 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
+import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceTransformer;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubReferenceHitMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubHitTransformer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
@@ -103,8 +104,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				createMock( LoadingContext.class );
-		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
-				createMock( StubDocumentReferenceTransformer.class );
+		ReferenceHitMapper<StubTransformedReference> referenceHitMapperMock =
+				createMock( StubReferenceHitMapper.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				createMock( StubEntityLoader.class );
 
@@ -125,7 +126,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
 		StubMapperUtils.expectHitMapping(
-				loadingContextMock, referenceTransformerMock, objectLoaderMock,
+				loadingContextMock, referenceHitMapperMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
@@ -167,8 +168,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				createMock( LoadingContext.class );
-		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
-				createMock( StubDocumentReferenceTransformer.class );
+		ReferenceHitMapper<StubTransformedReference> referenceHitMapperMock =
+				createMock( StubReferenceHitMapper.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				createMock( StubEntityLoader.class );
 
@@ -190,7 +191,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
 		StubMapperUtils.expectHitMapping(
-				loadingContextMock, referenceTransformerMock, objectLoaderMock,
+				loadingContextMock, referenceHitMapperMock, objectLoaderMock,
 				c -> c
 						.reference( mainReference, mainTransformedReference )
 						.reference( emptyReference, emptyTransformedReference )
@@ -211,8 +212,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				createMock( LoadingContext.class );
-		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
-				createMock( StubDocumentReferenceTransformer.class );
+		ReferenceHitMapper<StubTransformedReference> referenceHitMapperMock =
+				createMock( StubReferenceHitMapper.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				createMock( StubEntityLoader.class );
 
@@ -234,7 +235,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
 		StubMapperUtils.expectHitMapping(
-				loadingContextMock, referenceTransformerMock, objectLoaderMock,
+				loadingContextMock, referenceHitMapperMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
@@ -255,8 +256,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				createMock( LoadingContext.class );
-		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
-				createMock( StubDocumentReferenceTransformer.class );
+		ReferenceHitMapper<StubTransformedReference> referenceHitMapperMock =
+				createMock( StubReferenceHitMapper.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				createMock( StubEntityLoader.class );
 
@@ -285,7 +286,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
 		StubMapperUtils.expectHitMapping(
-				loadingContextMock, referenceTransformerMock, objectLoaderMock,
+				loadingContextMock, referenceHitMapperMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the reference projection,
 				 * but also loaded because of the entity projection.
@@ -364,8 +365,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				createMock( LoadingContext.class );
-		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
-				createMock( StubDocumentReferenceTransformer.class );
+		ReferenceHitMapper<StubTransformedReference> referenceHitMapperMock =
+				createMock( StubReferenceHitMapper.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				createMock( StubEntityLoader.class );
 		Function<List<?>, StubTransformedHit> hitTransformerMock = createMock( StubHitTransformer.class );
@@ -396,7 +397,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
 		StubMapperUtils.expectHitMapping(
-				loadingContextMock, referenceTransformerMock, objectLoaderMock,
+				loadingContextMock, referenceHitMapperMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the reference projection,
 				 * but also loaded because of the entity projection.
@@ -491,7 +492,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 		resetAll();
 		expect( loadingContextMock.getProjectionHitMapper() )
-				.andReturn( new DefaultProjectionHitMapper<>( Function.identity(), EntityLoader.identity() ) );
+				.andReturn( new DefaultProjectionHitMapper<>( reference -> reference, EntityLoader.identity() ) );
 		replayAll();
 		query.fetch();
 		verifyAll();
@@ -499,7 +500,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		// Second query execution to make sure the backend doesn't try to cache the projection hit mapper...
 		resetAll();
 		expect( loadingContextMock.getProjectionHitMapper() )
-				.andReturn( new DefaultProjectionHitMapper<>( Function.identity(), EntityLoader.identity() ) );
+				.andReturn( new DefaultProjectionHitMapper<>( reference -> reference, EntityLoader.identity() ) );
 		replayAll();
 		query.fetch();
 		verifyAll();

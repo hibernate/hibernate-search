@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
@@ -22,6 +21,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
+import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils;
 
 import org.easymock.EasyMock;
@@ -50,7 +50,7 @@ public final class StubMapperUtils {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <R, E> void expectHitMapping(
 			LoadingContext<R, E> loadingContextMock,
-			Function<DocumentReference, R> referenceTransformerMock,
+			ReferenceHitMapper<R> referenceTransformerMock,
 			EntityLoader<R, E> objectLoaderMock,
 			Consumer<HitMappingDefinitionContext<R, E>> hitMappingDefinition) {
 		/*
@@ -68,7 +68,7 @@ public final class StubMapperUtils {
 
 		for ( Map.Entry<DocumentReference, List<R>> entry : context.referenceMap.entrySet() ) {
 			for ( R transformedReference : entry.getValue() ) {
-				expect( referenceTransformerMock.apply( referenceMatcher( entry.getKey() ) ) )
+				expect( referenceTransformerMock.fromDocumentReference( referenceMatcher( entry.getKey() ) ) )
 						.andReturn( transformedReference );
 			}
 		}
