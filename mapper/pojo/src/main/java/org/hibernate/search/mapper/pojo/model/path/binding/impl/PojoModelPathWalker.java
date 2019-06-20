@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.binding.impl;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 
 public interface PojoModelPathWalker<T, P, V> {
 

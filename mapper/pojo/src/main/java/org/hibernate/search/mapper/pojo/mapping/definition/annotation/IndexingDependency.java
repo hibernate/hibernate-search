@@ -13,6 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 
 /**
  * Given a property, defines how a dependency of the indexing process to this property

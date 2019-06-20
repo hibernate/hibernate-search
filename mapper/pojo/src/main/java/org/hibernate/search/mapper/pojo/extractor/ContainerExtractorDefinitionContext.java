@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.pojo.extractor;
 
 import java.util.List;
 
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+
 /**
  * A context to assign names to container extractor implementations.
  *
