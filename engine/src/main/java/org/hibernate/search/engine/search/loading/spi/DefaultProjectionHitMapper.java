@@ -8,32 +8,31 @@ package org.hibernate.search.engine.search.loading.spi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapper<R, E> {
 
-	private final Function<DocumentReference, R> documentReferenceTransformer;
+	private final ReferenceHitMapper<R> referenceHitMapper;
 	private final EntityLoader<R, ? extends E> objectLoader;
 
 	private final List<R> referencesToLoad = new ArrayList<>();
 
-	public DefaultProjectionHitMapper(Function<DocumentReference, R> documentReferenceTransformer,
+	public DefaultProjectionHitMapper(ReferenceHitMapper<R> referenceHitMapper,
 			EntityLoader<R, ? extends E> objectLoader) {
-		this.documentReferenceTransformer = documentReferenceTransformer;
+		this.referenceHitMapper = referenceHitMapper;
 		this.objectLoader = objectLoader;
 	}
 
 	@Override
 	public R convertReference(DocumentReference reference) {
-		return documentReferenceTransformer.apply( reference );
+		return referenceHitMapper.fromDocumentReference( reference );
 	}
 
 	@Override
 	public Object planLoading(DocumentReference reference) {
-		referencesToLoad.add( documentReferenceTransformer.apply( reference ) );
+		referencesToLoad.add( referenceHitMapper.fromDocumentReference( reference ) );
 		return referencesToLoad.size() - 1;
 	}
 

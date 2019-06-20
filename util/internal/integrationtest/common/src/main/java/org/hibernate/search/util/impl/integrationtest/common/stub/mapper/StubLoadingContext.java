@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
-import java.util.function.Function;
-
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
@@ -18,7 +16,10 @@ public class StubLoadingContext implements LoadingContext<DocumentReference, Doc
 	private final ProjectionHitMapper<DocumentReference, DocumentReference> projectionHitMapper;
 
 	StubLoadingContext() {
-		this.projectionHitMapper = new DefaultProjectionHitMapper<>( Function.identity(), EntityLoader.identity() );
+		this.projectionHitMapper = new DefaultProjectionHitMapper<>(
+				documentReference -> documentReference,
+				EntityLoader.identity()
+		);
 	}
 
 	@Override
