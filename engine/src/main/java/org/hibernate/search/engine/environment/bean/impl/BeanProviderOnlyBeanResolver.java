@@ -26,20 +26,20 @@ final class BeanProviderOnlyBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> BeanHolder<T> getBean(Class<T> typeReference) {
+	public <T> BeanHolder<T> resolve(Class<T> typeReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
-		return beanProvider.resolve( typeReference );
+		return beanProvider.getBean( typeReference );
 	}
 
 	@Override
-	public <T> BeanHolder<T> getBean(Class<T> typeReference, String nameReference) {
+	public <T> BeanHolder<T> resolve(Class<T> typeReference, String nameReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
-		return beanProvider.resolve( typeReference, nameReference );
+		return beanProvider.getBean( typeReference, nameReference );
 	}
 
 	@Override
-	public <T> BeanHolder<List<T>> getBeansWithRole(Class<T> role) {
-		throw new AssertionFailure( "Unexpected call to getBeansWithRole before roles are even defined." );
+	public <T> BeanHolder<List<T>> resolveRole(Class<T> role) {
+		throw new AssertionFailure( "Unexpected call to resolveRole before roles are even defined." );
 	}
 }

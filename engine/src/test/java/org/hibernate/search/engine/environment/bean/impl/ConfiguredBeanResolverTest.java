@@ -42,7 +42,7 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 			partialMockBuilder( AbstractConfigurationPropertySourcePartialMock.class ).mock();
 
 	@Test
-	public void getBean_withoutBeanConfigurer() {
+	public void resolve_withoutBeanConfigurer() {
 		// Setup
 		resetAll();
 		expect( classResolverMock.loadJavaServices( BeanConfigurer.class ) )
@@ -59,40 +59,40 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		BeanHolder<Type3> type3BeanHolder1 = BeanHolder.of( new Type3() );
 		BeanHolder<Type3> type3BeanHolder2 = BeanHolder.of( new Type3() );
 
-		// getBean(Class)
+		// resolve(Class)
 		resetAll();
-		expect( beanProviderMock.resolve( Type1.class ) ).andReturn( type1BeanHolder );
+		expect( beanProviderMock.getBean( Type1.class ) ).andReturn( type1BeanHolder );
 		replayAll();
-		assertThat( beanResolver.getBean( Type1.class ) ).isSameAs( type1BeanHolder );
+		assertThat( beanResolver.resolve( Type1.class ) ).isSameAs( type1BeanHolder );
 		verifyAll();
 
-		// getBean(Class) through BeanReference
+		// resolve(Class) through BeanReference
 		resetAll();
-		expect( beanProviderMock.resolve( Type1.class ) ).andReturn( type1BeanHolder );
+		expect( beanProviderMock.getBean( Type1.class ) ).andReturn( type1BeanHolder );
 		replayAll();
-		assertThat( beanResolver.getBean( BeanReference.of( Type1.class ) ) ).isSameAs( type1BeanHolder );
+		assertThat( beanResolver.resolve( BeanReference.of( Type1.class ) ) ).isSameAs( type1BeanHolder );
 		verifyAll();
 
-		// getBean(Class, String)
+		// resolve(Class, String)
 		resetAll();
-		expect( beanProviderMock.resolve( Type2.class, "someName" ) ).andReturn( type2BeanHolder );
+		expect( beanProviderMock.getBean( Type2.class, "someName" ) ).andReturn( type2BeanHolder );
 		replayAll();
-		assertThat( beanResolver.getBean( Type2.class, "someName" ) ).isSameAs( type2BeanHolder );
+		assertThat( beanResolver.resolve( Type2.class, "someName" ) ).isSameAs( type2BeanHolder );
 		verifyAll();
 
-		// getBean(Class, String) through BeanReference
+		// resolve(Class, String) through BeanReference
 		resetAll();
-		expect( beanProviderMock.resolve( Type2.class, "someName" ) ).andReturn( type2BeanHolder );
+		expect( beanProviderMock.getBean( Type2.class, "someName" ) ).andReturn( type2BeanHolder );
 		replayAll();
-		assertThat( beanResolver.getBean( BeanReference.of( Type2.class, "someName" ) ) ).isSameAs( type2BeanHolder );
+		assertThat( beanResolver.resolve( BeanReference.of( Type2.class, "someName" ) ) ).isSameAs( type2BeanHolder );
 		verifyAll();
 
-		// getBeans(List<BeanReference>)
+		// resolve(List<BeanReference>)
 		resetAll();
-		expect( beanProviderMock.resolve( Type3.class ) ).andReturn( type3BeanHolder1 );
-		expect( beanProviderMock.resolve( Type3.class, "someOtherName" ) ).andReturn( type3BeanHolder2 );
+		expect( beanProviderMock.getBean( Type3.class ) ).andReturn( type3BeanHolder1 );
+		expect( beanProviderMock.getBean( Type3.class, "someOtherName" ) ).andReturn( type3BeanHolder2 );
 		replayAll();
-		BeanHolder<List<Type3>> beans = beanResolver.getBeans(
+		BeanHolder<List<Type3>> beans = beanResolver.resolve(
 				Arrays.asList( BeanReference.of( Type3.class ), BeanReference.of( Type3.class, "someOtherName" ) )
 		);
 		verifyAll();
@@ -101,7 +101,7 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void getBean_withBeanConfigurer() {
+	public void resolve_withBeanConfigurer() {
 		// Setup
 		BeanConfigurer beanConfigurer1Mock = createMock( BeanConfigurer.class );
 		BeanConfigurer beanConfigurer2Mock = createMock( BeanConfigurer.class );
@@ -140,34 +140,34 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		BeanHolder<Type3> type3BeanHolder1 = BeanHolder.of( new Type3() );
 		BeanHolder<Type3> type3BeanHolder2 = BeanHolder.of( new Type3() );
 
-		// getBean(Class)
+		// resolve(Class)
 		resetAll();
-		expect( beanProviderMock.resolve( Type1.class ) )
+		expect( beanProviderMock.getBean( Type1.class ) )
 				.andThrow( new SearchException( "cannot find Type1" ) );
 		expect( beanFactory1Mock.create( EasyMock.anyObject() ) ).andReturn( type1BeanHolder );
 		replayAll();
-		assertThat( beanResolver.getBean( Type1.class ) ).isSameAs( type1BeanHolder );
+		assertThat( beanResolver.resolve( Type1.class ) ).isSameAs( type1BeanHolder );
 		verifyAll();
 
-		// getBean(Class, String)
+		// resolve(Class, String)
 		resetAll();
-		expect( beanProviderMock.resolve( Type2.class, "someName" ) )
+		expect( beanProviderMock.getBean( Type2.class, "someName" ) )
 				.andThrow( new SearchException( "cannot find Type2#someName" ) );
 		expect( beanFactory2Mock.create( EasyMock.anyObject() ) ).andReturn( type2BeanHolder );
 		replayAll();
-		assertThat( beanResolver.getBean( Type2.class, "someName" ) ).isSameAs( type2BeanHolder );
+		assertThat( beanResolver.resolve( Type2.class, "someName" ) ).isSameAs( type2BeanHolder );
 		verifyAll();
 
-		// getBeans(List<BeanReference>)
+		// resolve(List<BeanReference>)
 		resetAll();
-		expect( beanProviderMock.resolve( Type3.class ) )
+		expect( beanProviderMock.getBean( Type3.class ) )
 				.andThrow( new SearchException( "cannot find Type3" ) );
-		expect( beanProviderMock.resolve( Type3.class, "someOtherName" ) )
+		expect( beanProviderMock.getBean( Type3.class, "someOtherName" ) )
 				.andThrow( new SearchException( "cannot find Type3#someOtherName" ) );
 		expect( beanFactory3Mock.create( EasyMock.anyObject() ) ).andReturn( type3BeanHolder1 );
 		expect( beanFactory4Mock.create( EasyMock.anyObject() ) ).andReturn( type3BeanHolder2 );
 		replayAll();
-		BeanHolder<List<Type3>> beans = beanResolver.getBeans(
+		BeanHolder<List<Type3>> beans = beanResolver.resolve(
 				Arrays.asList( BeanReference.of( Type3.class ), BeanReference.of( Type3.class, "someOtherName" ) )
 		);
 		verifyAll();
@@ -176,7 +176,7 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void getBeansWithRole() {
+	public void resolveRole() {
 		BeanConfigurer beanConfigurer1Mock = createMock( BeanConfigurer.class );
 		BeanConfigurer beanConfigurer2Mock = createMock( BeanConfigurer.class );
 
@@ -214,18 +214,18 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		BeanHolder<Type3> type3BeanHolder2 = BeanHolder.of( new Type3() );
 		BeanHolder<Type3> type3BeanHolder3 = BeanHolder.of( new Type3() );
 
-		// getBeansWithRole
+		// resolveRole
 		resetAll();
-		expect( beanProviderMock.resolve( Type3.class ) )
+		expect( beanProviderMock.getBean( Type3.class ) )
 				.andThrow( new SearchException( "cannot find Type3" ) );
 		expect( beanFactory1Mock.create( EasyMock.anyObject() ) ).andReturn( type3BeanHolder1 );
-		expect( beanProviderMock.resolve( Type3.class, "someNameWithNoAssignedBeanFactory" ) )
+		expect( beanProviderMock.getBean( Type3.class, "someNameWithNoAssignedBeanFactory" ) )
 				.andReturn( type3BeanHolder2 );
-		expect( beanProviderMock.resolve( Type3.class, "someOtherName" ) )
+		expect( beanProviderMock.getBean( Type3.class, "someOtherName" ) )
 				.andThrow( new SearchException( "cannot find Type3#someOtherName" ) );
 		expect( beanFactory3Mock.create( EasyMock.anyObject() ) ).andReturn( type3BeanHolder3 );
 		replayAll();
-		BeanHolder<List<RoleType>> beansWithRole = beanResolver.getBeansWithRole( RoleType.class );
+		BeanHolder<List<RoleType>> beansWithRole = beanResolver.resolveRole( RoleType.class );
 		verifyAll();
 		assertThat( beansWithRole.get() )
 				.containsExactlyInAnyOrder( type3BeanHolder1.get(), type3BeanHolder2.get(), type3BeanHolder3.get() );
@@ -233,22 +233,22 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		// Roles should ignore inheritance
 		resetAll();
 		replayAll();
-		BeanHolder<List<Object>> beansWithObjectRole = beanResolver.getBeansWithRole( Object.class );
+		BeanHolder<List<Object>> beansWithObjectRole = beanResolver.resolveRole( Object.class );
 		verifyAll();
 		assertThat( beansWithObjectRole.get() ).isEmpty();
 
 		// Unassigned roles should result in an empty list
 		resetAll();
 		replayAll();
-		BeanHolder<List<NonRoleType>> beansWithNonRole = beanResolver.getBeansWithRole( NonRoleType.class );
+		BeanHolder<List<NonRoleType>> beansWithNonRole = beanResolver.resolveRole( NonRoleType.class );
 		verifyAll();
 		assertThat( beansWithNonRole.get() ).isEmpty();
 
-		// Assigned roles should not affect the behavior of getBean()
+		// Assigned roles should not affect the behavior of resolve()
 		resetAll();
-		expect( beanProviderMock.resolve( RoleType.class ) ).andReturn( (BeanHolder) type3BeanHolder3 );
+		expect( beanProviderMock.getBean( RoleType.class ) ).andReturn( (BeanHolder) type3BeanHolder3 );
 		replayAll();
-		assertThat( beanResolver.getBean( RoleType.class ) ).isSameAs( type3BeanHolder3 );
+		assertThat( beanResolver.resolve( RoleType.class ) ).isSameAs( type3BeanHolder3 );
 		verifyAll();
 	}
 

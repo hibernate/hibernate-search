@@ -24,7 +24,7 @@ class TypeBeanReference<T> implements BeanReference<T> {
 
 	@Override
 	public BeanHolder<T> getBean(BeanResolver beanResolver) {
-		return beanResolver.getBean( type );
+		return beanResolver.resolve( type );
 	}
 
 	@Override

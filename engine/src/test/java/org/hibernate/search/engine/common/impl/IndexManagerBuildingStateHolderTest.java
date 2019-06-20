@@ -59,7 +59,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.type" ) )
 				.andReturn( (Optional) Optional.of( "someBackendType" ) );
-		EasyMock.expect( beanResolverMock.getBean( BackendFactory.class, "someBackendType" ) )
+		EasyMock.expect( beanResolverMock.resolve( BackendFactory.class, "someBackendType" ) )
 				.andReturn( BeanHolder.of( backendFactoryMock ) );
 		EasyMock.expect( backendFactoryMock.create(
 				EasyMock.eq( "myBackend" ),

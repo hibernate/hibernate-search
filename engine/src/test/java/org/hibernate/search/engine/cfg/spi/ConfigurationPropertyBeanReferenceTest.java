@@ -48,7 +48,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		// No value
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
-		EasyMock.expect( beanResolverMock.getBean( StubBean.class, "theDefault" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "theDefault" ) )
 				.andReturn( expectedAsStubBean );
 		replayAll();
 		result = property.get( sourceMock ).getBean( beanResolverMock );
@@ -58,7 +58,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		// String value
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "name" ) );
-		EasyMock.expect( beanResolverMock.getBean( StubBean.class, "name" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name" ) )
 				.andReturn( expectedAsStubBean );
 		replayAll();
 		result = property.get( sourceMock ).getBean( beanResolverMock );
@@ -68,7 +68,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		// Class value
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class ) ) );
-		EasyMock.expect( beanResolverMock.getBean( StubBeanImpl1.class ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl1.class ) )
 				.andReturn( expected );
 		replayAll();
 		result = property.get( sourceMock ).getBean( beanResolverMock );
@@ -78,7 +78,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		// BeanReference value
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class, "name" ) ) );
-		EasyMock.expect( beanResolverMock.getBean( StubBeanImpl1.class, "name" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl1.class, "name" ) )
 				.andReturn( expected );
 		replayAll();
 		result = property.get( sourceMock ).getBean( beanResolverMock );
@@ -109,7 +109,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		// String value
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "name" ) );
-		EasyMock.expect( beanResolverMock.getBean( StubBean.class, "name" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name" ) )
 				.andReturn( expectedAsStubBean );
 		replayAll();
 		reference = property.get( sourceMock );
@@ -121,7 +121,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		// Class value
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class ) ) );
-		EasyMock.expect( beanResolverMock.getBean( StubBeanImpl1.class ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl1.class ) )
 				.andReturn( expected );
 		replayAll();
 		reference = property.get( sourceMock );
@@ -133,7 +133,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		// BeanReference value
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class, "name" ) ) );
-		EasyMock.expect( beanResolverMock.getBean( StubBeanImpl1.class, "name" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl1.class, "name" ) )
 				.andReturn( expected );
 		replayAll();
 		reference = property.get( sourceMock );
@@ -161,17 +161,17 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
 		replayAll();
-		result = property.getAndMap( sourceMock, beanResolverMock::getBeans );
+		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyAll();
 		assertThat( result ).isEmpty();
 
 		// String value - one
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "name" ) );
-		EasyMock.expect( beanResolverMock.getBean( StubBean.class, "name" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name" ) )
 				.andReturn( expected1AsStubBean );
 		replayAll();
-		result = property.getAndMap( sourceMock, beanResolverMock::getBeans );
+		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyAll();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get().get() ).containsExactly( expected1AsStubBean.get() );
@@ -179,12 +179,12 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		// String value - multiple
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "name1 name2" ) );
-		EasyMock.expect( beanResolverMock.getBean( StubBean.class, "name1" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name1" ) )
 				.andReturn( expected1AsStubBean );
-		EasyMock.expect( beanResolverMock.getBean( StubBean.class, "name2" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name2" ) )
 				.andReturn( expected2AsStubBean );
 		replayAll();
-		result = property.getAndMap( sourceMock, beanResolverMock::getBeans );
+		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyAll();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get().get() ).containsExactly( expected1AsStubBean.get(), expected2AsStubBean.get() );
@@ -194,10 +194,10 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of(
 				createCollection( StubBeanImpl1.class )
 		) );
-		EasyMock.expect( beanResolverMock.getBean( StubBeanImpl1.class ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl1.class ) )
 				.andReturn( expected1 );
 		replayAll();
-		result = property.getAndMap( sourceMock, beanResolverMock::getBeans );
+		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyAll();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get().get() ).containsExactly( expected1.get() );
@@ -207,12 +207,12 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of(
 				createCollection( StubBeanImpl1.class, StubBeanImpl2.class )
 		) );
-		EasyMock.expect( beanResolverMock.getBean( StubBeanImpl1.class ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl1.class ) )
 				.andReturn( expected1 );
-		EasyMock.expect( beanResolverMock.getBean( StubBeanImpl2.class ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl2.class ) )
 				.andReturn( expected2 );
 		replayAll();
-		result = property.getAndMap( sourceMock, beanResolverMock::getBeans );
+		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyAll();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get().get() ).containsExactly( expected1.get(), expected2.get() );
@@ -222,10 +222,10 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of(
 				createCollection( BeanReference.of( StubBeanImpl1.class, "name" ) )
 		) );
-		EasyMock.expect( beanResolverMock.getBean( StubBeanImpl1.class, "name" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl1.class, "name" ) )
 				.andReturn( expected1 );
 		replayAll();
-		result = property.getAndMap( sourceMock, beanResolverMock::getBeans );
+		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyAll();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get().get() ).containsExactly( expected1.get() );
@@ -238,12 +238,12 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 						BeanReference.of( StubBeanImpl2.class, "name2" )
 				)
 		) );
-		EasyMock.expect( beanResolverMock.getBean( StubBeanImpl1.class, "name1" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl1.class, "name1" ) )
 				.andReturn( expected1 );
-		EasyMock.expect( beanResolverMock.getBean( StubBeanImpl2.class, "name2" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBeanImpl2.class, "name2" ) )
 				.andReturn( expected2 );
 		replayAll();
-		result = property.getAndMap( sourceMock, beanResolverMock::getBeans );
+		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyAll();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get().get() ).containsExactly( expected1.get(), expected2.get() );
@@ -289,12 +289,12 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( propertyValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
-		EasyMock.expect( beanResolverMock.getBean( StubBean.class, "name" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name" ) )
 				.andThrow( simulatedFailure );
 		replayAll();
 		SubTest.expectException(
 				() -> {
-					property.getAndMap( sourceMock, beanResolverMock::getBean );
+					property.getAndMap( sourceMock, beanResolverMock::resolve );
 				}
 		)
 				.assertThrown()
@@ -323,15 +323,15 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( propertyValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
-		EasyMock.expect( beanResolverMock.getBean( StubBean.class, "name1" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name1" ) )
 				.andReturn( bean1Mock );
-		EasyMock.expect( beanResolverMock.getBean( StubBean.class, "name2" ) )
+		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name2" ) )
 				.andThrow( simulatedFailure );
 		bean1Mock.close(); // Expect the first bean holder to be closed
 		replayAll();
 		SubTest.expectException(
 				() -> {
-					property.getAndMap( sourceMock, beanResolverMock::getBeans );
+					property.getAndMap( sourceMock, beanResolverMock::resolve );
 				}
 		)
 				.assertThrown()

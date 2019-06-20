@@ -44,7 +44,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		@Override
 		public BeanHolder<ElasticsearchClientFactory> getBean(BeanResolver beanResolver) {
 			BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurerHolders =
-					beanResolver.getBeansWithRole( ElasticsearchHttpClientConfigurer.class );
+					beanResolver.resolveRole( ElasticsearchHttpClientConfigurer.class );
 			ElasticsearchClientFactoryImpl factory = new ElasticsearchClientFactoryImpl( httpClientConfigurerHolders.get() );
 			return BeanHolder.<ElasticsearchClientFactory>of( factory )
 					.withDependencyAutoClosing( httpClientConfigurerHolders );

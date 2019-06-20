@@ -115,7 +115,7 @@ class IndexManagerBuildingStateHolder {
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.getAndMapOrThrow(
 						backendPropertySource,
-						beanResolver::getBean,
+						beanResolver::resolve,
 						key -> log.backendTypeCannotBeNullOrEmpty( backendName, key )
 				) ) {
 			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );

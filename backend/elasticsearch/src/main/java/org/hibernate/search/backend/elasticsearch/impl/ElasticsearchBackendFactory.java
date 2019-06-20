@@ -97,7 +97,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
 		ElasticsearchLinkImpl link = null;
 		try {
-			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanResolver::getBean );
+			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanResolver::resolve );
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(
@@ -164,7 +164,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		try {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanResolver beanResolver = buildContext.getBeanResolver();
-			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::getBean )
+			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 					.map( holder -> {
 						try ( BeanHolder<? extends ElasticsearchAnalysisConfigurer> configurerHolder = holder ) {
 							ElasticsearchAnalysisDefinitionContainerContextImpl collector =

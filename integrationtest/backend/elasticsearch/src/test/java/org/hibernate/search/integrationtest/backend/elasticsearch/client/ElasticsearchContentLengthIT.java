@@ -180,7 +180,7 @@ public class ElasticsearchContentLengthIT {
 
 		BeanResolver beanResolver = testConfigurationProvider.createBeanResolverForTest();
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
-				beanResolver.getBean( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
+				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			return factoryHolder.get().create(
 					backendProperties, DefaultGsonProvider.create( GsonBuilder::new, true )
 			);

@@ -164,7 +164,7 @@ public class ContainerExtractorBinder {
 				Class<? extends ContainerExtractor> extractorClass =
 						containerExtractorRegistry.getForName( extractorName );
 				BeanHolder<? extends ContainerExtractor> newExtractorHolder =
-						beanResolver.getBean( extractorClass );
+						beanResolver.resolve( extractorClass );
 				beanHolders.add( newExtractorHolder );
 				if ( extractor == null ) {
 					// First extractor: must be able to process type C

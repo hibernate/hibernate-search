@@ -14,7 +14,7 @@ public interface BeanConfigurationContext {
 	/**
 	 * Define a way to resolve a bean referenced by its {@code exposedType}.
 	 * <p>
-	 * Affects the behavior of {@link BeanResolver#getBean(Class)}
+	 * Affects the behavior of {@link BeanResolver#resolve(Class)}
 	 * in particular.
 	 *
 	 * @param exposedType The type that this definition will match (exact match: inheritance is ignored).
@@ -26,7 +26,7 @@ public interface BeanConfigurationContext {
 	/**
 	 * Define a way to resolve a bean referenced by its {@code exposedType} and {@code name}.
 	 * <p>
-	 * Affects the behavior of {@link BeanResolver#getBean(Class, String)}
+	 * Affects the behavior of {@link BeanResolver#resolve(Class, String)}
 	 * in particular.
 	 *
 	 * @param exposedType The type that this definition will match (exact match: inheritance is ignored).
@@ -39,7 +39,7 @@ public interface BeanConfigurationContext {
 	/**
 	 * Assign a role to a bean reference.
 	 * <p>
-	 * Affects the behavior of {@link BeanResolver#getBeansWithRole(Class)}
+	 * Affects the behavior of {@link BeanResolver#resolveRole(Class)}
 	 * in particular.
 	 * <p>
 	 * Roles allow to overcome limitations of the Spring/CDI integrations,
