@@ -134,7 +134,7 @@ public class ElasticsearchExtensionIT {
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
 		ElasticsearchSearchQueryResultContext<DocumentReference> asReferenceContext =
-				scope.query().extension( ElasticsearchExtension.get() ).asReference();
+				scope.query().extension( ElasticsearchExtension.get() ).asEntityReference();
 		ElasticsearchSearchQueryResultContext<DocumentReference> asEntityContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asEntity();
 		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();

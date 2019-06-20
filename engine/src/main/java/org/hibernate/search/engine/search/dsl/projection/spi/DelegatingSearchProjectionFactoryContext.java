@@ -15,8 +15,8 @@ import org.hibernate.search.engine.search.dsl.projection.CompositeProjectionCont
 import org.hibernate.search.engine.search.dsl.projection.DistanceToFieldProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.EntityProjectionContext;
+import org.hibernate.search.engine.search.dsl.projection.EntityReferenceProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.FieldProjectionContext;
-import org.hibernate.search.engine.search.dsl.projection.ReferenceProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
@@ -39,8 +39,8 @@ public class DelegatingSearchProjectionFactoryContext<R, E> implements SearchPro
 	}
 
 	@Override
-	public ReferenceProjectionContext<R> reference() {
-		return delegate.reference();
+	public EntityReferenceProjectionContext<R> entityReference() {
+		return delegate.entityReference();
 	}
 
 	@Override

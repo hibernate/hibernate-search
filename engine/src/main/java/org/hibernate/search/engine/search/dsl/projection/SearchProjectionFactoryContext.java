@@ -20,7 +20,8 @@ import org.hibernate.search.util.common.function.TriFunction;
 /**
  * A context allowing to create a projection.
  *
- * @param <R> The type of references, i.e. the type of objects returned for {@link #reference() reference projections}.
+ * @param <R> The type of entity references, i.e. the type of objects returned for
+ * {@link #entityReference() entity reference projections}.
  * @param <E> The type of entities, i.e. the type of objects returned for
  * {@link #entity() entity projections}.
  */
@@ -34,17 +35,17 @@ public interface SearchProjectionFactoryContext<R, E> {
 	DocumentReferenceProjectionContext documentReference();
 
 	/**
-	 * Project to a reference to the match.
+	 * Project to a reference to the entity that was originally indexed.
 	 * <p>
 	 * The actual type of the reference depends on the mapper used to create the query:
 	 * the ORM mapper will return a class/identifier pair, for example.
 	 *
 	 * @return A context allowing to define the projection more precisely.
 	 */
-	ReferenceProjectionContext<R> reference();
+	EntityReferenceProjectionContext<R> entityReference();
 
 	/**
-	 * Project to an entity representing the match.
+	 * Project to the entity was originally indexed.
 	 * <p>
 	 * The actual type of the entity depends on the mapper used to create the query
 	 * and on the indexes targeted by your query:

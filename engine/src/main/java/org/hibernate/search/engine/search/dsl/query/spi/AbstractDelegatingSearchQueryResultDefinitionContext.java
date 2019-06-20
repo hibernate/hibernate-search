@@ -41,8 +41,8 @@ public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, E>
 	}
 
 	@Override
-	public SearchQueryResultContext<?, R, ?> asReference() {
-		return delegate.asReference();
+	public SearchQueryResultContext<?, R, ?> asEntityReference() {
+		return delegate.asEntityReference();
 	}
 
 	@Override

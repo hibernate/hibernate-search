@@ -22,11 +22,11 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @param <N> The next context if no type of hits is explicitly selected,
  * i.e. if {@link #predicate(SearchPredicate)} or {@link #predicate(Function)} is called directly
- * without calling {@link #asEntity()}, or {@link #asReference()}, {@link #asProjection(SearchProjection)}
+ * without calling {@link #asEntity()}, or {@link #asEntityReference()}, {@link #asProjection(SearchProjection)}
  * or a similar method.
- * @param <R> The type of references, i.e. the type of hits returned by
- * {@link #asReference() reference queries},
- * or the type of objects returned for {@link SearchProjectionFactoryContext#reference() reference projections}.
+ * @param <R> The type of entity references, i.e. the type of hits returned by
+ * {@link #asEntityReference() reference queries},
+ * or the type of objects returned for {@link SearchProjectionFactoryContext#entityReference() entity reference projections}.
  * @param <E> The type of entities, i.e. the type of hits returned by
  * {@link #asEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
@@ -51,12 +51,12 @@ public interface SearchQueryResultDefinitionContext<
 	SearchQueryResultContext<?, E, ?> asEntity();
 
 	/**
-	 * Define the query results as a reference to entity that was originally indexed.
+	 * Define the query results as a reference to the entity that was originally indexed.
 	 *
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
-	SearchQueryResultContext<?, R, ?> asReference();
+	SearchQueryResultContext<?, R, ?> asEntityReference();
 
 	/**
 	 * Define the query results as one projection for each matching document.

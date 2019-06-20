@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjecti
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
@@ -73,8 +73,8 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	}
 
 	@Override
-	public <R> ReferenceProjectionBuilder<R> reference() {
-		return new LuceneReferenceProjectionBuilder( scopeModel.getIndexNames() );
+	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
+		return new LuceneEntityReferenceProjectionBuilder( scopeModel.getIndexNames() );
 	}
 
 	@Override

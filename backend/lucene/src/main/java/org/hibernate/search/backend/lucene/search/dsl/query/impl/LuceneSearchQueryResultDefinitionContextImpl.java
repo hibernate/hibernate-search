@@ -57,7 +57,7 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 	}
 
 	@Override
-	public LuceneSearchQueryResultContext<R> asReference() {
+	public LuceneSearchQueryResultContext<R> asEntityReference() {
 		LuceneSearchQueryBuilder<R> builder = indexScope.getSearchQueryBuilderFactory()
 				.asReference( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );

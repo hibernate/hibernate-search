@@ -966,7 +966,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/Pro
 ====
 
 [[search-dsl-projection-reference]]
-=== `reference`: return references to matched entities
+=== `entityReference`: return references to matched entities
 
 .Returning references to matched entities
 ====

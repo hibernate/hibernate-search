@@ -147,7 +147,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::reference[]
 			List<EntityReference> hits = searchSession.search( Book.class )
-					.asProjection( f -> f.reference() )
+					.asProjection( f -> f.entityReference() )
 					.predicate( f -> f.matchAll() )
 					.fetchHits();
 			// end::reference[]

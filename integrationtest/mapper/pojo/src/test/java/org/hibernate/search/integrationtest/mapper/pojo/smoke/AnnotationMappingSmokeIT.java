@@ -366,7 +366,7 @@ public class AnnotationMappingSmokeIT {
 			SearchQuery<EntityReference> query = session.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
-					.asReference()
+					.asEntityReference()
 					.predicate( f -> f.matchAll() )
 					.toQuery();
 
@@ -439,7 +439,7 @@ public class AnnotationMappingSmokeIT {
 			SearchQuery<List<?>> query = scope.search()
 					.asProjections(
 							scope.projection().field( "myTextField", String.class ).toProjection(),
-							scope.projection().reference().toProjection(),
+							scope.projection().entityReference().toProjection(),
 							scope.projection().field( "myLocalDateField", LocalDate.class ).toProjection(),
 							scope.projection().documentReference().toProjection(),
 							scope.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
