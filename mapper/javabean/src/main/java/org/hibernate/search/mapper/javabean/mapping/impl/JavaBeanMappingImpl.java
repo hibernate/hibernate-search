@@ -18,10 +18,12 @@ import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplement
 public class JavaBeanMappingImpl extends AbstractPojoMappingImplementor<JavaBeanMapping> implements CloseableJavaBeanMapping {
 
 	private final JavaBeanMappingContext mappingContext;
+	private final JavaBeanTypeContextContainer typeContextContainer;
 
-	JavaBeanMappingImpl(PojoMappingDelegate mappingDelegate) {
+	JavaBeanMappingImpl(PojoMappingDelegate mappingDelegate, JavaBeanTypeContextContainer typeContextContainer) {
 		super( mappingDelegate );
 		this.mappingContext = new JavaBeanMappingContext();
+		this.typeContextContainer = typeContextContainer;
 	}
 
 	@Override
@@ -40,6 +42,8 @@ public class JavaBeanMappingImpl extends AbstractPojoMappingImplementor<JavaBean
 	}
 
 	private SearchSessionBuilder createSearchManagerBuilder() {
-		return new JavaBeanSearchSession.JavaBeanSearchSessionBuilder( getDelegate(), mappingContext );
+		return new JavaBeanSearchSession.JavaBeanSearchSessionBuilder(
+				getDelegate(), mappingContext, typeContextContainer
+		);
 	}
 }

@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.RoutingKeyBridgeRoutingKeyProvider;
@@ -40,7 +40,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 	private final boolean implicitProvidedId;
 	private final BoundPojoModelPathPropertyNode<?, ?> entityIdPropertyPath;
 
-	IdentifierMapping<?, E> identifierMapping;
+	IdentifierMappingImplementor<?, E> identifierMapping;
 	Optional<String> documentIdSourcePropertyName;
 	RoutingKeyProvider<E> routingKeyProvider;
 
@@ -67,7 +67,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( IdentifierMapping::close, identifierMapping );
+			closer.push( IdentifierMappingImplementor::close, identifierMapping );
 			closer.push( RoutingKeyProvider::close, routingKeyProvider );
 		}
 	}

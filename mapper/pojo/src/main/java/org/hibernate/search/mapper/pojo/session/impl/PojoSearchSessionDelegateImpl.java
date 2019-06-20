@@ -10,25 +10,19 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContextProvider;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;
-import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContextProvider;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.work.impl.PojoSessionWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkPlanImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
-import org.hibernate.search.util.common.AssertionFailure;
 
-public final class PojoSearchSessionDelegateImpl implements PojoSearchSessionDelegate, ReferenceHitMapper<PojoReference> {
+public final class PojoSearchSessionDelegateImpl implements PojoSearchSessionDelegate {
 
 	private final PojoScopeIndexedTypeContextProvider indexedTypeContextProvider;
 	private final PojoScopeContainedTypeContextProvider containedTypeContextProvider;
@@ -48,7 +42,7 @@ public final class PojoSearchSessionDelegateImpl implements PojoSearchSessionDel
 	}
 
 	@Override
-	public <E, E2, C> PojoScopeDelegate<E2, C> createPojoScope(Collection<? extends Class<? extends E>> targetedTypes,
+	public <R, E, E2, C> PojoScopeDelegate<R, E2, C> createPojoScope(Collection<? extends Class<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		return PojoScopeDelegateImpl.create(
 				indexedTypeContextProvider,
@@ -70,23 +64,6 @@ public final class PojoSearchSessionDelegateImpl implements PojoSearchSessionDel
 	@Override
 	public PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy) {
 		return new PojoSessionWorkExecutorImpl( indexedTypeContextProvider, sessionContext, commitStrategy );
-	}
-
-	@Override
-	public ReferenceHitMapper<PojoReference> getReferenceHitMapper() {
-		return this;
-	}
-
-	@Override
-	public PojoReference fromDocumentReference(DocumentReference documentReference) {
-		PojoScopeIndexedTypeContext<?, ?, ?> typeContext =
-				indexedTypeContextProvider.getByIndexName( documentReference.getIndexName() )
-						.orElseThrow( () -> new AssertionFailure(
-								"Document reference " + documentReference + " could not be converted to a PojoReference"
-						) );
-		Object id = typeContext.getIdentifierMapping()
-				.fromDocumentIdentifier( documentReference.getId(), sessionContext );
-		return new PojoReferenceImpl( typeContext.getJavaClass(), id );
 	}
 
 }

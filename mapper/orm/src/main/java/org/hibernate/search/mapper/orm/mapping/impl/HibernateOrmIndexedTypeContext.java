@@ -16,15 +16,21 @@ import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmComposabl
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmSingleTypeByIdEntityLoader;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmSingleTypeCriteriaEntityLoader;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
-		implements HibernateOrmScopeIndexedTypeContext<E> {
+		implements HibernateOrmSessionIndexedTypeContext<E>, HibernateOrmScopeIndexedTypeContext<E> {
+	private final String indexName;
 	private final SingularAttribute<? super E, ?> nonIdDocumentIdSourceProperty;
+	private final IdentifierMapping identifierMapping;
 
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactory sessionFactory) {
 		super( builder.javaClass );
+
+		this.indexName = builder.indexName;
 
 		IdentifiableType<E> indexTypeModel = sessionFactory.getMetamodel().entity( getJavaClass() );
 		SingularAttribute<? super E, ?> documentIdSourceProperty =
@@ -35,6 +41,12 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		else {
 			nonIdDocumentIdSourceProperty = documentIdSourceProperty;
 		}
+
+		this.identifierMapping = builder.identifierMapping;
+	}
+
+	public String getIndexName() {
+		return indexName;
 	}
 
 	@Override
@@ -47,6 +59,11 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		else {
 			return entityId;
 		}
+	}
+
+	@Override
+	public IdentifierMapping getIdentifierMapping() {
+		return identifierMapping;
 	}
 
 	@Override
@@ -76,16 +93,24 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 	static class Builder<E> implements PojoIndexedTypeExtendedMappingCollector {
 		private final Class<E> javaClass;
+		private final String indexName;
 
 		private String documentIdSourcePropertyName;
+		private IdentifierMapping identifierMapping;
 
-		Builder(Class<E> javaClass) {
+		Builder(Class<E> javaClass, String indexName) {
 			this.javaClass = javaClass;
+			this.indexName = indexName;
 		}
 
 		@Override
 		public void documentIdSourcePropertyName(String documentIdSourcePropertyName) {
 			this.documentIdSourcePropertyName = documentIdSourcePropertyName;
+		}
+
+		@Override
+		public void identifierMapping(IdentifierMapping identifierMapping) {
+			this.identifierMapping = identifierMapping;
 		}
 
 		public HibernateOrmIndexedTypeContext<E> build(SessionFactory sessionFactory) {

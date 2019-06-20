@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchron
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
+import org.hibernate.search.mapper.pojo.search.spi.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;

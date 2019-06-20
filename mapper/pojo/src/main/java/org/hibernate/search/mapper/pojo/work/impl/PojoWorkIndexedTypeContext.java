@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
@@ -29,7 +29,7 @@ public interface PojoWorkIndexedTypeContext<I, E, D extends DocumentElement> {
 
 	Class<E> getJavaClass();
 
-	IdentifierMapping<I, E> getIdentifierMapping();
+	IdentifierMappingImplementor<I, E> getIdentifierMapping();
 
 	Supplier<E> toEntitySupplier(AbstractPojoSessionContextImplementor sessionContext, Object entity);
 

@@ -28,8 +28,8 @@ public final class HibernateOrmMapperDelegate
 
 	@Override
 	public <E> PojoIndexedTypeExtendedMappingCollector createIndexedTypeExtendedMappingCollector(
-			PojoRawTypeModel<E> rawTypeModel) {
-		return typeContextContainerBuilder.addIndexed( rawTypeModel );
+			PojoRawTypeModel<E> rawTypeModel, String indexName) {
+		return typeContextContainerBuilder.addIndexed( rawTypeModel, indexName );
 	}
 
 	@Override

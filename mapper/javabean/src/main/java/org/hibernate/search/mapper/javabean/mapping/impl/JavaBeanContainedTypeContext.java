@@ -9,8 +9,7 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 
 /*
- * TODO HSEARCH-1800 There's nothing here at the moment, just a placeholder.
- *  We may want to use an actual implementation once we allow users to plug in their own loading.
+ * There's nothing here at the moment, just a placeholder.
  */
 class JavaBeanContainedTypeContext {
 

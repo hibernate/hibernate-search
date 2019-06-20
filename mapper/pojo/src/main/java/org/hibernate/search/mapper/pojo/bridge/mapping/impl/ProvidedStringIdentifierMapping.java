@@ -15,15 +15,15 @@ import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingC
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 
-public class ProvidedStringIdentifierMapping implements IdentifierMapping<String, Object> {
+public class ProvidedStringIdentifierMapping implements IdentifierMappingImplementor<String, Object> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ProvidedStringIdentifierMapping INSTANCE = new ProvidedStringIdentifierMapping();
 
 	@SuppressWarnings("unchecked") // This class is bivariant in E
-	public static <E> IdentifierMapping<String, E> get() {
-		return (IdentifierMapping<String, E>) INSTANCE;
+	public static <E> IdentifierMappingImplementor<String, E> get() {
+		return (IdentifierMappingImplementor<String, E>) INSTANCE;
 	}
 
 	@Override

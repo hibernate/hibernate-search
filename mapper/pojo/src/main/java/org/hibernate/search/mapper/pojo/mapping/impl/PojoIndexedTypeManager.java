@@ -18,7 +18,7 @@ import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImpl
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.RoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
@@ -48,7 +48,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 
 	private final Class<E> indexedJavaClass;
 	private final PojoCaster<E> caster;
-	private final IdentifierMapping<I, E> identifierMapping;
+	private final IdentifierMappingImplementor<I, E> identifierMapping;
 	private final RoutingKeyProvider<E> routingKeyProvider;
 	private final PojoIndexingProcessor<E> processor;
 	private final MappedIndexManager<D> indexManager;
@@ -56,7 +56,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 
 	public PojoIndexedTypeManager(Class<E> indexedJavaClass,
 			PojoCaster<E> caster,
-			IdentifierMapping<I, E> identifierMapping,
+			IdentifierMappingImplementor<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
 			PojoIndexingProcessor<E> processor, MappedIndexManager<D> indexManager,
 			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
@@ -77,7 +77,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( IdentifierMapping::close, identifierMapping );
+			closer.push( IdentifierMappingImplementor::close, identifierMapping );
 			closer.push( RoutingKeyProvider::close, routingKeyProvider );
 			closer.push( PojoIndexingProcessor::close, processor );
 			closer.push( PojoImplicitReindexingResolver::close, reindexingResolver );
@@ -100,7 +100,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public IdentifierMapping<I, E> getIdentifierMapping() {
+	public IdentifierMappingImplementor<I, E> getIdentifierMapping() {
 		return identifierMapping;
 	}
 

@@ -274,7 +274,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				typeAdditionalMetadataProvider.get( entityTypeModel ),
 				mappingHelper,
 				indexManagerBuildingState,
-				delegate.createIndexedTypeExtendedMappingCollector( entityTypeModel ),
+				delegate.createIndexedTypeExtendedMappingCollector(
+						entityTypeModel, indexManagerBuildingState.getIndexName()
+				),
 				implicitProvidedId
 		);
 	}

@@ -14,9 +14,12 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 public class JavaBeanMappingPartialBuildState implements MappingPartialBuildState {
 
 	private final PojoMappingDelegate mappingDelegate;
+	private final JavaBeanTypeContextContainer typeContextContainer;
 
-	JavaBeanMappingPartialBuildState(PojoMappingDelegate mappingDelegate) {
+	JavaBeanMappingPartialBuildState(PojoMappingDelegate mappingDelegate,
+			JavaBeanTypeContextContainer typeContextContainer) {
 		this.mappingDelegate = mappingDelegate;
+		this.typeContextContainer = typeContextContainer;
 	}
 
 	@Override
@@ -25,7 +28,7 @@ public class JavaBeanMappingPartialBuildState implements MappingPartialBuildStat
 	}
 
 	public MappingImplementor<JavaBeanMapping> finalizeMapping() {
-		return new JavaBeanMappingImpl( mappingDelegate );
+		return new JavaBeanMappingImpl( mappingDelegate, typeContextContainer );
 	}
 
 }
