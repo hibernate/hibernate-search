@@ -50,7 +50,7 @@ public final class AnnotationInitializingBeanDelegatingMarkerBuilder<A extends A
 	@Override
 	public Object build(MarkerBuildContext buildContext) {
 		try ( BeanHolder<? extends AnnotationMarkerBuilder> delegateHolder =
-				delegateReference.getBean( buildContext.getBeanResolver() ) ) {
+				delegateReference.resolve( buildContext.getBeanResolver() ) ) {
 			return doBuild( buildContext, delegateHolder.get() );
 		}
 	}

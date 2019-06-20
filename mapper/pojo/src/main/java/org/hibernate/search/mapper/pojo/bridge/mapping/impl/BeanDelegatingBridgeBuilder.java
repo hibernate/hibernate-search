@@ -38,7 +38,7 @@ public final class BeanDelegatingBridgeBuilder<B> implements BridgeBuilder<B> {
 	public BeanHolder<? extends B> build(BridgeBuildContext buildContext) {
 		BeanHolder<?> bridgeHolder;
 		try ( BeanHolder<? extends BridgeBuilder> delegateHolder =
-				delegateReference.getBean( buildContext.getBeanResolver() ) ) {
+				delegateReference.resolve( buildContext.getBeanResolver() ) ) {
 			bridgeHolder = delegateHolder.get().build( buildContext );
 		}
 

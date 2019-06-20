@@ -23,7 +23,7 @@ final class InstanceBeanReference<T> implements BeanReference<T> {
 	}
 
 	@Override
-	public BeanHolder<T> getBean(BeanResolver beanResolver) {
+	public BeanHolder<T> resolve(BeanResolver beanResolver) {
 		return BeanHolder.of( instance );
 	}
 
