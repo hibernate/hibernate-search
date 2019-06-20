@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.util.impl;
+package org.hibernate.search.util.common.reflect.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.GenericArrayType;
@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**

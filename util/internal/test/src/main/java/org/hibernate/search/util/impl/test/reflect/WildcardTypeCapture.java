@@ -4,12 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.testsupport.util;
+package org.hibernate.search.util.impl.test.reflect;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-
-import org.hibernate.search.util.common.AssertionFailure;
 
 /**
  * A type capture used when the captured type cannot be used as a type argument to an anonymous type,
@@ -24,11 +22,11 @@ public abstract class WildcardTypeCapture<T extends WildcardTypeCapture.Of<?>> e
 	public static <T> Type captureTypeArgument(Class<T> superType, T instance) {
 		Type ofType = TypeCapture.captureTypeArgument( superType, instance );
 		if ( !( ofType instanceof ParameterizedType ) ) {
-			throw new AssertionFailure( ofType + " isn't parameterized" );
+			throw new IllegalArgumentException( ofType + " isn't parameterized" );
 		}
 		ParameterizedType parameterizedOfType = (ParameterizedType) ofType;
 		if ( !Of.class.equals( parameterizedOfType.getRawType() ) ) {
-			throw new AssertionFailure( ofType + " isn't a parameterized version of " + Of.class );
+			throw new IllegalArgumentException( ofType + " isn't a parameterized version of " + Of.class );
 		}
 		return parameterizedOfType.getActualTypeArguments()[0];
 	}

@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.logging.impl;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -27,7 +26,6 @@ import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ToStringTreeAppendableMultilineFormatter;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.TypeFormatter;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
@@ -128,25 +126,6 @@ public interface Log extends BasicLogger {
 			value = "Missing field name for GeoPointBridge on type %1$s."
 					+ " The field name is mandatory when the bridge is applied on an type, optional when applied on a property.")
 	SearchException missingFieldNameForGeoPointBridgeOnType(String typeName);
-
-	@Message(id = ID_OFFSET_2 + 12,
-			value = "Requested type argument %3$s to type %2$s"
-					+ " in implementing type %1$s, but %2$s doesn't declare any type parameter")
-	IllegalArgumentException cannotRequestTypeParameterOfUnparameterizedType(@FormatWith(TypeFormatter.class) Type type,
-			@FormatWith(ClassFormatter.class) Class<?> rawSuperType, int typeArgumentIndex);
-
-	@Message(id = ID_OFFSET_2 + 13,
-			value = "Requested type argument %3$s to type %2$s"
-					+ " in implementing type %1$s, but %2$s only declares %4$s type parameter(s)")
-	IllegalArgumentException typeParameterIndexOutOfBound(@FormatWith(TypeFormatter.class) Type type,
-			@FormatWith(ClassFormatter.class) Class<?> rawSuperType,
-			int typeArgumentIndex, int typeParametersLength);
-
-	@Message(id = ID_OFFSET_2 + 14,
-			value = "Requested type argument index %3$s to type %2$s"
-					+ " in implementing type %1$s should be 0 or greater")
-	IllegalArgumentException invalidTypeParameterIndex(@FormatWith(TypeFormatter.class) Type type,
-			@FormatWith(ClassFormatter.class) Class<?> rawSuperType, int typeArgumentIndex);
 
 	@Message(id = ID_OFFSET_2 + 15,
 			value = "Cannot interpret the type arguments to the ContainerExtractor interface in "

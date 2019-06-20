@@ -10,11 +10,13 @@ package org.hibernate.search.util.common.logging.impl;
 import static org.jboss.logging.Logger.Level.ERROR;
 
 import java.lang.reflect.Member;
+import java.lang.reflect.Type;
 
 import org.hibernate.search.util.common.SearchException;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -75,4 +77,24 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 5, value = "Exception while invoking '%1$s' on '%2$s'.")
 	SearchException errorInvokingMember(Member member, Object component, @Cause Throwable e);
+
+	@Message(id = ID_OFFSET_2 + 6,
+			value = "Requested type argument %3$s to type %2$s"
+					+ " in implementing type %1$s, but %2$s doesn't declare any type parameter")
+	IllegalArgumentException cannotRequestTypeParameterOfUnparameterizedType(@FormatWith(TypeFormatter.class) Type type,
+			@FormatWith(ClassFormatter.class) Class<?> rawSuperType, int typeArgumentIndex);
+
+	@Message(id = ID_OFFSET_2 + 7,
+			value = "Requested type argument %3$s to type %2$s"
+					+ " in implementing type %1$s, but %2$s only declares %4$s type parameter(s)")
+	IllegalArgumentException typeParameterIndexOutOfBound(@FormatWith(TypeFormatter.class) Type type,
+			@FormatWith(ClassFormatter.class) Class<?> rawSuperType,
+			int typeArgumentIndex, int typeParametersLength);
+
+	@Message(id = ID_OFFSET_2 + 8,
+			value = "Requested type argument index %3$s to type %2$s"
+					+ " in implementing type %1$s should be 0 or greater")
+	IllegalArgumentException invalidTypeParameterIndex(@FormatWith(TypeFormatter.class) Type type,
+			@FormatWith(ClassFormatter.class) Class<?> rawSuperType, int typeArgumentIndex);
+
 }
