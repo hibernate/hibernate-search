@@ -28,8 +28,8 @@ public final class SimpleSessionFactoryBuilder {
 	private final List<Consumer<MetadataSources>> metadataSourcesContributors = new ArrayList<>();
 	private final List<Consumer<SessionFactoryBuilder>> sessionFactoryBuilderContributors = new ArrayList<>();
 
-	public SimpleSessionFactoryBuilder setTcclLookupPrecedence(TcclLookupPrecedence tcclLookupPrecedence) {
-		return onBootstraServiceRegistryBuilder( builder -> builder.applyTcclLookupPrecedence( tcclLookupPrecedence ) );
+	public SimpleSessionFactoryBuilder setTcclLookupPrecedenceBefore() {
+		return onBootstraServiceRegistryBuilder( builder -> builder.applyTcclLookupPrecedence( TcclLookupPrecedence.BEFORE ) );
 	}
 
 	public SimpleSessionFactoryBuilder setProperty(String key, Object value) {
