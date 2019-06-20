@@ -4,16 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.bridge.builtin.spatial;
+package org.hibernate.search.mapper.pojo.bridge.builtin.programmatic;
 
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
 
 /**
  * A builder of markers that mark a property as the latitude or longitude
  * for a {@link GeoPointBridgeBuilder GeoPoint bridge}.
  *
- * @see org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude
- * @see org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude
+ * @see Latitude
+ * @see Longitude
  * @see GeoPointBridgeBuilder#latitude()
  * @see GeoPointBridgeBuilder#longitude()
  */

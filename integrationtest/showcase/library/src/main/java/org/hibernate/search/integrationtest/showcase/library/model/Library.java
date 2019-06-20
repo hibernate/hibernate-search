@@ -18,9 +18,9 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
