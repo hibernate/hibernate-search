@@ -168,6 +168,24 @@
         ]]></cypher>
     </concept>
 
+    <concept id="my-rules:IntegrationTestArtifacts">
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <description>
+            Contributes the :IntegrationTest label to :Maven:Artifact nodes representing integration testing artifacts.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (artifact:Maven:Artifact:HibernateSearch)
+            WHERE
+                artifact.name =~ ".*-integrationtest-.*"
+                OR artifact.name = "hibernate-search-documentation"
+            SET
+                artifact:IntegrationTest
+            RETURN
+                artifact
+        ]]></cypher>
+    </concept>
+
     <concept id="my-rules:ArtifactMetadata">
         <requiresConcept refId="my-rules:HibernateSearch" />
         <description>
@@ -501,6 +519,43 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="my-rules:UnitTestsMustHaveProperSuffix">
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <requiresConcept refId="my-rules:IntegrationTestArtifacts" />
+        <description>
+            Unit test class names must be suffixed with "Test".
+        </description>
+        <cypher><![CDATA[
+            MATCH (artifact:Maven:Artifact:HibernateSearch)
+                    -[:CONTAINS]->(type:Type)-[:DECLARES]->(method:Method)
+                    -[:ANNOTATED_BY]->()-[:OF_TYPE]->(testAnnotation:Type)
+            WHERE
+                NOT artifact:IntegrationTest
+                AND testAnnotation.fqn = "org.junit.Test"
+                AND NOT type.name ENDS WITH "Test"
+            RETURN DISTINCT
+                artifact.name AS Artifact, type.fqn AS Test
+        ]]></cypher>
+    </constraint>
+
+    <constraint id="my-rules:IntegrationTestsMustHaveProperSuffix">
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <requiresConcept refId="my-rules:IntegrationTestArtifacts" />
+        <description>
+            Integration test class names must be suffixed with "IT".
+        </description>
+        <cypher><![CDATA[
+            MATCH (artifact:Maven:Artifact:HibernateSearch:IntegrationTest)
+                    -[:CONTAINS]->(type:Type)-[:DECLARES]->(method:Method)
+                    -[:ANNOTATED_BY]->()-[:OF_TYPE]->(testAnnotation:Type)
+            WHERE
+                testAnnotation.fqn = "org.junit.Test"
+                AND NOT type.name ENDS WITH "IT"
+            RETURN DISTINCT
+                artifact.name AS Artifact, type.fqn AS Test
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
         <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
@@ -513,6 +568,8 @@
         <includeConstraint refId="my-rules:AbstractTypesShouldUseAbstractPrefix" />
         <includeConstraint refId="my-rules:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName" />
         <includeConstraint refId="my-rules:TypeNamesShouldBeUniqueInInterdependentModules" />
+        <includeConstraint refId="my-rules:UnitTestsMustHaveProperSuffix" />
+        <includeConstraint refId="my-rules:IntegrationTestsMustHaveProperSuffix" />
     </group>
 
     <group id="cycles">
