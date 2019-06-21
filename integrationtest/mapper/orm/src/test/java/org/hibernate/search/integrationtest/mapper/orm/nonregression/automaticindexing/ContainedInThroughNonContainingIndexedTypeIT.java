@@ -41,7 +41,7 @@ import org.junit.Test;
  * This should not matter given the current implementation, but better safe than sorry.
  */
 @TestForIssue(jiraKey = "HSEARCH-2496")
-public class ContainedInThroughNonContainingIndexedType {
+public class ContainedInThroughNonContainingIndexedTypeIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
