@@ -24,28 +24,6 @@ public interface PojoRuntimeIntrospector {
 	 */
 	Object unproxy(Object value);
 
-	// TODO HSEARCH-3067 also add the following as necessary
-//	/**
-//	 * @param <T> the type of the elements in the collection
-//	 * @param value the collection to initialize
-//	 * @return the initialized Collection, to be used on lazily-loading collections
-//	 */
-//	<T> Collection<T> initializeCollection(Collection<T> value);
-//
-//	/**
-//	 * @param <K> key
-//	 * @param <V> value
-//	 * @param value the map to initialize
-//	 * @return the initialized Map, to be used on lazily-loading maps
-//	 */
-//	<K,V> Map<K,V> initializeMap(Map<K,V> value);
-//
-//	/**
-//	 * @param value the array to initialize
-//	 * @return the initialized array, to be used on lazily-loading arrays
-//	 */
-//	Object[] initializeArray(Object[] value);
-
 	static PojoRuntimeIntrospector noProxy() {
 		return NoProxyPojoRuntimeIntrospector.get();
 	}
