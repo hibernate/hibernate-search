@@ -1,6 +1,59 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Alpha7 (21-06-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3618 Distance projection may lead to missing hits in the Lucene and Elasticsearch backends
+    * HSEARCH-1467 indexEmbedded depth parameter shared across class
+
+** Improvement
+    * HSEARCH-3616 Accept Collection<?> instead of Collection<Object>  in the ID predicate
+    * HSEARCH-3614 Allow integrators to opt out of using MethodHandles completely
+    * HSEARCH-3611 Add support for Elasticsearch 6.8
+    * HSEARCH-3605 Use a consistent strategy to decide on the package hosting each annotation
+    * HSEARCH-3604 Replace PojoReference with mapper-specific types
+    * HSEARCH-3595 Upgrade to Hibernate ORM 5.4.3.Final
+    * HSEARCH-3591 Expect a function as parameter for SearchQueryContext#sort
+    * HSEARCH-3255 Handle .onMissingValue().use() properly for date fields in Elasticsearch
+    * HSEARCH-3254 Handle .onMissingValue().use() properly for string fields in Lucene
+    * HSEARCH-2539 Return a CompletableFuture instead of a Future from MassIndexer.start()
+
+** New Feature
+    * HSEARCH-3592 Upgrade to Elasticsearch 7.1
+
+** Sub-task
+    * HSEARCH-3601 Fix a few typos and quirks in the documentation
+    * HSEARCH-3597 Document all available predicates/sorts/projections and query DSL basics
+    * HSEARCH-3373 Search 6 groundwork - Add javadoc to backend-specific APIs
+    * HSEARCH-3372 Search 6 groundwork - Add javadoc to remaining POJO mapper APIs
+    * HSEARCH-3371 Search 6 groundwork - Add javadoc to the ORM mapper APIs
+    * HSEARCH-3370 Search 6 groundwork - Add javadoc to the remaining engine APIs
+    * HSEARCH-3369 Search 6 groundwork - Add javadoc to the POJO bridge APIs
+
+** Task
+    * HSEARCH-3620 Add experimental build environments for JDK14
+    * HSEARCH-3619 Clean up the code in org.hibernate.search.mapper.pojo.mapping.impl
+    * HSEARCH-3617 Search 6 groundwork - Remove the by(SearchSort) method from the sort DSL
+    * HSEARCH-3610 Search 6 groundwork - Rename Search.getSearchSession(Session) to Search.session(Session)
+    * HSEARCH-3603 Swap the names of BeanResolver and BeanProvider
+    * HSEARCH-3588 Clean up TODOs in the code
+    * HSEARCH-3587 Rename MarkerMapping#builder to MarkerMapping#marker
+    * HSEARCH-3586 Document the BigInteger and BigDecimal field types in the documentation of the Lucene and Elasticsearch backends
+    * HSEARCH-3367 Search 6 groundwork - Restore the javadoc on all APIs
+    * HSEARCH-3230 Search 6 groundwork - Clarify the behavior of Lucene GeoPoint field codecs with respect to searchable/sortable/projectable
+    * HSEARCH-3203 Search 6 groundwork - Restore support for non-@Id document IDs in the ORM integration
+    * HSEARCH-3192 Allow "caching" predicates/sorts/projections for re-use
+    * HSEARCH-3077 Search 6 groundwork - Check that Marker/Bridge builders instances are suitable for the annotation before initializing them
+    * HSEARCH-3076 Search 6 groundwork - Check that IdentifierBridges are suitable for the property type before applying them
+    * HSEARCH-3074 Search 6 groundwork - Avoid depending on internal Hibernate ORM types
+    * HSEARCH-3067 Search 6 groundwork - Remove the notion of  explicit initialization of lazy collection/map/array initialization
+    * HSEARCH-3049 Search 6 groundwork - Implement the missing work types compared to Search 5 (except DeleteByQuery)
+    * HSEARCH-3048 Search 6 groundwork - Add the missing common field type options compared to Search 5
+    * HSEARCH-3046 Search 6 groundwork - Avoid the use of java.beans.Introspector in the mapper-javabean module
+    * HSEARCH-2473 Get test naming practices straight
+
 6.0.0.Alpha6 (24-05-2019)
 -------------------------
 
