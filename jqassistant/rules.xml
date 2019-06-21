@@ -54,6 +54,7 @@
     </concept>
 
     <concept id="my-rules:Spi">
+        <requiresConcept refId="my-rules:Test" />
         <description>
             Contributes the :Spi label to SPI types
         </description>
@@ -61,7 +62,8 @@
             MATCH
                 (type:Type)
             WHERE
-                type.fqn =~ ".*\\.spi\\..*"
+                NOT type:Test
+                AND type.fqn =~ ".*\\.spi\\..*"
                 AND type.visibility = "public"
             SET
                 type:Spi, type:Public
@@ -71,6 +73,7 @@
     </concept>
 
     <concept id="my-rules:Impl">
+        <requiresConcept refId="my-rules:Test" />
         <description>
             Contributes the :Impl label to implementation types
         </description>
@@ -78,7 +81,8 @@
             MATCH
                 (type:Type)
             WHERE
-                type.fqn =~ ".*\\.impl\\..*"
+                NOT type:Test
+                AND type.fqn =~ ".*\\.impl\\..*"
                 // Apache HTTP Client uses an impl package, but puts public classes in there... Such as the client builder.
                 AND NOT type.fqn STARTS WITH "org.apache.http.impl."
                 OR type.visibility <> "public"
