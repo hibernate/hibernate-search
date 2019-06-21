@@ -35,7 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-1710")
-public class ContainedInTriggerUnnecessaryCollectionInitialization {
+public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );

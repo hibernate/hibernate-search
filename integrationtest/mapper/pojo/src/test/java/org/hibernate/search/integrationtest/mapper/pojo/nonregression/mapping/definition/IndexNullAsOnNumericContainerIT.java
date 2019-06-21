@@ -28,7 +28,7 @@ import org.junit.Test;
  * would result in indexNullAs being interpreted as a string rather than the numeric type.
  */
 @TestForIssue(jiraKey = "HSEARCH-2663")
-public class IndexNullAsOnNumericContainer {
+public class IndexNullAsOnNumericContainerIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
