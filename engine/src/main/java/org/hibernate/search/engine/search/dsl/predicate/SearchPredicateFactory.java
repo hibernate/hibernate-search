@@ -158,6 +158,6 @@ public interface SearchPredicateFactory {
 	 *
 	 * @return A DSL step.
 	 */
-	SearchPredicateFactoryExtensionStep extension();
+	SearchPredicateFactoryExtensionIfSupportedStep extension();
 
 }
