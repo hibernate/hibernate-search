@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
-import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
+import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -20,7 +20,7 @@ public interface LuceneSearchQueryResultDefinitionContext<R, E>
 				LuceneSearchQueryContext<E>,
 				R,
 				E,
-				LuceneSearchProjectionFactoryContext<R, E>,
+				LuceneSearchProjectionFactory<R, E>,
 				LuceneSearchPredicateFactory
 		>,
 		LuceneSearchQueryResultContext<E> {
@@ -33,7 +33,7 @@ public interface LuceneSearchQueryResultDefinitionContext<R, E>
 
 	@Override
 	<P> LuceneSearchQueryResultContext<P> asProjection(
-			Function<? super LuceneSearchProjectionFactoryContext<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
+			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	@Override
 	<P> LuceneSearchQueryResultContext<P> asProjection(SearchProjection<P> projection);

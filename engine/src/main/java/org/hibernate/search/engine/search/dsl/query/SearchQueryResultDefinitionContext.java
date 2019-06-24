@@ -13,7 +13,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.util.common.SearchException;
 
@@ -26,18 +26,18 @@ import org.hibernate.search.util.common.SearchException;
  * or a similar method.
  * @param <R> The type of entity references, i.e. the type of hits returned by
  * {@link #asEntityReference() reference queries},
- * or the type of objects returned for {@link SearchProjectionFactoryContext#entityReference() entity reference projections}.
+ * or the type of objects returned for {@link SearchProjectionFactory#entityReference() entity reference projections}.
  * @param <E> The type of entities, i.e. the type of hits returned by
  * {@link #asEntity() entity queries},
- * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
- * @param <PJC> The type of contexts used to create projections in {@link #asProjection(Function)}.
+ * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
+ * @param <PJF> The type of factory used to create projections in {@link #asProjection(Function)}.
  * @param <PDF> The type of factory used to create predicates in {@link #predicate(Function)}.
  */
 public interface SearchQueryResultDefinitionContext<
 				N extends SearchQueryContext<?, E, ?>,
 				R,
 				E,
-				PJC extends SearchProjectionFactoryContext<R, E>,
+				PJF extends SearchProjectionFactory<R, E>,
 				PDF extends SearchPredicateFactory
 		>
 		extends SearchQueryResultContext<N, E, PDF> {
@@ -61,7 +61,7 @@ public interface SearchQueryResultDefinitionContext<
 	/**
 	 * Define the query results as one projection for each matching document.
 	 *
-	 * @param projectionContributor A function that will use the DSL context passed in parameter to create a projection,
+	 * @param projectionContributor A function that will use the factory passed in parameter to create a projection,
 	 * returning the final step in the projection DSL.
 	 * Should generally be a lambda expression.
 	 * @param <P> The resulting type of the projection.
@@ -69,7 +69,7 @@ public interface SearchQueryResultDefinitionContext<
 	 * @see SearchQueryResultContext
 	 */
 	<P> SearchQueryResultContext<?, P, ?> asProjection(
-			Function<? super PJC, ? extends ProjectionFinalStep<P>> projectionContributor);
+			Function<? super PJF, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	/**
 	 * Define the query results as one projection for each matching document.
@@ -87,11 +87,11 @@ public interface SearchQueryResultDefinitionContext<
 	 * Note that using this method will force you to use casts when consuming the results,
 	 * since the returned lists are not typed ({@code List<?>} instead of {@code List<T>}).
 	 * You can replace calls to this method advantageously with calls to {@link #asProjection(Function)}
-	 * defining a {@link SearchProjectionFactoryContext#composite(BiFunction, SearchProjection, SearchProjection) composite projection}.
+	 * defining a {@link SearchProjectionFactory#composite(BiFunction, SearchProjection, SearchProjection) composite projection}.
 	 *
 	 * @param projections A list of previously-created {@link SearchProjection} objects.
 	 * @return A context allowing to define the query further.
-	 * @see SearchProjectionFactoryContext#composite(BiFunction, SearchProjection, SearchProjection)
+	 * @see SearchProjectionFactory#composite(BiFunction, SearchProjection, SearchProjection)
 	 * @see SearchQueryResultContext
 	 */
 	SearchQueryResultContext<?, List<?>, ?> asProjections(SearchProjection<?>... projections);

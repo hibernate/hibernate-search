@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.javabean.scope;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -78,8 +78,8 @@ public interface SearchScope {
 	 * removing the need to create separate objects to represent the projections.
 	 *
 	 * @return A projection factory.
-	 * @see SearchProjectionFactoryContext
+	 * @see SearchProjectionFactory
 	 */
-	SearchProjectionFactoryContext<EntityReference, ?> projection();
+	SearchProjectionFactory<EntityReference, ?> projection();
 
 }

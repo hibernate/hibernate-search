@@ -6,22 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.search.dsl.projection.impl;
 
-import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
+import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
-import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchProjectionFactory;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
 
-public class LuceneSearchProjectionFactoryContextImpl<R, E>
-		extends DelegatingSearchProjectionFactoryContext<R, E>
-		implements LuceneSearchProjectionFactoryContext<R, E> {
+public class LuceneSearchProjectionFactoryImpl<R, E>
+		extends DelegatingSearchProjectionFactory<R, E>
+		implements LuceneSearchProjectionFactory<R, E> {
 
 	private final LuceneSearchProjectionBuilderFactory factory;
 
-	public LuceneSearchProjectionFactoryContextImpl(SearchProjectionFactoryContext<R, E> delegate,
+	public LuceneSearchProjectionFactoryImpl(SearchProjectionFactory<R, E> delegate,
 			LuceneSearchProjectionBuilderFactory factory) {
 		super( delegate );
 		this.factory = factory;

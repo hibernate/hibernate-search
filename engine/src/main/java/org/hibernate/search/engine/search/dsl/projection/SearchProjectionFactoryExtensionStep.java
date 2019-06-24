@@ -12,52 +12,52 @@ import org.hibernate.search.util.common.SearchException;
 
 /**
  * The DSL step when attempting to apply multiple extensions
- * to a {@link SearchProjectionFactoryContext}.
+ * to a {@link SearchProjectionFactory}.
  *
- * @param <R> The type of entity references in the parent {@link SearchProjectionFactoryContext}.
- * @param <E> The type of entities in the parent {@link SearchProjectionFactoryContext}.
+ * @param <R> The type of entity references in the parent {@link SearchProjectionFactory}.
+ * @param <E> The type of entities in the parent {@link SearchProjectionFactory}.
  * @param <P> The resulting projection type.
  *
- * @see SearchProjectionFactoryContext#extension()
+ * @see SearchProjectionFactory#extension()
  */
-public interface SearchProjectionFactoryContextExtensionStep<P, R, E> {
+public interface SearchProjectionFactoryExtensionStep<P, R, E> {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
-	 * {@link #ifSupported(SearchProjectionFactoryContextExtension, Function)}
-	 * was supported, extend the current context with this extension,
-	 * apply the given function to the extended context, and store the resulting projection for later retrieval.
+	 * {@link #ifSupported(SearchProjectionFactoryExtension, Function)}
+	 * was supported, extend the current factory with this extension,
+	 * apply the given function to the extended factory, and store the resulting projection for later retrieval.
 	 * <p>
 	 * This method cannot be called after {@link #orElse(Function)} or {@link #orElseFail()}.
 	 *
 	 * @param extension The extension to apply.
 	 * @param projectionContributor A function called if the extension is successfully applied;
-	 * it will use the (extended) DSL context passed in parameter to create a projection,
+	 * it will use the (extended) projection factory passed in parameter to create a projection,
 	 * returning the final step in the projection DSL.
 	 * Should generally be a lambda expression.
-	 * @param <T> The type of the extended context.
+	 * @param <T> The type of the extended factory.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchProjectionFactoryContextExtensionStep<P, R, E> ifSupported(
-			SearchProjectionFactoryContextExtension<T, R, E> extension,
+	<T> SearchProjectionFactoryExtensionStep<P, R, E> ifSupported(
+			SearchProjectionFactoryExtension<T, R, E> extension,
 			Function<T, ? extends ProjectionFinalStep<P>> projectionContributor
 	);
 
 	/**
-	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryContextExtension, Function)}
-	 * was supported so far, apply the given function to the current (non-extended) {@link SearchProjectionFactoryContext};
+	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryExtension, Function)}
+	 * was supported so far, apply the given function to the current (non-extended) {@link SearchProjectionFactory};
 	 * otherwise return the projection created in the first succeeding {@code ifSupported} call.
 	 *
 	 * @param projectionContributor A function called if no extension was successfully applied;
-	 * it will use the (extended) DSL context passed in parameter to create a projection,
+	 * it will use the (non-extended) projection factory passed in parameter to create a projection,
 	 * returning the final step in the projection DSL.
 	 * Should generally be a lambda expression.
 	 * @return The created projection.
 	 */
-	ProjectionFinalStep<P> orElse(Function<SearchProjectionFactoryContext<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
+	ProjectionFinalStep<P> orElse(Function<SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	/**
-	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryContextExtension, Function)}
+	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryExtension, Function)}
 	 * was supported so far, throw an exception;
 	 * otherwise return the projection created in the first succeeding {@code ifSupported} call.
 	 *

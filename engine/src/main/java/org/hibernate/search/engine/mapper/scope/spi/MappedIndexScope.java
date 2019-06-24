@@ -8,7 +8,7 @@ package org.hibernate.search.engine.mapper.scope.spi;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -16,10 +16,10 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 /**
  * @param <R> The type of entity references, i.e. the type of hits returned by
  * {@link SearchQueryResultDefinitionContext#asEntityReference() reference queries},
- * or the type of objects returned for {@link SearchProjectionFactoryContext#entityReference() entity reference projections}.
+ * or the type of objects returned for {@link SearchProjectionFactory#entityReference() entity reference projections}.
  * @param <E> The type of entities, i.e. the type of hits returned by
  * {@link SearchQueryResultDefinitionContext#asEntity() entity queries}
- * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
+ * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
  */
 public interface MappedIndexScope<R, E> {
 
@@ -29,7 +29,7 @@ public interface MappedIndexScope<R, E> {
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> with any T.
 	 */
-	SearchQueryResultDefinitionContext<?, R, E, SearchProjectionFactoryContext<R, E>, ?> search(
+	SearchQueryResultDefinitionContext<?, R, E, SearchProjectionFactory<R, E>, ?> search(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder);
 
@@ -42,6 +42,6 @@ public interface MappedIndexScope<R, E> {
 	 * otherwise some casts in EntityProjectionOptionsStepImpl and EntityReferenceProjectionOptionsStepImpl
 	 * will be wrong.
 	 */
-	SearchProjectionFactoryContext<R, E> projection();
+	SearchProjectionFactory<R, E> projection();
 
 }

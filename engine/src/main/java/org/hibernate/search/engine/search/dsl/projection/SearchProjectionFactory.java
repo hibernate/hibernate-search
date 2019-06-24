@@ -18,14 +18,14 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.function.TriFunction;
 
 /**
- * A context allowing to create a projection.
+ * A factory for search projections.
  *
  * @param <R> The type of entity references, i.e. the type of objects returned for
  * {@link #entityReference() entity reference projections}.
  * @param <E> The type of entities, i.e. the type of objects returned for
  * {@link #entity() entity projections}.
  */
-public interface SearchProjectionFactoryContext<R, E> {
+public interface SearchProjectionFactory<R, E> {
 
 	/**
 	 * Project the match to a {@link DocumentReference}.
@@ -270,22 +270,22 @@ public interface SearchProjectionFactoryContext<R, E> {
 	}
 
 	/**
-	 * Extend the current context with the given extension,
-	 * resulting in an extended context offering different types of projections.
+	 * Extend the current factory with the given extension,
+	 * resulting in an extended factory offering different types of projections.
 	 *
 	 * @param extension The extension to the projection DSL.
-	 * @param <T> The type of context provided by the extension.
-	 * @return The extended context.
+	 * @param <T> The type of factory provided by the extension.
+	 * @return The extended factory.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchProjectionFactoryContextExtension<T, R, E> extension);
+	<T> T extension(SearchProjectionFactoryExtension<T, R, E> extension);
 
 	/**
 	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
 	 * failing only if <em>none</em> of the extensions is supported.
 	 * <p>
 	 * If you only need to apply a single extension and fail if it is not supported,
-	 * use the simpler {@link #extension(SearchProjectionFactoryContextExtension)} method instead.
+	 * use the simpler {@link #extension(SearchProjectionFactoryExtension)} method instead.
 	 * <p>
 	 * This method is generic, and you should set the generic type explicitly to the expected projected type,
 	 * e.g. {@code .<MyProjectedType>extension()}.
@@ -293,5 +293,5 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * @param <T> The expected projected type.
 	 * @return A DSL step.
 	 */
-	<T> SearchProjectionFactoryContextExtensionStep<T, R, E> extension();
+	<T> SearchProjectionFactoryExtensionStep<T, R, E> extension();
 }

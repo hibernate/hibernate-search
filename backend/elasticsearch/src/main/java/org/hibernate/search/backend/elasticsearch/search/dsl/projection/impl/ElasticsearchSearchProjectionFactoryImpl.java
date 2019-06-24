@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
-import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchProjectionFactory;
 
-public class ElasticsearchSearchProjectionFactoryContextImpl<R, E>
-		extends DelegatingSearchProjectionFactoryContext<R, E>
-		implements ElasticsearchSearchProjectionFactoryContext<R, E> {
+public class ElasticsearchSearchProjectionFactoryImpl<R, E>
+		extends DelegatingSearchProjectionFactory<R, E>
+		implements ElasticsearchSearchProjectionFactory<R, E> {
 
 	private final ElasticsearchSearchProjectionBuilderFactory factory;
 
-	public ElasticsearchSearchProjectionFactoryContextImpl(SearchProjectionFactoryContext<R, E> delegate,
+	public ElasticsearchSearchProjectionFactoryImpl(SearchProjectionFactory<R, E> delegate,
 			ElasticsearchSearchProjectionBuilderFactory factory) {
 		super( delegate );
 		this.factory = factory;

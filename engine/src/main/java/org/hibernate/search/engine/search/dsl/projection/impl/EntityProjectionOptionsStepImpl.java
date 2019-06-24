@@ -23,7 +23,7 @@ public class EntityProjectionOptionsStepImpl<E> implements EntityProjectionOptio
 	@Override
 	/*
 	 * The backend has no control over the type of entities.
-	 * This cast is only safe because we make sure to only use SearchProjectionFactoryContext
+	 * This cast is only safe because we make sure to only use SearchProjectionFactory
 	 * with generic type arguments that are consistent with the type of entity loaders.
 	 * See comments in MappedIndexScope.
 	 */

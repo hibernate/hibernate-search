@@ -10,8 +10,8 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
+import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.query.impl.DefaultSearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
@@ -38,7 +38,7 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 	}
 
 	@Override
-	public SearchQueryResultDefinitionContext<?, R, E, SearchProjectionFactoryContext<R, E>, ?> search(
+	public SearchQueryResultDefinitionContext<?, R, E, SearchProjectionFactory<R, E>, ?> search(
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		return new DefaultSearchQueryResultDefinitionContext<>( delegate, sessionContext, loadingContextBuilder );
@@ -57,7 +57,7 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 	}
 
 	@Override
-	public SearchProjectionFactoryContext<R, E> projection() {
-		return new DefaultSearchProjectionFactoryContext<>( delegate.getSearchProjectionFactory() );
+	public SearchProjectionFactory<R, E> projection() {
+		return new DefaultSearchProjectionFactory<>( delegate.getSearchProjectionFactory() );
 	}
 }

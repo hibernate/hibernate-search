@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultDefinitionContext;
@@ -31,7 +31,7 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 				ElasticsearchSearchQueryContext<E>,
 				R,
 				E,
-				ElasticsearchSearchProjectionFactoryContext<R, E>,
+		ElasticsearchSearchProjectionFactory<R, E>,
 				ElasticsearchSearchPredicateFactory,
 				ElasticsearchSearchQueryElementCollector
 		>
@@ -65,9 +65,9 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 
 	@Override
 	public <P> ElasticsearchSearchQueryResultContext<P> asProjection(
-			Function<? super ElasticsearchSearchProjectionFactoryContext<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
-		ElasticsearchSearchProjectionFactoryContext<R, E> factoryContext =
-				createDefaultProjectionFactoryContext().extension( ElasticsearchExtension.get() );
+			Function<? super ElasticsearchSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
+		ElasticsearchSearchProjectionFactory<R, E> factoryContext =
+				createDefaultProjectionFactory().extension( ElasticsearchExtension.get() );
 		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();
 		return asProjection( projection );
 	}

@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
@@ -25,7 +25,7 @@ public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, E>
 				SearchQueryContext<?, E, ?>,
 				R,
 				E,
-				SearchProjectionFactoryContext<R, E>,
+				SearchProjectionFactory<R, E>,
 				SearchPredicateFactory
 		> {
 
@@ -47,7 +47,7 @@ public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, E>
 
 	@Override
 	public <P> SearchQueryResultContext<?, P, ?> asProjection(
-			Function<? super SearchProjectionFactoryContext<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
+			Function<? super SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		return delegate.asProjection( projectionContributor );
 	}
 

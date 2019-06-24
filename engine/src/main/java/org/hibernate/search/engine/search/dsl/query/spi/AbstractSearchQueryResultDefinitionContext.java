@@ -9,8 +9,8 @@ package org.hibernate.search.engine.search.dsl.query.spi;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
+import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -21,11 +21,11 @@ public abstract class AbstractSearchQueryResultDefinitionContext<
 				N extends SearchQueryContext<?, E, ?>,
 				R,
 				E,
-				PJC extends SearchProjectionFactoryContext<R, E>,
+				PJF extends SearchProjectionFactory<R, E>,
 				PDF extends SearchPredicateFactory,
 				C
 		>
-		implements SearchQueryResultDefinitionContext<N, R, E, PJC, PDF> {
+		implements SearchQueryResultDefinitionContext<N, R, E, PJF, PDF> {
 
 	@Override
 	public <T> T extension(SearchQueryContextExtension<T, R, E> extension) {
@@ -37,8 +37,8 @@ public abstract class AbstractSearchQueryResultDefinitionContext<
 		);
 	}
 
-	protected final SearchProjectionFactoryContext<R, E> createDefaultProjectionFactoryContext() {
-		return new DefaultSearchProjectionFactoryContext<>( getIndexScope().getSearchProjectionFactory() );
+	protected final SearchProjectionFactory<R, E> createDefaultProjectionFactory() {
+		return new DefaultSearchProjectionFactory<>( getIndexScope().getSearchProjectionFactory() );
 	}
 
 	protected abstract IndexScope<C> getIndexScope();

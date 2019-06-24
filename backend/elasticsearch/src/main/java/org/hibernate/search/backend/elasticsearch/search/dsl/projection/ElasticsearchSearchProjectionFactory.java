@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.projection;
 
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 
 /**
- * A DSL context allowing to create a projection, with some Elasticsearch-specific methods.
+ * A factory for search projections with some Elasticsearch-specific methods.
  *
  * @param <R> The type of entity references.
  * @param <E> The type of entities.
- * @see SearchProjectionFactoryContext
+ * @see SearchProjectionFactory
  */
-public interface ElasticsearchSearchProjectionFactoryContext<R, E> extends SearchProjectionFactoryContext<R, E> {
+public interface ElasticsearchSearchProjectionFactory<R, E> extends SearchProjectionFactory<R, E> {
 
 	/**
 	 * Project to a string representing the JSON document as stored in Elasticsearch.
