@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.dsl.projection.FieldProjectionOptionsS
 import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionStep;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionIfSupportedStep;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
@@ -97,7 +97,7 @@ public class DelegatingSearchProjectionFactory<R, E> implements SearchProjection
 	}
 
 	@Override
-	public <P> SearchProjectionFactoryExtensionStep<P, R, E> extension() {
+	public <P> SearchProjectionFactoryExtensionIfSupportedStep<P, R, E> extension() {
 		return delegate.extension();
 	}
 }
