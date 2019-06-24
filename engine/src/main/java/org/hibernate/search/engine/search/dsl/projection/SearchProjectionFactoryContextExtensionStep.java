@@ -11,7 +11,7 @@ import java.util.function.Function;
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * The context used when attempting to apply multiple extensions
+ * The DSL step when attempting to apply multiple extensions
  * to a {@link SearchProjectionFactoryContext}.
  *
  * @param <R> The type of entity references in the parent {@link SearchProjectionFactoryContext}.
@@ -20,7 +20,7 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @see SearchProjectionFactoryContext#extension()
  */
-public interface SearchProjectionFactoryExtensionContext<P, R, E> {
+public interface SearchProjectionFactoryContextExtensionStep<P, R, E> {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
@@ -33,14 +33,14 @@ public interface SearchProjectionFactoryExtensionContext<P, R, E> {
 	 * @param extension The extension to apply.
 	 * @param projectionContributor A function called if the extension is successfully applied;
 	 * it will use the (extended) DSL context passed in parameter to create a projection,
-	 * returning the resulting terminal context.
+	 * returning the final step in the projection DSL.
 	 * Should generally be a lambda expression.
 	 * @param <T> The type of the extended context.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchProjectionFactoryExtensionContext<P, R, E> ifSupported(
+	<T> SearchProjectionFactoryContextExtensionStep<P, R, E> ifSupported(
 			SearchProjectionFactoryContextExtension<T, R, E> extension,
-			Function<T, ? extends SearchProjectionTerminalContext<P>> projectionContributor
+			Function<T, ? extends ProjectionFinalStep<P>> projectionContributor
 	);
 
 	/**
@@ -50,11 +50,11 @@ public interface SearchProjectionFactoryExtensionContext<P, R, E> {
 	 *
 	 * @param projectionContributor A function called if no extension was successfully applied;
 	 * it will use the (extended) DSL context passed in parameter to create a projection,
-	 * returning the resulting terminal context.
+	 * returning the final step in the projection DSL.
 	 * Should generally be a lambda expression.
 	 * @return The created projection.
 	 */
-	SearchProjectionTerminalContext<P> orElse(Function<SearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
+	ProjectionFinalStep<P> orElse(Function<SearchProjectionFactoryContext<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryContextExtension, Function)}
@@ -64,6 +64,6 @@ public interface SearchProjectionFactoryExtensionContext<P, R, E> {
 	 * @return The created projection.
 	 * @throws SearchException If none of the previously passed extensions was supported.
 	 */
-	SearchProjectionTerminalContext<P> orElseFail();
+	ProjectionFinalStep<P> orElseFail();
 
 }

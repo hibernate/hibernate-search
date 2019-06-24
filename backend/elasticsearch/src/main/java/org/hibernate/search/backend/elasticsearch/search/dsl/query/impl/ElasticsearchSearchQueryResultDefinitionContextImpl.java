@@ -22,7 +22,7 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
@@ -65,7 +65,7 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 
 	@Override
 	public <P> ElasticsearchSearchQueryResultContext<P> asProjection(
-			Function<? super ElasticsearchSearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
+			Function<? super ElasticsearchSearchProjectionFactoryContext<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		ElasticsearchSearchProjectionFactoryContext<R, E> factoryContext =
 				createDefaultProjectionFactoryContext().extension( ElasticsearchExtension.get() );
 		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();

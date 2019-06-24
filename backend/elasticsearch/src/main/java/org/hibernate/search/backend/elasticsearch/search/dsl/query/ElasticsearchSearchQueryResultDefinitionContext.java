@@ -12,7 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 
 public interface ElasticsearchSearchQueryResultDefinitionContext<R, E>
@@ -33,7 +33,7 @@ public interface ElasticsearchSearchQueryResultDefinitionContext<R, E>
 
 	@Override
 	<P> ElasticsearchSearchQueryResultContext<P> asProjection(
-			Function<? super ElasticsearchSearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
+			Function<? super ElasticsearchSearchProjectionFactoryContext<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	@Override
 	<P> ElasticsearchSearchQueryResultContext<P> asProjection(SearchProjection<P> projection);

@@ -22,7 +22,7 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
@@ -65,7 +65,7 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 
 	@Override
 	public <P> LuceneSearchQueryResultContext<P> asProjection(
-			Function<? super LuceneSearchProjectionFactoryContext<R, E>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
+			Function<? super LuceneSearchProjectionFactoryContext<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		LuceneSearchProjectionFactoryContext<R, E> factoryContext =
 				createDefaultProjectionFactoryContext().extension( LuceneExtension.get() );
 		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();

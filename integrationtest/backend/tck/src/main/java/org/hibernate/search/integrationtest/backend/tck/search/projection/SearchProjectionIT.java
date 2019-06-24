@@ -29,7 +29,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -615,7 +615,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 			this.delegate = delegate;
 		}
 
-		public <T> SearchProjectionTerminalContext<T> extendedProjection(String fieldName, Class<T> type) {
+		public <T> ProjectionFinalStep<T> extendedProjection(String fieldName, Class<T> type) {
 			return delegate.field( fieldName, type );
 		}
 	}

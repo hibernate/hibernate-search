@@ -12,16 +12,16 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.CompositeProjectionContext;
-import org.hibernate.search.engine.search.dsl.projection.DistanceToFieldProjectionContext;
-import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionContext;
-import org.hibernate.search.engine.search.dsl.projection.EntityReferenceProjectionContext;
-import org.hibernate.search.engine.search.dsl.projection.FieldProjectionContext;
-import org.hibernate.search.engine.search.dsl.projection.EntityProjectionContext;
-import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
+import org.hibernate.search.engine.search.dsl.projection.CompositeProjectionOptionsStep;
+import org.hibernate.search.engine.search.dsl.projection.DistanceToFieldProjectionOptionsStep;
+import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionOptionsStep;
+import org.hibernate.search.engine.search.dsl.projection.EntityProjectionOptionsStep;
+import org.hibernate.search.engine.search.dsl.projection.EntityReferenceProjectionOptionsStep;
+import org.hibernate.search.engine.search.dsl.projection.FieldProjectionOptionsStep;
+import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtensionStep;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -38,80 +38,80 @@ public class DefaultSearchProjectionFactoryContext<R, E> implements SearchProjec
 	}
 
 	@Override
-	public DocumentReferenceProjectionContext documentReference() {
-		return new DocumentReferenceProjectionContextImpl( factory );
+	public DocumentReferenceProjectionOptionsStep documentReference() {
+		return new DocumentReferenceProjectionOptionsStepImpl( factory );
 	}
 
 	@Override
-	public <T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> clazz, ProjectionConverter projectionConverter) {
+	public <T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> clazz, ProjectionConverter projectionConverter) {
 		Contracts.assertNotNull( clazz, "clazz" );
 
-		return new FieldProjectionContextImpl<>( factory, absoluteFieldPath, clazz, projectionConverter );
+		return new FieldProjectionOptionsStepImpl<>( factory, absoluteFieldPath, clazz, projectionConverter );
 	}
 
 	@Override
-	public FieldProjectionContext<Object> field(String absoluteFieldPath, ProjectionConverter projectionConverter) {
+	public FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ProjectionConverter projectionConverter) {
 		return field( absoluteFieldPath, Object.class, projectionConverter );
 	}
 
 	@Override
-	public EntityReferenceProjectionContext<R> entityReference() {
-		return new EntityReferenceProjectionContextImpl<>( factory );
+	public EntityReferenceProjectionOptionsStep<R> entityReference() {
+		return new EntityReferenceProjectionOptionsStepImpl<>( factory );
 	}
 
 	@Override
-	public EntityProjectionContext<E> entity() {
-		return new EntityProjectionContextImpl<>( factory );
+	public EntityProjectionOptionsStep<E> entity() {
+		return new EntityProjectionOptionsStepImpl<>( factory );
 	}
 
 	@Override
-	public ScoreProjectionContext score() {
-		return new ScoreProjectionContextImpl( factory );
+	public ScoreProjectionOptionsStep score() {
+		return new ScoreProjectionOptionsStepImpl( factory );
 	}
 
 	@Override
-	public DistanceToFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center) {
+	public DistanceToFieldProjectionOptionsStep distance(String absoluteFieldPath, GeoPoint center) {
 		Contracts.assertNotNull( center, "center" );
 
-		return new DistanceToFieldProjectionContextImpl( factory, absoluteFieldPath, center );
+		return new DistanceToFieldProjectionOptionsStepImpl( factory, absoluteFieldPath, center );
 	}
 
 	@Override
-	public <T> CompositeProjectionContext<T> composite(Function<List<?>, T> transformer,
+	public <T> CompositeProjectionOptionsStep<T> composite(Function<List<?>, T> transformer,
 			SearchProjection<?>... projections) {
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNullNorEmpty( projections, "projections" );
 
-		return new CompositeProjectionContextImpl<>( factory, transformer, projections );
+		return new CompositeProjectionOptionsStepImpl<>( factory, transformer, projections );
 	}
 
 	@Override
-	public <P, T> CompositeProjectionContext<T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
+	public <P, T> CompositeProjectionOptionsStep<T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNull( projection, "projection" );
 
-		return new CompositeProjectionContextImpl<>( factory, transformer, projection );
+		return new CompositeProjectionOptionsStepImpl<>( factory, transformer, projection );
 	}
 
 	@Override
-	public <P1, P2, T> CompositeProjectionContext<T> composite(BiFunction<P1, P2, T> transformer,
+	public <P1, P2, T> CompositeProjectionOptionsStep<T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNull( projection1, "projection1" );
 		Contracts.assertNotNull( projection2, "projection2" );
 
-		return new CompositeProjectionContextImpl<>( factory, transformer, projection1, projection2 );
+		return new CompositeProjectionOptionsStepImpl<>( factory, transformer, projection1, projection2 );
 	}
 
 	@Override
-	public <P1, P2, P3, T> CompositeProjectionContext<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	public <P1, P2, P3, T> CompositeProjectionOptionsStep<T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNull( projection1, "projection1" );
 		Contracts.assertNotNull( projection2, "projection2" );
 		Contracts.assertNotNull( projection3, "projection3" );
 
-		return new CompositeProjectionContextImpl<>( factory, transformer, projection1, projection2, projection3 );
+		return new CompositeProjectionOptionsStepImpl<>( factory, transformer, projection1, projection2, projection3 );
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class DefaultSearchProjectionFactoryContext<R, E> implements SearchProjec
 	}
 
 	@Override
-	public <T> SearchProjectionFactoryExtensionContext<T, R, E> extension() {
-		return new SearchProjectionFactoryExtensionContextImpl<>( this, factory );
+	public <T> SearchProjectionFactoryContextExtensionStep<T, R, E> extension() {
+		return new SearchProjectionFactoryContextExtensionStepImpl<>( this, factory );
 	}
 }

@@ -7,8 +7,8 @@
 package org.hibernate.search.engine.search.dsl.projection;
 
 /**
- * The context used when starting to define a field projection.
+ * The initial and final step in an "entity" projection definition, where optional parameters can be set.
  */
-public interface FieldProjectionContext<T> extends SearchProjectionTerminalContext<T> {
+public interface EntityProjectionOptionsStep<E> extends ProjectionFinalStep<E> {
 
 }

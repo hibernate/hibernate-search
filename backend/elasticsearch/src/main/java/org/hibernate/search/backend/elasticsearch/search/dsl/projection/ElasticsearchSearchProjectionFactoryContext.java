@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.projection;
 
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 
 /**
  * A DSL context allowing to create a projection, with some Elasticsearch-specific methods.
@@ -20,9 +20,10 @@ public interface ElasticsearchSearchProjectionFactoryContext<R, E> extends Searc
 
 	/**
 	 * Project to a string representing the JSON document as stored in Elasticsearch.
-	 * @return A context allowing to define the projection more precisely.
+	 *
+	 * @return The final step of the projection DSL.
 	 */
-	SearchProjectionTerminalContext<String> source();
+	ProjectionFinalStep<String> source();
 
 	/**
 	 * Project to a string representing a JSON object describing the score computation for the hit.
@@ -30,8 +31,8 @@ public interface ElasticsearchSearchProjectionFactoryContext<R, E> extends Searc
 	 * This feature is relatively expensive, do not use unless you return a limited
 	 * amount of objects (using pagination).
 	 *
-	 * @return A context allowing to define the projection more precisely.
+	 * @return The final step of the projection DSL.
 	 */
-	SearchProjectionTerminalContext<String> explanation();
+	ProjectionFinalStep<String> explanation();
 
 }

@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.dsl.projection.impl;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchProjectionFactoryContext;
 
 import org.apache.lucene.document.Document;
@@ -28,12 +28,12 @@ public class LuceneSearchProjectionFactoryContextImpl<R, E>
 	}
 
 	@Override
-	public SearchProjectionTerminalContext<Document> document() {
-		return new LuceneDocumentProjectionContext( factory );
+	public ProjectionFinalStep<Document> document() {
+		return new LuceneDocumentProjectionFinalStep( factory );
 	}
 
 	@Override
-	public SearchProjectionTerminalContext<Explanation> explanation() {
-		return new LuceneExplanationProjectionContext( factory );
+	public ProjectionFinalStep<Explanation> explanation() {
+		return new LuceneExplanationProjectionFinalStep( factory );
 	}
 }

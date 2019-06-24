@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchProjectionFactoryContext;
 
 public class ElasticsearchSearchProjectionFactoryContextImpl<R, E>
@@ -25,12 +25,12 @@ public class ElasticsearchSearchProjectionFactoryContextImpl<R, E>
 	}
 
 	@Override
-	public SearchProjectionTerminalContext<String> source() {
-		return new ElasticsearchSourceProjectionContext( factory );
+	public ProjectionFinalStep<String> source() {
+		return new ElasticsearchSourceProjectionFinalStep( factory );
 	}
 
 	@Override
-	public SearchProjectionTerminalContext<String> explanation() {
-		return new ElasticsearchExplanationProjectionContext( factory );
+	public ProjectionFinalStep<String> explanation() {
+		return new ElasticsearchExplanationProjectionFinalStep( factory );
 	}
 }

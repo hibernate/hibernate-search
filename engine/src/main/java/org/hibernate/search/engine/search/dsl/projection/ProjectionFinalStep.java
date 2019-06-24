@@ -9,11 +9,11 @@ package org.hibernate.search.engine.search.dsl.projection;
 import org.hibernate.search.engine.search.SearchProjection;
 
 /**
- * The terminal context of the projection DSL.
+ * The final step in a projection definition, where the projection can be retrieved.
  *
  * @param <T> The type returned by the projection.
  */
-public interface SearchProjectionTerminalContext<T> {
+public interface ProjectionFinalStep<T> {
 
 	/**
 	 * Create a {@link SearchProjection} instance

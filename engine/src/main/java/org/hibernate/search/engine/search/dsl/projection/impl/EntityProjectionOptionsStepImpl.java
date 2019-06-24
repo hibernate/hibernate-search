@@ -7,17 +7,17 @@
 package org.hibernate.search.engine.search.dsl.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.EntityReferenceProjectionContext;
-import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
+import org.hibernate.search.engine.search.dsl.projection.EntityProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
-public class EntityReferenceProjectionContextImpl<R> implements EntityReferenceProjectionContext<R> {
+public class EntityProjectionOptionsStepImpl<E> implements EntityProjectionOptionsStep<E> {
 
-	private final EntityReferenceProjectionBuilder<R> entityReferenceProjectionBuilder;
+	private final EntityProjectionBuilder<E> entityProjectionBuilder;
 
-	EntityReferenceProjectionContextImpl(SearchProjectionBuilderFactory factory) {
-		this.entityReferenceProjectionBuilder = factory.entityReference();
+	EntityProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory) {
+		this.entityProjectionBuilder = factory.entity();
 	}
 
 	@Override
@@ -27,8 +27,8 @@ public class EntityReferenceProjectionContextImpl<R> implements EntityReferenceP
 	 * with generic type arguments that are consistent with the type of entity loaders.
 	 * See comments in MappedIndexScope.
 	 */
-	public SearchProjection<R> toProjection() {
-		return entityReferenceProjectionBuilder.build();
+	public SearchProjection<E> toProjection() {
+		return entityProjectionBuilder.build();
 	}
 
 }

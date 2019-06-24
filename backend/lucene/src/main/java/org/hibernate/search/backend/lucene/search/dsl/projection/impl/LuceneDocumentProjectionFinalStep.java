@@ -8,15 +8,15 @@ package org.hibernate.search.backend.lucene.search.dsl.projection.impl;
 
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
 import org.apache.lucene.document.Document;
 
-final class LuceneDocumentProjectionContext implements SearchProjectionTerminalContext<Document> {
+final class LuceneDocumentProjectionFinalStep implements ProjectionFinalStep<Document> {
 	private final SearchProjectionBuilder<Document> builder;
 
-	LuceneDocumentProjectionContext(LuceneSearchProjectionBuilderFactory factory) {
+	LuceneDocumentProjectionFinalStep(LuceneSearchProjectionBuilderFactory factory) {
 		this.builder = factory.document();
 	}
 

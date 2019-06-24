@@ -8,16 +8,16 @@ package org.hibernate.search.engine.search.dsl.projection.impl;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionContext;
+import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
-public class DocumentReferenceProjectionContextImpl implements DocumentReferenceProjectionContext {
+public class DocumentReferenceProjectionOptionsStepImpl implements DocumentReferenceProjectionOptionsStep {
 
 	private final DocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
 
-	DocumentReferenceProjectionContextImpl(SearchProjectionBuilderFactory factory) {
+	DocumentReferenceProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory) {
 		this.documentReferenceProjectionBuilder = factory.documentReference();
 	}
 

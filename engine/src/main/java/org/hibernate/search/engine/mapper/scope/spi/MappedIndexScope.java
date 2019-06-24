@@ -25,7 +25,7 @@ public interface MappedIndexScope<R, E> {
 
 	/*
 	 * IMPLEMENTATION NOTE: we *must* only accept a loading context with the same R/E type parameters as this class,
-	 * otherwise some casts in EntityProjectionContextImpl and EntityReferenceProjectionContextImpl
+	 * otherwise some casts in EntityProjectionOptionsStepImpl and EntityReferenceProjectionOptionsStepImpl
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> with any T.
 	 */
@@ -39,7 +39,7 @@ public interface MappedIndexScope<R, E> {
 
 	/*
 	 * IMPLEMENTATION NOTE: we *must* return a factory with the same R/E type arguments as this class,
-	 * otherwise some casts in EntityProjectionContextImpl and EntityReferenceProjectionContextImpl
+	 * otherwise some casts in EntityProjectionOptionsStepImpl and EntityReferenceProjectionOptionsStepImpl
 	 * will be wrong.
 	 */
 	SearchProjectionFactoryContext<R, E> projection();

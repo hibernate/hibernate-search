@@ -30,9 +30,9 @@ public interface SearchProjectionFactoryContext<R, E> {
 	/**
 	 * Project the match to a {@link DocumentReference}.
 	 *
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "document reference" projection can be defined in more details.
 	 */
-	DocumentReferenceProjectionContext documentReference();
+	DocumentReferenceProjectionOptionsStep documentReference();
 
 	/**
 	 * Project to a reference to the entity that was originally indexed.
@@ -40,9 +40,9 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * The actual type of the reference depends on the mapper used to create the query:
 	 * the ORM mapper will return a class/identifier pair, for example.
 	 *
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "entity reference" projection can be defined in more details.
 	 */
-	EntityReferenceProjectionContext<R> entityReference();
+	EntityReferenceProjectionOptionsStep<R> entityReference();
 
 	/**
 	 * Project to the entity was originally indexed.
@@ -51,9 +51,9 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * and on the indexes targeted by your query:
 	 * the ORM mapper will return a managed entity loaded from the database, for example.
 	 *
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "entity" projection can be defined in more details.
 	 */
-	EntityProjectionContext<E> entity();
+	EntityProjectionOptionsStep<E> entity();
 
 	/**
 	 * Project to the value of a field in the indexed document.
@@ -64,9 +64,9 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param type The resulting type of the projection.
 	 * @param <T> The resulting type of the projection.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	default <T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> type) {
+	default <T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> type) {
 		return field( absoluteFieldPath, type, ProjectionConverter.ENABLED );
 	}
 
@@ -78,10 +78,9 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * @param <T> The resulting type of the projection.
 	 * @param projectionConverter Controls how the data fetched from the backend should be converted.
 	 * See {@link ProjectionConverter}.
-	 *
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	<T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> type, ProjectionConverter projectionConverter);
+	<T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> type, ProjectionConverter projectionConverter);
 
 	/**
 	 * Project to the value of a field in the indexed document, without specifying a type.
@@ -90,9 +89,9 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * See {@link ProjectionConverter#ENABLED}.
 	 *
 	 * @param absoluteFieldPath The absolute path of the field.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	default FieldProjectionContext<Object> field(String absoluteFieldPath) {
+	default FieldProjectionOptionsStep<Object> field(String absoluteFieldPath) {
 		return field( absoluteFieldPath, ProjectionConverter.ENABLED );
 	}
 
@@ -102,45 +101,44 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param projectionConverter Controls how the data fetched from the backend should be converted.
 	 * See {@link ProjectionConverter}.
-	 *
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	FieldProjectionContext<Object> field(String absoluteFieldPath, ProjectionConverter projectionConverter);
+	FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ProjectionConverter projectionConverter);
 
 	/**
 	 * Project on the score of the hit.
 	 *
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "score" projection can be defined in more details.
 	 */
-	ScoreProjectionContext score();
+	ScoreProjectionOptionsStep score();
 
 	/**
 	 * Project on the distance from the center to a {@link GeoPoint} field.
 	 *
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param center The center to compute the distance from.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "distance" projection can be defined in more details.
 	 */
-	DistanceToFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center);
+	DistanceToFieldProjectionOptionsStep distance(String absoluteFieldPath, GeoPoint center);
 
 	/**
 	 * Create a projection that will compose a {@link List} based on the given projections.
 	 *
 	 * @param projections The projections used to populate the list, in order.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default CompositeProjectionContext<List<?>> composite(SearchProjection<?>... projections) {
+	default CompositeProjectionOptionsStep<List<?>> composite(SearchProjection<?>... projections) {
 		return composite( Function.identity(), projections );
 	}
 
 	/**
 	 * Create a projection that will compose a {@link List} based on the given almost-built projections.
 	 *
-	 * @param terminalContexts The terminal contexts allowing to retrieve {@link SearchProjection}s.
-	 * @return A context allowing to define the projection more precisely.
+	 * @param dslFinalSteps The final steps in the projection DSL allowing the retrieval of {@link SearchProjection}s.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default CompositeProjectionContext<List<?>> composite(SearchProjectionTerminalContext<?> ... terminalContexts) {
-		return composite( Function.identity(), terminalContexts );
+	default CompositeProjectionOptionsStep<List<?>> composite(ProjectionFinalStep<?>... dslFinalSteps) {
+		return composite( Function.identity(), dslFinalSteps );
 	}
 
 	/**
@@ -149,23 +147,23 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * @param transformer The function that will transform the list of projected elements into a custom object.
 	 * @param projections The projections used to populate the list, in order.
 	 * @param <T> The type of the custom object composing the projected elements.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<T> CompositeProjectionContext<T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
+	<T> CompositeProjectionOptionsStep<T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
 
 	/**
 	 * Create a projection that will compose a custom object based on the given almost-built projections.
 	 *
 	 * @param transformer The function that will transform the projected element into a custom object.
-	 * @param terminalContexts The terminal contexts allowing to retrieve {@link SearchProjection}s.
+	 * @param dslFinalSteps The final steps in the projection DSL allowing the retrieval of {@link SearchProjection}s.
 	 * @param <T> The type of the custom object composing the projected elements.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default <T> CompositeProjectionContext<T> composite(Function<List<?>, T> transformer,
-			SearchProjectionTerminalContext<?> ... terminalContexts) {
-		SearchProjection<?>[] projections = new SearchProjection<?>[terminalContexts.length];
-		for ( int i = 0; i < terminalContexts.length; i++ ) {
-			projections[i] = terminalContexts[i].toProjection();
+	default <T> CompositeProjectionOptionsStep<T> composite(Function<List<?>, T> transformer,
+			ProjectionFinalStep<?>... dslFinalSteps) {
+		SearchProjection<?>[] projections = new SearchProjection<?>[dslFinalSteps.length];
+		for ( int i = 0; i < dslFinalSteps.length; i++ ) {
+			projections[i] = dslFinalSteps[i].toProjection();
 		}
 		return composite( transformer, projections );
 	}
@@ -177,22 +175,22 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * @param projection The original projection used to produce the element passed to the transformer.
 	 * @param <P> The type of the element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected element.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<P, T> CompositeProjectionContext<T> composite(Function<P, T> transformer, SearchProjection<P> projection);
+	<P, T> CompositeProjectionOptionsStep<T> composite(Function<P, T> transformer, SearchProjection<P> projection);
 
 	/**
 	 * Create a projection that will compose a custom object based on one almost-built projection.
 	 *
 	 * @param transformer The function that will transform the projected element into a custom object.
-	 * @param terminalContext The terminal context allowing to retrieve the {@link SearchProjection}
+	 * @param dslFinalStep The final step in the projection DSL allowing the retrieval of the {@link SearchProjection}
 	 * that will be used to produce the element passed to the transformer.
 	 * @param <P> The type of the element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected element.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default <P, T> CompositeProjectionContext<T> composite(Function<P, T> transformer, SearchProjectionTerminalContext<P> terminalContext) {
-		return composite( transformer, terminalContext.toProjection() );
+	default <P, T> CompositeProjectionOptionsStep<T> composite(Function<P, T> transformer, ProjectionFinalStep<P> dslFinalStep) {
+		return composite( transformer, dslFinalStep.toProjection() );
 	}
 
 	/**
@@ -204,29 +202,29 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * @param <P1> The type of the first element passed to the transformer.
 	 * @param <P2> The type of the second element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected elements.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<P1, P2, T> CompositeProjectionContext<T> composite(BiFunction<P1, P2, T> transformer,
+	<P1, P2, T> CompositeProjectionOptionsStep<T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2);
 
 	/**
 	 * Create a projection that will compose a custom object based on two almost-built projections.
 	 *
 	 * @param transformer The function that will transform the projected elements into a custom object.
-	 * @param terminalContext1 The terminal context allowing to retrieve the {@link SearchProjection}
+	 * @param dslFinalStep1 The final step in the projection DSL allowing the retrieval of the {@link SearchProjection}
 	 * that will be used to produce the first element passed to the transformer.
-	 * @param terminalContext2 The terminal context allowing to retrieve the {@link SearchProjection}
+	 * @param dslFinalStep2 The final step in the projection DSL allowing the retrieval of the {@link SearchProjection}
 	 * that will be used to produce the second element passed to the transformer.
 	 * @param <P1> The type of the first element passed to the transformer.
 	 * @param <P2> The type of the second element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected elements.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default <P1, P2, T> CompositeProjectionContext<T> composite(BiFunction<P1, P2, T> transformer,
-			SearchProjectionTerminalContext<P1> terminalContext1, SearchProjectionTerminalContext<P2> terminalContext2) {
+	default <P1, P2, T> CompositeProjectionOptionsStep<T> composite(BiFunction<P1, P2, T> transformer,
+			ProjectionFinalStep<P1> dslFinalStep1, ProjectionFinalStep<P2> dslFinalStep2) {
 		return composite(
 				transformer,
-				terminalContext1.toProjection(), terminalContext2.toProjection()
+				dslFinalStep1.toProjection(), dslFinalStep2.toProjection()
 		);
 	}
 
@@ -241,33 +239,33 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * @param <P2> The type of the second element passed to the transformer.
 	 * @param <P3> The type of the third element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected elements.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<P1, P2, P3, T> CompositeProjectionContext<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	<P1, P2, P3, T> CompositeProjectionOptionsStep<T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3);
 
 	/**
 	 * Create a projection that will compose a custom object based on three almost-built projections.
 	 *
 	 * @param transformer The function that will transform the projected elements into a custom object.
-	 * @param terminalContext1 The terminal context allowing to retrieve the {@link SearchProjection}
+	 * @param dslFinalStep1 The final step in the projection DSL allowing the retrieval of the {@link SearchProjection}
 	 * that will be used to produce the first element passed to the transformer.
-	 * @param terminalContext2 The terminal context allowing to retrieve the {@link SearchProjection}
+	 * @param dslFinalStep2 The final step in the projection DSL allowing the retrieval of the {@link SearchProjection}
 	 * that will be used to produce the second element passed to the transformer.
-	 * @param terminalContext3 The terminal context allowing to retrieve the {@link SearchProjection}
+	 * @param dslFinalStep3 The final step in the projection DSL allowing the retrieval of the {@link SearchProjection}
 	 * that will be used to produce the third element passed to the transformer.
 	 * @param <P1> The type of the first element passed to the transformer.
 	 * @param <P2> The type of the second element passed to the transformer.
 	 * @param <P3> The type of the third element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected elements.
-	 * @return A context allowing to define the projection more precisely.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default <P1, P2, P3, T> CompositeProjectionContext<T> composite(TriFunction<P1, P2, P3, T> transformer,
-			SearchProjectionTerminalContext<P1> terminalContext1, SearchProjectionTerminalContext<P2> terminalContext2,
-			SearchProjectionTerminalContext<P3> terminalContext3) {
+	default <P1, P2, P3, T> CompositeProjectionOptionsStep<T> composite(TriFunction<P1, P2, P3, T> transformer,
+			ProjectionFinalStep<P1> dslFinalStep1, ProjectionFinalStep<P2> dslFinalStep2,
+			ProjectionFinalStep<P3> dslFinalStep3) {
 		return composite(
 				transformer,
-				terminalContext1.toProjection(), terminalContext2.toProjection(), terminalContext3.toProjection()
+				dslFinalStep1.toProjection(), dslFinalStep2.toProjection(), dslFinalStep3.toProjection()
 		);
 	}
 
@@ -283,7 +281,7 @@ public interface SearchProjectionFactoryContext<R, E> {
 	<T> T extension(SearchProjectionFactoryContextExtension<T, R, E> extension);
 
 	/**
-	 * Create a context allowing to try to apply multiple extensions one after the other,
+	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
 	 * failing only if <em>none</em> of the extensions is supported.
 	 * <p>
 	 * If you only need to apply a single extension and fail if it is not supported,
@@ -293,7 +291,7 @@ public interface SearchProjectionFactoryContext<R, E> {
 	 * e.g. {@code .<MyProjectedType>extension()}.
 	 *
 	 * @param <T> The expected projected type.
-	 * @return A context allowing to define the extensions to attempt, and the corresponding projections.
+	 * @return A DSL step.
 	 */
-	<T> SearchProjectionFactoryExtensionContext<T, R, E> extension();
+	<T> SearchProjectionFactoryContextExtensionStep<T, R, E> extension();
 }
