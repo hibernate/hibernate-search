@@ -89,10 +89,6 @@ public interface Log extends BasicLogger {
 			value = "Invalid multi value: expected either a Collection or a String.")
 	SearchException invalidMultiPropertyValue();
 
-	@Message(id = ID_OFFSET_2 + 7,
-			value = "Cannot add multiple predicates to the query root; use an explicit boolean predicate instead.")
-	SearchException cannotAddMultiplePredicatesToQueryRoot();
-
 	@Message(id = ID_OFFSET_2 + 9,
 			value = "Cannot add multiple predicates to a nested predicate; use an explicit boolean predicate instead.")
 	SearchException cannotAddMultiplePredicatesToNestedPredicate();
@@ -129,12 +125,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 16,
 			value = "Invalid polygon: the first point '%1$s' should be identical to the last point '%2$s' to properly close the polygon." )
 	IllegalArgumentException invalidGeoPolygonFirstPointNotIdenticalToLastPoint(GeoPoint firstPoint, GeoPoint lastPoint);
-
-	@Message(id = ID_OFFSET_2 + 18,
-			value = "Cannot add a sort to this DSL context anymore, because the DSL context was already closed."
-					+ " If you want to re-use sorts, do not re-use the sort DSL context objects,"
-					+ " but rather build SearchSort objects.")
-	SearchException cannotAddSortToUsedContext();
 
 	@Message(id = ID_OFFSET_2 + 19,
 			value = "Hibernate Search bootstrap failed; stopped collecting failures after '%2$s' failures."
