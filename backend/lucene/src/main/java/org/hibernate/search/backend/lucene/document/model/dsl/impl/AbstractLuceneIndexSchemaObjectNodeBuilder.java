@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
@@ -41,7 +41,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	}
 
 	@Override
-	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> addField(
+	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
 			String relativeFieldName, IndexFieldType<F> indexFieldType) {
 		LuceneIndexFieldType<F> luceneIndexFieldType = (LuceneIndexFieldType<F>) indexFieldType;
 		LuceneIndexSchemaFieldNodeBuilder<F> childBuilder = new LuceneIndexSchemaFieldNodeBuilder<>(
@@ -52,7 +52,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	}
 
 	@Override
-	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> createExcludedField(
+	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> createExcludedField(
 			String relativeFieldName, IndexFieldType<F> indexFieldType) {
 		LuceneIndexFieldType<F> luceneIndexFieldType = (LuceneIndexFieldType<F>) indexFieldType;
 		return new LuceneIndexSchemaFieldNodeBuilder<>(

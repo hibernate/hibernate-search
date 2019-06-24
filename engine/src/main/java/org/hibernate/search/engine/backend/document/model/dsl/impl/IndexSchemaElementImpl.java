@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -51,12 +51,12 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	}
 
 	@Override
-	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(
+	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(
 			String relativeFieldName, IndexFieldType<F> type) {
 		checkRelativeFieldName( relativeFieldName );
-		IndexSchemaFieldContext<?, IndexFieldReference<F>> fieldContext =
+		IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> fieldFinalStep =
 				// Explicit type parameter needed in order for JDT to compile correctly (probably a bug)
-				nestingContext.<IndexSchemaFieldContext<?, IndexFieldReference<F>>>nest(
+				nestingContext.<IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>>>nest(
 						relativeFieldName,
 						// If the field is included
 						prefixedName -> objectNodeBuilder.addField( prefixedName, type ),
@@ -64,13 +64,13 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 						prefixedName -> objectNodeBuilder.createExcludedField( prefixedName, type )
 				);
 		if ( directChildrenAreMultiValuedByDefault ) {
-			fieldContext.multiValued();
+			fieldFinalStep.multiValued();
 		}
-		return fieldContext;
+		return fieldFinalStep;
 	}
 
 	@Override
-	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(String relativeFieldName,
+	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(String relativeFieldName,
 			Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<F>> typeContributor) {
 		return field( relativeFieldName, typeContributor.apply( typeFactory ) );
 	}
@@ -78,7 +78,7 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	@Override
 	public IndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage) {
 		checkRelativeFieldName( relativeFieldName );
-		IndexSchemaObjectField fieldContext = nestingContext.nest(
+		IndexSchemaObjectField objectField = nestingContext.nest(
 				relativeFieldName,
 				// If the field is included
 				(prefixedName, filter) -> {
@@ -94,9 +94,9 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 				}
 		);
 		if ( directChildrenAreMultiValuedByDefault ) {
-			fieldContext.multiValued();
+			objectField.multiValued();
 		}
-		return fieldContext;
+		return objectField;
 	}
 
 	private void checkRelativeFieldName(String relativeFieldName) {

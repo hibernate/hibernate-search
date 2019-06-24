@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 
@@ -74,7 +74,7 @@ public final class StandardFieldMapper<F, M> {
 
 	private M map(IndexSchemaElement parent, String name, boolean multiValued,
 			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>>... additionalConfigurations) {
-		IndexSchemaFieldContext<?, IndexFieldReference<F>> fieldContext = parent
+		IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> fieldContext = parent
 				.field(
 						name,
 						f -> {

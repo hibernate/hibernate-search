@@ -26,9 +26,10 @@ public interface IndexSchemaElement {
 	 * @param relativeFieldName The relative name of the new field.
 	 * @param type The type of the new field.
 	 * @param <F> The type of values held by the field.
-	 * @return A context allowing to get the reference to that new field.
+	 * @return A DSL step where the field can be defined in more details,
+	 * and where a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
 	 */
-	<F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(
+	<F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(
 			String relativeFieldName, IndexFieldType<F> type);
 
 	/**
@@ -37,9 +38,10 @@ public interface IndexSchemaElement {
 	 * @param relativeFieldName The relative name of the new field.
 	 * @param dslFinalStep A final step in the index field type DSL allowing the retrieval of an {@link IndexFieldType}.
 	 * @param <F> The type of values held by the field.
-	 * @return A context allowing to get the reference to that new field.
+	 * @return A DSL step where the field can be defined in more details,
+	 * and where a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
 	 */
-	default <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(
+	default <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(
 			String relativeFieldName, IndexFieldTypeFinalStep<F> dslFinalStep) {
 		return field( relativeFieldName, dslFinalStep.toIndexFieldType() );
 	}
@@ -54,16 +56,19 @@ public interface IndexSchemaElement {
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @param <F> The type of accessors for the new field.
-	 * @return A context allowing to get the reference to that new field.
+	 * @return A DSL step where the field can be defined in more details,
+	 * and where a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
 	 */
-	<F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(String relativeFieldName,
+	<F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(String relativeFieldName,
 			Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<F>> typeContributor);
 
 	/**
 	 * Add an object field to this index schema element with the default storage type.
 	 *
 	 * @param relativeFieldName The relative name of the new field.
-	 * @return A context allowing to get the reference to that new object field and to add new child fields to it.
+	 * @return An {@link IndexSchemaObjectField}, where the field can be defined in more details,
+	 * in particular by adding new child fields to it,
+	 * and where ultimately a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
 	 */
 	default IndexSchemaObjectField objectField(String relativeFieldName) {
 		return objectField( relativeFieldName, ObjectFieldStorage.DEFAULT );
@@ -74,7 +79,9 @@ public interface IndexSchemaElement {
 	 *
 	 * @param relativeFieldName The relative name of the new field.
 	 * @param storage The storage type.
-	 * @return A context allowing to get the reference to that new object field and to add new child fields to it.
+	 * @return An {@link IndexSchemaObjectField}, where the field can be defined in more details,
+	 * in particular by adding new child fields to it,
+	 * and where ultimately a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
 	 * @see ObjectFieldStorage
 	 */
 	IndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage);
