@@ -7,7 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -24,7 +24,7 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 	}
 
 	@Override
-	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> addField(String relativeFieldName,
+	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(String relativeFieldName,
 			IndexFieldType<F> indexFieldType) {
 		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( builder, relativeFieldName );
 		getRootNodeBuilder().getBackendBehavior().onAddField(
@@ -38,7 +38,7 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 	}
 
 	@Override
-	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> createExcludedField(String relativeFieldName,
+	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> createExcludedField(String relativeFieldName,
 			IndexFieldType<F> indexFieldType) {
 		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( builder, relativeFieldName );
 		return new StubIndexSchemaFieldNodeBuilder<>( childBuilder, false );

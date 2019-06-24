@@ -15,10 +15,10 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
  * and the retrieval of {@link #toReference() a field reference} to be used when indexing.
  *
  * @see IndexSchemaElement
- * @see IndexSchemaFieldContext
- * @see IndexSchemaFieldTerminalContext
+ * @see IndexSchemaFieldOptionsStep
+ * @see IndexSchemaFieldFinalStep
  */
 public interface IndexSchemaObjectField
-		extends IndexSchemaElement, IndexSchemaFieldContext<IndexSchemaObjectField, IndexObjectFieldReference> {
+		extends IndexSchemaElement, IndexSchemaFieldOptionsStep<IndexSchemaObjectField, IndexObjectFieldReference> {
 
 }

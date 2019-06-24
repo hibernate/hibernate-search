@@ -7,12 +7,12 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIndexFieldReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
 class StubIndexSchemaFieldNodeBuilder<F>
-		implements IndexSchemaFieldContext<StubIndexSchemaFieldNodeBuilder<F>, IndexFieldReference<F>> {
+		implements IndexSchemaFieldOptionsStep<StubIndexSchemaFieldNodeBuilder<F>, IndexFieldReference<F>> {
 
 	private final StubIndexSchemaNode.Builder builder;
 	private final boolean included;

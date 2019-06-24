@@ -11,11 +11,12 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
 /**
- * The terminal context when specifying an index field.
+ * The final step in the definition of a field in the index schema,
+ * where a reference to the field can be retrieved.
  *
  * @param <R> The reference type.
  */
-public interface IndexSchemaFieldTerminalContext<R> {
+public interface IndexSchemaFieldFinalStep<R> {
 
 	/**
 	 * Create a reference to this field

@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
@@ -19,9 +19,9 @@ public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
 	 * @param relativeFieldName The relative name of the new field
 	 * @param indexFieldType The type of the new field
 	 * @param <F> The type of values for the new field
-	 * @return A context allowing to define the new field
+	 * @return A DSL step where the field can be defined in more details.
 	 */
-	<F> IndexSchemaFieldContext<?, IndexFieldReference<F>> addField(String relativeFieldName, IndexFieldType<F> indexFieldType);
+	<F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(String relativeFieldName, IndexFieldType<F> indexFieldType);
 
 	/**
 	 * Create a new field, but do not add it to the current builder.
@@ -32,9 +32,9 @@ public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
 	 * @param relativeFieldName The relative name of the new field
 	 * @param indexFieldType The type of the new field
 	 * @param <F> The type of values for the new field
-	 * @return A context allowing to define the new field
+	 * @return A DSL step where the field can be defined in more details.
 	 */
-	<F> IndexSchemaFieldContext<?, IndexFieldReference<F>> createExcludedField(String relativeFieldName, IndexFieldType<F> indexFieldType);
+	<F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> createExcludedField(String relativeFieldName, IndexFieldType<F> indexFieldType);
 
 	/**
 	 * Create a new object field and add it to the current builder.

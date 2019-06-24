@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -398,7 +398,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		// Then give the mapping a chance to override some of the model (add storage, ...)
 		contributor.contribute( fieldTypeContext, new FieldModelContributorBridgeContextImpl<>( bridge, fieldTypeContext ) );
 
-		IndexSchemaFieldContext<?, ? extends IndexFieldReference<? super F>> fieldContext =
+		IndexSchemaFieldOptionsStep<?, ? extends IndexFieldReference<? super F>> fieldContext =
 				schemaElement.field( relativeFieldName, fieldTypeContext );
 		if ( multiValued ) {
 			fieldContext.multiValued();

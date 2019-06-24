@@ -7,16 +7,17 @@
 package org.hibernate.search.engine.backend.document.model.dsl;
 
 /**
- * A field in the index schema,
- * allowing customization of some characteristics of this object field such as {@link #multiValued() multi-valued-ness},
- * and the retrieval of {@link #toReference() a field reference} to be used when indexing.
+ * The final step in the definition of a field in the index schema,
+ * where a reference to the field can be retrieved,
+ * optionally setting some parameters beforehand.
  *
- * @param <S> The exposed type for this context.
+ * @param <S> The "self" type (the actual exposed type of this step).
  * @param <R> The reference type.
  *
- * @see IndexSchemaFieldTerminalContext
+ * @see IndexSchemaFieldFinalStep
  */
-public interface IndexSchemaFieldContext<S extends IndexSchemaFieldContext<?, R>, R> extends IndexSchemaFieldTerminalContext<R> {
+public interface IndexSchemaFieldOptionsStep<S extends IndexSchemaFieldOptionsStep<?, R>, R>
+		extends IndexSchemaFieldFinalStep<R> {
 
 	/**
 	 * Mark the field as multi-valued.

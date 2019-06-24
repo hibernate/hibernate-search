@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldFinalStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
@@ -490,7 +490,7 @@ public class DocumentModelDslIT {
 					"Multiple toReference() calls after " + typedContextFunction,
 					() -> setup( ctx -> {
 						IndexSchemaElement root = ctx.getSchemaElement();
-						IndexSchemaFieldTerminalContext<?> context = root.field(
+						IndexSchemaFieldFinalStep<?> context = root.field(
 								"myField",
 								typedContextFunction::apply
 						);
