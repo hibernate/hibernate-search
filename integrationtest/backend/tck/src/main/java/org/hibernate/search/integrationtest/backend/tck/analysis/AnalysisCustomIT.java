@@ -16,8 +16,8 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
-import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
@@ -258,7 +258,7 @@ public class AnalysisCustomIT {
 	}
 
 	private void setup(String fieldName,
-			Function<StringIndexFieldTypeContext<?>, IndexFieldTypeTerminalContext<String>> typeContributor) {
+			Function<StringIndexFieldTypeOptionsStep<?>, IndexFieldTypeFinalStep<String>> typeContributor) {
 		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
 						INDEX_NAME,

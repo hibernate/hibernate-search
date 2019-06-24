@@ -12,12 +12,12 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
 
 /**
  * A value wrapper used when testing
- * {@link IndexFieldTypeConverterContext#dslConverter(ToDocumentFieldValueConverter) DSL converters}
- * and {@link IndexFieldTypeConverterContext#projectionConverter(FromDocumentFieldValueConverter) projection converters}.
+ * {@link IndexFieldTypeConverterStep#dslConverter(ToDocumentFieldValueConverter) DSL converters}
+ * and {@link IndexFieldTypeConverterStep#projectionConverter(FromDocumentFieldValueConverter) projection converters}.
  */
 public final class ValueWrapper<T> {
 	public static <T> ToDocumentFieldValueConverter<ValueWrapper<T>, T> toIndexFieldConverter() {

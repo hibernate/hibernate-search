@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
@@ -374,7 +374,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				new PojoModelValueElement<>( castedValueTypeModel ),
 				indexFieldTypeFactory
 		);
-		StandardIndexFieldTypeContext<?, ? super F> fieldTypeContext = bridge.bind( bridgeBindingContext );
+		StandardIndexFieldTypeOptionsStep<?, ? super F> fieldTypeContext = bridge.bind( bridgeBindingContext );
 
 		// If the bridge did not contribute anything, infer the field type and define it automatically
 		if ( fieldTypeContext == null ) {

@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
@@ -28,7 +28,7 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, BigInteger> configure(IndexFieldTypeFactoryContext fieldContext) {
+	public StandardIndexFieldTypeOptionsStep<?, BigInteger> configure(IndexFieldTypeFactoryContext fieldContext) {
 		return fieldContext.asBigInteger().decimalScale( DECIMAL_SCALE );
 	}
 

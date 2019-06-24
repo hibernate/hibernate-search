@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
@@ -81,7 +81,7 @@ public abstract class FieldTypeDescriptor<F> {
 		return uniqueName;
 	}
 
-	public StandardIndexFieldTypeContext<?, F> configure(IndexFieldTypeFactoryContext fieldContext) {
+	public StandardIndexFieldTypeOptionsStep<?, F> configure(IndexFieldTypeFactoryContext fieldContext) {
 		return fieldContext.as( javaType );
 	}
 

@@ -14,38 +14,38 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 
 public final class StandardFieldMapper<F, M> {
 
 	public static <F, M> StandardFieldMapper<F, M> of(
-			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> initialConfiguration,
+			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
 			BiFunction<IndexFieldReference<F>, String, M> resultFunction) {
 		return of( initialConfiguration, ignored -> { }, resultFunction );
 	}
 
 	public static <F> StandardFieldMapper<F, IndexFieldReference<F>> of(
-			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> initialConfiguration,
-			Consumer<? super StandardIndexFieldTypeContext<?, F>> configurationAdjustment) {
+			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
+			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment) {
 		return of( initialConfiguration, configurationAdjustment, (reference, ignored) -> reference );
 	}
 
 	public static <F, M> StandardFieldMapper<F, M> of(
-			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> initialConfiguration,
-			Consumer<? super StandardIndexFieldTypeContext<?, F>> configurationAdjustment,
+			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
+			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment,
 			BiFunction<IndexFieldReference<F>, String, M> resultFunction) {
 		return new StandardFieldMapper<>(
 				initialConfiguration, configurationAdjustment, resultFunction
 		);
 	}
 
-	private final Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> initialConfiguration;
-	private final Consumer<? super StandardIndexFieldTypeContext<?, F>> configurationAdjustment;
+	private final Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration;
+	private final Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment;
 	private final BiFunction<IndexFieldReference<F>, String, M> resultFunction;
 
 	private StandardFieldMapper(
-			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> initialConfiguration,
-			Consumer<? super StandardIndexFieldTypeContext<?, F>> configurationAdjustment,
+			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
+			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment,
 			BiFunction<IndexFieldReference<F>, String, M> resultFunction) {
 		this.initialConfiguration = initialConfiguration;
 		this.configurationAdjustment = configurationAdjustment;
@@ -62,25 +62,25 @@ public final class StandardFieldMapper<F, M> {
 
 	@SafeVarargs
 	public final M map(IndexSchemaElement parent, String name,
-			Consumer<? super StandardIndexFieldTypeContext<?, F>>... additionalConfigurations) {
+			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>>... additionalConfigurations) {
 		return map( parent, name, false, additionalConfigurations );
 	}
 
 	@SafeVarargs
 	public final M mapMultiValued(IndexSchemaElement parent, String name,
-			Consumer<? super StandardIndexFieldTypeContext<?, F>>... additionalConfigurations) {
+			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>>... additionalConfigurations) {
 		return map( parent, name, true, additionalConfigurations );
 	}
 
 	private M map(IndexSchemaElement parent, String name, boolean multiValued,
-			Consumer<? super StandardIndexFieldTypeContext<?, F>>... additionalConfigurations) {
+			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>>... additionalConfigurations) {
 		IndexSchemaFieldContext<?, IndexFieldReference<F>> fieldContext = parent
 				.field(
 						name,
 						f -> {
-							StandardIndexFieldTypeContext<?, F> typeContext = initialConfiguration.apply( f );
+							StandardIndexFieldTypeOptionsStep<?, F> typeContext = initialConfiguration.apply( f );
 							configurationAdjustment.accept( typeContext );
-							for ( Consumer<? super StandardIndexFieldTypeContext<?, F>> additionalConfiguration : additionalConfigurations ) {
+							for ( Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration : additionalConfigurations ) {
 								additionalConfiguration.accept( typeContext );
 							}
 							return typeContext;

@@ -11,17 +11,17 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributorBridgeContext;
 
-class PojoCompositeFieldModelContributor<C extends StandardIndexFieldTypeContext<?, ?>>
+class PojoCompositeFieldModelContributor<C extends StandardIndexFieldTypeOptionsStep<?, ?>>
 		implements FieldModelContributor {
-	private final Function<StandardIndexFieldTypeContext<?, ?>, C> contextConverter;
+	private final Function<StandardIndexFieldTypeOptionsStep<?, ?>, C> typeOptionsStepCaster;
 	private final List<BiConsumer<C, FieldModelContributorBridgeContext>> delegates = new ArrayList<>();
 
-	PojoCompositeFieldModelContributor(Function<StandardIndexFieldTypeContext<?, ?>, C> contextConverter) {
-		this.contextConverter = contextConverter;
+	PojoCompositeFieldModelContributor(Function<StandardIndexFieldTypeOptionsStep<?, ?>, C> typeOptionsStepCaster) {
+		this.typeOptionsStepCaster = typeOptionsStepCaster;
 	}
 
 	public void add(BiConsumer<C, FieldModelContributorBridgeContext> delegate) {
@@ -29,8 +29,9 @@ class PojoCompositeFieldModelContributor<C extends StandardIndexFieldTypeContext
 	}
 
 	@Override
-	public void contribute(StandardIndexFieldTypeContext<?, ?> context, FieldModelContributorBridgeContext bridgeContext) {
-		C convertedContext = contextConverter.apply( context );
-		delegates.forEach( c -> c.accept( convertedContext, bridgeContext ) );
+	public void contribute(StandardIndexFieldTypeOptionsStep<?, ?> optionsStep,
+			FieldModelContributorBridgeContext bridgeContext) {
+		C castedOptionsStep = typeOptionsStepCaster.apply( optionsStep );
+		delegates.forEach( c -> c.accept( castedOptionsStep, bridgeContext ) );
 	}
 }

@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import org.hibernate.search.engine.backend.types.Searchable;
-import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
@@ -148,8 +148,8 @@ public class ScaledNumberFieldIT {
 						.pathContext( ".notScalable" )
 						.failure(
 								"This property is mapped to a scaled number field, but with a value bridge that creates neither a BigDecimal nor a BigInteger field.",
-								"bind() method returned context '",
-								"expected '" + ScaledNumberIndexFieldTypeContext.class.getName() + "'"
+								"bind() method returned '",
+								"expected '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);
@@ -283,8 +283,8 @@ public class ScaledNumberFieldIT {
 						.pathContext( ".scaled" )
 						.failure(
 								"This property is mapped to a scaled number field, but with a value bridge that creates neither a BigDecimal nor a BigInteger field.",
-								"bind() method returned context '",
-								"expected '" + ScaledNumberIndexFieldTypeContext.class.getName() + "'"
+								"bind() method returned '",
+								"expected '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);
@@ -306,7 +306,7 @@ public class ScaledNumberFieldIT {
 	public static class ValidExplicitBindingBridge implements ValueBridge<WrappedValue, BigDecimal> {
 
 		@Override
-		public StandardIndexFieldTypeContext<?, BigDecimal> bind(ValueBridgeBindingContext<WrappedValue> context) {
+		public StandardIndexFieldTypeOptionsStep<?, BigDecimal> bind(ValueBridgeBindingContext<WrappedValue> context) {
 			return context.getTypeFactory().asBigDecimal();
 		}
 		@Override
@@ -323,7 +323,7 @@ public class ScaledNumberFieldIT {
 	public static class InvalidExplicitBindingBridge implements ValueBridge<BigDecimal, Integer> {
 
 		@Override
-		public StandardIndexFieldTypeContext<?, Integer> bind(ValueBridgeBindingContext<BigDecimal> context) {
+		public StandardIndexFieldTypeOptionsStep<?, Integer> bind(ValueBridgeBindingContext<BigDecimal> context) {
 			return context.getTypeFactory().asInteger();
 		}
 		@Override

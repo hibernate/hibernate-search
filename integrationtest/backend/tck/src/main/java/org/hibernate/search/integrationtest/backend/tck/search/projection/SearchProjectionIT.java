@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -553,13 +553,13 @@ public class SearchProjectionIT extends EasyMockSupport {
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
 				F document1Value, F document2Value, F document3Value) {
 			return mapper(
-					c -> (StandardIndexFieldTypeContext<?, F>) c.as( type ),
+					c -> (StandardIndexFieldTypeOptionsStep<?, F>) c.as( type ),
 					document1Value, document2Value, document3Value
 			);
 		}
 
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(
-				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration,
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> configuration,
 				F document1Value, F document2Value, F document3Value) {
 			return StandardFieldMapper.of(
 					configuration,

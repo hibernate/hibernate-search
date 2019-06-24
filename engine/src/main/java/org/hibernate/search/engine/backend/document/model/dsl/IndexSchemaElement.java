@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 /**
@@ -35,13 +35,13 @@ public interface IndexSchemaElement {
 	 * Add a field to this index schema element with the given almost-built type.
 	 *
 	 * @param relativeFieldName The relative name of the new field.
-	 * @param terminalContext The almost-built type of the new field.
+	 * @param dslFinalStep A final step in the index field type DSL allowing the retrieval of an {@link IndexFieldType}.
 	 * @param <F> The type of values held by the field.
 	 * @return A context allowing to get the reference to that new field.
 	 */
 	default <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(
-			String relativeFieldName, IndexFieldTypeTerminalContext<F> terminalContext) {
-		return field( relativeFieldName, terminalContext.toIndexFieldType() );
+			String relativeFieldName, IndexFieldTypeFinalStep<F> dslFinalStep) {
+		return field( relativeFieldName, dslFinalStep.toIndexFieldType() );
 	}
 
 	/**
@@ -51,13 +51,13 @@ public interface IndexSchemaElement {
 	 *
 	 * @param relativeFieldName The relative name of the new field.
 	 * @param typeContributor A function that will use the DSL context passed in parameter to create a type,
-	 * returning the resulting terminal context.
+	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @param <F> The type of accessors for the new field.
 	 * @return A context allowing to get the reference to that new field.
 	 */
 	<F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(String relativeFieldName,
-			Function<? super IndexFieldTypeFactoryContext, ? extends IndexFieldTypeTerminalContext<F>> typeContributor);
+			Function<? super IndexFieldTypeFactoryContext, ? extends IndexFieldTypeFinalStep<F>> typeContributor);
 
 	/**
 	 * Add an object field to this index schema element with the default storage type.

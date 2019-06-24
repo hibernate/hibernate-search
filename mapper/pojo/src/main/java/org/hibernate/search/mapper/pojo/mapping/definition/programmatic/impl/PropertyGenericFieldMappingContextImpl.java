@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 
 
 class PropertyGenericFieldMappingContextImpl
-		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyGenericFieldMappingContext, StandardIndexFieldTypeContext<?, ?>>
+		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyGenericFieldMappingContext, StandardIndexFieldTypeOptionsStep<?, ?>>
 		implements PropertyGenericFieldMappingContext {
 
 	PropertyGenericFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
 		super(
 				parent, relativeFieldName,
-				PropertyGenericFieldMappingContextImpl::convertFieldTypedContext
+				PropertyGenericFieldMappingContextImpl::castIndexFieldTypeOptionsStep
 		);
 	}
 
@@ -27,10 +27,10 @@ class PropertyGenericFieldMappingContextImpl
 		return this;
 	}
 
-	private static StandardIndexFieldTypeContext<?,?> convertFieldTypedContext(
-			StandardIndexFieldTypeContext<?,?> context) {
-		// Nothing to do: we don't need anything more than the standard context
-		return context;
+	private static StandardIndexFieldTypeOptionsStep<?,?> castIndexFieldTypeOptionsStep(
+			StandardIndexFieldTypeOptionsStep<?,?> optionsStep) {
+		// Nothing to do: we don't need anything more than the standard options
+		return optionsStep;
 	}
 
 }

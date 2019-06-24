@@ -33,8 +33,8 @@ public interface ElasticsearchIndexFieldTypeFactoryContext extends IndexFieldTyp
 	 * @param mappingJsonString A string representing an Elasticsearch field mapping as a JSON object.
 	 * The JSON object must be a syntactically correct Elasticsearch field mapping.
 	 * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html">the Elasticsearch documentation</a>.
-	 * @return A context allowing to get the resulting predicate.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	ElasticsearchNativeIndexFieldTypeContext<?> asNative(String mappingJsonString);
+	ElasticsearchNativeIndexFieldTypeOptionsStep<?> asNative(String mappingJsonString);
 
 }

@@ -25,10 +25,10 @@ import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributo
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
-import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
+import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -54,69 +54,69 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <F> StandardIndexFieldTypeContext<?, F> as(Class<F> valueType) {
+	public <F> StandardIndexFieldTypeOptionsStep<?, F> as(Class<F> valueType) {
 		if ( String.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asString();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asString();
 		}
 		else if ( Integer.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asInteger();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asInteger();
 		}
 		else if ( Long.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asLong();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asLong();
 		}
 		else if ( Boolean.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asBoolean();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asBoolean();
 		}
 		else if ( Byte.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asByte();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asByte();
 		}
 		else if ( Short.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asShort();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asShort();
 		}
 		else if ( Float.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asFloat();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asFloat();
 		}
 		else if ( Double.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asDouble();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asDouble();
 		}
 		else if ( LocalDate.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asLocalDate();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asLocalDate();
 		}
 		else if ( LocalDateTime.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asLocalDateTime();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asLocalDateTime();
 		}
 		else if ( LocalTime.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asLocalTime();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asLocalTime();
 		}
 		else if ( Instant.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asInstant();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asInstant();
 		}
 		else if ( ZonedDateTime.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asZonedDateTime();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asZonedDateTime();
 		}
 		else if ( Year.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asYear();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asYear();
 		}
 		else if ( YearMonth.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asYearMonth();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asYearMonth();
 		}
 		else if ( MonthDay.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asMonthDay();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asMonthDay();
 		}
 		else if ( OffsetDateTime.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asOffsetDateTime();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asOffsetDateTime();
 		}
 		else if ( OffsetTime.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asOffsetTime();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asOffsetTime();
 		}
 		else if ( GeoPoint.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asGeoPoint();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asGeoPoint();
 		}
 		else if ( BigDecimal.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asBigDecimal();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asBigDecimal();
 		}
 		else if ( BigInteger.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asBigInteger();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asBigInteger();
 		}
 		else {
 			throw log.cannotGuessFieldType( valueType, getEventContext() );
@@ -124,115 +124,115 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	}
 
 	@Override
-	public StringIndexFieldTypeContext<?> asString() {
-		return new LuceneStringIndexFieldTypeContext( this );
+	public StringIndexFieldTypeOptionsStep<?> asString() {
+		return new LuceneStringIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Integer> asInteger() {
-		return new LuceneIntegerIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Integer> asInteger() {
+		return new LuceneIntegerIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Long> asLong() {
-		return new LuceneLongIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Long> asLong() {
+		return new LuceneLongIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Boolean> asBoolean() {
-		return new LuceneBooleanIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Boolean> asBoolean() {
+		return new LuceneBooleanIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Byte> asByte() {
-		return new LuceneByteIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Byte> asByte() {
+		return new LuceneByteIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Short> asShort() {
-		return new LuceneShortIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Short> asShort() {
+		return new LuceneShortIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Float> asFloat() {
-		return new LuceneFloatIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Float> asFloat() {
+		return new LuceneFloatIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Double> asDouble() {
-		return new LuceneDoubleIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Double> asDouble() {
+		return new LuceneDoubleIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, LocalDate> asLocalDate() {
-		return new LuceneLocalDateIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, LocalDate> asLocalDate() {
+		return new LuceneLocalDateIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, LocalDateTime> asLocalDateTime() {
-		return new LuceneLocalDateTimeIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, LocalDateTime> asLocalDateTime() {
+		return new LuceneLocalDateTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, LocalTime> asLocalTime() {
-		return new LuceneLocalTimeIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, LocalTime> asLocalTime() {
+		return new LuceneLocalTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Instant> asInstant() {
-		return new LuceneInstantIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Instant> asInstant() {
+		return new LuceneInstantIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime() {
-		return new LuceneZonedDateTimeIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, ZonedDateTime> asZonedDateTime() {
+		return new LuceneZonedDateTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Year> asYear() {
-		return new LuceneYearIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Year> asYear() {
+		return new LuceneYearIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, YearMonth> asYearMonth() {
-		return new LuceneYearMonthIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, YearMonth> asYearMonth() {
+		return new LuceneYearMonthIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, MonthDay> asMonthDay() {
-		return new LuceneMonthDayIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, MonthDay> asMonthDay() {
+		return new LuceneMonthDayIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, OffsetDateTime> asOffsetDateTime() {
-		return new LuceneOffsetDateTimeIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, OffsetDateTime> asOffsetDateTime() {
+		return new LuceneOffsetDateTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, OffsetTime> asOffsetTime() {
-		return new LuceneOffsetTimeIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, OffsetTime> asOffsetTime() {
+		return new LuceneOffsetTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint() {
-		return new LuceneGeoPointIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, GeoPoint> asGeoPoint() {
+		return new LuceneGeoPointIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal() {
-		return new LuceneBigDecimalIndexFieldTypeContext( this, typeDefaultsProvider );
+	public ScaledNumberIndexFieldTypeOptionsStep<?, BigDecimal> asBigDecimal() {
+		return new LuceneBigDecimalIndexFieldTypeOptionsStep( this, typeDefaultsProvider );
 	}
 
 	@Override
-	public ScaledNumberIndexFieldTypeContext<?, BigInteger> asBigInteger() {
-		return new LuceneBigIntegerIndexFieldTypeContext( this, typeDefaultsProvider );
+	public ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger() {
+		return new LuceneBigIntegerIndexFieldTypeOptionsStep( this, typeDefaultsProvider );
 	}
 
 	@Override
-	public <F> IndexFieldTypeTerminalContext<F> asNative(Class<F> indexFieldType,
+	public <F> IndexFieldTypeFinalStep<F> asNative(Class<F> indexFieldType,
 			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		return new LuceneNativeIndexFieldTypeContext<>(
+		return new LuceneNativeIndexFieldTypeFinalStep<>(
 				indexFieldType, fieldContributor, fieldValueExtractor
 		);
 	}

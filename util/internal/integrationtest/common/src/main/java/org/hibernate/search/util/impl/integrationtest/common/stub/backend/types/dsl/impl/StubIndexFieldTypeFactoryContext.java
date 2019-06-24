@@ -20,9 +20,9 @@ import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -36,123 +36,123 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <F> StandardIndexFieldTypeContext<?, F> as(Class<F> valueType) {
+	public <F> StandardIndexFieldTypeOptionsStep<?, F> as(Class<F> valueType) {
 		if ( String.class.isAssignableFrom( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asString();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asString();
 		}
 		else if ( BigDecimal.class.isAssignableFrom( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asBigDecimal();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asBigDecimal();
 		}
 		else if ( BigInteger.class.isAssignableFrom( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asBigInteger();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asBigInteger();
 		}
 		else {
-			return new StubGenericIndexFieldTypeContext<>( valueType );
+			return new StubGenericIndexFieldTypeOptionsStep<>( valueType );
 		}
 	}
 
 	@Override
-	public StringIndexFieldTypeContext<?> asString() {
-		return new StubStringIndexFieldTypeContext();
+	public StringIndexFieldTypeOptionsStep<?> asString() {
+		return new StubStringIndexFieldTypeOptionsStep();
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Integer> asInteger() {
+	public StandardIndexFieldTypeOptionsStep<?, Integer> asInteger() {
 		return as( Integer.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Long> asLong() {
+	public StandardIndexFieldTypeOptionsStep<?, Long> asLong() {
 		return as( Long.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Boolean> asBoolean() {
+	public StandardIndexFieldTypeOptionsStep<?, Boolean> asBoolean() {
 		return as( Boolean.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Byte> asByte() {
+	public StandardIndexFieldTypeOptionsStep<?, Byte> asByte() {
 		return as( Byte.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Short> asShort() {
+	public StandardIndexFieldTypeOptionsStep<?, Short> asShort() {
 		return as( Short.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Float> asFloat() {
+	public StandardIndexFieldTypeOptionsStep<?, Float> asFloat() {
 		return as( Float.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Double> asDouble() {
+	public StandardIndexFieldTypeOptionsStep<?, Double> asDouble() {
 		return as( Double.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, LocalDate> asLocalDate() {
+	public StandardIndexFieldTypeOptionsStep<?, LocalDate> asLocalDate() {
 		return as( LocalDate.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, LocalDateTime> asLocalDateTime() {
+	public StandardIndexFieldTypeOptionsStep<?, LocalDateTime> asLocalDateTime() {
 		return as( LocalDateTime.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, LocalTime> asLocalTime() {
+	public StandardIndexFieldTypeOptionsStep<?, LocalTime> asLocalTime() {
 		return as( LocalTime.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Instant> asInstant() {
+	public StandardIndexFieldTypeOptionsStep<?, Instant> asInstant() {
 		return as( Instant.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime() {
+	public StandardIndexFieldTypeOptionsStep<?, ZonedDateTime> asZonedDateTime() {
 		return as( ZonedDateTime.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Year> asYear() {
+	public StandardIndexFieldTypeOptionsStep<?, Year> asYear() {
 		return as( Year.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, YearMonth> asYearMonth() {
+	public StandardIndexFieldTypeOptionsStep<?, YearMonth> asYearMonth() {
 		return as( YearMonth.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, MonthDay> asMonthDay() {
+	public StandardIndexFieldTypeOptionsStep<?, MonthDay> asMonthDay() {
 		return as( MonthDay.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, OffsetDateTime> asOffsetDateTime() {
+	public StandardIndexFieldTypeOptionsStep<?, OffsetDateTime> asOffsetDateTime() {
 		return as( OffsetDateTime.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, OffsetTime> asOffsetTime() {
+	public StandardIndexFieldTypeOptionsStep<?, OffsetTime> asOffsetTime() {
 		return as( OffsetTime.class );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint() {
+	public StandardIndexFieldTypeOptionsStep<?, GeoPoint> asGeoPoint() {
 		return as( GeoPoint.class );
 	}
 
 	@Override
-	public ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal() {
-		return new StubScaledNumberIndexFieldTypeContext<>( BigDecimal.class, defaultsProvider );
+	public ScaledNumberIndexFieldTypeOptionsStep<?, BigDecimal> asBigDecimal() {
+		return new StubScaledNumberIndexFieldTypeOptionsStep<>( BigDecimal.class, defaultsProvider );
 	}
 
 	@Override
-	public ScaledNumberIndexFieldTypeContext<?, BigInteger> asBigInteger() {
-		return new StubScaledNumberIndexFieldTypeContext<>( BigInteger.class, defaultsProvider );
+	public ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger() {
+		return new StubScaledNumberIndexFieldTypeOptionsStep<>( BigInteger.class, defaultsProvider );
 	}
 }

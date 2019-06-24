@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.StringHelper;
@@ -71,7 +71,7 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 
 	@Override
 	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(String relativeFieldName,
-			Function<? super IndexFieldTypeFactoryContext, ? extends IndexFieldTypeTerminalContext<F>> typeContributor) {
+			Function<? super IndexFieldTypeFactoryContext, ? extends IndexFieldTypeFinalStep<F>> typeContributor) {
 		return field( relativeFieldName, typeContributor.apply( typeFactoryContext ) );
 	}
 

@@ -7,10 +7,11 @@
 package org.hibernate.search.engine.search.projection;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
 
 /**
  * Allows to specify whether projected values should be converted using the
- * {@link org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext#projectionConverter(FromDocumentFieldValueConverter) projection converter}
+ * {@link IndexFieldTypeConverterStep#projectionConverter(FromDocumentFieldValueConverter) projection converter}
  * defined in the mapping.
  */
 public enum ProjectionConverter {
@@ -22,7 +23,7 @@ public enum ProjectionConverter {
 	 * as the entity property used to populate the index field.
 	 * <p>
 	 * To be more specific, it means the converter passed to
-	 * {@link org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext#projectionConverter(FromDocumentFieldValueConverter)}
+	 * {@link IndexFieldTypeConverterStep#projectionConverter(FromDocumentFieldValueConverter)}
 	 * will be applied to projected values before returning them.
 	 * <p>
 	 * If no projection converter was defined, this option won't have any effect.
@@ -36,7 +37,7 @@ public enum ProjectionConverter {
 	 * This generally means the projected values will have the same type as the index field.
 	 * <p>
 	 * To be more specific, it means the converter passed to
-	 * {@link org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext#projectionConverter(FromDocumentFieldValueConverter)}
+	 * {@link IndexFieldTypeConverterStep#projectionConverter(FromDocumentFieldValueConverter)}
 	 * will <strong>not</strong> be applied to projected values before returning them.
 	 * <p>
 	 * Please refer to the reference documentation for more information.

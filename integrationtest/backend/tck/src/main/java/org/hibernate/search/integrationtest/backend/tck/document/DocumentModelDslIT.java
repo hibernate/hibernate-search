@@ -14,8 +14,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -43,7 +43,7 @@ public class DocumentModelDslIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final List<Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>>> MAIN_TYPES =
+	private static final List<Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, ?>>> MAIN_TYPES =
 			CollectionHelper.toImmutableList( CollectionHelper.asList(
 					IndexFieldTypeFactoryContext::asString,
 					IndexFieldTypeFactoryContext::asInteger,
@@ -449,7 +449,7 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void missingGetReferenceCall() {
-		for ( Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> typedContextFunction : MAIN_TYPES ) {
+		for ( Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, ?>> typedContextFunction : MAIN_TYPES ) {
 			SubTest.expectException(
 					"Missing toReference() call after " + typedContextFunction,
 					() -> setup( ctx -> {
@@ -485,7 +485,7 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void multipleGetReferenceCall() {
-		for ( Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> typedContextFunction : MAIN_TYPES ) {
+		for ( Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, ?>> typedContextFunction : MAIN_TYPES ) {
 			SubTest.expectException(
 					"Multiple toReference() calls after " + typedContextFunction,
 					() -> setup( ctx -> {
@@ -526,7 +526,7 @@ public class DocumentModelDslIT {
 						.build() );
 	}
 
-	private IndexFieldTypeTerminalContext<String> irrelevantTypeContributor(IndexFieldTypeFactoryContext factoryContext) {
+	private IndexFieldTypeFinalStep<String> irrelevantTypeContributor(IndexFieldTypeFactoryContext factoryContext) {
 		return factoryContext.asString();
 	}
 

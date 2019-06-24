@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
@@ -653,7 +653,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	private static void mapByTypeFields(IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
 			FieldModelConsumer<FieldProjectionExpectations<?>, FieldModel<?>> consumer) {
 		forEachTypeDescriptor( typeDescriptor -> {
 			// Safe, see forEachTypeDescriptor
@@ -788,7 +788,7 @@ public class FieldSearchProjectionIT {
 				F document1Value, F document2Value, F document3Value) {
 			return mapper(
 					type,
-					c -> (StandardIndexFieldTypeContext<?, F>) c.as( type ),
+					c -> (StandardIndexFieldTypeOptionsStep<?, F>) c.as( type ),
 					document1Value, document2Value, document3Value
 			);
 		}
@@ -803,7 +803,7 @@ public class FieldSearchProjectionIT {
 		}
 
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
-				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration,
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> configuration,
 				F document1Value, F document2Value, F document3Value) {
 			return StandardFieldMapper.of(
 					configuration,
@@ -833,7 +833,7 @@ public class FieldSearchProjectionIT {
 
 	private static class IncompatibleFieldModel {
 		static <F> StandardFieldMapper<F, IncompatibleFieldModel> mapper(
-				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> configuration) {
 			return StandardFieldMapper.of(
 					configuration,
 					c -> c.projectable( Projectable.YES ),
