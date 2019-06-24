@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.math.BigInteger;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
@@ -28,7 +28,7 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	}
 
 	@Override
-	public StandardIndexFieldTypeOptionsStep<?, BigInteger> configure(IndexFieldTypeFactoryContext fieldContext) {
+	public StandardIndexFieldTypeOptionsStep<?, BigInteger> configure(IndexFieldTypeFactory fieldContext) {
 		return fieldContext.asBigInteger().decimalScale( DECIMAL_SCALE );
 	}
 

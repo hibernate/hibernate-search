@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.dsl;
 
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactory;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
@@ -18,7 +18,7 @@ import org.apache.lucene.search.Sort;
 
 
 
-public interface LuceneIndexFieldTypeFactoryContext extends IndexFieldTypeFactoryContext {
+public interface LuceneIndexFieldTypeFactory extends IndexFieldTypeFactory {
 
 	/**
 	 * Define a native field type.

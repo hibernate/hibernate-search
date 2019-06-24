@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -246,7 +246,7 @@ public class CompositeSearchSortIT {
 
 	private static class MainFieldModel<T> {
 		static <LT> StandardFieldMapper<LT, MainFieldModel<LT>> mapper(
-				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, LT>> configuration) {
+				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, LT>> configuration) {
 			return StandardFieldMapper.of(
 					configuration,
 					(reference, name) -> new MainFieldModel<>( reference, name )

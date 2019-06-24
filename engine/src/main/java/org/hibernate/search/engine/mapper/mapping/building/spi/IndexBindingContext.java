@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 /**
@@ -26,7 +26,7 @@ public interface IndexBindingContext {
 	/**
 	 * @return The type factory of the bound index, allowing to create field types.
 	 */
-	default IndexFieldTypeFactoryContext createTypeFactory() {
+	default IndexFieldTypeFactory createTypeFactory() {
 		return createTypeFactory( new IndexFieldTypeDefaultsProvider() );
 	}
 
@@ -37,7 +37,7 @@ public interface IndexBindingContext {
 	 * @param defaultsProvider The defaults to apply
 	 * @return The type factory of the bound index, allowing to create field types.
 	 */
-	IndexFieldTypeFactoryContext createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider);
+	IndexFieldTypeFactory createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider);
 
 	/**
 	 * @return The element in the index schema that this context points to.

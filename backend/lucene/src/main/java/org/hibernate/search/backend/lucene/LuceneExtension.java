@@ -18,9 +18,9 @@ import org.hibernate.search.backend.lucene.search.dsl.query.impl.LuceneSearchQue
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
-import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtension;
+import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactory;
 import org.hibernate.search.backend.lucene.search.dsl.sort.impl.LuceneSearchSortFactoryImpl;
@@ -71,7 +71,7 @@ public final class LuceneExtension<H, R, E>
 		SearchPredicateFactoryExtension<LuceneSearchPredicateFactory>,
 		SearchSortFactoryExtension<LuceneSearchSortFactory>,
 		SearchProjectionFactoryExtension<LuceneSearchProjectionFactory<R, E>, R, E>,
-		IndexFieldTypeFactoryContextExtension<LuceneIndexFieldTypeFactoryContext> {
+		IndexFieldTypeFactoryExtension<LuceneIndexFieldTypeFactory> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -187,9 +187,9 @@ public final class LuceneExtension<H, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LuceneIndexFieldTypeFactoryContext extendOrFail(IndexFieldTypeFactoryContext original) {
-		if ( original instanceof LuceneIndexFieldTypeFactoryContext ) {
-			return (LuceneIndexFieldTypeFactoryContext) original;
+	public LuceneIndexFieldTypeFactory extendOrFail(IndexFieldTypeFactory original) {
+		if ( original instanceof LuceneIndexFieldTypeFactory ) {
+			return (LuceneIndexFieldTypeFactory) original;
 		}
 		else {
 			throw log.luceneExtensionOnUnknownType( original );

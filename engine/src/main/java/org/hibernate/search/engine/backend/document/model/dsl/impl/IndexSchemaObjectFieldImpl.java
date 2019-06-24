@@ -9,16 +9,16 @@ package org.hibernate.search.engine.backend.document.model.dsl.impl;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 
 class IndexSchemaObjectFieldImpl extends IndexSchemaElementImpl<IndexSchemaObjectFieldNodeBuilder>
 		implements IndexSchemaObjectField {
 
-	IndexSchemaObjectFieldImpl(IndexFieldTypeFactoryContext typeFactoryContext,
+	IndexSchemaObjectFieldImpl(IndexFieldTypeFactory typeFactory,
 			IndexSchemaObjectFieldNodeBuilder objectFieldBuilder,
 			IndexSchemaNestingContext nestingContext,
 			boolean directChildrenAreMultiValuedByDefault) {
-		super( typeFactoryContext, objectFieldBuilder, nestingContext, directChildrenAreMultiValuedByDefault );
+		super( typeFactory, objectFieldBuilder, nestingContext, directChildrenAreMultiValuedByDefault );
 	}
 
 	@Override

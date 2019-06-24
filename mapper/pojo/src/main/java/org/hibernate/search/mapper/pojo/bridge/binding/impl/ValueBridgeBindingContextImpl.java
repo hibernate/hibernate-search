@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 
 public class ValueBridgeBindingContextImpl<T> implements ValueBridgeBindingContext<T> {
 	private final PojoModelValue<T> bridgedElement;
-	private final IndexFieldTypeFactoryContext indexFieldTypeFactoryContext;
+	private final IndexFieldTypeFactory indexFieldTypeFactory;
 
 	public ValueBridgeBindingContextImpl(PojoModelValue<T> bridgedElement,
-			IndexFieldTypeFactoryContext indexFieldTypeFactoryContext) {
+			IndexFieldTypeFactory indexFieldTypeFactory) {
 		this.bridgedElement = bridgedElement;
-		this.indexFieldTypeFactoryContext = indexFieldTypeFactoryContext;
+		this.indexFieldTypeFactory = indexFieldTypeFactory;
 	}
 
 	@Override
@@ -26,8 +26,8 @@ public class ValueBridgeBindingContextImpl<T> implements ValueBridgeBindingConte
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext getTypeFactory() {
-		return indexFieldTypeFactoryContext;
+	public IndexFieldTypeFactory getTypeFactory() {
+		return indexFieldTypeFactory;
 	}
 
 }

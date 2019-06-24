@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.dialect.model.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasticsearch7IndexFieldTypeFactoryContextProvider;
-import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasticsearch7IndexFieldTypeFactoryProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 
 import com.google.gson.Gson;
 
@@ -17,8 +17,8 @@ import com.google.gson.Gson;
 public class Elasticsearch7ModelDialect implements ElasticsearchModelDialect {
 
 	@Override
-	public ElasticsearchIndexFieldTypeFactoryContextProvider createIndexTypeFieldFactoryContextProvider(
+	public ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(
 			Gson userFacingGson) {
-		return new Elasticsearch7IndexFieldTypeFactoryContextProvider( userFacingGson );
+		return new Elasticsearch7IndexFieldTypeFactoryProvider( userFacingGson );
 	}
 }

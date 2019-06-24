@@ -12,7 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
@@ -26,15 +26,15 @@ import org.hibernate.search.util.common.impl.StringHelper;
 public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> implements IndexSchemaElement {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final IndexFieldTypeFactoryContext typeFactoryContext;
+	private final IndexFieldTypeFactory typeFactory;
 	final B objectNodeBuilder;
 	private final IndexSchemaNestingContext nestingContext;
 	private final boolean directChildrenAreMultiValuedByDefault;
 
-	public IndexSchemaElementImpl(IndexFieldTypeFactoryContext typeFactoryContext,
+	public IndexSchemaElementImpl(IndexFieldTypeFactory typeFactory,
 			B objectNodeBuilder, IndexSchemaNestingContext nestingContext,
 			boolean directChildrenAreMultiValuedByDefault) {
-		this.typeFactoryContext = typeFactoryContext;
+		this.typeFactory = typeFactory;
 		this.objectNodeBuilder = objectNodeBuilder;
 		this.nestingContext = nestingContext;
 		this.directChildrenAreMultiValuedByDefault = directChildrenAreMultiValuedByDefault;
@@ -71,8 +71,8 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 
 	@Override
 	public <F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(String relativeFieldName,
-			Function<? super IndexFieldTypeFactoryContext, ? extends IndexFieldTypeFinalStep<F>> typeContributor) {
-		return field( relativeFieldName, typeContributor.apply( typeFactoryContext ) );
+			Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<F>> typeContributor) {
+		return field( relativeFieldName, typeContributor.apply( typeFactory ) );
 	}
 
 	@Override
@@ -84,13 +84,13 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 				(prefixedName, filter) -> {
 					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 							this.objectNodeBuilder.addObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( typeFactoryContext, objectFieldBuilder, filter, false );
+					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder, filter, false );
 				},
 				// If the field is filtered out
 				(prefixedName, filter) -> {
 					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 							this.objectNodeBuilder.createExcludedObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( typeFactoryContext, objectFieldBuilder, filter, false );
+					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder, filter, false );
 				}
 		);
 		if ( directChildrenAreMultiValuedByDefault ) {

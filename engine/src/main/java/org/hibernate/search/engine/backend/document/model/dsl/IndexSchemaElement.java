@@ -10,7 +10,7 @@ package org.hibernate.search.engine.backend.document.model.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
@@ -50,14 +50,14 @@ public interface IndexSchemaElement {
 	 * Best used with lambda expressions.
 	 *
 	 * @param relativeFieldName The relative name of the new field.
-	 * @param typeContributor A function that will use the DSL context passed in parameter to create a type,
+	 * @param typeContributor A function that will use the factory passed in parameter to create a type,
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @param <F> The type of accessors for the new field.
 	 * @return A context allowing to get the reference to that new field.
 	 */
 	<F> IndexSchemaFieldContext<?, IndexFieldReference<F>> field(String relativeFieldName,
-			Function<? super IndexFieldTypeFactoryContext, ? extends IndexFieldTypeFinalStep<F>> typeContributor);
+			Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<F>> typeContributor);
 
 	/**
 	 * Add an object field to this index schema element with the default storage type.

@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
@@ -860,7 +860,7 @@ public class FieldSearchSortIT {
 
 	private static class MainFieldModel<T> {
 		static <LT> StandardFieldMapper<LT, MainFieldModel<LT>> mapper(
-				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, LT>> configuration,
+				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, LT>> configuration,
 				LT document1Value, LT document2Value, LT document3Value) {
 			return StandardFieldMapper.of(
 					configuration,
@@ -921,7 +921,7 @@ public class FieldSearchSortIT {
 
 	private static class IncompatibleFieldModel {
 		static <F> StandardFieldMapper<F, IncompatibleFieldModel> mapper(
-				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> configuration) {
+				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> configuration) {
 			return StandardFieldMapper.of(
 					configuration,
 					(reference, name) -> new IncompatibleFieldModel( name )

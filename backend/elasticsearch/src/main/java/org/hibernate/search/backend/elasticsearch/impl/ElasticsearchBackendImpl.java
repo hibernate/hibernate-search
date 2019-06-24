@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
-import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
@@ -50,7 +50,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final String name;
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
 
-	private final ElasticsearchIndexFieldTypeFactoryContextProvider typeFactoryContextProvider;
+	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
@@ -66,7 +66,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	ElasticsearchBackendImpl(ElasticsearchLinkImpl link,
 			String name,
-			ElasticsearchIndexFieldTypeFactoryContextProvider typeFactoryContextProvider,
+			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
@@ -83,7 +83,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.queryOrchestrator = orchestratorProvider.createParallelOrchestrator( "Elasticsearch query orchestrator for backend " + name );
 
-		this.typeFactoryContextProvider = typeFactoryContextProvider;
+		this.typeFactoryProvider = typeFactoryProvider;
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexingContext = new IndexingBackendContext( eventContext, link, multiTenancyStrategy,
@@ -172,7 +172,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
 				new ElasticsearchIndexSchemaRootNodeBuilder(
-						typeFactoryContextProvider,
+						typeFactoryProvider,
 						indexEventContext,
 						multiTenancyStrategy
 				);

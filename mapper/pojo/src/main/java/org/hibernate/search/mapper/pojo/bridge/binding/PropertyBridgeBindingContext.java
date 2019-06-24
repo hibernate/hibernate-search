@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.binding;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoPropertyDependencyContext;
@@ -32,7 +32,7 @@ public interface PropertyBridgeBindingContext {
 	/**
 	 * @return An entry point allowing to define a new field type.
 	 */
-	IndexFieldTypeFactoryContext getTypeFactory();
+	IndexFieldTypeFactory getTypeFactory();
 
 	/**
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the index schema.

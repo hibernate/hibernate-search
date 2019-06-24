@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.dsl.impl;
+package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
@@ -20,12 +20,10 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
-import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
-import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
-import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeOptionsStep;
+import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
@@ -34,21 +32,26 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.Gson;
 
 
-public class LuceneIndexFieldTypeFactoryContextImpl
-		implements LuceneIndexFieldTypeFactoryContext, LuceneIndexFieldTypeBuildContext {
+
+public class ElasticsearchIndexFieldTypeFactoryImpl
+		implements ElasticsearchIndexFieldTypeFactory, ElasticsearchIndexFieldTypeBuildContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EventContext eventContext;
-	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	private final Gson userFacingGson;
+	private final ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider;
 	private final IndexFieldTypeDefaultsProvider typeDefaultsProvider;
 
-	public LuceneIndexFieldTypeFactoryContextImpl(EventContext eventContext,
-			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
+	public ElasticsearchIndexFieldTypeFactoryImpl(EventContext eventContext, Gson userFacingGson,
+			ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider,
+			IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
 		this.eventContext = eventContext;
-		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
+		this.userFacingGson = userFacingGson;
+		this.defaultFieldFormatProvider = defaultFieldFormatProvider;
 		this.typeDefaultsProvider = typeDefaultsProvider;
 	}
 
@@ -125,116 +128,112 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 
 	@Override
 	public StringIndexFieldTypeOptionsStep<?> asString() {
-		return new LuceneStringIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchStringIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, Integer> asInteger() {
-		return new LuceneIntegerIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchIntegerIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, Long> asLong() {
-		return new LuceneLongIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchLongIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, Boolean> asBoolean() {
-		return new LuceneBooleanIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchBooleanIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, Byte> asByte() {
-		return new LuceneByteIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchByteIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, Short> asShort() {
-		return new LuceneShortIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchShortIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, Float> asFloat() {
-		return new LuceneFloatIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchFloatIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, Double> asDouble() {
-		return new LuceneDoubleIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchDoubleIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, LocalDate> asLocalDate() {
-		return new LuceneLocalDateIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchLocalDateIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, LocalDateTime> asLocalDateTime() {
-		return new LuceneLocalDateTimeIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchLocalDateTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, LocalTime> asLocalTime() {
-		return new LuceneLocalTimeIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchLocalTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, Instant> asInstant() {
-		return new LuceneInstantIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchInstantIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, ZonedDateTime> asZonedDateTime() {
-		return new LuceneZonedDateTimeIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, Year> asYear() {
-		return new LuceneYearIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchYearIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, YearMonth> asYearMonth() {
-		return new LuceneYearMonthIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchYearMonthIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, MonthDay> asMonthDay() {
-		return new LuceneMonthDayIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchMonthDayIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, OffsetDateTime> asOffsetDateTime() {
-		return new LuceneOffsetDateTimeIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchOffsetDateTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, OffsetTime> asOffsetTime() {
-		return new LuceneOffsetTimeIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchOffsetTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, GeoPoint> asGeoPoint() {
-		return new LuceneGeoPointIndexFieldTypeOptionsStep( this );
+		return new ElasticsearchGeoPointIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
 	public ScaledNumberIndexFieldTypeOptionsStep<?, BigDecimal> asBigDecimal() {
-		return new LuceneBigDecimalIndexFieldTypeOptionsStep( this, typeDefaultsProvider );
+		return new ElasticsearchBigDecimalIndexFieldTypeOptionsStep( this, typeDefaultsProvider );
 	}
 
 	@Override
 	public ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger() {
-		return new LuceneBigIntegerIndexFieldTypeOptionsStep( this, typeDefaultsProvider );
+		return new ElasticsearchBigIntegerIndexFieldTypeOptionsStep( this, typeDefaultsProvider );
 	}
 
 	@Override
-	public <F> IndexFieldTypeFinalStep<F> asNative(Class<F> indexFieldType,
-			LuceneFieldContributor<F> fieldContributor,
-			LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		return new LuceneNativeIndexFieldTypeFinalStep<>(
-				indexFieldType, fieldContributor, fieldValueExtractor
-		);
+	public ElasticsearchNativeIndexFieldTypeOptionsStep<?> asNative(String mappingJsonString) {
+		return new ElasticsearchNativeIndexFieldTypeOptionsStepImpl( this, mappingJsonString );
 	}
 
 	@Override
@@ -243,7 +242,12 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	}
 
 	@Override
-	public LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
-		return analysisDefinitionRegistry;
+	public Gson getUserFacingGson() {
+		return userFacingGson;
+	}
+
+	@Override
+	public ElasticsearchDefaultFieldFormatProvider getDefaultFieldFormatProvider() {
+		return defaultFieldFormatProvider;
 	}
 }

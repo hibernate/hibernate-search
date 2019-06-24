@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.dialect.model.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasticsearch6IndexFieldTypeFactoryContextProvider;
-import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasticsearch6IndexFieldTypeFactoryProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 
 import com.google.gson.Gson;
 
@@ -17,9 +17,9 @@ import com.google.gson.Gson;
 public class Elasticsearch6ModelDialect extends Elasticsearch7ModelDialect implements ElasticsearchModelDialect {
 
 	@Override
-	public ElasticsearchIndexFieldTypeFactoryContextProvider createIndexTypeFieldFactoryContextProvider(
+	public ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(
 			Gson userFacingGson) {
 		// Necessary because the date formats are handled differently in ES7
-		return new Elasticsearch6IndexFieldTypeFactoryContextProvider( userFacingGson );
+		return new Elasticsearch6IndexFieldTypeFactoryProvider( userFacingGson );
 	}
 }

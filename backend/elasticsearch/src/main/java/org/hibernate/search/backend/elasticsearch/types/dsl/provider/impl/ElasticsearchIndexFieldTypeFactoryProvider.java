@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
- * The low-level provider of {@link org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext}.
+ * The low-level provider of {@link ElasticsearchIndexFieldTypeFactory}.
  * <p>
  * Different implementations of this factory may exist for different versions of Elasticsearch.
  */
-public interface ElasticsearchIndexFieldTypeFactoryContextProvider {
+public interface ElasticsearchIndexFieldTypeFactoryProvider {
 
-	ElasticsearchIndexFieldTypeFactoryContext create(EventContext eventContext, IndexFieldTypeDefaultsProvider defaultsProvider);
+	ElasticsearchIndexFieldTypeFactory create(EventContext eventContext, IndexFieldTypeDefaultsProvider defaultsProvider);
 
 }
