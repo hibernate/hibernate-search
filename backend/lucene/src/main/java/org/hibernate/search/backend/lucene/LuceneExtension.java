@@ -11,8 +11,8 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearchPredicateFactoryImpl;
-import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
-import org.hibernate.search.backend.lucene.search.dsl.projection.impl.LuceneSearchProjectionFactoryContextImpl;
+import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
+import org.hibernate.search.backend.lucene.search.dsl.projection.impl.LuceneSearchProjectionFactoryImpl;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultDefinitionContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.impl.LuceneSearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
@@ -30,8 +30,8 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuil
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
@@ -70,7 +70,7 @@ public final class LuceneExtension<H, R, E>
 		SearchQueryExtension<LuceneSearchQuery<H>, H>,
 		SearchPredicateFactoryExtension<LuceneSearchPredicateFactory>,
 		SearchSortFactoryExtension<LuceneSearchSortFactory>,
-		SearchProjectionFactoryContextExtension<LuceneSearchProjectionFactoryContext<R, E>, R, E>,
+		SearchProjectionFactoryExtension<LuceneSearchProjectionFactory<R, E>, R, E>,
 		IndexFieldTypeFactoryContextExtension<LuceneIndexFieldTypeFactoryContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -171,10 +171,10 @@ public final class LuceneExtension<H, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchProjectionFactoryContext<R, E>> extendOptional(
-			SearchProjectionFactoryContext<R, E> original, SearchProjectionBuilderFactory factory) {
+	public Optional<LuceneSearchProjectionFactory<R, E>> extendOptional(
+			SearchProjectionFactory<R, E> original, SearchProjectionBuilderFactory factory) {
 		if ( factory instanceof LuceneSearchProjectionBuilderFactory ) {
-			return Optional.of( new LuceneSearchProjectionFactoryContextImpl<>(
+			return Optional.of( new LuceneSearchProjectionFactoryImpl<>(
 					original, (LuceneSearchProjectionBuilderFactory) factory
 			) );
 		}

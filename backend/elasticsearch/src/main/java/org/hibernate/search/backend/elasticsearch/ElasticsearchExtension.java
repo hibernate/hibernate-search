@@ -9,10 +9,10 @@ package org.hibernate.search.backend.elasticsearch;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactory;
+import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.ElasticsearchSearchProjectionFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
-import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.ElasticsearchSearchProjectionFactoryContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.impl.ElasticsearchSearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
@@ -30,8 +30,8 @@ import org.hibernate.search.backend.elasticsearch.search.sort.impl.Elasticsearch
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
@@ -70,7 +70,7 @@ public final class ElasticsearchExtension<H, R, E>
 		SearchQueryExtension<ElasticsearchSearchQuery<H>, H>,
 		SearchPredicateFactoryExtension<ElasticsearchSearchPredicateFactory>,
 		SearchSortFactoryExtension<ElasticsearchSearchSortFactory>,
-		SearchProjectionFactoryContextExtension<ElasticsearchSearchProjectionFactoryContext<R, E>, R, E>,
+		SearchProjectionFactoryExtension<ElasticsearchSearchProjectionFactory<R, E>, R, E>,
 		IndexFieldTypeFactoryContextExtension<ElasticsearchIndexFieldTypeFactoryContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -171,10 +171,10 @@ public final class ElasticsearchExtension<H, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchProjectionFactoryContext<R, E>> extendOptional(
-			SearchProjectionFactoryContext<R, E> original, SearchProjectionBuilderFactory factory) {
+	public Optional<ElasticsearchSearchProjectionFactory<R, E>> extendOptional(
+			SearchProjectionFactory<R, E> original, SearchProjectionBuilderFactory factory) {
 		if ( factory instanceof ElasticsearchSearchProjectionBuilderFactory ) {
-			return Optional.of( new ElasticsearchSearchProjectionFactoryContextImpl<>(
+			return Optional.of( new ElasticsearchSearchProjectionFactoryImpl<>(
 					original, (ElasticsearchSearchProjectionBuilderFactory) factory
 			) );
 		}

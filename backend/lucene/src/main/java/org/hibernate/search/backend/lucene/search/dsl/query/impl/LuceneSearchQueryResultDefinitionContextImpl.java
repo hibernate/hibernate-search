@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
-import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
+import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultDefinitionContext;
@@ -31,7 +31,7 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 				LuceneSearchQueryContext<E>,
 				R,
 				E,
-				LuceneSearchProjectionFactoryContext<R, E>,
+		LuceneSearchProjectionFactory<R, E>,
 				LuceneSearchPredicateFactory,
 				LuceneSearchQueryElementCollector
 		>
@@ -65,9 +65,9 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 
 	@Override
 	public <P> LuceneSearchQueryResultContext<P> asProjection(
-			Function<? super LuceneSearchProjectionFactoryContext<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
-		LuceneSearchProjectionFactoryContext<R, E> factoryContext =
-				createDefaultProjectionFactoryContext().extension( LuceneExtension.get() );
+			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
+		LuceneSearchProjectionFactory<R, E> factoryContext =
+				createDefaultProjectionFactory().extension( LuceneExtension.get() );
 		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();
 		return asProjection( projection );
 	}

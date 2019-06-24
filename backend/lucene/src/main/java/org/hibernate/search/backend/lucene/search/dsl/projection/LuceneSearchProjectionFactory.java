@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.search.dsl.projection;
 
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
 
 /**
- * A DSL context allowing to create a projection, with some Lucene-specific methods.
+ * A factory for search projections with some Lucene-specific methods.
  *
  * @param <R> The type of entity references.
  * @param <E> The type of entities.
- * @see SearchProjectionFactoryContext
+ * @see SearchProjectionFactory
  */
-public interface LuceneSearchProjectionFactoryContext<R, E> extends SearchProjectionFactoryContext<R, E> {
+public interface LuceneSearchProjectionFactory<R, E> extends SearchProjectionFactory<R, E> {
 
 	/**
 	 * Project to a Lucene {@link Document} containing all the stored fields.

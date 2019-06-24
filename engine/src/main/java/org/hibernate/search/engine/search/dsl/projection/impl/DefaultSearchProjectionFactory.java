@@ -19,9 +19,9 @@ import org.hibernate.search.engine.search.dsl.projection.EntityProjectionOptions
 import org.hibernate.search.engine.search.dsl.projection.EntityReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.dsl.projection.FieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionOptionsStep;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionStep;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -29,11 +29,11 @@ import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.impl.Contracts;
 
 
-public class DefaultSearchProjectionFactoryContext<R, E> implements SearchProjectionFactoryContext<R, E> {
+public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFactory<R, E> {
 
 	private final SearchProjectionBuilderFactory factory;
 
-	public DefaultSearchProjectionFactoryContext(SearchProjectionBuilderFactory factory) {
+	public DefaultSearchProjectionFactory(SearchProjectionBuilderFactory factory) {
 		this.factory = factory;
 	}
 
@@ -115,14 +115,14 @@ public class DefaultSearchProjectionFactoryContext<R, E> implements SearchProjec
 	}
 
 	@Override
-	public <T> T extension(SearchProjectionFactoryContextExtension<T, R, E> extension) {
+	public <T> T extension(SearchProjectionFactoryExtension<T, R, E> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, factory )
 		);
 	}
 
 	@Override
-	public <T> SearchProjectionFactoryContextExtensionStep<T, R, E> extension() {
-		return new SearchProjectionFactoryContextExtensionStepImpl<>( this, factory );
+	public <T> SearchProjectionFactoryExtensionStep<T, R, E> extension() {
+		return new SearchProjectionFactoryExtensionStepImpl<>( this, factory );
 	}
 }

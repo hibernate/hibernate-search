@@ -18,18 +18,18 @@ import org.hibernate.search.engine.search.dsl.projection.EntityProjectionOptions
 import org.hibernate.search.engine.search.dsl.projection.EntityReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.dsl.projection.FieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionOptionsStep;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionStep;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
 
-public class DelegatingSearchProjectionFactoryContext<R, E> implements SearchProjectionFactoryContext<R, E> {
+public class DelegatingSearchProjectionFactory<R, E> implements SearchProjectionFactory<R, E> {
 
-	private final SearchProjectionFactoryContext<R, E> delegate;
+	private final SearchProjectionFactory<R, E> delegate;
 
-	public DelegatingSearchProjectionFactoryContext(SearchProjectionFactoryContext<R, E> delegate) {
+	public DelegatingSearchProjectionFactory(SearchProjectionFactory<R, E> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -92,12 +92,12 @@ public class DelegatingSearchProjectionFactoryContext<R, E> implements SearchPro
 	}
 
 	@Override
-	public <T> T extension(SearchProjectionFactoryContextExtension<T, R, E> extension) {
+	public <T> T extension(SearchProjectionFactoryExtension<T, R, E> extension) {
 		return delegate.extension( extension );
 	}
 
 	@Override
-	public <P> SearchProjectionFactoryContextExtensionStep<P, R, E> extension() {
+	public <P> SearchProjectionFactoryExtensionStep<P, R, E> extension() {
 		return delegate.extension();
 	}
 }

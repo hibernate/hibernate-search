@@ -23,12 +23,12 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeConte
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
@@ -587,20 +587,20 @@ public class SearchProjectionIT extends EasyMockSupport {
 	}
 
 	private static class SupportedExtension<R, E>
-			implements SearchProjectionFactoryContextExtension<MyExtendedContext<R, E>, R, E> {
+			implements SearchProjectionFactoryExtension<MyExtendedFactory<R, E>, R, E> {
 		@Override
-		public Optional<MyExtendedContext<R, E>> extendOptional(SearchProjectionFactoryContext<R, E> original,
+		public Optional<MyExtendedFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
 				SearchProjectionBuilderFactory factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
-			return Optional.of( new MyExtendedContext<>( original ) );
+			return Optional.of( new MyExtendedFactory<>( original ) );
 		}
 	}
 
 	private static class UnSupportedExtension<R, E>
-			implements SearchProjectionFactoryContextExtension<MyExtendedContext<R, E>, R, E> {
+			implements SearchProjectionFactoryExtension<MyExtendedFactory<R, E>, R, E> {
 		@Override
-		public Optional<MyExtendedContext<R, E>> extendOptional(SearchProjectionFactoryContext<R, E> original,
+		public Optional<MyExtendedFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
 				SearchProjectionBuilderFactory factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
@@ -608,10 +608,10 @@ public class SearchProjectionIT extends EasyMockSupport {
 		}
 	}
 
-	private static class MyExtendedContext<R, E> {
-		private final SearchProjectionFactoryContext<R, E> delegate;
+	private static class MyExtendedFactory<R, E> {
+		private final SearchProjectionFactory<R, E> delegate;
 
-		MyExtendedContext(SearchProjectionFactoryContext<R, E> delegate) {
+		MyExtendedFactory(SearchProjectionFactory<R, E> delegate) {
 			this.delegate = delegate;
 		}
 

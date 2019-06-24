@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
@@ -28,7 +28,7 @@ public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
 				SearchQueryContext<?, E, ?>,
 				R,
 				E,
-				SearchProjectionFactoryContext<R, E>,
+				SearchProjectionFactory<R, E>,
 				SearchPredicateFactory,
 				C
 		> {
@@ -61,9 +61,9 @@ public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
 
 	@Override
 	public <P> SearchQueryResultContext<?, P, ?> asProjection(
-			Function<? super SearchProjectionFactoryContext<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
-		SearchProjectionFactoryContext<R, E> factoryContext = createDefaultProjectionFactoryContext();
-		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();
+			Function<? super SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
+		SearchProjectionFactory<R, E> factory = createDefaultProjectionFactory();
+		SearchProjection<P> projection = projectionContributor.apply( factory ).toProjection();
 		return asProjection( projection );
 	}
 

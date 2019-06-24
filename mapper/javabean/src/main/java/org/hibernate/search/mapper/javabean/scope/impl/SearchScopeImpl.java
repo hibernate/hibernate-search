@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.javabean.scope.impl;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
@@ -43,7 +43,7 @@ public class SearchScopeImpl implements SearchScope {
 	}
 
 	@Override
-	public SearchProjectionFactoryContext<EntityReference, ?> projection() {
+	public SearchProjectionFactory<EntityReference, ?> projection() {
 		return delegate.projection();
 	}
 }
