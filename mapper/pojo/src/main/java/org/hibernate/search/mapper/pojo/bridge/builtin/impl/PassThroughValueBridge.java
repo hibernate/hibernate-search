@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
@@ -20,7 +20,7 @@ import org.hibernate.search.util.common.impl.Contracts;
  * A pass-through value bridge, i.e. a bridge that passes the input value as-is to the underlying backend.
  * <p>
  * This bridge will not work for any type: only types supported by the backend
- * through {@link IndexFieldTypeFactoryContext#as(Class)} will work.
+ * through {@link IndexFieldTypeFactory#as(Class)} will work.
  *
  * @param <F> The type of input values, as well as the type of the index field.
  */

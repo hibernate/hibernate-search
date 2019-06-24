@@ -17,9 +17,9 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.query.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
-import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtension;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactory;
@@ -71,7 +71,7 @@ public final class ElasticsearchExtension<H, R, E>
 		SearchPredicateFactoryExtension<ElasticsearchSearchPredicateFactory>,
 		SearchSortFactoryExtension<ElasticsearchSearchSortFactory>,
 		SearchProjectionFactoryExtension<ElasticsearchSearchProjectionFactory<R, E>, R, E>,
-		IndexFieldTypeFactoryContextExtension<ElasticsearchIndexFieldTypeFactoryContext> {
+		IndexFieldTypeFactoryExtension<ElasticsearchIndexFieldTypeFactory> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -187,9 +187,9 @@ public final class ElasticsearchExtension<H, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ElasticsearchIndexFieldTypeFactoryContext extendOrFail(IndexFieldTypeFactoryContext original) {
-		if ( original instanceof ElasticsearchIndexFieldTypeFactoryContext ) {
-			return (ElasticsearchIndexFieldTypeFactoryContext) original;
+	public ElasticsearchIndexFieldTypeFactory extendOrFail(IndexFieldTypeFactory original) {
+		if ( original instanceof ElasticsearchIndexFieldTypeFactory ) {
+			return (ElasticsearchIndexFieldTypeFactory) original;
 		}
 		else {
 			throw log.elasticsearchExtensionOnUnknownType( original );

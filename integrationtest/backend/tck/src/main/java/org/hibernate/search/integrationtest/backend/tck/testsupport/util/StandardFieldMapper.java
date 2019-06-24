@@ -13,25 +13,25 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 
 public final class StandardFieldMapper<F, M> {
 
 	public static <F, M> StandardFieldMapper<F, M> of(
-			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
+			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
 			BiFunction<IndexFieldReference<F>, String, M> resultFunction) {
 		return of( initialConfiguration, ignored -> { }, resultFunction );
 	}
 
 	public static <F> StandardFieldMapper<F, IndexFieldReference<F>> of(
-			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
+			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
 			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment) {
 		return of( initialConfiguration, configurationAdjustment, (reference, ignored) -> reference );
 	}
 
 	public static <F, M> StandardFieldMapper<F, M> of(
-			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
+			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
 			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment,
 			BiFunction<IndexFieldReference<F>, String, M> resultFunction) {
 		return new StandardFieldMapper<>(
@@ -39,12 +39,12 @@ public final class StandardFieldMapper<F, M> {
 		);
 	}
 
-	private final Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration;
+	private final Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration;
 	private final Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment;
 	private final BiFunction<IndexFieldReference<F>, String, M> resultFunction;
 
 	private StandardFieldMapper(
-			Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
+			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
 			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> configurationAdjustment,
 			BiFunction<IndexFieldReference<F>, String, M> resultFunction) {
 		this.initialConfiguration = initialConfiguration;

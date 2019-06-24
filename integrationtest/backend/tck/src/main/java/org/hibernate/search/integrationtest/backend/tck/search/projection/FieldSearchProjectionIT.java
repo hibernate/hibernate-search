@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -803,7 +803,7 @@ public class FieldSearchProjectionIT {
 		}
 
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
-				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> configuration,
+				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> configuration,
 				F document1Value, F document2Value, F document3Value) {
 			return StandardFieldMapper.of(
 					configuration,
@@ -833,7 +833,7 @@ public class FieldSearchProjectionIT {
 
 	private static class IncompatibleFieldModel {
 		static <F> StandardFieldMapper<F, IncompatibleFieldModel> mapper(
-				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> configuration) {
+				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> configuration) {
 			return StandardFieldMapper.of(
 					configuration,
 					c -> c.projectable( Projectable.YES ),

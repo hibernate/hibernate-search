@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaEl
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
@@ -49,7 +49,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
+	public IndexFieldTypeFactory createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
 		return indexSchemaRootNodeBuilder.createTypeFactory( defaultsProvider );
 	}
 

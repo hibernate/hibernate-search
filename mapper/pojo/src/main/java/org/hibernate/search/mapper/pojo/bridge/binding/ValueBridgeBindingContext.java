@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding;
 
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 
@@ -25,6 +25,6 @@ public interface ValueBridgeBindingContext<V> {
 	/**
 	 * @return An entry point allowing to define a new field type.
 	 */
-	IndexFieldTypeFactoryContext getTypeFactory();
+	IndexFieldTypeFactory getTypeFactory();
 
 }

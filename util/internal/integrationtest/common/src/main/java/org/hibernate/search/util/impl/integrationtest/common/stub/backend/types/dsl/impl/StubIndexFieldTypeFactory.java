@@ -19,18 +19,18 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryContext {
+public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 
 	private final IndexFieldTypeDefaultsProvider defaultsProvider;
 
-	public StubIndexFieldTypeFactoryContext(IndexFieldTypeDefaultsProvider defaultsProvider) {
+	public StubIndexFieldTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
 		this.defaultsProvider = defaultsProvider;
 	}
 

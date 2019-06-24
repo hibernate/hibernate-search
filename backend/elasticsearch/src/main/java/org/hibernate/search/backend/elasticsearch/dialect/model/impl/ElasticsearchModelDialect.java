@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.dialect.model.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 
 import com.google.gson.Gson;
 
@@ -27,6 +27,6 @@ import com.google.gson.Gson;
  */
 public interface ElasticsearchModelDialect {
 
-	ElasticsearchIndexFieldTypeFactoryContextProvider createIndexTypeFieldFactoryContextProvider(Gson userFacingGson);
+	ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(Gson userFacingGson);
 
 }

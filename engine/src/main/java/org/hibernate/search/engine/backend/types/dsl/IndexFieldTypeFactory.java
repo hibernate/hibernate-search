@@ -24,9 +24,9 @@ import org.hibernate.search.util.common.SearchException;
 
 
 /**
- * The initial context when specifying the type of an index field.
+ * A factory for types of index fields.
  */
-public interface IndexFieldTypeFactoryContext {
+public interface IndexFieldTypeFactory {
 
 	/**
 	 * Define a field type whose values are represented as a given type in Hibernate Search.
@@ -168,15 +168,15 @@ public interface IndexFieldTypeFactoryContext {
 	ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger();
 
 	/**
-	 * Extend the current context with the given extension,
-	 * resulting in an extended context offering more field types.
+	 * Extend the current factory with the given extension,
+	 * resulting in an extended factory offering more field types.
 	 *
 	 * @param extension The extension to apply.
-	 * @param <T> The type of context provided by the extension.
-	 * @return The extended context.
+	 * @param <T> The type of factory provided by the extension.
+	 * @return The extended factory.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying technology, ...).
 	 */
-	default <T> T extension(IndexFieldTypeFactoryContextExtension<T> extension) {
+	default <T> T extension(IndexFieldTypeFactoryExtension<T> extension) {
 		return extension.extendOrFail( this );
 	}
 

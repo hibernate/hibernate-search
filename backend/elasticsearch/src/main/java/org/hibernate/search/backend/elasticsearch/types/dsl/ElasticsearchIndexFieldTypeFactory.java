@@ -8,10 +8,10 @@ package org.hibernate.search.backend.elasticsearch.types.dsl;
 
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactory;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 
 
-public interface ElasticsearchIndexFieldTypeFactoryContext extends IndexFieldTypeFactoryContext {
+public interface ElasticsearchIndexFieldTypeFactory extends IndexFieldTypeFactory {
 
 	/**
 	 * Define a native field type.

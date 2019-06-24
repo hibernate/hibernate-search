@@ -26,7 +26,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -120,8 +120,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			Gson userFacingGson = new GsonBuilder().setPrettyPrinting().create();
 
-			ElasticsearchIndexFieldTypeFactoryContextProvider typeFactoryContextProvider =
-					dialect.createIndexTypeFieldFactoryContextProvider( userFacingGson );
+			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider =
+					dialect.createIndexTypeFieldFactoryProvider( userFacingGson );
 
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
 					getAnalysisDefinitionRegistry( backendContext, buildContext, propertySource );
@@ -129,7 +129,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			return new ElasticsearchBackendImpl(
 					link,
 					name,
-					typeFactoryContextProvider,
+					typeFactoryProvider,
 					userFacingGson,
 					analysisDefinitionRegistry,
 					getMultiTenancyStrategy( name, propertySource )

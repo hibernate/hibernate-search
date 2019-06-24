@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -126,12 +126,12 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 		bind( defaultedFieldName, context.getTypeFactory(), context.getIndexSchemaElement(), context.getBridgedElement() );
 	}
 
-	private void bind(String defaultedFieldName, IndexFieldTypeFactoryContext typeFactoryContext,
+	private void bind(String defaultedFieldName, IndexFieldTypeFactory typeFactory,
 			IndexSchemaElement indexSchemaElement,
 			PojoModelCompositeElement bridgedPojoModelElement) {
 		indexFieldReference = indexSchemaElement.field(
 				defaultedFieldName,
-				typeFactoryContext.asGeoPoint().projectable( projectable ).sortable( sortable ).toIndexFieldType()
+				typeFactory.asGeoPoint().projectable( projectable ).sortable( sortable ).toIndexFieldType()
 		)
 				.toReference();
 

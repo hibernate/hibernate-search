@@ -15,20 +15,21 @@ package org.hibernate.search.engine.backend.types.dsl;
  * In short, users are only expected to get instances of this type from an API ({@code SomeExtension.get()})
  * and pass it to another API.
  *
- * @param <T> The type of extended schema field contexts. Should generally extend {@link IndexFieldTypeFactoryContext}.
+ * @param <T> The type of extended index field type factories.
+ * Should generally extend {@link IndexFieldTypeFactory}.
  *
- * @see IndexFieldTypeFactoryContext#extension(IndexFieldTypeFactoryContextExtension)
+ * @see IndexFieldTypeFactory#extension(IndexFieldTypeFactoryExtension)
  */
-public interface IndexFieldTypeFactoryContextExtension<T> {
+public interface IndexFieldTypeFactoryExtension<T> {
 
 	/**
-	 * Attempt to extend a given context, throwing an exception in case of failure.
+	 * Attempt to extend a given factory, throwing an exception in case of failure.
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link IndexFieldTypeFactoryContext}.
-	 * @return An extended search predicate factory context ({@link T})
+	 * @param original The original, non-extended {@link IndexFieldTypeFactory}.
+	 * @return An extended index field type factory ({@link T})
 	 */
-	T extendOrFail(IndexFieldTypeFactoryContext original);
+	T extendOrFail(IndexFieldTypeFactory original);
 
 }

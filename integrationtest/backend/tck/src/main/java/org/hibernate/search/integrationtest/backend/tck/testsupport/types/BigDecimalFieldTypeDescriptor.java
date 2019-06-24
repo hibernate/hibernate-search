@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
@@ -29,7 +29,7 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 	}
 
 	@Override
-	public StandardIndexFieldTypeOptionsStep<?, BigDecimal> configure(IndexFieldTypeFactoryContext fieldContext) {
+	public StandardIndexFieldTypeOptionsStep<?, BigDecimal> configure(IndexFieldTypeFactory fieldContext) {
 		return fieldContext.asBigDecimal().decimalScale( DECIMAL_SCALE );
 	}
 

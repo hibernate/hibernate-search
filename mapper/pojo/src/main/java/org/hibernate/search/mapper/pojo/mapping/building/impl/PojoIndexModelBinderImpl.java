@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
@@ -343,7 +343,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	private <V, V2, F, B extends ValueBridge<V2, F>> BoundValueBridge<V, ?> bindValueBridge(
-			IndexFieldTypeFactoryContext indexFieldTypeFactory,
+			IndexFieldTypeFactory indexFieldTypeFactory,
 			IndexSchemaElement schemaElement, PojoGenericTypeModel<V> valueTypeModel, boolean multiValued,
 			BeanHolder<? extends B> bridgeHolder,
 			String relativeFieldName, FieldModelContributor contributor) {
