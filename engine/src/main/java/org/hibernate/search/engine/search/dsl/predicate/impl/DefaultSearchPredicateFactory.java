@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateFieldStep
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionStep;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionIfSupportedStep;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateInitialStep;
@@ -105,8 +105,8 @@ public class DefaultSearchPredicateFactory<B> implements SearchPredicateFactory 
 	}
 
 	@Override
-	public SearchPredicateFactoryExtensionStep extension() {
-		return new SearchPredicateFactoryExtensionStepImpl<>( this, builderFactory );
+	public SearchPredicateFactoryExtensionIfSupportedStep extension() {
+		return new SearchPredicateFactoryExtensionStep<>( this, builderFactory );
 	}
 
 }

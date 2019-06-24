@@ -12,25 +12,28 @@ import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionStep;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionIfSupportedMoreStep;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionIfSupportedStep;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-final class SearchPredicateFactoryExtensionStepImpl<B> implements SearchPredicateFactoryExtensionStep {
+final class SearchPredicateFactoryExtensionStep<B>
+		implements SearchPredicateFactoryExtensionIfSupportedStep,
+		SearchPredicateFactoryExtensionIfSupportedMoreStep {
 
 	private final SearchPredicateFactory parent;
 	private final SearchPredicateBuilderFactory<?, B> factory;
 
 	private final DslExtensionState<PredicateFinalStep> state = new DslExtensionState<>();
 
-	SearchPredicateFactoryExtensionStepImpl(SearchPredicateFactory parent,
+	SearchPredicateFactoryExtensionStep(SearchPredicateFactory parent,
 			SearchPredicateBuilderFactory<?, B> factory) {
 		this.parent = parent;
 		this.factory = factory;
 	}
 
 	@Override
-	public <T> SearchPredicateFactoryExtensionStep ifSupported(
+	public <T> SearchPredicateFactoryExtensionIfSupportedMoreStep ifSupported(
 			SearchPredicateFactoryExtension<T> extension,
 			Function<T, ? extends PredicateFinalStep> predicateContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent, factory ), predicateContributor );
