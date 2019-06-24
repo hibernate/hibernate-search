@@ -77,8 +77,8 @@ class MatchPredicateFieldMoreStepImpl<B>
 	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, MatchPredicateFieldMoreStepImpl<B>>
 			implements MatchPredicateOptionsStep {
 
-		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
-			super( factory );
+		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+			super( builderFactory );
 		}
 
 		MatchPredicateOptionsStep matching(Object value, DslConverter dslConverter) {

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.javabean.scope;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
@@ -48,9 +48,9 @@ public interface SearchScope {
 	 * removing the need to create separate objects to represent the predicates.
 	 *
 	 * @return A predicate factory.
-	 * @see SearchPredicateFactoryContext
+	 * @see SearchPredicateFactory
 	 */
-	SearchPredicateFactoryContext predicate();
+	SearchPredicateFactory predicate();
 
 	/**
 	 * Initiate the building of a search sort.

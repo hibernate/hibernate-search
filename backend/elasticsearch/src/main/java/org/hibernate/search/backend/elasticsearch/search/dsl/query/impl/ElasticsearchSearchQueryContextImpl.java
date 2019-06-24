@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.query.impl;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactoryContext;
@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 
@@ -25,8 +25,8 @@ class ElasticsearchSearchQueryContextImpl<H>
 				ElasticsearchSearchQueryContext<H>,
 				H,
 				ElasticsearchSearchResult<H>,
-				ElasticsearchSearchPredicateFactoryContext,
-		ElasticsearchSearchSortFactoryContext,
+				ElasticsearchSearchPredicateFactory,
+				ElasticsearchSearchSortFactoryContext,
 				ElasticsearchSearchQueryElementCollector
 		>
 		implements ElasticsearchSearchQueryResultContext<H>, ElasticsearchSearchQueryContext<H> {
@@ -50,9 +50,9 @@ class ElasticsearchSearchQueryContextImpl<H>
 	}
 
 	@Override
-	protected ElasticsearchSearchPredicateFactoryContext extendPredicateContext(
-			SearchPredicateFactoryContext predicateFactoryContext) {
-		return predicateFactoryContext.extension( ElasticsearchExtension.get() );
+	protected ElasticsearchSearchPredicateFactory extendPredicateFactory(
+			SearchPredicateFactory predicateFactory) {
+		return predicateFactory.extension( ElasticsearchExtension.get() );
 	}
 
 	@Override

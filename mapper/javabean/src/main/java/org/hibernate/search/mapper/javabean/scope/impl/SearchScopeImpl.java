@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.scope.impl;
 
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
@@ -33,7 +33,7 @@ public class SearchScopeImpl implements SearchScope {
 	}
 
 	@Override
-	public SearchPredicateFactoryContext predicate() {
+	public SearchPredicateFactory predicate() {
 		return delegate.predicate();
 	}
 

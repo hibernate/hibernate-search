@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl;
 
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 
@@ -25,7 +26,7 @@ public interface ElasticsearchIndexFieldTypeFactoryContext extends IndexFieldTyp
 	 *     <li>The predicate/sort/projection DSLs have only limited support for fields of this type.
 	 *     Some features may not work and throw an exception, such as phrase predicates.
 	 *     It is recommended to create the predicate/sort/projections targeting these fields from JSON
-	 *     using {@link org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext#fromJson(String)}
+	 *     using {@link ElasticsearchSearchPredicateFactory#fromJson(String)}
 	 *     or {@link ElasticsearchSearchSortFactoryContext#fromJson(String)}</li>
 	 * </ul>
 	 *

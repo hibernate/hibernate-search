@@ -12,7 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
@@ -29,7 +29,7 @@ public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
 				R,
 				E,
 				SearchProjectionFactoryContext<R, E>,
-				SearchPredicateFactoryContext,
+				SearchPredicateFactory,
 				C
 		> {
 
@@ -83,7 +83,7 @@ public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
 
 	@Override
 	public SearchQueryContext<?, E, ?> predicate(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return asEntity().predicate( predicateContributor );
 	}
 

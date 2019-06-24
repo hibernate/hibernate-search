@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.query.impl;
 
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
@@ -16,13 +16,13 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 final class DefaultSearchQueryContext<H, C>
 		extends AbstractSearchQueryContext<
-						DefaultSearchQueryContext<H, C>,
-						H,
-						SearchPredicateFactoryContext,
-						SearchSortFactoryContext,
-						C
-				>
-		implements SearchQueryResultContext<DefaultSearchQueryContext<H, C>, H, SearchPredicateFactoryContext>,
+				DefaultSearchQueryContext<H, C>,
+				H,
+				SearchPredicateFactory,
+				SearchSortFactoryContext,
+				C
+		>
+		implements SearchQueryResultContext<DefaultSearchQueryContext<H, C>, H, SearchPredicateFactory>,
 				SearchQueryContext<DefaultSearchQueryContext<H, C>, H, SearchSortFactoryContext> {
 
 	DefaultSearchQueryContext(IndexScope<C> indexScope, SearchQueryBuilder<H, C> searchQueryBuilder) {
@@ -30,10 +30,10 @@ final class DefaultSearchQueryContext<H, C>
 	}
 
 	@Override
-	protected SearchPredicateFactoryContext extendPredicateContext(
-			SearchPredicateFactoryContext predicateFactoryContext) {
+	protected SearchPredicateFactory extendPredicateFactory(
+			SearchPredicateFactory predicateFactory) {
 		// We don't extend anything.
-		return predicateFactoryContext;
+		return predicateFactory;
 	}
 
 	@Override

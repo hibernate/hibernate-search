@@ -56,12 +56,12 @@ public interface MatchAllPredicateOptionsStep
 	 * <p>
 	 * Documents matching the "must not" clause won't match the "match all" predicate.
 	 *
-	 * @param clauseContributor A function that will use the factory context passed in parameter to create a predicate,
+	 * @param clauseContributor A function that will use the factory passed in parameter to create a predicate,
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
 	MatchAllPredicateOptionsStep except(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor);
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 }

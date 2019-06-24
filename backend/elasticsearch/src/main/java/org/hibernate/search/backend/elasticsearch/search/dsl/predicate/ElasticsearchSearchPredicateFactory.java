@@ -7,12 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.predicate;
 
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 
 /**
- * A DSL context allowing to specify the type of a predicate, with some Elasticsearch-specific methods.
+ * A factory for search predicates with some Elasticsearch-specific methods.
  */
-public interface ElasticsearchSearchPredicateFactoryContext extends SearchPredicateFactoryContext {
+public interface ElasticsearchSearchPredicateFactory extends SearchPredicateFactory {
 
 	/**
 	 * Create a predicate from JSON.

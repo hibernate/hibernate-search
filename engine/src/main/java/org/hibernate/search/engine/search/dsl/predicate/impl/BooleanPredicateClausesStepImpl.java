@@ -12,7 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchConditionStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
@@ -23,16 +23,17 @@ class BooleanPredicateClausesStepImpl<B>
 		extends AbstractPredicateFinalStep<B>
 		implements BooleanPredicateClausesStep {
 
-	private final SearchPredicateFactoryContext factoryContext;
+	private final SearchPredicateFactory factory;
 
 	private final BooleanJunctionPredicateBuilder<B> builder;
 
 	private final MinimumShouldMatchConditionStepImpl<BooleanPredicateClausesStep> minimumShouldMatchStep;
 
-	BooleanPredicateClausesStepImpl(SearchPredicateBuilderFactory<?, B> factory, SearchPredicateFactoryContext factoryContext) {
-		super( factory );
-		this.factoryContext = factoryContext;
-		this.builder = factory.bool();
+	BooleanPredicateClausesStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory,
+			SearchPredicateFactory factory) {
+		super( builderFactory );
+		this.factory = factory;
+		this.builder = builderFactory.bool();
 		this.minimumShouldMatchStep = new MinimumShouldMatchConditionStepImpl<>( builder, this );
 	}
 
@@ -50,53 +51,53 @@ class BooleanPredicateClausesStepImpl<B>
 
 	@Override
 	public BooleanPredicateClausesStep must(SearchPredicate searchPredicate) {
-		builder.must( factory.toImplementation( searchPredicate ) );
+		builder.must( builderFactory.toImplementation( searchPredicate ) );
 		return this;
 	}
 
 	@Override
 	public BooleanPredicateClausesStep mustNot(SearchPredicate searchPredicate) {
-		builder.mustNot( factory.toImplementation( searchPredicate ) );
+		builder.mustNot( builderFactory.toImplementation( searchPredicate ) );
 		return this;
 	}
 
 	@Override
 	public BooleanPredicateClausesStep should(SearchPredicate searchPredicate) {
-		builder.should( factory.toImplementation( searchPredicate ) );
+		builder.should( builderFactory.toImplementation( searchPredicate ) );
 		return this;
 	}
 
 	@Override
 	public BooleanPredicateClausesStep filter(SearchPredicate searchPredicate) {
-		builder.filter( factory.toImplementation( searchPredicate ) );
+		builder.filter( builderFactory.toImplementation( searchPredicate ) );
 		return this;
 	}
 
 	@Override
 	public BooleanPredicateClausesStep must(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor) {
-		must( clauseContributor.apply( factoryContext ) );
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+		must( clauseContributor.apply( factory ) );
 		return this;
 	}
 
 	@Override
 	public BooleanPredicateClausesStep mustNot(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor) {
-		mustNot( clauseContributor.apply( factoryContext ) );
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+		mustNot( clauseContributor.apply( factory ) );
 		return this;
 	}
 
 	@Override
 	public BooleanPredicateClausesStep should(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor) {
-		should( clauseContributor.apply( factoryContext ) );
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+		should( clauseContributor.apply( factory ) );
 		return this;
 	}
 
 	@Override
 	public BooleanPredicateClausesStep filter(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor) {
-		filter( clauseContributor.apply( factoryContext ) );
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+		filter( clauseContributor.apply( factory ) );
 		return this;
 	}
 

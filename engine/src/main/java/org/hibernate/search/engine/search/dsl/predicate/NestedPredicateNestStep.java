@@ -58,12 +58,12 @@ public interface NestedPredicateNestStep {
 	 * Matching documents are those for which at least one element of the nested object field
 	 * matches the inner predicate.
 	 *
-	 * @param predicateContributor A function that will use the factory context passed in parameter to create a predicate,
+	 * @param predicateContributor A function that will use the factory passed in parameter to create a predicate,
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @return The next step.
 	 */
 	NestedPredicateOptionsStep nest(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> predicateContributor);
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor);
 
 }

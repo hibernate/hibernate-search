@@ -6,22 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.search.dsl.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext;
+import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactory;
 
 import org.apache.lucene.search.Query;
 
 
-public class LuceneSearchPredicateFactoryContextImpl
-		extends DelegatingSearchPredicateFactoryContext
-		implements LuceneSearchPredicateFactoryContext {
+public class LuceneSearchPredicateFactoryImpl
+		extends DelegatingSearchPredicateFactory
+		implements LuceneSearchPredicateFactory {
 
 	private final LuceneSearchPredicateBuilderFactory factory;
 
-	public LuceneSearchPredicateFactoryContextImpl(SearchPredicateFactoryContext delegate,
+	public LuceneSearchPredicateFactoryImpl(SearchPredicateFactory delegate,
 			LuceneSearchPredicateBuilderFactory factory) {
 		super( delegate );
 		this.factory = factory;

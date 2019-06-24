@@ -96,8 +96,8 @@ class RangePredicateFieldMoreStepImpl<B>
 		// excludeLimit in to/below means excluding the upper one
 		protected boolean excludeUpperLimit = false;
 
-		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
-			super( factory );
+		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+			super( builderFactory );
 		}
 
 		@Override

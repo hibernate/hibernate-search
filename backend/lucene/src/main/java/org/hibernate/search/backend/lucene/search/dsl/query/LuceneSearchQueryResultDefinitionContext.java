@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.dsl.query;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext;
+import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
@@ -21,7 +21,7 @@ public interface LuceneSearchQueryResultDefinitionContext<R, E>
 				R,
 				E,
 				LuceneSearchProjectionFactoryContext<R, E>,
-				LuceneSearchPredicateFactoryContext
+				LuceneSearchPredicateFactory
 		>,
 		LuceneSearchQueryResultContext<E> {
 

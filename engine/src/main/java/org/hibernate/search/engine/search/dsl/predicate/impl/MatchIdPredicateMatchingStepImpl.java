@@ -19,9 +19,9 @@ class MatchIdPredicateMatchingStepImpl<B>
 
 	private final MatchIdPredicateBuilder<B> matchIdBuilder;
 
-	MatchIdPredicateMatchingStepImpl(SearchPredicateBuilderFactory<?, B> factory) {
-		super( factory );
-		this.matchIdBuilder = factory.id();
+	MatchIdPredicateMatchingStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		super( builderFactory );
+		this.matchIdBuilder = builderFactory.id();
 	}
 
 	@Override

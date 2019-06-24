@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultDefinitionContext;
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.ElasticsearchSearchProjectionFactoryContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.impl.ElasticsearchSearchQueryResultDefinitionContextImpl;
@@ -21,15 +21,15 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateFactoryContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.impl.ElasticsearchSearchSortFactoryContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
@@ -68,7 +68,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public final class ElasticsearchExtension<H, R, E>
 		implements SearchQueryContextExtension<ElasticsearchSearchQueryResultDefinitionContext<R, E>, R, E>,
 		SearchQueryExtension<ElasticsearchSearchQuery<H>, H>,
-		SearchPredicateFactoryContextExtension<ElasticsearchSearchPredicateFactoryContext>,
+		SearchPredicateFactoryExtension<ElasticsearchSearchPredicateFactory>,
 		SearchSortFactoryContextExtension<ElasticsearchSearchSortFactoryContext>,
 		SearchProjectionFactoryContextExtension<ElasticsearchSearchProjectionFactoryContext<R, E>, R, E>,
 		IndexFieldTypeFactoryContextExtension<ElasticsearchIndexFieldTypeFactoryContext> {
@@ -137,10 +137,10 @@ public final class ElasticsearchExtension<H, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> Optional<ElasticsearchSearchPredicateFactoryContext> extendOptional(
-			SearchPredicateFactoryContext original, SearchPredicateBuilderFactory<C, B> factory) {
+	public <C, B> Optional<ElasticsearchSearchPredicateFactory> extendOptional(
+			SearchPredicateFactory original, SearchPredicateBuilderFactory<C, B> factory) {
 		if ( factory instanceof ElasticsearchSearchPredicateBuilderFactory ) {
-			return Optional.of( new ElasticsearchSearchPredicateFactoryContextImpl(
+			return Optional.of( new ElasticsearchSearchPredicateFactoryImpl(
 					original, (ElasticsearchSearchPredicateBuilderFactory) factory
 			) );
 		}

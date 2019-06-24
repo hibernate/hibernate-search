@@ -19,13 +19,13 @@ final class ExistsPredicateFieldStepImpl<B>
 
 	private ExistsPredicateBuilder<B> builder;
 
-	ExistsPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> factory) {
-		super( factory );
+	ExistsPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		super( builderFactory );
 	}
 
 	@Override
 	public ExistsPredicateOptionsStep onField(String absoluteFieldPath) {
-		this.builder = factory.exists( absoluteFieldPath );
+		this.builder = builderFactory.exists( absoluteFieldPath );
 		return this;
 	}
 

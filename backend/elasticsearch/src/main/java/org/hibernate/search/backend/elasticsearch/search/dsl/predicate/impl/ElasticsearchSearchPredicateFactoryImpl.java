@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactory;
 
 
-public class ElasticsearchSearchPredicateFactoryContextImpl
-		extends DelegatingSearchPredicateFactoryContext
-		implements ElasticsearchSearchPredicateFactoryContext {
+public class ElasticsearchSearchPredicateFactoryImpl
+		extends DelegatingSearchPredicateFactory
+		implements ElasticsearchSearchPredicateFactory {
 
 	private final ElasticsearchSearchPredicateBuilderFactory factory;
 
-	public ElasticsearchSearchPredicateFactoryContextImpl(SearchPredicateFactoryContext delegate,
+	public ElasticsearchSearchPredicateFactoryImpl(SearchPredicateFactory delegate,
 			ElasticsearchSearchPredicateBuilderFactory factory) {
 		super( delegate );
 		this.factory = factory;

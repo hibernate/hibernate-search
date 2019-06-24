@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.dsl.query.impl;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
-import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext;
+import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactoryContext;
@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 
@@ -25,8 +25,8 @@ class LuceneSearchQueryContextImpl<H>
 				LuceneSearchQueryContext<H>,
 				H,
 				LuceneSearchResult<H>,
-				LuceneSearchPredicateFactoryContext,
-		LuceneSearchSortFactoryContext,
+				LuceneSearchPredicateFactory,
+				LuceneSearchSortFactoryContext,
 				LuceneSearchQueryElementCollector
 		>
 		implements LuceneSearchQueryResultContext<H>, LuceneSearchQueryContext<H> {
@@ -50,9 +50,9 @@ class LuceneSearchQueryContextImpl<H>
 	}
 
 	@Override
-	protected LuceneSearchPredicateFactoryContext extendPredicateContext(
-			SearchPredicateFactoryContext predicateFactoryContext) {
-		return predicateFactoryContext.extension( LuceneExtension.get() );
+	protected LuceneSearchPredicateFactory extendPredicateFactory(
+			SearchPredicateFactory predicateFactory) {
+		return predicateFactory.extension( LuceneExtension.get() );
 	}
 
 	@Override

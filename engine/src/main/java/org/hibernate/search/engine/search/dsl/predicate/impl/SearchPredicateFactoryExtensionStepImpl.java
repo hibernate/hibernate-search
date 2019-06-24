@@ -10,28 +10,28 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionStep;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-final class SearchPredicateFactoryContextExtensionStepImpl<B> implements SearchPredicateFactoryContextExtensionStep {
+final class SearchPredicateFactoryExtensionStepImpl<B> implements SearchPredicateFactoryExtensionStep {
 
-	private final SearchPredicateFactoryContext parent;
+	private final SearchPredicateFactory parent;
 	private final SearchPredicateBuilderFactory<?, B> factory;
 
 	private final DslExtensionState<PredicateFinalStep> state = new DslExtensionState<>();
 
-	SearchPredicateFactoryContextExtensionStepImpl(SearchPredicateFactoryContext parent,
+	SearchPredicateFactoryExtensionStepImpl(SearchPredicateFactory parent,
 			SearchPredicateBuilderFactory<?, B> factory) {
 		this.parent = parent;
 		this.factory = factory;
 	}
 
 	@Override
-	public <T> SearchPredicateFactoryContextExtensionStep ifSupported(
-			SearchPredicateFactoryContextExtension<T> extension,
+	public <T> SearchPredicateFactoryExtensionStep ifSupported(
+			SearchPredicateFactoryExtension<T> extension,
 			Function<T, ? extends PredicateFinalStep> predicateContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent, factory ), predicateContributor );
 		return this;
@@ -39,7 +39,7 @@ final class SearchPredicateFactoryContextExtensionStepImpl<B> implements SearchP
 
 	@Override
 	public PredicateFinalStep orElse(
-			Function<SearchPredicateFactoryContext, ? extends PredicateFinalStep> predicateContributor) {
+			Function<SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return state.orElse( parent, predicateContributor );
 	}
 

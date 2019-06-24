@@ -153,52 +153,52 @@ public interface BooleanPredicateClausesStep extends
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A function that will use the factory context passed in parameter to create a predicate,
+	 * @param clauseContributor A function that will use the factory passed in parameter to create a predicate,
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
 	BooleanPredicateClausesStep must(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor);
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#mustnot">"must not" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A function that will use the factory context passed in parameter to create a predicate,
+	 * @param clauseContributor A function that will use the factory passed in parameter to create a predicate,
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
 	BooleanPredicateClausesStep mustNot(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor);
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#should">"should" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A function that will use the factory context passed in parameter to create a predicate,
+	 * @param clauseContributor A function that will use the factory passed in parameter to create a predicate,
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
 	BooleanPredicateClausesStep should(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor);
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A function that will use the factory context passed in parameter to create a predicate,
+	 * @param clauseContributor A function that will use the factory passed in parameter to create a predicate,
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
 	BooleanPredicateClausesStep filter(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor);
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/*
 	 * Options

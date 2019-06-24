@@ -17,8 +17,8 @@ class SpatialWithinPredicateFieldStepImpl<B> implements SpatialWithinPredicateFi
 
 	private final SpatialWithinPredicateFieldMoreStepImpl.CommonState<B> commonState;
 
-	SpatialWithinPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> factory) {
-		this.commonState = new SpatialWithinPredicateFieldMoreStepImpl.CommonState<>( factory );
+	SpatialWithinPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		this.commonState = new SpatialWithinPredicateFieldMoreStepImpl.CommonState<>( builderFactory );
 	}
 
 	@Override

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 
 /**
  * Defines the storage strategy for an object field.
@@ -73,7 +73,7 @@ public enum ObjectFieldStorage {
 	 * keeping structural information.
 	 * Note however that access to that information when querying
 	 * requires special care.
-	 * See in particular the {@link SearchPredicateFactoryContext#nested() "nested" predicate}.
+	 * See in particular the {@link SearchPredicateFactory#nested() "nested" predicate}.
 	 */
 	NESTED
 

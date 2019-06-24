@@ -8,8 +8,8 @@ package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -45,8 +45,8 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 	}
 
 	@Override
-	public SearchPredicateFactoryContext predicate() {
-		return new DefaultSearchPredicateFactoryContext<>( delegate.getSearchPredicateBuilderFactory() );
+	public SearchPredicateFactory predicate() {
+		return new DefaultSearchPredicateFactory<>( delegate.getSearchPredicateBuilderFactory() );
 	}
 
 	@Override

@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.dsl.query.spi;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
@@ -22,10 +22,10 @@ public abstract class AbstractSearchQueryResultDefinitionContext<
 				R,
 				E,
 				PJC extends SearchProjectionFactoryContext<R, E>,
-				PDC extends SearchPredicateFactoryContext,
+				PDF extends SearchPredicateFactory,
 				C
 		>
-		implements SearchQueryResultDefinitionContext<N, R, E, PJC, PDC> {
+		implements SearchQueryResultDefinitionContext<N, R, E, PJC, PDF> {
 
 	@Override
 	public <T> T extension(SearchQueryContextExtension<T, R, E> extension) {
