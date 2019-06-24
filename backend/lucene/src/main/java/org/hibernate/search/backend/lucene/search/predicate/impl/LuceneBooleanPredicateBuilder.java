@@ -14,7 +14,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -24,8 +24,8 @@ import org.apache.lucene.search.Query;
 
 
 
-class LuceneBooleanJunctionPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
-		implements BooleanJunctionPredicateBuilder<LuceneSearchPredicateBuilder> {
+class LuceneBooleanPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
+		implements BooleanPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

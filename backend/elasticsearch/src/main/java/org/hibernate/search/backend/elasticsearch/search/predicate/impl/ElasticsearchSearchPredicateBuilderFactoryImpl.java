@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.scope.model.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
@@ -87,8 +87,8 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	}
 
 	@Override
-	public BooleanJunctionPredicateBuilder<ElasticsearchSearchPredicateBuilder> bool() {
-		return new ElasticsearchBooleanJunctionPredicateBuilder();
+	public BooleanPredicateBuilder<ElasticsearchSearchPredicateBuilder> bool() {
+		return new ElasticsearchBooleanPredicateBuilder();
 	}
 
 	@Override
