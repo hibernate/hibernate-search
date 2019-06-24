@@ -65,10 +65,10 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public LuceneSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
+	public LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(
 			String absoluteFieldPath) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneSimpleQueryStringPredicateBuilderFieldContext(
+		return new LuceneSimpleQueryStringPredicateBuilderFieldState(
 				analyzerOrNormalizer
 		);
 	}

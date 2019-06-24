@@ -15,13 +15,13 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchConditionStep;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -742,7 +742,7 @@ public class BoolSearchPredicateIT {
 	public void minimumShouldMatch_multipleConstraints() {
 		StubMappingScope scope = indexManager.createScope();
 
-		Consumer<MinimumShouldMatchContext<?>> minimumShouldMatchConstraints = b -> b
+		Consumer<MinimumShouldMatchConditionStep<?>> minimumShouldMatchConstraints = b -> b
 				.ifMoreThan( 2 ).thenRequireNumber( -1 )
 				.ifMoreThan( 4 ).thenRequirePercent( 70 );
 
@@ -843,7 +843,7 @@ public class BoolSearchPredicateIT {
 	public void minimumShouldMatch_multipleConstraints_0ceiling() {
 		StubMappingScope scope = indexManager.createScope();
 
-		Consumer<MinimumShouldMatchContext<?>> minimumShouldMatchConstraints = b -> b
+		Consumer<MinimumShouldMatchConditionStep<?>> minimumShouldMatchConstraints = b -> b
 				// Test that we can set the "default" minimum by using a ceiling of 0
 				.ifMoreThan( 0 ).thenRequireNumber( 1 )
 				.ifMoreThan( 2 ).thenRequireNumber( -1 )

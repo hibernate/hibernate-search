@@ -8,8 +8,8 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactoryContext;
 
 
@@ -26,7 +26,7 @@ public class ElasticsearchSearchPredicateFactoryContextImpl
 	}
 
 	@Override
-	public SearchPredicateTerminalContext fromJson(String jsonString) {
-		return new ElasticsearchJsonStringPredicateContext( factory, jsonString );
+	public PredicateFinalStep fromJson(String jsonString) {
+		return new ElasticsearchJsonStringPredicateFinalStep( factory, jsonString );
 	}
 }

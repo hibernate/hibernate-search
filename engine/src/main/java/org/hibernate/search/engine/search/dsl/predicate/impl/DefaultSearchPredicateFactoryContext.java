@@ -9,21 +9,21 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.ExistsPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.dsl.predicate.ExistsPredicateFieldStep;
+import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateOptionsStep;
+import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateMatchingStep;
+import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldStep;
+import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldStep;
+import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateFieldStep;
+import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
-import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
+import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateFieldStep;
+import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateInitialStep;
+import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
@@ -36,65 +36,65 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 	}
 
 	@Override
-	public MatchAllPredicateContext matchAll() {
-		return new MatchAllPredicateContextImpl<>( factory, this );
+	public MatchAllPredicateOptionsStep matchAll() {
+		return new MatchAllPredicateOptionsStepImpl<>( factory, this );
 	}
 
 	@Override
-	public MatchIdPredicateContext id() {
-		return new MatchIdPredicateContextImpl<>( factory );
+	public MatchIdPredicateMatchingStep id() {
+		return new MatchIdPredicateMatchingStepImpl<>( factory );
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext bool() {
-		return new BooleanJunctionPredicateContextImpl<>( factory, this );
+	public BooleanPredicateClausesStep bool() {
+		return new BooleanPredicateClausesStepImpl<>( factory, this );
 	}
 
 	@Override
-	public SearchPredicateTerminalContext bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor) {
-		BooleanJunctionPredicateContext context = bool();
-		clauseContributor.accept( context );
-		return context;
+	public PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep> clauseContributor) {
+		BooleanPredicateClausesStep next = bool();
+		clauseContributor.accept( next );
+		return next;
 	}
 
 	@Override
-	public MatchPredicateContext match() {
-		return new MatchPredicateContextImpl<>( factory );
+	public MatchPredicateFieldStep match() {
+		return new MatchPredicateFieldStepImpl<>( factory );
 	}
 
 	@Override
-	public RangePredicateContext range() {
-		return new RangePredicateContextImpl<>( factory );
+	public RangePredicateFieldStep range() {
+		return new RangePredicateFieldStepImpl<>( factory );
 	}
 
 	@Override
-	public PhrasePredicateContext phrase() {
-		return new PhrasePredicateContextImpl<>( factory );
+	public PhrasePredicateFieldStep phrase() {
+		return new PhrasePredicateFieldStepImpl<>( factory );
 	}
 
 	@Override
-	public WildcardPredicateContext wildcard() {
-		return new WildcardPredicateContextImpl<>( factory );
+	public WildcardPredicateFieldStep wildcard() {
+		return new WildcardPredicateFieldStepImpl<>( factory );
 	}
 
 	@Override
-	public NestedPredicateContext nested() {
-		return new NestedPredicateContextImpl<>( factory, this );
+	public NestedPredicateFieldStep nested() {
+		return new NestedPredicateFieldStepImpl<>( factory, this );
 	}
 
 	@Override
-	public SimpleQueryStringPredicateContext simpleQueryString() {
-		return new SimpleQueryStringPredicateContextImpl<>( factory );
+	public SimpleQueryStringPredicateFieldStep simpleQueryString() {
+		return new SimpleQueryStringPredicateFieldStepImpl<>( factory );
 	}
 
 	@Override
-	public ExistsPredicateContext exists() {
-		return new ExistsPredicateContextImpl<>( factory );
+	public ExistsPredicateFieldStep exists() {
+		return new ExistsPredicateFieldStepImpl<>( factory );
 	}
 
 	@Override
-	public SpatialPredicateContext spatial() {
-		return new SpatialPredicateContextImpl<>( factory );
+	public SpatialPredicateInitialStep spatial() {
+		return new SpatialPredicateInitialStepImpl<>( factory );
 	}
 
 	@Override
@@ -105,8 +105,8 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 	}
 
 	@Override
-	public SearchPredicateFactoryExtensionContext extension() {
-		return new SearchPredicateFactoryExtensionContextImpl<>( this, factory );
+	public SearchPredicateFactoryContextExtensionStep extension() {
+		return new SearchPredicateFactoryContextExtensionStepImpl<>( this, factory );
 	}
 
 }

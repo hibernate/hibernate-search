@@ -46,7 +46,7 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory implements Elas
 	}
 
 	@Override
-	public ElasticsearchSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
+	public ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(
 			String absoluteFieldPath) {
 		throw log.textPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )

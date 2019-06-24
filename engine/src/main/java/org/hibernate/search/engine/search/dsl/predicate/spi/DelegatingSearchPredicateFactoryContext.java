@@ -8,21 +8,21 @@ package org.hibernate.search.engine.search.dsl.predicate.spi;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.dsl.predicate.ExistsPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.ExistsPredicateFieldStep;
+import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateOptionsStep;
+import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateMatchingStep;
+import org.hibernate.search.engine.search.dsl.predicate.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldStep;
+import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldStep;
+import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateFieldStep;
+import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
+import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
-import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateFieldStep;
+import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateInitialStep;
+import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateFieldStep;
 
 /**
  * A delegating {@link SearchPredicateFactoryContext}.
@@ -38,62 +38,62 @@ public class DelegatingSearchPredicateFactoryContext implements SearchPredicateF
 	}
 
 	@Override
-	public MatchAllPredicateContext matchAll() {
+	public MatchAllPredicateOptionsStep matchAll() {
 		return delegate.matchAll();
 	}
 
 	@Override
-	public MatchIdPredicateContext id() {
+	public MatchIdPredicateMatchingStep id() {
 		return delegate.id();
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext bool() {
+	public BooleanPredicateClausesStep bool() {
 		return delegate.bool();
 	}
 
 	@Override
-	public SearchPredicateTerminalContext bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor) {
+	public PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep> clauseContributor) {
 		return delegate.bool( clauseContributor );
 	}
 
 	@Override
-	public MatchPredicateContext match() {
+	public MatchPredicateFieldStep match() {
 		return delegate.match();
 	}
 
 	@Override
-	public RangePredicateContext range() {
+	public RangePredicateFieldStep range() {
 		return delegate.range();
 	}
 
 	@Override
-	public PhrasePredicateContext phrase() {
+	public PhrasePredicateFieldStep phrase() {
 		return delegate.phrase();
 	}
 
 	@Override
-	public WildcardPredicateContext wildcard() {
+	public WildcardPredicateFieldStep wildcard() {
 		return delegate.wildcard();
 	}
 
 	@Override
-	public NestedPredicateContext nested() {
+	public NestedPredicateFieldStep nested() {
 		return delegate.nested();
 	}
 
 	@Override
-	public SimpleQueryStringPredicateContext simpleQueryString() {
+	public SimpleQueryStringPredicateFieldStep simpleQueryString() {
 		return delegate.simpleQueryString();
 	}
 
 	@Override
-	public ExistsPredicateContext exists() {
+	public ExistsPredicateFieldStep exists() {
 		return delegate.exists();
 	}
 
 	@Override
-	public SpatialPredicateContext spatial() {
+	public SpatialPredicateInitialStep spatial() {
 		return delegate.spatial();
 	}
 
@@ -103,7 +103,7 @@ public class DelegatingSearchPredicateFactoryContext implements SearchPredicateF
 	}
 
 	@Override
-	public SearchPredicateFactoryExtensionContext extension() {
+	public SearchPredicateFactoryContextExtensionStep extension() {
 		return delegate.extension();
 	}
 

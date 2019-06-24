@@ -8,8 +8,8 @@ package org.hibernate.search.backend.lucene.search.dsl.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactoryContext;
 
 import org.apache.lucene.search.Query;
@@ -28,7 +28,7 @@ public class LuceneSearchPredicateFactoryContextImpl
 	}
 
 	@Override
-	public SearchPredicateTerminalContext fromLuceneQuery(Query luceneQuery) {
-		return new LuceneQueryPredicateContext( factory, luceneQuery );
+	public PredicateFinalStep fromLuceneQuery(Query luceneQuery) {
+		return new LuceneQueryPredicateFinalStep( factory, luceneQuery );
 	}
 }

@@ -69,9 +69,9 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public ElasticsearchSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
+	public ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(
 			String absoluteFieldPath) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchSimpleQueryStringPredicateBuilderFieldContext( absoluteFieldPath );
+		return new ElasticsearchSimpleQueryStringPredicateBuilderFieldState( absoluteFieldPath );
 	}
 }

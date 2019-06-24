@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -22,7 +22,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
- * A common state for a multi-field predicate context
+ * A common state for a multi-field predicate DSL
  * that will simply create one predicate per field and a boolean query to join the predicates.
  * <p>
  * This abstract class is appropriate if the predicate supports targeting multiple fields at the DSL level,
@@ -32,18 +32,18 @@ import org.hibernate.search.util.common.reporting.EventContext;
  *
  * @param <S> The "self" type returned by DSL methods.
  * @param <B> The implementation type of builders.
- * @param <F> The type of field set contexts.
+ * @param <F> The type of field set states.
  */
 abstract class AbstractBooleanMultiFieldPredicateCommonState<
 		S extends AbstractBooleanMultiFieldPredicateCommonState<?, ?, ?>,
 		B,
-		F extends AbstractBooleanMultiFieldPredicateCommonState.FieldSetContext<B>
+		F extends AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B>
 		>
-		extends AbstractSearchPredicateTerminalContext<B> {
+		extends AbstractPredicateFinalStep<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final List<F> fieldSetContexts = new ArrayList<>();
+	private final List<F> fieldSetStates = new ArrayList<>();
 	private Float predicateLevelBoost;
 	private boolean withConstantScore = false;
 
@@ -55,12 +55,12 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 		return factory;
 	}
 
-	public void add(F fieldSetContext) {
-		fieldSetContexts.add( fieldSetContext );
+	public void add(F fieldSetState) {
+		fieldSetStates.add( fieldSetState );
 	}
 
-	List<F> getFieldSetContexts() {
-		return fieldSetContexts;
+	List<F> getFieldSetStates() {
+		return fieldSetStates;
 	}
 
 	public S boostedTo(float boost) {
@@ -76,8 +76,8 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 	@Override
 	protected B toImplementation() {
 		List<B> predicateBuilders = new ArrayList<>();
-		for ( F fieldSetContext : fieldSetContexts ) {
-			fieldSetContext.contributePredicateBuilders( predicateBuilders::add );
+		for ( F fieldSetState : fieldSetStates ) {
+			fieldSetState.contributePredicateBuilders( predicateBuilders::add );
 		}
 		if ( predicateBuilders.size() > 1 ) {
 			BooleanJunctionPredicateBuilder<B> boolBuilder = factory.bool();
@@ -116,12 +116,12 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 
 	protected final EventContext getEventContext() {
 		return EventContexts.fromIndexFieldAbsolutePaths(
-				getFieldSetContexts().stream().flatMap( f -> f.getAbsoluteFieldPaths().stream() )
+				getFieldSetStates().stream().flatMap( f -> f.getAbsoluteFieldPaths().stream() )
 						.collect( Collectors.toList() )
 		);
 	}
 
-	public interface FieldSetContext<B> {
+	public interface FieldSetState<B> {
 		List<String> getAbsoluteFieldPaths();
 		void contributePredicateBuilders(Consumer<B> collector);
 	}

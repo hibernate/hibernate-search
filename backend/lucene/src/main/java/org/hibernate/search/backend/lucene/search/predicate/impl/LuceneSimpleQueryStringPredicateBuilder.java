@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSucceedingCompatibilityChecker;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldContext;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.util.impl.FieldContextSimpleQueryParser;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -38,7 +38,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	private final LuceneScopeModel scopeModel;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-	private final Map<String, LuceneSimpleQueryStringPredicateBuilderFieldContext> fields = new LinkedHashMap<>();
+	private final Map<String, LuceneSimpleQueryStringPredicateBuilderFieldState> fields = new LinkedHashMap<>();
 	private Occur defaultOperator = Occur.SHOULD;
 	private String simpleQueryString;
 	private Analyzer overrideAnalyzer;
@@ -56,8 +56,8 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	}
 
 	@Override
-	public FieldContext field(String absoluteFieldPath) {
-		LuceneSimpleQueryStringPredicateBuilderFieldContext field = fields.get( absoluteFieldPath );
+	public FieldState field(String absoluteFieldPath) {
+		LuceneSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
 			LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
 					absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
@@ -125,7 +125,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 		 * would pick the first analyzer returned by any of the scoped analyzers in its list.
 		 */
 		ScopedAnalyzer.Builder builder = new ScopedAnalyzer.Builder();
-		for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldContext> entry : fields.entrySet() ) {
+		for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldState> entry : fields.entrySet() ) {
 			builder.setAnalyzer( entry.getKey(), entry.getValue().getAnalyzer() );
 		}
 		return builder.build();

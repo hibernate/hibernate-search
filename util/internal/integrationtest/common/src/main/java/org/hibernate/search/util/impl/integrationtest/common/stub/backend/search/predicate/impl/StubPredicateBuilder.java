@@ -136,8 +136,8 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public FieldContext field(String absoluteFieldPath) {
-		return new StubFieldContext();
+	public FieldState field(String absoluteFieldPath) {
+		return new StubFieldState();
 	}
 
 	@Override
@@ -184,7 +184,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 		// No-op, just simulates a call on this object
 	}
 
-	private static class StubFieldContext implements SimpleQueryStringPredicateBuilder.FieldContext {
+	private static class StubFieldState implements FieldState {
 
 		@Override
 		public void boost(float boost) {
