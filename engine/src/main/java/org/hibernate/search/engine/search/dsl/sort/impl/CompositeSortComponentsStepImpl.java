@@ -7,20 +7,20 @@
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.sort.CompositeSortContext;
+import org.hibernate.search.engine.search.dsl.sort.CompositeSortComponentsStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
-class CompositeSortContextImpl<B> implements CompositeSortContext {
+class CompositeSortComponentsStepImpl<B> implements CompositeSortComponentsStep {
 
 	private SearchSortDslContext<?, B> dslContext;
 
-	CompositeSortContextImpl(SearchSortDslContext<?, B> dslContext) {
+	CompositeSortComponentsStepImpl(SearchSortDslContext<?, B> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public CompositeSortContext add(SearchSort searchSort) {
+	public CompositeSortComponentsStep add(SearchSort searchSort) {
 		dslContext = dslContext.append( dslContext.getFactory().toImplementation( searchSort ) );
 		return this;
 	}

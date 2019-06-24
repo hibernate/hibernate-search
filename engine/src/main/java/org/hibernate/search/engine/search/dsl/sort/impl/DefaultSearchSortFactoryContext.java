@@ -9,15 +9,15 @@ package org.hibernate.search.engine.search.dsl.sort.impl;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.search.dsl.sort.CompositeSortContext;
-import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
-import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
-import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
-import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
+import org.hibernate.search.engine.search.dsl.sort.CompositeSortComponentsStep;
+import org.hibernate.search.engine.search.dsl.sort.DistanceSortOptionsStep;
+import org.hibernate.search.engine.search.dsl.sort.FieldSortOptionsStep;
+import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
+import org.hibernate.search.engine.search.dsl.sort.ScoreSortOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.StaticNonEmptySortContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.sort.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -31,37 +31,37 @@ public class DefaultSearchSortFactoryContext<B> implements SearchSortFactoryCont
 	}
 
 	@Override
-	public ScoreSortContext byScore() {
-		return new ScoreSortContextImpl<>( dslContext );
+	public ScoreSortOptionsStep byScore() {
+		return new ScoreSortOptionsStepImpl<>( dslContext );
 	}
 
 	@Override
-	public NonEmptySortContext byIndexOrder() {
-		return staticNonEmptyContext( dslContext.getFactory().indexOrder() );
+	public SortThenStep byIndexOrder() {
+		return staticThenStep( dslContext.getFactory().indexOrder() );
 	}
 
 	@Override
-	public FieldSortContext byField(String absoluteFieldPath) {
-		return new FieldSortContextImpl<>( dslContext, absoluteFieldPath );
+	public FieldSortOptionsStep byField(String absoluteFieldPath) {
+		return new FieldSortOptionsStepImpl<>( dslContext, absoluteFieldPath );
 	}
 
 	@Override
-	public DistanceSortContext byDistance(String absoluteFieldPath, GeoPoint location) {
-		return new DistanceSortContextImpl<>(
+	public DistanceSortOptionsStep byDistance(String absoluteFieldPath, GeoPoint location) {
+		return new DistanceSortOptionsStepImpl<>(
 				dslContext, absoluteFieldPath, location
 		);
 	}
 
 	@Override
-	public CompositeSortContext byComposite() {
-		return new CompositeSortContextImpl<>( dslContext );
+	public CompositeSortComponentsStep byComposite() {
+		return new CompositeSortComponentsStepImpl<>( dslContext );
 	}
 
 	@Override
-	public NonEmptySortContext byComposite(Consumer<? super CompositeSortContext> elementContributor) {
-		CompositeSortContext context = byComposite();
-		elementContributor.accept( context );
-		return context;
+	public SortThenStep byComposite(Consumer<? super CompositeSortComponentsStep> elementContributor) {
+		CompositeSortComponentsStep next = byComposite();
+		elementContributor.accept( next );
+		return next;
 	}
 
 	@Override
@@ -72,12 +72,12 @@ public class DefaultSearchSortFactoryContext<B> implements SearchSortFactoryCont
 	}
 
 	@Override
-	public SearchSortFactoryExtensionContext extension() {
-		return new SearchSortFactoryExtensionContextImpl<>( this, dslContext );
+	public SearchSortFactoryContextExtensionStep extension() {
+		return new SearchSortFactoryContextExtensionStepImpl<>( this, dslContext );
 	}
 
-	private NonEmptySortContext staticNonEmptyContext(B builder) {
-		return new StaticNonEmptySortContext<B>( dslContext, builder );
+	private SortThenStep staticThenStep(B builder) {
+		return new StaticSortThenStep<>( dslContext, builder );
 	}
 
 }

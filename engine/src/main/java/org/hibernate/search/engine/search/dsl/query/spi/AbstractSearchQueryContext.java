@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredic
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
+import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
@@ -83,7 +83,7 @@ public abstract class AbstractSearchQueryContext<
 	}
 
 	@Override
-	public S sort(Function<? super SC, ? extends SearchSortTerminalContext> sortContributor) {
+	public S sort(Function<? super SC, ? extends SortFinalStep> sortContributor) {
 		SearchSortBuilderFactory<? super C, ?> factory = indexScope.getSearchSortBuilderFactory();
 		SearchSortFactoryContext factoryContext = new DefaultSearchSortFactoryContext<>(
 				SearchSortDslContextImpl.root( factory )

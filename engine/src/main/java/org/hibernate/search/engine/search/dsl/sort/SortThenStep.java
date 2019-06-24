@@ -7,10 +7,17 @@
 package org.hibernate.search.engine.search.dsl.sort;
 
 /**
- * The context used when defining a score sort.
+ * The step in a sort definition where another sort can be chained.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface ScoreSortContext
-		extends NonEmptySortContext, SortOrderContext<ScoreSortContext> {
+public interface SortThenStep extends SortFinalStep {
+
+	/**
+	 * Start defining another sort, to be applied after the current one.
+	 *
+	 * @return The next step.
+	 */
+	SearchSortFactoryContext then();
+
 }

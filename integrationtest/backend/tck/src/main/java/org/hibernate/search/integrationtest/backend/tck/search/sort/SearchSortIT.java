@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
+import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.SearchSort;
@@ -95,7 +95,7 @@ public class SearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor) {
+			Function<? super SearchSortFactoryContext, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )

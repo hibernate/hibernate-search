@@ -15,7 +15,6 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTermina
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
@@ -68,8 +67,7 @@ public interface SearchScope<E> {
 	 * within the search query DSL,
 	 * removing the need to create separate objects to represent the sorts.
 	 *
-	 * @return A context allowing to define the sort,
-	 * and ultimately {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 * @return A sort factory.
 	 * @see SearchSortFactoryContext
 	 */
 	SearchSortFactoryContext sort();

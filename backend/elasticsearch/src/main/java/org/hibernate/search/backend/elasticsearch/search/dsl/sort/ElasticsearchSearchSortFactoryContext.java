@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.sort;
 
-import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
+import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 
 /**
  * A DSL context allowing to specify the sort order, with some Elasticsearch-specific methods.
@@ -21,9 +20,9 @@ public interface ElasticsearchSearchSortFactoryContext extends SearchSortFactory
 	 * @param jsonString A string representing an Elasticsearch sort as a JSON object.
 	 * The JSON object must be represent a syntactically correct Elasticsearch sort.
 	 * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html">the Elasticsearch documentation</a>.
-	 * @return A context allowing to {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 * @return A {@link SortThenStep} allowing the retrieval of the sort
+	 * or the chaining of other sorts.
 	 */
-	NonEmptySortContext fromJson(String jsonString);
+	SortThenStep fromJson(String jsonString);
 
 }

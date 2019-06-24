@@ -10,13 +10,13 @@ import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * The context used when defining the missing value behavior of a field sort.
+ * The step in a sort definition where the behavior on missing values can be set.
  *
- * @param <N> The type of the next context (returned by {@link FieldSortMissingValueContext#sortFirst()}, for example).
+ * @param <N> The type of the next step (returned by {@link FieldSortMissingValueBehaviorStep#sortFirst()}, for example).
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface FieldSortMissingValueContext<N> {
+public interface FieldSortMissingValueBehaviorStep<N> {
 
 	/**
 	 * Put documents with missing values last in the sorting.
@@ -24,7 +24,7 @@ public interface FieldSortMissingValueContext<N> {
 	 * <p>This instruction is independent of whether the sort is being ascending
 	 * or descending.
 	 *
-	 * @return The original context, for method chaining.
+	 * @return The next step.
 	 */
 	N sortLast();
 
@@ -34,7 +34,7 @@ public interface FieldSortMissingValueContext<N> {
 	 * <p>This instruction is independent of whether the sort is being ascending
 	 * or descending.
 	 *
-	 * @return The original context, for method chaining.
+	 * @return The next step.
 	 */
 	N sortFirst();
 
@@ -45,7 +45,7 @@ public interface FieldSortMissingValueContext<N> {
 	 * See {@link DslConverter#ENABLED}.
 	 *
 	 * @param value The value to use as a default when a document is missing a value on the sort field.
-	 * @return The original context, for method chaining.
+	 * @return The next step.
 	 * @throws SearchException If the field is not numeric.
 	 */
 	default N use(Object value) {
@@ -58,8 +58,7 @@ public interface FieldSortMissingValueContext<N> {
 	 * @param value The value to use as a default when a document is missing a value on the sort field.
 	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
 	 * See {@link DslConverter}.
-	 *
-	 * @return The original context, for method chaining.
+	 * @return The next step.
 	 * @throws SearchException If the field is not numeric.
 	 */
 	N use(Object value, DslConverter dslConverter);

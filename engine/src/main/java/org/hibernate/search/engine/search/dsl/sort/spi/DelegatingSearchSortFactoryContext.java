@@ -8,14 +8,14 @@ package org.hibernate.search.engine.search.dsl.sort.spi;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.dsl.sort.CompositeSortContext;
-import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
-import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
-import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
-import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
+import org.hibernate.search.engine.search.dsl.sort.CompositeSortComponentsStep;
+import org.hibernate.search.engine.search.dsl.sort.DistanceSortOptionsStep;
+import org.hibernate.search.engine.search.dsl.sort.FieldSortOptionsStep;
+import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
+import org.hibernate.search.engine.search.dsl.sort.ScoreSortOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtensionStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -32,37 +32,37 @@ public class DelegatingSearchSortFactoryContext implements SearchSortFactoryCont
 	}
 
 	@Override
-	public ScoreSortContext byScore() {
+	public ScoreSortOptionsStep byScore() {
 		return delegate.byScore();
 	}
 
 	@Override
-	public NonEmptySortContext byIndexOrder() {
+	public SortThenStep byIndexOrder() {
 		return delegate.byIndexOrder();
 	}
 
 	@Override
-	public FieldSortContext byField(String absoluteFieldPath) {
+	public FieldSortOptionsStep byField(String absoluteFieldPath) {
 		return delegate.byField( absoluteFieldPath );
 	}
 
 	@Override
-	public DistanceSortContext byDistance(String absoluteFieldPath, GeoPoint location) {
+	public DistanceSortOptionsStep byDistance(String absoluteFieldPath, GeoPoint location) {
 		return delegate.byDistance( absoluteFieldPath, location );
 	}
 
 	@Override
-	public DistanceSortContext byDistance(String absoluteFieldPath, double latitude, double longitude) {
+	public DistanceSortOptionsStep byDistance(String absoluteFieldPath, double latitude, double longitude) {
 		return delegate.byDistance( absoluteFieldPath, latitude, longitude );
 	}
 
 	@Override
-	public CompositeSortContext byComposite() {
+	public CompositeSortComponentsStep byComposite() {
 		return delegate.byComposite();
 	}
 
 	@Override
-	public NonEmptySortContext byComposite(Consumer<? super CompositeSortContext> elementContributor) {
+	public SortThenStep byComposite(Consumer<? super CompositeSortComponentsStep> elementContributor) {
 		return delegate.byComposite( elementContributor );
 	}
 
@@ -72,7 +72,7 @@ public class DelegatingSearchSortFactoryContext implements SearchSortFactoryCont
 	}
 
 	@Override
-	public SearchSortFactoryExtensionContext extension() {
+	public SearchSortFactoryContextExtensionStep extension() {
 		return delegate.extension();
 	}
 

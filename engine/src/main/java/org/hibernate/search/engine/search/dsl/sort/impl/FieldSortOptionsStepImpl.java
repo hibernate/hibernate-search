@@ -6,51 +6,51 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
-import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
-import org.hibernate.search.engine.search.dsl.sort.FieldSortMissingValueContext;
+import org.hibernate.search.engine.search.dsl.sort.FieldSortOptionsStep;
+import org.hibernate.search.engine.search.dsl.sort.FieldSortMissingValueBehaviorStep;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
-import org.hibernate.search.engine.search.dsl.sort.spi.AbstractNonEmptySortContext;
+import org.hibernate.search.engine.search.dsl.sort.spi.AbstractSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
-class FieldSortContextImpl<B>
-		extends AbstractNonEmptySortContext<B>
-		implements FieldSortContext, FieldSortMissingValueContext<FieldSortContext> {
+class FieldSortOptionsStepImpl<B>
+		extends AbstractSortThenStep<B>
+		implements FieldSortOptionsStep, FieldSortMissingValueBehaviorStep<FieldSortOptionsStep> {
 
 	private final FieldSortBuilder<B> builder;
 
-	FieldSortContextImpl(SearchSortDslContext<?, B> dslContext,
+	FieldSortOptionsStepImpl(SearchSortDslContext<?, B> dslContext,
 			String absoluteFieldPath) {
 		super( dslContext );
 		this.builder = dslContext.getFactory().field( absoluteFieldPath );
 	}
 
 	@Override
-	public FieldSortContext order(SortOrder order) {
+	public FieldSortOptionsStep order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}
 
 	@Override
-	public FieldSortMissingValueContext<FieldSortContext> onMissingValue() {
+	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStep> onMissingValue() {
 		return this;
 	}
 
 	@Override
-	public FieldSortContext sortFirst() {
+	public FieldSortOptionsStep sortFirst() {
 		builder.missingFirst();
 		return this;
 	}
 
 	@Override
-	public FieldSortContext sortLast() {
+	public FieldSortOptionsStep sortLast() {
 		builder.missingLast();
 		return this;
 	}
 
 	@Override
-	public FieldSortContext use(Object value, DslConverter dslConverter) {
+	public FieldSortOptionsStep use(Object value, DslConverter dslConverter) {
 		builder.missingAs( value, dslConverter );
 		return this;
 	}

@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
+import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -187,12 +187,12 @@ public class CompositeSearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor) {
+			Function<? super SearchSortFactoryContext, ? extends SortFinalStep> sortContributor) {
 		return simpleQuery( indexManager.createScope(), sortContributor );
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(StubMappingScope scope,
-			Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor) {
+			Function<? super SearchSortFactoryContext, ? extends SortFinalStep> sortContributor) {
 		return scope.query()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
