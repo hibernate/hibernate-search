@@ -8,8 +8,8 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.query.impl;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
-import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryOptionsStep;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryPredicateStep;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
@@ -17,23 +17,23 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 
-class ElasticsearchSearchQueryContextImpl<H>
-		extends AbstractExtendedSearchQueryContext<
-				ElasticsearchSearchQueryContext<H>,
-				H,
-				ElasticsearchSearchResult<H>,
-				ElasticsearchSearchPredicateFactory,
-		ElasticsearchSearchSortFactory,
-				ElasticsearchSearchQueryElementCollector
-		>
-		implements ElasticsearchSearchQueryResultContext<H>, ElasticsearchSearchQueryContext<H> {
+class ElasticsearchSearchQueryOptionsStepImpl<H>
+		extends AbstractExtendedSearchQueryOptionsStep<
+		ElasticsearchSearchQueryOptionsStep<H>,
+						H,
+						ElasticsearchSearchResult<H>,
+						ElasticsearchSearchPredicateFactory,
+				ElasticsearchSearchSortFactory,
+						ElasticsearchSearchQueryElementCollector
+				>
+		implements ElasticsearchSearchQueryPredicateStep<H>, ElasticsearchSearchQueryOptionsStep<H> {
 
 	private final ElasticsearchSearchQueryBuilder<H> searchQueryBuilder;
 
-	ElasticsearchSearchQueryContextImpl(ElasticsearchIndexScope indexSearchScope,
+	ElasticsearchSearchQueryOptionsStepImpl(ElasticsearchIndexScope indexSearchScope,
 			ElasticsearchSearchQueryBuilder<H> searchQueryBuilder) {
 		super( indexSearchScope, searchQueryBuilder );
 		this.searchQueryBuilder = searchQueryBuilder;
@@ -45,7 +45,7 @@ class ElasticsearchSearchQueryContextImpl<H>
 	}
 
 	@Override
-	protected ElasticsearchSearchQueryContextImpl<H> thisAsS() {
+	protected ElasticsearchSearchQueryOptionsStepImpl<H> thisAsS() {
 		return this;
 	}
 

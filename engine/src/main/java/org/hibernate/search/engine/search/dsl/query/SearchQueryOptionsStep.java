@@ -14,21 +14,22 @@ import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchFetchable;
-import org.hibernate.search.engine.search.query.SearchQuery;
 
 /**
- * The context used when building a query, after the search predicate has been defined.
+ * The final step in a query definition, where optional parameters such as {@link #sort(Function) sorts} can be set,
+ * and where the query can be {@link SearchFetchable executed} or {@link #toQuery() retrieved as an object}.
  *
- * @param <S> The type actually exposed to the user for this context (may be a subtype of SearchQueryContext, with more exposed methods).
+ * @param <S> The "self" type (the actual exposed type of this step).
+ * May be a subtype of SearchQueryOptionsStep with more exposed methods.
  * @param <H> The type of hits for the created query.
  * @param <SF> The type of factory used to create sorts in {@link #sort(Function)}.
  */
-public interface SearchQueryContext<
-				S extends SearchQueryContext<? extends S, H, SF>,
+public interface SearchQueryOptionsStep<
+				S extends SearchQueryOptionsStep<? extends S, H, SF>,
 				H,
 				SF extends SearchSortFactory
 		>
-		extends SearchFetchable<H> {
+		extends SearchQueryFinalStep<H>, SearchFetchable<H> {
 
 	/**
 	 * Configure routing of the search query.
@@ -70,7 +71,5 @@ public interface SearchQueryContext<
 	 * @return {@code this}, for method chaining.
 	 */
 	S sort(Function<? super SF, ? extends SortFinalStep> sortContributor);
-
-	SearchQuery<H> toQuery();
 
 }

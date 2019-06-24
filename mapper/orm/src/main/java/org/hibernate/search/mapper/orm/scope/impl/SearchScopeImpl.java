@@ -13,8 +13,8 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
-import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.orm.search.dsl.query.impl.HibernateOrmSearchQueryResultDefinitionContextImpl;
+import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryHitTypeStep;
+import org.hibernate.search.mapper.orm.search.dsl.query.impl.HibernateOrmSearchQueryHitTypeStepImpl;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
@@ -38,7 +38,7 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 	}
 
 	@Override
-	public HibernateOrmSearchQueryResultDefinitionContext<E> search() {
+	public HibernateOrmSearchQueryHitTypeStep<E> search() {
 		SessionImplementor sessionImplementor = sessionContext.getSession();
 		EntityLoaderBuilder<E> entityLoaderBuilder =
 				new EntityLoaderBuilder<>( sessionImplementor, delegate.getIncludedIndexedTypes() );
@@ -46,7 +46,7 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
 				sessionContext, entityLoaderBuilder, loadingOptions
 		);
-		return new HibernateOrmSearchQueryResultDefinitionContextImpl<>(
+		return new HibernateOrmSearchQueryHitTypeStepImpl<>(
 				delegate.search( loadingContextBuilder ),
 				loadingOptions
 		);

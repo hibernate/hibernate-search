@@ -13,8 +13,8 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearchPredicateFactoryImpl;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.dsl.projection.impl.LuceneSearchProjectionFactoryImpl;
-import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultDefinitionContext;
-import org.hibernate.search.backend.lucene.search.dsl.query.impl.LuceneSearchQueryResultDefinitionContextImpl;
+import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryHitTypeStep;
+import org.hibernate.search.backend.lucene.search.dsl.query.impl.LuceneSearchQueryHitTypeStepImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
@@ -32,8 +32,8 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryDslExtension;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
@@ -66,7 +66,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @see #get()
  */
 public final class LuceneExtension<H, R, E>
-		implements SearchQueryContextExtension<LuceneSearchQueryResultDefinitionContext<R, E>, R, E>,
+		implements SearchQueryDslExtension<LuceneSearchQueryHitTypeStep<R, E>, R, E>,
 		SearchQueryExtension<LuceneSearchQuery<H>, H>,
 		SearchPredicateFactoryExtension<LuceneSearchPredicateFactory>,
 		SearchSortFactoryExtension<LuceneSearchSortFactory>,
@@ -104,13 +104,13 @@ public final class LuceneExtension<H, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchQueryResultDefinitionContext<R, E>> extendOptional(
-			SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
+	public Optional<LuceneSearchQueryHitTypeStep<R, E>> extendOptional(
+			SearchQueryHitTypeStep<?, R, E, ?, ?> original,
 			IndexScope<?> indexScope,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		if ( indexScope instanceof LuceneIndexScope ) {
-			return Optional.of( new LuceneSearchQueryResultDefinitionContextImpl<>(
+			return Optional.of( new LuceneSearchQueryHitTypeStepImpl<>(
 					(LuceneIndexScope) indexScope, sessionContext, loadingContextBuilder
 			) );
 		}

@@ -7,24 +7,24 @@
 package org.hibernate.search.engine.search.dsl.query.spi;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.query.ExtendedSearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-public abstract class AbstractExtendedSearchQueryContext<
-				S extends SearchQueryContext<S, H, SF>,
+public abstract class AbstractExtendedSearchQueryOptionsStep<
+				S extends SearchQueryOptionsStep<S, H, SF>,
 				H,
 				R extends SearchResult<H>,
 				PDF extends SearchPredicateFactory,
 				SF extends SearchSortFactory,
 				C
 		>
-		extends AbstractSearchQueryContext<S, H, PDF, SF, C> {
+		extends AbstractSearchQueryOptionsStep<S, H, PDF, SF, C> {
 
-	public AbstractExtendedSearchQueryContext(IndexScope<C> indexScope,
+	public AbstractExtendedSearchQueryOptionsStep(IndexScope<C> indexScope,
 			SearchQueryBuilder<H, C> searchQueryBuilder) {
 		super( indexScope, searchQueryBuilder );
 	}

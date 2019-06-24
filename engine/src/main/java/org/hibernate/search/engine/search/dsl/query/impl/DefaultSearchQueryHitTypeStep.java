@@ -16,28 +16,28 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
+import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryHitTypeStep;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
-		extends AbstractSearchQueryResultDefinitionContext<
-				SearchQueryContext<?, E, ?>,
-				R,
-				E,
-				SearchProjectionFactory<R, E>,
-				SearchPredicateFactory,
-				C
-		> {
+public final class DefaultSearchQueryHitTypeStep<R, E, C>
+		extends AbstractSearchQueryHitTypeStep<
+						SearchQueryOptionsStep<?, E, ?>,
+						R,
+						E,
+						SearchProjectionFactory<R, E>,
+						SearchPredicateFactory,
+						C
+				> {
 
 	private final IndexScope<C> indexScope;
 	private final SessionContextImplementor sessionContext;
 	private final LoadingContextBuilder<R, E> loadingContextBuilder;
 
-	public DefaultSearchQueryResultDefinitionContext(IndexScope<C> indexScope,
+	public DefaultSearchQueryHitTypeStep(IndexScope<C> indexScope,
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		this.indexScope = indexScope;
@@ -46,21 +46,21 @@ public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
 	}
 
 	@Override
-	public SearchQueryResultContext<?, E, ?> asEntity() {
+	public SearchQueryPredicateStep<?, E, ?> asEntity() {
 		SearchQueryBuilder<E, C> builder = indexScope.getSearchQueryBuilderFactory()
 				.asEntity( sessionContext, loadingContextBuilder );
-		return new DefaultSearchQueryContext<>( indexScope, builder );
+		return new DefaultSearchQueryOptionsStep<>( indexScope, builder );
 	}
 
 	@Override
-	public SearchQueryResultContext<?, R, ?> asEntityReference() {
+	public SearchQueryPredicateStep<?, R, ?> asEntityReference() {
 		SearchQueryBuilder<R, C> builder = indexScope.getSearchQueryBuilderFactory()
 				.asReference( sessionContext, loadingContextBuilder );
-		return new DefaultSearchQueryContext<>( indexScope, builder );
+		return new DefaultSearchQueryOptionsStep<>( indexScope, builder );
 	}
 
 	@Override
-	public <P> SearchQueryResultContext<?, P, ?> asProjection(
+	public <P> SearchQueryPredicateStep<?, P, ?> asProjection(
 			Function<? super SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		SearchProjectionFactory<R, E> factory = createDefaultProjectionFactory();
 		SearchProjection<P> projection = projectionContributor.apply( factory ).toProjection();
@@ -68,27 +68,27 @@ public final class DefaultSearchQueryResultDefinitionContext<R, E, C>
 	}
 
 	@Override
-	public <P> SearchQueryResultContext<?, P, ?> asProjection(SearchProjection<P> projection) {
+	public <P> SearchQueryPredicateStep<?, P, ?> asProjection(SearchProjection<P> projection) {
 		SearchQueryBuilder<P, C> builder = indexScope.getSearchQueryBuilderFactory()
 				.asProjection( sessionContext, loadingContextBuilder, projection );
-		return new DefaultSearchQueryContext<>( indexScope, builder );
+		return new DefaultSearchQueryOptionsStep<>( indexScope, builder );
 	}
 
 	@Override
-	public SearchQueryResultContext<?, List<?>, ?> asProjections(SearchProjection<?>... projections) {
+	public SearchQueryPredicateStep<?, List<?>, ?> asProjections(SearchProjection<?>... projections) {
 		SearchQueryBuilder<List<?>, C> builder = indexScope.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, loadingContextBuilder, projections );
-		return new DefaultSearchQueryContext<>( indexScope, builder );
+		return new DefaultSearchQueryOptionsStep<>( indexScope, builder );
 	}
 
 	@Override
-	public SearchQueryContext<?, E, ?> predicate(
+	public SearchQueryOptionsStep<?, E, ?> predicate(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return asEntity().predicate( predicateContributor );
 	}
 
 	@Override
-	public SearchQueryContext<?, E, ?> predicate(SearchPredicate predicate) {
+	public SearchQueryOptionsStep<?, E, ?> predicate(SearchPredicate predicate) {
 		return asEntity().predicate( predicate );
 	}
 

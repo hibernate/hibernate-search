@@ -18,9 +18,10 @@ import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * The context used when building a query, before the search result type has been defined.
+ * The initial step in a query definition, where the type of query hits can be set,
+ * or where the predicate can be set directly, assuming that query hits are returned as entities.
  *
- * @param <N> The next context if no type of hits is explicitly selected,
+ * @param <N> The next step if no type of hits is explicitly selected,
  * i.e. if {@link #predicate(SearchPredicate)} or {@link #predicate(Function)} is called directly
  * without calling {@link #asEntity()}, or {@link #asEntityReference()}, {@link #asProjection(SearchProjection)}
  * or a similar method.
@@ -33,30 +34,30 @@ import org.hibernate.search.util.common.SearchException;
  * @param <PJF> The type of factory used to create projections in {@link #asProjection(Function)}.
  * @param <PDF> The type of factory used to create predicates in {@link #predicate(Function)}.
  */
-public interface SearchQueryResultDefinitionContext<
-				N extends SearchQueryContext<?, E, ?>,
+public interface SearchQueryHitTypeStep<
+				N extends SearchQueryOptionsStep<?, E, ?>,
 				R,
 				E,
 				PJF extends SearchProjectionFactory<R, E>,
 				PDF extends SearchPredicateFactory
 		>
-		extends SearchQueryResultContext<N, E, PDF> {
+		extends SearchQueryPredicateStep<N, E, PDF> {
 
 	/**
 	 * Define the query results as the entity was originally indexed, loaded from an external source (database, ...).
 	 *
-	 * @return A context allowing to define the query further.
-	 * @see SearchQueryResultContext
+	 * @return The next step.
+	 * @see SearchQueryPredicateStep
 	 */
-	SearchQueryResultContext<?, E, ?> asEntity();
+	SearchQueryPredicateStep<?, E, ?> asEntity();
 
 	/**
 	 * Define the query results as a reference to the entity that was originally indexed.
 	 *
-	 * @return A context allowing to define the query further.
-	 * @see SearchQueryResultContext
+	 * @return The next step.
+	 * @see SearchQueryPredicateStep
 	 */
-	SearchQueryResultContext<?, R, ?> asEntityReference();
+	SearchQueryPredicateStep<?, R, ?> asEntityReference();
 
 	/**
 	 * Define the query results as one projection for each matching document.
@@ -65,10 +66,10 @@ public interface SearchQueryResultDefinitionContext<
 	 * returning the final step in the projection DSL.
 	 * Should generally be a lambda expression.
 	 * @param <P> The resulting type of the projection.
-	 * @return A context allowing to define the query further.
-	 * @see SearchQueryResultContext
+	 * @return The next step.
+	 * @see SearchQueryPredicateStep
 	 */
-	<P> SearchQueryResultContext<?, P, ?> asProjection(
+	<P> SearchQueryPredicateStep<?, P, ?> asProjection(
 			Function<? super PJF, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	/**
@@ -76,10 +77,10 @@ public interface SearchQueryResultDefinitionContext<
 	 *
 	 * @param projection A previously-created {@link SearchProjection} object.
 	 * @param <P> The resulting type of the projection.
-	 * @return A context allowing to define the query further.
-	 * @see SearchQueryResultContext
+	 * @return The next step.
+	 * @see SearchQueryPredicateStep
 	 */
-	<P> SearchQueryResultContext<?, P, ?> asProjection(SearchProjection<P> projection);
+	<P> SearchQueryPredicateStep<?, P, ?> asProjection(SearchProjection<P> projection);
 
 	/**
 	 * Define the query results as a list of projections for each matching document.
@@ -90,21 +91,21 @@ public interface SearchQueryResultDefinitionContext<
 	 * defining a {@link SearchProjectionFactory#composite(BiFunction, SearchProjection, SearchProjection) composite projection}.
 	 *
 	 * @param projections A list of previously-created {@link SearchProjection} objects.
-	 * @return A context allowing to define the query further.
+	 * @return The next step.
 	 * @see SearchProjectionFactory#composite(BiFunction, SearchProjection, SearchProjection)
-	 * @see SearchQueryResultContext
+	 * @see SearchQueryPredicateStep
 	 */
-	SearchQueryResultContext<?, List<?>, ?> asProjections(SearchProjection<?>... projections);
+	SearchQueryPredicateStep<?, List<?>, ?> asProjections(SearchProjection<?>... projections);
 
 	/**
-	 * Extend the current context with the given extension,
-	 * resulting in an extended context offering more query options.
+	 * Extend the current DSL step with the given extension,
+	 * resulting in an extended step offering more query options.
 	 *
-	 * @param extension The extension to the predicate DSL.
-	 * @param <T> The type of context provided by the extension.
-	 * @return The extended context.
+	 * @param extension The extension to the query DSL.
+	 * @param <T> The type of DSL step provided by the extension.
+	 * @return The extended DSL step.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchQueryContextExtension<T, R, E> extension);
+	<T> T extension(SearchQueryDslExtension<T, R, E> extension);
 
 }

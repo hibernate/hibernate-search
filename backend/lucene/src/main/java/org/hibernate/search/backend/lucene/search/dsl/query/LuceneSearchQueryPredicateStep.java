@@ -7,9 +7,9 @@
 package org.hibernate.search.backend.lucene.search.dsl.query;
 
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
 
-public interface LuceneSearchQueryResultContext<H>
-		extends SearchQueryResultContext<LuceneSearchQueryContext<H>, H, LuceneSearchPredicateFactory> {
+public interface LuceneSearchQueryPredicateStep<H>
+		extends SearchQueryPredicateStep<LuceneSearchQueryOptionsStep<H>, H, LuceneSearchPredicateFactory> {
 
 }

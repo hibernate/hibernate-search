@@ -13,11 +13,10 @@ import java.util.Collections;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
-import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryHitTypeStep;
 
 public interface SearchSession {
 
@@ -28,11 +27,10 @@ public interface SearchSession {
 	 *
 	 * @param type An indexed type, or a supertype of all indexed types that will be targeted by the search query.
 	 * @param <T> An indexed type, or a supertype of all indexed types that will be targeted by the search query.
-	 * @return A context allowing to define the search query,
-	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
-	 * @see HibernateOrmSearchQueryResultDefinitionContext
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see HibernateOrmSearchQueryHitTypeStep
 	 */
-	default <T> HibernateOrmSearchQueryResultDefinitionContext<T> search(Class<T> type) {
+	default <T> HibernateOrmSearchQueryHitTypeStep<T> search(Class<T> type) {
 		return scope( type ).search();
 	}
 
@@ -43,11 +41,10 @@ public interface SearchSession {
 	 *
 	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the search query.
 	 * @param <T> A supertype of all indexed types that will be targeted by the search query.
-	 * @return A context allowing to define the search query,
-	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
-	 * @see HibernateOrmSearchQueryResultDefinitionContext
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see HibernateOrmSearchQueryHitTypeStep
 	 */
-	default <T> HibernateOrmSearchQueryResultDefinitionContext<T> search(Collection<? extends Class<? extends T>> types) {
+	default <T> HibernateOrmSearchQueryHitTypeStep<T> search(Collection<? extends Class<? extends T>> types) {
 		return scope( types ).search();
 	}
 

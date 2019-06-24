@@ -9,10 +9,10 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.query;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchFetchable;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 
-public interface ElasticsearchSearchQueryContext<H>
-		extends SearchQueryContext<ElasticsearchSearchQueryContext<H>, H, ElasticsearchSearchSortFactory>,
+public interface ElasticsearchSearchQueryOptionsStep<H>
+		extends SearchQueryOptionsStep<ElasticsearchSearchQueryOptionsStep<H>, H, ElasticsearchSearchSortFactory>,
 				ElasticsearchSearchFetchable<H> {
 
 	@Override

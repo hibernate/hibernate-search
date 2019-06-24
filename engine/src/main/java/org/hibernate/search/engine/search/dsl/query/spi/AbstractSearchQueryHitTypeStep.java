@@ -11,24 +11,24 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactory;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryDslExtension;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
-public abstract class AbstractSearchQueryResultDefinitionContext<
-				N extends SearchQueryContext<?, E, ?>,
+public abstract class AbstractSearchQueryHitTypeStep<
+				N extends SearchQueryOptionsStep<?, E, ?>,
 				R,
 				E,
 				PJF extends SearchProjectionFactory<R, E>,
 				PDF extends SearchPredicateFactory,
 				C
 		>
-		implements SearchQueryResultDefinitionContext<N, R, E, PJF, PDF> {
+		implements SearchQueryHitTypeStep<N, R, E, PJF, PDF> {
 
 	@Override
-	public <T> T extension(SearchQueryContextExtension<T, R, E> extension) {
+	public <T> T extension(SearchQueryDslExtension<T, R, E> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension,
 				extension.extendOptional(

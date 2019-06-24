@@ -13,14 +13,14 @@ import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 
 /**
- * The context used when building a query, after the search result type has been defined.
+ * The step in a query definition where the predicate can be set.
  *
- * @param <N> The type of the next context, returned after a predicate is defined.
+ * @param <N> The type of the next step, returned after a predicate is defined.
  * @param <H> The type of hits for the created query.
  * @param <PDF> The type of factory used to create predicates in {@link #predicate(Function)}.
  */
-public interface SearchQueryResultContext<
-				N extends SearchQueryContext<?, H, ?>,
+public interface SearchQueryPredicateStep<
+				N extends SearchQueryOptionsStep<?, H, ?>,
 				H,
 				PDF extends SearchPredicateFactory
 		> {
@@ -28,7 +28,7 @@ public interface SearchQueryResultContext<
 	/**
 	 * Set the predicate for this query.
 	 * @param predicate A {@link SearchPredicate} object obtained from the search scope.
-	 * @return A context allowing to define the query further.
+	 * @return The next step.
 	 */
 	N predicate(SearchPredicate predicate);
 
@@ -37,7 +37,7 @@ public interface SearchQueryResultContext<
 	 * @param predicateContributor A function that will use the factory passed in parameter to create a predicate,
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
-	 * @return A context allowing to define the query further.
+	 * @return The next step.
 	 */
 	N predicate(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor);
 

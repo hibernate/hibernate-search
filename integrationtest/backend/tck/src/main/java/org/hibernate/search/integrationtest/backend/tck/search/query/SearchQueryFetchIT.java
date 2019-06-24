@@ -24,7 +24,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -261,27 +261,27 @@ public class SearchQueryFetchIT {
 				.hasNoHits();
 	}
 
-	private SearchQueryContext<?, DocumentReference, ?> matchAllQuery() {
+	private SearchQueryOptionsStep<?, DocumentReference, ?> matchAllQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.byField( "integer" ).asc() );
 	}
 
-	private SearchQueryContext<?, DocumentReference, ?> matchFirstHalfQuery() {
+	private SearchQueryOptionsStep<?, DocumentReference, ?> matchFirstHalfQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.range().onField( "integer" ).below( DOCUMENT_COUNT / 2 ).excludeLimit() )
 				.sort( f -> f.byField( "integer" ).asc() );
 	}
 
-	private SearchQueryContext<?, DocumentReference, ?> matchOneQuery(int id) {
+	private SearchQueryOptionsStep<?, DocumentReference, ?> matchOneQuery(int id) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.match().onField( "integer" ).matching( id ) );
 	}
 
-	private SearchQueryContext<?, DocumentReference, ?> matchNoneQuery() {
+	private SearchQueryOptionsStep<?, DocumentReference, ?> matchNoneQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.match().onField( "integer" ).matching( DOCUMENT_COUNT + 2 ) );

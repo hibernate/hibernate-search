@@ -22,9 +22,9 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkE
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryDslExtension;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -186,9 +186,10 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class SupportedQueryDslExtension<R, E> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, E> {
+	private static class SupportedQueryDslExtension<R, E> implements
+			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E> {
 		@Override
-		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
+		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryHitTypeStep<?, R, E, ?, ?> original,
 				IndexScope<?> indexScope, SessionContextImplementor sessionContext,
 				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
@@ -199,9 +200,10 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class UnSupportedQueryDslExtension<R, E> implements SearchQueryContextExtension<MyExtendedDslContext<R>, R, E> {
+	private static class UnSupportedQueryDslExtension<R, E> implements
+			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E> {
 		@Override
-		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryResultDefinitionContext<?, R, E, ?, ?> original,
+		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryHitTypeStep<?, R, E, ?, ?> original,
 				IndexScope<?> indexScope, SessionContextImplementor sessionContext,
 				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
@@ -213,9 +215,9 @@ public class SearchQueryBaseIT {
 	}
 
 	private static class MyExtendedDslContext<T> {
-		private final SearchQueryResultContext<?, T, ?> delegate;
+		private final SearchQueryPredicateStep<?, T, ?> delegate;
 
-		MyExtendedDslContext(SearchQueryResultContext<?, T, ?> delegate) {
+		MyExtendedDslContext(SearchQueryPredicateStep<?, T, ?> delegate) {
 			this.delegate = delegate;
 		}
 

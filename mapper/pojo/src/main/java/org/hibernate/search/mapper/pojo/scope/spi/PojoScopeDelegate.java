@@ -10,16 +10,16 @@ import java.util.Set;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 
 /**
  * @param <R> The type of entity references, i.e. the type of hits returned by
- * {@link SearchQueryResultDefinitionContext#asEntityReference()} reference queries},
+ * {@link SearchQueryHitTypeStep#asEntityReference()} reference queries},
  * @param <E> The type of loaded entities, i.e. the type of hits returned by
- * {@link SearchQueryResultDefinitionContext#asEntity() entity queries},
+ * {@link SearchQueryHitTypeStep#asEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
  * @param <C> The type of indexed type extended contexts; i.e. the type of elements in the set returned by
  * {@link #getIncludedIndexedTypes()}.
@@ -29,7 +29,7 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	Set<C> getIncludedIndexedTypes();
 
-	SearchQueryResultDefinitionContext<?, R, E, SearchProjectionFactory<R, E>, ?> search(
+	SearchQueryHitTypeStep<?, R, E, SearchProjectionFactory<R, E>, ?> search(
 			LoadingContextBuilder<R, E> loadingContextBuilder);
 
 	SearchPredicateFactory predicate();

@@ -9,10 +9,10 @@ package org.hibernate.search.backend.lucene.search.dsl.query;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchFetchable;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 
-public interface LuceneSearchQueryContext<H>
-		extends SearchQueryContext<LuceneSearchQueryContext<H>, H, LuceneSearchSortFactory>,
+public interface LuceneSearchQueryOptionsStep<H>
+		extends SearchQueryOptionsStep<LuceneSearchQueryOptionsStep<H>, H, LuceneSearchSortFactory>,
 				LuceneSearchFetchable<H> {
 
 	@Override
