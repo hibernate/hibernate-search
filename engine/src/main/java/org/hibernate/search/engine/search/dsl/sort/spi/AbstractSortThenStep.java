@@ -7,16 +7,16 @@
 package org.hibernate.search.engine.search.dsl.sort.spi;
 
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
+import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortFactoryContext;
 
-public abstract class AbstractNonEmptySortContext<B> implements NonEmptySortContext {
+public abstract class AbstractSortThenStep<B> implements SortThenStep {
 	private final SearchSortDslContext<?, ? super B> parentDslContext;
 
 	private SearchSortDslContext<?, ? super B> selfDslContext;
 
-	public AbstractNonEmptySortContext(SearchSortDslContext<?, ? super B> parentDslContext) {
+	public AbstractSortThenStep(SearchSortDslContext<?, ? super B> parentDslContext) {
 		this.parentDslContext = parentDslContext;
 	}
 

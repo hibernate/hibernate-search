@@ -7,28 +7,35 @@
 package org.hibernate.search.engine.search.dsl.sort;
 
 /**
- * A superinterface for contexts allowing to define a sort order.
+ * The step in a sort definition where the order can be set.
  *
+ * @param <S> The "self" type (the actual exposed type of this step)
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SortOrderContext<T> {
+public interface SortOrderStep<S> {
 	/**
 	 * Sort in ascending order.
 	 *
-	 * @return The original context, for method chaining.
+	 * @return {@code this}, for method chaining.
 	 */
-	default T asc() {
+	default S asc() {
 		return order( SortOrder.ASC );
 	}
 
 	/**
 	 * Sort in descending order.
 	 *
-	 * @return The original context, for method chaining.
+	 * @return {@code this}, for method chaining.
 	 */
-	default T desc() {
+	default S desc() {
 		return order( SortOrder.DESC );
 	}
 
-	T order(SortOrder order);
+	/**
+	 * Sort in the given order.
+	 *
+	 * @param order The order.
+	 * @return {@code this}, for method chaining.
+	 */
+	S order(SortOrder order);
 }

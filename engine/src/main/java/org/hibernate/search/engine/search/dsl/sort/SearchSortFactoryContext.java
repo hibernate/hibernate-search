@@ -23,18 +23,16 @@ public interface SearchSortFactoryContext {
 	 * <p>
 	 * The default order is <strong>descending</strong>, i.e. higher scores come first.
 	 *
-	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 * @return A DSL step where the "score" sort can be defined in more details.
 	 */
-	ScoreSortContext byScore();
+	ScoreSortOptionsStep byScore();
 
 	/**
 	 * Order elements by their internal index order.
 	 *
-	 * @return A context allowing to {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 * @return A DSL step where the "index order" sort can be defined in more details.
 	 */
-	NonEmptySortContext byIndexOrder();
+	SortThenStep byIndexOrder();
 
 	/**
 	 * Order elements by the value of a specific field.
@@ -42,11 +40,10 @@ public interface SearchSortFactoryContext {
 	 * The default order is <strong>ascending</strong>.
 	 *
 	 * @param absoluteFieldPath The absolute path of the index field to sort by
-	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
-	 * @throws SearchException If the sort field type could not be automatically determined.
+	 * @return A DSL step where the "field" sort can be defined in more details.
+	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
 	 */
-	FieldSortContext byField(String absoluteFieldPath);
+	FieldSortOptionsStep byField(String absoluteFieldPath);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -55,11 +52,10 @@ public interface SearchSortFactoryContext {
 	 *
 	 * @param absoluteFieldPath The absolute path of the indexed location field to sort by.
 	 * @param location The location to which we want to compute the distance.
-	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	DistanceSortContext byDistance(String absoluteFieldPath, GeoPoint location);
+	DistanceSortOptionsStep byDistance(String absoluteFieldPath, GeoPoint location);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -69,11 +65,10 @@ public interface SearchSortFactoryContext {
 	 * @param absoluteFieldPath The absolute path of the indexed location field to sort by.
 	 * @param latitude The latitude of the location to which we want to compute the distance.
 	 * @param longitude The longitude of the location to which we want to compute the distance.
-	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	default DistanceSortContext byDistance(String absoluteFieldPath, double latitude, double longitude) {
+	default DistanceSortOptionsStep byDistance(String absoluteFieldPath, double latitude, double longitude) {
 		return byDistance( absoluteFieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 
@@ -81,14 +76,13 @@ public interface SearchSortFactoryContext {
 	 * Order by a sort composed of several elements.
 	 * <p>
 	 * Note that, in general, calling this method is not necessary as you can chain sorts by calling
-	 * {@link NonEmptySortContext#then()}.
+	 * {@link SortThenStep#then()}.
 	 * This method is mainly useful to mix imperative and declarative style when building sorts.
 	 * See {@link #byComposite(Consumer)}
 	 *
-	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
-	CompositeSortContext byComposite();
+	CompositeSortComponentsStep byComposite();
 
 	/**
 	 * Order by a sort composed of several elements,
@@ -107,12 +101,11 @@ public interface SearchSortFactoryContext {
 	 * } )
 	 * }</pre>
 	 *
-	 * @param elementContributor A consumer that will add elements to the context passed in parameter.
+	 * @param elementContributor A consumer that will add clauses to the step passed in parameter.
 	 * Should generally be a lambda expression.
-	 * @return A context allowing {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
-	NonEmptySortContext byComposite(Consumer<? super CompositeSortContext> elementContributor);
+	SortThenStep byComposite(Consumer<? super CompositeSortComponentsStep> elementContributor);
 
 	/**
 	 * Extend the current context with the given extension,
@@ -126,14 +119,14 @@ public interface SearchSortFactoryContext {
 	<T> T extension(SearchSortFactoryContextExtension<T> extension);
 
 	/**
-	 * Create a context allowing to try to apply multiple extensions one after the other,
+	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
 	 * failing only if <em>none</em> of the extensions is supported.
 	 * <p>
 	 * If you only need to apply a single extension and fail if it is not supported,
 	 * use the simpler {@link #extension(SearchSortFactoryContextExtension)} method instead.
 	 *
-	 * @return A context allowing to define the extensions to attempt, and the corresponding sorts.
+	 * @return A DSL step.
 	 */
-	SearchSortFactoryExtensionContext extension();
+	SearchSortFactoryContextExtensionStep extension();
 
 }

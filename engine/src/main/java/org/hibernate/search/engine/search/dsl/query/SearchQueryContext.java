@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
+import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchFetchable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 
@@ -65,11 +65,11 @@ public interface SearchQueryContext<
 	/**
 	 * Add a sort to this query.
 	 * @param sortContributor A function that will use the DSL context passed in parameter to create a sort,
-	 * returning the resulting terminal context.
+	 * returning the final step in the sort DSL.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	S sort(Function<? super SC, ? extends SearchSortTerminalContext> sortContributor);
+	S sort(Function<? super SC, ? extends SortFinalStep> sortContributor);
 
 	SearchQuery<H> toQuery();
 

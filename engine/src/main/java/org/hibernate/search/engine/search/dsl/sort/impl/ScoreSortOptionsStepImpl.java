@@ -6,25 +6,25 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
-import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
+import org.hibernate.search.engine.search.dsl.sort.ScoreSortOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
-import org.hibernate.search.engine.search.dsl.sort.spi.AbstractNonEmptySortContext;
+import org.hibernate.search.engine.search.dsl.sort.spi.AbstractSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
-class ScoreSortContextImpl<B>
-		extends AbstractNonEmptySortContext<B>
-		implements ScoreSortContext {
+class ScoreSortOptionsStepImpl<B>
+		extends AbstractSortThenStep<B>
+		implements ScoreSortOptionsStep {
 
 	private final ScoreSortBuilder<B> builder;
 
-	ScoreSortContextImpl(SearchSortDslContext<?, B> dslContext) {
+	ScoreSortOptionsStepImpl(SearchSortDslContext<?, B> dslContext) {
 		super( dslContext );
 		this.builder = dslContext.getFactory().score();
 	}
 
 	@Override
-	public ScoreSortContext order(SortOrder order) {
+	public ScoreSortOptionsStep order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}

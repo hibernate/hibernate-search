@@ -11,54 +11,55 @@ import java.util.function.Function;
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * The context used when attempting to apply multiple extensions
+ * The DSL step when attempting to apply multiple extensions
  * to a {@link SearchSortFactoryContext}.
  *
  * @see SearchSortFactoryContext#extension()
  */
-public interface SearchSortFactoryExtensionContext {
+public interface SearchSortFactoryContextExtensionStep {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
 	 * {@link #ifSupported(SearchSortFactoryContextExtension, Function)}
 	 * was supported, extend the current context with this extension,
-	 * and apply the given consumer to the extended context.
+	 * apply the given function to the extended factory context, and store the resulting sort for later retrieval.
 	 * <p>
 	 * This method cannot be called after {@link #orElse(Function)} or {@link #orElseFail()}.
 	 *
 	 * @param extension The extension to apply.
 	 * @param sortContributor A function called if the extension is successfully applied;
-	 * it will use the (extended) DSL context passed in parameter to create a sort,
-	 * returning the resulting terminal context.
+	 * it will use the (extended) sort factory context passed in parameter to create a sort,
+	 * returning the final step in the sort DSL.
 	 * Should generally be a lambda expression.
 	 * @param <T> The type of the extended context.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchSortFactoryExtensionContext ifSupported(
+	<T> SearchSortFactoryContextExtensionStep ifSupported(
 			SearchSortFactoryContextExtension<T> extension,
-			Function<T, ? extends SearchSortTerminalContext> sortContributor
+			Function<T, ? extends SortFinalStep> sortContributor
 	);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchSortFactoryContextExtension, Function)}
 	 * was supported so far, apply the given consumer to the current (non-extended) {@link SearchSortFactoryContext};
-	 * otherwise do nothing.
+	 * otherwise return the sort created in the first succeeding {@code ifSupported} call.
 	 *
 	 * @param sortContributor A function called if no extension was successfully applied;
-	 * it will use the (extended) DSL context passed in parameter to create a sort,
-	 * returning the resulting terminal context.
+	 * it will use the (non-extended) sort factory context passed in parameter to create a sort,
+	 * returning the final step in the sort DSL.
 	 * Should generally be a lambda expression.
-	 * @return The next context.
+	 * @return The final step in the DSL of the resulting sort.
 	 */
-	NonEmptySortContext orElse(Function<SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor);
+	SortThenStep orElse(Function<SearchSortFactoryContext, ? extends SortFinalStep> sortContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchSortFactoryContextExtension, Function)}
-	 * was supported so far, throw an exception; otherwise do nothing.
+	 * was supported so far, throw an exception;
+	 * otherwise return the sort created in the first succeeding {@code ifSupported} call.
 	 *
-	 * @return The next context.
+	 * @return The final step in the DSL of the resulting sort.
 	 * @throws SearchException If none of the previously passed extensions was supported.
 	 */
-	NonEmptySortContext orElseFail();
+	SortThenStep orElseFail();
 
 }

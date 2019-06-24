@@ -7,17 +7,10 @@
 package org.hibernate.search.engine.search.dsl.sort;
 
 /**
- * A superinterface for contexts allowing to define sorts.
+ * The initial and final step in a "score" sort definition, where optional parameters can be set.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface NonEmptySortContext extends SearchSortTerminalContext {
-
-	/**
-	 * Start defining another sort, to be applied after the current one.
-	 *
-	 * @return A {@link SearchSortFactoryContext} allowing to define a sort.
-	 */
-	SearchSortFactoryContext then();
-
+public interface ScoreSortOptionsStep
+		extends SortFinalStep, SortThenStep, SortOrderStep<ScoreSortOptionsStep> {
 }

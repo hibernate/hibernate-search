@@ -11,10 +11,10 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactoryContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
-import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
+import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.StaticNonEmptySortContext;
+import org.hibernate.search.engine.search.dsl.sort.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
@@ -31,16 +31,16 @@ public class LuceneSearchSortFactoryContextImpl
 	}
 
 	@Override
-	public NonEmptySortContext fromLuceneSortField(SortField luceneSortField) {
-		return staticNonEmptyContext( dslContext.getFactory().fromLuceneSortField( luceneSortField ) );
+	public SortThenStep fromLuceneSortField(SortField luceneSortField) {
+		return staticThenStep( dslContext.getFactory().fromLuceneSortField( luceneSortField ) );
 	}
 
 	@Override
-	public NonEmptySortContext fromLuceneSort(Sort luceneSort) {
-		return staticNonEmptyContext( dslContext.getFactory().fromLuceneSort( luceneSort ) );
+	public SortThenStep fromLuceneSort(Sort luceneSort) {
+		return staticThenStep( dslContext.getFactory().fromLuceneSort( luceneSort ) );
 	}
 
-	private NonEmptySortContext staticNonEmptyContext(LuceneSearchSortBuilder builder) {
-		return new StaticNonEmptySortContext<>( dslContext, builder );
+	private SortThenStep staticThenStep(LuceneSearchSortBuilder builder) {
+		return new StaticSortThenStep<>( dslContext, builder );
 	}
 }

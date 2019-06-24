@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
+import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -63,7 +63,7 @@ public class LuceneSearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactoryContext, ? extends SearchSortTerminalContext> sortContributor) {
+			Function<? super SearchSortFactoryContext, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )

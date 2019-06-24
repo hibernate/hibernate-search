@@ -7,9 +7,9 @@
 package org.hibernate.search.engine.search.dsl.sort;
 
 /**
- * The context used when defining a field sort.
+ * The initial and final step in a "distance" sort definition, where optional parameters can be set.
  */
-public interface DistanceSortContext
-		extends NonEmptySortContext, SortOrderContext<DistanceSortContext> {
+public interface DistanceSortOptionsStep
+		extends SortFinalStep, SortThenStep, SortOrderStep<DistanceSortOptionsStep> {
 
 }

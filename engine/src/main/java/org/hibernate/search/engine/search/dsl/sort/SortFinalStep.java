@@ -10,9 +10,9 @@ package org.hibernate.search.engine.search.dsl.sort;
 import org.hibernate.search.engine.search.SearchSort;
 
 /**
- * The terminal context of the sort DSL.
+ * The final step in a sort definition, where the sort can be retrieved.
  */
-public interface SearchSortTerminalContext {
+public interface SortFinalStep {
 
 	/**
 	 * Create a {@link SearchSort} instance

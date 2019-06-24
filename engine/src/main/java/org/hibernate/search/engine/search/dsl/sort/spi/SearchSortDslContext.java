@@ -7,12 +7,14 @@
 package org.hibernate.search.engine.search.dsl.sort.spi;
 
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 /**
  * Represents the current context in the search DSL,
- * i.e. the current position in the sort tree.
+ * including in particular the sort builder factory
+ * and the knowledge of previous sorts chained using {@link SortThenStep#then()}.
  *
  * @param <F> The type of sort factory.
  * @param <B> The implementation type of builders.

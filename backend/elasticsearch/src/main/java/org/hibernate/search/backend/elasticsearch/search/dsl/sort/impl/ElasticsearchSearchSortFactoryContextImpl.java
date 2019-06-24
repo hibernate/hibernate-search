@@ -9,10 +9,10 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.sort.impl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
-import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
+import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.StaticNonEmptySortContext;
+import org.hibernate.search.engine.search.dsl.sort.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
@@ -29,11 +29,11 @@ public class ElasticsearchSearchSortFactoryContextImpl
 	}
 
 	@Override
-	public NonEmptySortContext fromJson(String jsonString) {
-		return staticNonEmptyContext( dslContext.getFactory().fromJson( jsonString ) );
+	public SortThenStep fromJson(String jsonString) {
+		return staticThenStep( dslContext.getFactory().fromJson( jsonString ) );
 	}
 
-	private NonEmptySortContext staticNonEmptyContext(ElasticsearchSearchSortBuilder builder) {
-		return new StaticNonEmptySortContext<>( dslContext, builder );
+	private SortThenStep staticThenStep(ElasticsearchSearchSortBuilder builder) {
+		return new StaticSortThenStep<>( dslContext, builder );
 	}
 }
