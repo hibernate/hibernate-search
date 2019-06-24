@@ -293,5 +293,5 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The expected projected type.
 	 * @return A DSL step.
 	 */
-	<T> SearchProjectionFactoryExtensionStep<T, R, E> extension();
+	<T> SearchProjectionFactoryExtensionIfSupportedStep<T, R, E> extension();
 }

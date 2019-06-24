@@ -8,10 +8,8 @@ package org.hibernate.search.engine.search.dsl.projection;
 
 import java.util.function.Function;
 
-import org.hibernate.search.util.common.SearchException;
-
 /**
- * The DSL step when attempting to apply multiple extensions
+ * The initial step when attempting to apply multiple extensions
  * to a {@link SearchProjectionFactory}.
  *
  * @param <R> The type of entity references in the parent {@link SearchProjectionFactory}.
@@ -20,7 +18,7 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @see SearchProjectionFactory#extension()
  */
-public interface SearchProjectionFactoryExtensionStep<P, R, E> {
+public interface SearchProjectionFactoryExtensionIfSupportedStep<P, R, E> {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
@@ -28,7 +26,8 @@ public interface SearchProjectionFactoryExtensionStep<P, R, E> {
 	 * was supported, extend the current factory with this extension,
 	 * apply the given function to the extended factory, and store the resulting projection for later retrieval.
 	 * <p>
-	 * This method cannot be called after {@link #orElse(Function)} or {@link #orElseFail()}.
+	 * This method cannot be called after {@link SearchProjectionFactoryExtensionIfSupportedMoreStep#orElse(Function)}
+	 * or {@link SearchProjectionFactoryExtensionIfSupportedMoreStep#orElseFail()}.
 	 *
 	 * @param extension The extension to apply.
 	 * @param projectionContributor A function called if the extension is successfully applied;
@@ -38,32 +37,9 @@ public interface SearchProjectionFactoryExtensionStep<P, R, E> {
 	 * @param <T> The type of the extended factory.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchProjectionFactoryExtensionStep<P, R, E> ifSupported(
+	<T> SearchProjectionFactoryExtensionIfSupportedMoreStep<P, R, E> ifSupported(
 			SearchProjectionFactoryExtension<T, R, E> extension,
 			Function<T, ? extends ProjectionFinalStep<P>> projectionContributor
 	);
-
-	/**
-	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryExtension, Function)}
-	 * was supported so far, apply the given function to the current (non-extended) {@link SearchProjectionFactory};
-	 * otherwise return the projection created in the first succeeding {@code ifSupported} call.
-	 *
-	 * @param projectionContributor A function called if no extension was successfully applied;
-	 * it will use the (non-extended) projection factory passed in parameter to create a projection,
-	 * returning the final step in the projection DSL.
-	 * Should generally be a lambda expression.
-	 * @return The created projection.
-	 */
-	ProjectionFinalStep<P> orElse(Function<SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
-
-	/**
-	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryExtension, Function)}
-	 * was supported so far, throw an exception;
-	 * otherwise return the projection created in the first succeeding {@code ifSupported} call.
-	 *
-	 * @return The created projection.
-	 * @throws SearchException If none of the previously passed extensions was supported.
-	 */
-	ProjectionFinalStep<P> orElseFail();
 
 }

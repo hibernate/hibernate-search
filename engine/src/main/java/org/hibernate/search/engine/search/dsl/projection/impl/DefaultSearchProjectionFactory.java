@@ -21,7 +21,7 @@ import org.hibernate.search.engine.search.dsl.projection.FieldProjectionOptionsS
 import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionStep;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionIfSupportedStep;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -122,7 +122,7 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 	}
 
 	@Override
-	public <T> SearchProjectionFactoryExtensionStep<T, R, E> extension() {
-		return new SearchProjectionFactoryExtensionStepImpl<>( this, factory );
+	public <T> SearchProjectionFactoryExtensionIfSupportedStep<T, R, E> extension() {
+		return new SearchProjectionFactoryExtensionStep<>( this, factory );
 	}
 }
