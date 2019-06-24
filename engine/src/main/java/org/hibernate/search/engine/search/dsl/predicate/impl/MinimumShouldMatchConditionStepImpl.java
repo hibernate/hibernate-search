@@ -9,17 +9,17 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchConditionStep;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchMoreStep;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchRequireStep;
-import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 
 final class MinimumShouldMatchConditionStepImpl<N> implements MinimumShouldMatchConditionStep<N>,
 		MinimumShouldMatchRequireStep<N>, MinimumShouldMatchMoreStep<N> {
 
-	private final BooleanJunctionPredicateBuilder<?> builder;
+	private final BooleanPredicateBuilder<?> builder;
 	private final N nextStep;
 	private int ignoreConstraintCeiling = 0;
 
-	MinimumShouldMatchConditionStepImpl(BooleanJunctionPredicateBuilder<?> builder, N nextStep) {
+	MinimumShouldMatchConditionStepImpl(BooleanPredicateBuilder<?> builder, N nextStep) {
 		this.builder = builder;
 		this.nextStep = nextStep;
 	}

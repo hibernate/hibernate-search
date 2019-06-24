@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractPredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -80,7 +80,7 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 			fieldSetState.contributePredicateBuilders( predicateBuilders::add );
 		}
 		if ( predicateBuilders.size() > 1 ) {
-			BooleanJunctionPredicateBuilder<B> boolBuilder = builderFactory.bool();
+			BooleanPredicateBuilder<B> boolBuilder = builderFactory.bool();
 			for ( B predicateBuilder : predicateBuilders ) {
 				boolBuilder.should( predicateBuilder );
 			}

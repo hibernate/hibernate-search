@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
@@ -85,8 +85,8 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	}
 
 	@Override
-	public BooleanJunctionPredicateBuilder<LuceneSearchPredicateBuilder> bool() {
-		return new LuceneBooleanJunctionPredicateBuilder();
+	public BooleanPredicateBuilder<LuceneSearchPredicateBuilder> bool() {
+		return new LuceneBooleanPredicateBuilder();
 	}
 
 	@Override

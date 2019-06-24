@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.dsl.predicate.BooleanPredicateClausesStep;
 
-public interface BooleanJunctionPredicateBuilder<B> extends SearchPredicateBuilder<B> {
+public interface BooleanPredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
 	void must(B clauseBuilder);
 

@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateOptions
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractPredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
@@ -74,7 +74,7 @@ class MatchAllPredicateOptionsStepImpl<B>
 
 	private class MatchAllExceptState {
 
-		private final BooleanJunctionPredicateBuilder<B> booleanBuilder;
+		private final BooleanPredicateBuilder<B> booleanBuilder;
 		private final List<B> clauseBuilders = new ArrayList<>();
 
 		MatchAllExceptState() {

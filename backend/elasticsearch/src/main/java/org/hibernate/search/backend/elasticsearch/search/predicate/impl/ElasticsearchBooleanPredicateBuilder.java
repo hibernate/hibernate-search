@@ -15,15 +15,15 @@ import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 
 
-class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
-		implements BooleanJunctionPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
+		implements BooleanPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

@@ -58,7 +58,7 @@ public interface SearchPredicateBuilderFactory<C, B> {
 
 	MatchIdPredicateBuilder<B> id();
 
-	BooleanJunctionPredicateBuilder<B> bool();
+	BooleanPredicateBuilder<B> bool();
 
 	MatchPredicateBuilder<B> match(String absoluteFieldPath);
 

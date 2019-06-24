@@ -14,7 +14,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -53,7 +53,7 @@ public class StubSearchPredicateBuilderFactory
 	}
 
 	@Override
-	public BooleanJunctionPredicateBuilder<StubPredicateBuilder> bool() {
+	public BooleanPredicateBuilder<StubPredicateBuilder> bool() {
 		return new StubPredicateBuilder();
 	}
 
