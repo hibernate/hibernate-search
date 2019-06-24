@@ -9,13 +9,19 @@ package org.hibernate.search.mapper.orm.search.dsl.query;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
-public interface HibernateOrmSearchQueryResultDefinitionContext<E>
-		extends SearchQueryResultDefinitionContext<
-				SearchQueryContext<?, E, ?>,
+/**
+ * The initial step in a query definition, where the type of query hits can be set,
+ * or where the predicate can be set directly, assuming that query hits are returned as entities.
+ *
+ * @see SearchQueryHitTypeStep
+ */
+public interface HibernateOrmSearchQueryHitTypeStep<E>
+		extends SearchQueryHitTypeStep<
+				SearchQueryOptionsStep<?, E, ?>,
 				EntityReference,
 				E,
 				SearchProjectionFactory<EntityReference, E>,
@@ -29,6 +35,6 @@ public interface HibernateOrmSearchQueryResultDefinitionContext<E>
 	 * @return {@code this} for method chaining.
 	 * @see Query#setFetchSize(int)
 	 */
-	HibernateOrmSearchQueryResultDefinitionContext<E> fetchSize(int fetchSize);
+	HibernateOrmSearchQueryHitTypeStep<E> fetchSize(int fetchSize);
 
 }

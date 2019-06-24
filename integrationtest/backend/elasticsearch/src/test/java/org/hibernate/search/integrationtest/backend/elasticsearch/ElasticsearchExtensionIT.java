@@ -17,9 +17,9 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
-import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
-import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
-import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultDefinitionContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryOptionsStep;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryPredicateStep;
+import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryHitTypeStep;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.engine.backend.Backend;
@@ -108,9 +108,9 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		ElasticsearchSearchQueryResultDefinitionContext<DocumentReference, DocumentReference> context1 =
+		ElasticsearchSearchQueryHitTypeStep<DocumentReference, DocumentReference> context1 =
 				scope.query().extension( ElasticsearchExtension.get() );
-		ElasticsearchSearchQueryResultContext<DocumentReference> context2 = context1.asProjection(
+		ElasticsearchSearchQueryPredicateStep<DocumentReference> context2 = context1.asProjection(
 				f -> f.composite(
 						// We don't care about the source, it's just to test that the factory context allows ES-specific projection
 						(docRef, source) -> docRef,
@@ -118,10 +118,10 @@ public class ElasticsearchExtensionIT {
 				)
 		);
 		// Note we can use Elasticsearch-specific predicates immediately
-		ElasticsearchSearchQueryContext<DocumentReference> context3 =
+		ElasticsearchSearchQueryOptionsStep<DocumentReference> context3 =
 				context2.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
 		// Note we can use Elasticsearch-specific sorts immediately
-		ElasticsearchSearchQueryContext<DocumentReference> context4 =
+		ElasticsearchSearchQueryOptionsStep<DocumentReference> context4 =
 				context3.sort( f -> f.fromJson( "{'sort1': 'asc'}" ) );
 
 		// Put the query and result into variables to check they have the right type
@@ -133,16 +133,16 @@ public class ElasticsearchExtensionIT {
 				.hasTotalHitCount( 6 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
-		ElasticsearchSearchQueryResultContext<DocumentReference> asReferenceContext =
+		ElasticsearchSearchQueryPredicateStep<DocumentReference> asReferenceContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asEntityReference();
-		ElasticsearchSearchQueryResultContext<DocumentReference> asEntityContext =
+		ElasticsearchSearchQueryPredicateStep<DocumentReference> asEntityContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asEntity();
 		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();
-		ElasticsearchSearchQueryResultContext<DocumentReference> asProjectionContext =
+		ElasticsearchSearchQueryPredicateStep<DocumentReference> asProjectionContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asProjection( projection );
-		ElasticsearchSearchQueryResultContext<List<?>> asProjectionsContext =
+		ElasticsearchSearchQueryPredicateStep<List<?>> asProjectionsContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asProjections( projection, projection );
-		ElasticsearchSearchQueryContext<DocumentReference> defaultResultContext =
+		ElasticsearchSearchQueryOptionsStep<DocumentReference> defaultResultContext =
 				scope.query().extension( ElasticsearchExtension.get() )
 						.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
 	}

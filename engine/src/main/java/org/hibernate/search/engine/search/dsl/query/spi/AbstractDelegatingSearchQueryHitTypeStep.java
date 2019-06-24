@@ -15,66 +15,66 @@ import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContextExtension;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryDslExtension;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 
-public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, E>
-		implements SearchQueryResultDefinitionContext<
-				SearchQueryContext<?, E, ?>,
-				R,
-				E,
-				SearchProjectionFactory<R, E>,
-				SearchPredicateFactory
-		> {
+public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E>
+		implements SearchQueryHitTypeStep<
+						SearchQueryOptionsStep<?, E, ?>,
+						R,
+						E,
+						SearchProjectionFactory<R, E>,
+						SearchPredicateFactory
+				> {
 
-	private final SearchQueryResultDefinitionContext<?, R, E, ?, ?> delegate;
+	private final SearchQueryHitTypeStep<?, R, E, ?, ?> delegate;
 
-	public AbstractDelegatingSearchQueryResultDefinitionContext(SearchQueryResultDefinitionContext<?, R, E, ?, ?> delegate) {
+	public AbstractDelegatingSearchQueryHitTypeStep(SearchQueryHitTypeStep<?, R, E, ?, ?> delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public SearchQueryResultContext<?, E, ?> asEntity() {
+	public SearchQueryPredicateStep<?, E, ?> asEntity() {
 		return delegate.asEntity();
 	}
 
 	@Override
-	public SearchQueryResultContext<?, R, ?> asEntityReference() {
+	public SearchQueryPredicateStep<?, R, ?> asEntityReference() {
 		return delegate.asEntityReference();
 	}
 
 	@Override
-	public <P> SearchQueryResultContext<?, P, ?> asProjection(
+	public <P> SearchQueryPredicateStep<?, P, ?> asProjection(
 			Function<? super SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		return delegate.asProjection( projectionContributor );
 	}
 
 	@Override
-	public <P> SearchQueryResultContext<?, P, ?> asProjection(SearchProjection<P> projection) {
+	public <P> SearchQueryPredicateStep<?, P, ?> asProjection(SearchProjection<P> projection) {
 		return delegate.asProjection( projection );
 	}
 
 	@Override
-	public SearchQueryResultContext<?, List<?>, ?> asProjections(
+	public SearchQueryPredicateStep<?, List<?>, ?> asProjections(
 			SearchProjection<?>... projections) {
 		return delegate.asProjections( projections );
 	}
 
 	@Override
-	public SearchQueryContext<?, E, ?> predicate(
+	public SearchQueryOptionsStep<?, E, ?> predicate(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return delegate.predicate( predicateContributor );
 	}
 
 	@Override
-	public SearchQueryContext<?, E, ?> predicate(SearchPredicate predicate) {
+	public SearchQueryOptionsStep<?, E, ?> predicate(SearchPredicate predicate) {
 		return delegate.predicate( predicate );
 	}
 
 	@Override
-	public <T> T extension(SearchQueryContextExtension<T, R, E> extension) {
+	public <T> T extension(SearchQueryDslExtension<T, R, E> extension) {
 		return delegate.extension( extension );
 	}
 }

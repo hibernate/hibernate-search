@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -27,11 +27,11 @@ public class GenericStubMappingScope<R, E> {
 		this.delegate = delegate;
 	}
 
-	public SearchQueryResultDefinitionContext<?, R, E, ?, ?> query(LoadingContext<R, E> loadingContext) {
+	public SearchQueryHitTypeStep<?, R, E, ?, ?> query(LoadingContext<R, E> loadingContext) {
 		return query( new StubSessionContext(), loadingContext );
 	}
 
-	public SearchQueryResultDefinitionContext<?, R, E, ?, ?> query(StubSessionContext sessionContext,
+	public SearchQueryHitTypeStep<?, R, E, ?, ?> query(StubSessionContext sessionContext,
 			LoadingContext<R, E> loadingContext) {
 		LoadingContextBuilder<R, E> loadingContextBuilder = () -> loadingContext;
 		return delegate.search( sessionContext, loadingContextBuilder );

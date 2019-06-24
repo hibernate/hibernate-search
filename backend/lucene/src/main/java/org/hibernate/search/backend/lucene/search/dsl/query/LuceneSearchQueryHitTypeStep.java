@@ -13,32 +13,32 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 
-public interface LuceneSearchQueryResultDefinitionContext<R, E>
-		extends SearchQueryResultDefinitionContext<
-				LuceneSearchQueryContext<E>,
+public interface LuceneSearchQueryHitTypeStep<R, E>
+		extends SearchQueryHitTypeStep<
+		LuceneSearchQueryOptionsStep<E>,
 				R,
 				E,
 				LuceneSearchProjectionFactory<R, E>,
 				LuceneSearchPredicateFactory
 		>,
-		LuceneSearchQueryResultContext<E> {
+		LuceneSearchQueryPredicateStep<E> {
 
 	@Override
-	LuceneSearchQueryResultContext<E> asEntity();
+	LuceneSearchQueryPredicateStep<E> asEntity();
 
 	@Override
-	LuceneSearchQueryResultContext<R> asEntityReference();
+	LuceneSearchQueryPredicateStep<R> asEntityReference();
 
 	@Override
-	<P> LuceneSearchQueryResultContext<P> asProjection(
+	<P> LuceneSearchQueryPredicateStep<P> asProjection(
 			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	@Override
-	<P> LuceneSearchQueryResultContext<P> asProjection(SearchProjection<P> projection);
+	<P> LuceneSearchQueryPredicateStep<P> asProjection(SearchProjection<P> projection);
 
 	@Override
-	LuceneSearchQueryResultContext<List<?>> asProjections(SearchProjection<?>... projections);
+	LuceneSearchQueryPredicateStep<List<?>> asProjections(SearchProjection<?>... projections);
 
 }

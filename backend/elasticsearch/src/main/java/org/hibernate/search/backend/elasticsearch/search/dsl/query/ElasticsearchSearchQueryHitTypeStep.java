@@ -13,32 +13,32 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 
-public interface ElasticsearchSearchQueryResultDefinitionContext<R, E>
-		extends SearchQueryResultDefinitionContext<
-				ElasticsearchSearchQueryContext<E>,
+public interface ElasticsearchSearchQueryHitTypeStep<R, E>
+		extends SearchQueryHitTypeStep<
+				ElasticsearchSearchQueryOptionsStep<E>,
 				R,
 				E,
 				ElasticsearchSearchProjectionFactory<R, E>,
 				ElasticsearchSearchPredicateFactory
 		>,
-		ElasticsearchSearchQueryResultContext<E> {
+		ElasticsearchSearchQueryPredicateStep<E> {
 
 	@Override
-	ElasticsearchSearchQueryResultContext<E> asEntity();
+	ElasticsearchSearchQueryPredicateStep<E> asEntity();
 
 	@Override
-	ElasticsearchSearchQueryResultContext<R> asEntityReference();
+	ElasticsearchSearchQueryPredicateStep<R> asEntityReference();
 
 	@Override
-	<P> ElasticsearchSearchQueryResultContext<P> asProjection(
+	<P> ElasticsearchSearchQueryPredicateStep<P> asProjection(
 			Function<? super ElasticsearchSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	@Override
-	<P> ElasticsearchSearchQueryResultContext<P> asProjection(SearchProjection<P> projection);
+	<P> ElasticsearchSearchQueryPredicateStep<P> asProjection(SearchProjection<P> projection);
 
 	@Override
-	ElasticsearchSearchQueryResultContext<List<?>> asProjections(SearchProjection<?>... projections);
+	ElasticsearchSearchQueryPredicateStep<List<?>> asProjections(SearchProjection<?>... projections);
 
 }

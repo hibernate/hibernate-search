@@ -10,9 +10,9 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 
@@ -28,11 +28,10 @@ public interface SearchScope {
 	 * <p>
 	 * The query will target the indexes mapped to types in this scope, or to any of their sub-types.
 	 *
-	 * @return A context allowing to define the search query,
-	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
-	 * @see SearchQueryResultDefinitionContext
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see SearchQueryHitTypeStep
 	 */
-	SearchQueryResultDefinitionContext<?, EntityReference, ?, ?, ?> search();
+	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search();
 
 	/**
 	 * Initiate the building of a search predicate.
@@ -41,7 +40,7 @@ public interface SearchScope {
 	 * or a wider scope.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
-	 * since you can {@link SearchQueryResultContext#predicate(Function) define predicates with lambdas}
+	 * since you can {@link SearchQueryPredicateStep#predicate(Function) define predicates with lambdas}
 	 * within the search query DSL,
 	 * removing the need to create separate objects to represent the predicates.
 	 *
@@ -57,7 +56,7 @@ public interface SearchScope {
 	 * or a wider scope.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
-	 * since you can {@link SearchQueryContext#sort(Function) define sorts with lambdas}
+	 * since you can {@link SearchQueryOptionsStep#sort(Function) define sorts with lambdas}
 	 * within the search query DSL,
 	 * removing the need to create separate objects to represent the sorts.
 	 *
@@ -73,7 +72,7 @@ public interface SearchScope {
 	 * or a wider scope.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
-	 * since you can {@link SearchQueryResultDefinitionContext#asProjection(Function)} define projections with lambdas}
+	 * since you can {@link SearchQueryHitTypeStep#asProjection(Function)} define projections with lambdas}
 	 * within the search query DSL,
 	 * removing the need to create separate objects to represent the projections.
 	 *

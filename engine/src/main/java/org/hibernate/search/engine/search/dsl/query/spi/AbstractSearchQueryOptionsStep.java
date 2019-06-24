@@ -16,8 +16,8 @@ import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortFactory;
@@ -29,19 +29,19 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
-public abstract class AbstractSearchQueryContext<
-				S extends SearchQueryContext<S, H, SF>,
+public abstract class AbstractSearchQueryOptionsStep<
+				S extends SearchQueryOptionsStep<S, H, SF>,
 				H,
 				PDF extends SearchPredicateFactory,
 				SF extends SearchSortFactory,
 				C
 		>
-		implements SearchQueryResultContext<S, H, PDF>, SearchQueryContext<S, H, SF> {
+		implements SearchQueryPredicateStep<S, H, PDF>, SearchQueryOptionsStep<S, H, SF> {
 
 	private final IndexScope<C> indexScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;
 
-	public AbstractSearchQueryContext(IndexScope<C> indexScope,
+	public AbstractSearchQueryOptionsStep(IndexScope<C> indexScope,
 			SearchQueryBuilder<H, C> searchQueryBuilder) {
 		this.indexScope = indexScope;
 		this.searchQueryBuilder = searchQueryBuilder;

@@ -9,8 +9,7 @@ package org.hibernate.search.mapper.javabean.session;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
@@ -30,11 +29,10 @@ public interface SearchSession extends AutoCloseable {
 	 * The query will target the indexes mapped to the given type, or to any of its sub-types.
 	 *
 	 * @param type An indexed type, or a supertype of all indexed types that will be targeted by the search query.
-	 * @return A context allowing to define the search query,
-	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
-	 * @see SearchQueryResultDefinitionContext
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see SearchQueryHitTypeStep
 	 */
-	default SearchQueryResultDefinitionContext<?, EntityReference, ?, ?, ?> search(Class<?> type) {
+	default SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(Class<?> type) {
 		return scope( type ).search();
 	}
 
@@ -44,11 +42,10 @@ public interface SearchSession extends AutoCloseable {
 	 * The query will target the indexes mapped to the given types, or to any of their sub-types.
 	 *
 	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the search query.
-	 * @return A context allowing to define the search query,
-	 * and ultimately {@link SearchQueryContext#toQuery() get the resulting query}.
-	 * @see SearchQueryResultDefinitionContext
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see SearchQueryHitTypeStep
 	 */
-	default SearchQueryResultDefinitionContext<?, EntityReference, ?, ?, ?> search(Collection<? extends Class<?>> types) {
+	default SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(Collection<? extends Class<?>> types) {
 		return scope( types ).search();
 	}
 

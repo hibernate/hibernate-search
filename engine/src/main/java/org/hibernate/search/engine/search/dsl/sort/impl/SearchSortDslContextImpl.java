@@ -12,14 +12,14 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 /**
  * A DSL context used when building a {@link SearchSort} object,
  * either when calling {@link MappedIndexScope#sort()} from a search scope
- * or when calling {@link SearchQueryContext#sort(Function)} to build the sort using a lambda
+ * or when calling {@link SearchQueryOptionsStep#sort(Function)} to build the sort using a lambda
  * (in which case the lambda may retrieve the resulting {@link SearchSort} object and cache it).
  */
 public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?, B>, B>
