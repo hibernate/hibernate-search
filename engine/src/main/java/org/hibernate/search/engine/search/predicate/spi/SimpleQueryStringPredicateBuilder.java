@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.predicate.spi;
 
 public interface SimpleQueryStringPredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
-	FieldContext field(String absoluteFieldPath);
+	FieldState field(String absoluteFieldPath);
 
 	void withAndAsDefaultOperator();
 
@@ -18,7 +18,7 @@ public interface SimpleQueryStringPredicateBuilder<B> extends SearchPredicateBui
 
 	void skipAnalysis();
 
-	interface FieldContext {
+	interface FieldState {
 
 		void boost(float boost);
 

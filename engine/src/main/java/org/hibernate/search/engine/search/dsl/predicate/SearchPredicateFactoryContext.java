@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -22,29 +21,26 @@ public interface SearchPredicateFactoryContext {
 	/**
 	 * Match all documents.
 	 *
-	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
-	 * @see MatchAllPredicateContext
+	 * @return The initial step of a DSL where the "match all" predicate can be defined.
+	 * @see MatchAllPredicateOptionsStep
 	 */
-	MatchAllPredicateContext matchAll();
+	MatchAllPredicateOptionsStep matchAll();
 
 	/**
 	 * Match documents where the identifier is among the given values.
 	 *
-	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
-	 * @see MatchIdPredicateContext
+	 * @return The initial step of a DSL allowing the definition of an "id" predicate.
+	 * @see MatchIdPredicateMatchingStep
 	 */
-	MatchIdPredicateContext id();
+	MatchIdPredicateMatchingStep id();
 
 	/**
 	 * Match documents if they match a combination of boolean clauses.
 	 *
-	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
-	 * @see BooleanJunctionPredicateContext
+	 * @return The initial step of a DSL where the "boolean" predicate can be defined.
+	 * @see BooleanPredicateClausesStep
 	 */
-	BooleanJunctionPredicateContext bool();
+	BooleanPredicateClausesStep bool();
 
 	/**
 	 * Match documents if they match a combination of boolean clauses,
@@ -52,12 +48,12 @@ public interface SearchPredicateFactoryContext {
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A consumer that will add clauses to the context passed in parameter.
+	 * @param clauseContributor A consumer that will add clauses to the step passed in parameter.
 	 * Should generally be a lambda expression.
-	 * @return The resulting {@link SearchPredicate}
-	 * @see BooleanJunctionPredicateContext
+	 * @return The final step of the boolean predicate definition.
+	 * @see BooleanPredicateClausesStep
 	 */
-	SearchPredicateTerminalContext bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor);
+	PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep> clauseContributor);
 
 	/**
 	 * Match documents where targeted fields have a value that "matches" a given single value.
@@ -66,29 +62,26 @@ public interface SearchPredicateFactoryContext {
 	 * numeric fields in particular imply exact matches,
 	 * while analyzed, full-text fields imply approximate matches depending on how they are analyzed.
 	 *
-	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
-	 * @see MatchPredicateContext
+	 * @return The initial step of a DSL where the "match" predicate can be defined.
+	 * @see MatchPredicateFieldStep
 	 */
-	MatchPredicateContext match();
+	MatchPredicateFieldStep match();
 
 	/**
 	 * Match documents where targeted fields have a value within lower and upper bounds.
 	 *
-	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
-	 * @see RangePredicateContext
+	 * @return The initial step of a DSL where the "range" predicate can be defined.
+	 * @see RangePredicateFieldStep
 	 */
-	RangePredicateContext range();
+	RangePredicateFieldStep range();
 
 	/**
 	 * Match documents where targeted fields have a value that contains a given phrase.
 	 *
-	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
-	 * @see PhrasePredicateContext
+	 * @return The initial step of a DSL where the "phrase" predicate can be defined.
+	 * @see PhrasePredicateFieldStep
 	 */
-	PhrasePredicateContext phrase();
+	PhrasePredicateFieldStep phrase();
 
 	/**
 	 * Match documents where targeted fields contain a term that matches a given pattern,
@@ -98,22 +91,20 @@ public interface SearchPredicateFactoryContext {
 	 * thus any character that is not a wildcard must match exactly the content of the index
 	 * (including uppercase letters, diacritics, ...).
 	 *
-	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
-	 * @see WildcardPredicateContext
+	 * @return The initial step of a DSL where the "wildcard" predicate can be defined.
+	 * @see WildcardPredicateFieldStep
 	 */
-	WildcardPredicateContext wildcard();
+	WildcardPredicateFieldStep wildcard();
 
 	/**
 	 * Match documents where a
 	 * {@link org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage#NESTED nested object}
 	 * matches a given predicate.
 	 *
-	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
-	 * @see NestedPredicateContext
+	 * @return The initial step of a DSL where the "nested" predicate can be defined.
+	 * @see NestedPredicateFieldStep
 	 */
-	NestedPredicateContext nested();
+	NestedPredicateFieldStep nested();
 
 	/**
 	 * Match documents according to a given query string,
@@ -122,32 +113,30 @@ public interface SearchPredicateFactoryContext {
 	 * Note that by default, unless the query string contains explicit operators,
 	 * documents will match if <em>any</em> term mentioned in the query string is present in the document (OR operator).
 	 * This makes sense when sorting results by relevance, but is not ideal otherwise.
-	 * See {@link SimpleQueryStringPredicateTerminalContext#withAndAsDefaultOperator()} to change this behavior.
+	 * See {@link SimpleQueryStringPredicateOptionsStep#withAndAsDefaultOperator()} to change this behavior.
 	 *
-	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
-	 * @see SimpleQueryStringPredicateContext
+	 * @return The initial step of a DSL where the "simple query string" predicate can be defined.
+	 * @see SimpleQueryStringPredicateFieldStep
 	 */
-	SimpleQueryStringPredicateContext simpleQueryString();
+	SimpleQueryStringPredicateFieldStep simpleQueryString();
 
 	/**
 	 * Match documents where a given field exists.
 	 * <p>
 	 * Fields are considered to exist in a document when they have at least one non-null value in this document.
 	 *
-	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
-	 * @see ExistsPredicateContext
+	 * @return The initial step of a DSL where the "exists" predicate can be defined.
+	 * @see ExistsPredicateFieldStep
 	 */
-	ExistsPredicateContext exists();
+	ExistsPredicateFieldStep exists();
 
 	/**
 	 * Access the different types of spatial predicates.
 	 *
-	 * @return A context allowing to define the type of spatial predicate.
-	 * @see SpatialPredicateContext
+	 * @return The initial step of a DSL where spatial predicates can be defined.
+	 * @see SpatialPredicateInitialStep
 	 */
-	SpatialPredicateContext spatial();
+	SpatialPredicateInitialStep spatial();
 
 	/**
 	 * Extend the current context with the given extension,
@@ -161,14 +150,14 @@ public interface SearchPredicateFactoryContext {
 	<T> T extension(SearchPredicateFactoryContextExtension<T> extension);
 
 	/**
-	 * Create a context allowing to try to apply multiple extensions one after the other,
+	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
 	 * failing only if <em>none</em> of the extensions is supported.
 	 * <p>
 	 * If you only need to apply a single extension and fail if it is not supported,
 	 * use the simpler {@link #extension(SearchPredicateFactoryContextExtension)} method instead.
 	 *
-	 * @return A context allowing to define the extensions to attempt, and the corresponding predicates.
+	 * @return A DSL step.
 	 */
-	SearchPredicateFactoryExtensionContext extension();
+	SearchPredicateFactoryContextExtensionStep extension();
 
 }

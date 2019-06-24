@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.scope.model.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSucceedingCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldContext;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerConstants;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
@@ -40,7 +40,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 
 	private final ElasticsearchScopeModel scopeModel;
 
-	private final Map<String, ElasticsearchSimpleQueryStringPredicateBuilderFieldContext> fields = new LinkedHashMap<>();
+	private final Map<String, ElasticsearchSimpleQueryStringPredicateBuilderFieldState> fields = new LinkedHashMap<>();
 	private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 	private String simpleQueryString;
 	private String analyzer;
@@ -56,8 +56,8 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	}
 
 	@Override
-	public FieldContext field(String absoluteFieldPath) {
-		ElasticsearchSimpleQueryStringPredicateBuilderFieldContext field = fields.get( absoluteFieldPath );
+	public FieldState field(String absoluteFieldPath) {
+		ElasticsearchSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
 			ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
 					absoluteFieldPath, ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
@@ -94,7 +94,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 		DEFAULT_OPERATOR_ACCESSOR.set( innerObject, defaultOperator );
 
 		JsonArray fieldArray = new JsonArray();
-		for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldContext fieldContext : fields.values() ) {
+		for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldState fieldContext : fields.values() ) {
 			fieldArray.add( fieldContext.build() );
 		}
 		FIELDS_ACCESSOR.set( innerObject, fieldArray );

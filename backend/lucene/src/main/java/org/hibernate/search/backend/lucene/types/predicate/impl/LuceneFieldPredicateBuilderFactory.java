@@ -55,7 +55,7 @@ public interface LuceneFieldPredicateBuilderFactory {
 	WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
 			String absoluteFieldPath);
 
-	LuceneSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(String absoluteFieldPath);
+	LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(String absoluteFieldPath);
 
 	ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(String absoluteFieldPath);
 

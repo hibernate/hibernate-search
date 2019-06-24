@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.orm.scope;
 
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
@@ -53,7 +53,7 @@ public interface SearchScope<E> {
 	 * removing the need to create separate objects to represent the predicates.
 	 *
 	 * @return A context allowing to define the predicate,
-	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
+	 * and ultimately {@link PredicateFinalStep#toPredicate() get the resulting predicate}.
 	 * @see SearchPredicateFactoryContext
 	 */
 	SearchPredicateFactoryContext predicate();

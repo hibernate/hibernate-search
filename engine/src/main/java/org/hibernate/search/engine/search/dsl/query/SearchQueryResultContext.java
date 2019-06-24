@@ -9,8 +9,8 @@ package org.hibernate.search.engine.search.dsl.query;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 
 /**
  * The context used when building a query, after the search result type has been defined.
@@ -35,10 +35,10 @@ public interface SearchQueryResultContext<
 	/**
 	 * Set the predicate for this query.
 	 * @param predicateContributor A function that will use the DSL context passed in parameter to create a predicate,
-	 * returning the resulting terminal context.
+	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to define the query further.
 	 */
-	N predicate(Function<? super PDC, ? extends SearchPredicateTerminalContext> predicateContributor);
+	N predicate(Function<? super PDC, ? extends PredicateFinalStep> predicateContributor);
 
 }

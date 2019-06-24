@@ -56,7 +56,7 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 	WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
 			String absoluteFieldPath);
 
-	ElasticsearchSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(String absoluteFieldPath);
+	ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(String absoluteFieldPath);
 
 	SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath);

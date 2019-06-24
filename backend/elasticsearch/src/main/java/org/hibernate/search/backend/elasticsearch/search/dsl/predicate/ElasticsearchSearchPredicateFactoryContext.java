@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.predicate;
 
+import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 
 /**
  * A DSL context allowing to specify the type of a predicate, with some Elasticsearch-specific methods.
@@ -20,8 +20,8 @@ public interface ElasticsearchSearchPredicateFactoryContext extends SearchPredic
 	 * @param jsonString A string representing an Elasticsearch query as a JSON object.
 	 * The JSON object must be a syntactically correct Elasticsearch query.
 	 * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html">the Elasticsearch documentation</a>.
-	 * @return A context allowing to get the resulting predicate.
+	 * @return The final step of the predicate DSL.
 	 */
-	SearchPredicateTerminalContext fromJson(String jsonString);
+	PredicateFinalStep fromJson(String jsonString);
 
 }

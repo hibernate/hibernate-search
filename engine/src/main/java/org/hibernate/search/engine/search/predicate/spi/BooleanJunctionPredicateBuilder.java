@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import org.hibernate.search.engine.search.dsl.predicate.BooleanPredicateClausesStep;
+
 public interface BooleanJunctionPredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
 	void must(B clauseBuilder);
@@ -17,7 +19,7 @@ public interface BooleanJunctionPredicateBuilder<B> extends SearchPredicateBuild
 	void filter(B clauseBuilder);
 
 	/**
-	 * See {@link org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext#minimumShouldMatch()}.
+	 * See {@link BooleanPredicateClausesStep#minimumShouldMatch()}.
 	 *
 	 * @param ignoreConstraintCeiling The maximum number of "should" clauses above which this constraint
 	 * will cease to be ignored.
@@ -26,7 +28,7 @@ public interface BooleanJunctionPredicateBuilder<B> extends SearchPredicateBuild
 	void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber);
 
 	/**
-	 * See {@link org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext#minimumShouldMatch()}.
+	 * See {@link BooleanPredicateClausesStep#minimumShouldMatch()}.
 	 *
 	 * @param ignoreConstraintCeiling The maximum number of "should" clauses above which this constraint
 	 * will cease to be ignored.

@@ -7,8 +7,9 @@
 package org.hibernate.search.backend.lucene.search.dsl.predicate;
 
 import org.apache.lucene.search.Query;
+
+import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 
 /**
  * A DSL context allowing to specify the type of a predicate, with some Lucene-specific methods.
@@ -19,7 +20,7 @@ public interface LuceneSearchPredicateFactoryContext extends SearchPredicateFact
 	 * Create a predicate from a Lucene {@link Query}.
 	 *
 	 * @param query A Lucene query.
-	 * @return A context allowing to get the resulting predicate.
+	 * @return The final step of the predicate DSL.
 	 */
-	SearchPredicateTerminalContext fromLuceneQuery(Query query);
+	PredicateFinalStep fromLuceneQuery(Query query);
 }

@@ -77,7 +77,7 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public LuceneSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
+	public LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(
 			String absoluteFieldPath) {
 		throw log.textPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
