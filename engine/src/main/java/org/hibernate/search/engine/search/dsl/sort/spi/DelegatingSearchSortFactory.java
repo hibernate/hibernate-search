@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionStep;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionIfSupportedStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -72,7 +72,7 @@ public class DelegatingSearchSortFactory implements SearchSortFactory {
 	}
 
 	@Override
-	public SearchSortFactoryExtensionStep extension() {
+	public SearchSortFactoryExtensionIfSupportedStep extension() {
 		return delegate.extension();
 	}
 
