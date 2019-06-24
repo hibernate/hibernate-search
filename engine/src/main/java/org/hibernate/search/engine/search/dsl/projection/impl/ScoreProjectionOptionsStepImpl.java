@@ -7,16 +7,16 @@
 package org.hibernate.search.engine.search.dsl.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
+import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
-public class ScoreProjectionContextImpl implements ScoreProjectionContext {
+public class ScoreProjectionOptionsStepImpl implements ScoreProjectionOptionsStep {
 
 	private final ScoreProjectionBuilder scoreProjectionBuilder;
 
-	ScoreProjectionContextImpl(SearchProjectionBuilderFactory factory) {
+	ScoreProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory) {
 		this.scoreProjectionBuilder = factory.score();
 	}
 

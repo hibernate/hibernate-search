@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -62,14 +62,14 @@ public interface SearchQueryResultDefinitionContext<
 	 * Define the query results as one projection for each matching document.
 	 *
 	 * @param projectionContributor A function that will use the DSL context passed in parameter to create a projection,
-	 * returning the resulting terminal context.
+	 * returning the final step in the projection DSL.
 	 * Should generally be a lambda expression.
 	 * @param <P> The resulting type of the projection.
 	 * @return A context allowing to define the query further.
 	 * @see SearchQueryResultContext
 	 */
 	<P> SearchQueryResultContext<?, P, ?> asProjection(
-			Function<? super PJC, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
+			Function<? super PJC, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	/**
 	 * Define the query results as one projection for each matching document.

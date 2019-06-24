@@ -11,36 +11,36 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.CompositeProjectionContext;
+import org.hibernate.search.engine.search.dsl.projection.CompositeProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.util.common.function.TriFunction;
 
 
-public class CompositeProjectionContextImpl<T> implements CompositeProjectionContext<T> {
+public class CompositeProjectionOptionsStepImpl<T> implements CompositeProjectionOptionsStep<T> {
 
 	private final CompositeProjectionBuilder<T> compositeProjectionBuilder;
 
-	public CompositeProjectionContextImpl(SearchProjectionBuilderFactory factory,
+	public CompositeProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory,
 			Function<List<?>, T> transformer,
 			SearchProjection<?>[] projections) {
 		this.compositeProjectionBuilder = factory.composite( transformer, projections );
 	}
 
-	public <P> CompositeProjectionContextImpl(SearchProjectionBuilderFactory factory,
+	public <P> CompositeProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory,
 			Function<P, T> transformer,
 			SearchProjection<P> projection) {
 		this.compositeProjectionBuilder = factory.composite( transformer, projection );
 	}
 
-	public <P1, P2> CompositeProjectionContextImpl(SearchProjectionBuilderFactory factory,
+	public <P1, P2> CompositeProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory,
 			BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1,
 			SearchProjection<P2> projection2) {
 		this.compositeProjectionBuilder = factory.composite( transformer, projection1, projection2 );
 	}
 
-	public <P1, P2, P3> CompositeProjectionContextImpl(SearchProjectionBuilderFactory factory,
+	public <P1, P2, P3> CompositeProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory,
 			TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1,
 			SearchProjection<P2> projection2,

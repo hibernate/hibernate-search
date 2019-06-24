@@ -6,11 +6,9 @@
  */
 package org.hibernate.search.engine.search.dsl.projection;
 
-import org.hibernate.search.engine.search.DocumentReference;
-
 /**
- * The context used when starting to define a document reference projection.
+ * The initial and final step in a "field" projection definition, where optional parameters can be set.
  */
-public interface DocumentReferenceProjectionContext extends SearchProjectionTerminalContext<DocumentReference> {
+public interface FieldProjectionOptionsStep<T> extends ProjectionFinalStep<T> {
 
 }

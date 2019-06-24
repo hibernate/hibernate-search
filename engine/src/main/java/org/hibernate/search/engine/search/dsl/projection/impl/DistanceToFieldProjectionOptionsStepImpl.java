@@ -7,8 +7,8 @@
 package org.hibernate.search.engine.search.dsl.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.DistanceToFieldProjectionContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.DistanceToFieldProjectionOptionsStep;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -16,16 +16,16 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.Contracts;
 
 
-public class DistanceToFieldProjectionContextImpl implements DistanceToFieldProjectionContext {
+public class DistanceToFieldProjectionOptionsStepImpl implements DistanceToFieldProjectionOptionsStep {
 
 	private final DistanceToFieldProjectionBuilder distanceFieldProjectionBuilder;
 
-	DistanceToFieldProjectionContextImpl(SearchProjectionBuilderFactory factory, String absoluteFieldPath, GeoPoint center) {
+	DistanceToFieldProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory, String absoluteFieldPath, GeoPoint center) {
 		this.distanceFieldProjectionBuilder = factory.distance( absoluteFieldPath, center );
 	}
 
 	@Override
-	public SearchProjectionTerminalContext<Double> unit(DistanceUnit unit) {
+	public ProjectionFinalStep<Double> unit(DistanceUnit unit) {
 		Contracts.assertNotNull( unit, "unit" );
 
 		distanceFieldProjectionBuilder.unit( unit );

@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.dsl.projection;
 
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
@@ -28,9 +28,9 @@ public interface LuceneSearchProjectionFactoryContext<R, E> extends SearchProjec
 	 * {@link org.hibernate.search.engine.backend.types.Projectable#YES projectable}
 	 * may be missing.
 	 *
-	 * @return A context allowing to define the projection more precisely.
+	 * @return The final step of the projection DSL.
 	 */
-	SearchProjectionTerminalContext<Document> document();
+	ProjectionFinalStep<Document> document();
 
 	/**
 	 * Project to a Lucene {@link Explanation} describing the score computation for the hit.
@@ -38,8 +38,8 @@ public interface LuceneSearchProjectionFactoryContext<R, E> extends SearchProjec
 	 * This feature is relatively expensive, do not use unless you return a limited
 	 * amount of objects (using pagination).
 	 *
-	 * @return A context allowing to define the projection more precisely.
+	 * @return The final step of the projection DSL.
 	 */
-	SearchProjectionTerminalContext<Explanation> explanation();
+	ProjectionFinalStep<Explanation> explanation();
 
 }

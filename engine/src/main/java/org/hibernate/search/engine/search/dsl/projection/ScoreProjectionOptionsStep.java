@@ -7,8 +7,8 @@
 package org.hibernate.search.engine.search.dsl.projection;
 
 /**
- * The context used when starting to define an entity reference projection.
+ * The initial and final step in a "score" projection definition, where optional parameters can be set.
  */
-public interface EntityReferenceProjectionContext<R> extends SearchProjectionTerminalContext<R> {
+public interface ScoreProjectionOptionsStep extends ProjectionFinalStep<Float> {
 
 }

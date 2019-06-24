@@ -10,7 +10,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -78,8 +77,7 @@ public interface SearchScope {
 	 * within the search query DSL,
 	 * removing the need to create separate objects to represent the projections.
 	 *
-	 * @return A context allowing to define the projection,
-	 * and ultimately {@link SearchProjectionTerminalContext#toProjection() get the resulting projection}.
+	 * @return A projection factory.
 	 * @see SearchProjectionFactoryContext
 	 */
 	SearchProjectionFactoryContext<EntityReference, ?> projection();

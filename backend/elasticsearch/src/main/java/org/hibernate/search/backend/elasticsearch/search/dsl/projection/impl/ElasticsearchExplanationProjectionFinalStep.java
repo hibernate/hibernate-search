@@ -8,14 +8,14 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
-public class ElasticsearchSourceProjectionContext implements SearchProjectionTerminalContext<String> {
+public class ElasticsearchExplanationProjectionFinalStep implements ProjectionFinalStep<String> {
 	private final SearchProjectionBuilder<String> builder;
 
-	ElasticsearchSourceProjectionContext(ElasticsearchSearchProjectionBuilderFactory factory) {
-		this.builder = factory.source();
+	ElasticsearchExplanationProjectionFinalStep(ElasticsearchSearchProjectionBuilderFactory factory) {
+		this.builder = factory.explanation();
 	}
 
 	@Override

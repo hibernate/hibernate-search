@@ -9,15 +9,15 @@ package org.hibernate.search.engine.search.dsl.projection;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 
 /**
- * The context used when starting to define a distance field projection.
+ * The initial and final step in a "distance to field" projection definition, where optional parameters can be set.
  */
-public interface DistanceToFieldProjectionContext extends SearchProjectionTerminalContext<Double> {
+public interface DistanceToFieldProjectionOptionsStep extends ProjectionFinalStep<Double> {
 
 	/**
 	 * Defines the unit of the computed distance (default is meters).
 	 *
 	 * @param unit The unit.
-	 * @return The next context.
+	 * @return {@code this}, for method chaining.
 	 */
-	SearchProjectionTerminalContext<Double> unit(DistanceUnit unit);
+	ProjectionFinalStep<Double> unit(DistanceUnit unit);
 }
