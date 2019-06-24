@@ -16,7 +16,6 @@ import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -72,8 +71,8 @@ public class DefaultSearchSortFactory<B> implements SearchSortFactory {
 	}
 
 	@Override
-	public SearchSortFactoryExtensionStep extension() {
-		return new SearchSortFactoryExtensionStepImpl<>( this, dslContext );
+	public org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionIfSupportedStep extension() {
+		return new SearchSortFactoryExtensionStep<>( this, dslContext );
 	}
 
 	private SortThenStep staticThenStep(B builder) {

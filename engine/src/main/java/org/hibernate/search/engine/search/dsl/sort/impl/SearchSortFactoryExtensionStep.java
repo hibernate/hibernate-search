@@ -9,30 +9,31 @@ package org.hibernate.search.engine.search.dsl.sort.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionIfSupportedMoreStep;
 import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionStep;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
-final class SearchSortFactoryExtensionStepImpl<B> implements SearchSortFactoryExtensionStep {
+final class SearchSortFactoryExtensionStep<B>
+		implements SearchSortFactoryExtensionIfSupportedMoreStep {
 
 	private final SearchSortFactory parent;
 	private final SearchSortDslContext<?, B> dslContext;
 
 	private final DslExtensionState<SortFinalStep> state = new DslExtensionState<>();
 
-	SearchSortFactoryExtensionStepImpl(SearchSortFactory parent,
+	SearchSortFactoryExtensionStep(SearchSortFactory parent,
 			SearchSortDslContext<?, B> dslContext) {
 		this.parent = parent;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <T> SearchSortFactoryExtensionStep ifSupported(
+	public <T> SearchSortFactoryExtensionIfSupportedMoreStep ifSupported(
 			SearchSortFactoryExtension<T> extension,
 			Function<T, ? extends SortFinalStep> sortContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent, dslContext ), sortContributor );

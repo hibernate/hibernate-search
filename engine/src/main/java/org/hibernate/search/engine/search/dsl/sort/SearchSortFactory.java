@@ -127,6 +127,6 @@ public interface SearchSortFactory {
 	 *
 	 * @return A DSL step.
 	 */
-	SearchSortFactoryExtensionStep extension();
+	SearchSortFactoryExtensionIfSupportedStep extension();
 
 }
