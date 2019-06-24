@@ -17,7 +17,7 @@ import java.util.TimeZone;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
@@ -31,7 +31,7 @@ public final class DefaultJavaUtilCalendarValueBridge implements ValueBridge<Cal
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, ZonedDateTime> bind(ValueBridgeBindingContext<Calendar> context) {
+	public StandardIndexFieldTypeOptionsStep<?, ZonedDateTime> bind(ValueBridgeBindingContext<Calendar> context) {
 		return context.getTypeFactory().asZonedDateTime()
 				.projectionConverter( PojoDefaultCalendarFromDocumentFieldValueConverter.INSTANCE );
 	}

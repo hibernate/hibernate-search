@@ -22,11 +22,11 @@ import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeOptionsStep;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
-import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -57,69 +57,69 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <F> StandardIndexFieldTypeContext<?, F> as(Class<F> valueType) {
+	public <F> StandardIndexFieldTypeOptionsStep<?, F> as(Class<F> valueType) {
 		if ( String.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asString();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asString();
 		}
 		else if ( Integer.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asInteger();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asInteger();
 		}
 		else if ( Long.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asLong();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asLong();
 		}
 		else if ( Boolean.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asBoolean();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asBoolean();
 		}
 		else if ( Byte.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asByte();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asByte();
 		}
 		else if ( Short.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asShort();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asShort();
 		}
 		else if ( Float.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asFloat();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asFloat();
 		}
 		else if ( Double.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asDouble();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asDouble();
 		}
 		else if ( LocalDate.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asLocalDate();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asLocalDate();
 		}
 		else if ( LocalDateTime.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asLocalDateTime();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asLocalDateTime();
 		}
 		else if ( LocalTime.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asLocalTime();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asLocalTime();
 		}
 		else if ( Instant.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asInstant();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asInstant();
 		}
 		else if ( ZonedDateTime.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asZonedDateTime();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asZonedDateTime();
 		}
 		else if ( Year.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asYear();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asYear();
 		}
 		else if ( YearMonth.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asYearMonth();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asYearMonth();
 		}
 		else if ( MonthDay.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asMonthDay();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asMonthDay();
 		}
 		else if ( OffsetDateTime.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asOffsetDateTime();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asOffsetDateTime();
 		}
 		else if ( OffsetTime.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asOffsetTime();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asOffsetTime();
 		}
 		else if ( GeoPoint.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asGeoPoint();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asGeoPoint();
 		}
 		else if ( BigDecimal.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asBigDecimal();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asBigDecimal();
 		}
 		else if ( BigInteger.class.equals( valueType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asBigInteger();
+			return (StandardIndexFieldTypeOptionsStep<?, F>) asBigInteger();
 		}
 		else {
 			throw log.cannotGuessFieldType( valueType, getEventContext() );
@@ -127,113 +127,113 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	}
 
 	@Override
-	public StringIndexFieldTypeContext<?> asString() {
-		return new ElasticsearchStringIndexFieldTypeContext( this );
+	public StringIndexFieldTypeOptionsStep<?> asString() {
+		return new ElasticsearchStringIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Integer> asInteger() {
-		return new ElasticsearchIntegerIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Integer> asInteger() {
+		return new ElasticsearchIntegerIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Long> asLong() {
-		return new ElasticsearchLongIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Long> asLong() {
+		return new ElasticsearchLongIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Boolean> asBoolean() {
-		return new ElasticsearchBooleanIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Boolean> asBoolean() {
+		return new ElasticsearchBooleanIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Byte> asByte() {
-		return new ElasticsearchByteIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Byte> asByte() {
+		return new ElasticsearchByteIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Short> asShort() {
-		return new ElasticsearchShortIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Short> asShort() {
+		return new ElasticsearchShortIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Float> asFloat() {
-		return new ElasticsearchFloatIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Float> asFloat() {
+		return new ElasticsearchFloatIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Double> asDouble() {
-		return new ElasticsearchDoubleIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Double> asDouble() {
+		return new ElasticsearchDoubleIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, LocalDate> asLocalDate() {
-		return new ElasticsearchLocalDateIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, LocalDate> asLocalDate() {
+		return new ElasticsearchLocalDateIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, LocalDateTime> asLocalDateTime() {
-		return new ElasticsearchLocalDateTimeIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, LocalDateTime> asLocalDateTime() {
+		return new ElasticsearchLocalDateTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, LocalTime> asLocalTime() {
-		return new ElasticsearchLocalTimeIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, LocalTime> asLocalTime() {
+		return new ElasticsearchLocalTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Instant> asInstant() {
-		return new ElasticsearchInstantIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Instant> asInstant() {
+		return new ElasticsearchInstantIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime() {
-		return new ElasticsearchZonedDateTimeIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, ZonedDateTime> asZonedDateTime() {
+		return new ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Year> asYear() {
-		return new ElasticsearchYearIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, Year> asYear() {
+		return new ElasticsearchYearIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, YearMonth> asYearMonth() {
-		return new ElasticsearchYearMonthIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, YearMonth> asYearMonth() {
+		return new ElasticsearchYearMonthIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, MonthDay> asMonthDay() {
-		return new ElasticsearchMonthDayIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, MonthDay> asMonthDay() {
+		return new ElasticsearchMonthDayIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, OffsetDateTime> asOffsetDateTime() {
-		return new ElasticsearchOffsetDateTimeIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, OffsetDateTime> asOffsetDateTime() {
+		return new ElasticsearchOffsetDateTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, OffsetTime> asOffsetTime() {
-		return new ElasticsearchOffsetTimeIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, OffsetTime> asOffsetTime() {
+		return new ElasticsearchOffsetTimeIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint() {
-		return new ElasticsearchGeoPointIndexFieldTypeContext( this );
+	public StandardIndexFieldTypeOptionsStep<?, GeoPoint> asGeoPoint() {
+		return new ElasticsearchGeoPointIndexFieldTypeOptionsStep( this );
 	}
 
 	@Override
-	public ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal() {
-		return new ElasticsearchBigDecimalIndexFieldTypeContext( this, typeDefaultsProvider );
+	public ScaledNumberIndexFieldTypeOptionsStep<?, BigDecimal> asBigDecimal() {
+		return new ElasticsearchBigDecimalIndexFieldTypeOptionsStep( this, typeDefaultsProvider );
 	}
 
 	@Override
-	public ScaledNumberIndexFieldTypeContext<?, BigInteger> asBigInteger() {
-		return new ElasticsearchBigIntegerIndexFieldTypeContext( this, typeDefaultsProvider );
+	public ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger() {
+		return new ElasticsearchBigIntegerIndexFieldTypeOptionsStep( this, typeDefaultsProvider );
 	}
 
 	@Override
-	public ElasticsearchNativeIndexFieldTypeContext<?> asNative(String mappingJsonString) {
-		return new ElasticsearchNativeIndexFieldTypeContextImpl( this, mappingJsonString );
+	public ElasticsearchNativeIndexFieldTypeOptionsStep<?> asNative(String mappingJsonString) {
+		return new ElasticsearchNativeIndexFieldTypeOptionsStepImpl( this, mappingJsonString );
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -30,7 +30,7 @@ public final class DefaultJavaNetURIValueBridge implements ValueBridge<URI, Stri
 
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexFieldTypeContext<?, String> bind(ValueBridgeBindingContext<URI> context) {
+	public StandardIndexFieldTypeOptionsStep<?, String> bind(ValueBridgeBindingContext<URI> context) {
 		return context.getTypeFactory().asString()
 				.projectionConverter( PojoDefaultURIFromDocumentFieldValueConverter.INSTANCE );
 	}

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ValidateUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
@@ -25,7 +25,7 @@ public final class DefaultUUIDValueBridge implements ValueBridge<UUID, String> {
 
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexFieldTypeContext<?, String> bind(ValueBridgeBindingContext<UUID> context) {
+	public StandardIndexFieldTypeOptionsStep<?, String> bind(ValueBridgeBindingContext<UUID> context) {
 		return context.getTypeFactory().asString()
 				.projectionConverter( PojoDefaultUUIDFromDocumentFieldValueConverter.INSTANCE );
 	}

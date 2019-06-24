@@ -11,7 +11,7 @@ import java.time.Duration;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
@@ -30,7 +30,7 @@ public final class DefaultDurationValueBridge implements ValueBridge<Duration, L
 
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexFieldTypeContext<?, Long> bind(ValueBridgeBindingContext<Duration> context) {
+	public StandardIndexFieldTypeOptionsStep<?, Long> bind(ValueBridgeBindingContext<Duration> context) {
 		return context.getTypeFactory().asLong()
 				.projectionConverter( PojoDefaultZoneOffsetFromDocumentFieldValueConverter.INSTANCE );
 	}

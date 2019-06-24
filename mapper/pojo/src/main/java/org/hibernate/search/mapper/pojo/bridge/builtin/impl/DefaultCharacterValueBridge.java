@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ValidateUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
@@ -23,7 +23,7 @@ public final class DefaultCharacterValueBridge implements ValueBridge<Character,
 
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexFieldTypeContext<?, String> bind(ValueBridgeBindingContext<Character> context) {
+	public StandardIndexFieldTypeOptionsStep<?, String> bind(ValueBridgeBindingContext<Character> context) {
 		return context.getTypeFactory().asString()
 				.projectionConverter( PojoDefaultCharacterFromDocumentFieldValueConverter.INSTANCE );
 	}

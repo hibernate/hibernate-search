@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
@@ -253,20 +253,20 @@ public interface Log extends BasicLogger {
 			value = "This property is mapped to a full-text field,"
 					+ " but with a value bridge that creates a non-String or otherwise incompatible field."
 					+ " Make sure to use a compatible bridge."
-					+ " Details: the value bridge's bind() method returned context '%1$s',"
+					+ " Details: the value bridge's bind() method returned '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
-	SearchException invalidFieldEncodingForFullTextFieldMapping(StandardIndexFieldTypeContext<?, ?> context,
+	SearchException invalidFieldEncodingForFullTextFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 	@Message(id = ID_OFFSET_2 + 32,
 			value = "This property is mapped to a keyword field,"
 					+ " but with a value bridge that creates a non-String or otherwise incompatible field."
 					+ " Make sure to use a compatible bridge."
-					+ " Details: the value bridge's bind() method returned context '%1$s',"
+					+ " Details: the value bridge's bind() method returned '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
-	SearchException invalidFieldEncodingForKeywordFieldMapping(StandardIndexFieldTypeContext<?, ?> context,
+	SearchException invalidFieldEncodingForKeywordFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 	@Message(id = ID_OFFSET_2 + 34, value = "Could not find a property with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
@@ -353,10 +353,10 @@ public interface Log extends BasicLogger {
 			value = "This property is mapped to a scaled number field,"
 					+ " but with a value bridge that creates neither a BigDecimal nor a BigInteger field."
 					+ " Make sure to use a compatible bridge."
-					+ " Details: the value bridge's bind() method returned context '%1$s',"
+					+ " Details: the value bridge's bind() method returned '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
-	SearchException invalidFieldEncodingForScaledNumberFieldMapping(StandardIndexFieldTypeContext<?, ?> context,
+	SearchException invalidFieldEncodingForScaledNumberFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 	@Message(id = ID_OFFSET_2 + 52,

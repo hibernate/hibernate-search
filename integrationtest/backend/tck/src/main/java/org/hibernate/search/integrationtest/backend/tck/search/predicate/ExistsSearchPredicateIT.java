@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -470,7 +470,7 @@ public class ExistsSearchPredicateIT {
 	}
 
 	private static void mapByTypeFields(IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
 			FieldModelConsumer<MatchPredicateExpectations<?>, ByTypeFieldModel<?>> consumer) {
 		forEachTypeDescriptor( typeDescriptor -> {
 			// Safe, see forEachTypeDescriptor
@@ -482,7 +482,7 @@ public class ExistsSearchPredicateIT {
 	}
 
 	private static void mapByTypeFieldsIfSortSupported(IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
 			FieldModelConsumer<MatchPredicateExpectations<?>, ByTypeFieldModel<?>> consumer) {
 		forEachTypeDescriptor( typeDescriptor -> {
 			// Safe, see forEachTypeDescriptor
@@ -620,7 +620,7 @@ public class ExistsSearchPredicateIT {
 		}
 
 		static StandardFieldMapper<String, MainFieldModel> mapper(
-				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, String>> configuration,
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, String>> configuration,
 				String document1Value, String document2Value, String document3Value) {
 			return StandardFieldMapper.of(
 					configuration,
@@ -665,7 +665,7 @@ public class ExistsSearchPredicateIT {
 
 	private static class IncompatibleFieldModel {
 		static <F> StandardFieldMapper<?, IncompatibleFieldModel> mapper(
-				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeOptionsStep<?, F>> configuration) {
 			return StandardFieldMapper.of( configuration, (reference, name) -> new IncompatibleFieldModel( name ) );
 		}
 

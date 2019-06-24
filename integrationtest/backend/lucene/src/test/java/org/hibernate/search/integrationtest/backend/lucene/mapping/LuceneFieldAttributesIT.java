@@ -16,11 +16,11 @@ import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
-import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -150,28 +150,28 @@ public class LuceneFieldAttributesIT {
 
 			norms = root.field( "norms", f -> {
 				// extracting a variable to workaround an Eclipse compiler issue
-				StringIndexFieldTypeContext<?> ctx = f.asString()
+				StringIndexFieldTypeOptionsStep<?> ctx = f.asString()
 						.analyzer( ANALYZER_NAME ).projectable( Projectable.YES );
 				return ctx.norms( Norms.YES ); }
 			).toReference();
 
 			noNorms = root.field( "noNorms", f -> {
 				// extracting a variable to workaround an Eclipse compiler issue
-				StringIndexFieldTypeContext<?> ctx = f.asString()
+				StringIndexFieldTypeOptionsStep<?> ctx = f.asString()
 						.analyzer( ANALYZER_NAME ).projectable( Projectable.YES );
 				return ctx.norms( Norms.NO );
 			} ).toReference();
 
 			termVector = root.field( "termVector", f -> {
 				// extracting a variable to workaround an Eclipse compiler issue
-				StringIndexFieldTypeContext<?> ctx = f.asString()
+				StringIndexFieldTypeOptionsStep<?> ctx = f.asString()
 						.analyzer( ANALYZER_NAME ).projectable( Projectable.YES );
 				return ctx.termVector( TermVector.YES ); }
 			).toReference();
 
 			moreOptions = root.field( "moreOptions", f -> {
 				// extracting a variable to workaround an Eclipse compiler issue
-				StringIndexFieldTypeContext<?> ctx = f.asString()
+				StringIndexFieldTypeOptionsStep<?> ctx = f.asString()
 						.analyzer( ANALYZER_NAME ).projectable( Projectable.YES );
 				return ctx.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS ); }
 			).toReference();

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContextExtension;
@@ -43,7 +43,7 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * {@code null} to let Hibernate Search derive the expectations
 	 * from the {@code ValueBridge}'s generic type parameters.
 	 */
-	default StandardIndexFieldTypeContext<?, F> bind(ValueBridgeBindingContext<V> context) {
+	default StandardIndexFieldTypeOptionsStep<?, F> bind(ValueBridgeBindingContext<V> context) {
 		return null; // Auto-detect the return type and use default encoding
 	}
 

@@ -8,21 +8,21 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyScaledNumberFieldMappingContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PropertyScaledNumberFieldMappingContextImpl
-		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyScaledNumberFieldMappingContext, ScaledNumberIndexFieldTypeContext<?, ?>>
+		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyScaledNumberFieldMappingContext, ScaledNumberIndexFieldTypeOptionsStep<?, ?>>
 		implements PropertyScaledNumberFieldMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	PropertyScaledNumberFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
-		super( parent, relativeFieldName, PropertyScaledNumberFieldMappingContextImpl::convertFieldTypedContext );
+		super( parent, relativeFieldName, PropertyScaledNumberFieldMappingContextImpl::castIndexFieldTypeOptionsStep );
 	}
 
 	@Override
@@ -36,14 +36,14 @@ public class PropertyScaledNumberFieldMappingContextImpl
 		return thisAsS();
 	}
 
-	private static ScaledNumberIndexFieldTypeContext<?, ?> convertFieldTypedContext(
-			StandardIndexFieldTypeContext<?,?> context) {
-		if ( context instanceof ScaledNumberIndexFieldTypeContext ) {
-			return (ScaledNumberIndexFieldTypeContext<?, ?>) context;
+	private static ScaledNumberIndexFieldTypeOptionsStep<?, ?> castIndexFieldTypeOptionsStep(
+			StandardIndexFieldTypeOptionsStep<?,?> optionsStep) {
+		if ( optionsStep instanceof ScaledNumberIndexFieldTypeOptionsStep ) {
+			return (ScaledNumberIndexFieldTypeOptionsStep<?, ?>) optionsStep;
 		}
 		else {
 			throw log.invalidFieldEncodingForScaledNumberFieldMapping(
-					context, ScaledNumberIndexFieldTypeContext.class
+					optionsStep, ScaledNumberIndexFieldTypeOptionsStep.class
 			);
 		}
 	}

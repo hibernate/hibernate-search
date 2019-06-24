@@ -31,163 +31,141 @@ public interface IndexFieldTypeFactoryContext {
 	/**
 	 * Define a field type whose values are represented as a given type in Hibernate Search.
 	 * <p>
-	 * Note this method will return a "generic" context that does not offer any type-specific options.
+	 * Note this method will return a "generic" DSL step that does not offer any type-specific options.
 	 * When possible, prefer the other methods such as {@link #asString()} or {@link #asInteger()}.
 	 *
 	 * @param valueType The type of values for this field type.
 	 * @param <F> The type of values for this field type.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 * @throws SearchException If the given {@code inputType} is not supported.
 	 */
-	<F> StandardIndexFieldTypeContext<?, F> as(Class<F> valueType);
+	<F> StandardIndexFieldTypeOptionsStep<?, F> as(Class<F> valueType);
 
 	/**
 	 * Define a field type whose values are represented as a {@link String} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StringIndexFieldTypeContext<?> asString();
+	StringIndexFieldTypeOptionsStep<?> asString();
 
 	/**
 	 * Define a field type whose values are represented as an {@link Integer} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, Integer> asInteger();
+	StandardIndexFieldTypeOptionsStep<?, Integer> asInteger();
 
 	/**
 	 * Define a field type whose values are represented as a {@link Long} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, Long> asLong();
+	StandardIndexFieldTypeOptionsStep<?, Long> asLong();
 
 	/**
 	 * Define a field type whose values are represented as a {@link Boolean} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, Boolean> asBoolean();
+	StandardIndexFieldTypeOptionsStep<?, Boolean> asBoolean();
 
 	/**
 	 * Define a field type whose values are represented as a {@link Byte} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, Byte> asByte();
+	StandardIndexFieldTypeOptionsStep<?, Byte> asByte();
 
 	/**
 	 * Define a field type whose values are represented as a {@link Short} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, Short> asShort();
+	StandardIndexFieldTypeOptionsStep<?, Short> asShort();
 
 	/**
 	 * Define a field type whose values are represented as a {@link Float} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, Float> asFloat();
+	StandardIndexFieldTypeOptionsStep<?, Float> asFloat();
 
 	/**
 	 * Define a field type whose values are represented as a {@link Double} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, Double> asDouble();
+	StandardIndexFieldTypeOptionsStep<?, Double> asDouble();
 
 	/**
 	 * Define a field type whose values are represented as a {@link LocalDate} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, LocalDate> asLocalDate();
+	StandardIndexFieldTypeOptionsStep<?, LocalDate> asLocalDate();
 
 	/**
 	 * Define a field type whose values are represented as a {@link LocalDateTime} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, LocalDateTime> asLocalDateTime();
+	StandardIndexFieldTypeOptionsStep<?, LocalDateTime> asLocalDateTime();
 
 	/**
 	 * Define a field type whose values are represented as a {@link LocalTime} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, LocalTime> asLocalTime();
+	StandardIndexFieldTypeOptionsStep<?, LocalTime> asLocalTime();
 
 	/**
 	 * Define a field type whose values are represented as an {@link Instant} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, Instant> asInstant();
+	StandardIndexFieldTypeOptionsStep<?, Instant> asInstant();
 
 	/**
 	 * Define a field type whose values are represented as a {@link ZonedDateTime} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime();
+	StandardIndexFieldTypeOptionsStep<?, ZonedDateTime> asZonedDateTime();
 
 	/**
 	 * Define a field type whose values are represented as a {@link Year} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, Year> asYear();
+	StandardIndexFieldTypeOptionsStep<?, Year> asYear();
 
 	/**
 	 * Define a field type whose values are represented as a {@link YearMonth} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, YearMonth> asYearMonth();
+	StandardIndexFieldTypeOptionsStep<?, YearMonth> asYearMonth();
 
 	/**
 	 * Define a field type whose values are represented as a {@link MonthDay} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, MonthDay> asMonthDay();
+	StandardIndexFieldTypeOptionsStep<?, MonthDay> asMonthDay();
 
 	/**
 	 * Define a field type whose values are represented as an {@link OffsetDateTime} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, OffsetDateTime> asOffsetDateTime();
+	StandardIndexFieldTypeOptionsStep<?, OffsetDateTime> asOffsetDateTime();
 
 	/**
 	 * Define a field type whose values are represented as an {@link OffsetTime} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, OffsetTime> asOffsetTime();
+	StandardIndexFieldTypeOptionsStep<?, OffsetTime> asOffsetTime();
 
 	/**
 	 * Define a field type whose values are represented as a {@link GeoPoint} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint();
+	StandardIndexFieldTypeOptionsStep<?, GeoPoint> asGeoPoint();
 
 	/**
 	 * Define a field type whose values are represented as a {@link BigDecimal} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	ScaledNumberIndexFieldTypeContext<?, BigDecimal> asBigDecimal();
+	ScaledNumberIndexFieldTypeOptionsStep<?, BigDecimal> asBigDecimal();
 
 	/**
 	 * Define a field type whose values are represented as a {@link BigInteger} in Hibernate Search.
-	 * @return A context to define the type more precisely
-	 * and ultimately {@link IndexFieldTypeTerminalContext#toIndexFieldType() get the resulting type}.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	ScaledNumberIndexFieldTypeContext<?, BigInteger> asBigInteger();
+	ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger();
 
 	/**
 	 * Extend the current context with the given extension,

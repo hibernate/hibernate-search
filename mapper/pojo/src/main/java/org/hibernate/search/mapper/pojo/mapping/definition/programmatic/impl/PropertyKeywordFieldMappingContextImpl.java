@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.types.Norms;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
@@ -18,13 +18,13 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 class PropertyKeywordFieldMappingContextImpl
-		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyKeywordFieldMappingContext, StringIndexFieldTypeContext<?>>
+		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyKeywordFieldMappingContext, StringIndexFieldTypeOptionsStep<?>>
 		implements PropertyKeywordFieldMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	PropertyKeywordFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
-		super( parent, relativeFieldName, PropertyKeywordFieldMappingContextImpl::convertFieldTypedContext );
+		super( parent, relativeFieldName, PropertyKeywordFieldMappingContextImpl::castIndexFieldTypeOptionsStep );
 	}
 
 	@Override
@@ -44,14 +44,14 @@ class PropertyKeywordFieldMappingContextImpl
 		return thisAsS();
 	}
 
-	private static StringIndexFieldTypeContext<?> convertFieldTypedContext(
-			StandardIndexFieldTypeContext<?,?> context) {
-		if ( context instanceof StringIndexFieldTypeContext ) {
-			return (StringIndexFieldTypeContext<?>) context;
+	private static StringIndexFieldTypeOptionsStep<?> castIndexFieldTypeOptionsStep(
+			StandardIndexFieldTypeOptionsStep<?,?> optionsStep) {
+		if ( optionsStep instanceof StringIndexFieldTypeOptionsStep ) {
+			return (StringIndexFieldTypeOptionsStep<?>) optionsStep;
 		}
 		else {
 			throw log.invalidFieldEncodingForKeywordFieldMapping(
-					context, StringIndexFieldTypeContext.class
+					optionsStep, StringIndexFieldTypeOptionsStep.class
 			);
 		}
 	}

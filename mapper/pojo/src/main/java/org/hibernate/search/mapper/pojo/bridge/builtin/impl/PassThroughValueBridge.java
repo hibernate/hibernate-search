@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -41,7 +41,7 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, F> bind(ValueBridgeBindingContext<F> context) {
+	public StandardIndexFieldTypeOptionsStep<?, F> bind(ValueBridgeBindingContext<F> context) {
 		return context.getTypeFactory().as( fieldType )
 				.projectionConverter( new PassThroughFromDocumentFieldValueConverter<>( fieldType ) );
 	}
