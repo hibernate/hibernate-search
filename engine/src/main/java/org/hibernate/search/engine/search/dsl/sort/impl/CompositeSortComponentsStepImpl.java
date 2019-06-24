@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.dsl.sort.impl;
 
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.CompositeSortComponentsStep;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 class CompositeSortComponentsStepImpl<B> implements CompositeSortComponentsStep {
@@ -21,13 +21,13 @@ class CompositeSortComponentsStepImpl<B> implements CompositeSortComponentsStep 
 
 	@Override
 	public CompositeSortComponentsStep add(SearchSort searchSort) {
-		dslContext = dslContext.append( dslContext.getFactory().toImplementation( searchSort ) );
+		dslContext = dslContext.append( dslContext.getBuilderFactory().toImplementation( searchSort ) );
 		return this;
 	}
 
 	@Override
-	public SearchSortFactoryContext then() {
-		return new DefaultSearchSortFactoryContext<>( dslContext );
+	public SearchSortFactory then() {
+		return new DefaultSearchSortFactory<>( dslContext );
 	}
 
 	@Override

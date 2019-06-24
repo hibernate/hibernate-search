@@ -12,48 +12,48 @@ import org.hibernate.search.util.common.SearchException;
 
 /**
  * The DSL step when attempting to apply multiple extensions
- * to a {@link SearchSortFactoryContext}.
+ * to a {@link SearchSortFactory}.
  *
- * @see SearchSortFactoryContext#extension()
+ * @see SearchSortFactory#extension()
  */
-public interface SearchSortFactoryContextExtensionStep {
+public interface SearchSortFactoryExtensionStep {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
-	 * {@link #ifSupported(SearchSortFactoryContextExtension, Function)}
-	 * was supported, extend the current context with this extension,
-	 * apply the given function to the extended factory context, and store the resulting sort for later retrieval.
+	 * {@link #ifSupported(SearchSortFactoryExtension, Function)}
+	 * was supported, extend the current factory with this extension,
+	 * apply the given function to the extended factory, and store the resulting sort for later retrieval.
 	 * <p>
 	 * This method cannot be called after {@link #orElse(Function)} or {@link #orElseFail()}.
 	 *
 	 * @param extension The extension to apply.
 	 * @param sortContributor A function called if the extension is successfully applied;
-	 * it will use the (extended) sort factory context passed in parameter to create a sort,
+	 * it will use the (extended) sort factory passed in parameter to create a sort,
 	 * returning the final step in the sort DSL.
 	 * Should generally be a lambda expression.
-	 * @param <T> The type of the extended context.
+	 * @param <T> The type of the extended factory.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchSortFactoryContextExtensionStep ifSupported(
-			SearchSortFactoryContextExtension<T> extension,
+	<T> SearchSortFactoryExtensionStep ifSupported(
+			SearchSortFactoryExtension<T> extension,
 			Function<T, ? extends SortFinalStep> sortContributor
 	);
 
 	/**
-	 * If no extension passed to {@link #ifSupported(SearchSortFactoryContextExtension, Function)}
-	 * was supported so far, apply the given consumer to the current (non-extended) {@link SearchSortFactoryContext};
+	 * If no extension passed to {@link #ifSupported(SearchSortFactoryExtension, Function)}
+	 * was supported so far, apply the given consumer to the current (non-extended) {@link SearchSortFactory};
 	 * otherwise return the sort created in the first succeeding {@code ifSupported} call.
 	 *
 	 * @param sortContributor A function called if no extension was successfully applied;
-	 * it will use the (non-extended) sort factory context passed in parameter to create a sort,
+	 * it will use the (non-extended) sort factory passed in parameter to create a sort,
 	 * returning the final step in the sort DSL.
 	 * Should generally be a lambda expression.
 	 * @return The final step in the DSL of the resulting sort.
 	 */
-	SortThenStep orElse(Function<SearchSortFactoryContext, ? extends SortFinalStep> sortContributor);
+	SortThenStep orElse(Function<SearchSortFactory, ? extends SortFinalStep> sortContributor);
 
 	/**
-	 * If no extension passed to {@link #ifSupported(SearchSortFactoryContextExtension, Function)}
+	 * If no extension passed to {@link #ifSupported(SearchSortFactoryExtension, Function)}
 	 * was supported so far, throw an exception;
 	 * otherwise return the sort created in the first succeeding {@code ifSupported} call.
 	 *

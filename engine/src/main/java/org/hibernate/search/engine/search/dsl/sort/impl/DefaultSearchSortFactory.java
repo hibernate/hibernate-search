@@ -14,19 +14,19 @@ import org.hibernate.search.engine.search.dsl.sort.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortOptionsStep;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtension;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public class DefaultSearchSortFactoryContext<B> implements SearchSortFactoryContext {
+public class DefaultSearchSortFactory<B> implements SearchSortFactory {
 
 	private final SearchSortDslContext<?, B> dslContext;
 
-	public DefaultSearchSortFactoryContext(SearchSortDslContext<?, B> dslContext) {
+	public DefaultSearchSortFactory(SearchSortDslContext<?, B> dslContext) {
 		this.dslContext = dslContext;
 	}
 
@@ -37,7 +37,7 @@ public class DefaultSearchSortFactoryContext<B> implements SearchSortFactoryCont
 
 	@Override
 	public SortThenStep byIndexOrder() {
-		return staticThenStep( dslContext.getFactory().indexOrder() );
+		return staticThenStep( dslContext.getBuilderFactory().indexOrder() );
 	}
 
 	@Override
@@ -65,15 +65,15 @@ public class DefaultSearchSortFactoryContext<B> implements SearchSortFactoryCont
 	}
 
 	@Override
-	public <T> T extension(SearchSortFactoryContextExtension<T> extension) {
+	public <T> T extension(SearchSortFactoryExtension<T> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, dslContext )
 		);
 	}
 
 	@Override
-	public SearchSortFactoryContextExtensionStep extension() {
-		return new SearchSortFactoryContextExtensionStepImpl<>( this, dslContext );
+	public SearchSortFactoryExtensionStep extension() {
+		return new SearchSortFactoryExtensionStepImpl<>( this, dslContext );
 	}
 
 	private SortThenStep staticThenStep(B builder) {

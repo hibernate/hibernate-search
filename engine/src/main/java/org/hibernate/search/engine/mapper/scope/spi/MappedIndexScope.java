@@ -10,7 +10,7 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 /**
@@ -35,7 +35,7 @@ public interface MappedIndexScope<R, E> {
 
 	SearchPredicateFactory predicate();
 
-	SearchSortFactoryContext sort();
+	SearchSortFactory sort();
 
 	/*
 	 * IMPLEMENTATION NOTE: we *must* return a factory with the same R/E type arguments as this class,

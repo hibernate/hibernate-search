@@ -8,13 +8,12 @@ package org.hibernate.search.mapper.orm.scope;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryResultDefinitionContext;
@@ -68,9 +67,9 @@ public interface SearchScope<E> {
 	 * removing the need to create separate objects to represent the sorts.
 	 *
 	 * @return A sort factory.
-	 * @see SearchSortFactoryContext
+	 * @see SearchSortFactory
 	 */
-	SearchSortFactoryContext sort();
+	SearchSortFactory sort();
 
 	/**
 	 * Initiate the building of a search projection that will be valid for the indexes in this scope.

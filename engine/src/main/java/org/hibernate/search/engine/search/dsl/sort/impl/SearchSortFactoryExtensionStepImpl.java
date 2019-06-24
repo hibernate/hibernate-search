@@ -10,44 +10,44 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtension;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionStep;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
-final class SearchSortFactoryContextExtensionStepImpl<B> implements SearchSortFactoryContextExtensionStep {
+final class SearchSortFactoryExtensionStepImpl<B> implements SearchSortFactoryExtensionStep {
 
-	private final SearchSortFactoryContext parent;
+	private final SearchSortFactory parent;
 	private final SearchSortDslContext<?, B> dslContext;
 
 	private final DslExtensionState<SortFinalStep> state = new DslExtensionState<>();
 
-	SearchSortFactoryContextExtensionStepImpl(SearchSortFactoryContext parent,
+	SearchSortFactoryExtensionStepImpl(SearchSortFactory parent,
 			SearchSortDslContext<?, B> dslContext) {
 		this.parent = parent;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <T> SearchSortFactoryContextExtensionStep ifSupported(
-			SearchSortFactoryContextExtension<T> extension,
+	public <T> SearchSortFactoryExtensionStep ifSupported(
+			SearchSortFactoryExtension<T> extension,
 			Function<T, ? extends SortFinalStep> sortContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent, dslContext ), sortContributor );
 		return this;
 	}
 
 	@Override
-	public SortThenStep orElse(Function<SearchSortFactoryContext, ? extends SortFinalStep> sortContributor) {
+	public SortThenStep orElse(Function<SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		SortFinalStep result = state.orElse( parent, sortContributor );
-		return new StaticSortThenStep<>( dslContext, dslContext.getFactory().toImplementation( result.toSort() ) );
+		return new StaticSortThenStep<>( dslContext, dslContext.getBuilderFactory().toImplementation( result.toSort() ) );
 	}
 
 	@Override
 	public SortThenStep orElseFail() {
 		SortFinalStep result = state.orElseFail();
-		return new StaticSortThenStep<>( dslContext, dslContext.getFactory().toImplementation( result.toSort() ) );
+		return new StaticSortThenStep<>( dslContext, dslContext.getBuilderFactory().toImplementation( result.toSort() ) );
 	}
 }

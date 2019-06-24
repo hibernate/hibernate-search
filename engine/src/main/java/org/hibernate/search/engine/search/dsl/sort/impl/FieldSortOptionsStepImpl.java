@@ -23,7 +23,7 @@ class FieldSortOptionsStepImpl<B>
 	FieldSortOptionsStepImpl(SearchSortDslContext<?, B> dslContext,
 			String absoluteFieldPath) {
 		super( dslContext );
-		this.builder = dslContext.getFactory().field( absoluteFieldPath );
+		this.builder = dslContext.getBuilderFactory().field( absoluteFieldPath );
 	}
 
 	@Override

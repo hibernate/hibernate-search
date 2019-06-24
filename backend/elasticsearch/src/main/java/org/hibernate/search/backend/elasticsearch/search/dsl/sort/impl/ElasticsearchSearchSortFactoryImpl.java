@@ -6,23 +6,23 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.sort.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
-public class ElasticsearchSearchSortFactoryContextImpl
-		extends DelegatingSearchSortFactoryContext
-		implements ElasticsearchSearchSortFactoryContext {
+public class ElasticsearchSearchSortFactoryImpl
+		extends DelegatingSearchSortFactory
+		implements ElasticsearchSearchSortFactory {
 
 	private final SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder> dslContext;
 
-	public ElasticsearchSearchSortFactoryContextImpl(SearchSortFactoryContext delegate,
+	public ElasticsearchSearchSortFactoryImpl(SearchSortFactory delegate,
 			SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
@@ -30,7 +30,7 @@ public class ElasticsearchSearchSortFactoryContextImpl
 
 	@Override
 	public SortThenStep fromJson(String jsonString) {
-		return staticThenStep( dslContext.getFactory().fromJson( jsonString ) );
+		return staticThenStep( dslContext.getBuilderFactory().fromJson( jsonString ) );
 	}
 
 	private SortThenStep staticThenStep(ElasticsearchSearchSortBuilder builder) {
