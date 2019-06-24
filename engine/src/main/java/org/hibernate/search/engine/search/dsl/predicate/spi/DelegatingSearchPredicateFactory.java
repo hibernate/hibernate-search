@@ -17,23 +17,23 @@ import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldStep
 import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionStep;
 import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateInitialStep;
 import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateFieldStep;
 
 /**
- * A delegating {@link SearchPredicateFactoryContext}.
+ * A delegating {@link SearchPredicateFactory}.
  * <p>
- * Mainly useful when implementing a {@link SearchPredicateFactoryContextExtension}.
+ * Mainly useful when implementing a {@link SearchPredicateFactoryExtension}.
  */
-public class DelegatingSearchPredicateFactoryContext implements SearchPredicateFactoryContext {
+public class DelegatingSearchPredicateFactory implements SearchPredicateFactory {
 
-	private final SearchPredicateFactoryContext delegate;
+	private final SearchPredicateFactory delegate;
 
-	public DelegatingSearchPredicateFactoryContext(SearchPredicateFactoryContext delegate) {
+	public DelegatingSearchPredicateFactory(SearchPredicateFactory delegate) {
 		this.delegate = delegate;
 	}
 
@@ -98,16 +98,16 @@ public class DelegatingSearchPredicateFactoryContext implements SearchPredicateF
 	}
 
 	@Override
-	public <T> T extension(SearchPredicateFactoryContextExtension<T> extension) {
+	public <T> T extension(SearchPredicateFactoryExtension<T> extension) {
 		return delegate.extension( extension );
 	}
 
 	@Override
-	public SearchPredicateFactoryContextExtensionStep extension() {
+	public SearchPredicateFactoryExtensionStep extension() {
 		return delegate.extension();
 	}
 
-	protected SearchPredicateFactoryContext getDelegate() {
+	protected SearchPredicateFactory getDelegate() {
 		return delegate;
 	}
 }

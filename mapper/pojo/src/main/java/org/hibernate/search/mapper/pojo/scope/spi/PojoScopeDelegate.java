@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.scope.spi;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
@@ -32,7 +32,7 @@ public interface PojoScopeDelegate<R, E, C> {
 	SearchQueryResultDefinitionContext<?, R, E, SearchProjectionFactoryContext<R, E>, ?> search(
 			LoadingContextBuilder<R, E> loadingContextBuilder);
 
-	SearchPredicateFactoryContext predicate();
+	SearchPredicateFactory predicate();
 
 	SearchSortFactoryContext sort();
 

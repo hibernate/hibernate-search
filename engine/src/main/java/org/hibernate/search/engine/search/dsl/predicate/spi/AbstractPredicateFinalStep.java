@@ -19,18 +19,18 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
  */
 public abstract class AbstractPredicateFinalStep<B> implements PredicateFinalStep {
 
-	protected final SearchPredicateBuilderFactory<?, B> factory;
+	protected final SearchPredicateBuilderFactory<?, B> builderFactory;
 
 	private SearchPredicate predicateResult;
 
-	public AbstractPredicateFinalStep(SearchPredicateBuilderFactory<?, B> factory) {
-		this.factory = factory;
+	public AbstractPredicateFinalStep(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		this.builderFactory = builderFactory;
 	}
 
 	@Override
 	public SearchPredicate toPredicate() {
 		if ( predicateResult == null ) {
-			predicateResult = factory.toSearchPredicate( toImplementation() );
+			predicateResult = builderFactory.toSearchPredicate( toImplementation() );
 		}
 		return predicateResult;
 	}

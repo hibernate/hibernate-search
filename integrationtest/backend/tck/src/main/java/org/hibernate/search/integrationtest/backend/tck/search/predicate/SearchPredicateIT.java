@@ -20,8 +20,8 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -373,19 +373,19 @@ public class SearchPredicateIT {
 		}
 	}
 
-	private static class SupportedExtension implements SearchPredicateFactoryContextExtension<MyExtendedContext> {
+	private static class SupportedExtension implements SearchPredicateFactoryExtension<MyExtendedFactory> {
 		@Override
-		public <C, B> Optional<MyExtendedContext> extendOptional(SearchPredicateFactoryContext original,
+		public <C, B> Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original,
 				SearchPredicateBuilderFactory<C, B> factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
-			return Optional.of( new MyExtendedContext( original ) );
+			return Optional.of( new MyExtendedFactory( original ) );
 		}
 	}
 
-	private static class UnSupportedExtension implements SearchPredicateFactoryContextExtension<MyExtendedContext> {
+	private static class UnSupportedExtension implements SearchPredicateFactoryExtension<MyExtendedFactory> {
 		@Override
-		public <C, B> Optional<MyExtendedContext> extendOptional(SearchPredicateFactoryContext original,
+		public <C, B> Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original,
 				SearchPredicateBuilderFactory<C, B> factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
@@ -393,10 +393,10 @@ public class SearchPredicateIT {
 		}
 	}
 
-	private static class MyExtendedContext {
-		private final SearchPredicateFactoryContext delegate;
+	private static class MyExtendedFactory {
+		private final SearchPredicateFactory delegate;
 
-		MyExtendedContext(SearchPredicateFactoryContext delegate) {
+		MyExtendedFactory(SearchPredicateFactory delegate) {
 			this.delegate = delegate;
 		}
 

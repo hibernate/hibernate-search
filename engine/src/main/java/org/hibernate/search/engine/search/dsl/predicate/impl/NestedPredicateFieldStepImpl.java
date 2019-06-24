@@ -13,7 +13,7 @@ import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateOptionsStep;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateNestStep;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractPredicateFinalStep;
@@ -28,18 +28,18 @@ class NestedPredicateFieldStepImpl<B>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SearchPredicateFactoryContext factoryContext;
+	private final SearchPredicateFactory factory;
 	private NestedPredicateBuilder<B> builder;
 	private B childPredicateBuilder;
 
-	NestedPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> factory, SearchPredicateFactoryContext factoryContext) {
-		super( factory );
-		this.factoryContext = factoryContext;
+	NestedPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory, SearchPredicateFactory factory) {
+		super( builderFactory );
+		this.factory = factory;
 	}
 
 	@Override
 	public NestedPredicateNestStep onObjectField(String absoluteFieldPath) {
-		this.builder = factory.nested( absoluteFieldPath );
+		this.builder = builderFactory.nested( absoluteFieldPath );
 		return this;
 	}
 
@@ -48,14 +48,14 @@ class NestedPredicateFieldStepImpl<B>
 		if ( this.childPredicateBuilder != null ) {
 			throw log.cannotAddMultiplePredicatesToNestedPredicate();
 		}
-		this.childPredicateBuilder = factory.toImplementation( searchPredicate );
+		this.childPredicateBuilder = builderFactory.toImplementation( searchPredicate );
 		return this;
 	}
 
 	@Override
 	public NestedPredicateOptionsStep nest(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> predicateContributor) {
-		return nest( predicateContributor.apply( factoryContext ) );
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
+		return nest( predicateContributor.apply( factory ) );
 	}
 
 	@Override

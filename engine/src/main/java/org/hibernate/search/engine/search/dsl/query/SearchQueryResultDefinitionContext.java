@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.util.common.SearchException;
@@ -31,16 +31,16 @@ import org.hibernate.search.util.common.SearchException;
  * {@link #asEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#entity() entity projections}.
  * @param <PJC> The type of contexts used to create projections in {@link #asProjection(Function)}.
- * @param <PDC> The type of contexts used to create predicates in {@link #predicate(Function)}.
+ * @param <PDF> The type of factory used to create predicates in {@link #predicate(Function)}.
  */
 public interface SearchQueryResultDefinitionContext<
 				N extends SearchQueryContext<?, E, ?>,
 				R,
 				E,
 				PJC extends SearchProjectionFactoryContext<R, E>,
-				PDC extends SearchPredicateFactoryContext
+				PDF extends SearchPredicateFactory
 		>
-		extends SearchQueryResultContext<N, E, PDC> {
+		extends SearchQueryResultContext<N, E, PDF> {
 
 	/**
 	 * Define the query results as the entity was originally indexed, loaded from an external source (database, ...).

@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.scope.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -53,7 +53,7 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 	}
 
 	@Override
-	public SearchPredicateFactoryContext predicate() {
+	public SearchPredicateFactory predicate() {
 		return delegate.predicate();
 	}
 

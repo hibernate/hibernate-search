@@ -17,8 +17,8 @@ class SimpleQueryStringPredicateFieldStepImpl<B> implements SimpleQueryStringPre
 
 	private final SimpleQueryStringPredicateFieldMoreStepImpl.CommonState<B> commonState;
 
-	SimpleQueryStringPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> factory) {
-		this.commonState = new SimpleQueryStringPredicateFieldMoreStepImpl.CommonState<>( factory );
+	SimpleQueryStringPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		this.commonState = new SimpleQueryStringPredicateFieldMoreStepImpl.CommonState<>( builderFactory );
 	}
 
 	@Override

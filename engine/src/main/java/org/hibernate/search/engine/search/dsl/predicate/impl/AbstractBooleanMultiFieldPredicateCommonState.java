@@ -52,7 +52,7 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 	}
 
 	public SearchPredicateBuilderFactory<?, B> getFactory() {
-		return factory;
+		return builderFactory;
 	}
 
 	public void add(F fieldSetState) {
@@ -80,7 +80,7 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 			fieldSetState.contributePredicateBuilders( predicateBuilders::add );
 		}
 		if ( predicateBuilders.size() > 1 ) {
-			BooleanJunctionPredicateBuilder<B> boolBuilder = factory.bool();
+			BooleanJunctionPredicateBuilder<B> boolBuilder = builderFactory.bool();
 			for ( B predicateBuilder : predicateBuilders ) {
 				boolBuilder.should( predicateBuilder );
 			}

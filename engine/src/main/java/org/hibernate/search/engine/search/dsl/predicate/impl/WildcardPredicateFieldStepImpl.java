@@ -17,8 +17,8 @@ class WildcardPredicateFieldStepImpl<B> implements WildcardPredicateFieldStep {
 
 	private final WildcardPredicateFieldMoreStepImpl.CommonState<B> commonState;
 
-	WildcardPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> factory) {
-		this.commonState = new WildcardPredicateFieldMoreStepImpl.CommonState<>( factory );
+	WildcardPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		this.commonState = new WildcardPredicateFieldMoreStepImpl.CommonState<>( builderFactory );
 	}
 
 	@Override

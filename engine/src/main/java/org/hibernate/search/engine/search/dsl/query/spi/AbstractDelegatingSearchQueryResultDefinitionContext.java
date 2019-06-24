@@ -12,7 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
@@ -26,7 +26,7 @@ public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, E>
 				R,
 				E,
 				SearchProjectionFactoryContext<R, E>,
-				SearchPredicateFactoryContext
+				SearchPredicateFactory
 		> {
 
 	private final SearchQueryResultDefinitionContext<?, R, E, ?, ?> delegate;
@@ -64,7 +64,7 @@ public abstract class AbstractDelegatingSearchQueryResultDefinitionContext<R, E>
 
 	@Override
 	public SearchQueryContext<?, E, ?> predicate(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return delegate.predicate( predicateContributor );
 	}
 

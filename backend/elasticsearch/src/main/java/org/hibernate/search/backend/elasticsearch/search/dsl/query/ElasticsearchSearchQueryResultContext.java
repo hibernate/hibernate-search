@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.query;
 
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 
 public interface ElasticsearchSearchQueryResultContext<H>
-		extends SearchQueryResultContext<ElasticsearchSearchQueryContext<H>, H, ElasticsearchSearchPredicateFactoryContext> {
+		extends SearchQueryResultContext<ElasticsearchSearchQueryContext<H>, H, ElasticsearchSearchPredicateFactory> {
 
 }

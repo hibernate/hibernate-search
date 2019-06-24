@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.search.dsl.query;
 
 import org.hibernate.query.Query;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -19,7 +19,7 @@ public interface HibernateOrmSearchQueryResultDefinitionContext<E>
 				EntityReference,
 				E,
 				SearchProjectionFactoryContext<EntityReference, E>,
-				SearchPredicateFactoryContext
+				SearchPredicateFactory
 		> {
 
 	/**

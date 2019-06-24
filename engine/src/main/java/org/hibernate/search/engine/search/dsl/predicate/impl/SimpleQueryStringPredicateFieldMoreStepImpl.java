@@ -63,9 +63,9 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 
 		private final List<SimpleQueryStringPredicateFieldMoreStepImpl<B>> fieldSetStates = new ArrayList<>();
 
-		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
-			super( factory );
-			this.builder = factory.simpleQueryString();
+		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+			super( builderFactory );
+			this.builder = builderFactory.simpleQueryString();
 		}
 
 		@Override

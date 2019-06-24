@@ -12,49 +12,49 @@ import org.hibernate.search.util.common.SearchException;
 
 /**
  * The DSL step when attempting to apply multiple extensions
- * to a {@link SearchPredicateFactoryContext}.
+ * to a {@link SearchPredicateFactory}.
  *
- * @see SearchPredicateFactoryContext#extension()
+ * @see SearchPredicateFactory#extension()
  */
-public interface SearchPredicateFactoryContextExtensionStep {
+public interface SearchPredicateFactoryExtensionStep {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
-	 * {@link #ifSupported(SearchPredicateFactoryContextExtension, Function)}
-	 * was supported, extend the current context with this extension,
-	 * apply the given function to the extended context, and store the resulting predicate for later retrieval.
+	 * {@link #ifSupported(SearchPredicateFactoryExtension, Function)}
+	 * was supported, extend the current factory with this extension,
+	 * apply the given function to the extended factory, and store the resulting predicate for later retrieval.
 	 * <p>
 	 * This method cannot be called after {@link #orElse(Function)} or {@link #orElseFail()}.
 	 *
 	 * @param extension The extension to apply.
 	 * @param predicateContributor A function called if the extension is successfully applied;
-	 * it will use the (extended) DSL context passed in parameter to create a predicate,
+	 * it will use the (extended) predicate factory passed in parameter to create a predicate,
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
-	 * @param <T> The type of the extended context.
+	 * @param <T> The type of the extended factory.
 	 * @return The next step.
 	 */
-	<T> SearchPredicateFactoryContextExtensionStep ifSupported(
-			SearchPredicateFactoryContextExtension<T> extension,
+	<T> SearchPredicateFactoryExtensionStep ifSupported(
+			SearchPredicateFactoryExtension<T> extension,
 			Function<T, ? extends PredicateFinalStep> predicateContributor
 	);
 
 	/**
-	 * If no extension passed to {@link #ifSupported(SearchPredicateFactoryContextExtension, Function)}
-	 * was supported so far, apply the given consumer to the current (non-extended) {@link SearchPredicateFactoryContext};
+	 * If no extension passed to {@link #ifSupported(SearchPredicateFactoryExtension, Function)}
+	 * was supported so far, apply the given consumer to the current (non-extended) {@link SearchPredicateFactory};
 	 * otherwise return the predicate created in the first succeeding {@code ifSupported} call.
 	 *
 	 * @param predicateContributor A function called if no extension was successfully applied;
-	 * it will use the (extended) DSL context passed in parameter to create a predicate,
+	 * it will use the (non-extended) predicate factory passed in parameter to create a predicate,
 	 * returning the final step in the predicate DSL.
 	 * Should generally be a lambda expression.
 	 * @return The final step in the DSL of the resulting predicate.
 	 */
 	PredicateFinalStep orElse(
-			Function<SearchPredicateFactoryContext, ? extends PredicateFinalStep> predicateContributor);
+			Function<SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor);
 
 	/**
-	 * If no extension passed to {@link #ifSupported(SearchPredicateFactoryContextExtension, Function)}
+	 * If no extension passed to {@link #ifSupported(SearchPredicateFactoryExtension, Function)}
 	 * was supported so far, throw an exception;
 	 * otherwise return the predicate created in the first succeeding {@code ifSupported} call.
 	 *

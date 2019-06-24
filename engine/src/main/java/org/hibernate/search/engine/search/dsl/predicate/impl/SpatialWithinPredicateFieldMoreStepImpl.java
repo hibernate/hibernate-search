@@ -120,8 +120,8 @@ class SpatialWithinPredicateFieldMoreStepImpl<B>
 	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, SpatialWithinPredicateFieldMoreStepImpl<B>>
 			implements SpatialWithinPredicateOptionsStep {
 
-		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
-			super( factory );
+		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+			super( builderFactory );
 		}
 
 		SpatialWithinPredicateOptionsStep circle(GeoPoint center, double radius, DistanceUnit unit) {

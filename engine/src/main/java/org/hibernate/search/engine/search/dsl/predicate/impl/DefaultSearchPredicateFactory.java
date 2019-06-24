@@ -17,9 +17,9 @@ import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionStep;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateInitialStep;
@@ -27,27 +27,27 @@ import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateFieldSt
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateFactoryContext {
+public class DefaultSearchPredicateFactory<B> implements SearchPredicateFactory {
 
-	private final SearchPredicateBuilderFactory<?, B> factory;
+	private final SearchPredicateBuilderFactory<?, B> builderFactory;
 
-	public DefaultSearchPredicateFactoryContext(SearchPredicateBuilderFactory<?, B> factory) {
-		this.factory = factory;
+	public DefaultSearchPredicateFactory(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		this.builderFactory = builderFactory;
 	}
 
 	@Override
 	public MatchAllPredicateOptionsStep matchAll() {
-		return new MatchAllPredicateOptionsStepImpl<>( factory, this );
+		return new MatchAllPredicateOptionsStepImpl<>( builderFactory, this );
 	}
 
 	@Override
 	public MatchIdPredicateMatchingStep id() {
-		return new MatchIdPredicateMatchingStepImpl<>( factory );
+		return new MatchIdPredicateMatchingStepImpl<>( builderFactory );
 	}
 
 	@Override
 	public BooleanPredicateClausesStep bool() {
-		return new BooleanPredicateClausesStepImpl<>( factory, this );
+		return new BooleanPredicateClausesStepImpl<>( builderFactory, this );
 	}
 
 	@Override
@@ -59,54 +59,54 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 
 	@Override
 	public MatchPredicateFieldStep match() {
-		return new MatchPredicateFieldStepImpl<>( factory );
+		return new MatchPredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
 	public RangePredicateFieldStep range() {
-		return new RangePredicateFieldStepImpl<>( factory );
+		return new RangePredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
 	public PhrasePredicateFieldStep phrase() {
-		return new PhrasePredicateFieldStepImpl<>( factory );
+		return new PhrasePredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
 	public WildcardPredicateFieldStep wildcard() {
-		return new WildcardPredicateFieldStepImpl<>( factory );
+		return new WildcardPredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
 	public NestedPredicateFieldStep nested() {
-		return new NestedPredicateFieldStepImpl<>( factory, this );
+		return new NestedPredicateFieldStepImpl<>( builderFactory, this );
 	}
 
 	@Override
 	public SimpleQueryStringPredicateFieldStep simpleQueryString() {
-		return new SimpleQueryStringPredicateFieldStepImpl<>( factory );
+		return new SimpleQueryStringPredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
 	public ExistsPredicateFieldStep exists() {
-		return new ExistsPredicateFieldStepImpl<>( factory );
+		return new ExistsPredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
 	public SpatialPredicateInitialStep spatial() {
-		return new SpatialPredicateInitialStepImpl<>( factory );
+		return new SpatialPredicateInitialStepImpl<>( builderFactory );
 	}
 
 	@Override
-	public <T> T extension(SearchPredicateFactoryContextExtension<T> extension) {
+	public <T> T extension(SearchPredicateFactoryExtension<T> extension) {
 		return DslExtensionState.returnIfSupported(
-				extension, extension.extendOptional( this, factory )
+				extension, extension.extendOptional( this, builderFactory )
 		);
 	}
 
 	@Override
-	public SearchPredicateFactoryContextExtensionStep extension() {
-		return new SearchPredicateFactoryContextExtensionStepImpl<>( this, factory );
+	public SearchPredicateFactoryExtensionStep extension() {
+		return new SearchPredicateFactoryExtensionStepImpl<>( this, builderFactory );
 	}
 
 }

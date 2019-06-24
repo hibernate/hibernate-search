@@ -17,8 +17,8 @@ class PhrasePredicateFieldStepImpl<B> implements PhrasePredicateFieldStep {
 
 	private final PhrasePredicateFieldMoreStepImpl.CommonState<B> commonState;
 
-	PhrasePredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> factory) {
-		this.commonState = new PhrasePredicateFieldMoreStepImpl.CommonState<>( factory );
+	PhrasePredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		this.commonState = new PhrasePredicateFieldMoreStepImpl.CommonState<>( builderFactory );
 	}
 
 	@Override

@@ -76,8 +76,8 @@ class WildcardPredicateFieldMoreStepImpl<B>
 	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, WildcardPredicateFieldMoreStepImpl<B>>
 			implements WildcardPredicateOptionsStep {
 
-		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
-			super( factory );
+		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+			super( builderFactory );
 		}
 
 		private WildcardPredicateOptionsStep matching(String wildcardPattern) {

@@ -16,8 +16,8 @@ class RangePredicateFieldStepImpl<B> implements RangePredicateFieldStep {
 
 	private final RangePredicateFieldMoreStepImpl.CommonState<B> commonState;
 
-	RangePredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> factory) {
-		this.commonState = new RangePredicateFieldMoreStepImpl.CommonState<>( factory );
+	RangePredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		this.commonState = new RangePredicateFieldMoreStepImpl.CommonState<>( builderFactory );
 	}
 
 	@Override

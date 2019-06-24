@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortTerminalContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangeSearchPredicateIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -84,7 +84,7 @@ public class BooleanSortAndRangePredicateIT {
 				.toQuery();
 	}
 
-	private SearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactoryContext, PredicateFinalStep> rangePredicate) {
+	private SearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactory, PredicateFinalStep> rangePredicate) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( rangePredicate )

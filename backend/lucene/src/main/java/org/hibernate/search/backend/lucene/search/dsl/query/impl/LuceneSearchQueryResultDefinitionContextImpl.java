@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
-import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext;
+import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
@@ -32,7 +32,7 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 				R,
 				E,
 				LuceneSearchProjectionFactoryContext<R, E>,
-				LuceneSearchPredicateFactoryContext,
+				LuceneSearchPredicateFactory,
 				LuceneSearchQueryElementCollector
 		>
 		implements LuceneSearchQueryResultDefinitionContext<R, E> {
@@ -93,7 +93,7 @@ public class LuceneSearchQueryResultDefinitionContextImpl<R, E>
 
 	@Override
 	public LuceneSearchQueryContext<E> predicate(
-			Function<? super LuceneSearchPredicateFactoryContext, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super LuceneSearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return asEntity().predicate( predicateContributor );
 	}
 

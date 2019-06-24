@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryResultContext;
@@ -32,7 +32,7 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 				R,
 				E,
 				ElasticsearchSearchProjectionFactoryContext<R, E>,
-				ElasticsearchSearchPredicateFactoryContext,
+				ElasticsearchSearchPredicateFactory,
 				ElasticsearchSearchQueryElementCollector
 		>
 		implements ElasticsearchSearchQueryResultDefinitionContext<R, E> {
@@ -93,7 +93,7 @@ public class ElasticsearchSearchQueryResultDefinitionContextImpl<R, E>
 
 	@Override
 	public ElasticsearchSearchQueryContext<E> predicate(
-			Function<? super ElasticsearchSearchPredicateFactoryContext, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super ElasticsearchSearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return asEntity().predicate( predicateContributor );
 	}
 

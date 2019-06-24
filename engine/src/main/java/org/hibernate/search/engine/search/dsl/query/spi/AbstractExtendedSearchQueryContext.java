@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.query.spi;
 
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
@@ -18,11 +18,11 @@ public abstract class AbstractExtendedSearchQueryContext<
 				S extends SearchQueryContext<S, H, SC>,
 				H,
 				R extends SearchResult<H>,
-				PDC extends SearchPredicateFactoryContext,
+				PDF extends SearchPredicateFactory,
 				SC extends SearchSortFactoryContext,
 				C
 		>
-		extends AbstractSearchQueryContext<S, H, PDC, SC, C> {
+		extends AbstractSearchQueryContext<S, H, PDF, SC, C> {
 
 	public AbstractExtendedSearchQueryContext(IndexScope<C> indexScope,
 			SearchQueryBuilder<H, C> searchQueryBuilder) {

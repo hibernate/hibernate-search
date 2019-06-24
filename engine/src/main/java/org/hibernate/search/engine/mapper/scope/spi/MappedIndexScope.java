@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.mapper.scope.spi;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
@@ -33,7 +33,7 @@ public interface MappedIndexScope<R, E> {
 			SessionContextImplementor sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder);
 
-	SearchPredicateFactoryContext predicate();
+	SearchPredicateFactory predicate();
 
 	SearchSortFactoryContext sort();
 

@@ -76,8 +76,8 @@ class PhrasePredicateFieldMoreStepImpl<B>
 	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, PhrasePredicateFieldMoreStepImpl<B>>
 			implements PhrasePredicateOptionsStep {
 
-		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
-			super( factory );
+		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+			super( builderFactory );
 		}
 
 		private PhrasePredicateOptionsStep matching(String phrase) {

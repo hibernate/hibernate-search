@@ -13,9 +13,9 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
@@ -30,13 +30,13 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 public abstract class AbstractSearchQueryContext<
-		S extends SearchQueryContext<S, H, SC>,
-		H,
-		PDC extends SearchPredicateFactoryContext,
-		SC extends SearchSortFactoryContext,
-		C
+				S extends SearchQueryContext<S, H, SC>,
+				H,
+				PDF extends SearchPredicateFactory,
+				SC extends SearchSortFactoryContext,
+				C
 		>
-		implements SearchQueryResultContext<S, H, PDC>, SearchQueryContext<S, H, SC> {
+		implements SearchQueryResultContext<S, H, PDF>, SearchQueryContext<S, H, SC> {
 
 	private final IndexScope<C> indexScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;
@@ -55,11 +55,11 @@ public abstract class AbstractSearchQueryContext<
 	}
 
 	@Override
-	public S predicate(Function<? super PDC, ? extends PredicateFinalStep> predicateContributor) {
-		SearchPredicateBuilderFactory<? super C, ?> factory = indexScope.getSearchPredicateBuilderFactory();
-		SearchPredicateFactoryContext factoryContext = new DefaultSearchPredicateFactoryContext<>( factory );
-		SearchPredicate predicate = predicateContributor.apply( extendPredicateContext( factoryContext ) ).toPredicate();
-		contribute( factory, predicate );
+	public S predicate(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor) {
+		SearchPredicateBuilderFactory<? super C, ?> builderFactory = indexScope.getSearchPredicateBuilderFactory();
+		SearchPredicateFactory factory = new DefaultSearchPredicateFactory<>( builderFactory );
+		SearchPredicate predicate = predicateContributor.apply( extendPredicateFactory( factory ) ).toPredicate();
+		contribute( builderFactory, predicate );
 		return thisAsS();
 	}
 
@@ -148,7 +148,7 @@ public abstract class AbstractSearchQueryContext<
 
 	protected abstract S thisAsS();
 
-	protected abstract PDC extendPredicateContext(SearchPredicateFactoryContext predicateFactoryContext);
+	protected abstract PDF extendPredicateFactory(SearchPredicateFactory predicateFactory);
 
 	protected abstract SC extendSortContext(SearchSortFactoryContext sortFactoryContext);
 }

@@ -9,12 +9,12 @@ package org.hibernate.search.backend.lucene.search.dsl.predicate;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 
 /**
- * A DSL context allowing to specify the type of a predicate, with some Lucene-specific methods.
+ * A factory for search predicates with some Lucene-specific methods.
  */
-public interface LuceneSearchPredicateFactoryContext extends SearchPredicateFactoryContext {
+public interface LuceneSearchPredicateFactory extends SearchPredicateFactory {
 
 	/**
 	 * Create a predicate from a Lucene {@link Query}.

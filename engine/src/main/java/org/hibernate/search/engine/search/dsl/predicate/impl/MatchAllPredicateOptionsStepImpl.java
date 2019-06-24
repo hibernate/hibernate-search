@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateOptionsStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
@@ -24,15 +24,16 @@ class MatchAllPredicateOptionsStepImpl<B>
 		extends AbstractPredicateFinalStep<B>
 		implements MatchAllPredicateOptionsStep {
 
-	private final SearchPredicateFactoryContext factoryContext;
+	private final SearchPredicateFactory factory;
 
 	private final MatchAllPredicateBuilder<B> matchAllBuilder;
 	private MatchAllExceptState exceptState;
 
-	MatchAllPredicateOptionsStepImpl(SearchPredicateBuilderFactory<?, B> factory, SearchPredicateFactoryContext factoryContext) {
-		super( factory );
-		this.factoryContext = factoryContext;
-		this.matchAllBuilder = factory.matchAll();
+	MatchAllPredicateOptionsStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory,
+			SearchPredicateFactory factory) {
+		super( builderFactory );
+		this.factory = factory;
+		this.matchAllBuilder = builderFactory.matchAll();
 	}
 
 	@Override
@@ -49,7 +50,7 @@ class MatchAllPredicateOptionsStepImpl<B>
 
 	@Override
 	public MatchAllPredicateOptionsStep except(
-			Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor) {
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
 		getExceptState().addClause( clauseContributor );
 		return this;
 	}
@@ -77,15 +78,15 @@ class MatchAllPredicateOptionsStepImpl<B>
 		private final List<B> clauseBuilders = new ArrayList<>();
 
 		MatchAllExceptState() {
-			this.booleanBuilder = MatchAllPredicateOptionsStepImpl.this.factory.bool();
+			this.booleanBuilder = MatchAllPredicateOptionsStepImpl.this.builderFactory.bool();
 		}
 
-		void addClause(Function<? super SearchPredicateFactoryContext, ? extends PredicateFinalStep> clauseContributor) {
-			addClause( clauseContributor.apply( factoryContext ).toPredicate() );
+		void addClause(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+			addClause( clauseContributor.apply( factory ).toPredicate() );
 		}
 
 		void addClause(SearchPredicate predicate) {
-			clauseBuilders.add( factory.toImplementation( predicate ) );
+			clauseBuilders.add( builderFactory.toImplementation( predicate ) );
 		}
 
 		B toImplementation(B matchAllBuilder) {

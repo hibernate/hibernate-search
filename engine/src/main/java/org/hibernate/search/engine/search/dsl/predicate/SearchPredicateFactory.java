@@ -12,11 +12,11 @@ import java.util.function.Consumer;
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * A context allowing to specify the type of a predicate.
+ * A factory for search predicates.
  * <p>
  * This is the main entry point to the predicate DSL.
  */
-public interface SearchPredicateFactoryContext {
+public interface SearchPredicateFactory {
 
 	/**
 	 * Match all documents.
@@ -139,25 +139,25 @@ public interface SearchPredicateFactoryContext {
 	SpatialPredicateInitialStep spatial();
 
 	/**
-	 * Extend the current context with the given extension,
-	 * resulting in an extended context offering different types of predicates.
+	 * Extend the current factory with the given extension,
+	 * resulting in an extended factory offering different types of predicates.
 	 *
 	 * @param extension The extension to the predicate DSL.
-	 * @param <T> The type of context provided by the extension.
-	 * @return The extended context.
+	 * @param <T> The type of factory provided by the extension.
+	 * @return The extended factory.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchPredicateFactoryContextExtension<T> extension);
+	<T> T extension(SearchPredicateFactoryExtension<T> extension);
 
 	/**
 	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
 	 * failing only if <em>none</em> of the extensions is supported.
 	 * <p>
 	 * If you only need to apply a single extension and fail if it is not supported,
-	 * use the simpler {@link #extension(SearchPredicateFactoryContextExtension)} method instead.
+	 * use the simpler {@link #extension(SearchPredicateFactoryExtension)} method instead.
 	 *
 	 * @return A DSL step.
 	 */
-	SearchPredicateFactoryContextExtensionStep extension();
+	SearchPredicateFactoryExtensionStep extension();
 
 }

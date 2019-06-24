@@ -17,8 +17,8 @@ class MatchPredicateFieldStepImpl<B> implements MatchPredicateFieldStep {
 
 	private final MatchPredicateFieldMoreStepImpl.CommonState<B> commonState;
 
-	MatchPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> factory) {
-		this.commonState = new MatchPredicateFieldMoreStepImpl.CommonState<>( factory );
+	MatchPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		this.commonState = new MatchPredicateFieldMoreStepImpl.CommonState<>( builderFactory );
 	}
 
 	@Override
