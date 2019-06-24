@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
@@ -19,11 +19,11 @@ final class DefaultSearchQueryContext<H, C>
 				DefaultSearchQueryContext<H, C>,
 				H,
 				SearchPredicateFactory,
-				SearchSortFactoryContext,
+				SearchSortFactory,
 				C
 		>
 		implements SearchQueryResultContext<DefaultSearchQueryContext<H, C>, H, SearchPredicateFactory>,
-				SearchQueryContext<DefaultSearchQueryContext<H, C>, H, SearchSortFactoryContext> {
+				SearchQueryContext<DefaultSearchQueryContext<H, C>, H, SearchSortFactory> {
 
 	DefaultSearchQueryContext(IndexScope<C> indexScope, SearchQueryBuilder<H, C> searchQueryBuilder) {
 		super( indexScope, searchQueryBuilder );
@@ -37,9 +37,9 @@ final class DefaultSearchQueryContext<H, C>
 	}
 
 	@Override
-	protected SearchSortFactoryContext extendSortContext(SearchSortFactoryContext sortFactoryContext) {
+	protected SearchSortFactory extendSortFactory(SearchSortFactory sortFactory) {
 		// We don't extend anything.
-		return sortFactoryContext;
+		return sortFactory;
 	}
 
 	@Override

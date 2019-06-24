@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionC
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.mapper.pojo.work.impl.PojoScopeWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -110,7 +110,7 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 	}
 
 	@Override
-	public SearchSortFactoryContext sort() {
+	public SearchSortFactory sort() {
 		return getIndexScope().sort();
 	}
 

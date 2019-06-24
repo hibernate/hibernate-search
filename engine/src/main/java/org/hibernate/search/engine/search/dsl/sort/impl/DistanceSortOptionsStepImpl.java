@@ -22,7 +22,7 @@ class DistanceSortOptionsStepImpl<B>
 	DistanceSortOptionsStepImpl(SearchSortDslContext<?, B> dslContext,
 			String absoluteFieldPath, GeoPoint location) {
 		super( dslContext );
-		this.builder = dslContext.getFactory().distance( absoluteFieldPath, location );
+		this.builder = dslContext.getBuilderFactory().distance( absoluteFieldPath, location );
 	}
 
 	@Override

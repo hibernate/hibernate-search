@@ -42,7 +42,7 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 	}
 
 	@Override
-	public F getFactory() {
+	public F getBuilderFactory() {
 		return factory;
 	}
 

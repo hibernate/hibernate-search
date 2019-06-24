@@ -7,12 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.sort;
 
 import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 
 /**
- * A DSL context allowing to specify the sort order, with some Elasticsearch-specific methods.
+ * A factory for search sorts with some Elasticsearch-specific methods.
  */
-public interface ElasticsearchSearchSortFactoryContext extends SearchSortFactoryContext {
+public interface ElasticsearchSearchSortFactory extends SearchSortFactory {
 
 	/**
 	 * Order elements according to a JSON sort definition.

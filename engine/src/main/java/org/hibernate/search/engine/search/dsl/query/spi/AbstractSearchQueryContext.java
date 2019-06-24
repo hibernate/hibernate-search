@@ -18,9 +18,9 @@ import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
-import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -30,13 +30,13 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 public abstract class AbstractSearchQueryContext<
-				S extends SearchQueryContext<S, H, SC>,
+				S extends SearchQueryContext<S, H, SF>,
 				H,
 				PDF extends SearchPredicateFactory,
-				SC extends SearchSortFactoryContext,
+				SF extends SearchSortFactory,
 				C
 		>
-		implements SearchQueryResultContext<S, H, PDF>, SearchQueryContext<S, H, SC> {
+		implements SearchQueryResultContext<S, H, PDF>, SearchQueryContext<S, H, SF> {
 
 	private final IndexScope<C> indexScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;
@@ -83,13 +83,13 @@ public abstract class AbstractSearchQueryContext<
 	}
 
 	@Override
-	public S sort(Function<? super SC, ? extends SortFinalStep> sortContributor) {
-		SearchSortBuilderFactory<? super C, ?> factory = indexScope.getSearchSortBuilderFactory();
-		SearchSortFactoryContext factoryContext = new DefaultSearchSortFactoryContext<>(
-				SearchSortDslContextImpl.root( factory )
+	public S sort(Function<? super SF, ? extends SortFinalStep> sortContributor) {
+		SearchSortBuilderFactory<? super C, ?> builderFactory = indexScope.getSearchSortBuilderFactory();
+		SearchSortFactory factory = new DefaultSearchSortFactory<>(
+				SearchSortDslContextImpl.root( builderFactory )
 		);
-		SearchSort sort = sortContributor.apply( extendSortContext( factoryContext ) ).toSort();
-		contribute( factory, sort );
+		SearchSort sort = sortContributor.apply( extendSortFactory( factory ) ).toSort();
+		contribute( builderFactory, sort );
 		return thisAsS();
 	}
 
@@ -150,5 +150,5 @@ public abstract class AbstractSearchQueryContext<
 
 	protected abstract PDF extendPredicateFactory(SearchPredicateFactory predicateFactory);
 
-	protected abstract SC extendSortContext(SearchSortFactoryContext sortFactoryContext);
+	protected abstract SF extendSortFactory(SearchSortFactory sortFactory);
 }

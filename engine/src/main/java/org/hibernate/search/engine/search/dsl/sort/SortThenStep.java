@@ -18,6 +18,6 @@ public interface SortThenStep extends SortFinalStep {
 	 *
 	 * @return The next step.
 	 */
-	SearchSortFactoryContext then();
+	SearchSortFactory then();
 
 }

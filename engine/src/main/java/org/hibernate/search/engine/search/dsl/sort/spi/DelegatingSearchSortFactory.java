@@ -13,21 +13,21 @@ import org.hibernate.search.engine.search.dsl.sort.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortOptionsStep;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtensionStep;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtension;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtensionStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
- * A delegating {@link SearchSortFactoryContext}.
+ * A delegating {@link SearchSortFactory}.
  * <p>
- * Mainly useful when implementing a {@link SearchSortFactoryContextExtension}.
+ * Mainly useful when implementing a {@link SearchSortFactoryExtension}.
  */
-public class DelegatingSearchSortFactoryContext implements SearchSortFactoryContext {
+public class DelegatingSearchSortFactory implements SearchSortFactory {
 
-	private final SearchSortFactoryContext delegate;
+	private final SearchSortFactory delegate;
 
-	public DelegatingSearchSortFactoryContext(SearchSortFactoryContext delegate) {
+	public DelegatingSearchSortFactory(SearchSortFactory delegate) {
 		this.delegate = delegate;
 	}
 
@@ -67,16 +67,16 @@ public class DelegatingSearchSortFactoryContext implements SearchSortFactoryCont
 	}
 
 	@Override
-	public <T> T extension(SearchSortFactoryContextExtension<T> extension) {
+	public <T> T extension(SearchSortFactoryExtension<T> extension) {
 		return delegate.extension( extension );
 	}
 
 	@Override
-	public SearchSortFactoryContextExtensionStep extension() {
+	public SearchSortFactoryExtensionStep extension() {
 		return delegate.extension();
 	}
 
-	protected SearchSortFactoryContext getDelegate() {
+	protected SearchSortFactory getDelegate() {
 		return delegate;
 	}
 }

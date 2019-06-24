@@ -27,9 +27,9 @@ import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryExtension;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -95,7 +95,7 @@ public class SearchSortIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactoryContext, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )
@@ -535,30 +535,30 @@ public class SearchSortIT {
 		}
 	}
 
-	private static class SupportedExtension implements SearchSortFactoryContextExtension<MyExtendedContext> {
+	private static class SupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedContext> extendOptional(SearchSortFactoryContext original,
+		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
 				SearchSortDslContext<?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
-			Assertions.assertThat( dslContext.getFactory() ).isNotNull();
-			return Optional.of( new MyExtendedContext( original ) );
+			Assertions.assertThat( dslContext.getBuilderFactory() ).isNotNull();
+			return Optional.of( new MyExtendedFactory( original ) );
 		}
 	}
 
-	private static class UnSupportedExtension implements SearchSortFactoryContextExtension<MyExtendedContext> {
+	private static class UnSupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedContext> extendOptional(SearchSortFactoryContext original,
+		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
 				SearchSortDslContext<?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
-			Assertions.assertThat( dslContext.getFactory() ).isNotNull();
+			Assertions.assertThat( dslContext.getBuilderFactory() ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
-	private static class MyExtendedContext extends DelegatingSearchSortFactoryContext {
-		MyExtendedContext(SearchSortFactoryContext delegate) {
+	private static class MyExtendedFactory extends DelegatingSearchSortFactory {
+		MyExtendedFactory(SearchSortFactory delegate) {
 			super( delegate );
 		}
 	}

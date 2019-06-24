@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchFetchable;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -21,12 +21,12 @@ import org.hibernate.search.engine.search.query.SearchQuery;
  *
  * @param <S> The type actually exposed to the user for this context (may be a subtype of SearchQueryContext, with more exposed methods).
  * @param <H> The type of hits for the created query.
- * @param <SC> The type of contexts used to create sorts in {@link #sort(Function)}.
+ * @param <SF> The type of factory used to create sorts in {@link #sort(Function)}.
  */
 public interface SearchQueryContext<
-		S extends SearchQueryContext<? extends S, H, SC>,
-		H,
-		SC extends SearchSortFactoryContext
+				S extends SearchQueryContext<? extends S, H, SF>,
+				H,
+				SF extends SearchSortFactory
 		>
 		extends SearchFetchable<H> {
 
@@ -64,12 +64,12 @@ public interface SearchQueryContext<
 
 	/**
 	 * Add a sort to this query.
-	 * @param sortContributor A function that will use the DSL context passed in parameter to create a sort,
+	 * @param sortContributor A function that will use the factory passed in parameter to create a sort,
 	 * returning the final step in the sort DSL.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	S sort(Function<? super SC, ? extends SortFinalStep> sortContributor);
+	S sort(Function<? super SF, ? extends SortFinalStep> sortContributor);
 
 	SearchQuery<H> toQuery();
 

@@ -25,7 +25,7 @@ public interface SearchSortDslContext<F extends SearchSortBuilderFactory<?, B>, 
 	/**
 	 * @return The sort builder factory. Will always return the exact same instance.
 	 */
-	F getFactory();
+	F getBuilderFactory();
 
 	/**
 	 * Create a new context with a sort builder appended.

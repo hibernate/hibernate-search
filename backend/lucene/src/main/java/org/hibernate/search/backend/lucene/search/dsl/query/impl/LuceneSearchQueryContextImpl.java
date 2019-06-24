@@ -10,7 +10,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryContext;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryResultContext;
-import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactoryContext;
+import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 
 class LuceneSearchQueryContextImpl<H>
 		extends AbstractExtendedSearchQueryContext<
@@ -26,7 +26,7 @@ class LuceneSearchQueryContextImpl<H>
 				H,
 				LuceneSearchResult<H>,
 				LuceneSearchPredicateFactory,
-				LuceneSearchSortFactoryContext,
+		LuceneSearchSortFactory,
 				LuceneSearchQueryElementCollector
 		>
 		implements LuceneSearchQueryResultContext<H>, LuceneSearchQueryContext<H> {
@@ -56,8 +56,8 @@ class LuceneSearchQueryContextImpl<H>
 	}
 
 	@Override
-	protected LuceneSearchSortFactoryContext extendSortContext(
-			SearchSortFactoryContext sortFactoryContext) {
-		return sortFactoryContext.extension( LuceneExtension.get() );
+	protected LuceneSearchSortFactory extendSortFactory(
+			SearchSortFactory sortFactory) {
+		return sortFactory.extension( LuceneExtension.get() );
 	}
 }

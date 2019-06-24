@@ -12,11 +12,11 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * A context allowing to specify the type of a sort.
+ * A factory for search sorts.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface SearchSortFactoryContext {
+public interface SearchSortFactory {
 
 	/**
 	 * Order elements by their relevance score.
@@ -108,25 +108,25 @@ public interface SearchSortFactoryContext {
 	SortThenStep byComposite(Consumer<? super CompositeSortComponentsStep> elementContributor);
 
 	/**
-	 * Extend the current context with the given extension,
-	 * resulting in an extended context offering different types of sorts.
+	 * Extend the current factory with the given extension,
+	 * resulting in an extended factory offering different types of sorts.
 	 *
 	 * @param extension The extension to the sort DSL.
-	 * @param <T> The type of context provided by the extension.
-	 * @return The extended context.
+	 * @param <T> The type of factory provided by the extension.
+	 * @return The extended factory.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchSortFactoryContextExtension<T> extension);
+	<T> T extension(SearchSortFactoryExtension<T> extension);
 
 	/**
 	 * Create a DSL step allowing multiple attempts to apply extensions one after the other,
 	 * failing only if <em>none</em> of the extensions is supported.
 	 * <p>
 	 * If you only need to apply a single extension and fail if it is not supported,
-	 * use the simpler {@link #extension(SearchSortFactoryContextExtension)} method instead.
+	 * use the simpler {@link #extension(SearchSortFactoryExtension)} method instead.
 	 *
 	 * @return A DSL step.
 	 */
-	SearchSortFactoryContextExtensionStep extension();
+	SearchSortFactoryExtensionStep extension();
 
 }

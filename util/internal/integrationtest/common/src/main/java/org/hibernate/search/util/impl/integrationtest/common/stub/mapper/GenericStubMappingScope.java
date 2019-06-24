@@ -10,7 +10,7 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
@@ -41,7 +41,7 @@ public class GenericStubMappingScope<R, E> {
 		return delegate.predicate();
 	}
 
-	public SearchSortFactoryContext sort() {
+	public SearchSortFactory sort() {
 		return delegate.sort();
 	}
 
