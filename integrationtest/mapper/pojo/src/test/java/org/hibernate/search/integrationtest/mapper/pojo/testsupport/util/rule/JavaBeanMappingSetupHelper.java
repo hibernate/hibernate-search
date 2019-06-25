@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingBuilder;
@@ -38,7 +37,7 @@ public final class JavaBeanMappingSetupHelper
 
 	@Override
 	protected SetupContext createSetupContext() {
-		return new SetupContext( ConfigurationPropertySource.empty() );
+		return new SetupContext();
 	}
 
 	@Override
@@ -55,19 +54,16 @@ public final class JavaBeanMappingSetupHelper
 			extends MappingSetupHelper<SetupContext, JavaBeanMappingBuilder, CloseableJavaBeanMapping>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
-		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
+		private final Map<String, Object> properties = new LinkedHashMap<>();
 
-		private final ConfigurationPropertySource propertySource;
-
-		SetupContext(ConfigurationPropertySource propertySource) {
-			this.propertySource = propertySource;
+		SetupContext() {
 			// Ensure overridden properties will be applied
-			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
+			withConfiguration( builder -> properties.forEach( builder::setProperty ) );
 		}
 
 		@Override
 		public SetupContext withProperty(String key, Object value) {
-			overriddenProperties.put( key, value );
+			properties.put( key, value );
 			return thisAsC();
 		}
 
@@ -102,7 +98,7 @@ public final class JavaBeanMappingSetupHelper
 
 		@Override
 		protected JavaBeanMappingBuilder createBuilder() {
-			return JavaBeanMapping.builder( propertySource, lookup );
+			return JavaBeanMapping.builder( lookup ).setProperties( properties );
 		}
 
 		@Override
