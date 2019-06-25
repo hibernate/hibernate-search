@@ -35,7 +35,7 @@ class LuceneNormalizerComponentsStep
 
 	private final List<LuceneTokenFilterParametersStep> tokenFilters = new ArrayList<>();
 
-	LuceneNormalizerComponentsStep(InitialLuceneAnalysisDefinitionContainerContext parentContext, String name) {
+	LuceneNormalizerComponentsStep(LuceneAnalysisConfigurationContextImpl parentContext, String name) {
 		super( parentContext );
 		this.name = name;
 	}

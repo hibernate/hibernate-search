@@ -4,20 +4,16 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.analysis.model.dsl;
+package org.hibernate.search.backend.lucene.analysis;
+
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTypeStep;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerTypeStep;
 
 /**
  * A context allowing the definition of named analyzers and normalizers in a Lucene backend.
- *
- * @deprecated Use {@link org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext}
- * in your analysis configurer,
- * and avoid chaining multiple analyzer definitions in one statement
- * ({@code context.analyzer(...)....analyzer(...)...;}):
- * use multiple statements instead
- * ({@code context.analyzer(...).... ; context.analyzer(...)...;})
  */
-@Deprecated
-public interface LuceneAnalysisDefinitionContainerContext {
+public interface LuceneAnalysisConfigurationContext extends LuceneAnalysisDefinitionContainerContext {
 
 	/**
 	 * Start a new analyzer definition.

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
+
 import org.apache.lucene.analysis.Analyzer;
 
 /**
@@ -28,6 +30,6 @@ public interface LuceneNormalizerTypeStep {
 	 * This instance is expected to never produce more than one token per stream.
 	 * @return The next step.
 	 */
-	LuceneAnalysisDefinitionContainerContext instance(Analyzer instance);
+	LuceneAnalysisConfigurationContext instance(Analyzer instance);
 
 }

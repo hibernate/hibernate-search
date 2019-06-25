@@ -40,7 +40,7 @@ class LuceneAnalyzerComponentsStep
 
 	private final List<LuceneTokenFilterParametersStep> tokenFilters = new ArrayList<>();
 
-	LuceneAnalyzerComponentsStep(InitialLuceneAnalysisDefinitionContainerContext parentContext, String name) {
+	LuceneAnalyzerComponentsStep(LuceneAnalysisConfigurationContextImpl parentContext, String name) {
 		super( parentContext );
 		this.tokenizer = new LuceneTokenizerParametersStep( this );
 		this.name = name;

@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.testsupport;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
@@ -17,7 +17,7 @@ import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 
 class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
-	public void configure(LuceneAnalysisDefinitionContainerContext context) {
+	public void configure(LuceneAnalysisConfigurationContext context) {
 		context.analyzer( "english" ).custom()
 				.tokenizer( StandardTokenizerFactory.class )
 				.tokenFilter( ASCIIFoldingFilterFactory.class )

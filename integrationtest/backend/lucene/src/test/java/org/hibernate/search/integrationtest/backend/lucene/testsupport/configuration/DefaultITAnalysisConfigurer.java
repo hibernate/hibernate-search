@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
@@ -16,7 +16,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 public class DefaultITAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
-	public void configure(LuceneAnalysisDefinitionContainerContext context) {
+	public void configure(LuceneAnalysisConfigurationContext context) {
 		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 				.instance( new StandardAnalyzer( EnglishAnalyzer.ENGLISH_STOP_WORDS_SET ) );
 		context.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ).custom()

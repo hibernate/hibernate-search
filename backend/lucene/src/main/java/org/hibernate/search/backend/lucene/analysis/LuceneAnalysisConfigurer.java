@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.analysis;
 
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 
 /**
@@ -23,6 +22,6 @@ public interface LuceneAnalysisConfigurer {
 	 * Configures analysis as necessary using the given {@code context}.
 	 * @param context A context exposing methods to configure analysis.
 	 */
-	void configure(LuceneAnalysisDefinitionContainerContext context);
+	void configure(LuceneAnalysisConfigurationContext context);
 
 }

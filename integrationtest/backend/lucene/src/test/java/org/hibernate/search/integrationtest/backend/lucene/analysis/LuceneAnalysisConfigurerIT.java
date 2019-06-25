@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.lucene.analysis;
 import java.util.function.Consumer;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -78,7 +78,7 @@ public class LuceneAnalysisConfigurerIT {
 	public static class FailingConfigurer implements LuceneAnalysisConfigurer {
 		private static final String FAILURE_MESSAGE = "Simulated failure for " + FailingConfigurer.class.getName();
 		@Override
-		public void configure(LuceneAnalysisDefinitionContainerContext context) {
+		public void configure(LuceneAnalysisConfigurationContext context) {
 			throw new SimulatedFailure( FAILURE_MESSAGE );
 		}
 	}
@@ -111,7 +111,7 @@ public class LuceneAnalysisConfigurerIT {
 
 	public static class AnalyzerNamingConflictConfigurer implements LuceneAnalysisConfigurer {
 		@Override
-		public void configure(LuceneAnalysisDefinitionContainerContext context) {
+		public void configure(LuceneAnalysisConfigurationContext context) {
 			context.analyzer( "analyzerName" ).custom();
 			context.analyzer( "anotherAnalyzerName" ).custom();
 			context.analyzer( "analyzerName" ).instance( new StandardAnalyzer() );
@@ -140,7 +140,7 @@ public class LuceneAnalysisConfigurerIT {
 
 	public static class NormalizerNamingConflictConfigurer implements LuceneAnalysisConfigurer {
 		@Override
-		public void configure(LuceneAnalysisDefinitionContainerContext context) {
+		public void configure(LuceneAnalysisConfigurationContext context) {
 			context.normalizer( "normalizerName" ).custom();
 			context.normalizer( "anotherNormalizerName" ).custom();
 			context.normalizer( "normalizerName" ).instance( new StandardAnalyzer() );
@@ -171,7 +171,7 @@ public class LuceneAnalysisConfigurerIT {
 
 	public static class ParameterNamingConflictConfigurer implements LuceneAnalysisConfigurer {
 		@Override
-		public void configure(LuceneAnalysisDefinitionContainerContext context) {
+		public void configure(LuceneAnalysisConfigurationContext context) {
 			context.analyzer( "analyzerName" ).custom()
 					.tokenizer( WhitespaceTokenizerFactory.class )
 							.param( "parameterName", "value1" )
