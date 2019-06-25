@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalysisDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentParametersStep;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisOptionalComponentsStep;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -19,23 +19,23 @@ import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 
-abstract class AbstractLuceneAnalysisComponentDefinitionContext<T>
+abstract class AbstractLuceneAnalysisComponentParametersStep<T>
 		extends DelegatingAnalysisDefinitionContainerContext
-		implements LuceneAnalysisComponentDefinitionContext, LuceneAnalysisComponentBuilder<T> {
+		implements LuceneAnalysisComponentParametersStep, LuceneAnalysisComponentBuilder<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneCustomAnalysisDefinitionContext parentContext;
+	private final LuceneAnalysisOptionalComponentsStep parentStep;
 
 	final Map<String, String> params = new LinkedHashMap<>();
 
-	AbstractLuceneAnalysisComponentDefinitionContext(LuceneCustomAnalysisDefinitionContext parentContext) {
-		super( parentContext );
-		this.parentContext = parentContext;
+	AbstractLuceneAnalysisComponentParametersStep(LuceneAnalysisOptionalComponentsStep parentStep) {
+		super( parentStep );
+		this.parentStep = parentStep;
 	}
 
 	@Override
-	public LuceneAnalysisComponentDefinitionContext param(String name, String value) {
+	public LuceneAnalysisComponentParametersStep param(String name, String value) {
 		String previous = params.putIfAbsent( name, value );
 		if ( previous != null ) {
 			throw log.analysisComponentParameterConflict( name, previous, value );
@@ -44,13 +44,13 @@ abstract class AbstractLuceneAnalysisComponentDefinitionContext<T>
 	}
 
 	@Override
-	public LuceneAnalysisComponentDefinitionContext charFilter(Class<? extends CharFilterFactory> factory) {
-		return parentContext.charFilter( factory );
+	public LuceneAnalysisComponentParametersStep charFilter(Class<? extends CharFilterFactory> factory) {
+		return parentStep.charFilter( factory );
 	}
 
 	@Override
-	public LuceneAnalysisComponentDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory) {
-		return parentContext.tokenFilter( factory );
+	public LuceneAnalysisComponentParametersStep tokenFilter(Class<? extends TokenFilterFactory> factory) {
+		return parentStep.tokenFilter( factory );
 	}
 
 }

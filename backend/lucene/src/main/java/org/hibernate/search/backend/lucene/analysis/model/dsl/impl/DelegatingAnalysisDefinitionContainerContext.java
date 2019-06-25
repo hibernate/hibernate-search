@@ -7,8 +7,8 @@
 package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTypeStep;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerTypeStep;
 
 
 class DelegatingAnalysisDefinitionContainerContext implements LuceneAnalysisDefinitionContainerContext {
@@ -20,12 +20,12 @@ class DelegatingAnalysisDefinitionContainerContext implements LuceneAnalysisDefi
 	}
 
 	@Override
-	public LuceneAnalyzerDefinitionContext analyzer(String name) {
+	public LuceneAnalyzerTypeStep analyzer(String name) {
 		return parentContext.analyzer( name );
 	}
 
 	@Override
-	public LuceneNormalizerDefinitionContext normalizer(String name) {
+	public LuceneNormalizerTypeStep normalizer(String name) {
 		return parentContext.normalizer( name );
 	}
 

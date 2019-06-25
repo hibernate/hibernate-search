@@ -9,22 +9,26 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
-public interface LuceneCustomAnalysisDefinitionContext extends LuceneAnalysisDefinitionContainerContext {
+/**
+ * The step in an analyzer/normalizer definition
+ * where optional components such as char filters or token filters can be added.
+ */
+public interface LuceneAnalysisOptionalComponentsStep extends LuceneAnalysisDefinitionContainerContext {
 
 	/**
 	 * Add a char filter that the analyzer will use.
 	 *
 	 * @param factory The factory that will create the char filter.
-	 * @return A context allowing to further define this analyzer or the char filter.
+	 * @return The next step.
 	 */
-	LuceneAnalysisComponentDefinitionContext charFilter(Class<? extends CharFilterFactory> factory);
+	LuceneAnalysisComponentParametersStep charFilter(Class<? extends CharFilterFactory> factory);
 
 	/**
 	 * Add a token filter that the analyzer will use.
 	 *
 	 * @param factory The factory that will create the token filter.
-	 * @return A context allowing to further define this analyzer or the token filter.
+	 * @return The next step.
 	 */
-	LuceneAnalysisComponentDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory);
+	LuceneAnalysisComponentParametersStep tokenFilter(Class<? extends TokenFilterFactory> factory);
 
 }
