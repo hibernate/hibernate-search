@@ -7,6 +7,27 @@
 package org.hibernate.search.integrationtest.showcase.library;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.ART_OF_COMPUTER_PROG_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.CALLIGRAPHY_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.CITY_CENTER_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.ELTON_JOHN_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.INDONESIAN_ECONOMY_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.JANE_FONDA_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.JANE_PORTER_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.JANE_SMITH_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.JAVA_DANCING_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.JAVA_FOR_DUMMIES_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.JOHN_LENNON_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.JOHN_PAUL_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.JOHN_PAUL_SMITH_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.JOHN_SMITH_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.LIVING_ON_ISLAND_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.PATTY_SMITH_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.PAUL_JOHN_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.SUBURBAN_1_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.SUBURBAN_2_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.THESAURUS_OF_LANGUAGES_ID;
+import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.UNIVERSITY_ID;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -28,8 +49,8 @@ import org.hibernate.search.integrationtest.showcase.library.model.Person;
 import org.hibernate.search.integrationtest.showcase.library.service.AdminService;
 import org.hibernate.search.integrationtest.showcase.library.service.BorrowalService;
 import org.hibernate.search.integrationtest.showcase.library.service.DocumentService;
-import org.hibernate.search.integrationtest.showcase.library.service.TestDataService;
 import org.hibernate.search.integrationtest.showcase.library.service.LibraryService;
+import org.hibernate.search.integrationtest.showcase.library.service.TestDataService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,33 +69,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LibraryShowcaseBaseIT {
-
-	// Document IDs
-	public static final int CALLIGRAPHY_ID = 1;
-	public static final int JAVA_DANCING_ID = 2;
-	public static final int INDONESIAN_ECONOMY_ID = 3;
-	public static final int JAVA_FOR_DUMMIES_ID = 4;
-	public static final int ART_OF_COMPUTER_PROG_ID = 5;
-	public static final int THESAURUS_OF_LANGUAGES_ID = 6;
-	public static final int LIVING_ON_ISLAND_ID = 7;
-
-	// Library IDs
-	public static final int CITY_CENTER_ID = 1;
-	public static final int SUBURBAN_1_ID = 2;
-	public static final int SUBURBAN_2_ID = 3;
-	public static final int UNIVERSITY_ID = 4;
-
-	// Person IDs
-	public static final int JANE_SMITH_ID = 1;
-	public static final int JANE_FONDA_ID = 2;
-	public static final int JANE_PORTER_ID = 3;
-	public static final int JOHN_LENNON_ID = 4;
-	public static final int ELTON_JOHN_ID = 5;
-	public static final int PATTY_SMITH_ID = 6;
-	public static final int JOHN_SMITH_ID = 7;
-	public static final int JOHN_PAUL_SMITH_ID = 8;
-	public static final int JOHN_PAUL_ID = 9;
-	public static final int PAUL_JOHN_ID = 10;
 
 	@Autowired
 	private DocumentService documentService;
