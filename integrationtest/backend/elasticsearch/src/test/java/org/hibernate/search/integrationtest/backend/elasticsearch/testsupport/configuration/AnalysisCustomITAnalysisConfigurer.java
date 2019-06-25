@@ -7,12 +7,12 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisCustomIT;
 
 public class AnalysisCustomITAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	@Override
-	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		String charFilterName = AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name + "_charFilter";
 		String tokenizerName = AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name + "_tokenizer";
 		String tokenFilterName = AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name + "_tokenFilter";

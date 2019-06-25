@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.showcase.library.analysis;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class ElasticsearchLibraryAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 
 	@Override
-	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.normalizer( LibraryAnalyzers.NORMALIZER_SORT ).custom()
 				.withTokenFilters( "asciifolding", "lowercase" );
 		context.normalizer( LibraryAnalyzers.NORMALIZER_ISBN ).custom()

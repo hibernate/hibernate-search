@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.analysis;
 import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -75,7 +75,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	public static class FailingConfigurer implements ElasticsearchAnalysisConfigurer {
 		private static final String FAILURE_MESSAGE = "Simulated failure for " + FailingConfigurer.class.getName();
 		@Override
-		public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
 			throw new SimulatedFailure( FAILURE_MESSAGE );
 		}
 	}
@@ -108,7 +108,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	public static class AnalyzerNamingConflictConfigurer implements ElasticsearchAnalysisConfigurer {
 		@Override
-		public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
 			context.analyzer( "analyzerName" ).custom().withTokenizer( "whitespace" );
 			context.analyzer( "anotherAnalyzerName" ).custom().withTokenizer( "whitespace" );
 			context.analyzer( "analyzerName" ).type( "someType" );
@@ -137,7 +137,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	public static class NormalizerNamingConflictConfigurer implements ElasticsearchAnalysisConfigurer {
 		@Override
-		public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
 			context.normalizer( "normalizerName" ).custom();
 			context.normalizer( "anotherNormalizerName" ).custom();
 			context.normalizer( "normalizerName" ).custom();
@@ -166,7 +166,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	public static class TokenizerNamingConflictConfigurer implements ElasticsearchAnalysisConfigurer {
 		@Override
-		public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
 			context.tokenizer( "tokenizerName" ).type( "someType" );
 			context.tokenizer( "tokenizerName" ).type( "someType" );
 		}
@@ -194,7 +194,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	public static class TokenizerMissingTypeConfigurer implements ElasticsearchAnalysisConfigurer {
 		@Override
-		public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
 			context.tokenizer( "tokenizerName" );
 		}
 	}
@@ -221,7 +221,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	public static class CharFilterNamingConflictConfigurer implements ElasticsearchAnalysisConfigurer {
 		@Override
-		public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
 			context.charFilter( "charFilterName" ).type( "someType" );
 			context.charFilter( "charFilterName" ).type( "someType" );
 		}
@@ -249,7 +249,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	public static class CharFilterMissingTypeConfigurer implements ElasticsearchAnalysisConfigurer {
 		@Override
-		public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
 			context.charFilter( "charFilterName" );
 		}
 	}
@@ -276,7 +276,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	public static class TokenFilterNamingConflictConfigurer implements ElasticsearchAnalysisConfigurer {
 		@Override
-		public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
 			context.tokenFilter( "tokenFilterName" ).type( "someType" );
 			context.tokenFilter( "tokenFilterName" ).type( "someType" );
 		}
@@ -304,7 +304,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	public static class TokenFilterMissingTypeConfigurer implements ElasticsearchAnalysisConfigurer {
 		@Override
-		public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
 			context.tokenFilter( "tokenFilterName" );
 		}
 	}
@@ -333,7 +333,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	public static class ParameterNamingConflictConfigurer implements ElasticsearchAnalysisConfigurer {
 		@Override
-		public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
 			context.analyzer( "analyzerName" ).type( "someType" )
 					.param( "parameterName", "value1" )
 					.param( "anotherParameterName", "someValue" )

@@ -7,11 +7,11 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 
 public class ElasticsearchAnalyzerManagementITAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	@Override
-	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.analyzer( "custom-analyzer" ).custom()
 				.withTokenizer( "custom-edgeNGram" )
 				.withCharFilters( "custom-pattern-replace" )

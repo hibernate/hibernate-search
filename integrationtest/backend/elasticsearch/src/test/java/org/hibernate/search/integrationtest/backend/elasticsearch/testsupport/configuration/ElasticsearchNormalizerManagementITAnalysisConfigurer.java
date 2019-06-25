@@ -7,11 +7,11 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 
 public class ElasticsearchNormalizerManagementITAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	@Override
-	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.normalizer( "custom-normalizer" ).custom()
 				.withCharFilters( "custom-char-mapping" )
 				.withTokenFilters( "custom-elision" );

@@ -8,11 +8,11 @@
 package org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 
 public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	@Override
-	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.analyzer( "english" ).custom() // <1>
 				.withTokenizer( "standard" ) // <2>
 				.withTokenFilters( "asciifolding", "lowercase", "snowball_english" ); // <3>

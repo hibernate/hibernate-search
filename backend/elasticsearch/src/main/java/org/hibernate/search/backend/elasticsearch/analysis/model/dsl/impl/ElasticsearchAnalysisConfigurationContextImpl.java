@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentTypeStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTypeStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTokenizerStep;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchNormalizerOptionalComponentsStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchNormalizerTypeStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentParametersStep;
@@ -21,8 +21,8 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.Elasticsea
 
 
 
-public class ElasticsearchAnalysisDefinitionContainerContextImpl
-		implements ElasticsearchAnalysisDefinitionContainerContext, ElasticsearchAnalysisDefinitionContributor {
+public class ElasticsearchAnalysisConfigurationContextImpl
+		implements ElasticsearchAnalysisConfigurationContext, ElasticsearchAnalysisDefinitionContributor {
 
 	private final List<ElasticsearchAnalysisDefinitionContributor> children = new ArrayList<>();
 
