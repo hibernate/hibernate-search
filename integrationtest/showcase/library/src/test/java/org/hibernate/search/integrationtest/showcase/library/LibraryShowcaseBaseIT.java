@@ -46,7 +46,6 @@ import org.hibernate.search.integrationtest.showcase.library.model.DocumentCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryServiceOption;
 import org.hibernate.search.integrationtest.showcase.library.model.Person;
-import org.hibernate.search.integrationtest.showcase.library.service.AdminService;
 import org.hibernate.search.integrationtest.showcase.library.service.BorrowalService;
 import org.hibernate.search.integrationtest.showcase.library.service.DocumentService;
 import org.hibernate.search.integrationtest.showcase.library.service.LibraryService;
@@ -78,9 +77,6 @@ public class LibraryShowcaseBaseIT {
 
 	@Autowired
 	private BorrowalService borrowalService;
-
-	@Autowired
-	private AdminService adminService;
 
 	@Autowired
 	private TestDataService testDataService;
