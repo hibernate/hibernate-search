@@ -25,7 +25,7 @@ import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Closer;
@@ -74,7 +74,7 @@ public class HibernateOrmIntegrationBooterIT {
 				 */
 				.setProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, new HibernateOrmSearchMappingConfigurer() {
 					@Override
-					public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+					public void configure(HibernateOrmMappingConfigurationContext context) {
 						Fail.fail( "Hibernate Search did not re-use the mapping generated when pre-booting" );
 					}
 				} );

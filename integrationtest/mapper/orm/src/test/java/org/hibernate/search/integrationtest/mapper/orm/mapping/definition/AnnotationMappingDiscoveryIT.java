@@ -21,7 +21,7 @@ import javax.persistence.Id;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -82,7 +82,7 @@ public class AnnotationMappingDiscoveryIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
 							@Override
-							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping()
 										.type( IndexedEntity.class )
 										.property( "nonAnnotationMappedEmbedded" )
@@ -122,7 +122,7 @@ public class AnnotationMappingDiscoveryIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
 							@Override
-							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping()
 										.type( IndexedEntity.class )
 										.property( "nonAnnotationMappedEmbedded" )

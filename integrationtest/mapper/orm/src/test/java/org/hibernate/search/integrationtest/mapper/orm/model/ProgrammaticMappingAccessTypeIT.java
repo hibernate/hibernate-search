@@ -20,7 +20,7 @@ import javax.persistence.Transient;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -138,7 +138,7 @@ public class ProgrammaticMappingAccessTypeIT {
 
 	private class MyMappingConfigurer implements HibernateOrmSearchMappingConfigurer {
 		@Override
-		public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+		public void configure(HibernateOrmMappingConfigurationContext context) {
 			ProgrammaticMappingDefinitionContext mapping = context.programmaticMapping();
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )

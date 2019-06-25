@@ -10,7 +10,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorDefinitionCo
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 
-public interface HibernateOrmMappingDefinitionContainerContext {
+public interface HibernateOrmMappingConfigurationContext {
 
 	/**
 	 * Start the definition of a programmatic mapping.

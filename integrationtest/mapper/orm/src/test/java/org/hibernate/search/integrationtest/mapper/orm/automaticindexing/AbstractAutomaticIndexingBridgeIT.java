@@ -18,7 +18,7 @@ import javax.persistence.OrderBy;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
@@ -645,7 +645,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
 							@Override
-							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( ContainingEntity.class )
 										.bridge( getContainingEntityTypeBridgeClass() );
 							}
@@ -672,7 +672,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
 							@Override
-							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( ContainingEntity.class )
 										.property( "association1" )
 										.bridge( getContainingEntitySingleValuedPropertyBridgeClass() );
@@ -707,7 +707,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
 							@Override
-							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( ContainingEntity.class )
 										.property( "association2" )
 										.bridge( bridgeClass );
