@@ -43,7 +43,11 @@ public class LuceneEntityProjection<E> implements LuceneSearchProjection<Object,
 	@Override
 	public E transform(LoadingResult<?> loadingResult, Object extractedData,
 			SearchProjectionTransformContext context) {
-		return (E) loadingResult.getLoaded( extractedData );
+		E loaded = (E) loadingResult.getLoaded( extractedData );
+		if ( loaded == null ) {
+			context.reportFailedLoad();
+		}
+		return loaded;
 	}
 
 	@Override

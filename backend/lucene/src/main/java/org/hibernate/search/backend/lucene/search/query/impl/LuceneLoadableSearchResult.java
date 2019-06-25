@@ -54,9 +54,26 @@ public class LuceneLoadableSearchResult<H> {
 
 		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking();
 
-		for ( int i = 0; i < extractedData.size(); i++ ) {
-			H transformed = transformUnsafe( rootProjection, loadingResult, extractedData.get( i ), transformContext );
-			extractedData.set( i, transformed );
+		int readIndex = 0;
+		int writeIndex = 0;
+		for ( ; readIndex < extractedData.size(); ++readIndex ) {
+			transformContext.reset();
+			H transformed = transformUnsafe(
+					rootProjection, loadingResult, extractedData.get( readIndex ), transformContext
+			);
+
+			if ( transformContext.hasFailedLoad() ) {
+				// Skip the hit
+				continue;
+			}
+
+			extractedData.set( writeIndex, transformed );
+			++writeIndex;
+		}
+
+		if ( writeIndex < readIndex ) {
+			// Some hits were skipped; adjust the list size.
+			extractedData.subList( writeIndex, readIndex ).clear();
 		}
 
 		// The cast is safe, since all elements extend H and we make the list unmodifiable

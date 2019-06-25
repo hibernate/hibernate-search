@@ -14,11 +14,25 @@ public class SearchProjectionTransformContext {
 
 	private final FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext;
 
+	private boolean hasFailedLoad = false;
+
 	public SearchProjectionTransformContext(SessionContextImplementor sessionContext) {
 		this.fromDocumentFieldValueConvertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
 	}
 
 	FromDocumentFieldValueConvertContext getFromDocumentFieldValueConvertContext() {
 		return fromDocumentFieldValueConvertContext;
+	}
+
+	void reportFailedLoad() {
+		hasFailedLoad = true;
+	}
+
+	public boolean hasFailedLoad() {
+		return hasFailedLoad;
+	}
+
+	public void reset() {
+		hasFailedLoad = false;
 	}
 }
