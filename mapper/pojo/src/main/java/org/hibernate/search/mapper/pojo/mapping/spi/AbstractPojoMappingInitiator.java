@@ -20,10 +20,10 @@ import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingDefinitionContextImpl;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingDefinitionContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingConfigurationContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBuildState>
@@ -34,7 +34,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	private boolean implicitProvidedId;
 	private boolean multiTenancyEnabled;
 
-	private final AnnotationMappingDefinitionContextImpl annotationMappingDefinition;
+	private final AnnotationMappingConfigurationContextImpl annotationMappingConfiguration;
 
 	private final ContainerExtractorRegistry.Builder containerExtractorRegistryBuilder;
 
@@ -50,20 +50,20 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		 * Also, make sure to re-use the same mapping, so as not to parse annotations on a given type twice,
 		 * which would lead to duplicate field definitions.
 		 */
-		annotationMappingDefinition = new AnnotationMappingDefinitionContextImpl( introspector );
-		addConfigurationContributor( annotationMappingDefinition );
+		annotationMappingConfiguration = new AnnotationMappingConfigurationContextImpl( introspector );
+		addConfigurationContributor( annotationMappingConfiguration );
 
 		containerExtractorRegistryBuilder = ContainerExtractorRegistry.builder();
 	}
 
-	public ProgrammaticMappingDefinitionContext programmaticMapping() {
-		ProgrammaticMappingDefinitionContextImpl definition = new ProgrammaticMappingDefinitionContextImpl( introspector );
-		addConfigurationContributor( definition );
-		return definition;
+	public ProgrammaticMappingConfigurationContext programmaticMapping() {
+		ProgrammaticMappingConfigurationContextImpl context = new ProgrammaticMappingConfigurationContextImpl( introspector );
+		addConfigurationContributor( context );
+		return context;
 	}
 
-	public AnnotationMappingDefinitionContext annotationMapping() {
-		return annotationMappingDefinition;
+	public AnnotationMappingConfigurationContext annotationMapping() {
+		return annotationMappingConfiguration;
 	}
 
 	public ContainerExtractorConfigurationContext containerExtractors() {
@@ -79,7 +79,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	}
 
 	public void setAnnotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
-		annotationMappingDefinition.setAnnotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
+		annotationMappingConfiguration.setAnnotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
 	}
 
 	@Override

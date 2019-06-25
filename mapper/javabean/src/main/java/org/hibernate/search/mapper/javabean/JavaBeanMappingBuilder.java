@@ -22,8 +22,8 @@ import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingPartialB
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public final class JavaBeanMappingBuilder {
@@ -45,11 +45,11 @@ public final class JavaBeanMappingBuilder {
 		mappingInitiator.setAnnotatedTypeDiscoveryEnabled( true );
 	}
 
-	public ProgrammaticMappingDefinitionContext programmaticMapping() {
+	public ProgrammaticMappingConfigurationContext programmaticMapping() {
 		return mappingInitiator.programmaticMapping();
 	}
 
-	public AnnotationMappingDefinitionContext annotationMapping() {
+	public AnnotationMappingConfigurationContext annotationMapping() {
 		return mappingInitiator.annotationMapping();
 	}
 

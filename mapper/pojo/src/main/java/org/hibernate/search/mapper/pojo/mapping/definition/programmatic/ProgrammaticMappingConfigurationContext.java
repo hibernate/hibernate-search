@@ -7,9 +7,9 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 /**
- * A context to define programmatic mapping.
+ * A context to configure programmatic mapping.
  */
-public interface ProgrammaticMappingDefinitionContext {
+public interface ProgrammaticMappingConfigurationContext {
 
 	/**
 	 * Starts the definition of the mapping of a specific type.

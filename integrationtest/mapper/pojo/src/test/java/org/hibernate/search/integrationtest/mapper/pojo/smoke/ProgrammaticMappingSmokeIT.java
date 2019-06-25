@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
@@ -135,7 +135,7 @@ public class ProgrammaticMappingSmokeIT {
 							YetAnotherIndexedEntity.class
 					) );
 
-					ProgrammaticMappingDefinitionContext mappingDefinition = builder.programmaticMapping();
+					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 					mappingDefinition.type( IndexedEntity.class )
 							.indexed( IndexedEntity.INDEX )
 							.bridge(
@@ -152,7 +152,7 @@ public class ProgrammaticMappingSmokeIT {
 											.maxDepth( 1 )
 											.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
 
-					ProgrammaticMappingDefinitionContext secondMappingDefinition = builder.programmaticMapping();
+					ProgrammaticMappingConfigurationContext secondMappingDefinition = builder.programmaticMapping();
 					secondMappingDefinition.type( ParentIndexedEntity.class )
 							.property( "localDate" )
 									.genericField( "myLocalDateField" )

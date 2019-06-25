@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilde
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
@@ -322,7 +322,7 @@ public class CleanupIT {
 		assertRuntimeComponentsClosed();
 	}
 
-	private void failingStartup(Consumer<ProgrammaticMappingDefinitionContext> additionalMappingContributor) {
+	private void failingStartup(Consumer<ProgrammaticMappingConfigurationContext> additionalMappingContributor) {
 		SubTest.expectException(
 				() -> startup( additionalMappingContributor )
 		)
@@ -331,7 +331,7 @@ public class CleanupIT {
 				.hasMessageContaining( SimulatedFailure.MESSAGE );
 	}
 
-	private void startup(Consumer<ProgrammaticMappingDefinitionContext> additionalMappingContributor) {
+	private void startup(Consumer<ProgrammaticMappingConfigurationContext> additionalMappingContributor) {
 		this.mapping = setupHelper.withBackendMock( backendMock )
 				/*
 				 * Make the StartubStubContainerExtractor available through a factory
@@ -359,7 +359,7 @@ public class CleanupIT {
 							containerExtractorDefinition.define( StartupStubContainerExtractor.NAME, StartupStubContainerExtractor.class );
 							containerExtractorDefinition.define( FailingContainerExtractor.NAME, FailingContainerExtractor.class );
 
-							ProgrammaticMappingDefinitionContext mappingDefinition = builder.programmaticMapping();
+							ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 							mappingDefinition.type( IndexedEntity.class )
 									.indexed( IndexedEntity.INDEX )
 									.bridge( new SucceedingBridgeBuilder( TYPE_BRIDGE_COUNTER_KEYS ) )
