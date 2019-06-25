@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -1164,7 +1164,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new ElasticsearchAnalysisConfigurer() {
 							@Override
-							public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+							public void configure(ElasticsearchAnalysisConfigurationContext context) {
 								// No-op
 							}
 						}

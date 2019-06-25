@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.analysis;
 
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 
 /**
@@ -22,6 +21,6 @@ public interface ElasticsearchAnalysisConfigurer {
 	 * Configures analysis as necessary using the given {@code context}.
 	 * @param context A context exposing methods to configure analysis.
 	 */
-	void configure(ElasticsearchAnalysisDefinitionContainerContext context);
+	void configure(ElasticsearchAnalysisConfigurationContext context);
 
 }

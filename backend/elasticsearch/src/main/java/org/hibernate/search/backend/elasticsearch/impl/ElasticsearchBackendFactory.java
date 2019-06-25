@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisDefinitionContainerContextImpl;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisConfigurationContextImpl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyName;
@@ -167,8 +167,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 					.map( holder -> {
 						try ( BeanHolder<? extends ElasticsearchAnalysisConfigurer> configurerHolder = holder ) {
-							ElasticsearchAnalysisDefinitionContainerContextImpl collector =
-									new ElasticsearchAnalysisDefinitionContainerContextImpl();
+							ElasticsearchAnalysisConfigurationContextImpl collector =
+									new ElasticsearchAnalysisConfigurationContextImpl();
 							configurerHolder.get().configure( collector );
 							return new ElasticsearchAnalysisDefinitionRegistry( collector );
 						}

@@ -4,18 +4,21 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
+package org.hibernate.search.backend.elasticsearch.analysis;
 
-import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentTypeStep;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisOptionalComponentsStep;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTokenizerStep;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTypeStep;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchNormalizerTypeStep;
 
 /**
  * A context allowing the definition of named analysis-related elements in an Elasticsearch backend:
  * analyzers, tokenizers, char filters, ...
- *
- * @deprecated Use {@link ElasticsearchAnalysisConfigurationContext} instead.
  */
-@Deprecated
-public interface ElasticsearchAnalysisDefinitionContainerContext {
+public interface ElasticsearchAnalysisConfigurationContext
+		extends ElasticsearchAnalysisDefinitionContainerContext {
 
 	/**
 	 * Start an analyzer definition.
