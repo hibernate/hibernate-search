@@ -15,8 +15,8 @@ public interface ProgrammaticMappingConfigurationContext {
 	 * Starts the definition of the mapping of a specific type.
 	 *
 	 * @param clazz The type to map.
-	 * @return A context to map this type.
+	 * @return The initial step of a DSL where the type mapping can be defined.
 	 */
-	TypeMappingContext type(Class<?> clazz);
+	TypeMappingStep type(Class<?> clazz);
 
 }

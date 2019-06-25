@@ -17,15 +17,15 @@ import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-public class TypeMappingContextImpl
-		implements TypeMappingContext, PojoMappingConfigurationContributor, PojoTypeMetadataContributor {
+public class TypeMappingStepImpl
+		implements TypeMappingStep, PojoMappingConfigurationContributor, PojoTypeMetadataContributor {
 
 	private final PojoRawTypeModel<?> typeModel;
 
@@ -34,7 +34,7 @@ public class TypeMappingContextImpl
 
 	private final ErrorCollectingPojoTypeMetadataContributor children = new ErrorCollectingPojoTypeMetadataContributor();
 
-	public TypeMappingContextImpl(PojoRawTypeModel<?> typeModel) {
+	public TypeMappingStepImpl(PojoRawTypeModel<?> typeModel) {
 		this.typeModel = typeModel;
 	}
 
@@ -65,59 +65,59 @@ public class TypeMappingContextImpl
 	}
 
 	@Override
-	public TypeMappingContext indexed() {
+	public TypeMappingStep indexed() {
 		return indexed( typeModel.getJavaClass().getName() );
 	}
 
 	@Override
-	public TypeMappingContext indexed(String indexName) {
+	public TypeMappingStep indexed(String indexName) {
 		this.indexName = indexName;
 		return this;
 	}
 
 	@Override
-	public TypeMappingContext indexed(String backendName, String indexName) {
+	public TypeMappingStep indexed(String backendName, String indexName) {
 		this.backendName = backendName;
 		this.indexName = indexName;
 		return this;
 	}
 
 	@Override
-	public TypeMappingContext routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass) {
+	public TypeMappingStep routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass) {
 		return routingKeyBridge( BeanReference.of( bridgeClass ) );
 	}
 
 	@Override
-	public TypeMappingContext routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference) {
+	public TypeMappingStep routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference) {
 		return routingKeyBridge( new BeanBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override
-	public TypeMappingContext routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder) {
+	public TypeMappingStep routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder) {
 		children.add( new RoutingKeyBridgeMappingContributor( builder ) );
 		return this;
 	}
 
 	@Override
-	public TypeMappingContext bridge(Class<? extends TypeBridge> bridgeClass) {
+	public TypeMappingStep bridge(Class<? extends TypeBridge> bridgeClass) {
 		return bridge( BeanReference.of( bridgeClass ) );
 	}
 
 	@Override
-	public TypeMappingContext bridge(BeanReference<? extends TypeBridge> bridgeReference) {
+	public TypeMappingStep bridge(BeanReference<? extends TypeBridge> bridgeReference) {
 		return bridge( new BeanBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override
-	public TypeMappingContext bridge(BridgeBuilder<? extends TypeBridge> builder) {
+	public TypeMappingStep bridge(BridgeBuilder<? extends TypeBridge> builder) {
 		children.add( new TypeBridgeMappingContributor( builder ) );
 		return this;
 	}
 
 	@Override
-	public PropertyMappingContext property(String propertyName) {
+	public PropertyMappingStep property(String propertyName) {
 		PojoPropertyModel<?> propertyModel = typeModel.getProperty( propertyName );
-		InitialPropertyMappingContext child = new InitialPropertyMappingContext( this, propertyModel );
+		InitialPropertyMappingStep child = new InitialPropertyMappingStep( this, propertyModel );
 		children.add( child );
 		return child;
 	}

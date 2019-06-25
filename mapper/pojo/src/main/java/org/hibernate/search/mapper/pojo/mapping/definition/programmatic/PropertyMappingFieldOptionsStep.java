@@ -15,11 +15,11 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 /**
- * A context to configure an index field mapped to a POJO property.
+ * The step in a property-to-index-field mapping where optional parameters can be set.
  *
- * @param <S> The "self" type, i.e. the type to return from methods.
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface PropertyFieldMappingContext<S extends PropertyFieldMappingContext<?>> extends PropertyMappingContext {
+public interface PropertyMappingFieldOptionsStep<S extends PropertyMappingFieldOptionsStep<?>> extends PropertyMappingStep {
 
 	/**
 	 * @param projectable Whether projections are enabled for this field.

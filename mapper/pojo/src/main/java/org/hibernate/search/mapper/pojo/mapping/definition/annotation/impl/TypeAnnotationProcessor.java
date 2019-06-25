@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 abstract class TypeAnnotationProcessor<A extends Annotation> {
@@ -30,15 +30,15 @@ abstract class TypeAnnotationProcessor<A extends Annotation> {
 	 * @param mappingContext The mapping context to push translated information to.
 	 * @param typeModel A model of the type holding the annotation.
 	 */
-	public final void process(TypeMappingContext mappingContext, PojoRawTypeModel<?> typeModel) {
+	public final void process(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel) {
 		processEach( mappingContext, typeModel, extractAnnotations( typeModel ) );
 	}
 
 	abstract Stream<? extends A> extractAnnotations(PojoRawTypeModel<?> typeModel);
 
-	abstract void doProcess(TypeMappingContext mappingContext, PojoRawTypeModel<?> typeModel, A annotation);
+	abstract void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, A annotation);
 
-	private void processEach(TypeMappingContext mappingContext, PojoRawTypeModel<?> typeModel,
+	private void processEach(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel,
 			Stream<? extends A> annotations) {
 		List<A> annotationList = annotations.collect( Collectors.toList() );
 		for ( A annotation : annotationList ) {

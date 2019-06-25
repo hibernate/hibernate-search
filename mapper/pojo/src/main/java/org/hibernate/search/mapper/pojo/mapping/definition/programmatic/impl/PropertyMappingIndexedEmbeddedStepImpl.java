@@ -14,13 +14,13 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingIndexedEmbeddedStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
-public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropertyMappingContext
-		implements PropertyIndexedEmbeddedMappingContext, PojoPropertyMetadataContributor {
+class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingStep
+		implements PropertyMappingIndexedEmbeddedStep, PojoPropertyMetadataContributor {
 
 	private String prefix;
 
@@ -32,7 +32,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
-	PropertyIndexedEmbeddedMappingContextImpl(PropertyMappingContext parent) {
+	PropertyMappingIndexedEmbeddedStepImpl(PropertyMappingStep parent) {
 		super( parent );
 	}
 
@@ -53,31 +53,31 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 	}
 
 	@Override
-	public PropertyIndexedEmbeddedMappingContext prefix(String prefix) {
+	public PropertyMappingIndexedEmbeddedStep prefix(String prefix) {
 		this.prefix = prefix;
 		return this;
 	}
 
 	@Override
-	public PropertyIndexedEmbeddedMappingContext storage(ObjectFieldStorage storage) {
+	public PropertyMappingIndexedEmbeddedStep storage(ObjectFieldStorage storage) {
 		this.storage = storage;
 		return this;
 	}
 
 	@Override
-	public PropertyIndexedEmbeddedMappingContext maxDepth(Integer depth) {
+	public PropertyMappingIndexedEmbeddedStep maxDepth(Integer depth) {
 		this.maxDepth = depth;
 		return this;
 	}
 
 	@Override
-	public PropertyIndexedEmbeddedMappingContext includePaths(Collection<String> paths) {
+	public PropertyMappingIndexedEmbeddedStep includePaths(Collection<String> paths) {
 		this.includePaths.addAll( paths );
 		return this;
 	}
 
 	@Override
-	public PropertyIndexedEmbeddedMappingContext withExtractors(ContainerExtractorPath extractorPath) {
+	public PropertyMappingIndexedEmbeddedStep withExtractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return this;
 	}

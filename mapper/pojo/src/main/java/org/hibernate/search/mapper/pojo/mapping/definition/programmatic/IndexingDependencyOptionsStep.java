@@ -13,10 +13,9 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 /**
- * A context to define how a dependency of the indexing process to the property
- * should affect automatic indexing.
+ * The step in an "indexing dependency" definition where optional parameters can be set.
  */
-public interface IndexingDependencyMappingContext extends PropertyMappingContext {
+public interface IndexingDependencyOptionsStep extends PropertyMappingStep {
 
 	/**
 	 * @param reindexOnUpdate How indexed entities using the annotated property should be reindexed when the value,
@@ -25,7 +24,7 @@ public interface IndexingDependencyMappingContext extends PropertyMappingContext
 	 * @see IndexingDependency#reindexOnUpdate()
 	 * @see ReindexOnUpdate
 	 */
-	IndexingDependencyMappingContext reindexOnUpdate(ReindexOnUpdate reindexOnUpdate);
+	IndexingDependencyOptionsStep reindexOnUpdate(ReindexOnUpdate reindexOnUpdate);
 
 	/**
 	 * @param pojoModelPath A path to other values that are used to generate the value of this property.
@@ -36,7 +35,7 @@ public interface IndexingDependencyMappingContext extends PropertyMappingContext
 	 * @see PojoModelPath#ofValue(String, ContainerExtractorPath)
 	 * @see PojoModelPath#builder()
 	 */
-	IndexingDependencyMappingContext derivedFrom(PojoModelPathValueNode pojoModelPath);
+	IndexingDependencyOptionsStep derivedFrom(PojoModelPathValueNode pojoModelPath);
 
 	/**
 	 * @param extractorName The name of the container extractor to use.
@@ -44,7 +43,7 @@ public interface IndexingDependencyMappingContext extends PropertyMappingContext
 	 * @see IndexingDependency#extraction()
 	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	default IndexingDependencyMappingContext withExtractor(String extractorName) {
+	default IndexingDependencyOptionsStep withExtractor(String extractorName) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
@@ -54,7 +53,7 @@ public interface IndexingDependencyMappingContext extends PropertyMappingContext
 	 * @return {@code this}, for method chaining.
 	 * @see IndexingDependency#extraction()
 	 */
-	default IndexingDependencyMappingContext withoutExtractors() {
+	default IndexingDependencyOptionsStep withoutExtractors() {
 		return withExtractors( ContainerExtractorPath.noExtractors() );
 	}
 
@@ -64,6 +63,6 @@ public interface IndexingDependencyMappingContext extends PropertyMappingContext
 	 * @see IndexingDependency#extraction()
 	 * @see ContainerExtractorPath
 	 */
-	IndexingDependencyMappingContext withExtractors(ContainerExtractorPath extractorPath);
+	IndexingDependencyOptionsStep withExtractors(ContainerExtractorPath extractorPath);
 
 }

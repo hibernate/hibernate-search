@@ -13,16 +13,17 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilde
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 /**
- * A context to map a type to the index schema.
+ * The step in a mapping definition where a type can be mapped,
+ * and where properties of that type can be referenced to map them more precisely.
  */
-public interface TypeMappingContext {
+public interface TypeMappingStep {
 
 	/**
 	 * Maps an entity type to an index.
 	 * @return {@code this}, for method chaining.
 	 * @see Indexed
 	 */
-	TypeMappingContext indexed();
+	TypeMappingStep indexed();
 
 	/**
 	 * Maps an entity type to an index.
@@ -31,7 +32,7 @@ public interface TypeMappingContext {
 	 * @see Indexed
 	 * @see Indexed#index()
 	 */
-	TypeMappingContext indexed(String indexName);
+	TypeMappingStep indexed(String indexName);
 
 	/**
 	 * Maps an entity type to an index.
@@ -42,14 +43,14 @@ public interface TypeMappingContext {
 	 * @see Indexed#backend()
 	 * @see Indexed#index()
 	 */
-	TypeMappingContext indexed(String backendName, String indexName);
+	TypeMappingStep indexed(String backendName, String indexName);
 
 	/**
 	 * @param bridgeClass The class of the bridge to use.
 	 * @return {@code this}, for method chaining.
 	 * @see RoutingKeyBridge
 	 */
-	TypeMappingContext routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass);
+	TypeMappingStep routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass);
 
 	/**
 	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
@@ -58,21 +59,21 @@ public interface TypeMappingContext {
 	 * @return {@code this}, for method chaining.
 	 * @see RoutingKeyBridge
 	 */
-	TypeMappingContext routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference);
+	TypeMappingStep routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference);
 
 	/**
 	 * @param builder A bridge builder.
 	 * @return {@code this}, for method chaining.
 	 * @see RoutingKeyBridge
 	 */
-	TypeMappingContext routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder);
+	TypeMappingStep routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder);
 
 	/**
 	 * @param bridgeClass The class of the bridge to use.
 	 * @return {@code this}, for method chaining.
 	 * @see TypeBridge
 	 */
-	TypeMappingContext bridge(Class<? extends TypeBridge> bridgeClass);
+	TypeMappingStep bridge(Class<? extends TypeBridge> bridgeClass);
 
 	/**
 	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
@@ -81,21 +82,21 @@ public interface TypeMappingContext {
 	 * @return {@code this}, for method chaining.
 	 * @see TypeBridge
 	 */
-	TypeMappingContext bridge(BeanReference<? extends TypeBridge> bridgeReference);
+	TypeMappingStep bridge(BeanReference<? extends TypeBridge> bridgeReference);
 
 	/**
 	 * @param builder A bridge builder.
 	 * @return {@code this}, for method chaining.
 	 * @see TypeBridge
 	 */
-	TypeMappingContext bridge(BridgeBuilder<? extends TypeBridge> builder);
+	TypeMappingStep bridge(BridgeBuilder<? extends TypeBridge> builder);
 
 	/**
 	 * Starts the definition of the mapping of a specific property.
 	 *
 	 * @param propertyName The name of a property in this type.
-	 * @return A context to map this property.
+	 * @return A DSL step where the property mapping can be defined in more details.
 	 */
-	PropertyMappingContext property(String propertyName);
+	PropertyMappingStep property(String propertyName);
 
 }

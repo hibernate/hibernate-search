@@ -12,34 +12,34 @@ import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingKeywordFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-class PropertyKeywordFieldMappingContextImpl
-		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyKeywordFieldMappingContext, StringIndexFieldTypeOptionsStep<?>>
-		implements PropertyKeywordFieldMappingContext {
+class PropertyMappingKeywordFieldOptionsStepImpl
+		extends AbstractPropertyMappingNonFullTextFieldOptionsStep<PropertyMappingKeywordFieldOptionsStep, StringIndexFieldTypeOptionsStep<?>>
+		implements PropertyMappingKeywordFieldOptionsStep {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	PropertyKeywordFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
-		super( parent, relativeFieldName, PropertyKeywordFieldMappingContextImpl::castIndexFieldTypeOptionsStep );
+	PropertyMappingKeywordFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
+		super( parent, relativeFieldName, PropertyMappingKeywordFieldOptionsStepImpl::castIndexFieldTypeOptionsStep );
 	}
 
 	@Override
-	PropertyKeywordFieldMappingContext thisAsS() {
+	PropertyMappingKeywordFieldOptionsStep thisAsS() {
 		return this;
 	}
 
 	@Override
-	public PropertyKeywordFieldMappingContext normalizer(String normalizerName) {
+	public PropertyMappingKeywordFieldOptionsStep normalizer(String normalizerName) {
 		fieldModelContributor.add( (c, b) -> c.normalizer( normalizerName ) );
 		return thisAsS();
 	}
 
 	@Override
-	public PropertyKeywordFieldMappingContext norms(Norms norms) {
+	public PropertyMappingKeywordFieldOptionsStep norms(Norms norms) {
 		fieldModelContributor.add( (c, b) -> c.norms( norms ) );
 		return thisAsS();
 	}

@@ -11,16 +11,18 @@ import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 
 /**
- * A context to configure a full-text index field mapped to a POJO property.
+ * The step in a property-to-index-field mapping where optional parameters can be set,
+ * when the index field is a full-text field.
  */
-public interface PropertyFullTextFieldMappingContext extends PropertyFieldMappingContext<PropertyFullTextFieldMappingContext> {
+public interface PropertyMappingFullTextFieldOptionsStep
+		extends PropertyMappingFieldOptionsStep<PropertyMappingFullTextFieldOptionsStep> {
 
 	/**
 	 * @param analyzerName A reference to the analyzer to use for this field.
 	 * @return {@code this}, for method chaining.
 	 * @see FullTextField#analyzer()
 	 */
-	PropertyFullTextFieldMappingContext analyzer(String analyzerName);
+	PropertyMappingFullTextFieldOptionsStep analyzer(String analyzerName);
 
 	/**
 	 * @param norms Whether index time scoring information should be stored or not.
@@ -28,7 +30,7 @@ public interface PropertyFullTextFieldMappingContext extends PropertyFieldMappin
 	 * @see FullTextField#norms()
 	 * @see Norms
 	 */
-	PropertyFullTextFieldMappingContext norms(Norms norms);
+	PropertyMappingFullTextFieldOptionsStep norms(Norms norms);
 
 	/**
 	 * @param termVector The term vector storing strategy.
@@ -36,6 +38,6 @@ public interface PropertyFullTextFieldMappingContext extends PropertyFieldMappin
 	 * @see FullTextField#termVector()
 	 * @see TermVector
 	 */
-	PropertyFullTextFieldMappingContext termVector(TermVector termVector);
+	PropertyMappingFullTextFieldOptionsStep termVector(TermVector termVector);
 
 }

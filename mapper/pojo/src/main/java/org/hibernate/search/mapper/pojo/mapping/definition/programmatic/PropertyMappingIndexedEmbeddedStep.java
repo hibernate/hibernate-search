@@ -14,30 +14,30 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 /**
- * A context to define how a property is indexed-embedded.
+ * The step in a property-to-indexed-embedded mapping where optional parameters can be set.
  */
-public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingContext {
+public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep {
 
 	/**
 	 * @param prefix The prefix used when embedding.
 	 * @return {@code this}, for method chaining.
 	 * @see IndexedEmbedded#prefix()
 	 */
-	PropertyIndexedEmbeddedMappingContext prefix(String prefix);
+	PropertyMappingIndexedEmbeddedStep prefix(String prefix);
 
 	/**
 	 * @param depth The max recursion depth for indexed-embedded processing.
 	 * @return {@code this}, for method chaining.
 	 * @see IndexedEmbedded#maxDepth()
 	 */
-	PropertyIndexedEmbeddedMappingContext maxDepth(Integer depth);
+	PropertyMappingIndexedEmbeddedStep maxDepth(Integer depth);
 
 	/**
 	 * @param paths The paths of index fields to include explicitly.
 	 * @return {@code this}, for method chaining.
 	 * @see IndexedEmbedded#includePaths()
 	 */
-	default PropertyIndexedEmbeddedMappingContext includePaths(String ... paths) {
+	default PropertyMappingIndexedEmbeddedStep includePaths(String ... paths) {
 		return includePaths( Arrays.asList( paths ) );
 	}
 
@@ -46,7 +46,7 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 	 * @return {@code this}, for method chaining.
 	 * @see IndexedEmbedded#includePaths()
 	 */
-	PropertyIndexedEmbeddedMappingContext includePaths(Collection<String> paths);
+	PropertyMappingIndexedEmbeddedStep includePaths(Collection<String> paths);
 
 	/**
 	 * @param storage The storage strategy of the object field created for this indexed-embedded.
@@ -54,7 +54,7 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 	 * @see IndexedEmbedded#storage()
 	 * @see ObjectFieldStorage
 	 */
-	PropertyIndexedEmbeddedMappingContext storage(ObjectFieldStorage storage);
+	PropertyMappingIndexedEmbeddedStep storage(ObjectFieldStorage storage);
 
 	/**
 	 * @param extractorName The name of the container extractor to use.
@@ -62,7 +62,7 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 	 * @see IndexedEmbedded#extraction()
 	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	default PropertyIndexedEmbeddedMappingContext withExtractor(String extractorName) {
+	default PropertyMappingIndexedEmbeddedStep withExtractor(String extractorName) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
@@ -72,7 +72,7 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 	 * @return {@code this}, for method chaining.
 	 * @see IndexedEmbedded#extraction()
 	 */
-	default PropertyIndexedEmbeddedMappingContext withoutExtractors() {
+	default PropertyMappingIndexedEmbeddedStep withoutExtractors() {
 		return withExtractors( ContainerExtractorPath.noExtractors() );
 	}
 
@@ -82,6 +82,6 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 	 * @see IndexedEmbedded#extraction()
 	 * @see ContainerExtractorPath
 	 */
-	PropertyIndexedEmbeddedMappingContext withExtractors(ContainerExtractorPath extractorPath);
+	PropertyMappingIndexedEmbeddedStep withExtractors(ContainerExtractorPath extractorPath);
 
 }

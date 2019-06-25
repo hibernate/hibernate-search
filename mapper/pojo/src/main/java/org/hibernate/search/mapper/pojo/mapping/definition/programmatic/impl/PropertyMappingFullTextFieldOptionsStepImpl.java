@@ -13,43 +13,43 @@ import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFullTextFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFullTextFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-class PropertyFullTextFieldMappingContextImpl
-		extends AbstractPropertyFieldMappingContext<PropertyFullTextFieldMappingContext, StringIndexFieldTypeOptionsStep<?>>
-		implements PropertyFullTextFieldMappingContext {
+class PropertyMappingFullTextFieldOptionsStepImpl
+		extends AbstractPropertyMappingFieldOptionsStep<PropertyMappingFullTextFieldOptionsStep, StringIndexFieldTypeOptionsStep<?>>
+		implements PropertyMappingFullTextFieldOptionsStep {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	PropertyFullTextFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
+	PropertyMappingFullTextFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
 		super(
 				parent, relativeFieldName,
-				PropertyFullTextFieldMappingContextImpl::castIndexFieldTypeOptionsStep
+				PropertyMappingFullTextFieldOptionsStepImpl::castIndexFieldTypeOptionsStep
 		);
 	}
 
 	@Override
-	PropertyFullTextFieldMappingContext thisAsS() {
+	PropertyMappingFullTextFieldOptionsStep thisAsS() {
 		return this;
 	}
 
 	@Override
-	public PropertyFullTextFieldMappingContext analyzer(String normalizerName) {
+	public PropertyMappingFullTextFieldOptionsStep analyzer(String normalizerName) {
 		fieldModelContributor.add( (c, b) -> c.analyzer( normalizerName ) );
 		return thisAsS();
 	}
 
 	@Override
-	public PropertyFullTextFieldMappingContext norms(Norms norms) {
+	public PropertyMappingFullTextFieldOptionsStep norms(Norms norms) {
 		fieldModelContributor.add( (c, b) -> c.norms( norms ) );
 		return thisAsS();
 	}
 
 	@Override
-	public PropertyFullTextFieldMappingContext termVector(TermVector termVector) {
+	public PropertyMappingFullTextFieldOptionsStep termVector(TermVector termVector) {
 		fieldModelContributor.add( (c, b) -> c.termVector( termVector ) );
 		return thisAsS();
 	}

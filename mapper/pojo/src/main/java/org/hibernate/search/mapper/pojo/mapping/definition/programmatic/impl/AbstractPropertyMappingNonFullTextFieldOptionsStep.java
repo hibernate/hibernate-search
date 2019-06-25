@@ -10,15 +10,18 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyNotFullTextFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 
 
-abstract class AbstractPropertyNotFullTextFieldMappingContext<S extends PropertyNotFullTextFieldMappingContext<?>, C extends StandardIndexFieldTypeOptionsStep<?, ?>>
-		extends AbstractPropertyFieldMappingContext<S, C>
-		implements PropertyNotFullTextFieldMappingContext<S> {
+abstract class AbstractPropertyMappingNonFullTextFieldOptionsStep<
+				S extends PropertyMappingNonFullTextFieldOptionsStep<?>,
+				C extends StandardIndexFieldTypeOptionsStep<?, ?>
+		>
+		extends AbstractPropertyMappingFieldOptionsStep<S, C>
+		implements PropertyMappingNonFullTextFieldOptionsStep<S> {
 
-	AbstractPropertyNotFullTextFieldMappingContext(PropertyMappingContext parent, String relativeFieldName,
+	AbstractPropertyMappingNonFullTextFieldOptionsStep(PropertyMappingStep parent, String relativeFieldName,
 			Function<StandardIndexFieldTypeOptionsStep<?, ?>, C> typeOptionsStepCaster) {
 		super( parent, relativeFieldName, typeOptionsStepCaster );
 	}

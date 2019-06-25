@@ -9,21 +9,21 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 
 
-public class AssociationInverseSideMappingContextImpl
-		extends DelegatingPropertyMappingContext
-		implements AssociationInverseSideMappingContext, PojoPropertyMetadataContributor {
+class AssociationInverseSideOptionsStepImpl
+		extends DelegatingPropertyMappingStep
+		implements AssociationInverseSideOptionsStep, PojoPropertyMetadataContributor {
 
 	private final PojoModelPathValueNode inversePath;
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
-	AssociationInverseSideMappingContextImpl(PropertyMappingContext delegate, PojoModelPathValueNode inversePath) {
+	AssociationInverseSideOptionsStepImpl(PropertyMappingStep delegate, PojoModelPathValueNode inversePath) {
 		super( delegate );
 		this.inversePath = inversePath;
 	}
@@ -39,7 +39,7 @@ public class AssociationInverseSideMappingContextImpl
 	}
 
 	@Override
-	public AssociationInverseSideMappingContext withExtractors(ContainerExtractorPath extractorPath) {
+	public AssociationInverseSideOptionsStep withExtractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return this;
 	}

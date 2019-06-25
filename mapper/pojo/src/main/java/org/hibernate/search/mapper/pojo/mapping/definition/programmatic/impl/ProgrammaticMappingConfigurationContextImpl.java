@@ -13,7 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
@@ -23,7 +23,7 @@ public class ProgrammaticMappingConfigurationContextImpl
 	private final PojoBootstrapIntrospector introspector;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<Class<?>, TypeMappingContextImpl> entities = new LinkedHashMap<>();
+	private final Map<Class<?>, TypeMappingStepImpl> typeMappingContributors = new LinkedHashMap<>();
 
 	public ProgrammaticMappingConfigurationContextImpl(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
@@ -32,14 +32,16 @@ public class ProgrammaticMappingConfigurationContextImpl
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
-		for ( TypeMappingContextImpl contextImpl : entities.values() ) {
-			contextImpl.configure( buildContext, configurationCollector );
+		for ( TypeMappingStepImpl typeMappingContributor : typeMappingContributors.values() ) {
+			typeMappingContributor.configure( buildContext, configurationCollector );
 		}
 	}
 
 	@Override
-	public TypeMappingContext type(Class<?> clazz) {
-		return entities.computeIfAbsent( clazz, c -> new TypeMappingContextImpl( introspector.getTypeModel( c ) ) );
+	public TypeMappingStep type(Class<?> clazz) {
+		return typeMappingContributors.computeIfAbsent(
+				clazz, c -> new TypeMappingStepImpl( introspector.getTypeModel( c ) )
+		);
 	}
 
 }

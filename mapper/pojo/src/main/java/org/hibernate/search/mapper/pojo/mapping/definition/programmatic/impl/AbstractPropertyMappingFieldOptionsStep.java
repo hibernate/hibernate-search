@@ -18,14 +18,17 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilde
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
-abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappingContext<?>, C extends StandardIndexFieldTypeOptionsStep<?, ?>>
-		extends DelegatingPropertyMappingContext
-		implements PojoPropertyMetadataContributor, PropertyFieldMappingContext<S> {
+abstract class AbstractPropertyMappingFieldOptionsStep<
+				S extends PropertyMappingFieldOptionsStep<?>,
+				C extends StandardIndexFieldTypeOptionsStep<?, ?>
+		>
+		extends DelegatingPropertyMappingStep
+		implements PojoPropertyMetadataContributor, PropertyMappingFieldOptionsStep<S> {
 
 	private final String relativeFieldName;
 
@@ -35,7 +38,7 @@ abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappin
 
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
-	AbstractPropertyFieldMappingContext(PropertyMappingContext parent, String relativeFieldName,
+	AbstractPropertyMappingFieldOptionsStep(PropertyMappingStep parent, String relativeFieldName,
 			Function<StandardIndexFieldTypeOptionsStep<?, ?>, C> typeOptionsStepCaster) {
 		super( parent );
 		this.relativeFieldName = relativeFieldName;

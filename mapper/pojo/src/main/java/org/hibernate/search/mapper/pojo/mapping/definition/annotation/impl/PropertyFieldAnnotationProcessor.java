@@ -16,8 +16,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilde
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -35,7 +35,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 	}
 
 	@Override
-	final void doProcess(PropertyMappingContext mappingContext,
+	final void doProcess(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			A annotation) {
 		String cleanedUpRelativeFieldName = getName( annotation );
@@ -43,7 +43,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 			cleanedUpRelativeFieldName = null;
 		}
 
-		PropertyFieldMappingContext<?> fieldContext =
+		PropertyMappingFieldOptionsStep<?> fieldContext =
 				initFieldMappingContext( mappingContext, propertyModel, annotation, cleanedUpRelativeFieldName );
 
 		BridgeBuilder<? extends ValueBridge<?, ?>> builder = helper.createValueBridgeBuilder(
@@ -67,7 +67,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 		}
 	}
 
-	abstract PropertyFieldMappingContext<?> initFieldMappingContext(PropertyMappingContext mappingContext,
+	abstract PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
 			PojoPropertyModel<?> propertyModel, A annotation, String fieldName);
 
 	abstract String getName(A annotation);

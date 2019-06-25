@@ -46,14 +46,14 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFullTextFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyNotFullTextFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyScaledNumberFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFullTextFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingKeywordFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingScaledNumberFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -108,7 +108,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		void doProcess(PropertyMappingContext mappingContext,
+		void doProcess(PropertyMappingStep mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel, Annotation annotation) {
 			MarkerBuilder builder = helper.createMarkerBuilder( annotation );
 			mappingContext.marker( builder );
@@ -126,7 +126,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		void doProcess(PropertyMappingContext mappingContext,
+		void doProcess(PropertyMappingStep mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				AssociationInverseSide annotation) {
 			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
@@ -153,14 +153,14 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		void doProcess(PropertyMappingContext mappingContext,
+		void doProcess(PropertyMappingStep mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				IndexingDependency annotation) {
 			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
 
 			ReindexOnUpdate reindexOnUpdate = annotation.reindexOnUpdate();
 
-			IndexingDependencyMappingContext indexingDependencyContext = mappingContext.indexingDependency()
+			IndexingDependencyOptionsStep indexingDependencyContext = mappingContext.indexingDependency()
 					.withExtractors( extractorPath );
 
 			indexingDependencyContext.reindexOnUpdate( reindexOnUpdate );
@@ -189,7 +189,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		void doProcess(PropertyMappingContext mappingContext,
+		void doProcess(PropertyMappingStep mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				DocumentId annotation) {
 			BridgeBuilder<? extends IdentifierBridge<?>> builder =
@@ -210,7 +210,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		void doProcess(TypeMappingContext mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
+		void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
 			BridgeBuilder<? extends RoutingKeyBridge> builder = helper.createRoutingKeyBridgeBuilder( annotation );
 			mappingContext.routingKeyBridge( builder );
 		}
@@ -227,7 +227,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		void doProcess(TypeMappingContext mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
+		void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
 			BridgeBuilder<? extends TypeBridge> builder = helper.createTypeBridgeBuilder( annotation );
 			mappingContext.bridge( builder );
 		}
@@ -244,7 +244,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		void doProcess(PropertyMappingContext mappingContext,
+		void doProcess(PropertyMappingStep mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				Annotation annotation) {
 			BridgeBuilder<? extends PropertyBridge> builder = helper.createPropertyBridgeBuilder( annotation );
@@ -258,7 +258,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		PropertyNotFullTextFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
+		PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
 				PojoPropertyModel<?> propertyModel, GenericField annotation, String fieldName) {
 			return mappingContext.genericField( fieldName );
 		}
@@ -305,9 +305,9 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		PropertyFieldMappingContext<?> initFieldMappingContext(PropertyMappingContext mappingContext,
+		PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
 				PojoPropertyModel<?> propertyModel, FullTextField annotation, String fieldName) {
-			PropertyFullTextFieldMappingContext fieldContext = mappingContext.fullTextField( fieldName )
+			PropertyMappingFullTextFieldOptionsStep fieldContext = mappingContext.fullTextField( fieldName )
 					.analyzer( annotation.analyzer() );
 
 			Norms norms = annotation.norms();
@@ -355,9 +355,9 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		PropertyNotFullTextFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
+		PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
 				PojoPropertyModel<?> propertyModel, KeywordField annotation, String fieldName) {
-			PropertyKeywordFieldMappingContext fieldContext = mappingContext.keywordField( fieldName );
+			PropertyMappingKeywordFieldOptionsStep fieldContext = mappingContext.keywordField( fieldName );
 
 			String normalizer = annotation.normalizer();
 			if ( !normalizer.isEmpty() ) {
@@ -414,9 +414,9 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		PropertyNotFullTextFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
+		PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
 				PojoPropertyModel<?> propertyModel, ScaledNumberField annotation, String fieldName) {
-			PropertyScaledNumberFieldMappingContext fieldContext = mappingContext.scaledNumberField( fieldName );
+			PropertyMappingScaledNumberFieldOptionsStep fieldContext = mappingContext.scaledNumberField( fieldName );
 			int decimalScale = annotation.decimalScale();
 			if ( decimalScale != AnnotationDefaultValues.DEFAULT_DECIMAL_SCALE ) {
 				fieldContext.decimalScale( decimalScale );
@@ -471,7 +471,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		void doProcess(PropertyMappingContext mappingContext,
+		void doProcess(PropertyMappingStep mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				IndexedEmbedded annotation) {
 			String cleanedUpPrefix = annotation.prefix();

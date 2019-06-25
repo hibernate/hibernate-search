@@ -23,33 +23,34 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 /**
- * A context to map a property to the index schema.
+ * The step in a mapping definition where a property can be mapped.
  */
-public interface PropertyMappingContext {
+public interface PropertyMappingStep {
 
 	/**
 	 * Stops mapping the current property and switches to another one on the same parent type.
 	 * @param propertyName The name of another property <strong>on the same type</strong> as the current property
 	 * (not a nested property).
-	 * @return A mapping context for that property.
+	 * @return A DSL step where the property mapping can be defined in more details.
 	 */
-	PropertyMappingContext property(String propertyName);
+	PropertyMappingStep property(String propertyName);
 
 	/**
 	 * Maps the property to the identifier of documents in the index.
 	 * <p>
 	 * This is only taken into account on {@link Indexed} types.
-	 * @return A context to configure the ID mapping or to add more mappings to the same property.
+	 * @return A DSL step where the document ID mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see DocumentId
 	 */
-	PropertyDocumentIdMappingContext documentId();
+	PropertyMappingDocumentIdOptionsStep documentId();
 
 	/**
 	 * @param bridgeClass The class of the bridge to use.
 	 * @return {@code this}, for method chaining.
 	 * @see PropertyBridge
 	 */
-	PropertyMappingContext bridge(Class<? extends PropertyBridge> bridgeClass);
+	PropertyMappingStep bridge(Class<? extends PropertyBridge> bridgeClass);
 
 	/**
 	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
@@ -58,14 +59,14 @@ public interface PropertyMappingContext {
 	 * @return {@code this}, for method chaining.
 	 * @see PropertyBridge
 	 */
-	PropertyMappingContext bridge(BeanReference<? extends PropertyBridge> bridgeReference);
+	PropertyMappingStep bridge(BeanReference<? extends PropertyBridge> bridgeReference);
 
 	/**
 	 * @param builder A bridge builder.
 	 * @return {@code this}, for method chaining.
 	 * @see PropertyBridge
 	 */
-	PropertyMappingContext bridge(BridgeBuilder<? extends PropertyBridge> builder);
+	PropertyMappingStep bridge(BridgeBuilder<? extends PropertyBridge> builder);
 
 	/**
 	 * @param builder A marker builder.
@@ -74,78 +75,87 @@ public interface PropertyMappingContext {
 	 * @see org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker.Builder
 	 * @see org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker.Builder
 	 */
-	PropertyMappingContext marker(MarkerBuilder builder);
+	PropertyMappingStep marker(MarkerBuilder builder);
 
 	/**
 	 * Maps the property to a field in the index with the same name as this property.
-	 * @return A context to configure the field or to add more mappings to the same property.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see GenericField
 	 */
-	PropertyGenericFieldMappingContext genericField();
+	PropertyMappingGenericFieldOptionsStep genericField();
 
 	/**
 	 * Maps the property to a field in the index with a custom name.
 	 * @param relativeFieldName The name of the index field.
-	 * @return A context to configure the field or to add more mappings to the same property.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see GenericField
 	 * @see GenericField#name()
 	 */
-	PropertyGenericFieldMappingContext genericField(String relativeFieldName);
+	PropertyMappingGenericFieldOptionsStep genericField(String relativeFieldName);
 
 	/**
 	 * Maps the property to a full-text field in the index with the same name as this property.
-	 * @return A context to configure the field or to add more mappings to the same property.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see FullTextField
 	 */
-	PropertyFullTextFieldMappingContext fullTextField();
+	PropertyMappingFullTextFieldOptionsStep fullTextField();
 
 	/**
 	 * Maps the property to a full-text field in the index with a custom name.
 	 * @param relativeFieldName The name of the index field.
-	 * @return A context to configure the field or to add more mappings to the same property.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see FullTextField
 	 * @see FullTextField#name()
 	 */
-	PropertyFullTextFieldMappingContext fullTextField(String relativeFieldName);
+	PropertyMappingFullTextFieldOptionsStep fullTextField(String relativeFieldName);
 
 	/**
 	 * Maps the property to a keyword field in the index with the same name as this property.
-	 * @return A context to configure the field or to add more mappings to the same property.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see KeywordField
 	 */
-	PropertyKeywordFieldMappingContext keywordField();
+	PropertyMappingKeywordFieldOptionsStep keywordField();
 
 	/**
 	 * Maps the property to a keyword field in the index with a custom name.
 	 * @param relativeFieldName The name of the index field.
-	 * @return A context to configure the field or to add more mappings to the same property.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see KeywordField
 	 * @see KeywordField#name()
 	 */
-	PropertyKeywordFieldMappingContext keywordField(String relativeFieldName);
+	PropertyMappingKeywordFieldOptionsStep keywordField(String relativeFieldName);
 
 	/**
 	 * Maps the property to a scaled number field in the index with the same name as this property.
-	 * @return A context to configure the field or to add more mappings to the same property.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see ScaledNumberField
 	 */
-	PropertyScaledNumberFieldMappingContext scaledNumberField();
+	PropertyMappingScaledNumberFieldOptionsStep scaledNumberField();
 
 	/**
 	 * Maps the property to a scaled number field in the index with a custom name.
 	 * @param relativeFieldName The name of the index field.
-	 * @return A context to configure the field or to add more mappings to the same property.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see ScaledNumberField
 	 * @see ScaledNumberField#name()
 	 */
-	PropertyScaledNumberFieldMappingContext scaledNumberField(String relativeFieldName);
+	PropertyMappingScaledNumberFieldOptionsStep scaledNumberField(String relativeFieldName);
 
 	/**
 	 * Maps the property to an object field whose fields are the same as those defined in the property type.
-	 * @return A context to configure the embedding or to add more mappings to the same property.
+	 * @return A DSL step where the indexed-embedded mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see IndexedEmbedded
 	 */
-	PropertyIndexedEmbeddedMappingContext indexedEmbedded();
+	PropertyMappingIndexedEmbeddedStep indexedEmbedded();
 
 	/**
 	 * Assuming the property represents an association on a entity type A to entity type B,
@@ -156,21 +166,21 @@ public interface PropertyMappingContext {
 	 * and the Hibernate ORM mapper will register these inverse sides automatically.
 	 *
 	 * @param inversePath The path representing the inverse side of the association.
-	 * @return A context to configure the association inverse side in more details
-	 * or to add more mappings to the same property.
+	 * @return A DSL step where the association's inverse side can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 * @see AssociationInverseSide
 	 * @see PojoModelPath#ofValue(String)
 	 * @see PojoModelPath#ofValue(String, ContainerExtractorPath)
 	 * @see PojoModelPath#builder()
 	 */
-	AssociationInverseSideMappingContext associationInverseSide(PojoModelPathValueNode inversePath);
+	AssociationInverseSideOptionsStep associationInverseSide(PojoModelPathValueNode inversePath);
 
 	/**
 	 * Defines how a dependency of the indexing process to this property
 	 * should affect automatic reindexing.
-	 * @return A context to configure indexing dependency
-	 * or to add more mappings to the same property.
+	 * @return A DSL step where indexing dependency can be defined in more details,
+	 * or where other elements can be mapped to the property.
 	 */
-	IndexingDependencyMappingContext indexingDependency();
+	IndexingDependencyOptionsStep indexingDependency();
 
 }

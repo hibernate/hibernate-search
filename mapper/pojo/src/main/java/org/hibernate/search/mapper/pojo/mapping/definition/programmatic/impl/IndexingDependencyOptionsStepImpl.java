@@ -13,24 +13,24 @@ import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 
 
-public class IndexingDependencyMappingContextImpl
-		extends DelegatingPropertyMappingContext
-		implements IndexingDependencyMappingContext, PojoPropertyMetadataContributor {
+class IndexingDependencyOptionsStepImpl
+		extends DelegatingPropertyMappingStep
+		implements IndexingDependencyOptionsStep, PojoPropertyMetadataContributor {
 
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 	private ReindexOnUpdate reindexOnUpdate = ReindexOnUpdate.DEFAULT;
 	// Use a LinkedHashSet for deterministic iteration
 	private Set<PojoModelPathValueNode> derivedFrom = null;
 
-	IndexingDependencyMappingContextImpl(PropertyMappingContext delegate) {
+	IndexingDependencyOptionsStepImpl(PropertyMappingStep delegate) {
 		super( delegate );
 	}
 
@@ -51,13 +51,13 @@ public class IndexingDependencyMappingContextImpl
 	}
 
 	@Override
-	public IndexingDependencyMappingContext reindexOnUpdate(ReindexOnUpdate reindexOnUpdate) {
+	public IndexingDependencyOptionsStep reindexOnUpdate(ReindexOnUpdate reindexOnUpdate) {
 		this.reindexOnUpdate = reindexOnUpdate;
 		return this;
 	}
 
 	@Override
-	public IndexingDependencyMappingContext derivedFrom(PojoModelPathValueNode pojoModelPath) {
+	public IndexingDependencyOptionsStep derivedFrom(PojoModelPathValueNode pojoModelPath) {
 		if ( derivedFrom == null ) {
 			// Use a LinkedHashSet for deterministic iteration
 			derivedFrom = new LinkedHashSet<>();
@@ -67,7 +67,7 @@ public class IndexingDependencyMappingContextImpl
 	}
 
 	@Override
-	public IndexingDependencyMappingContext withExtractors(ContainerExtractorPath extractorPath) {
+	public IndexingDependencyOptionsStep withExtractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return this;
 	}

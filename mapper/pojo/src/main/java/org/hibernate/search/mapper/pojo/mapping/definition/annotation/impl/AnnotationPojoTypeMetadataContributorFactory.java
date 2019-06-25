@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingStepImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -22,7 +22,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 
 	public PojoTypeMetadataContributor create(PojoRawTypeModel<?> typeModel) {
 		// Create a programmatic type mapping object
-		TypeMappingContextImpl typeMappingContext = new TypeMappingContextImpl( typeModel );
+		TypeMappingStepImpl typeMappingContext = new TypeMappingStepImpl( typeModel );
 
 		// Process annotations and add metadata to the type mapping
 		processTypeLevelAnnotations( typeMappingContext, typeModel );
@@ -33,7 +33,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		return typeMappingContext;
 	}
 
-	private void processTypeLevelAnnotations(TypeMappingContextImpl typeMappingContext, PojoRawTypeModel<?> typeModel) {
+	private void processTypeLevelAnnotations(TypeMappingStepImpl typeMappingContext, PojoRawTypeModel<?> typeModel) {
 		for ( TypeAnnotationProcessor<?> processor : annotationProcessorProvider.getTypeAnnotationProcessors() ) {
 			processor.process(
 					typeMappingContext, typeModel
@@ -41,10 +41,10 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		}
 	}
 
-	private void processPropertyLevelAnnotations(TypeMappingContextImpl typeMappingContext,
+	private void processPropertyLevelAnnotations(TypeMappingStepImpl typeMappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel) {
 		String propertyName = propertyModel.getName();
-		PropertyMappingContext mappingContext = typeMappingContext.property( propertyName );
+		PropertyMappingStep mappingContext = typeMappingContext.property( propertyName );
 
 		for ( PropertyAnnotationProcessor<?> processor : annotationProcessorProvider.getPropertyAnnotationProcessors() ) {
 			processor.process(
