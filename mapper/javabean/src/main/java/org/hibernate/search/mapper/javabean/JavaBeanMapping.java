@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.javabean;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 
@@ -32,11 +31,7 @@ public interface JavaBeanMapping {
 	}
 
 	static JavaBeanMappingBuilder builder(MethodHandles.Lookup lookup) {
-		return builder( ConfigurationPropertySource.empty(), lookup );
-	}
-
-	static JavaBeanMappingBuilder builder(ConfigurationPropertySource propertySource, MethodHandles.Lookup lookup) {
-		return new JavaBeanMappingBuilder( propertySource, lookup );
+		return new JavaBeanMappingBuilder( lookup );
 	}
 
 }

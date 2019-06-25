@@ -28,14 +28,14 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public final class JavaBeanMappingBuilder {
 
+	private final Map<String, Object> properties = new HashMap<>();
 	private final ConfigurationPropertySource propertySource;
-	private final Map<String, Object> overriddenProperties = new HashMap<>();
 	private final SearchIntegrationBuilder integrationBuilder;
 	private final JavaBeanMappingKey mappingKey;
 	private final JavaBeanMappingInitiator mappingInitiator;
 
-	JavaBeanMappingBuilder(ConfigurationPropertySource basePropertySource, MethodHandles.Lookup lookup) {
-		propertySource = basePropertySource.withOverride( ConfigurationPropertySource.fromMap( overriddenProperties ) );
+	JavaBeanMappingBuilder(MethodHandles.Lookup lookup) {
+		propertySource = ConfigurationPropertySource.fromMap( properties );
 		integrationBuilder = SearchIntegration.builder( propertySource );
 		JavaBeanBootstrapIntrospector introspector = JavaBeanBootstrapIntrospector.create( lookup );
 		mappingKey = new JavaBeanMappingKey();
@@ -95,7 +95,12 @@ public final class JavaBeanMappingBuilder {
 	}
 
 	public JavaBeanMappingBuilder setProperty(String name, Object value) {
-		overriddenProperties.put( name, value );
+		properties.put( name, value );
+		return this;
+	}
+
+	public JavaBeanMappingBuilder setProperties(Map<String, Object> map) {
+		properties.putAll( map );
 		return this;
 	}
 
