@@ -7,7 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 
 
-public interface ElasticsearchCustomAnalysisDefinitionContext {
+/**
+ * The step in an analyzer/normalizer definition
+ * where optional components such as char filters or token filters can be added.
+ */
+public interface ElasticsearchAnalysisOptionalComponentsStep {
 
 	/**
 	 * Set the char filters that the normalizer will use.
@@ -17,9 +21,9 @@ public interface ElasticsearchCustomAnalysisDefinitionContext {
 	 * This can be achieved by defining the char filter
 	 * {@link ElasticsearchAnalysisDefinitionContainerContext#charFilter(String) from Hibernate Search},
 	 * by configuring the Elasticsearch server directly, or by using built-in tokenizers.
-	 * @return This context, allowing to chain calls.
+	 * @return {@code this}, for method chaining.
 	 */
-	ElasticsearchCustomAnalysisDefinitionContext withCharFilters(String... names);
+	ElasticsearchAnalysisOptionalComponentsStep withCharFilters(String... names);
 
 	/**
 	 * Set the token filters that the normalizer will use.
@@ -29,8 +33,8 @@ public interface ElasticsearchCustomAnalysisDefinitionContext {
 	 * This can be achieved by defining the token filter
 	 * {@link ElasticsearchAnalysisDefinitionContainerContext#tokenFilter(String) from Hibernate Search},
 	 * by configuring the Elasticsearch server, or by using built-in tokenizers.
-	 * @return This context, allowing to chain calls.
+	 * @return {@code this}, for method chaining.
 	 */
-	ElasticsearchCustomAnalysisDefinitionContext withTokenFilters(String... names);
+	ElasticsearchAnalysisOptionalComponentsStep withTokenFilters(String... names);
 
 }

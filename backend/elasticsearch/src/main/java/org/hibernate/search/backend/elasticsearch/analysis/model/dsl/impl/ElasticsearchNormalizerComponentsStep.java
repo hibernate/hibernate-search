@@ -9,25 +9,25 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.NormalizerDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchCustomNormalizerDefinitionContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchNormalizerOptionalComponentsStep;
 
 
 
-public class ElasticsearchCustomNormalizerDefinitionContextImpl
-		implements ElasticsearchCustomNormalizerDefinitionContext,
+class ElasticsearchNormalizerComponentsStep
+		implements ElasticsearchNormalizerOptionalComponentsStep,
 		ElasticsearchAnalysisDefinitionContributor {
 
 	private final String name;
 
 	private final NormalizerDefinition definition = new NormalizerDefinition();
 
-	ElasticsearchCustomNormalizerDefinitionContextImpl(String name) {
+	ElasticsearchNormalizerComponentsStep(String name) {
 		this.name = name;
 		this.definition.setType( "custom" );
 	}
 
 	@Override
-	public ElasticsearchCustomNormalizerDefinitionContext withCharFilters(String... names) {
+	public ElasticsearchNormalizerOptionalComponentsStep withCharFilters(String... names) {
 		definition.setCharFilters( null );
 		for ( String charFilterName : names ) {
 			definition.addCharFilter( charFilterName );
@@ -36,7 +36,7 @@ public class ElasticsearchCustomNormalizerDefinitionContextImpl
 	}
 
 	@Override
-	public ElasticsearchCustomNormalizerDefinitionContext withTokenFilters(String... names) {
+	public ElasticsearchNormalizerOptionalComponentsStep withTokenFilters(String... names) {
 		definition.setTokenFilters( null );
 		for ( String tokenFilterName : names ) {
 			definition.addTokenFilter( tokenFilterName );
