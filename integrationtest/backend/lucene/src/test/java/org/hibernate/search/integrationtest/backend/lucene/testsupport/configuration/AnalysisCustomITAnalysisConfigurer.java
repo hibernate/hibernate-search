@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 import org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisCustomIT;
 
 import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
@@ -19,7 +19,7 @@ import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
 
 public class AnalysisCustomITAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
-	public void configure(LuceneAnalysisDefinitionContainerContext context) {
+	public void configure(LuceneAnalysisConfigurationContext context) {
 		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_NOOP.name ).custom();
 		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_LOWERCASE.name ).custom()
 				.tokenFilter( LowerCaseFilterFactory.class );

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration;
 
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
 
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
@@ -16,7 +16,7 @@ import org.apache.lucene.analysis.ngram.NGramTokenizerFactory;
 public class AnalysisOverrideITAnalysisConfigurer extends DefaultITAnalysisConfigurer {
 
 	@Override
-	public void configure(LuceneAnalysisDefinitionContainerContext context) {
+	public void configure(LuceneAnalysisConfigurationContext context) {
 		super.configure( context );
 
 		context.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ).custom()

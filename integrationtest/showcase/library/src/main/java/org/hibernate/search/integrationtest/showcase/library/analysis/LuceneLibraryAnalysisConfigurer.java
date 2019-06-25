@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.showcase.library.analysis;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class LuceneLibraryAnalysisConfigurer implements LuceneAnalysisConfigurer {
 
 	@Override
-	public void configure(LuceneAnalysisDefinitionContainerContext context) {
+	public void configure(LuceneAnalysisConfigurationContext context) {
 		context.analyzer( LibraryAnalyzers.ANALYZER_DEFAULT ).instance( new StandardAnalyzer() );
 		context.normalizer( LibraryAnalyzers.NORMALIZER_SORT ).custom()
 				.tokenFilter( ASCIIFoldingFilterFactory.class )

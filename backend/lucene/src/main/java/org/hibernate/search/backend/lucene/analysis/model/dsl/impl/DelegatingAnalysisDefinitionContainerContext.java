@@ -10,7 +10,10 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefi
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTypeStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerTypeStep;
 
-
+/**
+ * @deprecated This should disappear once we remove the ability to chain multiple analyzer definitions.
+ */
+@Deprecated
 class DelegatingAnalysisDefinitionContainerContext implements LuceneAnalysisDefinitionContainerContext {
 
 	private final LuceneAnalysisDefinitionContainerContext parentContext;

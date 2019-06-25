@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTypeStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTokenizerStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerOptionalComponentsStep;
@@ -25,8 +25,8 @@ import org.apache.lucene.analysis.Analyzer;
 
 
 
-public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAnalysisDefinitionContainerContext,
-		LuceneAnalysisDefinitionContributor {
+public class LuceneAnalysisConfigurationContextImpl
+		implements LuceneAnalysisConfigurationContext, LuceneAnalysisDefinitionContributor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -36,7 +36,7 @@ public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAn
 
 	private final Map<String, LuceneAnalyzerBuilder> normalizers = new LinkedHashMap<>();
 
-	public InitialLuceneAnalysisDefinitionContainerContext(LuceneAnalysisComponentFactory factory) {
+	public LuceneAnalysisConfigurationContextImpl(LuceneAnalysisComponentFactory factory) {
 		this.factory = factory;
 	}
 
@@ -46,17 +46,17 @@ public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAn
 			@Override
 			public LuceneAnalyzerTokenizerStep custom() {
 				LuceneAnalyzerComponentsStep definition = new LuceneAnalyzerComponentsStep(
-						InitialLuceneAnalysisDefinitionContainerContext.this, name
+						LuceneAnalysisConfigurationContextImpl.this, name
 				);
 				addAnalyzer( name, definition );
 				return definition;
 			}
 
 			@Override
-			public LuceneAnalysisDefinitionContainerContext instance(Analyzer instance) {
+			public LuceneAnalysisConfigurationContext instance(Analyzer instance) {
 				LuceneAnalyzerInstanceBuilder definition = new LuceneAnalyzerInstanceBuilder( instance );
 				addAnalyzer( name, definition );
-				return InitialLuceneAnalysisDefinitionContainerContext.this;
+				return LuceneAnalysisConfigurationContextImpl.this;
 			}
 		};
 	}
@@ -67,17 +67,17 @@ public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAn
 			@Override
 			public LuceneNormalizerOptionalComponentsStep custom() {
 				LuceneNormalizerComponentsStep definition = new LuceneNormalizerComponentsStep(
-						InitialLuceneAnalysisDefinitionContainerContext.this, name
+						LuceneAnalysisConfigurationContextImpl.this, name
 				);
 				addNormalizer( name, definition );
 				return definition;
 			}
 
 			@Override
-			public LuceneAnalysisDefinitionContainerContext instance(Analyzer instance) {
+			public LuceneAnalysisConfigurationContext instance(Analyzer instance) {
 				LuceneNormalizerInstanceBuilder definition = new LuceneNormalizerInstanceBuilder( name, instance );
 				addNormalizer( name, definition );
-				return InitialLuceneAnalysisDefinitionContainerContext.this;
+				return LuceneAnalysisConfigurationContextImpl.this;
 			}
 		};
 	}

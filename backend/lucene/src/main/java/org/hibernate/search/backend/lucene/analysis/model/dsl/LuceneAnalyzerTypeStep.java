@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
+
 import org.apache.lucene.analysis.Analyzer;
 
 /**
@@ -27,6 +29,6 @@ public interface LuceneAnalyzerTypeStep {
 	 * @param instance The analyzer instance.
 	 * @return The parent context, for method chaining.
 	 */
-	LuceneAnalysisDefinitionContainerContext instance(Analyzer instance);
+	LuceneAnalysisConfigurationContext instance(Analyzer instance);
 
 }
