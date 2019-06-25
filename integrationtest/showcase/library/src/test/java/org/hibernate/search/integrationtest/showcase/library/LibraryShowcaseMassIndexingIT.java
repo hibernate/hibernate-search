@@ -69,7 +69,7 @@ public class LibraryShowcaseMassIndexingIT {
 
 	@Test
 	public void testMassIndexing() {
-		assertThat( documentService.findAllIndexed() ).hasSize( 0 );
+		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
 		MassIndexer indexer = massiveIndexer.createMassIndexer();
 		try {
 			indexer.startAndWait();
@@ -77,12 +77,12 @@ public class LibraryShowcaseMassIndexingIT {
 		catch (InterruptedException e) {
 			fail( "Unexpected InterruptedException: " + e.getMessage() );
 		}
-		assertThat( documentService.findAllIndexed() ).hasSize( 200 );
+		assertThat( documentService.countIndexed() ).isEqualTo( 200 );
 	}
 
 	@Test
 	public void testMassIndexingMonitor() {
-		assertThat( documentService.findAllIndexed() ).hasSize( 0 );
+		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
 		MassIndexer indexer = massiveIndexer.createMassIndexer();
 		try {
 			/*
@@ -108,6 +108,6 @@ public class LibraryShowcaseMassIndexingIT {
 		catch (InterruptedException e) {
 			fail( "Unexpected InterruptedException: " + e.getMessage() );
 		}
-		assertThat( documentService.findAllIndexed() ).hasSize( 200 );
+		assertThat( documentService.countIndexed() ).isEqualTo( 200 );
 	}
 }

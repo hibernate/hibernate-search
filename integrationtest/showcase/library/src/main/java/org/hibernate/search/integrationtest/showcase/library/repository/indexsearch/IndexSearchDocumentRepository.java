@@ -18,7 +18,7 @@ import org.hibernate.search.integrationtest.showcase.library.model.LibraryServic
 
 public interface IndexSearchDocumentRepository {
 
-	List<Book> findAllIndexed();
+	long countIndexed();
 
 	Optional<Book> getByIsbn(String isbnAsString);
 

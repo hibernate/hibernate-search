@@ -37,8 +37,8 @@ public class DocumentService {
 		return documentRepo.save( new Video( id, title, author, summary, tags ) );
 	}
 
-	public List<Book> findAllIndexed() {
-		return documentRepo.findAllIndexed();
+	public long countIndexed() {
+		return documentRepo.countIndexed();
 	}
 
 	public Optional<Book> getByIsbn(String isbnAsString) {
