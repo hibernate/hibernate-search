@@ -6,15 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
-public interface LuceneAnalyzerDefinitionWithTokenizerContext extends LuceneCustomAnalysisDefinitionContext {
+/**
+ * The step in an analyzer definition
+ * where tokenizer paramaters can be set,
+ * and where optional components such as char filters or token filters can be added.
+ */
+public interface LuceneAnalyzerOptionalComponentsStep extends LuceneAnalysisOptionalComponentsStep {
 
 	/**
 	 * Set a tokenizer parameter.
 	 *
 	 * @param name The name of the parameter.
 	 * @param value The value of the parameter.
-	 * @return This context, allowing to chain calls.
+	 * @return {@code this}, for method chaining.
 	 */
-	LuceneAnalyzerDefinitionWithTokenizerContext param(String name, String value);
+	LuceneAnalyzerOptionalComponentsStep param(String name, String value);
 
 }

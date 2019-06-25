@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomNormalizerDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentParametersStep;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerOptionalComponentsStep;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -23,33 +23,33 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 
 
-public class LuceneCustomNormalizerDefinitionContextImpl
+class LuceneNormalizerComponentsStep
 		extends DelegatingAnalysisDefinitionContainerContext
-		implements LuceneCustomNormalizerDefinitionContext, LuceneAnalyzerBuilder {
+		implements LuceneNormalizerOptionalComponentsStep, LuceneAnalyzerBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
-	private final List<LuceneCharFilterDefinitionContext> charFilters = new ArrayList<>();
+	private final List<LuceneCharFilterParametersStep> charFilters = new ArrayList<>();
 
-	private final List<LuceneTokenFilterDefinitionContext> tokenFilters = new ArrayList<>();
+	private final List<LuceneTokenFilterParametersStep> tokenFilters = new ArrayList<>();
 
-	LuceneCustomNormalizerDefinitionContextImpl(InitialLuceneAnalysisDefinitionContainerContext parentContext, String name) {
+	LuceneNormalizerComponentsStep(InitialLuceneAnalysisDefinitionContainerContext parentContext, String name) {
 		super( parentContext );
 		this.name = name;
 	}
 
 	@Override
-	public LuceneAnalysisComponentDefinitionContext charFilter(Class<? extends CharFilterFactory> factory) {
-		LuceneCharFilterDefinitionContext filter = new LuceneCharFilterDefinitionContext( this, factory );
+	public LuceneAnalysisComponentParametersStep charFilter(Class<? extends CharFilterFactory> factory) {
+		LuceneCharFilterParametersStep filter = new LuceneCharFilterParametersStep( this, factory );
 		charFilters.add( filter );
 		return filter;
 	}
 
 	@Override
-	public LuceneAnalysisComponentDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory) {
-		LuceneTokenFilterDefinitionContext filter = new LuceneTokenFilterDefinitionContext( this, factory );
+	public LuceneAnalysisComponentParametersStep tokenFilter(Class<? extends TokenFilterFactory> factory) {
+		LuceneTokenFilterParametersStep filter = new LuceneTokenFilterParametersStep( this, factory );
 		tokenFilters.add( filter );
 		return filter;
 	}

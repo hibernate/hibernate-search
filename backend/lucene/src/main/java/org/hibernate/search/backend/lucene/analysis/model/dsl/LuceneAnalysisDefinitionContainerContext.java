@@ -6,22 +6,25 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
+/**
+ * A context allowing the definition of named analyzers and normalizers in a Lucene backend.
+ */
 public interface LuceneAnalysisDefinitionContainerContext {
 
 	/**
 	 * Start a new analyzer definition.
 	 *
 	 * @param name The name used to reference this analyzer in Hibernate Search.
-	 * @return A context allowing to further define the analyzer.
+	 * @return The initial step of a DSL where the analyzer can be defined.
 	 */
-	LuceneAnalyzerDefinitionContext analyzer(String name);
+	LuceneAnalyzerTypeStep analyzer(String name);
 
 	/**
 	 * Start a new normalizer definition.
 	 *
 	 * @param name The name used to reference this normalizer in Hibernate Search.
-	 * @return A context allowing to further define the normalizer.
+	 * @return The initial step of a DSL where the normalizer can be defined.
 	 */
-	LuceneNormalizerDefinitionContext normalizer(String name);
+	LuceneNormalizerTypeStep normalizer(String name);
 
 }

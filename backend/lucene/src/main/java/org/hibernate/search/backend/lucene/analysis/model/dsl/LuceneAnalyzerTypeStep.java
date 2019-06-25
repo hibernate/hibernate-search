@@ -8,21 +8,23 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
 import org.apache.lucene.analysis.Analyzer;
 
-public interface LuceneNormalizerDefinitionContext {
+/**
+ * The initial step in an analyzer definition, where the type of analyzer can be set.
+ */
+public interface LuceneAnalyzerTypeStep {
 
 	/**
-	 * Start a custom normalizer definition,
-	 * assigning char filters and token filters to the definition.
+	 * Start a custom analyzer definition,
+	 * assigning a tokenizer, and optionally char filters and token filters to the definition.
 	 *
-	 * @return A context allowing to further define the analyzer.
+	 * @return The next step.
 	 */
-	LuceneCustomNormalizerDefinitionContext custom();
+	LuceneAnalyzerTokenizerStep custom();
 
 	/**
-	 * Assign the given normalizer instance to this normalizer definition.
+	 * Assign the given analyzer instance to this analyzer definition.
 	 *
-	 * @param instance The normalizer instance.
-	 * This instance is expected to never produce more than one token per stream.
+	 * @param instance The analyzer instance.
 	 * @return The parent context, for method chaining.
 	 */
 	LuceneAnalysisDefinitionContainerContext instance(Analyzer instance);

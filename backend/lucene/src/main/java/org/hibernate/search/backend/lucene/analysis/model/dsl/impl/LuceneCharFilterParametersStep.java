@@ -9,20 +9,20 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalysisDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisOptionalComponentsStep;
 
 import org.apache.lucene.analysis.util.CharFilterFactory;
 
 
 
-public class LuceneCharFilterDefinitionContext
-		extends AbstractLuceneAnalysisComponentDefinitionContext<CharFilterFactory> {
+class LuceneCharFilterParametersStep
+		extends AbstractLuceneAnalysisComponentParametersStep<CharFilterFactory> {
 
 	private final Class<? extends CharFilterFactory> factoryClass;
 
-	LuceneCharFilterDefinitionContext(LuceneCustomAnalysisDefinitionContext parentContext,
+	LuceneCharFilterParametersStep(LuceneAnalysisOptionalComponentsStep parentStep,
 			Class<? extends CharFilterFactory> factoryClass) {
-		super( parentContext );
+		super( parentStep );
 		this.factoryClass = factoryClass;
 	}
 

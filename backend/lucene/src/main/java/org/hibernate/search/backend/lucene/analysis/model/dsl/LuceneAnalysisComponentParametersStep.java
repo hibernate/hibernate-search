@@ -6,15 +6,18 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
-public interface LuceneAnalysisComponentDefinitionContext extends LuceneCustomAnalysisDefinitionContext {
+/**
+ * The step in an analysis component definition where optional parameters can be set.
+ */
+public interface LuceneAnalysisComponentParametersStep extends LuceneAnalysisOptionalComponentsStep {
 
 	/**
 	 * Set a parameter.
 	 *
 	 * @param name The name of the parameter.
 	 * @param value The value of the parameter.
-	 * @return This context, allowing to chain calls.
+	 * @return {@code this}, for method chaining.
 	 */
-	LuceneAnalysisComponentDefinitionContext param(String name, String value);
+	LuceneAnalysisComponentParametersStep param(String name, String value);
 
 }

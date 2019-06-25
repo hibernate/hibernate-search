@@ -9,19 +9,19 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalysisDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisOptionalComponentsStep;
 
 import org.apache.lucene.analysis.util.TokenizerFactory;
 
 
 
-public class LuceneTokenizerDefinitionContext
-		extends AbstractLuceneAnalysisComponentDefinitionContext<TokenizerFactory> {
+class LuceneTokenizerParametersStep
+		extends AbstractLuceneAnalysisComponentParametersStep<TokenizerFactory> {
 
 	private Class<? extends TokenizerFactory> factoryClass;
 
-	LuceneTokenizerDefinitionContext(LuceneCustomAnalysisDefinitionContext parentContext) {
-		super( parentContext );
+	LuceneTokenizerParametersStep(LuceneAnalysisOptionalComponentsStep parentStep) {
+		super( parentStep );
 	}
 
 	public void factory(Class<? extends TokenizerFactory> factoryClass) {

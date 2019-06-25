@@ -12,10 +12,10 @@ import java.util.Map;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalyzerDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomNormalizerDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTypeStep;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTokenizerStep;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerOptionalComponentsStep;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerTypeStep;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionCollector;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionContributor;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -41,11 +41,11 @@ public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAn
 	}
 
 	@Override
-	public LuceneAnalyzerDefinitionContext analyzer(String name) {
-		return new LuceneAnalyzerDefinitionContext() {
+	public LuceneAnalyzerTypeStep analyzer(String name) {
+		return new LuceneAnalyzerTypeStep() {
 			@Override
-			public LuceneCustomAnalyzerDefinitionContext custom() {
-				LuceneCustomAnalyzerDefinitionContextImpl definition = new LuceneCustomAnalyzerDefinitionContextImpl(
+			public LuceneAnalyzerTokenizerStep custom() {
+				LuceneAnalyzerComponentsStep definition = new LuceneAnalyzerComponentsStep(
 						InitialLuceneAnalysisDefinitionContainerContext.this, name
 				);
 				addAnalyzer( name, definition );
@@ -54,7 +54,7 @@ public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAn
 
 			@Override
 			public LuceneAnalysisDefinitionContainerContext instance(Analyzer instance) {
-				LuceneAnalyzerInstanceContext definition = new LuceneAnalyzerInstanceContext( instance );
+				LuceneAnalyzerInstanceBuilder definition = new LuceneAnalyzerInstanceBuilder( instance );
 				addAnalyzer( name, definition );
 				return InitialLuceneAnalysisDefinitionContainerContext.this;
 			}
@@ -62,11 +62,11 @@ public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAn
 	}
 
 	@Override
-	public LuceneNormalizerDefinitionContext normalizer(String name) {
-		return new LuceneNormalizerDefinitionContext() {
+	public LuceneNormalizerTypeStep normalizer(String name) {
+		return new LuceneNormalizerTypeStep() {
 			@Override
-			public LuceneCustomNormalizerDefinitionContext custom() {
-				LuceneCustomNormalizerDefinitionContextImpl definition = new LuceneCustomNormalizerDefinitionContextImpl(
+			public LuceneNormalizerOptionalComponentsStep custom() {
+				LuceneNormalizerComponentsStep definition = new LuceneNormalizerComponentsStep(
 						InitialLuceneAnalysisDefinitionContainerContext.this, name
 				);
 				addNormalizer( name, definition );
@@ -75,7 +75,7 @@ public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAn
 
 			@Override
 			public LuceneAnalysisDefinitionContainerContext instance(Analyzer instance) {
-				LuceneNormalizerInstanceContext definition = new LuceneNormalizerInstanceContext( name, instance );
+				LuceneNormalizerInstanceBuilder definition = new LuceneNormalizerInstanceBuilder( name, instance );
 				addNormalizer( name, definition );
 				return InitialLuceneAnalysisDefinitionContainerContext.this;
 			}

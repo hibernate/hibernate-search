@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalyzerDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionWithTokenizerContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTokenizerStep;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerOptionalComponentsStep;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentParametersStep;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -25,49 +25,49 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 
 
 
-public class LuceneCustomAnalyzerDefinitionContextImpl
+class LuceneAnalyzerComponentsStep
 		extends DelegatingAnalysisDefinitionContainerContext
-		implements LuceneCustomAnalyzerDefinitionContext, LuceneAnalyzerDefinitionWithTokenizerContext,
+		implements LuceneAnalyzerTokenizerStep, LuceneAnalyzerOptionalComponentsStep,
 		LuceneAnalyzerBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
-	private final LuceneTokenizerDefinitionContext tokenizer;
+	private final LuceneTokenizerParametersStep tokenizer;
 
-	private final List<LuceneCharFilterDefinitionContext> charFilters = new ArrayList<>();
+	private final List<LuceneCharFilterParametersStep> charFilters = new ArrayList<>();
 
-	private final List<LuceneTokenFilterDefinitionContext> tokenFilters = new ArrayList<>();
+	private final List<LuceneTokenFilterParametersStep> tokenFilters = new ArrayList<>();
 
-	LuceneCustomAnalyzerDefinitionContextImpl(InitialLuceneAnalysisDefinitionContainerContext parentContext, String name) {
+	LuceneAnalyzerComponentsStep(InitialLuceneAnalysisDefinitionContainerContext parentContext, String name) {
 		super( parentContext );
-		this.tokenizer = new LuceneTokenizerDefinitionContext( this );
+		this.tokenizer = new LuceneTokenizerParametersStep( this );
 		this.name = name;
 	}
 
 	@Override
-	public LuceneAnalyzerDefinitionWithTokenizerContext tokenizer(Class<? extends TokenizerFactory> factory) {
+	public LuceneAnalyzerOptionalComponentsStep tokenizer(Class<? extends TokenizerFactory> factory) {
 		tokenizer.factory( factory );
 		return this;
 	}
 
 	@Override
-	public LuceneAnalyzerDefinitionWithTokenizerContext param(String name, String value) {
+	public LuceneAnalyzerOptionalComponentsStep param(String name, String value) {
 		tokenizer.param( name, value );
 		return this;
 	}
 
 	@Override
-	public LuceneAnalysisComponentDefinitionContext charFilter(Class<? extends CharFilterFactory> factory) {
-		LuceneCharFilterDefinitionContext filter = new LuceneCharFilterDefinitionContext( this, factory );
+	public LuceneAnalysisComponentParametersStep charFilter(Class<? extends CharFilterFactory> factory) {
+		LuceneCharFilterParametersStep filter = new LuceneCharFilterParametersStep( this, factory );
 		charFilters.add( filter );
 		return filter;
 	}
 
 	@Override
-	public LuceneAnalysisComponentDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory) {
-		LuceneTokenFilterDefinitionContext filter = new LuceneTokenFilterDefinitionContext( this, factory );
+	public LuceneAnalysisComponentParametersStep tokenFilter(Class<? extends TokenFilterFactory> factory) {
+		LuceneTokenFilterParametersStep filter = new LuceneTokenFilterParametersStep( this, factory );
 		tokenFilters.add( filter );
 		return filter;
 	}

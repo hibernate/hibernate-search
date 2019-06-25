@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
-public interface LuceneCustomNormalizerDefinitionContext extends LuceneCustomAnalysisDefinitionContext {
+/**
+ * The step in a normalizer definition
+ * where optional components such as char filters or token filters can be added.
+ */
+public interface LuceneNormalizerOptionalComponentsStep extends LuceneAnalysisOptionalComponentsStep {
 
 }
