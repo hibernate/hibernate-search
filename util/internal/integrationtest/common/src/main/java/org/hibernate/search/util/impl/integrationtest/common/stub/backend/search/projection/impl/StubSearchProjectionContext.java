@@ -14,6 +14,8 @@ public class StubSearchProjectionContext {
 
 	private final FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext;
 
+	private boolean hasFailedLoad = false;
+
 	public StubSearchProjectionContext(SessionContextImplementor sessionContext) {
 		this.fromDocumentFieldValueConvertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
 	}
@@ -22,4 +24,15 @@ public class StubSearchProjectionContext {
 		return fromDocumentFieldValueConvertContext;
 	}
 
+	void reportFailedLoad() {
+		hasFailedLoad = true;
+	}
+
+	public boolean hasFailedLoad() {
+		return hasFailedLoad;
+	}
+
+	public void reset() {
+		hasFailedLoad = false;
+	}
 }

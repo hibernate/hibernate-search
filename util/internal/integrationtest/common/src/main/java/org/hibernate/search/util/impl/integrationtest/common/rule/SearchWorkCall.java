@@ -82,13 +82,14 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		return Objects.equals( indexNames, other.indexNames );
 	}
 
-	private static <U> List<U> getResults(StubSearchProjectionContext actualProjectionContext,
+	private static <H> List<H> getResults(StubSearchProjectionContext actualProjectionContext,
 			ProjectionHitMapper<?, ?> actualProjectionHitMapper,
-			StubSearchProjection<U> actualRootProjection,
+			StubSearchProjection<H> actualRootProjection,
 			List<?> rawHits) {
 		List<Object> extractedElements = new ArrayList<>( rawHits.size() );
 
 		for ( Object rawHit : rawHits ) {
+			actualProjectionContext.reset();
 			extractedElements.add(
 					actualRootProjection.extract( actualProjectionHitMapper, rawHit, actualProjectionContext )
 			);
@@ -96,15 +97,21 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 
 		LoadingResult<?> loadingResult = actualProjectionHitMapper.loadBlocking();
 
-		List<U> results = new ArrayList<>( rawHits.size() );
+		List<H> hits = new ArrayList<>( rawHits.size() );
 
 		for ( Object extractedElement : extractedElements ) {
-			results.add(
-					actualRootProjection.transform( loadingResult, extractedElement, actualProjectionContext )
-			);
+			actualProjectionContext.reset();
+
+			H hit = actualRootProjection.transform( loadingResult, extractedElement, actualProjectionContext );
+			if ( actualProjectionContext.hasFailedLoad() ) {
+				// skip this hit
+				continue;
+			}
+
+			hits.add( hit );
 		}
 
-		return results;
+		return hits;
 	}
 
 	@Override

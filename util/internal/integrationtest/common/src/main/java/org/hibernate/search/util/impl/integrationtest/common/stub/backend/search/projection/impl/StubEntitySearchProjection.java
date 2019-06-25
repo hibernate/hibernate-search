@@ -33,6 +33,10 @@ public class StubEntitySearchProjection<T> implements StubSearchProjection<T> {
 	@Override
 	public T transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
-		return (T) loadingResult.getLoaded( extractedData );
+		T loaded = (T) loadingResult.getLoaded( extractedData );
+		if ( loaded == null ) {
+			context.reportFailedLoad();
+		}
+		return loaded;
 	}
 }

@@ -47,11 +47,6 @@ public class HibernateOrmSingleTypeCriteriaEntityLoader<E> implements HibernateO
 		// Re-create the list of objects in the same order
 		List<E> result = new ArrayList<>( references.size() );
 		for ( EntityReference reference : references ) {
-			/*
-			 * TODO HSEARCH-3349 remove null values? We used to do it in Search 5...
-			 *  Note that if we do, we have to change the javadoc
-			 *  for this method and also change the other EntityLoader implementations.
-			 */
 			result.add( objectsByReference.get( reference ) );
 		}
 		return result;
