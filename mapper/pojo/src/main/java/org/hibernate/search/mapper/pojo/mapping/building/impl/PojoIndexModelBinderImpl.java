@@ -41,8 +41,8 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.AbstractPojoBridgedElementDependencyContext;
-import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyDependencyContextImpl;
-import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeDependencyContextImpl;
+import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyIndexingDependencyConfigurationContextImpl;
+import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.AbstractPojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
@@ -129,8 +129,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		try {
 			PojoModelTypeRootElement<T> pojoModelRootElement =
 					new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
-			PojoTypeDependencyContextImpl<T> pojoDependencyContext =
-					new PojoTypeDependencyContextImpl<>(
+			PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
+					new PojoTypeIndexingDependencyConfigurationContextImpl<>(
 							introspector,
 							extractorBinder,
 							typeAdditionalMetadataProvider,
@@ -164,8 +164,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 			PojoModelTypeRootElement<T> pojoModelRootElement =
 					new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
-			PojoTypeDependencyContextImpl<T> pojoDependencyContext =
-					new PojoTypeDependencyContextImpl<>(
+			PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
+					new PojoTypeIndexingDependencyConfigurationContextImpl<>(
 							introspector,
 							extractorBinder,
 							typeAdditionalMetadataProvider,
@@ -209,8 +209,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 			PojoModelPropertyRootElement<P> pojoModelRootElement =
 					new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
-			PojoPropertyDependencyContextImpl<P> pojoDependencyContext =
-					new PojoPropertyDependencyContextImpl<>(
+			PojoPropertyIndexingDependencyConfigurationContextImpl<P> pojoDependencyContext =
+					new PojoPropertyIndexingDependencyConfigurationContextImpl<>(
 							introspector,
 							extractorBinder,
 							typeAdditionalMetadataProvider,
