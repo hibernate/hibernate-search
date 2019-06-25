@@ -22,7 +22,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -139,7 +139,7 @@ public class ProgrammaticMappingAccessTypeIT {
 	private class MyMappingConfigurer implements HibernateOrmSearchMappingConfigurer {
 		@Override
 		public void configure(HibernateOrmMappingConfigurationContext context) {
-			ProgrammaticMappingDefinitionContext mapping = context.programmaticMapping();
+			ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )
 					.property( "id" ).documentId()

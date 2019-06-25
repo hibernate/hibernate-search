@@ -38,7 +38,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationC
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -334,7 +334,7 @@ public class ProgrammaticMappingSmokeIT {
 	private class MyMappingConfigurer implements HibernateOrmSearchMappingConfigurer {
 		@Override
 		public void configure(HibernateOrmMappingConfigurationContext context) {
-			ProgrammaticMappingDefinitionContext mapping = context.programmaticMapping();
+			ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )
 					.bridge(
@@ -351,7 +351,7 @@ public class ProgrammaticMappingSmokeIT {
 									.maxDepth( 1 )
 									.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
 
-			ProgrammaticMappingDefinitionContext secondMapping = context.programmaticMapping();
+			ProgrammaticMappingConfigurationContext secondMapping = context.programmaticMapping();
 			secondMapping.type( ParentIndexedEntity.class )
 					.property( "localDate" )
 							.genericField( "myLocalDateField" )

@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
 import org.hibernate.search.util.common.impl.StreamHelper;
 
@@ -110,7 +110,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		if ( enableAnnotationMapping ) {
 			setAnnotatedTypeDiscoveryEnabled( true );
 
-			AnnotationMappingDefinitionContext annotationMapping = annotationMapping();
+			AnnotationMappingConfigurationContext annotationMapping = annotationMapping();
 			for ( PersistentClass persistentClass : persistentClasses.values() ) {
 				annotationMapping.add( persistentClass.getMappedClass() );
 			}

@@ -9,20 +9,20 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation;
 import java.util.Set;
 
 /**
- * A context to define annotation mapping.
+ * A context to configure annotation mapping.
  */
-public interface AnnotationMappingDefinitionContext {
+public interface AnnotationMappingConfigurationContext {
 
 	/**
 	 * @param annotatedType A type to scan for annotations.
 	 * @return {@code this}, for method chaining.
 	 */
-	AnnotationMappingDefinitionContext add(Class<?> annotatedType);
+	AnnotationMappingConfigurationContext add(Class<?> annotatedType);
 
 	/**
 	 * @param annotatedTypes A set of types to scan for annotations.
 	 * @return {@code this}, for method chaining.
 	 */
-	AnnotationMappingDefinitionContext add(Set<Class<?>> annotatedTypes);
+	AnnotationMappingConfigurationContext add(Set<Class<?>> annotatedTypes);
 
 }

@@ -17,14 +17,14 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDisco
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 
-public class AnnotationMappingDefinitionContextImpl implements AnnotationMappingDefinitionContext,
+public class AnnotationMappingConfigurationContextImpl implements AnnotationMappingConfigurationContext,
 		PojoMappingConfigurationContributor {
 
 	private final PojoBootstrapIntrospector introspector;
@@ -33,7 +33,7 @@ public class AnnotationMappingDefinitionContextImpl implements AnnotationMapping
 
 	private boolean annotatedTypeDiscoveryEnabled = false;
 
-	public AnnotationMappingDefinitionContextImpl(PojoBootstrapIntrospector introspector) {
+	public AnnotationMappingConfigurationContextImpl(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
 	}
 
@@ -42,13 +42,13 @@ public class AnnotationMappingDefinitionContextImpl implements AnnotationMapping
 	}
 
 	@Override
-	public AnnotationMappingDefinitionContext add(Class<?> annotatedType) {
+	public AnnotationMappingConfigurationContext add(Class<?> annotatedType) {
 		this.annotatedTypes.add( annotatedType );
 		return this;
 	}
 
 	@Override
-	public AnnotationMappingDefinitionContext add(Set<Class<?>> annotatedTypes) {
+	public AnnotationMappingConfigurationContext add(Set<Class<?>> annotatedTypes) {
 		this.annotatedTypes.addAll( annotatedTypes );
 		return this;
 	}
