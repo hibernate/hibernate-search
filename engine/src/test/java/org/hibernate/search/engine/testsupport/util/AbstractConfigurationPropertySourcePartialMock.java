@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.testsupport.util;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 /**
  * Used for partial mocks, to benefit from default methods and mock the rest.

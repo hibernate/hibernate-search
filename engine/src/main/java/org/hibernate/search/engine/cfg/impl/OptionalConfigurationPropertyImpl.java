@@ -9,7 +9,7 @@ package org.hibernate.search.engine.cfg.impl;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 
 final class OptionalConfigurationPropertyImpl<T> extends AbstractConfigurationProperty<Optional<T>>

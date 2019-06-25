@@ -9,7 +9,7 @@ package org.hibernate.search.engine.cfg.impl;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 public class MapConfigurationPropertySource implements ConfigurationPropertySource {
 

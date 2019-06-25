@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.spi;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 

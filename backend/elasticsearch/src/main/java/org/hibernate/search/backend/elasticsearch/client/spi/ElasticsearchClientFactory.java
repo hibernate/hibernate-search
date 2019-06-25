@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.client.spi;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 /**
  * Creates the Elasticsearch client.

@@ -11,8 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-
 public final class ConsumedPropertyTrackingConfigurationPropertySource implements ConfigurationPropertySource {
 
 	private final ConfigurationPropertySource delegate;

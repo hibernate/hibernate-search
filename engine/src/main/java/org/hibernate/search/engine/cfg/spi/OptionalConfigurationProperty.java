@@ -9,8 +9,6 @@ package org.hibernate.search.engine.cfg.spi;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-
 public interface OptionalConfigurationProperty<T> extends ConfigurationProperty<Optional<T>> {
 
 	/**

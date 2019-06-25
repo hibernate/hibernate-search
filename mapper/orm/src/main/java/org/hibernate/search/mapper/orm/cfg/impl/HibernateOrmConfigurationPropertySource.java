@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.engine.config.spi.ConfigurationService;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConsumedPropertyTrackingConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;

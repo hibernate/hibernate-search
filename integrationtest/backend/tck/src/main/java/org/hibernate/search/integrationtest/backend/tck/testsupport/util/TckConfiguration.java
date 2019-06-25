@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 /**
