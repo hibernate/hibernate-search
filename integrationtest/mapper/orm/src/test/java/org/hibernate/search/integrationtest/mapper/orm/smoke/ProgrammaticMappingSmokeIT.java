@@ -34,7 +34,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -333,7 +333,7 @@ public class ProgrammaticMappingSmokeIT {
 
 	private class MyMappingConfigurer implements HibernateOrmSearchMappingConfigurer {
 		@Override
-		public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+		public void configure(HibernateOrmMappingConfigurationContext context) {
 			ProgrammaticMappingDefinitionContext mapping = context.programmaticMapping();
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )

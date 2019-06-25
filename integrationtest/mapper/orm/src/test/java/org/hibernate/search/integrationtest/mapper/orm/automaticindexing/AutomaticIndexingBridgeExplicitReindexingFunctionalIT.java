@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.mapper.orm.HibernateOrmExtension;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
@@ -67,7 +67,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
 							@Override
-							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( IndexedEntity.class )
 										.bridge( QueryBasedTypeBridge.class );
 							}

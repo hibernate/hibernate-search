@@ -18,6 +18,6 @@ public interface HibernateOrmSearchMappingConfigurer {
 	 * Configure the Hibernate Search mapping as necessary using the given {@code context}.
 	 * @param context A context exposing methods to configure the mapping.
 	 */
-	void configure(HibernateOrmMappingDefinitionContainerContext context);
+	void configure(HibernateOrmMappingConfigurationContext context);
 
 }
