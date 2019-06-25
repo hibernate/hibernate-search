@@ -506,6 +506,46 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		verifyAll();
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3349")
+	public void failedEntityLoading_skipHit() {
+		DocumentReference mainDocumentReference = reference( INDEX_NAME, MAIN_ID );
+		DocumentReference emptyDocumentReference = reference( INDEX_NAME, EMPTY_ID );
+		StubTransformedReference mainEntityReference = new StubTransformedReference( mainDocumentReference );
+		StubTransformedReference emptyEntityReference = new StubTransformedReference( emptyDocumentReference );
+		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyDocumentReference );
+
+		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				createMock( LoadingContext.class );
+		ReferenceHitMapper<StubTransformedReference> referenceHitMapperMock =
+				createMock( StubReferenceHitMapper.class );
+		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
+				createMock( StubEntityLoader.class );
+
+		resetAll();
+		// No calls expected on the mocks
+		replayAll();
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createGenericScope();
+		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+		verifyAll();
+
+		resetAll();
+		StubMapperUtils.expectHitMapping(
+				loadingContextMock, referenceHitMapperMock, objectLoaderMock,
+				c -> c
+						// Return "null" when loading, meaning the entity failed to load
+						.load( mainDocumentReference, mainEntityReference, null )
+						.load( emptyDocumentReference, emptyEntityReference, emptyLoadedObject )
+		);
+		replayAll();
+		// Expect the main document to be excluded from hits, since it could not be loaded.
+		assertThat( objectsQuery ).hasHitsAnyOrder( emptyLoadedObject );
+		verifyAll();
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( MAIN_ID ), document -> {

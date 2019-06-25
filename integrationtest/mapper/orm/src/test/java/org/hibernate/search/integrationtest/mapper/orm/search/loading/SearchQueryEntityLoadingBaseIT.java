@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -66,6 +67,34 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 				c -> c
 						.entity( primitives.getIndexedClass(), 1 )
 						.entity( primitives.getIndexedClass(), 2 )
+						.entity( primitives.getIndexedClass(), 3 )
+		);
+	}
+
+	/**
+	 * Test loading of entities that are not found in the database.
+	 * This can happen when the index is slightly out of sync and still has deleted entities in it.
+	 * In that case, we expect the loader to return null,
+	 * and the backend to skip the corresponding hits.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3349")
+	public void notFound() {
+		// We don't care about what is indexed exactly, so use the lenient mode
+		backendMock.inLenientMode( () ->
+				OrmUtils.withinTransaction( sessionFactory, session -> {
+					session.persist( primitives.newIndexed( 1 ) );
+					session.persist( primitives.newIndexed( 3 ) );
+				} )
+		);
+
+		testLoading(
+				c -> c
+						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
+						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) )
+						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 3 ) ),
+				c -> c
+						.entity( primitives.getIndexedClass(), 1 )
 						.entity( primitives.getIndexedClass(), 3 )
 		);
 	}

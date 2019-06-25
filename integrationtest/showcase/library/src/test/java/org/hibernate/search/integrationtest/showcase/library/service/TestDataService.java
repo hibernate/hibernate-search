@@ -10,6 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Locale;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.BorrowalType;
@@ -62,6 +65,9 @@ public class TestDataService {
 
 	@Autowired
 	private BorrowalService borrowalService;
+
+	@Autowired
+	private EntityManager entityManager;
 
 	public void initDefaultDataSet() {
 		Book calligraphy = documentService.createBook(
@@ -261,5 +267,13 @@ public class TestDataService {
 					"literature,poem,afterlife"
 			);
 		}
+	}
+
+	public void executeSql(String sql, Object... parameters) {
+		Query query = entityManager.createNativeQuery( sql );
+		for ( int i = 0; i < parameters.length; i++ ) {
+			query.setParameter( i, parameters[i] );
+		}
+		query.executeUpdate();
 	}
 }

@@ -39,6 +39,14 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	}
 
 	@Override
+	public List<Document<?>> findAllIndexed() {
+		return Search.session( entityManager )
+				.search( DOCUMENT_CLASS )
+				.predicate( p -> p.matchAll() )
+				.fetchHits();
+	}
+
+	@Override
 	public Optional<Book> getByIsbn(String isbnAsString) {
 		if ( isbnAsString == null ) {
 			return Optional.empty();

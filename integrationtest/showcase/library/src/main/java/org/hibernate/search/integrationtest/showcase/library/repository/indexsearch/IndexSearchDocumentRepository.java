@@ -20,6 +20,8 @@ public interface IndexSearchDocumentRepository {
 
 	long countIndexed();
 
+	List<Document<?>> findAllIndexed();
+
 	Optional<Book> getByIsbn(String isbnAsString);
 
 	List<Book> searchByMedium(String terms, BookMedium medium, int limit, int offset);
