@@ -10,7 +10,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
-public interface PojoPropertyDependencyContext {
+public interface PojoPropertyIndexingDependencyConfigurationContext {
 
 	/**
 	 * Declare that the bridge will only use the property value directly,
@@ -35,7 +35,7 @@ public interface PojoPropertyDependencyContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the given path cannot be applied to the values of the bridged property.
 	 * @see #use(ContainerExtractorPath, PojoModelPathValueNode)
 	 */
-	default PojoPropertyDependencyContext use(String pathFromBridgedPropertyToUsedValue) {
+	default PojoPropertyIndexingDependencyConfigurationContext use(String pathFromBridgedPropertyToUsedValue) {
 		return use( ContainerExtractorPath.defaultExtractors(), pathFromBridgedPropertyToUsedValue );
 	}
 
@@ -49,7 +49,7 @@ public interface PojoPropertyDependencyContext {
 	 * or if the given path cannot be applied to the values of the bridged property.
 	 * @see #use(ContainerExtractorPath, PojoModelPathValueNode)
 	 */
-	default PojoPropertyDependencyContext use(PojoModelPathValueNode pathFromBridgedPropertyToUsedValue) {
+	default PojoPropertyIndexingDependencyConfigurationContext use(PojoModelPathValueNode pathFromBridgedPropertyToUsedValue) {
 		return use( ContainerExtractorPath.defaultExtractors(), pathFromBridgedPropertyToUsedValue );
 	}
 
@@ -65,7 +65,7 @@ public interface PojoPropertyDependencyContext {
 	 * or if the given path cannot be applied to the values of the bridged property.
 	 * @see #use(ContainerExtractorPath, PojoModelPathValueNode)
 	 */
-	default PojoPropertyDependencyContext use(ContainerExtractorPath extractorPathFromBridgedProperty,
+	default PojoPropertyIndexingDependencyConfigurationContext use(ContainerExtractorPath extractorPathFromBridgedProperty,
 			String pathFromExtractedBridgedPropertyValueToUsedValue) {
 		return use( extractorPathFromBridgedProperty, PojoModelPath.parse( pathFromExtractedBridgedPropertyValueToUsedValue ) );
 	}
@@ -86,7 +86,7 @@ public interface PojoPropertyDependencyContext {
 	 * or if the given path cannot be applied to the values of the bridged property.
 	 * @see #use(ContainerExtractorPath, PojoModelPathValueNode)
 	 */
-	PojoPropertyDependencyContext use(ContainerExtractorPath extractorPathFromBridgedProperty,
+	PojoPropertyIndexingDependencyConfigurationContext use(ContainerExtractorPath extractorPathFromBridgedProperty,
 			PojoModelPathValueNode pathFromExtractedBridgedPropertyValueToUsedValue);
 
 	/**
@@ -108,7 +108,7 @@ public interface PojoPropertyDependencyContext {
 	 * @hsearch.experimental This feature is under active development.
 	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
-	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
+	default PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(Class<?> otherEntityType,
 			String pathFromOtherEntityTypeToBridgedType) {
 		return fromOtherEntity( otherEntityType, PojoModelPath.parse( pathFromOtherEntityTypeToBridgedType ) );
 	}
@@ -131,7 +131,7 @@ public interface PojoPropertyDependencyContext {
 	 * @hsearch.experimental This feature is under active development.
 	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
-	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
+	default PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {
 		return fromOtherEntity(
 				ContainerExtractorPath.defaultExtractors(), otherEntityType, pathFromOtherEntityTypeToBridgedType
@@ -158,7 +158,7 @@ public interface PojoPropertyDependencyContext {
 	 * @hsearch.experimental This feature is under active development.
 	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
-	PojoOtherEntityDependencyContext fromOtherEntity(ContainerExtractorPath extractorPathFromBridgedProperty,
+	PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(ContainerExtractorPath extractorPathFromBridgedProperty,
 			Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedPropertyExtractedType);
 

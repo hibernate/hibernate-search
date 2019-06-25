@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
  * @hsearch.experimental This type is under active development.
  *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
-public interface PojoOtherEntityDependencyContext {
+public interface PojoOtherEntityIndexingDependencyConfigurationContext {
 
 	/**
 	 * Declare that the given path is read by the bridge at index time to populate the indexed document.
@@ -26,7 +26,7 @@ public interface PojoOtherEntityDependencyContext {
 	 * @hsearch.experimental This feature is under active development.
 	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
-	default PojoOtherEntityDependencyContext use(String pathFromOtherEntityTypeToUsedValue) {
+	default PojoOtherEntityIndexingDependencyConfigurationContext use(String pathFromOtherEntityTypeToUsedValue) {
 		return use( PojoModelPath.parse( pathFromOtherEntityTypeToUsedValue ) );
 	}
 
@@ -44,6 +44,6 @@ public interface PojoOtherEntityDependencyContext {
 	 * @hsearch.experimental This feature is under active development.
 	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
-	PojoOtherEntityDependencyContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue);
+	PojoOtherEntityIndexingDependencyConfigurationContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue);
 
 }

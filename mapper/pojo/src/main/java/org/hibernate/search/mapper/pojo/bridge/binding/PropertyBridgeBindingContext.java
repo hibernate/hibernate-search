@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.mapper.pojo.model.dependency.PojoPropertyDependencyContext;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoPropertyIndexingDependencyConfigurationContext;
 
 /**
  * The context provided to the {@link PropertyBridge#bind(PropertyBridgeBindingContext)} method.
@@ -27,7 +27,7 @@ public interface PropertyBridgeBindingContext {
 	/**
 	 * @return An entry point allowing to declare the parts of the entity graph that this bridge will depend on.
 	 */
-	PojoPropertyDependencyContext getDependencies();
+	PojoPropertyIndexingDependencyConfigurationContext getDependencies();
 
 	/**
 	 * @return An entry point allowing to define a new field type.

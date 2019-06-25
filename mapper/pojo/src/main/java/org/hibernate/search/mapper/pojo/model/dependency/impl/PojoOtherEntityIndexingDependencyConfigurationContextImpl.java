@@ -12,20 +12,21 @@ import java.util.List;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorDisjointValueNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.model.dependency.PojoOtherEntityDependencyContext;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoOtherEntityIndexingDependencyConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 
-class PojoOtherEntityDependencyContextImpl<T> implements PojoOtherEntityDependencyContext {
+class PojoOtherEntityIndexingDependencyConfigurationContextImpl<T> implements
+		PojoOtherEntityIndexingDependencyConfigurationContext {
 	private final BoundPojoModelPath.Walker bindingPathWalker;
 	private final BoundPojoModelPathTypeNode<T> modelPath;
 	private final BoundPojoModelPathValueNode<?, ?, ?> boundPathFromOtherEntityTypeToBridgedType;
 	private final List<BoundPojoModelPathValueNode<?, ?, ?>> usedPaths = new ArrayList<>();
 
-	PojoOtherEntityDependencyContextImpl(BoundPojoModelPath.Walker bindingPathWalker,
+	PojoOtherEntityIndexingDependencyConfigurationContextImpl(BoundPojoModelPath.Walker bindingPathWalker,
 			BoundPojoModelPathTypeNode<T> modelPath,
 			BoundPojoModelPathValueNode<?, ?, ?> boundPathFromOtherEntityTypeToBridgedType) {
 		this.bindingPathWalker = bindingPathWalker;
@@ -34,7 +35,7 @@ class PojoOtherEntityDependencyContextImpl<T> implements PojoOtherEntityDependen
 	}
 
 	@Override
-	public PojoOtherEntityDependencyContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue) {
+	public PojoOtherEntityIndexingDependencyConfigurationContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue) {
 		BoundPojoModelPathValueNode<?, ?, ?> boundPath = PojoModelPathBinder.bind(
 				modelPath, pathFromBridgedTypeToUsedValue, bindingPathWalker
 		);

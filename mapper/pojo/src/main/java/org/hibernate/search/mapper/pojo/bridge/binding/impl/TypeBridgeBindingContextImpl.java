@@ -10,17 +10,17 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
-import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeDependencyContext;
-import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeDependencyContextImpl;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeIndexingDependencyConfigurationContext;
+import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeIndexingDependencyConfigurationContextImpl;
 
 public class TypeBridgeBindingContextImpl implements TypeBridgeBindingContext {
 	private final PojoModelType bridgedElement;
-	private final PojoTypeDependencyContextImpl<?> pojoDependencyContext;
+	private final PojoTypeIndexingDependencyConfigurationContextImpl<?> pojoDependencyContext;
 	private final IndexFieldTypeFactory indexFieldTypeFactory;
 	private final IndexSchemaElement indexSchemaElement;
 
 	public TypeBridgeBindingContextImpl(PojoModelType bridgedElement,
-			PojoTypeDependencyContextImpl<?> pojoDependencyContext,
+			PojoTypeIndexingDependencyConfigurationContextImpl<?> pojoDependencyContext,
 			IndexFieldTypeFactory indexFieldTypeFactory,
 			IndexSchemaElement indexSchemaElement) {
 		this.bridgedElement = bridgedElement;
@@ -35,7 +35,7 @@ public class TypeBridgeBindingContextImpl implements TypeBridgeBindingContext {
 	}
 
 	@Override
-	public PojoTypeDependencyContext getDependencies() {
+	public PojoTypeIndexingDependencyConfigurationContext getDependencies() {
 		return pojoDependencyContext;
 	}
 

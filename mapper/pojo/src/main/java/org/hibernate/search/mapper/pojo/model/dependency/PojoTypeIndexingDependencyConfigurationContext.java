@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.model.dependency;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
-public interface PojoTypeDependencyContext {
+public interface PojoTypeIndexingDependencyConfigurationContext {
 
 	/**
 	 * Declare that the bridge will only use the type directly,
@@ -32,7 +32,7 @@ public interface PojoTypeDependencyContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the given path cannot be applied to the bridged type.
 	 * @see #use(PojoModelPathValueNode)
 	 */
-	default PojoTypeDependencyContext use(String pathFromBridgedTypeToUsedValue) {
+	default PojoTypeIndexingDependencyConfigurationContext use(String pathFromBridgedTypeToUsedValue) {
 		return use( PojoModelPath.parse( pathFromBridgedTypeToUsedValue ) );
 	}
 
@@ -50,7 +50,7 @@ public interface PojoTypeDependencyContext {
 	 * @hsearch.experimental This feature is under active development.
 	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
-	PojoTypeDependencyContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue);
+	PojoTypeIndexingDependencyConfigurationContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue);
 
 	/**
 	 * Start the declaration of dependencies to properties of another entity,
@@ -71,7 +71,7 @@ public interface PojoTypeDependencyContext {
 	 * @hsearch.experimental This feature is under active development.
 	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
-	default PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
+	default PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(Class<?> otherEntityType,
 			String pathFromOtherEntityTypeToBridgedType) {
 		return fromOtherEntity( otherEntityType, PojoModelPath.parse( pathFromOtherEntityTypeToBridgedType ) );
 	}
@@ -94,7 +94,7 @@ public interface PojoTypeDependencyContext {
 	 * @hsearch.experimental This feature is under active development.
 	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
-	PojoOtherEntityDependencyContext fromOtherEntity(Class<?> otherEntityType,
+	PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType);
 
 }
