@@ -10,12 +10,13 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 /**
- * A context to configure an index field mapped to a POJO property.
+ * The step in a property-to-index-field mapping where optional parameters can be set,
+ * when the index field is not a full-text field.
  *
- * @param <S> The "self" type, i.e. the type to return from methods.
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface PropertyNotFullTextFieldMappingContext<S extends PropertyNotFullTextFieldMappingContext<?>>
-		extends PropertyFieldMappingContext<S> {
+public interface PropertyMappingNonFullTextFieldOptionsStep<S extends PropertyMappingNonFullTextFieldOptionsStep<?>>
+		extends PropertyMappingFieldOptionsStep<S> {
 
 	/**
 	 * @param sortable Whether this field should be sortable.

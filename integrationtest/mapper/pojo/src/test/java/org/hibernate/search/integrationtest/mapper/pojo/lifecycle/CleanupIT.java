@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -68,7 +68,7 @@ public class CleanupIT {
 		backendMock.expectAnySchema( OtherIndexedEntity.INDEX );
 
 		startup( mappingDefinition -> {
-			TypeMappingContext typeContext = mappingDefinition.type( OtherIndexedEntity.class );
+			TypeMappingStep typeContext = mappingDefinition.type( OtherIndexedEntity.class );
 			typeContext.indexed( OtherIndexedEntity.INDEX )
 					.routingKeyBridge( new SucceedingBridgeBuilder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
 					.bridge( new SucceedingBridgeBuilder( TYPE_BRIDGE_COUNTER_KEYS ) )
@@ -116,7 +116,7 @@ public class CleanupIT {
 	@Test
 	public void failingRoutingKeyBridgeBuilding() {
 		failingStartup( mappingDefinition -> {
-			TypeMappingContext typeContext = mappingDefinition.type( OtherIndexedEntity.class );
+			TypeMappingStep typeContext = mappingDefinition.type( OtherIndexedEntity.class );
 			typeContext.indexed( OtherIndexedEntity.INDEX )
 					.bridge( new SucceedingBridgeBuilder( TYPE_BRIDGE_COUNTER_KEYS ) )
 					.property( "id" )
@@ -150,7 +150,7 @@ public class CleanupIT {
 	@Test
 	public void failingTypeBridgeBuilding() {
 		failingStartup( mappingDefinition -> {
-			TypeMappingContext typeContext = mappingDefinition.type( OtherIndexedEntity.class );
+			TypeMappingStep typeContext = mappingDefinition.type( OtherIndexedEntity.class );
 			typeContext.indexed( OtherIndexedEntity.INDEX )
 					.routingKeyBridge( new SucceedingBridgeBuilder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
 					.property( "id" )

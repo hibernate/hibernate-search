@@ -10,9 +10,9 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 
 /**
- * A context to define the inverse side of an association.
+ * The step in a "association inverse side" definition where optional parameters can be set.
  */
-public interface AssociationInverseSideMappingContext extends PropertyMappingContext {
+public interface AssociationInverseSideOptionsStep extends PropertyMappingStep {
 
 	/**
 	 * @param extractorName The name of the container extractor to use.
@@ -20,7 +20,7 @@ public interface AssociationInverseSideMappingContext extends PropertyMappingCon
 	 * @see AssociationInverseSide#extraction()
 	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	default AssociationInverseSideMappingContext withExtractor(String extractorName) {
+	default AssociationInverseSideOptionsStep withExtractor(String extractorName) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
@@ -30,7 +30,7 @@ public interface AssociationInverseSideMappingContext extends PropertyMappingCon
 	 * @return {@code this}, for method chaining.
 	 * @see AssociationInverseSide#extraction()
 	 */
-	default AssociationInverseSideMappingContext withoutExtractors() {
+	default AssociationInverseSideOptionsStep withoutExtractors() {
 		return withExtractors( ContainerExtractorPath.noExtractors() );
 	}
 
@@ -40,6 +40,6 @@ public interface AssociationInverseSideMappingContext extends PropertyMappingCon
 	 * @see AssociationInverseSide#extraction()
 	 * @see ContainerExtractorPath
 	 */
-	AssociationInverseSideMappingContext withExtractors(ContainerExtractorPath extractorPath);
+	AssociationInverseSideOptionsStep withExtractors(ContainerExtractorPath extractorPath);
 
 }

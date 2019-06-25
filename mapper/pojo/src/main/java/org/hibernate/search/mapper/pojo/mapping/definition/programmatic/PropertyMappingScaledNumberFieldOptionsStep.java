@@ -9,16 +9,17 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
 
 /**
- * A context to configure a scaled number field mapped to a POJO property.
+ * The step in a property-to-index-field mapping where optional parameters can be set,
+ * when the index field is a "scaled number" field.
  */
-public interface PropertyScaledNumberFieldMappingContext
-		extends PropertyNotFullTextFieldMappingContext<PropertyScaledNumberFieldMappingContext> {
+public interface PropertyMappingScaledNumberFieldOptionsStep
+		extends PropertyMappingNonFullTextFieldOptionsStep<PropertyMappingScaledNumberFieldOptionsStep> {
 
 	/**
 	 * @param decimalScale How the scale of values should be adjusted before indexing as a fixed-precision integer.
 	 * @return {@code this}, for method chaining.
 	 * @see ScaledNumberField#decimalScale()
 	 */
-	PropertyScaledNumberFieldMappingContext decimalScale(int decimalScale);
+	PropertyMappingScaledNumberFieldOptionsStep decimalScale(int decimalScale);
 
 }

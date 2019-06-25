@@ -10,9 +10,9 @@ import java.lang.annotation.Annotation;
 
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyNotFullTextFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation> extends PropertyFieldAnnotationProcessor<A> {
@@ -21,9 +21,9 @@ abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation>
 	}
 
 	@Override
-	final PropertyFieldMappingContext<?> initFieldMappingContext(PropertyMappingContext mappingContext,
+	final PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
 			PojoPropertyModel<?> propertyModel, A annotation, String fieldName) {
-		PropertyNotFullTextFieldMappingContext<?> fieldContext = initSortableFieldMappingContext(
+		PropertyMappingNonFullTextFieldOptionsStep<?> fieldContext = initSortableFieldMappingContext(
 				mappingContext, propertyModel, annotation, fieldName
 		);
 
@@ -40,7 +40,7 @@ abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation>
 		return fieldContext;
 	}
 
-	abstract PropertyNotFullTextFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
+	abstract PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
 			PojoPropertyModel<?> propertyModel, A annotation, String fieldName);
 
 	abstract Sortable getSortable(A annotation);

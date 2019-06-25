@@ -12,18 +12,18 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingDocumentIdOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
 
-public class PropertyDocumentIdMappingContextImpl extends DelegatingPropertyMappingContext
-		implements PropertyDocumentIdMappingContext, PojoPropertyMetadataContributor {
+class PropertyMappingDocumentIdOptionsStepImpl extends DelegatingPropertyMappingStep
+		implements PropertyMappingDocumentIdOptionsStep, PojoPropertyMetadataContributor {
 
 	private BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder;
 
-	public PropertyDocumentIdMappingContextImpl(PropertyMappingContext parent) {
+	PropertyMappingDocumentIdOptionsStepImpl(PropertyMappingStep parent) {
 		super( parent );
 	}
 
@@ -38,17 +38,17 @@ public class PropertyDocumentIdMappingContextImpl extends DelegatingPropertyMapp
 	}
 
 	@Override
-	public PropertyDocumentIdMappingContext identifierBridge(Class<? extends IdentifierBridge<?>> bridgeClass) {
+	public PropertyMappingDocumentIdOptionsStep identifierBridge(Class<? extends IdentifierBridge<?>> bridgeClass) {
 		return identifierBridge( BeanReference.of( bridgeClass ) );
 	}
 
 	@Override
-	public PropertyDocumentIdMappingContext identifierBridge(BeanReference<? extends IdentifierBridge<?>> bridgeReference) {
+	public PropertyMappingDocumentIdOptionsStep identifierBridge(BeanReference<? extends IdentifierBridge<?>> bridgeReference) {
 		return identifierBridge( new BeanBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override
-	public PropertyDocumentIdMappingContext identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder) {
+	public PropertyMappingDocumentIdOptionsStep identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		this.bridgeBuilder = builder;
 		return this;
 	}

@@ -11,27 +11,27 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyScaledNumberFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingScaledNumberFieldOptionsStep;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PropertyScaledNumberFieldMappingContextImpl
-		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyScaledNumberFieldMappingContext, ScaledNumberIndexFieldTypeOptionsStep<?, ?>>
-		implements PropertyScaledNumberFieldMappingContext {
+class PropertyMappingScaledNumberFieldOptionsStepImpl
+		extends AbstractPropertyMappingNonFullTextFieldOptionsStep<PropertyMappingScaledNumberFieldOptionsStep, ScaledNumberIndexFieldTypeOptionsStep<?, ?>>
+		implements PropertyMappingScaledNumberFieldOptionsStep {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	PropertyScaledNumberFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
-		super( parent, relativeFieldName, PropertyScaledNumberFieldMappingContextImpl::castIndexFieldTypeOptionsStep );
+	PropertyMappingScaledNumberFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
+		super( parent, relativeFieldName, PropertyMappingScaledNumberFieldOptionsStepImpl::castIndexFieldTypeOptionsStep );
 	}
 
 	@Override
-	PropertyScaledNumberFieldMappingContext thisAsS() {
+	PropertyMappingScaledNumberFieldOptionsStep thisAsS() {
 		return this;
 	}
 
 	@Override
-	public PropertyScaledNumberFieldMappingContext decimalScale(int decimalScale) {
+	public PropertyMappingScaledNumberFieldOptionsStep decimalScale(int decimalScale) {
 		fieldModelContributor.add( (c, b) -> c.decimalScale( decimalScale ) );
 		return thisAsS();
 	}

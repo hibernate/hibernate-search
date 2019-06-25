@@ -7,23 +7,23 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingGenericFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 
-class PropertyGenericFieldMappingContextImpl
-		extends AbstractPropertyNotFullTextFieldMappingContext<PropertyGenericFieldMappingContext, StandardIndexFieldTypeOptionsStep<?, ?>>
-		implements PropertyGenericFieldMappingContext {
+class PropertyMappingGenericFieldOptionsStepImpl
+		extends AbstractPropertyMappingNonFullTextFieldOptionsStep<PropertyMappingGenericFieldOptionsStep, StandardIndexFieldTypeOptionsStep<?, ?>>
+		implements PropertyMappingGenericFieldOptionsStep {
 
-	PropertyGenericFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
+	PropertyMappingGenericFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
 		super(
 				parent, relativeFieldName,
-				PropertyGenericFieldMappingContextImpl::castIndexFieldTypeOptionsStep
+				PropertyMappingGenericFieldOptionsStepImpl::castIndexFieldTypeOptionsStep
 		);
 	}
 
 	@Override
-	PropertyGenericFieldMappingContext thisAsS() {
+	PropertyMappingGenericFieldOptionsStep thisAsS() {
 		return this;
 	}
 
