@@ -31,11 +31,11 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	private EntityManager entityManager;
 
 	@Override
-	public List<Book> findAllIndexed() {
+	public long countIndexed() {
 		return Search.session( entityManager )
-				.search( Book.class )
+				.search( Document.class )
 				.predicate( p -> p.matchAll() )
-				.fetchHits();
+				.fetchTotalHitCount();
 	}
 
 	@Override
