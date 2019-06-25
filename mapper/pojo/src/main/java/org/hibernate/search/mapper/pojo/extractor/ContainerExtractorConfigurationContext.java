@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
  * @see ContainerExtractorPath#explicitExtractors(List)
  */
 @SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
-public interface ContainerExtractorDefinitionContext {
+public interface ContainerExtractorConfigurationContext {
 
 	void define(String extractorName, Class<? extends ContainerExtractor> extractorClass);
 

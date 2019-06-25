@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorDefinitionContext;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 /**
@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtrac
  * <li>explicitly by their name, e.g. {@code ["map-values", "collection"]},
  * meaning "apply the 'map-values' extractor to the property value, then apply the 'collection' extractor to the map values".
  * Names are either {@link BuiltinContainerExtractors built-in}
- * or {@link ContainerExtractorDefinitionContext registered at bootstrap}.
+ * or {@link ContainerExtractorConfigurationContext registered at bootstrap}.
  * <li>or simply by the "default" path ({@link #defaultExtractors()}),
  * which means "whatever default Hibernate Search manages to apply using its internal extractor resolution algorithm".
  * This second form may result in different "resolved" paths depending on the type of the property it is applied to.

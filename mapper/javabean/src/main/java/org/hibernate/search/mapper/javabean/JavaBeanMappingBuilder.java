@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingPartialBuildState;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorDefinitionContext;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -53,7 +53,7 @@ public final class JavaBeanMappingBuilder {
 		return mappingInitiator.annotationMapping();
 	}
 
-	public ContainerExtractorDefinitionContext containerExtractors() {
+	public ContainerExtractorConfigurationContext containerExtractors() {
 		return mappingInitiator.containerExtractors();
 	}
 

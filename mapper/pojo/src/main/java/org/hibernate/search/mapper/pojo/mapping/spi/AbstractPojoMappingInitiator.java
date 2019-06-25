@@ -15,7 +15,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorDefinitionContext;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
@@ -66,7 +66,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		return annotationMappingDefinition;
 	}
 
-	public ContainerExtractorDefinitionContext containerExtractors() {
+	public ContainerExtractorConfigurationContext containerExtractors() {
 		return containerExtractorRegistryBuilder;
 	}
 

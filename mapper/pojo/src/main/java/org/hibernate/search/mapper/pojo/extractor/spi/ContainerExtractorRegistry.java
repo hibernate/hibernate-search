@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorDefinitionContext;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.ArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
@@ -77,7 +77,7 @@ public final class ContainerExtractorRegistry {
 		extractorsByName.put( name, extractorClass );
 	}
 
-	public static final class Builder implements ContainerExtractorDefinitionContext {
+	public static final class Builder implements ContainerExtractorConfigurationContext {
 		private final Map<String, Class<? extends ContainerExtractor>> extractorsByName = new HashMap<>();
 
 		private Builder() {

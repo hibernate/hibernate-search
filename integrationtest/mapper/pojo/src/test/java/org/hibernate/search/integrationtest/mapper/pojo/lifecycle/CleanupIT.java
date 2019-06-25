@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorDefinitionContext;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
@@ -355,7 +355,7 @@ public class CleanupIT {
 							builder.addEntityType( IndexedEntity.class );
 							builder.addEntityType( OtherIndexedEntity.class );
 
-							ContainerExtractorDefinitionContext containerExtractorDefinition = builder.containerExtractors();
+							ContainerExtractorConfigurationContext containerExtractorDefinition = builder.containerExtractors();
 							containerExtractorDefinition.define( StartupStubContainerExtractor.NAME, StartupStubContainerExtractor.class );
 							containerExtractorDefinition.define( FailingContainerExtractor.NAME, FailingContainerExtractor.class );
 
