@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.cfg.impl;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.EngineSettings;
 
 public final class EngineConfigurationUtils {

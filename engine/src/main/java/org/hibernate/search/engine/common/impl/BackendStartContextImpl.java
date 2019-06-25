@@ -8,7 +8,7 @@ package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 class BackendStartContextImpl implements BackendStartContext {
 	private final ContextualFailureCollector failureCollector;

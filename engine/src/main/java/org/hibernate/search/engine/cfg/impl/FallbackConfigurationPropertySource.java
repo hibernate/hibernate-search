@@ -8,7 +8,7 @@ package org.hibernate.search.engine.cfg.impl;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 public class FallbackConfigurationPropertySource implements ConfigurationPropertySource {
 	private final ConfigurationPropertySource main;
