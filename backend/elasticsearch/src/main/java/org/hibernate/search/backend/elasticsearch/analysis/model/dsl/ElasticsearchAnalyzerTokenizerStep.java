@@ -7,7 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 
 
-public interface ElasticsearchCustomAnalyzerDefinitionContext {
+/**
+ * The step in an analyzer definition where the tokenizer can be set.
+ */
+public interface ElasticsearchAnalyzerTokenizerStep {
 
 	/**
 	 * Set the tokenizer that the analyzer will use.
@@ -17,8 +20,8 @@ public interface ElasticsearchCustomAnalyzerDefinitionContext {
 	 * This can be achieved by defining the tokenizer
 	 * {@link ElasticsearchAnalysisDefinitionContainerContext#tokenizer(String) from Hibernate Search},
 	 * by configuring the Elasticsearch server directly, or by using built-in tokenizers.
-	 * @return A definition context allowing to define the analyzer's filters.
+	 * @return The next step.
 	 */
-	ElasticsearchAnalyzerDefinitionWithTokenizerContext withTokenizer(String name);
+	ElasticsearchAnalyzerOptionalComponentsStep withTokenizer(String name);
 
 }

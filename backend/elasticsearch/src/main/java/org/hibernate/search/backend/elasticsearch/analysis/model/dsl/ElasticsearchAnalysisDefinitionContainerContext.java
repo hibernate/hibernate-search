@@ -15,39 +15,39 @@ public interface ElasticsearchAnalysisDefinitionContainerContext {
 	/**
 	 * Start an analyzer definition.
 	 * @param name The name used to reference this analyzer (both in Elasticsearch and in Hibernate Search).
-	 * @return A context allowing to further define the analyzer.
+	 * @return The initial step of a DSL where the analyzer can be defined.
 	 */
-	ElasticsearchAnalyzerDefinitionContext analyzer(String name);
+	ElasticsearchAnalyzerTypeStep analyzer(String name);
 
 	/**
 	 * Start a normalizer definition.
 	 * @param name The name used to reference this normalizer (both in Elasticsearch and in Hibernate Search).
-	 * @return A context allowing to further define the normalizer.
+	 * @return The initial step of a DSL where the normalizer can be defined.
 	 */
-	ElasticsearchNormalizerDefinitionContext normalizer(String name);
+	ElasticsearchNormalizerTypeStep normalizer(String name);
 
 	/**
 	 * Start a tokenizer definition.
 	 * @param name The name used to reference this tokenizer
-	 * {@link ElasticsearchCustomAnalyzerDefinitionContext#withTokenizer(String) in analyzer definitions}.
-	 * @return The tokenizer definition context, allowing to define the tokenizer's type and parameters.
+	 * {@link ElasticsearchAnalyzerTokenizerStep#withTokenizer(String) in analyzer definitions}.
+	 * @return The initial step of a DSL where the tokenizer can be defined.
 	 */
-	ElasticsearchAnalysisComponentDefinitionContext tokenizer(String name);
+	ElasticsearchAnalysisComponentTypeStep tokenizer(String name);
 
 	/**
 	 * Start a char filter definition.
 	 * @param name The name used to reference this char filter
-	 * {@link ElasticsearchCustomAnalysisDefinitionContext#withCharFilters(String...) in analyzer or normalizer definitions}.
-	 * @return The char filter definition context, allowing to define the char filter's type and parameters.
+	 * {@link ElasticsearchAnalysisOptionalComponentsStep#withCharFilters(String...) in analyzer or normalizer definitions}.
+	 * @return The initial step of a DSL where the char filter can be defined.
 	 */
-	ElasticsearchAnalysisComponentDefinitionContext charFilter(String name);
+	ElasticsearchAnalysisComponentTypeStep charFilter(String name);
 
 	/**
 	 * Start a token filter definition.
 	 * @param name The name used to reference this token filter
-	 * {@link ElasticsearchCustomAnalysisDefinitionContext#withTokenFilters(String...) in analyzer or normalizer definitions}.
-	 * @return The token filter definition context, allowing to define the token filter's type and parameters.
+	 * {@link ElasticsearchAnalysisOptionalComponentsStep#withTokenFilters(String...) in analyzer or normalizer definitions}.
+	 * @return The initial step of a DSL where the token filter can be defined.
 	 */
-	ElasticsearchAnalysisComponentDefinitionContext tokenFilter(String name);
+	ElasticsearchAnalysisComponentTypeStep tokenFilter(String name);
 
 }

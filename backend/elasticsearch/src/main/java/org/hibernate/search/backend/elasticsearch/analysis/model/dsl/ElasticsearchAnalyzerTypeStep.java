@@ -7,23 +7,26 @@
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 
 
-public interface ElasticsearchAnalyzerDefinitionContext {
+/**
+ * The initial step in an analyzer definition, where the type of analyzer can be set.
+ */
+public interface ElasticsearchAnalyzerTypeStep {
 
 	/**
 	 * Start a custom analyzer definition,
 	 * assigning a tokenizer, and optionally char filters and token filters to the definition.
 	 *
-	 * @return A context allowing to further define the analyzer.
+	 * @return The next step.
 	 */
-	ElasticsearchCustomAnalyzerDefinitionContext custom();
+	ElasticsearchAnalyzerTokenizerStep custom();
 
 	/**
 	 * Start a typed analyzer definition,
 	 * assigning a type, and optionally parameters to the definition.
 	 *
 	 * @param type The name of the analyzer type to configure.
-	 * @return The parent context, for method chaining.
+	 * @return The next step.
 	 */
-	ElasticsearchTypedAnalysisComponentDefinitionContext type(String type);
+	ElasticsearchAnalysisComponentParametersStep type(String type);
 
 }

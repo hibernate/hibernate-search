@@ -8,20 +8,20 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchCustomAnalyzerDefinitionContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTokenizerStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.AnalyzerDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerDefinitionWithTokenizerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerOptionalComponentsStep;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.StringHelper;
 
 
 
-public class ElasticsearchCustomAnalyzerDefinitionContextImpl
-		implements ElasticsearchCustomAnalyzerDefinitionContext,
-		ElasticsearchAnalyzerDefinitionWithTokenizerContext,
+class ElasticsearchAnalyzerComponentsStep
+		implements ElasticsearchAnalyzerTokenizerStep,
+		ElasticsearchAnalyzerOptionalComponentsStep,
 		ElasticsearchAnalysisDefinitionContributor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -30,19 +30,19 @@ public class ElasticsearchCustomAnalyzerDefinitionContextImpl
 
 	private final AnalyzerDefinition definition = new AnalyzerDefinition();
 
-	ElasticsearchCustomAnalyzerDefinitionContextImpl(String name) {
+	ElasticsearchAnalyzerComponentsStep(String name) {
 		this.name = name;
 		this.definition.setType( "custom" );
 	}
 
 	@Override
-	public ElasticsearchAnalyzerDefinitionWithTokenizerContext withTokenizer(String tokenizerName) {
+	public ElasticsearchAnalyzerOptionalComponentsStep withTokenizer(String tokenizerName) {
 		definition.setTokenizer( tokenizerName );
 		return this;
 	}
 
 	@Override
-	public ElasticsearchAnalyzerDefinitionWithTokenizerContext withCharFilters(String... names) {
+	public ElasticsearchAnalyzerOptionalComponentsStep withCharFilters(String... names) {
 		definition.setCharFilters( null );
 		for ( String charFilterName : names ) {
 			definition.addCharFilter( charFilterName );
@@ -51,7 +51,7 @@ public class ElasticsearchCustomAnalyzerDefinitionContextImpl
 	}
 
 	@Override
-	public ElasticsearchAnalyzerDefinitionWithTokenizerContext withTokenFilters(String... names) {
+	public ElasticsearchAnalyzerOptionalComponentsStep withTokenFilters(String... names) {
 		definition.setTokenFilters( null );
 		for ( String tokenFilterName : names ) {
 			definition.addTokenFilter( tokenFilterName );
