@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Locale;
 
-import org.hibernate.search.integrationtest.showcase.library.OrmLibraryShowcaseIT;
+import org.hibernate.search.integrationtest.showcase.library.LibraryShowcaseBaseIT;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.BorrowalType;
@@ -39,7 +39,7 @@ public class TestDataService {
 
 	public void initDefaultDataSet() {
 		Book calligraphy = documentService.createBook(
-				OrmLibraryShowcaseIT.CALLIGRAPHY_ID,
+				LibraryShowcaseBaseIT.CALLIGRAPHY_ID,
 				"978-0-00-000001-1",
 				"Calligraphy for Dummies",
 				"Roger Blue",
@@ -48,7 +48,7 @@ public class TestDataService {
 		);
 
 		Video javaDancing = documentService.createVideo(
-				OrmLibraryShowcaseIT.JAVA_DANCING_ID,
+				LibraryShowcaseBaseIT.JAVA_DANCING_ID,
 				"Java le dire à tout le monde",
 				"Michele Violet",
 				"A brief history of Java dancing in Paris during the early 20th century",
@@ -56,7 +56,7 @@ public class TestDataService {
 		);
 
 		Book indonesianEconomy = documentService.createBook(
-				OrmLibraryShowcaseIT.INDONESIAN_ECONOMY_ID,
+				LibraryShowcaseBaseIT.INDONESIAN_ECONOMY_ID,
 				"978-0-00-000003-3",
 				"Comparative Study of the Economy of Java and other Indonesian Islands",
 				"Mark Red",
@@ -66,7 +66,7 @@ public class TestDataService {
 		);
 
 		Book javaForDummies = documentService.createBook(
-				OrmLibraryShowcaseIT.JAVA_FOR_DUMMIES_ID,
+				LibraryShowcaseBaseIT.JAVA_FOR_DUMMIES_ID,
 				"978-0-00-000004-4",
 				// Use varying case on purpose
 				"java for Dummies",
@@ -76,7 +76,7 @@ public class TestDataService {
 		);
 
 		Book artOfComputerProg = documentService.createBook(
-				OrmLibraryShowcaseIT.ART_OF_COMPUTER_PROG_ID,
+				LibraryShowcaseBaseIT.ART_OF_COMPUTER_PROG_ID,
 				"978-0-00-000005-5",
 				"The Art of Computer Programming",
 				"Stuart Green",
@@ -85,7 +85,7 @@ public class TestDataService {
 		);
 
 		Book thesaurusOfLanguages = documentService.createBook(
-				OrmLibraryShowcaseIT.THESAURUS_OF_LANGUAGES_ID,
+				LibraryShowcaseBaseIT.THESAURUS_OF_LANGUAGES_ID,
 				"978-0-00-000006-6" ,
 				"Thesaurus of Indo-European Languages",
 				"Dorothy White",
@@ -94,7 +94,7 @@ public class TestDataService {
 		);
 
 		Video livingOnIsland = documentService.createVideo(
-				OrmLibraryShowcaseIT.LIVING_ON_ISLAND_ID,
+				LibraryShowcaseBaseIT.LIVING_ON_ISLAND_ID,
 				"Living in an Island, Episode 3: Indonesia",
 				"Mark Red",
 				"A journey across Indonesia's smallest islands depicting how island way of life differs from mainland living",
@@ -103,7 +103,7 @@ public class TestDataService {
 
 		// City center library
 		Library cityCenterLibrary = libraryService.create(
-				OrmLibraryShowcaseIT.CITY_CENTER_ID,
+				LibraryShowcaseBaseIT.CITY_CENTER_ID,
 				"City Center Library",
 				12400,
 				42.0, 0.0,
@@ -121,7 +121,7 @@ public class TestDataService {
 
 		// Suburban library 1
 		Library suburbanLibrary1 = libraryService.create(
-				OrmLibraryShowcaseIT.SUBURBAN_1_ID,
+				LibraryShowcaseBaseIT.SUBURBAN_1_ID,
 				// Use varying case on purpose
 				"suburban Library 1",
 				800,
@@ -138,7 +138,7 @@ public class TestDataService {
 
 		// Suburban library 2
 		Library suburbanLibrary2 = libraryService.create(
-				OrmLibraryShowcaseIT.SUBURBAN_2_ID,
+				LibraryShowcaseBaseIT.SUBURBAN_2_ID,
 				"Suburban Library 2",
 				800, // Same as the other suburban library
 				42.0, -0.25,
@@ -157,7 +157,7 @@ public class TestDataService {
 
 		// University library
 		Library universityLibrary = libraryService.create(
-				OrmLibraryShowcaseIT.UNIVERSITY_ID,
+				LibraryShowcaseBaseIT.UNIVERSITY_ID,
 				"University Library",
 				9000,
 				42.0, 0.5,
@@ -170,7 +170,7 @@ public class TestDataService {
 		libraryService.createCopyInLibrary( universityLibrary, artOfComputerProg, BookMedium.HARDCOPY );
 		libraryService.createCopyInLibrary( universityLibrary, thesaurusOfLanguages, BookMedium.HARDCOPY );
 
-		Person janeSmith = borrowalService.create( OrmLibraryShowcaseIT.JANE_SMITH_ID, "Jane", "Smith" );
+		Person janeSmith = borrowalService.create( LibraryShowcaseBaseIT.JANE_SMITH_ID, "Jane", "Smith" );
 		borrowalService.createAccount( janeSmith );
 		borrowalService.borrow( janeSmith, cityCenterLibrary, indonesianEconomy, BorrowalType.SHORT_TERM );
 		borrowalService.borrow( janeSmith, cityCenterLibrary, artOfComputerProg, BorrowalType.LONG_TERM );
@@ -178,7 +178,7 @@ public class TestDataService {
 		borrowalService.borrow( janeSmith, cityCenterLibrary, calligraphy, BorrowalType.SHORT_TERM );
 		borrowalService.borrow( janeSmith, cityCenterLibrary, javaDancing, BorrowalType.LONG_TERM );
 
-		Person janeFonda = borrowalService.create( OrmLibraryShowcaseIT.JANE_FONDA_ID, "Jane", "Fonda" );
+		Person janeFonda = borrowalService.create( LibraryShowcaseBaseIT.JANE_FONDA_ID, "Jane", "Fonda" );
 		borrowalService.createAccount( janeFonda );
 		borrowalService.borrow( janeFonda, universityLibrary, javaForDummies, BorrowalType.SHORT_TERM );
 		borrowalService.borrow( janeFonda, universityLibrary, artOfComputerProg, BorrowalType.SHORT_TERM );
@@ -186,40 +186,40 @@ public class TestDataService {
 		borrowalService.borrow( janeFonda, universityLibrary, indonesianEconomy, BorrowalType.SHORT_TERM );
 
 		// Use varying case on purpose
-		Person janePorter = borrowalService.create( OrmLibraryShowcaseIT.JANE_PORTER_ID, "Jane", "porter" );
+		Person janePorter = borrowalService.create( LibraryShowcaseBaseIT.JANE_PORTER_ID, "Jane", "porter" );
 		borrowalService.createAccount( janePorter );
 		borrowalService.borrow( janePorter, suburbanLibrary1, indonesianEconomy, BorrowalType.LONG_TERM );
 		borrowalService.borrow( janePorter, suburbanLibrary2, livingOnIsland, 1, BorrowalType.LONG_TERM );
 		borrowalService.borrow( janePorter, universityLibrary, thesaurusOfLanguages, BorrowalType.LONG_TERM );
 
 		// Use varying case on purpose
-		Person johnLennon = borrowalService.create( OrmLibraryShowcaseIT.JOHN_LENNON_ID, "john", "Lennon" );
+		Person johnLennon = borrowalService.create( LibraryShowcaseBaseIT.JOHN_LENNON_ID, "john", "Lennon" );
 		borrowalService.createAccount( johnLennon );
 		borrowalService.borrow( johnLennon, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
 
 		// Use varying case on purpose
-		Person eltonJohn = borrowalService.create( OrmLibraryShowcaseIT.ELTON_JOHN_ID, "elton", "john" );
+		Person eltonJohn = borrowalService.create( LibraryShowcaseBaseIT.ELTON_JOHN_ID, "elton", "john" );
 		borrowalService.createAccount( eltonJohn );
 		borrowalService.borrow( eltonJohn, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
 
-		Person pattySmith = borrowalService.create( OrmLibraryShowcaseIT.PATTY_SMITH_ID, "Patty", "Smith" );
+		Person pattySmith = borrowalService.create( LibraryShowcaseBaseIT.PATTY_SMITH_ID, "Patty", "Smith" );
 		borrowalService.createAccount( pattySmith );
 		borrowalService.borrow( pattySmith, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
 
-		Person johnSmith = borrowalService.create( OrmLibraryShowcaseIT.JOHN_SMITH_ID, "John", "Smith" );
+		Person johnSmith = borrowalService.create( LibraryShowcaseBaseIT.JOHN_SMITH_ID, "John", "Smith" );
 		borrowalService.createAccount( johnSmith );
 		borrowalService.borrow( johnSmith, suburbanLibrary1, indonesianEconomy, BorrowalType.SHORT_TERM );
 		borrowalService.borrow( johnSmith, suburbanLibrary1, artOfComputerProg, BorrowalType.LONG_TERM );
 
 		@SuppressWarnings("unused")
-		Person johnPaulSmith = borrowalService.create( OrmLibraryShowcaseIT.JOHN_PAUL_SMITH_ID, "John Paul", "Smith" );
+		Person johnPaulSmith = borrowalService.create( LibraryShowcaseBaseIT.JOHN_PAUL_SMITH_ID, "John Paul", "Smith" );
 		// No account for this one
 
-		Person johnPaul = borrowalService.create( OrmLibraryShowcaseIT.JOHN_PAUL_ID, "John", "Paul" );
+		Person johnPaul = borrowalService.create( LibraryShowcaseBaseIT.JOHN_PAUL_ID, "John", "Paul" );
 		borrowalService.createAccount( johnPaul );
 		// This one has an account, but no borrowal
 
-		Person paulJohn = borrowalService.create( OrmLibraryShowcaseIT.PAUL_JOHN_ID, "Paul", "John" );
+		Person paulJohn = borrowalService.create( LibraryShowcaseBaseIT.PAUL_JOHN_ID, "Paul", "John" );
 		borrowalService.createAccount( paulJohn );
 		borrowalService.borrow( paulJohn, cityCenterLibrary, javaForDummies, BorrowalType.SHORT_TERM );
 		borrowalService.borrow( paulJohn, cityCenterLibrary, artOfComputerProg, BorrowalType.SHORT_TERM );

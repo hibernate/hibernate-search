@@ -32,7 +32,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @TestPropertySource(properties = { "automatic_indexing.strategy=none" })
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class OrmManualIndexingIT {
+public class LibraryShowcaseMassIndexingIT {
 
 	private static final int NUMBER_OF_BOOKS = 200;
 	private static final int MASS_INDEXING_MONITOR_LOG_PERIOD = 50; // This is the default in the implementation, do not change this value
