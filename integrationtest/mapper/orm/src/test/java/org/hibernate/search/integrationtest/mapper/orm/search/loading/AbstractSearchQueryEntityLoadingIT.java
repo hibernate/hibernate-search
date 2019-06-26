@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSoftAssertions;
 
 import org.junit.Rule;
 
@@ -39,8 +38,9 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 	protected final <T> void testLoading(List<? extends Class<? extends T>> targetClasses,
 			List<String> targetIndexes,
 			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
-			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor) {
-		OrmUtils.withinSession( sessionFactory(), session -> {
+			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
+			Consumer<OrmSoftAssertions> assertionsContributor) {
+		OrmSoftAssertions.withinSession( sessionFactory(), (session, softAssertions) -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<T> query = searchSession.search( targetClasses )
@@ -67,12 +67,13 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 			expectedLoadedEntitiesContributor.accept( entityCollector );
 			List<T> expectedLoadedEntities = entityCollector.collected;
 
-			assertThat( loadedEntities )
+			softAssertions.assertThat( loadedEntities )
 					.as(
 							"Loaded entities when targeting types " + targetClasses
 									+ " and when the backend returns document references " + hitDocumentReferences
 					)
 					.containsExactlyElementsOf( expectedLoadedEntities );
+			assertionsContributor.accept( softAssertions );
 		} );
 	}
 

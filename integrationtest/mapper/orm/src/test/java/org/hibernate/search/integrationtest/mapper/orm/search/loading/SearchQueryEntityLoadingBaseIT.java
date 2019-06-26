@@ -67,7 +67,9 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 				c -> c
 						.entity( primitives.getIndexedClass(), 1 )
 						.entity( primitives.getIndexedClass(), 2 )
-						.entity( primitives.getIndexedClass(), 3 )
+						.entity( primitives.getIndexedClass(), 3 ),
+				// Only one entity type means only one statement should be executed, even if there are multiple hits
+				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
 		);
 	}
 
@@ -95,7 +97,9 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 3 ) ),
 				c -> c
 						.entity( primitives.getIndexedClass(), 1 )
-						.entity( primitives.getIndexedClass(), 3 )
+						.entity( primitives.getIndexedClass(), 3 ),
+				// Only one entity type means only one statement should be executed, even if there are multiple hits
+				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
 		);
 	}
 
