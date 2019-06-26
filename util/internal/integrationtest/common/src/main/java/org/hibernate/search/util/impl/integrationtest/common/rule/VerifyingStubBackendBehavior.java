@@ -1,0 +1,168 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.util.impl.integrationtest.common.rule;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
+
+class VerifyingStubBackendBehavior extends StubBackendBehavior {
+
+	private final Map<IndexFieldKey, CallBehavior> indexFieldAddBehaviors = new HashMap<>();
+
+	private final Map<String, CallQueue<PushSchemaCall>> pushSchemaCalls = new HashMap<>();
+
+	private final Map<String, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
+
+	private final CallQueue<IndexScopeWorkCall> indexScopeWorkCalls = new CallQueue<>();
+
+	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
+
+	private final CallQueue<CountWorkCall> countCalls = new CallQueue<>();
+
+	void setIndexFieldAddBehavior(String indexName, String absoluteFieldPath, CallBehavior behavior) {
+		indexFieldAddBehaviors.put( new IndexFieldKey( indexName, absoluteFieldPath ), behavior );
+	}
+
+	CallQueue<PushSchemaCall> getPushSchemaCalls(String indexName) {
+		return pushSchemaCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+	}
+
+	CallQueue<DocumentWorkCall> getDocumentWorkCalls(String indexName) {
+		return documentWorkCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+	}
+
+	CallQueue<IndexScopeWorkCall> getIndexScopeWorkCalls() {
+		return indexScopeWorkCalls;
+	}
+
+	CallQueue<SearchWorkCall<?>> getSearchWorkCalls() {
+		return searchCalls;
+	}
+
+	CallQueue<CountWorkCall> getCountWorkCalls() {
+		return countCalls;
+	}
+
+	void resetExpectations() {
+		indexFieldAddBehaviors.clear();
+		pushSchemaCalls.clear();
+		documentWorkCalls.clear();
+		searchCalls.reset();
+	}
+
+	void verifyExpectationsMet() {
+		pushSchemaCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		searchCalls.verifyExpectationsMet();
+	}
+
+	@Override
+	public void onAddField(String indexName, String absoluteFieldPath) {
+		CallBehavior behavior = indexFieldAddBehaviors.get( new IndexFieldKey( indexName, absoluteFieldPath ) );
+		if ( behavior != null ) {
+			behavior.execute();
+		}
+	}
+
+	@Override
+	public void pushSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
+		getPushSchemaCalls( indexName )
+				.verify( new PushSchemaCall( indexName, rootSchemaNode ), PushSchemaCall::verify );
+	}
+
+	@Override
+	public void prepareDocumentWorks(String indexName, List<StubDocumentWork> works) {
+		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
+		works.stream()
+				.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PREPARE, work ) )
+				.forEach( call -> callQueue.verify( call, DocumentWorkCall::verify ) );
+	}
+
+	@Override
+	public CompletableFuture<?> executeDocumentWorks(String indexName, List<StubDocumentWork> works) {
+		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
+		return works.stream()
+				.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ) )
+				.<CompletableFuture<?>>map( call -> callQueue.verify( call, DocumentWorkCall::verify ) )
+				.reduce( (first, second) -> second )
+				.orElseGet( () -> CompletableFuture.completedFuture( null ) );
+	}
+
+	@Override
+	public CompletableFuture<?> prepareAndExecuteDocumentWork(String indexName, StubDocumentWork work) {
+		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
+		callQueue.verify(
+				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PREPARE, work ),
+				DocumentWorkCall::verify
+		);
+		return callQueue.verify(
+				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
+				DocumentWorkCall::verify
+		);
+	}
+
+	@Override
+	public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
+			FromDocumentFieldValueConvertContext convertContext,
+			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
+		return searchCalls.verify(
+				new SearchWorkCall<>( indexNames, work, convertContext, loadingContext, rootProjection ),
+				(call1, call2) -> call1.verify( call2 )
+		);
+	}
+
+	@Override
+	public CompletableFuture<?> executeIndexScopeWork(List<String> indexNames, StubIndexScopeWork work) {
+		return indexScopeWorkCalls.verify(
+				new IndexScopeWorkCall( indexNames, work ),
+				IndexScopeWorkCall::verify
+		);
+	}
+
+	@Override
+	public long executeCountWork(List<String> indexNames) {
+		return countCalls.verify( new CountWorkCall( indexNames, null ), CountWorkCall::verify );
+	}
+
+	private static class IndexFieldKey {
+		final String indexName;
+		final String absoluteFieldPath;
+
+		private IndexFieldKey(String indexName, String absoluteFieldPath) {
+			this.indexName = indexName;
+			this.absoluteFieldPath = absoluteFieldPath;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( ! (obj instanceof IndexFieldKey ) ) {
+				return false;
+			}
+			IndexFieldKey other = (IndexFieldKey) obj;
+			return Objects.equals( indexName, other.indexName )
+					&& Objects.equals( absoluteFieldPath, other.absoluteFieldPath );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( indexName, absoluteFieldPath );
+		}
+	}
+}
