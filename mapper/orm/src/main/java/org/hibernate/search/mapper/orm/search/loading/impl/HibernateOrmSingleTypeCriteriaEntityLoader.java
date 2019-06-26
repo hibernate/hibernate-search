@@ -21,7 +21,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
-public class HibernateOrmSingleTypeCriteriaEntityLoader<E> implements HibernateOrmComposableEntityLoader<EntityReference, E> {
+public class HibernateOrmSingleTypeCriteriaEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
 	private final Session session;
 	private final Class<? extends E> entityType;
 	private final SingularAttribute<? super E, ?> documentIdSourceProperty;

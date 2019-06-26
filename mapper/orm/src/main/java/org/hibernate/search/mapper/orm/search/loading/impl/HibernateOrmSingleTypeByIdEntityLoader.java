@@ -16,7 +16,7 @@ import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
-public class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<EntityReference, E> {
+public class HibernateOrmSingleTypeByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
 	private final Session session;
 	private final Class<E> entityType;
 	private final MutableEntityLoadingOptions loadingOptions;
