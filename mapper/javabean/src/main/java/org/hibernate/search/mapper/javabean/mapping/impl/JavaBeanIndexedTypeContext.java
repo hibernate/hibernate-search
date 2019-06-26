@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 class JavaBeanIndexedTypeContext<E> implements JavaBeanSessionIndexedTypeContext<E> {
 	private final Class<E> javaClass;
@@ -46,7 +47,7 @@ class JavaBeanIndexedTypeContext<E> implements JavaBeanSessionIndexedTypeContext
 		}
 
 		@Override
-		public void documentIdSourcePropertyName(String documentIdSourcePropertyName) {
+		public void documentIdSourceProperty(PojoPropertyModel<?> documentIdSourceProperty) {
 			// Nothing to do
 		}
 
