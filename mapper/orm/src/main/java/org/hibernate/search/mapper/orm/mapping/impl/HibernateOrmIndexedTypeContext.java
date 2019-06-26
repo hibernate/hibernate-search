@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingO
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmSessionIndexedTypeContext<E>, HibernateOrmScopeIndexedTypeContext<E> {
@@ -67,7 +66,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	}
 
 	@Override
-	public HibernateOrmComposableEntityLoader<EntityReference, E> createLoader(Session session,
+	public HibernateOrmComposableEntityLoader<E> createLoader(Session session,
 			MutableEntityLoadingOptions mutableLoadingOptions) {
 		// TODO HSEARCH-3349 Add support for other types of database retrieval and object lookup?
 		//  See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.EntityLoaderBuilder#getObjectInitializer

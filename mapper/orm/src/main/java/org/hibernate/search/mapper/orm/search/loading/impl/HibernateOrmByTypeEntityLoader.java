@@ -22,29 +22,29 @@ public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<Entity
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<Class<? extends E>, HibernateOrmComposableEntityLoader<EntityReference, ? extends T>> delegatesByConcreteType;
+	private final Map<Class<? extends E>, HibernateOrmComposableEntityLoader<? extends T>> delegatesByConcreteType;
 
-	HibernateOrmByTypeEntityLoader(Map<Class<? extends E>, HibernateOrmComposableEntityLoader<EntityReference, ? extends T>> delegatesByConcreteType) {
+	HibernateOrmByTypeEntityLoader(Map<Class<? extends E>, HibernateOrmComposableEntityLoader<? extends T>> delegatesByConcreteType) {
 		this.delegatesByConcreteType = delegatesByConcreteType;
 	}
 
 	@Override
 	public List<T> loadBlocking(List<EntityReference> references) {
 		LinkedHashMap<EntityReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
-		Map<HibernateOrmComposableEntityLoader<EntityReference, ? extends T>, List<EntityReference>> referencesByDelegate = new HashMap<>();
+		Map<HibernateOrmComposableEntityLoader<? extends T>, List<EntityReference>> referencesByDelegate = new HashMap<>();
 
 		// Split references by delegate (by entity type)
 		for ( EntityReference reference : references ) {
 			objectsByReference.put( reference, null );
-			HibernateOrmComposableEntityLoader<EntityReference, ? extends T> delegate = getDelegate( reference.getType() );
+			HibernateOrmComposableEntityLoader<? extends T> delegate = getDelegate( reference.getType() );
 			referencesByDelegate.computeIfAbsent( delegate, ignored -> new ArrayList<>() )
 					.add( reference );
 		}
 
 		// Load all references
-		for ( Map.Entry<HibernateOrmComposableEntityLoader<EntityReference, ? extends T>, List<EntityReference>> entry :
+		for ( Map.Entry<HibernateOrmComposableEntityLoader<? extends T>, List<EntityReference>> entry :
 				referencesByDelegate.entrySet() ) {
-			HibernateOrmComposableEntityLoader<EntityReference, ? extends T> delegate = entry.getKey();
+			HibernateOrmComposableEntityLoader<? extends T> delegate = entry.getKey();
 			List<EntityReference> referencesForDelegate = entry.getValue();
 			delegate.loadBlocking( referencesForDelegate, objectsByReference );
 		}
@@ -57,8 +57,8 @@ public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<Entity
 		return result;
 	}
 
-	private HibernateOrmComposableEntityLoader<EntityReference, ? extends T> getDelegate(Class<?> entityType) {
-		HibernateOrmComposableEntityLoader<EntityReference, ? extends T> delegate = delegatesByConcreteType.get( entityType );
+	private HibernateOrmComposableEntityLoader<? extends T> getDelegate(Class<?> entityType) {
+		HibernateOrmComposableEntityLoader<? extends T> delegate = delegatesByConcreteType.get( entityType );
 		if ( delegate == null ) {
 			throw log.unexpectedSearchHitType( entityType, delegatesByConcreteType.keySet() );
 		}

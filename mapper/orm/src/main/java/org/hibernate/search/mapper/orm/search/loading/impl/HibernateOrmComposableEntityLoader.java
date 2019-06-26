@@ -10,15 +10,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 
 /**
  * An {@link EntityLoader} that can be easily composed with others entity loaders.
  * <p>
  * See {@link HibernateOrmByTypeEntityLoader} for uses.
- * @param <R>
- * @param <E>
+ *
+ * @param <E> The type of loaded entities.
  */
-public interface HibernateOrmComposableEntityLoader<R, E> extends EntityLoader<R, E> {
+public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<EntityReference, E> {
 
 	/**
 	 * For each reference in the given list,
@@ -31,6 +32,6 @@ public interface HibernateOrmComposableEntityLoader<R, E> extends EntityLoader<R
 	 * @param objectsByReference A map with references as keys and objects as values.
 	 * Initial values are undefined and the loader must not rely on them.
 	 */
-	void loadBlocking(List<R> references, Map<? super R, ? super E> objectsByReference);
+	void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> objectsByReference);
 
 }

@@ -42,10 +42,10 @@ public class EntityLoaderBuilder<E> {
 		 *  WARNING: Only do that if the entity types are loaded in a compatible way
 		 *  (all by ID, or all by query on a property defined in the common parent entity type)
 		 */
-		Map<Class<? extends E>, HibernateOrmComposableEntityLoader<EntityReference, ? extends E>> delegateByConcreteType =
+		Map<Class<? extends E>, HibernateOrmComposableEntityLoader<? extends E>> delegateByConcreteType =
 				new HashMap<>( concreteIndexedTypes.size() );
 		for ( HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext : concreteIndexedTypes ) {
-			HibernateOrmComposableEntityLoader<EntityReference, ? extends E> delegate =
+			HibernateOrmComposableEntityLoader<? extends E> delegate =
 					typeContext.createLoader( session, mutableLoadingOptions );
 			delegateByConcreteType.put( typeContext.getJavaClass(), delegate );
 		}
