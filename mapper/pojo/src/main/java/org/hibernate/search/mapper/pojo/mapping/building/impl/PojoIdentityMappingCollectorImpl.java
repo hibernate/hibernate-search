@@ -41,7 +41,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 	private final BoundPojoModelPathPropertyNode<?, ?> entityIdPropertyPath;
 
 	IdentifierMappingImplementor<?, E> identifierMapping;
-	Optional<String> documentIdSourcePropertyName;
+	Optional<PojoPropertyModel<?>> documentIdSourceProperty;
 	RoutingKeyProvider<E> routingKeyProvider;
 
 	PojoIdentityMappingCollectorImpl(PojoRawTypeModel<E> typeModel,
@@ -83,7 +83,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 				propertyModel.getHandle(),
 				bridgeHolder
 		);
-		this.documentIdSourcePropertyName = Optional.of( propertyModel.getName() );
+		this.documentIdSourceProperty = Optional.of( propertyModel );
 	}
 
 	@Override
@@ -100,7 +100,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 			// Assume a provided ID if requested
 			if ( implicitProvidedId ) {
 				identifierMapping = ProvidedStringIdentifierMapping.get();
-				documentIdSourcePropertyName = Optional.empty();
+				documentIdSourceProperty = Optional.empty();
 			}
 			// Fall back to the entity ID if possible
 			else if ( entityIdPropertyPath != null ) {

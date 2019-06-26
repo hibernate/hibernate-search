@@ -22,26 +22,31 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.hibernate.AssertionFailure;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
 
 	public static <E> EntityLoaderFactory factory(Class<E> entityType,
-			SingularAttribute<? super E,?> documentIdSourceProperty) {
-		return new Factory<>( entityType, documentIdSourceProperty );
+			SingularAttribute<? super E,?> documentIdSourceAttribute,
+			ValueReadHandle<?> documentIdSourceHandle) {
+		return new Factory<>( entityType, documentIdSourceAttribute, documentIdSourceHandle );
 	}
 
 	private final Class<? extends E> entityType;
-	private final SingularAttribute<? super E, ?> documentIdSourceProperty;
+	private final SingularAttribute<? super E, ?> documentIdSourceAttribute;
+	private final ValueReadHandle<?> documentIdSourceHandle;
 	private final Session session;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private HibernateOrmCriteriaEntityLoader(
 			Class<? extends E> entityType,
-			SingularAttribute<? super E, ?> documentIdSourceProperty,
+			SingularAttribute<? super E, ?> documentIdSourceAttribute,
+			ValueReadHandle<?> documentIdSourceHandle,
 			Session session,
 			MutableEntityLoadingOptions loadingOptions) {
 		this.entityType = entityType;
-		this.documentIdSourceProperty = documentIdSourceProperty;
+		this.documentIdSourceAttribute = documentIdSourceAttribute;
+		this.documentIdSourceHandle = documentIdSourceHandle;
 		this.session = session;
 		this.loadingOptions = loadingOptions;
 	}
@@ -67,34 +72,22 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 			documentIdSourceValueToReference.put( reference.getId(), reference );
 		}
 
-		List<EntityLoadingResult> loadingResults = loadEntities( documentIdSourceValueToReference.keySet() );
+		List<? extends E> loadedEntities = loadEntities( documentIdSourceValueToReference.keySet() );
 
-		for ( EntityLoadingResult loadingResult : loadingResults ) {
-			Object documentIdSourceValue = loadingResult.documentIdSourceValue;
+		for ( E loadedEntity : loadedEntities ) {
+			Object documentIdSourceValue = documentIdSourceHandle.get( loadedEntity );
 			EntityReference reference = documentIdSourceValueToReference.get( documentIdSourceValue );
-
-			@SuppressWarnings("unchecked") // Safe because "root" has the type "? extends E"
-			E loadedEntity = (E) loadingResult.loadedEntity;
-
 			entitiesByReference.put( reference, loadedEntity );
 		}
 	}
 
-	private List<EntityLoadingResult> loadEntities(Collection<Object> documentIdSourceValues) {
+	private List<? extends E> loadEntities(Collection<Object> documentIdSourceValues) {
 		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-		CriteriaQuery<EntityLoadingResult> criteriaQuery = criteriaBuilder.createQuery( EntityLoadingResult.class );
+		CriteriaQuery<? extends E> criteriaQuery = criteriaBuilder.createQuery( entityType );
 
 		Root<? extends E> root = criteriaQuery.from( entityType );
-		Path<?> documentIdSourcePropertyInRoot = root.get( documentIdSourceProperty );
+		Path<?> documentIdSourcePropertyInRoot = root.get( documentIdSourceAttribute );
 
-		/*
-		 * Hack to get the result type we want.
-		 * This is ugly, but safe, because "root" has the type "? extends E" and the second constructor parameter
-		 */
-		criteriaQuery.select( criteriaBuilder.construct(
-				EntityLoadingResult.class,
-				documentIdSourcePropertyInRoot, root
-		) );
 		criteriaQuery.where( documentIdSourcePropertyInRoot.in( documentIdSourceValues ) );
 
 		return session.createQuery( criteriaQuery )
@@ -102,24 +95,17 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 				.getResultList();
 	}
 
-	private static class EntityLoadingResult {
-		private final Object documentIdSourceValue;
-		private final Object loadedEntity;
-
-		public EntityLoadingResult(Object documentIdSourceValue, Object loadedEntity) {
-			this.documentIdSourceValue = documentIdSourceValue;
-			this.loadedEntity = loadedEntity;
-		}
-	}
-
 	private static class Factory<E> implements EntityLoaderFactory {
 
 		private final Class<E> entityType;
-		private final SingularAttribute<? super E, ?> documentIdSourceProperty;
+		private final SingularAttribute<? super E, ?> documentIdSourceAttribute;
+		private final ValueReadHandle<?> documentIdSourceHandle;
 
-		private Factory(Class<E> entityType, SingularAttribute<? super E, ?> documentIdSourceProperty) {
+		private Factory(Class<E> entityType, SingularAttribute<? super E, ?> documentIdSourceAttribute,
+				ValueReadHandle<?> documentIdSourceHandle) {
 			this.entityType = entityType;
-			this.documentIdSourceProperty = documentIdSourceProperty;
+			this.documentIdSourceAttribute = documentIdSourceAttribute;
+			this.documentIdSourceHandle = documentIdSourceHandle;
 		}
 
 		@Override
@@ -131,12 +117,13 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 			// If the entity type is different,
 			// the factories work in separate ID spaces and should be used separately.
 			return entityType.equals( other.entityType )
-					&& documentIdSourceProperty.equals( other.documentIdSourceProperty );
+					&& documentIdSourceAttribute.equals( other.documentIdSourceAttribute )
+					&& documentIdSourceHandle.equals( other.documentIdSourceHandle );
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash( entityType, documentIdSourceProperty );
+			return Objects.hash( entityType, documentIdSourceAttribute, documentIdSourceHandle );
 		}
 
 		@Override
@@ -178,7 +165,8 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 			@SuppressWarnings("unchecked")
 			HibernateOrmComposableEntityLoader<E2> result =
 					(HibernateOrmComposableEntityLoader<E2>) new HibernateOrmCriteriaEntityLoader<>(
-							entityType, documentIdSourceProperty, session, loadingOptions
+							entityType, documentIdSourceAttribute, documentIdSourceHandle,
+							session, loadingOptions
 					);
 
 			return result;

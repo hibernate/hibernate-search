@@ -108,9 +108,9 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 		identityMappingCollector.applyDefaults();
 
-		if ( identityMappingCollector.documentIdSourcePropertyName.isPresent() ) {
-			extendedMappingCollector.documentIdSourcePropertyName(
-					identityMappingCollector.documentIdSourcePropertyName.get()
+		if ( identityMappingCollector.documentIdSourceProperty.isPresent() ) {
+			extendedMappingCollector.documentIdSourceProperty(
+					identityMappingCollector.documentIdSourceProperty.get()
 			);
 		}
 

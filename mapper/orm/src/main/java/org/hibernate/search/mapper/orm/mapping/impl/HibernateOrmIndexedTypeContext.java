@@ -17,6 +17,8 @@ import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmCriteriaE
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmSessionIndexedTypeContext<E>, HibernateOrmScopeIndexedTypeContext<E> {
@@ -31,9 +33,9 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		this.indexName = builder.indexName;
 
 		IdentifiableType<E> indexTypeModel = sessionFactory.getMetamodel().entity( getJavaClass() );
-		SingularAttribute<? super E, ?> documentIdSourceProperty =
+		SingularAttribute<? super E, ?> documentIdSourceAttribute =
 				indexTypeModel.getSingularAttribute( builder.documentIdSourcePropertyName );
-		if ( documentIdSourceProperty.isId() ) {
+		if ( documentIdSourceAttribute.isId() ) {
 			documentIdIsEntityId = true;
 			loaderFactory = HibernateOrmByIdEntityLoader.factory(
 					sessionFactory, getJavaClass()
@@ -44,7 +46,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 			// We need to use a criteria query to load entities from the document IDs
 			documentIdIsEntityId = false;
 			loaderFactory = HibernateOrmCriteriaEntityLoader.factory(
-					getJavaClass(), documentIdSourceProperty
+					getJavaClass(), documentIdSourceAttribute, builder.documentIdSourcePropertyHandle
 			);
 		}
 
@@ -84,6 +86,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		private final String indexName;
 
 		private String documentIdSourcePropertyName;
+		private ValueReadHandle<?> documentIdSourcePropertyHandle;
 		private IdentifierMapping identifierMapping;
 
 		Builder(Class<E> javaClass, String indexName) {
@@ -92,8 +95,9 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		}
 
 		@Override
-		public void documentIdSourcePropertyName(String documentIdSourcePropertyName) {
-			this.documentIdSourcePropertyName = documentIdSourcePropertyName;
+		public void documentIdSourceProperty(PojoPropertyModel<?> documentIdSourceProperty) {
+			this.documentIdSourcePropertyName = documentIdSourceProperty.getName();
+			this.documentIdSourcePropertyHandle = documentIdSourceProperty.getHandle();
 		}
 
 		@Override
