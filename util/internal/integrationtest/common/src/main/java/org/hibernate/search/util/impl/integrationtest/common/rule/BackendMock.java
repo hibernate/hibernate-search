@@ -84,6 +84,16 @@ public class BackendMock implements TestRule {
 		StubBackendBehavior.unset( backendName, behaviorMock );
 	}
 
+	public void inLenientMode(Runnable action) {
+		behaviorMock.setLenient( true );
+		try {
+			action.run();
+		}
+		finally {
+			behaviorMock.setLenient( false );
+		}
+	}
+
 	public BackendMock expectFailingField(String indexName, String absoluteFieldPath,
 			Supplier<RuntimeException> exceptionSupplier) {
 		behaviorMock.setIndexFieldAddBehavior( indexName, absoluteFieldPath, () -> {

@@ -38,18 +38,6 @@ public class CallQueue<C extends Call<? super C>> {
 		callsExpectedOutOfOrder.add( expectedCall );
 	}
 
-	public <C2 extends C, T> T verify(C2 actualCall, BiFunction<C, C2, CallBehavior<T>> callVerifyFunction) {
-		return verify(
-				actualCall,
-				callVerifyFunction,
-				call -> {
-					Assert.fail( "No call expected, but got: " + call );
-					// Dead code, we throw an exception above
-					return null;
-				}
-		);
-	}
-
 	public synchronized <C2 extends C, T> T verify(C2 actualCall, BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
 			Function<C2, T> noExpectationBehavior) {
 		if ( callsExpectedInOrder.isEmpty() && callsExpectedOutOfOrder.isEmpty() ) {
