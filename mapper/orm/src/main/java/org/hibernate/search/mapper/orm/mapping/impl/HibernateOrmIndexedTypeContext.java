@@ -9,13 +9,11 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmComposableEntityLoader;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmSingleTypeByIdEntityLoader;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmSingleTypeCriteriaEntityLoader;
-import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
+import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderFactory;
+import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmByIdEntityLoader;
+import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmCriteriaEntityLoader;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
@@ -23,10 +21,11 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExte
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmSessionIndexedTypeContext<E>, HibernateOrmScopeIndexedTypeContext<E> {
 	private final String indexName;
-	private final SingularAttribute<? super E, ?> nonIdDocumentIdSourceProperty;
+	private final boolean documentIdIsEntityId;
+	private final EntityLoaderFactory loaderFactory;
 	private final IdentifierMapping identifierMapping;
 
-	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactory sessionFactory) {
+	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
 		super( builder.javaClass );
 
 		this.indexName = builder.indexName;
@@ -35,10 +34,18 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		SingularAttribute<? super E, ?> documentIdSourceProperty =
 				indexTypeModel.getSingularAttribute( builder.documentIdSourcePropertyName );
 		if ( documentIdSourceProperty.isId() ) {
-			nonIdDocumentIdSourceProperty = null;
+			documentIdIsEntityId = true;
+			loaderFactory = HibernateOrmByIdEntityLoader.factory(
+					sessionFactory, getJavaClass()
+			);
 		}
 		else {
-			nonIdDocumentIdSourceProperty = documentIdSourceProperty;
+			// The entity ID is not the property used to generate the document ID
+			// We need to use a criteria query to load entities from the document IDs
+			documentIdIsEntityId = false;
+			loaderFactory = HibernateOrmCriteriaEntityLoader.factory(
+					getJavaClass(), documentIdSourceProperty
+			);
 		}
 
 		this.identifierMapping = builder.identifierMapping;
@@ -50,13 +57,13 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 	@Override
 	public Object toWorkPlanProvidedId(Object entityId) {
-		if ( nonIdDocumentIdSourceProperty != null ) {
+		if ( documentIdIsEntityId ) {
+			return entityId;
+		}
+		else {
 			// The entity ID is not the property used to generate the document ID
 			// Return null, meaning the document ID has to be extracted from the entity
 			return null;
-		}
-		else {
-			return entityId;
 		}
 	}
 
@@ -66,28 +73,10 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	}
 
 	@Override
-	public HibernateOrmComposableEntityLoader<E> createLoader(Session session,
-			MutableEntityLoadingOptions mutableLoadingOptions) {
-		// TODO HSEARCH-3349 Add support for other types of database retrieval and object lookup?
+	public EntityLoaderFactory getLoaderFactory() {
+		// TODO HSEARCH-3349 Add support for customizable database retrieval and object lookup?
 		//  See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.EntityLoaderBuilder#getObjectInitializer
-
-		if ( nonIdDocumentIdSourceProperty != null ) {
-			// The entity ID is not the property used to generate the document ID
-			// We need to use a criteria query to load entities from the document IDs
-			return new HibernateOrmSingleTypeCriteriaEntityLoader<>(
-					session,
-					getJavaClass(),
-					nonIdDocumentIdSourceProperty,
-					mutableLoadingOptions
-			);
-		}
-		else {
-			return new HibernateOrmSingleTypeByIdEntityLoader<>(
-					session,
-					getJavaClass(),
-					mutableLoadingOptions
-			);
-		}
+		return loaderFactory;
 	}
 
 	static class Builder<E> implements PojoIndexedTypeExtendedMappingCollector {
@@ -112,7 +101,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 			this.identifierMapping = identifierMapping;
 		}
 
-		public HibernateOrmIndexedTypeContext<E> build(SessionFactory sessionFactory) {
+		public HibernateOrmIndexedTypeContext<E> build(SessionFactoryImplementor sessionFactory) {
 			return new HibernateOrmIndexedTypeContext<>( this, sessionFactory );
 		}
 	}
