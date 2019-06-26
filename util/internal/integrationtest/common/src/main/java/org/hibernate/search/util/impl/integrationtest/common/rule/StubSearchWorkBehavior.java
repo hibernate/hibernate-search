@@ -24,7 +24,10 @@ public interface StubSearchWorkBehavior<H> {
 
 	@SafeVarargs
 	static <H> StubSearchWorkBehavior<H> of(long totalHitCount, H... rawHits) {
-		List<H> rawHitsAsList = Arrays.asList( rawHits );
+		return of( totalHitCount, Arrays.asList( rawHits ) );
+	}
+
+	static <H> StubSearchWorkBehavior<H> of(long totalHitCount, List<H> rawHits) {
 		return new StubSearchWorkBehavior<H>() {
 			@Override
 			public long getTotalHitCount() {
@@ -33,7 +36,7 @@ public interface StubSearchWorkBehavior<H> {
 
 			@Override
 			public List<H> getRawHits() {
-				return rawHitsAsList;
+				return rawHits;
 			}
 		};
 	}
