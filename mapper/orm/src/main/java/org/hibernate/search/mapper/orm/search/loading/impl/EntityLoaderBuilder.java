@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,28 +30,70 @@ public class EntityLoaderBuilder<E> {
 	public EntityLoader<EntityReference, ? extends E> build(MutableEntityLoadingOptions mutableLoadingOptions) {
 		if ( concreteIndexedTypes.size() == 1 ) {
 			HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext = concreteIndexedTypes.iterator().next();
-			return typeContext.createLoader( session, mutableLoadingOptions );
+			return createForSingleType( typeContext, mutableLoadingOptions );
+		}
+
+		/*
+		 * First, group the types by their loader factory.
+		 * If multiple types are in the same entity hierarchy and are loaded the same way,
+		 * this will allow to run one query to load entities of all these types,
+		 * instead of one query per type.
+		 */
+		Map<EntityLoaderFactory, List<Class<? extends E>>> typesByEntityLoaderFactory =
+				new HashMap<>( concreteIndexedTypes.size() );
+		for ( HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext : concreteIndexedTypes ) {
+			EntityLoaderFactory loaderFactoryForType = typeContext.getLoaderFactory();
+			typesByEntityLoaderFactory.computeIfAbsent( loaderFactoryForType, ignored -> new ArrayList<>() )
+					.add( typeContext.getJavaClass() );
+		}
+
+		/*
+		 * Then create the loaders.
+		 */
+		if ( typesByEntityLoaderFactory.size() == 1 ) {
+			// Optimization: we only need one loader, so skip the "by type" wrapper.
+			Map.Entry<EntityLoaderFactory, List<Class<? extends E>>> entry =
+					typesByEntityLoaderFactory.entrySet().iterator().next();
+			EntityLoaderFactory loaderFactory = entry.getKey();
+			List<Class<? extends E>> types = entry.getValue();
+			return createForMultipleTypes( loaderFactory, types, mutableLoadingOptions );
 		}
 		else {
-			return buildForMultipleTypes( mutableLoadingOptions );
+			Map<Class<? extends E>, HibernateOrmComposableEntityLoader<? extends E>> delegateByConcreteType =
+					new HashMap<>( concreteIndexedTypes.size() );
+			for ( Map.Entry<EntityLoaderFactory, List<Class<? extends E>>> entry :
+					typesByEntityLoaderFactory.entrySet() ) {
+				EntityLoaderFactory loaderFactory = entry.getKey();
+				List<Class<? extends E>> types = entry.getValue();
+				HibernateOrmComposableEntityLoader<? extends E> loader =
+						createForMultipleTypes( loaderFactory, types, mutableLoadingOptions );
+				for ( Class<? extends E> type : types ) {
+					delegateByConcreteType.put( type, loader );
+				}
+			}
+			return new HibernateOrmByTypeEntityLoader<>( delegateByConcreteType );
 		}
 	}
 
-	private EntityLoader<EntityReference, E> buildForMultipleTypes(MutableEntityLoadingOptions mutableLoadingOptions) {
-		/*
-		 * TODO HSEARCH-3349 Group together entity types from a same hierarchy, so as to optimize loads
-		 *  (one query per entity hierarchy, and not one query per index).
-		 *  WARNING: Only do that if the entity types are loaded in a compatible way
-		 *  (all by ID, or all by query on a property defined in the common parent entity type)
-		 */
-		Map<Class<? extends E>, HibernateOrmComposableEntityLoader<? extends E>> delegateByConcreteType =
-				new HashMap<>( concreteIndexedTypes.size() );
-		for ( HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext : concreteIndexedTypes ) {
-			HibernateOrmComposableEntityLoader<? extends E> delegate =
-					typeContext.createLoader( session, mutableLoadingOptions );
-			delegateByConcreteType.put( typeContext.getJavaClass(), delegate );
-		}
-		return new HibernateOrmByTypeEntityLoader<>( delegateByConcreteType );
+	private HibernateOrmComposableEntityLoader<? extends E> createForSingleType(
+			HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext,
+			MutableEntityLoadingOptions mutableLoadingOptions) {
+		return typeContext.getLoaderFactory().create(
+				typeContext.getJavaClass(),
+				session,
+				mutableLoadingOptions
+		);
+	}
+
+	private HibernateOrmComposableEntityLoader<? extends E> createForMultipleTypes(
+			EntityLoaderFactory loaderFactory,
+			List<Class<? extends E>> types,
+			MutableEntityLoadingOptions mutableLoadingOptions) {
+		return loaderFactory.create(
+				types,
+				session,
+				mutableLoadingOptions
+		);
 	}
 
 }

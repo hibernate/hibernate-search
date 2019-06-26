@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
-import org.hibernate.Session;
-
 public interface HibernateOrmLoadingIndexedTypeContext<E> {
 
 	/**
@@ -15,7 +13,6 @@ public interface HibernateOrmLoadingIndexedTypeContext<E> {
 	 */
 	Class<E> getJavaClass();
 
-	HibernateOrmComposableEntityLoader<E> createLoader(
-			Session session, MutableEntityLoadingOptions mutableLoadingOptions);
+	EntityLoaderFactory getLoaderFactory();
 
 }

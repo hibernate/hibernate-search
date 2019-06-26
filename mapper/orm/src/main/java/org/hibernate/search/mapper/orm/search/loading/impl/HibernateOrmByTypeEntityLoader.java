@@ -34,6 +34,7 @@ public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<Entity
 		Map<HibernateOrmComposableEntityLoader<? extends T>, List<EntityReference>> referencesByDelegate = new HashMap<>();
 
 		// Split references by delegate (by entity type)
+		// Note that multiple entity types may share the same loader
 		for ( EntityReference reference : references ) {
 			objectsByReference.put( reference, null );
 			HibernateOrmComposableEntityLoader<? extends T> delegate = getDelegate( reference.getType() );

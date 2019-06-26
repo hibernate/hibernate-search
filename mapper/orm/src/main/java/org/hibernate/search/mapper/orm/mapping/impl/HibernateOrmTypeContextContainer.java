@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -23,7 +23,7 @@ class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContext
 	private final Map<String, HibernateOrmIndexedTypeContext<?>> indexedTypeContextsByIndexName = new LinkedHashMap<>();
 	private final Map<Class<?>, HibernateOrmContainedTypeContext<?>> containedTypeContexts = new LinkedHashMap<>();
 
-	private HibernateOrmTypeContextContainer(Builder builder, SessionFactory sessionFactory) {
+	private HibernateOrmTypeContextContainer(Builder builder, SessionFactoryImplementor sessionFactory) {
 		for ( HibernateOrmIndexedTypeContext.Builder<?> contextBuilder : builder.indexedTypeContextBuilders ) {
 			HibernateOrmIndexedTypeContext<?> indexedTypeContext = contextBuilder.build( sessionFactory );
 			indexedTypeContexts.put( indexedTypeContext.getJavaClass(), indexedTypeContext );
@@ -86,7 +86,7 @@ class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContext
 			return builder;
 		}
 
-		HibernateOrmTypeContextContainer build(SessionFactory sessionFactory) {
+		HibernateOrmTypeContextContainer build(SessionFactoryImplementor sessionFactory) {
 			return new HibernateOrmTypeContextContainer( this, sessionFactory );
 		}
 	}

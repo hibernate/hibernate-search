@@ -29,9 +29,9 @@ public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<Enti
 	 * When an object cannot be found, the map is not altered.
 	 *
 	 * @param references A list of references to the objects to load.
-	 * @param objectsByReference A map with references as keys and objects as values.
+	 * @param entitiesByReference A map with references as keys and loaded entities as values.
 	 * Initial values are undefined and the loader must not rely on them.
 	 */
-	void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> objectsByReference);
+	void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> entitiesByReference);
 
 }
