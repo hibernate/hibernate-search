@@ -7,14 +7,14 @@
 package org.hibernate.search.integrationtest.java.module.config;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 
 public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisConfigurer  {
 
 	public static final String MY_ANALYZER = "myAnalyzer";
 
 	@Override
-	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
+	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.analyzer( MY_ANALYZER ).custom()
 				.withTokenizer( "standard" )
 				.withTokenFilters( "asciifolding", "lowercase", "mySnowballFilter" );
