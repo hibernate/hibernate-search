@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSoftAssertions;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.EntityIdDocumentIdIndexedEntity;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.NonEntityIdDocumentIdIndexedEntity;
 
@@ -30,12 +31,14 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 	}
 
 	protected final void testLoading(Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
-			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor) {
+			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
+			Consumer<OrmSoftAssertions> assertionsContributor) {
 		testLoading(
 				Collections.singletonList( primitives.getIndexedClass() ),
 				Collections.singletonList( primitives.getIndexName() ),
 				hitDocumentReferencesContributor,
-				expectedLoadedEntitiesContributor
+				expectedLoadedEntitiesContributor,
+				assertionsContributor
 		);
 	}
 

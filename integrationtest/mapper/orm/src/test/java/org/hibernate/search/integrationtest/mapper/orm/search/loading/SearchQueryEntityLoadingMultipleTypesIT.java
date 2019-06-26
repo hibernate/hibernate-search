@@ -91,8 +91,6 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	public void singleHierarchy() {
-		// TODO HSEARCH-3349 check that we optimize this by running a single query even if multiple types are loaded
-
 		testLoading(
 				Arrays.asList(
 						Hierarchy1_A_B.class,
@@ -107,7 +105,8 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						.doc( Hierarchy1_A_C.NAME, "3" ),
 				c -> c
 						.entity( Hierarchy1_A_B.class, 2 )
-						.entity( Hierarchy1_A_C.class, 3 )
+						.entity( Hierarchy1_A_C.class, 3 ),
+				c -> c.assertStatementExecutionCount().isEqualTo( 1 ) // Optimized: only one query per entity hierarchy
 		);
 	}
 
@@ -133,7 +132,8 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						.doc( Hierarchy5_A_B_D.NAME, "4" ),
 				c -> c
 						.entity( Hierarchy5_A_B_C.class, 3 )
-						.entity( Hierarchy5_A_B_D.class, 4 )
+						.entity( Hierarchy5_A_B_D.class, 4 ),
+				c -> c.assertStatementExecutionCount().isEqualTo( 1 ) // Optimized: only one query per entity hierarchy
 		);
 	}
 
@@ -145,8 +145,6 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	public void mixedHierarchies() {
-		// TODO HSEARCH-3349 check that we optimize this by running a single query for each hierarchy
-
 		testLoading(
 				Arrays.asList(
 						Hierarchy1_A_B.class,
@@ -181,7 +179,8 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						.entity( Hierarchy2_A_B.class, 2 )
 						.entity( Hierarchy2_A_C.class, 3 )
 						.entity( Hierarchy3_A_B.class, 2 )
-						.entity( Hierarchy3_A_C.class, 3 )
+						.entity( Hierarchy3_A_C.class, 3 ),
+				c -> c.assertStatementExecutionCount().isEqualTo( 3 ) // Optimized: only one query per entity hierarchy
 		);
 	}
 
@@ -206,7 +205,8 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						.doc( Hierarchy1_A_B.NAME, "2" ),
 				c -> c
 						.entity( Hierarchy4_A_B__integer1DocumentId.class, 2 )
-						.entity( Hierarchy1_A_B.class, 2 )
+						.entity( Hierarchy1_A_B.class, 2 ),
+				c -> c.assertStatementExecutionCount().isEqualTo( 2 ) // Different loading method => need two separate statements
 		);
 	}
 
@@ -231,7 +231,8 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						.doc( Hierarchy4_A_D.NAME, "4" ),
 				c -> c
 						.entity( Hierarchy4_A_B__integer1DocumentId.class, 2 )
-						.entity( Hierarchy4_A_D.class, 4 )
+						.entity( Hierarchy4_A_D.class, 4 ),
+				c -> c.assertStatementExecutionCount().isEqualTo( 2 ) // Different loading method => need two separate statements
 		);
 	}
 
@@ -257,7 +258,8 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						.doc( Hierarchy4_A_C__integer2DocumentId.NAME, "43" ),
 				c -> c
 						.entity( Hierarchy4_A_B__integer1DocumentId.class, 2 )
-						.entity( Hierarchy4_A_C__integer2DocumentId.class, 3 )
+						.entity( Hierarchy4_A_C__integer2DocumentId.class, 3 ),
+				c -> c.assertStatementExecutionCount().isEqualTo( 2 ) // Different loading method => need two separate statements
 		);
 	}
 
