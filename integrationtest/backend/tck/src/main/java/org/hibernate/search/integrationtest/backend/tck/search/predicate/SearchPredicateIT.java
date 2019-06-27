@@ -123,14 +123,14 @@ public class SearchPredicateIT {
 				.predicate( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// reuse the same predicate instance on the same scope
 		query = scope.query()
 				.predicate( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// reuse the same predicate instance on a different scope,
 		// targeting the same index
@@ -138,7 +138,7 @@ public class SearchPredicateIT {
 				.predicate( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		predicate = indexManager.createScope( anotherIndexManager )
 				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
@@ -149,7 +149,7 @@ public class SearchPredicateIT {
 				.predicate( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -193,14 +193,14 @@ public class SearchPredicateIT {
 				.predicate( f -> f.bool().must( predicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// reuse the same predicate instance on the same scope
 		query = scope.query()
 				.predicate( f -> f.bool().must( predicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// reuse the same predicate instance on a different scope,
 		// targeting the same index
@@ -208,7 +208,7 @@ public class SearchPredicateIT {
 				.predicate( f -> f.bool().must( predicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		final SearchPredicate multiIndexScopedPredicate = indexManager.createScope( anotherIndexManager )
 				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
@@ -219,7 +219,7 @@ public class SearchPredicateIT {
 				.predicate( f -> f.bool().must( multiIndexScopedPredicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = anotherIndexManager.createScope( indexManager ).query()
 				.predicate( f -> f.bool()
@@ -228,7 +228,7 @@ public class SearchPredicateIT {
 				)
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test

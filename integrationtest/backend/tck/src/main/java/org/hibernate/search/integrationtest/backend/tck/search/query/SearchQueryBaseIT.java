@@ -90,7 +90,7 @@ public class SearchQueryBaseIT {
 		// Mandatory extension, supported
 		QueryWrapper<DocumentReference> extendedQuery = query.extension( new SupportedQueryExtension<>() );
 		SearchResultAssert.assertThat( extendedQuery.extendedFetch() ).fromQuery( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, "0","1" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "0", "1" );
 
 		// Mandatory extension, unsupported
 		SubTest.expectException(
