@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -119,7 +120,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
+	public <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
 			FromDocumentFieldValueConvertContext convertContext,
 			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 		return searchCalls.verify(
@@ -129,7 +130,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public CompletableFuture<?> executeIndexScopeWork(List<String> indexNames, StubIndexScopeWork work) {
+	public CompletableFuture<?> executeIndexScopeWork(Set<String> indexNames, StubIndexScopeWork work) {
 		return indexScopeWorkCalls.verify(
 				new IndexScopeWorkCall( indexNames, work ),
 				IndexScopeWorkCall::verify
@@ -137,7 +138,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public long executeCountWork(List<String> indexNames) {
+	public long executeCountWork(Set<String> indexNames) {
 		return countCalls.verify( new CountWorkCall( indexNames, null ), CountWorkCall::verify );
 	}
 

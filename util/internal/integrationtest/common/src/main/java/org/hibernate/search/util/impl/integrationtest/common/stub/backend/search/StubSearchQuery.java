@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search;
 
-import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
@@ -22,13 +22,13 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 		implements SearchQuery<H> {
 
 	private final StubBackend backend;
-	private final List<String> indexNames;
+	private final Set<String> indexNames;
 	private final StubSearchWork.Builder workBuilder;
 	private final FromDocumentFieldValueConvertContext convertContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<H> rootProjection;
 
-	StubSearchQuery(StubBackend backend, List<String> indexNames, StubSearchWork.Builder workBuilder,
+	StubSearchQuery(StubBackend backend, Set<String> indexNames, StubSearchWork.Builder workBuilder,
 			FromDocumentFieldValueConvertContext convertContext,
 			LoadingContext<?, ?> loadingContext, StubSearchProjection<H> rootProjection) {
 		this.backend = backend;

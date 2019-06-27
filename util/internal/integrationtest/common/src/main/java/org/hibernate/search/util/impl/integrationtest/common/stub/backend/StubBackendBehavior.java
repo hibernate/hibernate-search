@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -54,7 +55,7 @@ public abstract class StubBackendBehavior {
 		}
 
 		@Override
-		public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
+		public <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
 				FromDocumentFieldValueConvertContext convertContext,
 				LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a search work was executed for indexes "
@@ -62,13 +63,13 @@ public abstract class StubBackendBehavior {
 		}
 
 		@Override
-		public CompletableFuture<?> executeIndexScopeWork(List<String> indexNames, StubIndexScopeWork work) {
+		public CompletableFuture<?> executeIndexScopeWork(Set<String> indexNames, StubIndexScopeWork work) {
 			throw new IllegalStateException( "The stub backend behavior was not set during execution of an index-scope work for indexes "
 					+ indexNames + ": " + work );
 		}
 
 		@Override
-		public long executeCountWork(List<String> indexNames) {
+		public long executeCountWork(Set<String> indexNames) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a count work was executed for indexes "
 					+ indexNames );
 		}
@@ -101,11 +102,11 @@ public abstract class StubBackendBehavior {
 
 	public abstract CompletableFuture<?> prepareAndExecuteDocumentWork(String indexName, StubDocumentWork work);
 
-	public abstract <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
+	public abstract <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
 			FromDocumentFieldValueConvertContext convertContext,
 			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
 
-	public abstract CompletableFuture<?> executeIndexScopeWork(List<String> indexNames, StubIndexScopeWork work);
+	public abstract CompletableFuture<?> executeIndexScopeWork(Set<String> indexNames, StubIndexScopeWork work);
 
-	public abstract long executeCountWork(List<String> indexNames);
+	public abstract long executeCountWork(Set<String> indexNames);
 }

@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
@@ -24,14 +25,14 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 
 class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 
-	private final List<String> indexNames;
+	private final Set<String> indexNames;
 	private final StubSearchWork work;
 	private final FromDocumentFieldValueConvertContext convertContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubSearchWorkBehavior<?> behavior;
 
-	SearchWorkCall(List<String> indexNames,
+	SearchWorkCall(Set<String> indexNames,
 			StubSearchWork work,
 			FromDocumentFieldValueConvertContext convertContext,
 			LoadingContext<?, ?> loadingContext,
@@ -44,7 +45,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		this.behavior = null;
 	}
 
-	SearchWorkCall(List<String> indexNames,
+	SearchWorkCall(Set<String> indexNames,
 			StubSearchWork work,
 			StubSearchWorkBehavior<?> behavior) {
 		this.indexNames = indexNames;

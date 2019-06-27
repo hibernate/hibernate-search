@@ -8,8 +8,11 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -143,46 +146,46 @@ public class BackendMock implements TestRule {
 		return expectIndexScopeWorks( Collections.singletonList( indexName ), tenantId );
 	}
 
-	public IndexScopeWorkCallListContext expectIndexScopeWorks(List<String> indexNames, String tenantId) {
+	public IndexScopeWorkCallListContext expectIndexScopeWorks(Collection<String> indexNames, String tenantId) {
 		CallQueue<IndexScopeWorkCall> callQueue = behaviorMock.getIndexScopeWorkCalls();
 		return new IndexScopeWorkCallListContext(
-				indexNames, tenantId,
+				new LinkedHashSet<>( indexNames ), tenantId,
 				callQueue::expectInOrder
 		);
 	}
 
-	public BackendMock expectSearchReferences(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
+	public BackendMock expectSearchReferences(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<DocumentReference> behavior) {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.REFERENCES, behavior );
 	}
 
-	public BackendMock expectSearchObjects(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
+	public BackendMock expectSearchObjects(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<DocumentReference> behavior) {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.OBJECTS, behavior );
 	}
 
-	public BackendMock expectSearchProjections(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
+	public BackendMock expectSearchProjections(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<List<?>> behavior) {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, behavior );
 	}
 
-	public BackendMock expectSearchProjection(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
+	public BackendMock expectSearchProjection(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<?> behavior) {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, behavior );
 	}
 
-	private BackendMock expectSearch(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
+	private BackendMock expectSearch(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWork.ResultType resultType, StubSearchWorkBehavior<?> behavior) {
 		CallQueue<SearchWorkCall<?>> callQueue = behaviorMock.getSearchWorkCalls();
 		StubSearchWork.Builder builder = StubSearchWork.builder( resultType );
 		contributor.accept( builder );
-		callQueue.expectInOrder( new SearchWorkCall<>( indexNames, builder.build(), behavior ) );
+		callQueue.expectInOrder( new SearchWorkCall<>( new LinkedHashSet<>( indexNames ), builder.build(), behavior ) );
 		return this;
 	}
 
-	public BackendMock expectCount(List<String> indexNames, long expectedResult) {
+	public BackendMock expectCount(Collection<String> indexNames, long expectedResult) {
 		CallQueue<CountWorkCall> callQueue = behaviorMock.getCountWorkCalls();
-		callQueue.expectInOrder( new CountWorkCall( indexNames, expectedResult ) );
+		callQueue.expectInOrder( new CountWorkCall( new LinkedHashSet<>( indexNames ), expectedResult ) );
 		return this;
 	}
 
@@ -289,11 +292,11 @@ public class BackendMock implements TestRule {
 	}
 
 	public class IndexScopeWorkCallListContext {
-		private final List<String> indexNames;
+		private final Set<String> indexNames;
 		private final String tenantIdentifier;
 		private final Consumer<IndexScopeWorkCall> expectationConsumer;
 
-		private IndexScopeWorkCallListContext(List<String> indexNames,
+		private IndexScopeWorkCallListContext(Set<String> indexNames,
 				String tenantIdentifier,
 				Consumer<IndexScopeWorkCall> expectationConsumer) {
 			this.indexNames = indexNames;

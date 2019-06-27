@@ -8,15 +8,15 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class CountWorkCall extends Call<CountWorkCall> {
 
-	private final List<String> indexNames;
+	private final Set<String> indexNames;
 	private final Long expectedResult;
 
-	public CountWorkCall(List<String> indexNames, Long expectedResult) {
+	CountWorkCall(Set<String> indexNames, Long expectedResult) {
 		this.indexNames = indexNames;
 		this.expectedResult = expectedResult;
 	}
