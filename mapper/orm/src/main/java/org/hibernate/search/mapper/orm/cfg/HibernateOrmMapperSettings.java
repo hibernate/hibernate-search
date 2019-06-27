@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.cfg;
 
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
 /**
  * @author Emmanuel Bernard
@@ -85,6 +86,17 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
 
 	/**
+	 * The strategy to use when loading entities during the execution of a search query.
+	 * <p>
+	 * Expects a {@link EntityLoadingCacheLookupStrategy} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#QUERY_LOADING_CACHE_LOOKUP_STRATEGY}.
+	 *
+	 * @see EntityLoadingCacheLookupStrategy
+	 */
+	public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = PREFIX + Radicals.QUERY_LOADING_CACHE_LOOKUP_STRATEGY;
+
+	/**
 	 * Whether annotations should be automatically processed for entity types,
 	 * as well as nested types in those entity types, for instance embedded types.
 	 * <p>
@@ -120,6 +132,7 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING_STRATEGY = "automatic_indexing.strategy";
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = "automatic_indexing.synchronization_strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = "automatic_indexing.enable_dirty_check";
+		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup_strategy";
 		public static final String ENABLE_ANNOTATION_MAPPING = "enable_annotation_mapping";
 		public static final String MAPPING_CONFIGURER = "mapping_configurer";
 	}
@@ -139,6 +152,8 @@ public final class HibernateOrmMapperSettings {
 		public static final HibernateOrmAutomaticIndexingSynchronizationStrategyName AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				HibernateOrmAutomaticIndexingSynchronizationStrategyName.COMMITTED;
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
+		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
+				EntityLoadingCacheLookupStrategy.SKIP;
 		public static final boolean ENABLE_ANNOTATION_MAPPING = true;
 	}
 

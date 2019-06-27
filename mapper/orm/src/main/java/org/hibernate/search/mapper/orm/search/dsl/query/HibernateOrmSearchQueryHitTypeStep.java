@@ -12,6 +12,7 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
 /**
  * The initial step in a query definition, where the type of query hits can be set,
@@ -36,5 +37,13 @@ public interface HibernateOrmSearchQueryHitTypeStep<E>
 	 * @see Query#setFetchSize(int)
 	 */
 	HibernateOrmSearchQueryHitTypeStep<E> fetchSize(int fetchSize);
+
+	/**
+	 * Set the strategy for cache lookup before query results are loaded.
+	 *
+	 * @param strategy The strategy.
+	 * @return {@code this} for method chaining.
+	 */
+	HibernateOrmSearchQueryHitTypeStep<E> cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy);
 
 }
