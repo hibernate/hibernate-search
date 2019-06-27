@@ -50,6 +50,11 @@ public class OrmSoftAssertions extends AutoCloseableSoftAssertions {
 		statementInspector = this::inspectSql;
 	}
 
+	public void resetListenerData() {
+		statementExecutionCount = 0;
+		statements.clear();
+	}
+
 	public AbstractIntegerAssert<?> assertStatementExecutionCount() {
 		// Don't use statement.size(), just in case a statement is executed twice... not sure it can happen, though.
 		return assertThat( statementExecutionCount )
