@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -60,6 +61,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		);
 
 		testLoading(
+				session -> { }, // No particular session setup
 				c -> c
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) )
@@ -91,12 +93,58 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		);
 
 		testLoading(
+				session -> { }, // No particular session setup
 				c -> c
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) )
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 3 ) ),
 				c -> c
 						.entity( primitives.getIndexedClass(), 1 )
+						.entity( primitives.getIndexedClass(), 3 ),
+				// Only one entity type means only one statement should be executed, even if there are multiple hits
+				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
+		);
+	}
+
+	/**
+	 * Test that returned results are initialized even if a proxy was present in the persistence context.
+	 */
+	@Test
+	public void initializeProxyFromPersistenceContext() {
+		// We don't care about what is indexed exactly, so use the lenient mode
+		backendMock.inLenientMode( () ->
+				OrmUtils.withinTransaction( sessionFactory, session -> {
+					session.persist( primitives.newIndexed( 1 ) );
+					session.persist( primitives.newIndexed( 2 ) );
+					session.persist( primitives.newIndexed( 3 ) );
+				} )
+		);
+
+		AtomicReference<Object> proxyReference = new AtomicReference<>();
+
+		testLoading(
+				session -> {
+					/*
+					 * Add an entity to the persistence context,
+					 * to check that Search does not just get the entities from the persistence context
+					 * without initializing them.
+					 * testLoading() will assert that search results are not initialized.
+					 * NB: "session.load" does not load the entity but really creates a proxy.
+					 */
+					T proxy = session.load( primitives.getIndexedClass(), 1 );
+					/*
+					 * We need to keep a reference to the proxy, otherwise it will be garbage collected
+					 * and ORM (who only holds a weak reference to it) will forget about it.
+					 */
+					proxyReference.set( proxy );
+				},
+				c -> c
+						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
+						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) )
+						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 3 ) ),
+				c -> c
+						.entity( primitives.getIndexedClass(), 1 )
+						.entity( primitives.getIndexedClass(), 2 )
 						.entity( primitives.getIndexedClass(), 3 ),
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )

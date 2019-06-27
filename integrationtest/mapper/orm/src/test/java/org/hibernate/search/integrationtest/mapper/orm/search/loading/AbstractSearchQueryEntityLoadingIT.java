@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -35,12 +38,18 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 
 	protected abstract SessionFactory sessionFactory();
 
-	protected final <T> void testLoading(List<? extends Class<? extends T>> targetClasses,
+	protected final <T> void testLoading(
+			Consumer<Session> sessionSetup,
+			List<? extends Class<? extends T>> targetClasses,
 			List<String> targetIndexes,
 			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
 			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
 			Consumer<OrmSoftAssertions> assertionsContributor) {
 		OrmSoftAssertions.withinSession( sessionFactory(), (session, softAssertions) -> {
+			sessionSetup.accept( session );
+
+			softAssertions.resetListenerData();
+
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<T> query = searchSession.search( targetClasses )
@@ -62,19 +71,43 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 
 			List<T> loadedEntities = query.fetchHits();
 
-			// Be sure to do this after having executed the query, to avoid polluting the persistence context
-			EntityCollector<T> entityCollector = new EntityCollector<>( session );
-			expectedLoadedEntitiesContributor.accept( entityCollector );
-			List<T> expectedLoadedEntities = entityCollector.collected;
-
 			softAssertions.assertThat( loadedEntities )
 					.as(
 							"Loaded entities when targeting types " + targetClasses
 									+ " and when the backend returns document references " + hitDocumentReferences
 					)
-					.containsExactlyElementsOf( expectedLoadedEntities );
+					.allSatisfy( loadedEntity -> {
+						// Loading should fully initialize entities
+						assertThat( Hibernate.isInitialized( loadedEntity ) ).isTrue();
+					} );
+
 			assertionsContributor.accept( softAssertions );
+
+			// Be sure to do this after having executed the query and checked loading,
+			// because it may trigger additional loading.
+			EntityCollector<T> entityCollector = new EntityCollector<>( session );
+			expectedLoadedEntitiesContributor.accept( entityCollector );
+			List<T> expectedLoadedEntities = entityCollector.collected;
+
+			// Both the expected and actual list may contain proxies: unproxy everything so that equals() works correctly
+			List<T> unproxyfiedExpectedLoadedEntities = unproxyAll( expectedLoadedEntities );
+			List<T> unproxyfiedLoadedEntities = unproxyAll( loadedEntities );
+
+			softAssertions.assertThat( unproxyfiedLoadedEntities )
+					.as(
+							"Loaded, then unproxified entities when targeting types " + targetClasses
+									+ " and when the backend returns document references " + hitDocumentReferences
+					)
+					.containsExactlyElementsOf( unproxyfiedExpectedLoadedEntities );
 		} );
+	}
+
+	// This cast is fine as long as T is not a proxy interface
+	@SuppressWarnings("unchecked")
+	private <T> List<T> unproxyAll(List<T> entityList) {
+		return entityList.stream()
+				.map( entity -> (T) Hibernate.unproxy( entity ) )
+				.collect( Collectors.toList() );
 	}
 
 	protected static class DocumentReferenceCollector {

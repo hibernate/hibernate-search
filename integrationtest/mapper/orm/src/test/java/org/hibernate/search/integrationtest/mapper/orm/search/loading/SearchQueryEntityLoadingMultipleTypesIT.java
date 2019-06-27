@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy1_A__Abstract;
@@ -26,6 +28,7 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.mult
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy5_A_B_D;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy5_A_B__MappedSuperClass;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy5_A__Abstract;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmSoftAssertions;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -266,6 +269,20 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	@Override
 	protected SessionFactory sessionFactory() {
 		return sessionFactory;
+	}
+
+	protected <T> void testLoading(List<? extends Class<? extends T>> targetClasses,
+			List<String> targetIndexes,
+			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
+			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
+			Consumer<OrmSoftAssertions> assertionsContributor) {
+		testLoading(
+				session -> { }, // No particular session setup needed
+				targetClasses, targetIndexes,
+				hitDocumentReferencesContributor,
+				expectedLoadedEntitiesContributor,
+				assertionsContributor
+		);
 	}
 
 	private void initData() {
