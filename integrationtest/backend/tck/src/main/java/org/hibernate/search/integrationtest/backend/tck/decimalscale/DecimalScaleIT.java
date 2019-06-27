@@ -778,7 +778,7 @@ public class DecimalScaleIT {
 				.query().asEntityReference()
 				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, "1" );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 	}
 
 	private void matchAbove(BigInteger value) {
@@ -786,7 +786,7 @@ public class DecimalScaleIT {
 				.query().asEntityReference()
 				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, "1" );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 	}
 
 	public void doNotMatchAbove(BigDecimal value) {
