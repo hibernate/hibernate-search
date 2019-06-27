@@ -20,6 +20,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.AssertionFailure;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
@@ -75,8 +76,12 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 		List<? extends E> loadedEntities = loadEntities( documentIdSourceValueToReference.keySet() );
 
 		for ( E loadedEntity : loadedEntities ) {
-			Object documentIdSourceValue = documentIdSourceHandle.get( loadedEntity );
+			// The handle may point to a field, in which case it won't work on a proxy. Unproxy first.
+			Object unproxied = Hibernate.unproxy( loadedEntity );
+			Object documentIdSourceValue = documentIdSourceHandle.get( unproxied );
+
 			EntityReference reference = documentIdSourceValueToReference.get( documentIdSourceValue );
+
 			entitiesByReference.put( reference, loadedEntity );
 		}
 	}
