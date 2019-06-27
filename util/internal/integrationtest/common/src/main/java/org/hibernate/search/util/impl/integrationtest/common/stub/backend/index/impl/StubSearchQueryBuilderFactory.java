@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -39,7 +38,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 			LoadingContextBuilder<?, E> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.OBJECTS,
-				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
+				sessionContext,
 				loadingContextBuilder,
 				StubEntitySearchProjection.get()
 		);
@@ -50,7 +49,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 			LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.REFERENCES,
-				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
+				sessionContext,
 				loadingContextBuilder,
 				StubReferenceSearchProjection.get()
 		);
@@ -61,7 +60,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,
-				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
+				sessionContext,
 				loadingContextBuilder,
 				(StubSearchProjection<P>) projection
 		);
@@ -72,7 +71,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<?>... projections) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,
-				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
+				sessionContext,
 				loadingContextBuilder,
 				createRootProjection( projections )
 		);

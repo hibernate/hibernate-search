@@ -8,7 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.List;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.function.TriFunction;
@@ -34,7 +33,7 @@ public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, P> implements 
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
-			FromDocumentFieldValueConvertContext context) {
+			StubSearchProjectionContext context) {
 		List<?> listFromIndex = (List<?>) projectionFromIndex;
 
 		return new Object[] {
@@ -45,13 +44,14 @@ public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, P> implements 
 	}
 
 	@Override
-	public P transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public P transform(LoadingResult<?> loadingResult, Object extractedData,
+			StubSearchProjectionContext context) {
 		Object[] extractedElements = (Object[]) extractedData;
 
 		return transformer.apply(
-				projection1.transform( loadingResult, extractedElements[0] ),
-				projection2.transform( loadingResult, extractedElements[0] ),
-				projection3.transform( loadingResult, extractedElements[0] )
+				projection1.transform( loadingResult, extractedElements[0], context ),
+				projection2.transform( loadingResult, extractedElements[0], context ),
+				projection3.transform( loadingResult, extractedElements[0], context )
 		);
 	}
 

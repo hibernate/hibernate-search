@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
@@ -22,12 +21,15 @@ class StubFieldSearchProjection<T> implements StubSearchProjection<T> {
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
-			FromDocumentFieldValueConvertContext context) {
-		return converter.convertIndexToProjection( projectionFromIndex, context );
+			StubSearchProjectionContext context) {
+		return converter.convertIndexToProjection(
+				projectionFromIndex, context.getFromDocumentFieldValueConvertContext()
+		);
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public T transform(LoadingResult<?> loadingResult, Object extractedData,
+			StubSearchProjectionContext context) {
 		return expectedType.cast( extractedData );
 	}
 }

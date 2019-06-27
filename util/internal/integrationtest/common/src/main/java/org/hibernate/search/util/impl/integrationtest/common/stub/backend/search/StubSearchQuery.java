@@ -8,7 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
@@ -17,6 +16,7 @@ import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
 
 final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 		implements SearchQuery<H> {
@@ -24,17 +24,17 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 	private final StubBackend backend;
 	private final Set<String> indexNames;
 	private final StubSearchWork.Builder workBuilder;
-	private final FromDocumentFieldValueConvertContext convertContext;
+	private final StubSearchProjectionContext projectionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<H> rootProjection;
 
 	StubSearchQuery(StubBackend backend, Set<String> indexNames, StubSearchWork.Builder workBuilder,
-			FromDocumentFieldValueConvertContext convertContext,
+			StubSearchProjectionContext projectionContext,
 			LoadingContext<?, ?> loadingContext, StubSearchProjection<H> rootProjection) {
 		this.backend = backend;
 		this.indexNames = indexNames;
 		this.workBuilder = workBuilder;
-		this.convertContext = convertContext;
+		this.projectionContext = projectionContext;
 		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
 	}
@@ -55,7 +55,7 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 	public SearchResult<H> fetch(Integer limit, Integer offset) {
 		workBuilder.limit( limit ).offset( offset );
 		return backend.getBehavior().executeSearchWork(
-				indexNames, workBuilder.build(), convertContext, loadingContext, rootProjection
+				indexNames, workBuilder.build(), projectionContext, loadingContext, rootProjection
 		);
 	}
 

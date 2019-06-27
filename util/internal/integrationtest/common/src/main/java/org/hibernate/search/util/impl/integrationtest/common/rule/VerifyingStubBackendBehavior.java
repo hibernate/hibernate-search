@@ -16,7 +16,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
@@ -26,6 +25,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
 
 import org.junit.Assert;
 
@@ -147,10 +147,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-			FromDocumentFieldValueConvertContext convertContext,
+			StubSearchProjectionContext projectionContext,
 			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 		return searchCalls.verify(
-				new SearchWorkCall<>( indexNames, work, convertContext, loadingContext, rootProjection ),
+				new SearchWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection ),
 				(call1, call2) -> call1.verify( call2 ),
 				noExpectationsBehavior( () -> new SimpleSearchResult<>( 0L, Collections.emptyList() ) )
 		);
