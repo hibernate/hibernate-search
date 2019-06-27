@@ -8,21 +8,22 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
 public class StubScopeModel {
-	private final List<String> indexNames;
-	private final List<StubIndexSchemaNode> rootSchemaNodes;
+	private final Set<String> indexNames;
+	private final Set<StubIndexSchemaNode> rootSchemaNodes;
 
-	public StubScopeModel(List<String> indexNames, List<StubIndexSchemaNode> rootSchemaNodes) {
+	public StubScopeModel(Set<String> indexNames, Set<StubIndexSchemaNode> rootSchemaNodes) {
 		this.indexNames = indexNames;
 		this.rootSchemaNodes = rootSchemaNodes;
 	}
 
-	public List<String> getIndexNames() {
+	public Set<String> getIndexNames() {
 		return indexNames;
 	}
 

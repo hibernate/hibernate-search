@@ -30,7 +30,7 @@ class StubIndexWorkExecutor implements IndexWorkExecutor {
 	@Override
 	public CompletableFuture<?> optimize() {
 		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.OPTIMIZE ).build();
-		return behavior.executeIndexScopeWork( Collections.singletonList( indexName ), work );
+		return behavior.executeIndexScopeWork( Collections.singleton( indexName ), work );
 	}
 
 	@Override
@@ -38,12 +38,12 @@ class StubIndexWorkExecutor implements IndexWorkExecutor {
 		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.PURGE )
 				.tenantIdentifier( sessionContext.getTenantIdentifier() )
 				.build();
-		return behavior.executeIndexScopeWork( Collections.singletonList( indexName ), work );
+		return behavior.executeIndexScopeWork( Collections.singleton( indexName ), work );
 	}
 
 	@Override
 	public CompletableFuture<?> flush() {
 		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.FLUSH ).build();
-		return behavior.executeIndexScopeWork( Collections.singletonList( indexName ), work );
+		return behavior.executeIndexScopeWork( Collections.singleton( indexName ), work );
 	}
 }

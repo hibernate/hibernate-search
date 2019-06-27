@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.util.impl.integrationtest.common.assertion.StubIndexScopeWorkAssert;
@@ -15,18 +15,18 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 
 class IndexScopeWorkCall extends Call<IndexScopeWorkCall> {
 
-	private final List<String> indexNames;
+	private final Set<String> indexNames;
 	private final StubIndexScopeWork work;
 	private final CompletableFuture<?> completableFuture;
 
-	IndexScopeWorkCall(List<String> indexNames, StubIndexScopeWork work,
+	IndexScopeWorkCall(Set<String> indexNames, StubIndexScopeWork work,
 			CompletableFuture<?> completableFuture) {
 		this.indexNames = indexNames;
 		this.work = work;
 		this.completableFuture = completableFuture;
 	}
 
-	IndexScopeWorkCall(List<String> indexNames, StubIndexScopeWork work) {
+	IndexScopeWorkCall(Set<String> indexNames, StubIndexScopeWork work) {
 		this.indexNames = indexNames;
 		this.work = work;
 		this.completableFuture = null;

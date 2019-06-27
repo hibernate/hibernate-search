@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -28,9 +28,9 @@ class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 	private final StubSearchProjectionBuilderFactory projectionFactory;
 
 	private StubIndexScope(Builder builder) {
-		List<String> immutableIndexNames = Collections.unmodifiableList( new ArrayList<>( builder.indexNames ) );
-		List<StubIndexSchemaNode> immutableRootSchemaNodes =
-				Collections.unmodifiableList( new ArrayList<>( builder.rootSchemaNodes ) );
+		Set<String> immutableIndexNames = Collections.unmodifiableSet( new LinkedHashSet<>( builder.indexNames ) );
+		Set<StubIndexSchemaNode> immutableRootSchemaNodes =
+				Collections.unmodifiableSet( new LinkedHashSet<>( builder.rootSchemaNodes ) );
 		StubScopeModel model = new StubScopeModel( immutableIndexNames, immutableRootSchemaNodes );
 		this.predicateFactory = new StubSearchPredicateBuilderFactory();
 		this.sortFactory = new StubSearchSortBuilderFactory();
@@ -64,8 +64,8 @@ class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 		// In a real mapper, this should be used for some features; keeping this here in case we need to stub such feature
 		@SuppressWarnings("unused")
 		private final MappingContextImplementor mappingContext;
-		private final List<String> indexNames = new ArrayList<>();
-		private final List<StubIndexSchemaNode> rootSchemaNodes = new ArrayList<>();
+		private final Set<String> indexNames = new LinkedHashSet<>();
+		private final Set<StubIndexSchemaNode> rootSchemaNodes = new LinkedHashSet<>();
 
 		Builder(StubBackend backend, MappingContextImplementor mappingContext, String indexName, StubIndexSchemaNode rootSchemaNode) {
 			this.backend = backend;
