@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryH
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSoftAssertions;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.EntityIdDocumentIdIndexedEntity;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.NonEntityIdDocumentIdIndexedEntity;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
 public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends AbstractSearchQueryEntityLoadingIT {
 
@@ -31,6 +32,39 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 
 	AbstractSearchQueryEntityLoadingSingleTypeIT(SingleTypeLoadingModelPrimitives<T> primitives) {
 		this.primitives = primitives;
+	}
+
+	protected final void persistThatManyEntities(int entityCount) {
+		// We don't care about what is indexed exactly, so use the lenient mode
+		backendMock.inLenientMode( () -> OrmUtils.withinTransaction( sessionFactory(), session -> {
+			for ( int i = 0; i < entityCount; i++ ) {
+				session.persist( primitives.newIndexed( i ) );
+			}
+		} ) );
+	}
+
+	protected final void testLoadingThatManyEntities(
+			Consumer<Session> sessionSetup,
+			Function<HibernateOrmSearchQueryHitTypeStep<T>, HibernateOrmSearchQueryHitTypeStep<T>> loadingOptionsContributor,
+			int entityCount,
+			Consumer<OrmSoftAssertions> assertionsContributor) {
+		testLoading(
+				sessionSetup,
+				Collections.singletonList( primitives.getIndexedClass() ),
+				Collections.singletonList( primitives.getIndexName() ),
+				loadingOptionsContributor,
+				c -> {
+					for ( int i = 0; i < entityCount; i++ ) {
+						c.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( i ) );
+					}
+				},
+				c -> {
+					for ( int i = 0; i < entityCount; i++ ) {
+						c.entity( primitives.getIndexedClass(), i );
+					}
+				},
+				assertionsContributor
+		);
 	}
 
 	protected final void testLoading(
