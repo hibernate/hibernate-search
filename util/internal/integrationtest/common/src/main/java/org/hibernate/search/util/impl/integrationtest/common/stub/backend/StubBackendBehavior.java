@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -20,6 +19,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
 
 public abstract class StubBackendBehavior {
 
@@ -56,7 +56,7 @@ public abstract class StubBackendBehavior {
 
 		@Override
 		public <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-				FromDocumentFieldValueConvertContext convertContext,
+				StubSearchProjectionContext projectionContext,
 				LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a search work was executed for indexes "
 					+ indexNames + ": " + work );
@@ -103,7 +103,7 @@ public abstract class StubBackendBehavior {
 	public abstract CompletableFuture<?> prepareAndExecuteDocumentWork(String indexName, StubDocumentWork work);
 
 	public abstract <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-			FromDocumentFieldValueConvertContext convertContext,
+			StubSearchProjectionContext projectionContext,
 			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
 
 	public abstract CompletableFuture<?> executeIndexScopeWork(Set<String> indexNames, StubIndexScopeWork work);

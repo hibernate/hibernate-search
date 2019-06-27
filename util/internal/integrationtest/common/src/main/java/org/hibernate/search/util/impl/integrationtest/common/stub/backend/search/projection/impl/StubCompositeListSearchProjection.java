@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
@@ -28,7 +27,7 @@ public class StubCompositeListSearchProjection<P> implements StubCompositeSearch
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
-			FromDocumentFieldValueConvertContext context) {
+			StubSearchProjectionContext context) {
 		List<Object> extractedData = new ArrayList<>();
 		List<?> listFromIndex = (List<?>) projectionFromIndex;
 
@@ -41,12 +40,13 @@ public class StubCompositeListSearchProjection<P> implements StubCompositeSearch
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public P transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public P transform(LoadingResult<?> loadingResult, Object extractedData,
+			StubSearchProjectionContext context) {
 		List<Object> extractedElements = (List<Object>) extractedData;
 		List<Object> results = new ArrayList<>( extractedElements.size() );
 
 		for ( int i = 0; i < extractedElements.size(); i++ ) {
-			results.add( i, children.get( i ).transform( loadingResult, extractedElements.get( i ) ) );
+			results.add( i, children.get( i ).transform( loadingResult, extractedElements.get( i ), context ) );
 		}
 
 		return transformer.apply( results );

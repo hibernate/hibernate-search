@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -22,24 +21,25 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearchWorkAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
 
 class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 
 	private final Set<String> indexNames;
 	private final StubSearchWork work;
-	private final FromDocumentFieldValueConvertContext convertContext;
+	private final StubSearchProjectionContext projectionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubSearchWorkBehavior<?> behavior;
 
 	SearchWorkCall(Set<String> indexNames,
 			StubSearchWork work,
-			FromDocumentFieldValueConvertContext convertContext,
+			StubSearchProjectionContext projectionContext,
 			LoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection) {
 		this.indexNames = indexNames;
 		this.work = work;
-		this.convertContext = convertContext;
+		this.projectionContext = projectionContext;
 		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
 		this.behavior = null;
@@ -50,7 +50,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 			StubSearchWorkBehavior<?> behavior) {
 		this.indexNames = indexNames;
 		this.work = work;
-		this.convertContext = null;
+		this.projectionContext = null;
 		this.loadingContext = null;
 		this.rootProjection = null;
 		this.behavior = behavior;
@@ -69,7 +69,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		return () -> new SimpleSearchResult<>(
 				totalHitCount,
 				getResults(
-						actualCall.convertContext,
+						actualCall.projectionContext,
 						actualCall.loadingContext.getProjectionHitMapper(),
 						actualCall.rootProjection,
 						behavior.getRawHits()
@@ -82,7 +82,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		return Objects.equals( indexNames, other.indexNames );
 	}
 
-	private static <U> List<U> getResults(FromDocumentFieldValueConvertContext actualConvertContext,
+	private static <U> List<U> getResults(StubSearchProjectionContext actualProjectionContext,
 			ProjectionHitMapper<?, ?> actualProjectionHitMapper,
 			StubSearchProjection<U> actualRootProjection,
 			List<?> rawHits) {
@@ -90,7 +90,8 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 
 		for ( Object rawHit : rawHits ) {
 			extractedElements.add(
-					actualRootProjection.extract( actualProjectionHitMapper, rawHit, actualConvertContext ) );
+					actualRootProjection.extract( actualProjectionHitMapper, rawHit, actualProjectionContext )
+			);
 		}
 
 		LoadingResult<?> loadingResult = actualProjectionHitMapper.loadBlocking();
@@ -98,7 +99,9 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		List<U> results = new ArrayList<>( rawHits.size() );
 
 		for ( Object extractedElement : extractedElements ) {
-			results.add( actualRootProjection.transform( loadingResult, extractedElement ) );
+			results.add(
+					actualRootProjection.transform( loadingResult, extractedElement, actualProjectionContext )
+			);
 		}
 
 		return results;

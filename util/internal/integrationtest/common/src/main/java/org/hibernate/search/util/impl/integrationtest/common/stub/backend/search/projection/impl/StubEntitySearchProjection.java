@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -26,13 +25,14 @@ public class StubEntitySearchProjection<T> implements StubSearchProjection<T> {
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
-			FromDocumentFieldValueConvertContext context) {
+			StubSearchProjectionContext context) {
 		return projectionHitMapper.planLoading( (DocumentReference) projectionFromIndex );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public T transform(LoadingResult<?> loadingResult, Object extractedData,
+			StubSearchProjectionContext context) {
 		return (T) loadingResult.getLoaded( extractedData );
 	}
 }
