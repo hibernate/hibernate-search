@@ -296,6 +296,15 @@ public class AnnotationMappingSmokeIT {
 
 	@Test
 	public void search() {
+		backendMock.inLenientMode( () -> OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity0 = new IndexedEntity();
+			entity0.setId( 0 );
+			session.persist( entity0 );
+			YetAnotherIndexedEntity entity1 = new YetAnotherIndexedEntity();
+			entity1.setId( 1 );
+			session.persist( entity1 );
+		} ) );
+
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			SearchQuery<ParentIndexedEntity> query = searchSession.search(
@@ -321,8 +330,8 @@ public class AnnotationMappingSmokeIT {
 			backendMock.verifyExpectationsMet();
 			Assertions.assertThat( result )
 					.containsExactly(
-							session.get( IndexedEntity.class, 0 ),
-							session.get( YetAnotherIndexedEntity.class, 1 )
+							session.getReference( IndexedEntity.class, 0 ),
+							session.getReference( YetAnotherIndexedEntity.class, 1 )
 					);
 
 			backendMock.expectCount( Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 6L );
