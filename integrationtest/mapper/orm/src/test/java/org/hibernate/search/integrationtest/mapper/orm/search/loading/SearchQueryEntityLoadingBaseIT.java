@@ -62,6 +62,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 
 		testLoading(
 				session -> { }, // No particular session setup
+				loadingOptions -> loadingOptions, // No particular loading option
 				c -> c
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) )
@@ -94,6 +95,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 
 		testLoading(
 				session -> { }, // No particular session setup
+				loadingOptions -> loadingOptions, // No particular loading option
 				c -> c
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) )
@@ -138,6 +140,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 					 */
 					proxyReference.set( proxy );
 				},
+				loadingOptions -> loadingOptions, // No particular loading option
 				c -> c
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) )

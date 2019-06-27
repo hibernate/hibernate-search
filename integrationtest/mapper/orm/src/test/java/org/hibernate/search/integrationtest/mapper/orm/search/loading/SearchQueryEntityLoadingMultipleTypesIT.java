@@ -279,6 +279,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		testLoading(
 				session -> { }, // No particular session setup needed
 				targetClasses, targetIndexes,
+				loadingOptionsStep -> loadingOptionsStep, // We don't use any particular loading option
 				hitDocumentReferencesContributor,
 				expectedLoadedEntitiesContributor,
 				assertionsContributor
