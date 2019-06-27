@@ -10,8 +10,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.Session;
+import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryHitTypeStep;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSoftAssertions;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.EntityIdDocumentIdIndexedEntity;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.NonEntityIdDocumentIdIndexedEntity;
@@ -33,6 +35,7 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 
 	protected final void testLoading(
 			Consumer<Session> sessionSetup,
+			Function<HibernateOrmSearchQueryHitTypeStep<T>, HibernateOrmSearchQueryHitTypeStep<T>> loadingOptionsContributor,
 			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
 			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
 			Consumer<OrmSoftAssertions> assertionsContributor) {
@@ -40,6 +43,7 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 				sessionSetup,
 				Collections.singletonList( primitives.getIndexedClass() ),
 				Collections.singletonList( primitives.getIndexName() ),
+				loadingOptionsContributor,
 				hitDocumentReferencesContributor,
 				expectedLoadedEntitiesContributor,
 				assertionsContributor
