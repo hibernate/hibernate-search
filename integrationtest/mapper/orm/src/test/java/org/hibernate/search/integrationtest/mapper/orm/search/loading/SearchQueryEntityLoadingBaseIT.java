@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -51,26 +50,14 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	 */
 	@Test
 	public void simple() {
-		// We don't care about what is indexed exactly, so use the lenient mode
-		backendMock.inLenientMode( () ->
-				OrmUtils.withinTransaction( sessionFactory, session -> {
-					session.persist( primitives.newIndexed( 1 ) );
-					session.persist( primitives.newIndexed( 2 ) );
-					session.persist( primitives.newIndexed( 3 ) );
-				} )
-		);
+		final int entityCount = 3;
 
-		testLoading(
+		persistThatManyEntities( entityCount );
+
+		testLoadingThatManyEntities(
 				session -> { }, // No particular session setup
 				loadingOptions -> loadingOptions, // No particular loading option
-				c -> c
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) )
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 3 ) ),
-				c -> c
-						.entity( primitives.getIndexedClass(), 1 )
-						.entity( primitives.getIndexedClass(), 2 )
-						.entity( primitives.getIndexedClass(), 3 ),
+				entityCount,
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
 		);
@@ -85,24 +72,18 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	public void notFound() {
-		// We don't care about what is indexed exactly, so use the lenient mode
-		backendMock.inLenientMode( () ->
-				OrmUtils.withinTransaction( sessionFactory, session -> {
-					session.persist( primitives.newIndexed( 1 ) );
-					session.persist( primitives.newIndexed( 3 ) );
-				} )
-		);
+		persistThatManyEntities( 2 );
 
 		testLoading(
 				session -> { }, // No particular session setup
 				loadingOptions -> loadingOptions, // No particular loading option
 				c -> c
+						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 0 ) )
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) )
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 3 ) ),
+						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) ),
 				c -> c
-						.entity( primitives.getIndexedClass(), 1 )
-						.entity( primitives.getIndexedClass(), 3 ),
+						.entity( primitives.getIndexedClass(), 0 )
+						.entity( primitives.getIndexedClass(), 1 ),
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
 		);
@@ -113,18 +94,13 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	 */
 	@Test
 	public void initializeProxyFromPersistenceContext() {
-		// We don't care about what is indexed exactly, so use the lenient mode
-		backendMock.inLenientMode( () ->
-				OrmUtils.withinTransaction( sessionFactory, session -> {
-					session.persist( primitives.newIndexed( 1 ) );
-					session.persist( primitives.newIndexed( 2 ) );
-					session.persist( primitives.newIndexed( 3 ) );
-				} )
-		);
+		final int entityCount = 10;
+
+		persistThatManyEntities( entityCount );
 
 		AtomicReference<Object> proxyReference = new AtomicReference<>();
 
-		testLoading(
+		testLoadingThatManyEntities(
 				session -> {
 					/*
 					 * Add an entity to the persistence context,
@@ -141,14 +117,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 					proxyReference.set( proxy );
 				},
 				loadingOptions -> loadingOptions, // No particular loading option
-				c -> c
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) )
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 3 ) ),
-				c -> c
-						.entity( primitives.getIndexedClass(), 1 )
-						.entity( primitives.getIndexedClass(), 2 )
-						.entity( primitives.getIndexedClass(), 3 ),
+				entityCount,
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
 		);
