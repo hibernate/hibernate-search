@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.search.dsl.query.impl;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryHitTypeStep;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
@@ -28,5 +29,10 @@ public class HibernateOrmSearchQueryHitTypeStepImpl<E>
 	public HibernateOrmSearchQueryHitTypeStep<E> fetchSize(int fetchSize) {
 		loadingContextBuilder.fetchSize( fetchSize );
 		return this;
+	}
+
+	@Override
+	public HibernateOrmSearchQueryHitTypeStep<E> cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 }
