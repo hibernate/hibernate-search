@@ -92,6 +92,8 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 
 		public abstract boolean isCacheLookupSupported();
 
+		public abstract boolean isFetchSizeSupported();
+
 		public abstract T newIndexed(int id);
 
 		public abstract String getDocumentIdForEntityId(int id);
@@ -117,6 +119,11 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 
 		@Override
 		public boolean isCacheLookupSupported() {
+			return true;
+		}
+
+		@Override
+		public boolean isFetchSizeSupported() {
 			return true;
 		}
 
@@ -147,6 +154,11 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 
 		@Override
 		public boolean isCacheLookupSupported() {
+			return false;
+		}
+
+		@Override
+		public boolean isFetchSizeSupported() {
 			return false;
 		}
 
