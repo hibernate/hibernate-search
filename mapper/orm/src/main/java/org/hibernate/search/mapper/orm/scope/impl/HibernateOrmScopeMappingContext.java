@@ -7,8 +7,9 @@
 package org.hibernate.search.mapper.orm.scope.impl;
 
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
+import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingMappingContext;
 
 public interface HibernateOrmScopeMappingContext
-		extends HibernateOrmMassIndexingMappingContext {
+		extends HibernateOrmMassIndexingMappingContext, HibernateOrmLoadingMappingContext {
 
 }

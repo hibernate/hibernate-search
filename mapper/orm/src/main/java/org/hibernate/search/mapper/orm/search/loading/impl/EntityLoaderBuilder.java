@@ -12,19 +12,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
 public class EntityLoaderBuilder<E> {
 
-	private final Session session;
+	private final SessionImplementor session;
 	private final Set<? extends HibernateOrmLoadingIndexedTypeContext<? extends E>> concreteIndexedTypes;
 
-	public EntityLoaderBuilder(Session session,
+	private EntityLoadingCacheLookupStrategy cacheLookupStrategy;
+
+	public EntityLoaderBuilder(HibernateOrmLoadingMappingContext mappingContext,
+			HibernateOrmLoadingSessionContext sessionContext,
 			Set<? extends HibernateOrmLoadingIndexedTypeContext<? extends E>> concreteIndexedTypes) {
-		this.session = session;
+		this.session = sessionContext.getSession();
 		this.concreteIndexedTypes = concreteIndexedTypes;
+		this.cacheLookupStrategy = mappingContext.getCacheLookupStrategy();
+	}
+
+	public void cacheLookupStrategy(EntityLoadingCacheLookupStrategy cacheLookupStrategy) {
+		this.cacheLookupStrategy = cacheLookupStrategy;
 	}
 
 	public EntityLoader<EntityReference, ? extends E> build(MutableEntityLoadingOptions mutableLoadingOptions) {
@@ -81,6 +90,7 @@ public class EntityLoaderBuilder<E> {
 		return typeContext.getLoaderFactory().create(
 				typeContext.getJavaClass(),
 				session,
+				cacheLookupStrategy,
 				mutableLoadingOptions
 		);
 	}
@@ -92,6 +102,7 @@ public class EntityLoaderBuilder<E> {
 		return loaderFactory.create(
 				types,
 				session,
+				cacheLookupStrategy,
 				mutableLoadingOptions
 		);
 	}

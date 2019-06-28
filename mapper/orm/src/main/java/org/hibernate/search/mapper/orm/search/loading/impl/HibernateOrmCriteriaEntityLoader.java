@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
-import java.util.ArrayList;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +22,16 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.hibernate.AssertionFailure;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static <E> EntityLoaderFactory factory(Class<E> entityType,
 			SingularAttribute<? super E,?> documentIdSourceAttribute,
@@ -50,20 +56,6 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 		this.documentIdSourceHandle = documentIdSourceHandle;
 		this.session = session;
 		this.loadingOptions = loadingOptions;
-	}
-
-	@Override
-	public List<E> loadBlocking(List<EntityReference> references) {
-		// Load all references
-		Map<EntityReference, E> objectsByReference = new HashMap<>();
-		loadBlocking( references, objectsByReference );
-
-		// Re-create the list of objects in the same order
-		List<E> result = new ArrayList<>( references.size() );
-		for ( EntityReference reference : references ) {
-			result.add( objectsByReference.get( reference ) );
-		}
-		return result;
 	}
 
 	@Override
@@ -132,14 +124,16 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 		}
 
 		@Override
-		public <E2> HibernateOrmComposableEntityLoader<E2> create(Class<E2> targetEntityType, Session session,
-				MutableEntityLoadingOptions loadingOptions) {
-			return doCreate( targetEntityType, session, loadingOptions );
+		public <E2> HibernateOrmComposableEntityLoader<E2> create(Class<E2> targetEntityType,
+				SessionImplementor session,
+				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
+			return doCreate( targetEntityType, session, cacheLookupStrategy, loadingOptions );
 		}
 
 		@Override
 		public <E2> HibernateOrmComposableEntityLoader<? extends E2> create(List<Class<? extends E2>> targetEntityTypes,
-				Session session, MutableEntityLoadingOptions loadingOptions) {
+				SessionImplementor session,
+				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 			if ( targetEntityTypes.size() != 1 ) {
 				throw new AssertionFailure(
 						"Attempt to use a criteria-based entity loader with multiple target entity types."
@@ -149,10 +143,12 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 				);
 			}
 
-			return doCreate( targetEntityTypes.get( 0 ), session, loadingOptions );
+			return doCreate( targetEntityTypes.get( 0 ), session, cacheLookupStrategy, loadingOptions );
 		}
 
-		private <E2> HibernateOrmComposableEntityLoader<E2> doCreate(Class<E2> targetEntityType, Session session,
+		private <E2> HibernateOrmComposableEntityLoader<E2> doCreate(Class<E2> targetEntityType,
+				SessionImplementor session,
+				EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 				MutableEntityLoadingOptions loadingOptions) {
 			if ( !entityType.equals( targetEntityType ) ) {
 				throw new AssertionFailure(
@@ -173,6 +169,17 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 							entityType, documentIdSourceAttribute, documentIdSourceHandle,
 							session, loadingOptions
 					);
+
+			if ( !EntityLoadingCacheLookupStrategy.SKIP.equals( cacheLookupStrategy ) ) {
+				/*
+				 * We can't support preliminary cache lookup with this strategy,
+				 * because document IDs are not entity IDs.
+				 * However, we can't throw an exception either,
+				 * because this setting may still be relevant for other entity types targeted by the same query.
+				 * Let's log something, at least.
+				 */
+				log.skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader( entityType, cacheLookupStrategy );
+			}
 
 			return result;
 		}

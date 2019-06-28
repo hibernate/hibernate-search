@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,20 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
  * @param <E> The type of loaded entities.
  */
 public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<EntityReference, E> {
+
+	@Override
+	default List<E> loadBlocking(List<EntityReference> references) {
+		// Load all references
+		Map<EntityReference, E> objectsByReference = new HashMap<>();
+		loadBlocking( references, objectsByReference );
+
+		// Re-create the list of objects in the same order
+		List<E> result = new ArrayList<>( references.size() );
+		for ( EntityReference reference : references ) {
+			result.add( objectsByReference.get( reference ) );
+		}
+		return result;
+	}
 
 	/**
 	 * For each reference in the given list,

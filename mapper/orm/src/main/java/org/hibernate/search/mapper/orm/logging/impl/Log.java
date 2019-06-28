@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -182,4 +183,21 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 18,
 			value = "Invalid automatic indexing synchronization strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidAutomaticIndexingSynchronizationStrategyName(String invalidRepresentation, List<String> validRepresentations);
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET_2 + 19,
+			value = "The entity loader for '%1$s' will ignore the cache lookup strategy '%2$s',"
+					+ " because document IDs are distinct from entity IDs "
+					+ "and thus cannot be used for persistence context or second level cache lookups.")
+	void skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader(
+			@FormatWith(ClassFormatter.class) Class<?> entityType,
+			EntityLoadingCacheLookupStrategy cacheLookupStrategy);
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET_2 + 20,
+			value = "The entity loader for '%1$s' will ignore the second-level cache "
+					+ " even though it was instructed to use it,"
+					+ " because caching is not enabled for this entity type.")
+	void skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
+			@FormatWith(ClassFormatter.class) Class<?> entityType);
 }
