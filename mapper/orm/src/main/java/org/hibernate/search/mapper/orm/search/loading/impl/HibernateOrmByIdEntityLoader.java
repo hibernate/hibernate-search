@@ -35,8 +35,6 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 	private final Class<E> entityType;
 	private final MutableEntityLoadingOptions loadingOptions;
 
-	private MultiIdentifierLoadAccess<E> multiAccess;
-
 	private HibernateOrmByIdEntityLoader(
 			Class<E> entityType,
 			Session session,
@@ -75,9 +73,8 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 	}
 
 	private MultiIdentifierLoadAccess<E> getMultiAccess() {
-		if ( multiAccess == null ) {
-			multiAccess = session.byMultipleIds( entityType );
-		}
+		MultiIdentifierLoadAccess<E> multiAccess = session.byMultipleIds( entityType );
+
 		multiAccess.withBatchSize( loadingOptions.getFetchSize() );
 		return multiAccess;
 	}
