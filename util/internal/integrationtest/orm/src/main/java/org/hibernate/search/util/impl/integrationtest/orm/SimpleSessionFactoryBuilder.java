@@ -22,7 +22,11 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.service.ServiceRegistry;
 
+import org.jboss.logging.Logger;
+
 public final class SimpleSessionFactoryBuilder {
+	private static final Logger log = Logger.getLogger( SimpleSessionFactoryBuilder.class.getName() );
+
 	private final List<Consumer<BootstrapServiceRegistryBuilder>> bootstrapServiceRegistryBuilderContributors = new ArrayList<>();
 	private final List<Consumer<StandardServiceRegistryBuilder>> serviceRegistryBuilderContributors = new ArrayList<>();
 	private final List<Consumer<MetadataSources>> metadataSourcesContributors = new ArrayList<>();
@@ -33,7 +37,14 @@ public final class SimpleSessionFactoryBuilder {
 	}
 
 	public SimpleSessionFactoryBuilder setProperty(String key, Object value) {
-		return onServiceRegistryBuilder( builder -> builder.applySetting( key, value ) );
+		return onServiceRegistryBuilder( builder -> {
+			if ( value == null ) {
+				log.infof( "Not setting the property with key '%s' because value is null.", key );
+			}
+			else {
+				builder.applySetting( key, value );
+			}
+		} );
 	}
 
 	public SimpleSessionFactoryBuilder addAnnotatedClass(Class<?> clazz) {

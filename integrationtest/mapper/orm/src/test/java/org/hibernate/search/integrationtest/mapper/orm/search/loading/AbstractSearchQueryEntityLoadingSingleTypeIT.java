@@ -90,6 +90,8 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 
 		public abstract Class<T> getIndexedClass();
 
+		public abstract boolean isCacheLookupSupported();
+
 		public abstract T newIndexed(int id);
 
 		public abstract String getDocumentIdForEntityId(int id);
@@ -111,6 +113,11 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 		@Override
 		public Class<EntityIdDocumentIdIndexedEntity> getIndexedClass() {
 			return EntityIdDocumentIdIndexedEntity.class;
+		}
+
+		@Override
+		public boolean isCacheLookupSupported() {
+			return true;
 		}
 
 		@Override
@@ -136,6 +143,11 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 		@Override
 		public Class<NonEntityIdDocumentIdIndexedEntity> getIndexedClass() {
 			return NonEntityIdDocumentIdIndexedEntity.class;
+		}
+
+		@Override
+		public boolean isCacheLookupSupported() {
+			return false;
 		}
 
 		@Override
