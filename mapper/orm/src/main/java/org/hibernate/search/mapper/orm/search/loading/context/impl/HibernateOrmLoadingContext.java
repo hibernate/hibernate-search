@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.search.loading.context.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Set;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
@@ -14,6 +15,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
@@ -64,11 +66,14 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 		private final MutableEntityLoadingOptions loadingOptions;
 
 		public Builder(HibernateOrmLoadingSessionContext sessionContext,
-				EntityLoaderBuilder<E> entityLoaderBuilder,
-				MutableEntityLoadingOptions loadingOptions) {
+				Set<HibernateOrmScopeIndexedTypeContext<? extends E>> indexedTypeContexts) {
 			this.sessionContext = sessionContext;
-			this.entityLoaderBuilder = entityLoaderBuilder;
-			this.loadingOptions = loadingOptions;
+			this.entityLoaderBuilder = new EntityLoaderBuilder<>( sessionContext.getSession(), indexedTypeContexts );
+			this.loadingOptions = new MutableEntityLoadingOptions();
+		}
+
+		public void fetchSize(int fetchSize) {
+			loadingOptions.setFetchSize( fetchSize );
 		}
 
 		@Override

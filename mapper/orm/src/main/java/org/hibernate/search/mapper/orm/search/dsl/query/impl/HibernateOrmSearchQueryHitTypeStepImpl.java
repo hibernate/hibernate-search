@@ -9,24 +9,24 @@ package org.hibernate.search.mapper.orm.search.dsl.query.impl;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractDelegatingSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryHitTypeStep;
-import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
+import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public class HibernateOrmSearchQueryHitTypeStepImpl<E>
 		extends AbstractDelegatingSearchQueryHitTypeStep<EntityReference, E>
 		implements HibernateOrmSearchQueryHitTypeStep<E> {
-	private final MutableEntityLoadingOptions loadingOptions;
+	private final HibernateOrmLoadingContext.Builder<E> loadingContextBuilder;
 
 	public HibernateOrmSearchQueryHitTypeStepImpl(
 			SearchQueryHitTypeStep<?, EntityReference, E, ?, ?> delegate,
-			MutableEntityLoadingOptions loadingOptions) {
+			HibernateOrmLoadingContext.Builder<E> loadingContextBuilder) {
 		super( delegate );
-		this.loadingOptions = loadingOptions;
+		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
 	@Override
 	public HibernateOrmSearchQueryHitTypeStep<E> fetchSize(int fetchSize) {
-		loadingOptions.setFetchSize( fetchSize );
+		loadingContextBuilder.fetchSize( fetchSize );
 		return this;
 	}
 }

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
@@ -16,8 +15,6 @@ import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.search.dsl.query.impl.HibernateOrmSearchQueryHitTypeStepImpl;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
-import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
-import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.writing.impl.SearchWriterImpl;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
@@ -39,16 +36,12 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 
 	@Override
 	public HibernateOrmSearchQueryHitTypeStep<E> search() {
-		SessionImplementor sessionImplementor = sessionContext.getSession();
-		EntityLoaderBuilder<E> entityLoaderBuilder =
-				new EntityLoaderBuilder<>( sessionImplementor, delegate.getIncludedIndexedTypes() );
-		MutableEntityLoadingOptions loadingOptions = new MutableEntityLoadingOptions();
 		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
-				sessionContext, entityLoaderBuilder, loadingOptions
+				sessionContext, delegate.getIncludedIndexedTypes()
 		);
 		return new HibernateOrmSearchQueryHitTypeStepImpl<>(
 				delegate.search( loadingContextBuilder ),
-				loadingOptions
+				loadingContextBuilder
 		);
 	}
 
