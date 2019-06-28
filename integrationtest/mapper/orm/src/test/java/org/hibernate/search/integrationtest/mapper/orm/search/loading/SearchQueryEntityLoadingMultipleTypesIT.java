@@ -10,7 +10,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.persistence.SharedCacheMode;
+
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy1_A__Abstract;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy1_A_B;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy1_A_C;
@@ -28,6 +31,10 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.mult
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy5_A_B_D;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy5_A_B__MappedSuperClass;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy5_A__Abstract;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy6_A_B_Cacheable;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy6_A_C_Cacheable;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy6_A__Abstract;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSoftAssertions;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -62,7 +69,11 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		backendMock.expectAnySchema( Hierarchy5_A_B_C.NAME );
 		backendMock.expectAnySchema( Hierarchy5_A_B_D.NAME );
 
+		backendMock.expectAnySchema( Hierarchy6_A_B_Cacheable.NAME );
+		backendMock.expectAnySchema( Hierarchy6_A_C_Cacheable.NAME );
+
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
 				.setup(
 						Hierarchy1_A__Abstract.class,
 						Hierarchy1_A_B.class,
@@ -80,7 +91,10 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						Hierarchy5_A__Abstract.class,
 						Hierarchy5_A_B__MappedSuperClass.class,
 						Hierarchy5_A_B_C.class,
-						Hierarchy5_A_B_D.class
+						Hierarchy5_A_B_D.class,
+						Hierarchy6_A__Abstract.class,
+						Hierarchy6_A_B_Cacheable.class,
+						Hierarchy6_A_C_Cacheable.class
 				);
 
 		backendMock.verifyExpectationsMet();
@@ -266,6 +280,44 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		);
 	}
 
+	/**
+	 * Test loading multiple entity types from a single hierarchy
+	 * with second level cache lookup enabled.
+	 * We expect Hibernate Search to look into the cache for each targeted type,
+	 * even though a single loader is created for the abstract supertype,
+	 * which has no cache.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3349")
+	public void secondLevelCacheLookup() {
+		testLoading(
+				session -> { }, // No particular session setup needed
+				Arrays.asList(
+						Hierarchy6_A_B_Cacheable.class,
+						Hierarchy6_A_C_Cacheable.class
+				),
+				Arrays.asList(
+						Hierarchy6_A_B_Cacheable.NAME,
+						Hierarchy6_A_C_Cacheable.NAME
+				),
+				loadingOptions -> loadingOptions.cacheLookupStrategy(
+						EntityLoadingCacheLookupStrategy.PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE
+				),
+				c -> c
+						.doc( Hierarchy6_A_B_Cacheable.NAME, "2" )
+						.doc( Hierarchy6_A_C_Cacheable.NAME, "3" ),
+				c -> c
+						.entity( Hierarchy6_A_B_Cacheable.class, 2 )
+						.entity( Hierarchy6_A_C_Cacheable.class, 3 ),
+				c -> {
+					c.assertSecondLevelCacheHitCount()
+							.isEqualTo( 2 );
+					c.assertStatementExecutionCount()
+							.isEqualTo( 0 );
+				}
+		);
+	}
+
 	@Override
 	protected SessionFactory sessionFactory() {
 		return sessionFactory;
@@ -308,6 +360,9 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 
 					session.persist( new Hierarchy5_A_B_C( 3 ) );
 					session.persist( new Hierarchy5_A_B_D( 4 ) );
+
+					session.persist( new Hierarchy6_A_B_Cacheable( 2 ) );
+					session.persist( new Hierarchy6_A_C_Cacheable( 3 ) );
 				} )
 		);
 	}
