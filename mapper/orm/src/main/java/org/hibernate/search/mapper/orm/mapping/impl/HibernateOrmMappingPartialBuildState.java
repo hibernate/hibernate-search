@@ -8,29 +8,11 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.util.common.AssertionFailure;
 
 public class HibernateOrmMappingPartialBuildState implements MappingPartialBuildState {
-
-	private static final ConfigurationProperty<HibernateOrmAutomaticIndexingSynchronizationStrategyName> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY )
-					.as( HibernateOrmAutomaticIndexingSynchronizationStrategyName.class, HibernateOrmAutomaticIndexingSynchronizationStrategyName::of )
-					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY )
-					.build();
-
-	private static final ConfigurationProperty<EntityLoadingCacheLookupStrategy> QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.QUERY_LOADING_CACHE_LOOKUP_STRATEGY )
-					.as( EntityLoadingCacheLookupStrategy.class, EntityLoadingCacheLookupStrategy::of )
-					.withDefault( HibernateOrmMapperSettings.Defaults.QUERY_LOADING_CACHE_LOOKUP_STRATEGY )
-					.build();
 
 	private final PojoMappingDelegate mappingDelegate;
 	private final HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder;
@@ -44,14 +26,10 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 	public MappingImplementor<HibernateOrmMapping> bindToSessionFactory(
 			SessionFactoryImplementor sessionFactoryImplementor,
 			ConfigurationPropertySource propertySource) {
-		EntityLoadingCacheLookupStrategy cacheLookupStrategy =
-				QUERY_LOADING_CACHE_LOOKUP_STRATEGY.get( propertySource );
-		AutomaticIndexingSynchronizationStrategy synchronizationStrategy =
-				getAutomaticIndexingSynchronizationStrategy( propertySource );
-		return new HibernateOrmMapping(
+		return HibernateOrmMapping.create(
 				mappingDelegate, typeContextContainerBuilder.build( sessionFactoryImplementor ),
 				sessionFactoryImplementor,
-				synchronizationStrategy, cacheLookupStrategy
+				propertySource
 		);
 	}
 
@@ -60,18 +38,4 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 		mappingDelegate.close();
 	}
 
-	private AutomaticIndexingSynchronizationStrategy getAutomaticIndexingSynchronizationStrategy(ConfigurationPropertySource propertySource) {
-		HibernateOrmAutomaticIndexingSynchronizationStrategyName name =
-				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.get( propertySource );
-		switch ( name ) {
-			case QUEUED:
-				return AutomaticIndexingSynchronizationStrategy.queued();
-			case COMMITTED:
-				return AutomaticIndexingSynchronizationStrategy.committed();
-			case SEARCHABLE:
-				return AutomaticIndexingSynchronizationStrategy.searchable();
-			default:
-				throw new AssertionFailure( "Unexpected automatic indexing synchronization strategy name: " + name );
-		}
-	}
 }

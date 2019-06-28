@@ -14,6 +14,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
@@ -23,6 +28,7 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.TransientReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -31,22 +37,65 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final ConfigurationProperty<HibernateOrmAutomaticIndexingSynchronizationStrategyName> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY )
+					.as( HibernateOrmAutomaticIndexingSynchronizationStrategyName.class, HibernateOrmAutomaticIndexingSynchronizationStrategyName::of )
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY )
+					.build();
+
+	private static final ConfigurationProperty<EntityLoadingCacheLookupStrategy> QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.QUERY_LOADING_CACHE_LOOKUP_STRATEGY )
+					.as( EntityLoadingCacheLookupStrategy.class, EntityLoadingCacheLookupStrategy::of )
+					.withDefault( HibernateOrmMapperSettings.Defaults.QUERY_LOADING_CACHE_LOOKUP_STRATEGY )
+					.build();
+
 	private static final String SEARCH_SESSION_KEY =
 			HibernateOrmMapping.class.getName() + "#SEARCH_SESSION_KEY";
+
+	public static MappingImplementor<HibernateOrmMapping> create(
+			PojoMappingDelegate mappingDelegate, HibernateOrmTypeContextContainer typeContextContainer,
+			SessionFactoryImplementor sessionFactory, ConfigurationPropertySource propertySource) {
+		HibernateOrmAutomaticIndexingSynchronizationStrategyName synchronizationStrategyName =
+				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.get( propertySource );
+		AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+		switch ( synchronizationStrategyName ) {
+			case QUEUED:
+				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.queued();
+				break;
+			case COMMITTED:
+				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.committed();
+				break;
+			case SEARCHABLE:
+				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.searchable();
+				break;
+			default:
+				throw new AssertionFailure(
+						"Unexpected automatic indexing synchronization strategy name: " + synchronizationStrategyName
+				);
+		}
+
+		EntityLoadingCacheLookupStrategy cacheLookupStrategy =
+				QUERY_LOADING_CACHE_LOOKUP_STRATEGY.get( propertySource );
+
+		return new HibernateOrmMapping(
+				mappingDelegate, typeContextContainer, sessionFactory,
+				synchronizationStrategy, cacheLookupStrategy
+		);
+	}
 
 	private final HibernateOrmMappingContextImpl mappingContext;
 	private final HibernateOrmTypeContextContainer typeContextContainer;
 	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 
-	HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
+	private HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer typeContextContainer,
-			SessionFactoryImplementor sessionFactoryImplementor,
+			SessionFactoryImplementor sessionFactory,
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
-		this.mappingContext = new HibernateOrmMappingContextImpl( sessionFactoryImplementor );
+		this.mappingContext = new HibernateOrmMappingContextImpl( sessionFactory );
 		this.synchronizationStrategy = synchronizationStrategy;
 		this.cacheLookupStrategy = cacheLookupStrategy;
 	}
