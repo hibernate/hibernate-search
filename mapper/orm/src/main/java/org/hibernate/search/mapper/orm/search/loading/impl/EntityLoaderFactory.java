@@ -8,7 +8,8 @@ package org.hibernate.search.mapper.orm.search.loading.impl;
 
 import java.util.List;
 
-import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
 public interface EntityLoaderFactory {
 
@@ -26,9 +27,11 @@ public interface EntityLoaderFactory {
 	int hashCode();
 
 	<E> HibernateOrmComposableEntityLoader<E> create(Class<E> targetEntityType,
-			Session session, MutableEntityLoadingOptions loadingOptions);
+			SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
+			MutableEntityLoadingOptions loadingOptions);
 
 	<E> HibernateOrmComposableEntityLoader<? extends E> create(List<Class<? extends E>> targetEntityTypes,
-			Session session, MutableEntityLoadingOptions loadingOptions);
+			SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
+			MutableEntityLoadingOptions loadingOptions);
 
 }

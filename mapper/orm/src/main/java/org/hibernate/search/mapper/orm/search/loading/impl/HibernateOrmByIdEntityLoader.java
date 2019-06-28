@@ -21,8 +21,10 @@ import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
 public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
 
@@ -33,26 +35,40 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 
 	private final Session session;
 	private final Class<E> entityType;
+	private final EntityLoadingCacheLookupStrategyImplementor<E> cacheLookupStrategyImplementor;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private HibernateOrmByIdEntityLoader(
 			Class<E> entityType,
 			Session session,
+			EntityLoadingCacheLookupStrategyImplementor<E> cacheLookupStrategyImplementor,
 			MutableEntityLoadingOptions loadingOptions) {
 		this.entityType = entityType;
 		this.session = session;
+		this.cacheLookupStrategyImplementor = cacheLookupStrategyImplementor;
 		this.loadingOptions = loadingOptions;
 	}
 
 	@Override
 	public List<E> loadBlocking(List<EntityReference> references) {
-		return loadEntities( references );
+		if ( cacheLookupStrategyImplementor == null ) {
+			// Optimization: if we don't need to look up the cache, we don't need a map to store intermediary results.
+			return loadEntities( references );
+		}
+		else {
+			return HibernateOrmComposableEntityLoader.super.loadBlocking( references );
+		}
 	}
 
 	@Override
 	public void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> entitiesByReference) {
-		List<? extends E> loadedEntities = loadEntities( references );
-		Iterator<EntityReference> referencesIterator = references.iterator();
+		List<EntityReference> missingFromCacheReferences = loadBlockingFromCache( references, entitiesByReference );
+		if ( missingFromCacheReferences.isEmpty() ) {
+			return;
+		}
+
+		List<? extends E> loadedEntities = loadEntities( missingFromCacheReferences );
+		Iterator<EntityReference> referencesIterator = missingFromCacheReferences.iterator();
 		Iterator<? extends E> loadedEntityIterator = loadedEntities.iterator();
 		while ( referencesIterator.hasNext() ) {
 			EntityReference reference = referencesIterator.next();
@@ -61,6 +77,33 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 				entitiesByReference.put( reference, loadedEntity );
 			}
 		}
+	}
+
+	/**
+	 * @param references The references to entities to load from the cache.
+	 * @param entitiesByReference The map where loaded entities should be put.
+	 * @return The references that could not be loaded from the cache.
+	 */
+	private List<EntityReference> loadBlockingFromCache(List<EntityReference> references,
+			Map<? super EntityReference,? super E> entitiesByReference) {
+		if ( cacheLookupStrategyImplementor == null ) {
+			return references;
+		}
+
+		List<EntityReference> missingFromCacheReferences = new ArrayList<>( references.size() );
+
+		for ( EntityReference reference : references ) {
+			Object entityId = reference.getId();
+			E loadedEntity = cacheLookupStrategyImplementor.lookup( entityId );
+			if ( loadedEntity != null ) {
+				entitiesByReference.put( reference, loadedEntity );
+			}
+			else {
+				missingFromCacheReferences.add( reference );
+			}
+		}
+
+		return missingFromCacheReferences;
 	}
 
 	private List<E> loadEntities(List<EntityReference> references) {
@@ -116,8 +159,9 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 		}
 
 		@Override
-		public <E> HibernateOrmComposableEntityLoader<E> create(Class<E> targetEntityType, Session session,
-				MutableEntityLoadingOptions loadingOptions) {
+		public <E> HibernateOrmComposableEntityLoader<E> create(Class<E> targetEntityType,
+				SessionImplementor session,
+				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 			if ( !rootEntityType.isAssignableFrom( targetEntityType ) ) {
 				throw new AssertionFailure(
 						"The targeted entity type is not a subclass of the expected root entity type."
@@ -127,11 +171,12 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 				);
 			}
 
-			return doCreate( targetEntityType, session, loadingOptions );
+			return doCreate( targetEntityType, session, cacheLookupStrategy,loadingOptions );
 		}
 
 		@Override
-		public <E> HibernateOrmComposableEntityLoader<E> create(List<Class<? extends E>> targetEntityTypes, Session session,
+		public <E> HibernateOrmComposableEntityLoader<? extends E> create(List<Class<? extends E>> targetEntityTypes,
+				SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 				MutableEntityLoadingOptions loadingOptions) {
 			Class<?> commonSuperClass = toMostSpecificCommonEntitySuperClass( session.getSessionFactory(), targetEntityTypes );
 			if ( !rootEntityType.isAssignableFrom( commonSuperClass ) ) {
@@ -164,15 +209,46 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 			 */
 			@SuppressWarnings("unchecked")
 			HibernateOrmComposableEntityLoader<E> result = (HibernateOrmComposableEntityLoader<E>) doCreate(
-					commonSuperClass, session, loadingOptions
+					commonSuperClass, session, cacheLookupStrategy, loadingOptions
 			);
 
 			return result;
 		}
 
-		private <E> HibernateOrmComposableEntityLoader<E> doCreate(Class<E> targetEntityType, Session session, MutableEntityLoadingOptions loadingOptions) {
+		private <E> HibernateOrmComposableEntityLoader<E> doCreate(Class<E> targetEntityType,
+				SessionImplementor session,
+				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
+			EntityLoadingCacheLookupStrategyImplementor<E> cacheLookupStrategyImplementor;
+
+			/*
+			 * Ideally, in order to comply with the cache lookup strategy,
+			 * we would use multiAccess setters such as
+			 * with(CacheMode) and enableSessionCheck(boolean),
+			 * and let Hibernate ORM do it for us.
+			 *
+			 * However, with(CacheMode) has a side-effect: it can also affect how entities are put into the cache.
+			 * Since the cache lookup strategy has nothing to do with that,
+			 * we go the safer route and wrap the loader with other loaders that
+			 * will perform PC and 2LC checking prior to using the multiAccess.
+			 */
+			switch ( cacheLookupStrategy ) {
+				case SKIP:
+					cacheLookupStrategyImplementor = null;
+					break;
+				case PERSISTENCE_CONTEXT:
+					cacheLookupStrategyImplementor =
+							PersistenceContextLookupStrategy.create( targetEntityType, session );
+					break;
+				case PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE:
+					cacheLookupStrategyImplementor =
+							PersistenceContextThenSecondLevelCacheLookupStrategy.create( targetEntityType, session );
+					break;
+				default:
+					throw new AssertionFailure( "Unexpected cache lookup strategy: " + cacheLookupStrategy );
+			}
+
 			return new HibernateOrmByIdEntityLoader<>(
-					targetEntityType, session, loadingOptions
+					targetEntityType, session, cacheLookupStrategyImplementor, loadingOptions
 			);
 		}
 

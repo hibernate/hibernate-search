@@ -76,8 +76,6 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 	@Override
 	public EntityLoaderFactory getLoaderFactory() {
-		// TODO HSEARCH-3349 Add support for customizable database retrieval and object lookup?
-		//  See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.EntityLoaderBuilder#getObjectInitializer
 		return loaderFactory;
 	}
 

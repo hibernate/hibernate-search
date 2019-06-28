@@ -37,7 +37,7 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 	@Override
 	public HibernateOrmSearchQueryHitTypeStep<E> search() {
 		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
-				sessionContext, delegate.getIncludedIndexedTypes()
+				mappingContext, sessionContext, delegate.getIncludedIndexedTypes()
 		);
 		return new HibernateOrmSearchQueryHitTypeStepImpl<>(
 				delegate.search( loadingContextBuilder ),

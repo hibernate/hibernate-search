@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
@@ -36,15 +37,18 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	private final HibernateOrmMappingContextImpl mappingContext;
 	private final HibernateOrmTypeContextContainer typeContextContainer;
 	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 
 	HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactoryImplementor,
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+			AutomaticIndexingSynchronizationStrategy synchronizationStrategy,
+			EntityLoadingCacheLookupStrategy cacheLookupStrategy) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
 		this.mappingContext = new HibernateOrmMappingContextImpl( sessionFactoryImplementor );
 		this.synchronizationStrategy = synchronizationStrategy;
+		this.cacheLookupStrategy = cacheLookupStrategy;
 	}
 
 	@Override
@@ -56,6 +60,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public PojoSessionWorkExecutor createSessionWorkExecutor(SessionImplementor sessionImplementor,
 			DocumentCommitStrategy commitStrategy) {
 		return getSearchSession( sessionImplementor ).createSessionWorkExecutor( commitStrategy );
+	}
+
+	@Override
+	public EntityLoadingCacheLookupStrategy getCacheLookupStrategy() {
+		return cacheLookupStrategy;
 	}
 
 	/**

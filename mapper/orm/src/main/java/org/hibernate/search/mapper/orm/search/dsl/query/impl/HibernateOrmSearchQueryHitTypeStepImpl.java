@@ -33,6 +33,7 @@ public class HibernateOrmSearchQueryHitTypeStepImpl<E>
 
 	@Override
 	public HibernateOrmSearchQueryHitTypeStep<E> cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		loadingContextBuilder.cacheLookupStrategy( strategy );
+		return this;
 	}
 }
