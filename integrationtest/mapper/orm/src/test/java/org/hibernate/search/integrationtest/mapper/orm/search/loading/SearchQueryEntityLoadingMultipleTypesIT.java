@@ -34,6 +34,16 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.mult
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy6_A_B_Cacheable;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy6_A_C_Cacheable;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy6_A__Abstract;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy7_A_B;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy7_A_C;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy7_A_D;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy7_A__Abstract;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy8_A_B_Cacheable;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy8_A_C_Cacheable;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy8_A_D_Cacheable;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy8_A__Abstract;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Interface1;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Interface2;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSoftAssertions;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -72,6 +82,14 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		backendMock.expectAnySchema( Hierarchy6_A_B_Cacheable.NAME );
 		backendMock.expectAnySchema( Hierarchy6_A_C_Cacheable.NAME );
 
+		backendMock.expectAnySchema( Hierarchy7_A_B.NAME );
+		backendMock.expectAnySchema( Hierarchy7_A_C.NAME );
+		backendMock.expectAnySchema( Hierarchy7_A_D.NAME );
+
+		backendMock.expectAnySchema( Hierarchy8_A_B_Cacheable.NAME );
+		backendMock.expectAnySchema( Hierarchy8_A_C_Cacheable.NAME );
+		backendMock.expectAnySchema( Hierarchy8_A_D_Cacheable.NAME );
+
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
 				.setup(
@@ -94,7 +112,15 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						Hierarchy5_A_B_D.class,
 						Hierarchy6_A__Abstract.class,
 						Hierarchy6_A_B_Cacheable.class,
-						Hierarchy6_A_C_Cacheable.class
+						Hierarchy6_A_C_Cacheable.class,
+						Hierarchy7_A__Abstract.class,
+						Hierarchy7_A_B.class,
+						Hierarchy7_A_C.class,
+						Hierarchy7_A_D.class,
+						Hierarchy8_A__Abstract.class,
+						Hierarchy8_A_B_Cacheable.class,
+						Hierarchy8_A_C_Cacheable.class,
+						Hierarchy8_A_D_Cacheable.class
 				);
 
 		backendMock.verifyExpectationsMet();
@@ -318,6 +344,82 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		);
 	}
 
+	/**
+	 * Test loading of entities that are found in the database, but with a type that doesn't match the expected type.
+	 *
+	 * This can happen when the index is slightly out of sync and still has deleted entities in it.
+	 * For example, with entity types A, B, C, D, with B, C and D extending A,
+	 * an instance of type C and with id 4 may be deleted and replaced with an instance of type D and id 4.
+	 * If the search query returns a reference to "C with id 4",
+	 * it is possible that the loader will end up loading "D with id 4".
+	 * This is problematic because the user may have requested a search on an interface implemented by B and C,
+	 * but not D,
+	 * in which case the hits will contain one object of type D that does not implement the expected interface.
+	 *
+	 * That is why the incompatible type should be detected
+	 * and the entity should be deemed deleted,
+	 * so the loader should return null,
+	 * and the backend should skip the corresponding hits.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3349")
+	public void typeChanged() {
+		testLoading(
+				Arrays.asList( Interface1.class ), // Implemented by B and C, but not D
+				Arrays.asList(
+						Hierarchy7_A_B.NAME,
+						Hierarchy7_A_C.NAME
+				),
+				c -> c
+						/*
+						 * The index contains "B with ID 2" (correct)
+						 * and "C with ID 4" (incorrect, in the database we have "D with ID 4").
+						 * Since loading focuses on the common supertype A, which is also a supertype of D,
+						 * the loader will manage to load both two entities,
+						 * but one of them will have the wrong type (D instead of the expected C).
+						 * This should be detected and the entity with the wrong type should be replaced with null
+						 * to avoid class cast exceptions in the user code.
+						 */
+						.doc( Hierarchy7_A_B.NAME, "2" )
+						.doc( Hierarchy7_A_C.NAME, "4" ),
+				c -> c
+						.entity( Hierarchy7_A_B.class, 2 ),
+				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
+		);
+	}
+
+	/**
+	 * Same as {@link #typeChanged()},
+	 * but with the entity that changed its type retrieved from the second level cache instead of from a query.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3349")
+	public void typeChanged_secondLevelCacheLookup() {
+		testLoading(
+				session -> { }, // No particular session setup needed
+				Arrays.asList( Interface2.class ), // Implemented by B and C, but not D
+				Arrays.asList(
+						Hierarchy8_A_B_Cacheable.NAME,
+						Hierarchy8_A_C_Cacheable.NAME
+				),
+				loadingOptions -> loadingOptions.cacheLookupStrategy(
+						EntityLoadingCacheLookupStrategy.PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE
+				),
+				c -> c
+						// See typeChanged for a detailed explanation.
+						.doc( Hierarchy8_A_B_Cacheable.NAME, "2" )
+						.doc( Hierarchy8_A_B_Cacheable.NAME, "4" ),
+				c -> c
+						.entity( Hierarchy8_A_B_Cacheable.class, 2 ),
+				c -> {
+					c.assertSecondLevelCacheHitCount()
+							.isEqualTo( 2 );
+					c.assertStatementExecutionCount()
+							.isEqualTo( 0 );
+				}
+		);
+	}
+
 	@Override
 	protected SessionFactory sessionFactory() {
 		return sessionFactory;
@@ -363,6 +465,14 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 
 					session.persist( new Hierarchy6_A_B_Cacheable( 2 ) );
 					session.persist( new Hierarchy6_A_C_Cacheable( 3 ) );
+
+					session.persist( new Hierarchy7_A_B( 2 ) );
+					session.persist( new Hierarchy7_A_C( 3 ) );
+					session.persist( new Hierarchy7_A_D( 4 ) );
+
+					session.persist( new Hierarchy8_A_B_Cacheable( 2 ) );
+					session.persist( new Hierarchy8_A_C_Cacheable( 3 ) );
+					session.persist( new Hierarchy8_A_D_Cacheable( 4 ) );
 				} )
 		);
 	}

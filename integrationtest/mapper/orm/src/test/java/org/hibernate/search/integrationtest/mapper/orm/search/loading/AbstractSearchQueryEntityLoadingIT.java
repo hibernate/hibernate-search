@@ -101,6 +101,10 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 							"Loaded, then unproxified entities when targeting types " + targetClasses
 									+ " and when the backend returns document references " + hitDocumentReferences
 					)
+					.allSatisfy(
+							element -> assertThat( element )
+									.isInstanceOfAny( targetClasses.toArray( new Class<?>[0] ) )
+					)
 					.containsExactlyElementsOf( unproxyfiedExpectedLoadedEntities );
 		} );
 	}
