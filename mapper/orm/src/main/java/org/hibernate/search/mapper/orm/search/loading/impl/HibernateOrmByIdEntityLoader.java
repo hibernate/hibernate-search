@@ -95,11 +95,16 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 		for ( EntityReference reference : references ) {
 			Object entityId = reference.getId();
 			E loadedEntity = cacheLookupStrategyImplementor.lookup( entityId );
-			if ( loadedEntity != null ) {
+			if ( loadedEntity == null ) {
+				missingFromCacheReferences.add( reference );
+			}
+			else if ( hasExpectedType( reference, loadedEntity ) ) {
 				entitiesByReference.put( reference, loadedEntity );
 			}
 			else {
-				missingFromCacheReferences.add( reference );
+				// The index is out of sync and the referenced entity does not exist anymore.
+				// Assume the entity we were attempting to load was deleted, and mark it as such.
+				entitiesByReference.put( reference, null );
 			}
 		}
 
@@ -112,7 +117,19 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 			ids.add( (Serializable) reference.getId() );
 		}
 
-		return getMultiAccess().multiLoad( ids );
+		List<E> loadedEntities = getMultiAccess().multiLoad( ids );
+
+		for ( int i = 0; i < references.size(); i++ ) {
+			EntityReference reference = references.get( i );
+			E loadedEntity = loadedEntities.get( i );
+			if ( !hasExpectedType( reference, loadedEntity ) ) {
+				// The index is out of sync and the referenced entity does not exist anymore.
+				// Assume the entity we were attempting to load was deleted and mark it as such.
+				loadedEntities.set( i, null );
+			}
+		}
+
+		return loadedEntities;
 	}
 
 	private MultiIdentifierLoadAccess<E> getMultiAccess() {
@@ -121,6 +138,34 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 		multiAccess.withBatchSize( loadingOptions.getFetchSize() );
 
 		return multiAccess;
+	}
+
+	/*
+	 * Under some circumstances, the multi-access or the cache lookups may return entities that extend E,
+	 * but not the type expected by users.
+	 *
+	 * For example, let's consider entity types A, B, C, D, with B, C, and D extending A
+	 * Let's imagine an instance of type B and with id 4 is deleted from the database
+	 * and replaced with an instance of type D and id 4.
+	 * If a search on entity types B and C is performed before the index is refreshed,
+	 * we might be requested to load entity B with id 4,
+	 * and since we're working with the common supertype A,
+	 * loading will succeed but will yield an entity of type D with id 4.
+	 *
+	 * Now, the entity will still be an instance of A, but... the user doesn't care about A:
+	 * the user asked for a search on entities B and C.
+	 * Returning D might be a problem, especially if the user intends to call methods defined on an interface I,
+	 * implemented by B and C, but not D.
+	 * This will be a problem since that entity does not implement I.
+	 *
+	 * The easiest way to avoid this problem is to just check the type of every loaded entity,
+	 * to be sure it's the same type that was originally requested.
+	 * Then we will be safe, because callers are expected to only pass entity references
+	 * to types that were originally targeted by the search,
+	 * and these types are known to implement any interface that the user could possibly rely on.
+	 */
+	private static boolean hasExpectedType(EntityReference reference, Object loadedEntity) {
+		return reference.getType().isInstance( loadedEntity );
 	}
 
 	private static Class<?> toRootEntityClass(SessionFactoryImplementor sessionFactory, Class<?> entityClass) {
@@ -176,7 +221,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 		}
 
 		@Override
-		public <E> HibernateOrmComposableEntityLoader<? extends E> create(List<Class<? extends E>> targetEntityTypes,
+		public <E2> HibernateOrmComposableEntityLoader<? extends E2> create(List<Class<? extends E2>> targetEntityTypes,
 				SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 				MutableEntityLoadingOptions loadingOptions) {
 			Class<?> commonSuperClass = toMostSpecificCommonEntitySuperClass( session.getSessionFactory(), targetEntityTypes );
@@ -192,24 +237,14 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 			/*
 			 * Theoretically, this cast is unsafe,
 			 * since the loader could return entities of any type extending "commonSuperClass",
-			 * which is either E or a common supertype of some child types of E.
+			 * which is either E2 or a common supertype of some child types of E2.
 			 *
-			 * However, as long as both conditions below are met, the cast is safe:
+			 * However, we perform some runtime checks that make this cast safe.
 			 *
-			 * 1. The caller only passes entity references whose referenced type is among "entityTypes".
-			 * 2. The entities loaded by Hibernate have the same type as, or a child type of,
-			 * the type mentioned in the entity reference.
-			 *
-			 * #1 is part of the contract of the entity loaders in general and should always be true.
-			 * #2 will generally be true, though in some conditions it may not.
-			 * For example, with entity types A, B, C, with B and C extending A,
-			 * an instance of type B and with id 1 may be deleted and replaced with an instance of type C and id 1.
-			 * In this case, attempting to load an entity of type B with id 1 with this loader
-			 * will return an entity of type C with id 1.
-			 * FIXME HSEARCH-3349: find a way to test and address this issue.
+			 * See hasExpectedType() and its callers for more information.
 			 */
 			@SuppressWarnings("unchecked")
-			HibernateOrmComposableEntityLoader<E> result = (HibernateOrmComposableEntityLoader<E>) doCreate(
+			HibernateOrmComposableEntityLoader<E2> result = (HibernateOrmComposableEntityLoader<E2>) doCreate(
 					commonSuperClass, session, cacheLookupStrategy, loadingOptions
 			);
 
