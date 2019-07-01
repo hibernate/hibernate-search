@@ -72,7 +72,7 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 				Set<HibernateOrmScopeIndexedTypeContext<? extends E>> indexedTypeContexts) {
 			this.sessionContext = sessionContext;
 			this.entityLoaderBuilder = new EntityLoaderBuilder<>( mappingContext, sessionContext, indexedTypeContexts );
-			this.loadingOptions = new MutableEntityLoadingOptions();
+			this.loadingOptions = new MutableEntityLoadingOptions( mappingContext );
 		}
 
 		public void fetchSize(int fetchSize) {

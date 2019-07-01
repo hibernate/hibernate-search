@@ -23,6 +23,7 @@ import org.hibernate.AssertionFailure;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -87,9 +88,11 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 
 		criteriaQuery.where( documentIdSourcePropertyInRoot.in( documentIdSourceValues ) );
 
-		return session.createQuery( criteriaQuery )
-				.setFetchSize( loadingOptions.getFetchSize() )
-				.getResultList();
+		Query<? extends E> query = session.createQuery( criteriaQuery );
+
+		query.setFetchSize( loadingOptions.getFetchSize() );
+
+		return query.getResultList();
 	}
 
 	private static class Factory<E> implements EntityLoaderFactory {
