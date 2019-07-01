@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.documentation.searchdsl.query;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -15,6 +16,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 @Entity
 @Indexed
+@Cacheable
 public class Book {
 
 	@Id

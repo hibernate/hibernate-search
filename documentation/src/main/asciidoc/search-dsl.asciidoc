@@ -78,20 +78,107 @@ include::todo-placeholder.asciidoc[]
 
 include::todo-placeholder.asciidoc[]
 
-// TODO [[]]:
 // TODO [[_raise_an_exception_on_time_limit]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_raise_an_exception_on_time_limit
 // TODO [[_limit_the_number_of_results_when_the_time_limit_is_reached]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_limit_the_number_of_results_when_the_time_limit_is_reached
 
 [[search-dsl-query-entity-loading-options]]
 === Entity loading options
+
+Hibernate Search executes database queries to load entities
+that are returned as part of the hits of a search query.
+
+This section presents all available options related to entity loading in search queries.
+
+[[search-dsl-query-cache-lookup-strategy]]
+==== Cache lookup strategy
+// Search 5 anchors backward compatibility
+[[_customizing_object_initialization_strategies]]
+
+By default, Hibernate Search will load entities from the database directly,
+without looking at any cache.
+This is a good strategy when the size of caches (Hibernate ORM session or second level cache)
+is much lower than the total number of indexed entities.
+
+If a significant portion of your entities are present in the second level cache,
+you can force Hibernate Search to retrieve entities from the persistence context (the session)
+and/or the second level cache if possible.
+Hibernate Search will still need to execute a database query to retrieve entities missing from the cache,
+but the query will likely have to fetch fewer entities,
+leading to better performance and lower stress on your database.
+
+This is done through the cache lookup strategy,
+which can be configured by setting the configuration property `hibernate.search.query.loading.cache_lookup_strategy`:
+
+* `skip` (the default) will not perform any cache lookup.
+* `persistence-context` will only look into the persistence context,
+i.e. will check if the entities are already loaded in the session.
+Useful if most search hits are expected to already be loaded in session,
+which is generally unlikely.
+* `persistence-context-then-second-level-cache` will first look into the persistence context,
+then into the second level cache, if enabled in Hibernate ORM for the searched entity.
+Useful if most search hits are expected to be cached,
+which may be likely if you have a small number of entities and a large cache.
+
+[NOTE]
+====
+Before a second-level cache can be used for a given entity type,
+some configuration is required in Hibernate ORM.
+
+See link:{hibernateDocUrl}#caching[the caching section of the Hibernate ORM documentation]
+for more information.
+====
+
+It is also possible to override the configured strategy on a per-query basis, as shown below.
+
+.Overriding the cache lookup strategy in a single search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=cacheLookupStrategy-persistenceContextThenSecondLevelCache]
+----
+<1> Start building the query.
+<2> Mention that the persistence context and second level cache should be checked
+before entities are loaded from the database.
+<3> Fetch the results.
+The more entities found in the persistence context or second level cache,
+the less entities will be loaded from the database.
+====
+
+[[search-dsl-query-fetch-size]]
+==== Fetch size
+
+By default, Hibernate Search will use a fetch size of `100`,
+meaning that for a single `fetch*()` call on a single query,
+it will run a first query to load the first 100 entities,
+then if there are more hits it will run a second query to load the next 100,
+etc.
+
+The fetch size can be configured by setting the configuration property `hibernate.search.query.loading.fetch_size`.
+This property expects a strictly positive <<configuration-property-types,Integer value>>.
+
+It is also possible to override the configured fetch size on a per-query basis, as shown below.
+
+.Overriding the fetch size in a single search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=fetchSize]
+----
+<1> Start building the query.
+<2> Set the fetch size to an arbitrary value (must be `1` or more).
+<3> Fetch the results.
+One query will be executed to load the hits if there are less hits than the given fetch size;
+two queries if there are more hits than the fetch size but less than twice the fetch size,
+etc.
+====
+
+==== Entity graph
 // Search 5 anchors backward compatibility
 [[_fetching_strategy]]
-//[[_customizing_object_initialization_strategies]] // There can only be one anchor per paragraph, unfortunately...
 
 include::todo-placeholder.asciidoc[]
 
-// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_fetching_strategy
-// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_customizing_object_initialization_strategies
+// TODO HSEARCH-3628 https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_fetching_strategy
 
 [[search-dsl-query-turning-into-jpa-query]]
 === Turning the `SearchQuery` into a JPA or Hibernate ORM query
