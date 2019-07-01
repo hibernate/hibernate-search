@@ -97,6 +97,16 @@ public final class HibernateOrmMapperSettings {
 	public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = PREFIX + Radicals.QUERY_LOADING_CACHE_LOOKUP_STRATEGY;
 
 	/**
+	 * The fetch size to use when loading entities during the execution of a search query.
+	 * <p>
+	 * Expects a strictly positive Integer value, such as {@code 100},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#QUERY_LOADING_FETCH_SIZE}.
+	 */
+	public static final String QUERY_LOADING_FETCH_SIZE = PREFIX + Radicals.QUERY_LOADING_FETCH_SIZE;
+
+	/**
 	 * Whether annotations should be automatically processed for entity types,
 	 * as well as nested types in those entity types, for instance embedded types.
 	 * <p>
@@ -133,6 +143,7 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = "automatic_indexing.synchronization_strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = "automatic_indexing.enable_dirty_check";
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup_strategy";
+		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String ENABLE_ANNOTATION_MAPPING = "enable_annotation_mapping";
 		public static final String MAPPING_CONFIGURER = "mapping_configurer";
 	}
@@ -154,6 +165,7 @@ public final class HibernateOrmMapperSettings {
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;
+		public static final int QUERY_LOADING_FETCH_SIZE = 100;
 		public static final boolean ENABLE_ANNOTATION_MAPPING = true;
 	}
 

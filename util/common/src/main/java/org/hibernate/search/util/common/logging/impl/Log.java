@@ -105,4 +105,8 @@ public interface Log extends BasicLogger {
 	void cannotAccessRepeateableContainingAnnotationValue(
 			@FormatWith(ClassFormatter.class) Class<?> containingAnnotationType, @Cause Throwable e);
 
+	@Message(id = ID_OFFSET_2 + 10,
+			value = "'%1$s' must be strictly positive.")
+	IllegalArgumentException mustBeStrictlyPositive(String objectDescription);
+
 }

@@ -12,4 +12,6 @@ public interface HibernateOrmLoadingMappingContext {
 
 	EntityLoadingCacheLookupStrategy getCacheLookupStrategy();
 
+	int getFetchSize();
+
 }

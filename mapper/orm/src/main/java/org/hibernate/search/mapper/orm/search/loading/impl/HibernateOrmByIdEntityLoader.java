@@ -119,6 +119,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 		MultiIdentifierLoadAccess<E> multiAccess = session.byMultipleIds( entityType );
 
 		multiAccess.withBatchSize( loadingOptions.getFetchSize() );
+
 		return multiAccess;
 	}
 

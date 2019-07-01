@@ -49,6 +49,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 					.withDefault( HibernateOrmMapperSettings.Defaults.QUERY_LOADING_CACHE_LOOKUP_STRATEGY )
 					.build();
 
+	private static final ConfigurationProperty<Integer> QUERY_LOADING_FETCH_SIZE =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.QUERY_LOADING_FETCH_SIZE )
+					.asInteger()
+					.withDefault( HibernateOrmMapperSettings.Defaults.QUERY_LOADING_FETCH_SIZE )
+					.build();
+
 	private static final String SEARCH_SESSION_KEY =
 			HibernateOrmMapping.class.getName() + "#SEARCH_SESSION_KEY";
 
@@ -77,9 +83,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		EntityLoadingCacheLookupStrategy cacheLookupStrategy =
 				QUERY_LOADING_CACHE_LOOKUP_STRATEGY.get( propertySource );
 
+		int fetchSize = QUERY_LOADING_FETCH_SIZE.get( propertySource );
+
 		return new HibernateOrmMapping(
 				mappingDelegate, typeContextContainer, sessionFactory,
-				synchronizationStrategy, cacheLookupStrategy
+				synchronizationStrategy,
+				cacheLookupStrategy, fetchSize
 		);
 	}
 
@@ -87,17 +96,20 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	private final HibernateOrmTypeContextContainer typeContextContainer;
 	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
+	private final int fetchSize;
 
 	private HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy,
-			EntityLoadingCacheLookupStrategy cacheLookupStrategy) {
+			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
+			int fetchSize) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
 		this.mappingContext = new HibernateOrmMappingContextImpl( sessionFactory );
 		this.synchronizationStrategy = synchronizationStrategy;
 		this.cacheLookupStrategy = cacheLookupStrategy;
+		this.fetchSize = fetchSize;
 	}
 
 	@Override
@@ -114,6 +126,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public EntityLoadingCacheLookupStrategy getCacheLookupStrategy() {
 		return cacheLookupStrategy;
+	}
+
+	@Override
+	public int getFetchSize() {
+		return fetchSize;
 	}
 
 	/**
