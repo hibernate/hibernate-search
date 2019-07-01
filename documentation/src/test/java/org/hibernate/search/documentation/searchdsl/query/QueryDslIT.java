@@ -10,15 +10,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.SharedCacheMode;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.stat.Statistics;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,6 +62,7 @@ public class QueryDslIT {
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE
 				)
+				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
 				.setup( Book.class );
 		initData();
 	}
@@ -81,6 +87,51 @@ public class QueryDslIT {
 
 			assertThat( totalHitCount ).isEqualTo( 2 );
 			assertThat( hits ).extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void cacheLookupStrategy() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			Statistics statistics = entityManagerFactory.unwrap( SessionFactory.class ).getStatistics();
+			statistics.setStatisticsEnabled( true );
+			statistics.clear();
+
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::cacheLookupStrategy-persistenceContextThenSecondLevelCache[]
+			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
+					.cacheLookupStrategy(
+							EntityLoadingCacheLookupStrategy.PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE
+					) // <2>
+					.predicate( f -> f.match()
+							.onField( "title" )
+							.matching( "robot" ) )
+					.fetch(); // <3>
+			// end::cacheLookupStrategy-persistenceContextThenSecondLevelCache[]
+
+			assertThat( result.getHits() ).extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+			assertThat( statistics.getSecondLevelCacheHitCount() ).isEqualTo( 2 );
+		} );
+	}
+
+	@Test
+	public void fetchSize() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::fetchSize[]
+			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
+					.fetchSize( 50 ) // <2>
+					.predicate( f -> f.match()
+							.onField( "title" )
+							.matching( "robot" ) )
+					.fetch(); // <3>
+			// end::fetchSize[]
+
+			assertThat( result.getHits() ).extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
 	}
