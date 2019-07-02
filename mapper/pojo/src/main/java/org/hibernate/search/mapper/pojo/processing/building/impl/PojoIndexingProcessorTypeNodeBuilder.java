@@ -16,9 +16,9 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundRoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundTypeBridge;
@@ -65,13 +65,13 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	}
 
 	@Override
-	public void bridge(BridgeBuilder<? extends TypeBridge> builder) {
+	public void bridge(TypeBridgeBuilder<?> builder) {
 		mappingHelper.getIndexModelBinder().addTypeBridge( bindingContext, modelPath, builder )
 			.ifPresent( boundBridges::add );
 	}
 
 	@Override
-	public void routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder) {
+	public void routingKeyBridge(RoutingKeyBridgeBuilder<?> builder) {
 		if ( identityMappingCollector.isPresent() ) {
 			boundRoutingKeyBridge = identityMappingCollector.get().routingKeyBridge( modelPath, builder );
 		}

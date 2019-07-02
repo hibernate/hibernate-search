@@ -15,8 +15,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
@@ -29,7 +29,7 @@ public final class CustomPropertyBridge implements PropertyBridge {
 	private static final String LOCAL_DATE_FIELD_NAME = "date";
 
 	public static final class Builder
-			implements AnnotationBridgeBuilder<PropertyBridge, CustomPropertyBridgeAnnotation> {
+			implements PropertyBridgeBuilder<CustomPropertyBridgeAnnotation> {
 
 		private String objectName;
 
@@ -44,7 +44,7 @@ public final class CustomPropertyBridge implements PropertyBridge {
 		}
 
 		@Override
-		public BeanHolder<PropertyBridge> build(BridgeBuildContext buildContext) {
+		public BeanHolder<PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
 			return BeanHolder.of( new CustomPropertyBridge( objectName ) );
 		}
 	}

@@ -16,9 +16,9 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -73,13 +73,13 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	}
 
 	@Override
-	public void bridge(BridgeBuilder<? extends PropertyBridge> builder) {
+	public void bridge(PropertyBridgeBuilder builder) {
 		mappingHelper.getIndexModelBinder().addPropertyBridge( bindingContext, modelPath, builder )
 				.ifPresent( boundPropertyBridges::add );
 	}
 
 	@Override
-	public void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder) {
+	public void identifierBridge(IdentifierBridgeBuilder builder) {
 		if ( identityMappingCollector.isPresent() ) {
 			identityMappingCollector.get().identifierBridge( modelPath, builder );
 		}

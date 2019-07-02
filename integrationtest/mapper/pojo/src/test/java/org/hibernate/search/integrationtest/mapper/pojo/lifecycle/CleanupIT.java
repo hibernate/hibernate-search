@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.lifecycle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -20,8 +21,17 @@ import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubContainerExtractor;
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -522,9 +532,36 @@ public class CleanupIT {
 		}
 	}
 
-	private static class FailingBridgeBuilder implements BridgeBuilder<StartupStubBridge> {
+	private static class FailingBridgeBuilder implements TypeBridgeBuilder<Annotation>,
+			PropertyBridgeBuilder<Annotation>, RoutingKeyBridgeBuilder<Annotation>,
+			IdentifierBridgeBuilder, ValueBridgeBuilder {
 		@Override
-		public BeanHolder<StartupStubBridge> build(BridgeBuildContext buildContext) {
+		public void initialize(Annotation annotation) {
+			// Nothing to do
+		}
+
+		@Override
+		public BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext) {
+			throw new SimulatedFailure();
+		}
+
+		@Override
+		public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
+			throw new SimulatedFailure();
+		}
+
+		@Override
+		public BeanHolder<? extends RoutingKeyBridge> buildForRoutingKey(BridgeBuildContext buildContext) {
+			throw new SimulatedFailure();
+		}
+
+		@Override
+		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
+			throw new SimulatedFailure();
+		}
+
+		@Override
+		public BeanHolder<? extends ValueBridge<?, ?>> buildForValue(BridgeBuildContext buildContext) {
 			throw new SimulatedFailure();
 		}
 	}
@@ -542,7 +579,9 @@ public class CleanupIT {
 		}
 	}
 
-	private static class SucceedingBridgeBuilder implements BridgeBuilder<StartupStubBridge> {
+	private static class SucceedingBridgeBuilder implements TypeBridgeBuilder<Annotation>,
+			PropertyBridgeBuilder<Annotation>, RoutingKeyBridgeBuilder<Annotation>,
+			IdentifierBridgeBuilder, ValueBridgeBuilder {
 		private final StartupStubBridge.CounterKeys counterKeys;
 
 		private SucceedingBridgeBuilder(StartupStubBridge.CounterKeys counterKeys) {
@@ -550,7 +589,36 @@ public class CleanupIT {
 		}
 
 		@Override
-		public BeanHolder<StartupStubBridge> build(BridgeBuildContext buildContext) {
+		public void initialize(Annotation annotation) {
+			// Nothing to do
+		}
+
+		@Override
+		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
+			return build();
+		}
+
+		@Override
+		public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
+			return build();
+		}
+
+		@Override
+		public BeanHolder<? extends RoutingKeyBridge> buildForRoutingKey(BridgeBuildContext buildContext) {
+			return build();
+		}
+
+		@Override
+		public BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext) {
+			return build();
+		}
+
+		@Override
+		public BeanHolder<? extends ValueBridge<?, ?>> buildForValue(BridgeBuildContext buildContext) {
+			return build();
+		}
+
+		private BeanHolder<StartupStubBridge> build() {
 			return StartupStubBridge.create( counterKeys );
 		}
 	}

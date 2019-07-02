@@ -39,8 +39,6 @@ import java.util.UUID;
 import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultCharacterValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultDurationValueBridge;
@@ -62,7 +60,8 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDValueBrid
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneIdValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneOffsetValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.PassThroughValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
@@ -74,11 +73,11 @@ public final class BridgeResolver {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<Class<?>, BridgeBuilder<? extends IdentifierBridge<?>>> exactRawTypeIdentifierBridgeMappings = new HashMap<>();
-	private final Map<Class<?>, BridgeBuilder<? extends ValueBridge<?, ?>>> exactRawTypeValueBridgeMappings = new HashMap<>();
+	private final Map<Class<?>, IdentifierBridgeBuilder> exactRawTypeIdentifierBridgeMappings = new HashMap<>();
+	private final Map<Class<?>, ValueBridgeBuilder> exactRawTypeValueBridgeMappings = new HashMap<>();
 
-	private final List<TypePatternBridgeMapping<? extends IdentifierBridge<?>>> typePatternIdentifierBridgeMappings = new ArrayList<>();
-	private final List<TypePatternBridgeMapping<? extends ValueBridge<?, ?>>> typePatternValueBridgeMappings = new ArrayList<>();
+	private final List<TypePatternBridgeMapping<IdentifierBridgeBuilder>> typePatternIdentifierBridgeMappings = new ArrayList<>();
+	private final List<TypePatternBridgeMapping<ValueBridgeBuilder>> typePatternValueBridgeMappings = new ArrayList<>();
 
 	public BridgeResolver(TypePatternMatcherFactory typePatternMatcherFactory) {
 		// TODO HSEARCH-3096 add an extension point to override these maps, or at least to add defaults for other types
@@ -93,7 +92,7 @@ public final class BridgeResolver {
 		addIdentifierBridgeForExactRawType( BigInteger.class, ignored -> BeanHolder.of( new DefaultBigIntegerIdentifierBridge() ) );
 		addIdentifierBridgeForExactRawType( UUID.class, ignored -> BeanHolder.of( new DefaultUUIDIdentifierBridge() ) );
 
-		addValueBridgeForExactRawType( Integer.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Integer.class, ConvertUtils::convertInteger ) ) );
+		addValueBridgeForExactRawType( Integer.class, buildContext -> BeanHolder.of( new PassThroughValueBridge<>( Integer.class, ConvertUtils::convertInteger ) ) );
 		addValueBridgeForExactRawType( Long.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Long.class, ConvertUtils::convertLong ) ) );
 		addValueBridgeForExactRawType( Boolean.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Boolean.class, ConvertUtils::convertBoolean ) ) );
 		addValueBridgeForExactRawType( String.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( String.class, ParseUtils::parseString ) ) );
@@ -129,8 +128,8 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( Time.class, ignored -> BeanHolder.of( new DefaultJavaSqlTimeValueBridge() ) );
 	}
 
-	public BridgeBuilder<? extends IdentifierBridge<?>> resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {
-		BridgeBuilder<? extends IdentifierBridge<?>> result = getBridgeBuilderOrNull(
+	public IdentifierBridgeBuilder resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {
+		IdentifierBridgeBuilder result = getBridgeBuilderOrNull(
 				sourceType,
 				exactRawTypeIdentifierBridgeMappings,
 				typePatternIdentifierBridgeMappings
@@ -141,8 +140,8 @@ public final class BridgeResolver {
 		return result;
 	}
 
-	public BridgeBuilder<? extends ValueBridge<?, ?>> resolveValueBridgeForType(PojoGenericTypeModel<?> sourceType) {
-		BridgeBuilder<? extends ValueBridge<?, ?>> result = getBridgeBuilderOrNull(
+	public ValueBridgeBuilder resolveValueBridgeForType(PojoGenericTypeModel<?> sourceType) {
+		ValueBridgeBuilder result = getBridgeBuilderOrNull(
 				sourceType,
 				exactRawTypeValueBridgeMappings,
 				typePatternValueBridgeMappings
@@ -153,33 +152,32 @@ public final class BridgeResolver {
 		return result;
 	}
 
-	private <I> void addIdentifierBridgeForExactRawType(Class<I> type, BridgeBuilder<? extends IdentifierBridge<I>> builder) {
+	private <I> void addIdentifierBridgeForExactRawType(Class<I> type, IdentifierBridgeBuilder builder) {
 		exactRawTypeIdentifierBridgeMappings.put( type, builder );
 	}
 
 	private void addIdentifierBridgeForTypePattern(TypePatternMatcher typePatternMatcher,
-			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
+			IdentifierBridgeBuilder builder) {
 		typePatternIdentifierBridgeMappings.add( new TypePatternBridgeMapping<>( typePatternMatcher, builder ) );
 	}
 
-	private <V> void addValueBridgeForExactRawType(Class<V> type, BridgeBuilder<? extends ValueBridge<? super V, ?>> builder) {
+	private <V> void addValueBridgeForExactRawType(Class<V> type, ValueBridgeBuilder builder) {
 		exactRawTypeValueBridgeMappings.put( type, builder );
 	}
 
 	private void addValueBridgeForTypePattern(TypePatternMatcher typePatternMatcher,
-			BridgeBuilder<? extends ValueBridge<?, ?>> builder) {
+			ValueBridgeBuilder builder) {
 		typePatternValueBridgeMappings.add( new TypePatternBridgeMapping<>( typePatternMatcher, builder ) );
 	}
 
-	private static <B> BridgeBuilder<? extends B> getBridgeBuilderOrNull(PojoGenericTypeModel<?> sourceType,
-			Map<Class<?>, BridgeBuilder<? extends B>> exactRawTypeBridgeMappings,
-			List<TypePatternBridgeMapping<? extends B>> typePatternBridgeMappings
-	) {
+	private static <B> B getBridgeBuilderOrNull(PojoGenericTypeModel<?> sourceType,
+			Map<Class<?>, B> exactRawTypeBridgeMappings,
+			List<TypePatternBridgeMapping<B>> typePatternBridgeMappings) {
 		Class<?> rawType = sourceType.getRawType().getJavaClass();
-		BridgeBuilder<? extends B> result = exactRawTypeBridgeMappings.get( rawType );
+		B result = exactRawTypeBridgeMappings.get( rawType );
 
 		if ( result == null ) {
-			Iterator<TypePatternBridgeMapping<? extends B>> mappingIterator = typePatternBridgeMappings.iterator();
+			Iterator<TypePatternBridgeMapping<B>> mappingIterator = typePatternBridgeMappings.iterator();
 			while ( result == null && mappingIterator.hasNext() ) {
 				result = mappingIterator.next().getBuilderIfMatching( sourceType );
 			}
@@ -190,14 +188,14 @@ public final class BridgeResolver {
 
 	private static final class TypePatternBridgeMapping<B> {
 		private final TypePatternMatcher matcher;
-		private final BridgeBuilder<B> builder;
+		private final B builder;
 
-		TypePatternBridgeMapping(TypePatternMatcher matcher, BridgeBuilder<B> builder) {
+		TypePatternBridgeMapping(TypePatternMatcher matcher, B builder) {
 			this.matcher = matcher;
 			this.builder = builder;
 		}
 
-		BridgeBuilder<B> getBuilderIfMatching(PojoGenericTypeModel<?> typeModel) {
+		B getBuilderIfMatching(PojoGenericTypeModel<?> typeModel) {
 			if ( matcher.matches( typeModel ) ) {
 				return builder;
 			}

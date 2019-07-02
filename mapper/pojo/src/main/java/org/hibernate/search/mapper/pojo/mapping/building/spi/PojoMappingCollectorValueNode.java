@@ -9,12 +9,11 @@ package org.hibernate.search.mapper.pojo.mapping.building.spi;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 
 public interface PojoMappingCollectorValueNode extends PojoMappingCollector {
 
-	void valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder,
+	void valueBridge(ValueBridgeBuilder builder,
 			String relativeFieldName, FieldModelContributor fieldModelContributor);
 
 	void indexedEmbedded(String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);

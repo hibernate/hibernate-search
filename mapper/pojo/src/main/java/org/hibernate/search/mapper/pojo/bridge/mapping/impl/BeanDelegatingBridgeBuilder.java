@@ -8,25 +8,24 @@ package org.hibernate.search.mapper.pojo.bridge.mapping.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 
 /**
- * A bridge builder that upon building retrieves a {@link BridgeBuilder} from the bean provider,
+ * A bridge builder that upon building retrieves a delegate bridge builder from the bean provider,
  * then delegates to that bridge builder.
- *
- * @param <B> The type of bridges returned by this builder.
  */
-@SuppressWarnings("rawtypes") // Clients cannot provide a level of guarantee stronger than raw types
-public final class BeanDelegatingBridgeBuilder<B> implements BridgeBuilder<B> {
+public final class BeanDelegatingBridgeBuilder
+		implements IdentifierBridgeBuilder, ValueBridgeBuilder {
 
-	private final BeanReference<? extends BridgeBuilder> delegateReference;
-	private final Class<B> expectedBridgeType;
+	private final BeanReference<?> delegateReference;
 
-	public BeanDelegatingBridgeBuilder(BeanReference<? extends BridgeBuilder> delegateReference,
-			Class<B> expectedBridgeType) {
+	public BeanDelegatingBridgeBuilder(BeanReference<?> delegateReference) {
 		this.delegateReference = delegateReference;
-		this.expectedBridgeType = expectedBridgeType;
 	}
 
 	@Override
@@ -35,17 +34,24 @@ public final class BeanDelegatingBridgeBuilder<B> implements BridgeBuilder<B> {
 	}
 
 	@Override
-	public BeanHolder<? extends B> build(BridgeBuildContext buildContext) {
-		BeanHolder<?> bridgeHolder;
-		try ( BeanHolder<? extends BridgeBuilder> delegateHolder =
-				delegateReference.resolve( buildContext.getBeanResolver() ) ) {
-			bridgeHolder = delegateHolder.get().build( buildContext );
+	public BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext) {
+		try ( BeanHolder<? extends IdentifierBridgeBuilder> delegateHolder =
+				createDelegate( buildContext, IdentifierBridgeBuilder.class ) ) {
+			return delegateHolder.get().buildForIdentifier( buildContext );
 		}
+	}
 
-		expectedBridgeType.cast( bridgeHolder.get() );
-		@SuppressWarnings( "unchecked" ) // The cast above is enough, since BeanHolder must return the same instance for each call to get()
-		BeanHolder<? extends B> castedBridgeHolder = (BeanHolder<? extends B>) bridgeHolder;
-		return castedBridgeHolder;
+	@Override
+	public BeanHolder<? extends ValueBridge<?, ?>> buildForValue(BridgeBuildContext buildContext) {
+		try ( BeanHolder<? extends ValueBridgeBuilder> delegateHolder =
+				createDelegate( buildContext, ValueBridgeBuilder.class ) ) {
+			return delegateHolder.get().buildForValue( buildContext );
+		}
+	}
+
+	private <B> BeanHolder<? extends B> createDelegate(BridgeBuildContext buildContext, Class<B> expectedType) {
+		BeanResolver beanResolver = buildContext.getBeanResolver();
+		return delegateReference.asSubTypeOf( expectedType ).resolve( beanResolver );
 	}
 
 }

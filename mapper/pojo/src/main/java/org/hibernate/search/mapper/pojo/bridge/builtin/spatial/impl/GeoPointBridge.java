@@ -23,7 +23,6 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingCont
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
@@ -39,8 +38,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static class Builder implements GeoPointBridgeBuilder<GeoPointBridge>,
-			AnnotationBridgeBuilder<GeoPointBridge, org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge> {
+	public static class Builder implements GeoPointBridgeBuilder {
 
 		private String fieldName;
 		private Projectable projectable = Projectable.DEFAULT;
@@ -81,7 +79,12 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 		}
 
 		@Override
-		public BeanHolder<? extends GeoPointBridge> build(BridgeBuildContext buildContext) {
+		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
+			return BeanHolder.of( new GeoPointBridge( fieldName, projectable, sortable, markerSet ) );
+		}
+
+		@Override
+		public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
 			return BeanHolder.of( new GeoPointBridge( fieldName, projectable, sortable, markerSet ) );
 		}
 	}
@@ -95,7 +98,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	private Function<Object, GeoPoint> coordinatesExtractor;
 
 	/**
-	 * Private constructor, use {@link GeoPointBridgeBuilder#forType()} or {@link GeoPointBridgeBuilder#forProperty()} instead.
+	 * Private constructor, use {@link GeoPointBridgeBuilder#create()} instead.
 	 */
 	private GeoPointBridge(String fieldName, Projectable projectable, Sortable sortable, String markerSet) {
 		this.fieldName = fieldName;

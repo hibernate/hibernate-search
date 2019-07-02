@@ -24,9 +24,8 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -93,7 +92,7 @@ public class PropertyBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.property( "stringProperty" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+						.property( "stringProperty" ).bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							private PojoElementAccessor<String> pojoPropertyAccessor;
 							private IndexFieldReference<String> indexFieldReference;
 
@@ -178,7 +177,7 @@ public class PropertyBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.property( "contained" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+						.property( "contained" ).bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							private IndexFieldReference<String> indexFieldReference;
 
 							@Override
@@ -254,7 +253,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 									@Override
 									public void bind(PropertyBridgeBindingContext context) {
 										context.getDependencies().use( "doesNotExist.stringProperty" );
@@ -308,7 +307,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 									@Override
 									public void bind(PropertyBridgeBindingContext context) {
 										context.getDependencies()
@@ -360,7 +359,7 @@ public class PropertyBridgeBaseIT {
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 						.property( "child" )
-						.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+						.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							private IndexFieldReference<String> indexFieldReference;
 
 							@Override
@@ -482,7 +481,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 									@Override
 									public void bind(PropertyBridgeBindingContext context) {
 										context.getDependencies()
@@ -526,7 +525,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 									@Override
 									public void bind(PropertyBridgeBindingContext context) {
 										context.getDependencies()
@@ -568,7 +567,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 									@Override
 									public void bind(PropertyBridgeBindingContext context) {
 										context.getDependencies()
@@ -614,7 +613,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "notEntity" )
-								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 									@Override
 									public void bind(PropertyBridgeBindingContext context) {
 										context.getDependencies()
@@ -659,7 +658,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 									@Override
 									public void bind(PropertyBridgeBindingContext context) {
 										context.getDependencies()
@@ -704,7 +703,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 									@Override
 									public void bind(PropertyBridgeBindingContext context) {
 										context.getDependencies()
@@ -767,7 +766,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 									@Override
 									public void bind(PropertyBridgeBindingContext context) {
 										// Do not declare any dependency
@@ -822,7 +821,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 									@Override
 									public void bind(PropertyBridgeBindingContext context) {
 										// Declare no dependency, but also a dependency: this is inconsistent.
@@ -877,7 +876,7 @@ public class PropertyBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.property( "stringProperty" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+						.property( "stringProperty" ).bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							private IndexFieldReference<String> indexFieldReference;
 
 							@Override
@@ -960,7 +959,7 @@ public class PropertyBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
-						.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
+						.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							@Override
 							public void bind(PropertyBridgeBindingContext context) {
 								context.getDependencies().useRootOnly();
@@ -1062,7 +1061,7 @@ public class PropertyBridgeBaseIT {
 	}
 
 	public static class BridgeBuilderWithDifferentAnnotationType
-			implements AnnotationBridgeBuilder<PropertyBridge, DifferentAnnotationType> {
+			implements PropertyBridgeBuilder<DifferentAnnotationType> {
 		private static String TOSTRING = "<BridgeBuilderWithDifferentAnnotationType toString() result>";
 		@Override
 		public void initialize(DifferentAnnotationType annotation) {
@@ -1070,7 +1069,7 @@ public class PropertyBridgeBaseIT {
 		}
 
 		@Override
-		public BeanHolder<? extends PropertyBridge> build(BridgeBuildContext buildContext) {
+		public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
 			throw new UnsupportedOperationException( "This should not be called" );
 		}
 		@Override

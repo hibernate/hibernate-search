@@ -9,7 +9,8 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 /**
@@ -66,7 +67,7 @@ public interface TypeMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see RoutingKeyBridge
 	 */
-	TypeMappingStep routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder);
+	TypeMappingStep routingKeyBridge(RoutingKeyBridgeBuilder<?> builder);
 
 	/**
 	 * @param bridgeClass The class of the bridge to use.
@@ -89,7 +90,7 @@ public interface TypeMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see TypeBridge
 	 */
-	TypeMappingStep bridge(BridgeBuilder<? extends TypeBridge> builder);
+	TypeMappingStep bridge(TypeBridgeBuilder<?> builder);
 
 	/**
 	 * Starts the definition of the mapping of a specific property.

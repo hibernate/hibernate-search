@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
 /**
@@ -48,7 +48,7 @@ public @interface IdentifierBridgeRef {
 	 * Reference an identifier bridge by the type of its builder.
 	 * @return The type of the  identifier bridge builder.
 	 */
-	Class<? extends BridgeBuilder<? extends IdentifierBridge<?>>> builderType() default UndefinedBuilderImplementationType.class;
+	Class<? extends IdentifierBridgeBuilder> builderType() default UndefinedBuilderImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
@@ -61,7 +61,7 @@ public @interface IdentifierBridgeRef {
 	/**
 	 * Class used as a marker for the default value of the {@link #builderType()} attribute.
 	 */
-	abstract class UndefinedBuilderImplementationType implements BridgeBuilder<IdentifierBridge<Object>> {
+	abstract class UndefinedBuilderImplementationType implements IdentifierBridgeBuilder {
 		private UndefinedBuilderImplementationType() {
 		}
 	}

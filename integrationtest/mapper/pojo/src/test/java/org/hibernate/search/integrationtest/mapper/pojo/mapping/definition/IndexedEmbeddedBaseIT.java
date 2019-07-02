@@ -23,8 +23,10 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -577,8 +579,6 @@ public class IndexedEmbeddedBaseIT {
 		}
 
 		StartupStubBridge.CounterKeys filteredOutBridgeCounterKeys = StartupStubBridge.createKeys();
-		BridgeBuilder<StartupStubBridge> filteredOutBridgeBuilder =
-				c -> StartupStubBridge.create( filteredOutBridgeCounterKeys );
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.objectField( "level1", b2 -> b2
@@ -596,15 +596,21 @@ public class IndexedEmbeddedBaseIT {
 									.indexedEmbedded()
 											.includePaths( "level1IncludedField" );
 					b.programmaticMapping().type( IndexedEmbeddedLevel1.class )
-							.bridge( filteredOutBridgeBuilder )
+							.bridge( (TypeBridgeBuilder<?>)
+									c -> StartupStubBridge.create( filteredOutBridgeCounterKeys )
+							)
 							.bridge( new GeoPointBridge.Builder().fieldName( "location" ) )
 							.property( "latitude" ).marker( new LatitudeMarker.Builder() )
 							.property( "longitude" ).marker( new LongitudeMarker.Builder() )
 							.property( "level1Property" )
-									.bridge( filteredOutBridgeBuilder )
+									.bridge( (PropertyBridgeBuilder<?>)
+											c -> StartupStubBridge.create( filteredOutBridgeCounterKeys )
+									)
 									.genericField( "level1IncludedField" )
 									.genericField( "filteredOut" )
-											.valueBridge( filteredOutBridgeBuilder );
+											.valueBridge( (ValueBridgeBuilder)
+													c -> StartupStubBridge.create( filteredOutBridgeCounterKeys )
+											);
 				} )
 				.setup();
 		backendMock.verifyExpectationsMet();

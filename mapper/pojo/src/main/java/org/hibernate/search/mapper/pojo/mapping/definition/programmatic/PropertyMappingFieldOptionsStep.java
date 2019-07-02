@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
@@ -58,7 +58,7 @@ public interface PropertyMappingFieldOptionsStep<S extends PropertyMappingFieldO
 	 * @return {@code this}, for method chaining.
 	 * @see GenericField#valueBridge()
 	 */
-	S valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder);
+	S valueBridge(ValueBridgeBuilder builder);
 
 	/**
 	 * @param extractorName The name of the container extractor to use.

@@ -9,18 +9,21 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
@@ -53,20 +56,20 @@ public interface PojoIndexModelBinder {
 
 	<I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(
 			IndexedEntityBindingContext bindingContext,
-			BoundPojoModelPathPropertyNode<?, I> modelPath, BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);
+			BoundPojoModelPathPropertyNode<?, I> modelPath, IdentifierBridgeBuilder bridgeBuilder);
 
 	<T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexedEntityBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends RoutingKeyBridge> bridgeBuilder);
+			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBridgeBuilder<?> bridgeBuilder);
 
 	<T> Optional<BoundTypeBridge<T>> addTypeBridge(IndexBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends TypeBridge> bridgeBuilder);
+			BoundPojoModelPathTypeNode<T> modelPath, TypeBridgeBuilder<?> bridgeBuilder);
 
 	<P> Optional<BoundPropertyBridge<P>> addPropertyBridge(IndexBindingContext bindingContext,
-			BoundPojoModelPathPropertyNode<?, P> modelPath, BridgeBuilder<? extends PropertyBridge> bridgeBuilder);
+			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBridgeBuilder<?> bridgeBuilder);
 
 	<V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
-			BridgeBuilder<? extends ValueBridge<?, ?>> bridgeBuilder,
+			ValueBridgeBuilder bridgeBuilder,
 			String relativeFieldName, FieldModelContributor contributor);
 
 }

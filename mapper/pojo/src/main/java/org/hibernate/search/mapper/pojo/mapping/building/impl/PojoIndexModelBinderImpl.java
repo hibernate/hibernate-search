@@ -15,9 +15,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOp
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
@@ -33,12 +32,17 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.TypeBridgeBindingCon
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBridgeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.AbstractPojoBridgedElementDependencyContext;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyIndexingDependencyConfigurationContextImpl;
@@ -52,12 +56,12 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
-import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
+import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 
 
 public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
@@ -97,14 +101,14 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	public <I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(
 			IndexedEntityBindingContext bindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath,
-			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
+			IdentifierBridgeBuilder builder) {
 		PojoGenericTypeModel<I> typeModel = modelPath.valueWithoutExtractors().getTypeModel();
-		BridgeBuilder<? extends IdentifierBridge<?>> defaultedBuilder = builder;
+		IdentifierBridgeBuilder defaultedBuilder = builder;
 		if ( builder == null ) {
 			defaultedBuilder = bridgeResolver.resolveIdentifierBridgeForType( typeModel );
 		}
 
-		BeanHolder<? extends IdentifierBridge<?>> bridgeHolder = defaultedBuilder.build( bridgeBuildContext );
+		BeanHolder<? extends IdentifierBridge<?>> bridgeHolder = defaultedBuilder.buildForIdentifier( bridgeBuildContext );
 		try {
 			// This cast is safe, see the similar cast in addValueBridge for a detailed explanation
 			@SuppressWarnings({"unchecked", "rawtypes"})
@@ -124,8 +128,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexedEntityBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends RoutingKeyBridge> builder) {
-		BeanHolder<? extends RoutingKeyBridge> bridgeHolder = builder.build( bridgeBuildContext );
+			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBridgeBuilder<?> builder) {
+		BeanHolder<? extends RoutingKeyBridge> bridgeHolder = builder.buildForRoutingKey( bridgeBuildContext );
 		try {
 			PojoModelTypeRootElement<T> pojoModelRootElement =
 					new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
@@ -157,8 +161,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <T> Optional<BoundTypeBridge<T>> addTypeBridge(IndexBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends TypeBridge> builder) {
-		BeanHolder<? extends TypeBridge> bridgeHolder = builder.build( bridgeBuildContext );
+			BoundPojoModelPathTypeNode<T> modelPath, TypeBridgeBuilder<?> builder) {
+		BeanHolder<? extends TypeBridge> bridgeHolder = builder.buildForType( bridgeBuildContext );
 		try {
 			PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
 
@@ -202,8 +206,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <P> Optional<BoundPropertyBridge<P>> addPropertyBridge(IndexBindingContext bindingContext,
-			BoundPojoModelPathPropertyNode<?, P> modelPath, BridgeBuilder<? extends PropertyBridge> builder) {
-		BeanHolder<? extends PropertyBridge> bridgeHolder = builder.build( bridgeBuildContext );
+			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBridgeBuilder<?> builder) {
+		BeanHolder<? extends PropertyBridge> bridgeHolder = builder.buildForProperty( bridgeBuildContext );
 		try {
 			PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
 
@@ -250,19 +254,19 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	@Override
 	public <V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
-			BridgeBuilder<? extends ValueBridge<?, ?>> builder,
+			ValueBridgeBuilder builder,
 			String relativeFieldName, FieldModelContributor contributor) {
 		Integer decimalScale = typeAdditionalMetadataProvider.get( modelPath ).getDecimalScale();
 		IndexFieldTypeDefaultsProvider defaultsProvider = new IndexFieldTypeDefaultsProvider( decimalScale );
 
 		PojoGenericTypeModel<V> valueTypeModel = modelPath.getTypeModel();
 
-		BridgeBuilder<? extends ValueBridge<?, ?>> defaultedBuilder = builder;
+		ValueBridgeBuilder defaultedBuilder = builder;
 		if ( builder == null ) {
 			defaultedBuilder = bridgeResolver.resolveValueBridgeForType( valueTypeModel );
 		}
 
-		BeanHolder<? extends ValueBridge<?, ?>> bridgeHolder = defaultedBuilder.build( bridgeBuildContext );
+		BeanHolder<? extends ValueBridge<?, ?>> bridgeHolder = defaultedBuilder.buildForValue( bridgeBuildContext );
 		try {
 
 			PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();

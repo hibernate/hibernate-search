@@ -23,9 +23,8 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -87,7 +86,7 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+						.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 							private PojoElementAccessor<String> pojoPropertyAccessor;
 							private IndexFieldReference<String> indexFieldReference;
 
@@ -167,7 +166,7 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+						.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 							private IndexFieldReference<String> indexFieldReference;
 
 							@Override
@@ -234,7 +233,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
 									public void bind(TypeBridgeBindingContext context) {
 										context.getDependencies().use( "doesNotExist" );
@@ -296,7 +295,7 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+						.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 							private IndexFieldReference<String> indexFieldReference;
 
 							@Override
@@ -381,7 +380,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
 									public void bind(TypeBridgeBindingContext context) {
 										context.getDependencies()
@@ -437,7 +436,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
 									public void bind(TypeBridgeBindingContext context) {
 										context.getDependencies()
@@ -493,7 +492,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( NotEntity.class )
-								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
 									public void bind(TypeBridgeBindingContext context) {
 										context.getDependencies()
@@ -544,7 +543,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
 									public void bind(TypeBridgeBindingContext context) {
 										context.getDependencies()
@@ -607,7 +606,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
 									public void bind(TypeBridgeBindingContext context) {
 										context.getDependencies()
@@ -657,7 +656,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
 									public void bind(TypeBridgeBindingContext context) {
 										// Do not declare any dependency
@@ -704,7 +703,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
 									public void bind(TypeBridgeBindingContext context) {
 										// Declare no dependency, but also a dependency: this is inconsistent.
@@ -759,7 +758,7 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( CustomEnum.class )
-						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+						.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 							private IndexFieldReference<String> indexFieldReference;
 
 							@Override
@@ -864,7 +863,7 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( Contained.class )
-						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
+						.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
 							@Override
 							public void bind(TypeBridgeBindingContext context) {
 								context.getDependencies().useRootOnly();
@@ -963,7 +962,7 @@ public class TypeBridgeBaseIT {
 	}
 
 	public static class BridgeBuilderWithDifferentAnnotationType
-			implements AnnotationBridgeBuilder<TypeBridge, DifferentAnnotationType> {
+			implements TypeBridgeBuilder<DifferentAnnotationType> {
 		private static String TOSTRING = "<BridgeBuilderWithDifferentAnnotationType toString() result>";
 		@Override
 		public void initialize(DifferentAnnotationType annotation) {
@@ -971,7 +970,7 @@ public class TypeBridgeBaseIT {
 		}
 
 		@Override
-		public BeanHolder<? extends TypeBridge> build(BridgeBuildContext buildContext) {
+		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
 			throw new UnsupportedOperationException( "This should not be called" );
 		}
 		@Override
