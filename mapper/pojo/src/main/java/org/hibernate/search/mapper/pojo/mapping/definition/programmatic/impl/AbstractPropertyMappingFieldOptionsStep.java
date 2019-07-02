@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
@@ -32,7 +32,7 @@ abstract class AbstractPropertyMappingFieldOptionsStep<
 
 	private final String relativeFieldName;
 
-	private BridgeBuilder<? extends ValueBridge<?, ?>> bridgeBuilder;
+	private ValueBridgeBuilder bridgeBuilder;
 
 	final PojoCompositeFieldModelContributor<C> fieldModelContributor;
 
@@ -77,11 +77,11 @@ abstract class AbstractPropertyMappingFieldOptionsStep<
 
 	@Override
 	public S valueBridge(BeanReference<? extends ValueBridge<?, ?>> bridgeReference) {
-		return valueBridge( new BeanBridgeBuilder<>( bridgeReference ) );
+		return valueBridge( new BeanBridgeBuilder( bridgeReference ) );
 	}
 
 	@Override
-	public S valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder) {
+	public S valueBridge(ValueBridgeBuilder builder) {
 		this.bridgeBuilder = builder;
 		return thisAsS();
 	}

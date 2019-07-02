@@ -15,8 +15,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
@@ -28,7 +28,7 @@ public final class CustomTypeBridge implements TypeBridge {
 	private static final String TEXT_FIELD_NAME = "text";
 	private static final String LOCAL_DATE_FIELD_NAME = "date";
 
-	public static final class Builder implements AnnotationBridgeBuilder<TypeBridge, CustomTypeBridgeAnnotation> {
+	public static final class Builder implements TypeBridgeBuilder<CustomTypeBridgeAnnotation> {
 
 		private String objectName;
 
@@ -43,7 +43,7 @@ public final class CustomTypeBridge implements TypeBridge {
 		}
 
 		@Override
-		public BeanHolder<TypeBridge> build(BridgeBuildContext buildContext) {
+		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
 			return BeanHolder.of( new CustomTypeBridge( objectName ) );
 		}
 	}

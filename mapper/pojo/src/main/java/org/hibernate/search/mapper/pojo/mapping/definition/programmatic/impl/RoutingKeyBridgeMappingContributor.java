@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
@@ -16,9 +15,9 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 
 class RoutingKeyBridgeMappingContributor implements PojoTypeMetadataContributor {
 
-	private final BridgeBuilder<? extends RoutingKeyBridge> routingKeyBridgeBuilder;
+	private final RoutingKeyBridgeBuilder<?> routingKeyBridgeBuilder;
 
-	RoutingKeyBridgeMappingContributor(BridgeBuilder<? extends RoutingKeyBridge> routingKeyBridgeBuilder) {
+	RoutingKeyBridgeMappingContributor(RoutingKeyBridgeBuilder<?> routingKeyBridgeBuilder) {
 		this.routingKeyBridgeBuilder = routingKeyBridgeBuilder;
 	}
 

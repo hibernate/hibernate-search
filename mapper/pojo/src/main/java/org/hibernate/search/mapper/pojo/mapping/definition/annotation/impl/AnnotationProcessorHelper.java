@@ -30,10 +30,13 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializi
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
@@ -115,7 +118,7 @@ class AnnotationProcessorHelper {
 	}
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
-	BridgeBuilder<? extends IdentifierBridge<?>> createIdentifierBridgeBuilder(
+	IdentifierBridgeBuilder createIdentifierBridgeBuilder(
 			DocumentId annotation, PojoPropertyModel<?> annotationHolder) {
 		IdentifierBridgeRef bridgeReferenceAnnotation = annotation.identifierBridge();
 		Optional<BeanReference<? extends IdentifierBridge>> bridgeReference = toBeanReference(
@@ -123,8 +126,8 @@ class AnnotationProcessorHelper {
 				IdentifierBridgeRef.UndefinedBridgeImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
-		Optional<BeanReference<? extends BridgeBuilder>> bridgeBuilderReference = toBeanReference(
-				BridgeBuilder.class,
+		Optional<BeanReference<? extends IdentifierBridgeBuilder>> bridgeBuilderReference = toBeanReference(
+				IdentifierBridgeBuilder.class,
 				IdentifierBridgeRef.UndefinedBuilderImplementationType.class,
 				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
 		);
@@ -133,22 +136,10 @@ class AnnotationProcessorHelper {
 			throw log.invalidDocumentIdDefiningBothBridgeReferenceAndBridgeBuilderReference( annotationHolder.getName() );
 		}
 		else if ( bridgeReference.isPresent() ) {
-			BridgeBuilder<? extends IdentifierBridge> rawBuilder =
-					new BeanBridgeBuilder<>( bridgeReference.get() );
-			// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe
-			@SuppressWarnings( "unchecked" )
-			BridgeBuilder<? extends IdentifierBridge<?>> castedBuilder =
-					(BridgeBuilder<? extends IdentifierBridge<?>>) rawBuilder;
-			return castedBuilder;
+			return new BeanBridgeBuilder( bridgeReference.get() );
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
-			BridgeBuilder<? extends IdentifierBridge> rawBuilder =
-					new BeanDelegatingBridgeBuilder<>( bridgeBuilderReference.get(), IdentifierBridge.class );
-			// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe
-			@SuppressWarnings( "unchecked" )
-			BridgeBuilder<? extends IdentifierBridge<?>> castedBuilder =
-					(BridgeBuilder<? extends IdentifierBridge<?>>) rawBuilder;
-			return castedBuilder;
+			return new BeanDelegatingBridgeBuilder( bridgeBuilderReference.get() );
 		}
 		else {
 			// The bridge will be auto-detected from the property type
@@ -156,71 +147,113 @@ class AnnotationProcessorHelper {
 		}
 	}
 
-	<A extends Annotation> BridgeBuilder<? extends RoutingKeyBridge> createRoutingKeyBridgeBuilder(A annotation) {
+	<A extends Annotation> RoutingKeyBridgeBuilder createRoutingKeyBridgeBuilder(A annotation) {
 		RoutingKeyBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( RoutingKeyBridgeMapping.class );
 		RoutingKeyBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
-
-		return createAnnotationMappedBridgeBuilder(
+		Optional<BeanReference<? extends RoutingKeyBridge>> bridgeReference = toBeanReference(
 				RoutingKeyBridge.class,
-				RoutingKeyBridgeMapping.class,
-				annotation,
-				toBeanReference(
-						RoutingKeyBridge.class,
-						RoutingKeyBridgeRef.UndefinedBridgeImplementationType.class,
-						bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
-				),
-				toBeanReference(
-						AnnotationBridgeBuilder.class,
-						RoutingKeyBridgeRef.UndefinedBuilderImplementationType.class,
-						bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
-				)
+				RoutingKeyBridgeRef.UndefinedBridgeImplementationType.class,
+				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
+		Optional<BeanReference<? extends RoutingKeyBridgeBuilder>> builderReference = toBeanReference(
+				RoutingKeyBridgeBuilder.class,
+				RoutingKeyBridgeRef.UndefinedBuilderImplementationType.class,
+				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
+		);
+
+		if ( bridgeReference.isPresent() && builderReference.isPresent() ) {
+			throw log.conflictingBridgeReferenceInBridgeMapping(
+					bridgeMapping.annotationType(), annotation.annotationType()
+			);
+		}
+		else if ( bridgeReference.isPresent() ) {
+			return new BeanBridgeBuilder( bridgeReference.get() );
+		}
+		else if ( builderReference.isPresent() ) {
+			RoutingKeyBridgeBuilder<A> builder =
+					new AnnotationInitializingBeanDelegatingBridgeBuilder<>( builderReference.get() );
+			builder.initialize( annotation );
+			return builder;
+		}
+		else {
+			throw log.missingBridgeReferenceInBridgeMapping(
+					bridgeMapping.annotationType(), annotation.annotationType()
+			);
+		}
 	}
 
-	<A extends Annotation> BridgeBuilder<? extends TypeBridge> createTypeBridgeBuilder(A annotation) {
+	<A extends Annotation> TypeBridgeBuilder createTypeBridgeBuilder(A annotation) {
 		TypeBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( TypeBridgeMapping.class );
 		TypeBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
-
-		return createAnnotationMappedBridgeBuilder(
+		Optional<BeanReference<? extends TypeBridge>> bridgeReference = toBeanReference(
 				TypeBridge.class,
-				TypeBridgeMapping.class,
-				annotation,
-				toBeanReference(
-						TypeBridge.class,
-						TypeBridgeRef.UndefinedBridgeImplementationType.class,
-						bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
-				),
-				toBeanReference(
-						AnnotationBridgeBuilder.class,
-						TypeBridgeRef.UndefinedBuilderImplementationType.class,
-						bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
-				)
+				TypeBridgeRef.UndefinedBridgeImplementationType.class,
+				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
+		Optional<BeanReference<? extends TypeBridgeBuilder>> builderReference = toBeanReference(
+				TypeBridgeBuilder.class,
+				TypeBridgeRef.UndefinedBuilderImplementationType.class,
+				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
+		);
+
+		if ( bridgeReference.isPresent() && builderReference.isPresent() ) {
+			throw log.conflictingBridgeReferenceInBridgeMapping(
+					bridgeMapping.annotationType(), annotation.annotationType()
+			);
+		}
+		else if ( bridgeReference.isPresent() ) {
+			return new BeanBridgeBuilder( bridgeReference.get() );
+		}
+		else if ( builderReference.isPresent() ) {
+			TypeBridgeBuilder<A> builder =
+					new AnnotationInitializingBeanDelegatingBridgeBuilder<>( builderReference.get() );
+			builder.initialize( annotation );
+			return builder;
+		}
+		else {
+			throw log.missingBridgeReferenceInBridgeMapping(
+					bridgeMapping.annotationType(), annotation.annotationType()
+			);
+		}
 	}
 
-	<A extends Annotation> BridgeBuilder<? extends PropertyBridge> createPropertyBridgeBuilder(A annotation) {
+	<A extends Annotation> PropertyBridgeBuilder createPropertyBridgeBuilder(A annotation) {
 		PropertyBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( PropertyBridgeMapping.class );
 		PropertyBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
-
-		return createAnnotationMappedBridgeBuilder(
+		Optional<BeanReference<? extends PropertyBridge>> bridgeReference = toBeanReference(
 				PropertyBridge.class,
-				PropertyBridgeMapping.class,
-				annotation,
-				toBeanReference(
-						PropertyBridge.class,
-						PropertyBridgeRef.UndefinedBridgeImplementationType.class,
-						bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
-				),
-				toBeanReference(
-						AnnotationBridgeBuilder.class,
-						PropertyBridgeRef.UndefinedBuilderImplementationType.class,
-						bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
-				)
+				PropertyBridgeRef.UndefinedBridgeImplementationType.class,
+				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
+		Optional<BeanReference<? extends PropertyBridgeBuilder>> builderReference = toBeanReference(
+				PropertyBridgeBuilder.class,
+				PropertyBridgeRef.UndefinedBuilderImplementationType.class,
+				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
+		);
+
+		if ( bridgeReference.isPresent() && builderReference.isPresent() ) {
+			throw log.conflictingBridgeReferenceInBridgeMapping(
+					bridgeMapping.annotationType(), annotation.annotationType()
+			);
+		}
+		else if ( bridgeReference.isPresent() ) {
+			return new BeanBridgeBuilder( bridgeReference.get() );
+		}
+		else if ( builderReference.isPresent() ) {
+			PropertyBridgeBuilder<A> builder =
+					new AnnotationInitializingBeanDelegatingBridgeBuilder<>( builderReference.get() );
+			builder.initialize( annotation );
+			return builder;
+		}
+		else {
+			throw log.missingBridgeReferenceInBridgeMapping(
+					bridgeMapping.annotationType(), annotation.annotationType()
+			);
+		}
 	}
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
-	BridgeBuilder<? extends ValueBridge<?, ?>> createValueBridgeBuilder(
+	ValueBridgeBuilder createValueBridgeBuilder(
 			ValueBridgeRef bridgeReferenceAnnotation,
 			PojoPropertyModel<?> annotationHolder) {
 		Optional<BeanReference<? extends ValueBridge>> bridgeReference = toBeanReference(
@@ -228,8 +261,8 @@ class AnnotationProcessorHelper {
 				ValueBridgeRef.UndefinedBridgeImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
-		Optional<BeanReference<? extends BridgeBuilder>> bridgeBuilderReference = toBeanReference(
-				BridgeBuilder.class,
+		Optional<BeanReference<? extends ValueBridgeBuilder>> bridgeBuilderReference = toBeanReference(
+				ValueBridgeBuilder.class,
 				ValueBridgeRef.UndefinedBuilderImplementationType.class,
 				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
 		);
@@ -238,49 +271,14 @@ class AnnotationProcessorHelper {
 			throw log.invalidFieldDefiningBothBridgeReferenceAndBridgeBuilderReference( annotationHolder.getName() );
 		}
 		else if ( bridgeReference.isPresent() ) {
-			BridgeBuilder<? extends ValueBridge> rawBuilder =
-					new BeanBridgeBuilder<>( bridgeReference.get() );
-			// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe
-			@SuppressWarnings( "unchecked" )
-			BridgeBuilder<? extends ValueBridge<?, ?>> castedBuilder =
-					(BridgeBuilder<? extends ValueBridge<?, ?>>) rawBuilder;
-			return castedBuilder;
+			return new BeanBridgeBuilder( bridgeReference.get() );
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
-			BridgeBuilder<? extends ValueBridge> rawBuilder =
-					new BeanDelegatingBridgeBuilder<>( bridgeBuilderReference.get(), ValueBridge.class );
-			// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe
-			@SuppressWarnings( "unchecked" )
-			BridgeBuilder<? extends ValueBridge<?, ?>> castedBuilder =
-					(BridgeBuilder<? extends ValueBridge<?, ?>>) rawBuilder;
-			return castedBuilder;
+			return new BeanDelegatingBridgeBuilder( bridgeBuilderReference.get() );
 		}
 		else {
 			// The bridge will be auto-detected from the property type
 			return null;
-		}
-	}
-
-	@SuppressWarnings("rawtypes") // The bean reference must be to a raw type
-	private <A extends Annotation, B> BridgeBuilder<? extends B> createAnnotationMappedBridgeBuilder(
-			Class<B> expectedBridgeType, Class<? extends Annotation> bridgeMappingAnnotation, A annotation,
-			Optional<BeanReference<? extends B>> bridgeReferenceOptional,
-			Optional<BeanReference<? extends AnnotationBridgeBuilder>> builderReferenceOptional) {
-		if ( bridgeReferenceOptional.isPresent() && builderReferenceOptional.isPresent() ) {
-			throw log.conflictingBridgeReferenceInBridgeMapping( bridgeMappingAnnotation, annotation.annotationType() );
-		}
-		else if ( bridgeReferenceOptional.isPresent() ) {
-			return new BeanBridgeBuilder<>( bridgeReferenceOptional.get() );
-		}
-		else if ( builderReferenceOptional.isPresent() ) {
-			return new AnnotationInitializingBeanDelegatingBridgeBuilder<>(
-					builderReferenceOptional.get(),
-					expectedBridgeType,
-					annotation
-			);
-		}
-		else {
-			throw log.missingBridgeReferenceInBridgeMapping( bridgeMappingAnnotation, annotation.annotationType() );
 		}
 	}
 

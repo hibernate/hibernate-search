@@ -7,18 +7,14 @@
 package org.hibernate.search.mapper.pojo.bridge.mapping.programmatic;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
 /**
- * A builder of bridges.
+ * A builder of {@link ValueBridge}.
  *
- * @param <B> The type of created bridges.
- * @see org.hibernate.search.mapper.pojo.bridge.TypeBridge
- * @see org.hibernate.search.mapper.pojo.bridge.PropertyBridge
- * @see org.hibernate.search.mapper.pojo.bridge.ValueBridge
- * @see org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge
- * @see org.hibernate.search.mapper.pojo.bridge.IdentifierBridge
+ * @see ValueBridge
  */
-public interface BridgeBuilder<B> {
+public interface ValueBridgeBuilder {
 
 	/**
 	 * Build a bridge.
@@ -29,6 +25,7 @@ public interface BridgeBuilder<B> {
 	 * @return A new bridge instance, enclosed in a {@link BeanHolder}.
 	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
 	 */
-	BeanHolder<? extends B> build(BridgeBuildContext buildContext);
+	// FIXME use method parameter overload to avoid conflict between this build() method and the ones from other builders
+	BeanHolder<? extends ValueBridge<?, ?>> buildForValue(BridgeBuildContext buildContext);
 
 }

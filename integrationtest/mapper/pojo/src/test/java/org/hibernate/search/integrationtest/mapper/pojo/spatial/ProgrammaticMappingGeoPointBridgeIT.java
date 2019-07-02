@@ -60,16 +60,15 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 					mappingDefinition.type( GeoPointOnTypeEntity.class )
 							.indexed( GeoPointOnTypeEntity.INDEX )
-							.bridge( GeoPointBridgeBuilder.forType()
+							.bridge( GeoPointBridgeBuilder.create()
 									.fieldName( "homeLocation" )
 									.markerSet( "home" )
 									.projectable( Projectable.YES )
 									.sortable( Sortable.YES )
 							)
-							.bridge(
-							GeoPointBridgeBuilder.forType()
-											.fieldName( "workLocation" )
-											.markerSet( "work" )
+							.bridge( GeoPointBridgeBuilder.create()
+									.fieldName( "workLocation" )
+									.markerSet( "work" )
 							)
 							.property( "id" )
 									.documentId()
@@ -87,8 +86,8 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 							.property( "id" )
 									.documentId()
 							.property( "coord" )
-									.bridge( GeoPointBridgeBuilder.forProperty() )
-									.bridge( GeoPointBridgeBuilder.forProperty()
+									.bridge( GeoPointBridgeBuilder.create() )
+									.bridge( GeoPointBridgeBuilder.create()
 											.fieldName( "location" )
 											.projectable( Projectable.NO )
 									);
@@ -98,8 +97,8 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 							.property( "id" )
 									.documentId()
 							.property( "coord" )
-									.bridge( GeoPointBridgeBuilder.forProperty() )
-									.bridge( GeoPointBridgeBuilder.forProperty()
+									.bridge( GeoPointBridgeBuilder.create() )
+									.bridge( GeoPointBridgeBuilder.create()
 											.fieldName( "location" )
 									);
 

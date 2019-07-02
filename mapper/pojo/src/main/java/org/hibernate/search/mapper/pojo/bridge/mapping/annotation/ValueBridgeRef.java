@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -52,12 +52,12 @@ public @interface ValueBridgeRef {
 	 * Reference a value bridge by the type of its builder.
 	 * @return The type of the value bridge builder.
 	 */
-	Class<? extends BridgeBuilder<? extends ValueBridge<?, ?>>> builderType() default UndefinedBuilderImplementationType.class;
+	Class<? extends ValueBridgeBuilder> builderType() default UndefinedBuilderImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
-	abstract class UndefinedBridgeImplementationType implements ValueBridge<Object, Object> {
+	abstract class UndefinedBridgeImplementationType implements ValueBridge {
 		private UndefinedBridgeImplementationType() {
 		}
 	}
@@ -65,7 +65,7 @@ public @interface ValueBridgeRef {
 	/**
 	 * Class used as a marker for the default value of the {@link #builderType()} attribute.
 	 */
-	abstract class UndefinedBuilderImplementationType implements BridgeBuilder<ValueBridge<Object, Object>> {
+	abstract class UndefinedBuilderImplementationType implements ValueBridgeBuilder {
 		private UndefinedBuilderImplementationType() {
 		}
 	}

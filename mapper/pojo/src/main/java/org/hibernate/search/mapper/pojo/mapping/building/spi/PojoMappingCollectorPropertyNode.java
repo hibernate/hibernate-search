@@ -6,16 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 
 public interface PojoMappingCollectorPropertyNode extends PojoMappingCollector {
 
-	void bridge(BridgeBuilder<? extends PropertyBridge> builder);
+	void bridge(PropertyBridgeBuilder<?> builder);
 
-	void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> reference);
+	void identifierBridge(IdentifierBridgeBuilder reference);
 
 	PojoMappingCollectorValueNode value(ContainerExtractorPath extractorPath);
 

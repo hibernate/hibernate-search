@@ -11,8 +11,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
@@ -46,7 +45,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 		PropertyMappingFieldOptionsStep<?> fieldContext =
 				initFieldMappingContext( mappingContext, propertyModel, annotation, cleanedUpRelativeFieldName );
 
-		BridgeBuilder<? extends ValueBridge<?, ?>> builder = helper.createValueBridgeBuilder(
+		ValueBridgeBuilder builder = helper.createValueBridgeBuilder(
 				getValueBridge( annotation ),
 				propertyModel
 		);

@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
@@ -76,11 +76,11 @@ class InitialPropertyMappingStep
 
 	@Override
 	public PropertyMappingStep bridge(BeanReference<? extends PropertyBridge> bridgeReference) {
-		return bridge( new BeanBridgeBuilder<>( bridgeReference ) );
+		return bridge( new BeanBridgeBuilder( bridgeReference ) );
 	}
 
 	@Override
-	public PropertyMappingStep bridge(BridgeBuilder<? extends PropertyBridge> builder) {
+	public PropertyMappingStep bridge(PropertyBridgeBuilder<?> builder) {
 		children.add( new PropertyBridgeMappingContributor( builder ) );
 		return this;
 	}
