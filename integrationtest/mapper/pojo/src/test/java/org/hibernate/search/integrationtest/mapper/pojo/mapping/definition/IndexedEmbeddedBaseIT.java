@@ -596,21 +596,15 @@ public class IndexedEmbeddedBaseIT {
 									.indexedEmbedded()
 											.includePaths( "level1IncludedField" );
 					b.programmaticMapping().type( IndexedEmbeddedLevel1.class )
-							.bridge( (TypeBridgeBuilder<?>)
-									c -> StartupStubBridge.create( filteredOutBridgeCounterKeys )
-							)
+							.bridge( StartupStubBridge.builder( filteredOutBridgeCounterKeys ) )
 							.bridge( new GeoPointBridge.Builder().fieldName( "location" ) )
 							.property( "latitude" ).marker( new LatitudeMarker.Builder() )
 							.property( "longitude" ).marker( new LongitudeMarker.Builder() )
 							.property( "level1Property" )
-									.bridge( (PropertyBridgeBuilder<?>)
-											c -> StartupStubBridge.create( filteredOutBridgeCounterKeys )
-									)
+									.bridge( StartupStubBridge.builder( filteredOutBridgeCounterKeys ) )
 									.genericField( "level1IncludedField" )
 									.genericField( "filteredOut" )
-											.valueBridge( (ValueBridgeBuilder)
-													c -> StartupStubBridge.create( filteredOutBridgeCounterKeys )
-											);
+											.valueBridge( StartupStubBridge.builder( filteredOutBridgeCounterKeys ) );
 				} )
 				.setup();
 		backendMock.verifyExpectationsMet();
