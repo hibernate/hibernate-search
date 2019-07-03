@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.util;
 
+import java.lang.annotation.Annotation;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -16,6 +18,12 @@ import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingCo
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
@@ -53,12 +61,11 @@ public class StartupStubBridge
 		return new CounterKeys();
 	}
 
-	public static BeanHolder<StartupStubBridge> create(CounterKeys counterKeys) {
-		StartupStubBridge bridge = new StartupStubBridge( counterKeys );
-		return new CloseCountingBeanHolder<>( bridge, counterKeys.holderClose );
+	public static Builder builder(CounterKeys counterKeys) {
+		return new Builder( counterKeys );
 	}
 
-	public final CounterKeys counterKeys;
+	private final CounterKeys counterKeys;
 
 	private boolean closed = false;
 
@@ -152,5 +159,50 @@ public class StartupStubBridge
 				"Instances of " + getClass().getSimpleName() + " are not supposed to be used at runtime,"
 				+ " they should only be used to test the startup process."
 		);
+	}
+
+	public static class Builder implements TypeBridgeBuilder<Annotation>,
+			PropertyBridgeBuilder<Annotation>, RoutingKeyBridgeBuilder<Annotation>,
+			IdentifierBridgeBuilder, ValueBridgeBuilder {
+		private final StartupStubBridge.CounterKeys counterKeys;
+
+		private Builder(StartupStubBridge.CounterKeys counterKeys) {
+			this.counterKeys = counterKeys;
+		}
+
+		@Override
+		public void initialize(Annotation annotation) {
+			// Nothing to do
+		}
+
+		@Override
+		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
+			return build();
+		}
+
+		@Override
+		public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
+			return build();
+		}
+
+		@Override
+		public BeanHolder<? extends RoutingKeyBridge> buildForRoutingKey(BridgeBuildContext buildContext) {
+			return build();
+		}
+
+		@Override
+		public BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext) {
+			return build();
+		}
+
+		@Override
+		public BeanHolder<? extends ValueBridge<?, ?>> buildForValue(BridgeBuildContext buildContext) {
+			return build();
+		}
+
+		private BeanHolder<StartupStubBridge> build() {
+			StartupStubBridge bridge = new StartupStubBridge( counterKeys );
+			return new CloseCountingBeanHolder<>( bridge, counterKeys.holderClose );
+		}
 	}
 }
