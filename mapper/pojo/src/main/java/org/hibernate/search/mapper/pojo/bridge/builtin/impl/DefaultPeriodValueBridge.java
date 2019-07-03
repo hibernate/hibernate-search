@@ -11,12 +11,9 @@ import java.time.Duration;
 import java.time.Period;
 import java.util.Locale;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -34,15 +31,26 @@ public final class DefaultPeriodValueBridge implements ValueBridge<Period, Strin
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexFieldTypeOptionsStep<?, String> bind(ValueBridgeBindingContext<Period> context) {
-		return context.getTypeFactory().asString()
-				.projectionConverter( PojoDefaultPeriodFromDocumentFieldValueConverter.INSTANCE );
+	public String toIndexedValue(Period value, ValueBridgeToIndexedValueContext context) {
+		return toIndexedValue( value );
 	}
 
 	@Override
-	public String toIndexedValue(Period value, ValueBridgeToIndexedValueContext context) {
-		return toIndexedValue( value );
+	public Period fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) {
+		if ( value == null ) {
+			return null;
+		}
+
+		try {
+			int years = Integer.parseInt( value.substring( 0, PADDING ) );
+			int months = Integer.parseInt( value.substring( PADDING, 2 * PADDING ) );
+			int days = Integer.parseInt( value.substring( 2 * PADDING ) );
+
+			return Period.of( years, months, days );
+		}
+		catch (NumberFormatException e) {
+			throw log.parseException( value, Duration.class, e );
+		}
 	}
 
 	@Override
@@ -67,35 +75,4 @@ public final class DefaultPeriodValueBridge implements ValueBridge<Period, Strin
 		return String.format( Locale.ROOT, FORMAT, value.getYears(), value.getMonths(), value.getDays() );
 	}
 
-	private static class PojoDefaultPeriodFromDocumentFieldValueConverter implements FromDocumentFieldValueConverter<String, Period> {
-		private static final PojoDefaultPeriodFromDocumentFieldValueConverter INSTANCE = new PojoDefaultPeriodFromDocumentFieldValueConverter();
-
-		@Override
-		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-			return superTypeCandidate.isAssignableFrom( Period.class );
-		}
-
-		@Override
-		public Period convert(String value, FromDocumentFieldValueConvertContext context) {
-			if ( value == null ) {
-				return null;
-			}
-
-			try {
-				int years = Integer.parseInt( value.substring( 0, PADDING ) );
-				int months = Integer.parseInt( value.substring( PADDING, 2 * PADDING ) );
-				int days = Integer.parseInt( value.substring( 2 * PADDING ) );
-
-				return Period.of( years, months, days );
-			}
-			catch (NumberFormatException e) {
-				throw log.parseException( value, Duration.class, e );
-			}
-		}
-
-		@Override
-		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
-			return INSTANCE.equals( other );
-		}
-	}
 }

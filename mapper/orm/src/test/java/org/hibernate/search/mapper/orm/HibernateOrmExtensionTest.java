@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
@@ -83,10 +84,16 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 
 	@Test
 	public void valueBridge() {
-		ValueBridgeToIndexedValueContext context = new ValueBridgeToIndexedValueContextImpl( mappingContext );
+		ValueBridgeToIndexedValueContext toIndexedValueContext = new ValueBridgeToIndexedValueContextImpl( mappingContext );
 		resetAll();
 		replayAll();
-		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
+		assertThat( toIndexedValueContext.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
+		verifyAll();
+
+		ValueBridgeFromIndexedValueContext fromIndexedValueContext = new BridgeSessionContext( sessionContext );
+		resetAll();
+		replayAll();
+		assertThat( fromIndexedValueContext.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 		verifyAll();
 	}
 

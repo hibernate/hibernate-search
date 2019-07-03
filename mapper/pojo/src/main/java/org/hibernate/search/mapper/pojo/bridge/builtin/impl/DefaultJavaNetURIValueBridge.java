@@ -10,11 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -29,15 +26,13 @@ public final class DefaultJavaNetURIValueBridge implements ValueBridge<URI, Stri
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexFieldTypeOptionsStep<?, String> bind(ValueBridgeBindingContext<URI> context) {
-		return context.getTypeFactory().asString()
-				.projectionConverter( PojoDefaultURIFromDocumentFieldValueConverter.INSTANCE );
+	public String toIndexedValue(URI value, ValueBridgeToIndexedValueContext context) {
+		return value == null ? null : value.toString();
 	}
 
 	@Override
-	public String toIndexedValue(URI value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : value.toString();
+	public URI fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) {
+		return value == null ? null : toURI( value );
 	}
 
 	@Override
@@ -51,7 +46,7 @@ public final class DefaultJavaNetURIValueBridge implements ValueBridge<URI, Stri
 			return null;
 		}
 
-		PojoDefaultURIFromDocumentFieldValueConverter.toURI( value );
+		toURI( value );
 		return value;
 	}
 
@@ -60,32 +55,12 @@ public final class DefaultJavaNetURIValueBridge implements ValueBridge<URI, Stri
 		return getClass().equals( other.getClass() );
 	}
 
-	private static class PojoDefaultURIFromDocumentFieldValueConverter
-			implements FromDocumentFieldValueConverter<String, URI> {
-		private static final PojoDefaultURIFromDocumentFieldValueConverter INSTANCE = new PojoDefaultURIFromDocumentFieldValueConverter();
-
-		@Override
-		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-			return superTypeCandidate.isAssignableFrom( URI.class );
+	private static URI toURI(String value) {
+		try {
+			return new URI( value );
 		}
-
-		@Override
-		public URI convert(String value, FromDocumentFieldValueConvertContext context) {
-			return value == null ? null : toURI( value );
-		}
-
-		@Override
-		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
-			return INSTANCE.equals( other );
-		}
-
-		private static URI toURI(String value) {
-			try {
-				return new URI( value );
-			}
-			catch (URISyntaxException e) {
-				throw log.badURISyntax( value, e );
-			}
+		catch (URISyntaxException e) {
+			throw log.badURISyntax( value, e );
 		}
 	}
 }

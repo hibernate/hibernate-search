@@ -12,10 +12,10 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
 public final class BoundValueBridge<V, F> {
 	private final BeanHolder<? extends ValueBridge<? super V, F>> bridgeHolder;
-	private final IndexFieldReference<? super F> indexFieldReference;
+	private final IndexFieldReference<F> indexFieldReference;
 
 	BoundValueBridge(BeanHolder<? extends ValueBridge<? super V, F>> bridgeHolder,
-			IndexFieldReference<? super F> indexFieldReference) {
+			IndexFieldReference<F> indexFieldReference) {
 		this.bridgeHolder = bridgeHolder;
 		this.indexFieldReference = indexFieldReference;
 	}
@@ -24,7 +24,7 @@ public final class BoundValueBridge<V, F> {
 		return bridgeHolder;
 	}
 
-	public IndexFieldReference<? super F> getIndexFieldReference() {
+	public IndexFieldReference<F> getIndexFieldReference() {
 		return indexFieldReference;
 	}
 }

@@ -16,6 +16,8 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRouting
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExtension;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContextExtension;
 
 /**
  * A single implementation for all the bridge context interfaces that rely on the session context.
@@ -28,7 +30,8 @@ public final class BridgeSessionContext
 		implements IdentifierBridgeFromDocumentIdentifierContext,
 				RoutingKeyBridgeToRoutingKeyContext,
 				TypeBridgeWriteContext,
-				PropertyBridgeWriteContext {
+				PropertyBridgeWriteContext,
+				ValueBridgeFromIndexedValueContext {
 
 	private final SessionContextImplementor sessionContext;
 
@@ -53,6 +56,11 @@ public final class BridgeSessionContext
 
 	@Override
 	public <T> T extension(PropertyBridgeWriteContextExtension<T> extension) {
+		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
+	}
+
+	@Override
+	public <T> T extension(ValueBridgeFromIndexedValueContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
 	}
 }

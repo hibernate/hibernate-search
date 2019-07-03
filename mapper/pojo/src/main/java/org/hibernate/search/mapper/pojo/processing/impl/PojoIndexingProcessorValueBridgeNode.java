@@ -23,10 +23,10 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 public class PojoIndexingProcessorValueBridgeNode<V, F> extends PojoIndexingProcessor<V> {
 
 	private final BeanHolder<? extends ValueBridge<? super V, F>> bridgeHolder;
-	private final IndexFieldReference<? super F> indexFieldReference;
+	private final IndexFieldReference<F> indexFieldReference;
 
 	public PojoIndexingProcessorValueBridgeNode(BeanHolder<? extends ValueBridge<? super V, F>> bridgeHolder,
-			IndexFieldReference<? super F> indexFieldReference) {
+			IndexFieldReference<F> indexFieldReference) {
 		this.bridgeHolder = bridgeHolder;
 		this.indexFieldReference = indexFieldReference;
 	}

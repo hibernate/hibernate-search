@@ -9,12 +9,9 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -29,15 +26,13 @@ public final class DefaultDurationValueBridge implements ValueBridge<Duration, L
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexFieldTypeOptionsStep<?, Long> bind(ValueBridgeBindingContext<Duration> context) {
-		return context.getTypeFactory().asLong()
-				.projectionConverter( PojoDefaultZoneOffsetFromDocumentFieldValueConverter.INSTANCE );
+	public Long toIndexedValue(Duration value, ValueBridgeToIndexedValueContext context) {
+		return toIndexedValue( value );
 	}
 
 	@Override
-	public Long toIndexedValue(Duration value, ValueBridgeToIndexedValueContext context) {
-		return toIndexedValue( value );
+	public Duration fromIndexedValue(Long value, ValueBridgeFromIndexedValueContext context) {
+		return value == null ? null : Duration.ofNanos( value );
 	}
 
 	@Override
@@ -64,26 +59,6 @@ public final class DefaultDurationValueBridge implements ValueBridge<Duration, L
 		}
 		catch (ArithmeticException ae) {
 			throw log.valueTooLargeForConversionException( Duration.class, value, ae );
-		}
-	}
-
-	private static class PojoDefaultZoneOffsetFromDocumentFieldValueConverter
-			implements FromDocumentFieldValueConverter<Long, Duration> {
-		private static final PojoDefaultZoneOffsetFromDocumentFieldValueConverter INSTANCE = new PojoDefaultZoneOffsetFromDocumentFieldValueConverter();
-
-		@Override
-		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-			return superTypeCandidate.isAssignableFrom( Duration.class );
-		}
-
-		@Override
-		public Duration convert(Long value, FromDocumentFieldValueConvertContext context) {
-			return value == null ? null : Duration.ofNanos( value );
-		}
-
-		@Override
-		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
-			return INSTANCE.equals( other );
 		}
 	}
 }

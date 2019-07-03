@@ -8,12 +8,9 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import java.util.UUID;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ValidateUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 public final class DefaultUUIDValueBridge implements ValueBridge<UUID, String> {
@@ -24,15 +21,13 @@ public final class DefaultUUIDValueBridge implements ValueBridge<UUID, String> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexFieldTypeOptionsStep<?, String> bind(ValueBridgeBindingContext<UUID> context) {
-		return context.getTypeFactory().asString()
-				.projectionConverter( PojoDefaultUUIDFromDocumentFieldValueConverter.INSTANCE );
+	public String toIndexedValue(UUID value, ValueBridgeToIndexedValueContext context) {
+		return value == null ? null : value.toString();
 	}
 
 	@Override
-	public String toIndexedValue(UUID value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : value.toString();
+	public UUID fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) {
+		return value == null ? null : UUID.fromString( value );
 	}
 
 	@Override
@@ -51,23 +46,4 @@ public final class DefaultUUIDValueBridge implements ValueBridge<UUID, String> {
 		return getClass().equals( other.getClass() );
 	}
 
-	private static class PojoDefaultUUIDFromDocumentFieldValueConverter
-			implements FromDocumentFieldValueConverter<String, UUID> {
-		private static final PojoDefaultUUIDFromDocumentFieldValueConverter INSTANCE = new PojoDefaultUUIDFromDocumentFieldValueConverter();
-
-		@Override
-		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-			return superTypeCandidate.isAssignableFrom( UUID.class );
-		}
-
-		@Override
-		public UUID convert(String value, FromDocumentFieldValueConvertContext context) {
-			return value == null ? null : UUID.fromString( value );
-		}
-
-		@Override
-		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
-			return INSTANCE.equals( other );
-		}
-	}
 }
