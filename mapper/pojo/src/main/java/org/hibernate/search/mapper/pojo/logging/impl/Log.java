@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
@@ -251,9 +252,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 31,
 			value = "This property is mapped to a full-text field,"
-					+ " but with a value bridge that creates a non-String or otherwise incompatible field."
+					+ " but with a value bridge that binds to a non-String or otherwise incompatible field."
 					+ " Make sure to use a compatible bridge."
-					+ " Details: the value bridge's bind() method returned '%1$s',"
+					+ " Details: encountered type DSL step '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
 	SearchException invalidFieldEncodingForFullTextFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
@@ -261,9 +262,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 32,
 			value = "This property is mapped to a keyword field,"
-					+ " but with a value bridge that creates a non-String or otherwise incompatible field."
+					+ " but with a value bridge that binds to a non-String or otherwise incompatible field."
 					+ " Make sure to use a compatible bridge."
-					+ " Details: the value bridge's bind() method returned '%1$s',"
+					+ " Details: encountered type DSL step '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
 	SearchException invalidFieldEncodingForKeywordFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
@@ -351,9 +352,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 51,
 			value = "This property is mapped to a scaled number field,"
-					+ " but with a value bridge that creates neither a BigDecimal nor a BigInteger field."
+					+ " but with a value bridge that binds neither to a BigDecimal nor to a BigInteger field."
 					+ " Make sure to use a compatible bridge."
-					+ " Details: the value bridge's bind() method returned '%1$s',"
+					+ " Details: encountered type DSL step '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
 	SearchException invalidFieldEncodingForScaledNumberFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
@@ -393,4 +394,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 57, value = "The underlying member of property '%1$s' is supposed to be a method")
 	SearchException cannotAccessPropertyMethod(String propertyName);
+
+	@Message(id = ID_OFFSET_2 + 58,
+			value = "The bind() method of bridge builder '%1$s' is not implemented correctly:"
+					+ " it did not call context.setBridge(...).")
+	SearchException missingBridgeForBridgeBuilder(Object binder);
 }

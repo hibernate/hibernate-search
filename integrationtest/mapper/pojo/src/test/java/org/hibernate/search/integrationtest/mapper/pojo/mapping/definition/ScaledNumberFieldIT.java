@@ -12,10 +12,10 @@ import java.math.BigInteger;
 
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -120,8 +120,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void invalidFieldType() {
-
+	public void defaultBridge_invalidFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
@@ -147,8 +146,8 @@ public class ScaledNumberFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".notScalable" )
 						.failure(
-								"This property is mapped to a scaled number field, but with a value bridge that creates neither a BigDecimal nor a BigInteger field.",
-								"bind() method returned '",
+								"This property is mapped to a scaled number field, but with a value bridge that binds neither to a BigDecimal nor to a BigInteger field.",
+								"encountered type DSL step '",
 								"expected '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
@@ -203,8 +202,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_implicitBinding() {
-
+	public void customBridge_implicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
@@ -215,7 +213,7 @@ public class ScaledNumberFieldIT {
 				return id;
 			}
 
-			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(type = ValidImplicitBindingBridge.class))
+			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(type = ValidTypeBridge.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -229,8 +227,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_explicitBinding() {
-
+	public void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
@@ -241,7 +238,7 @@ public class ScaledNumberFieldIT {
 				return id;
 			}
 
-			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(type = ValidExplicitBindingBridge.class))
+			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(builderType = ValidTypeBridge.ExplictFieldTypeBuilder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -255,21 +252,20 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_invalidBinding() {
-
+	public void customBridge_implicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
-			BigDecimal scaled;
+			WrappedValue wrap;
 
 			@DocumentId
 			public Integer getId() {
 				return id;
 			}
 
-			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(type = InvalidExplicitBindingBridge.class))
-			public BigDecimal getScaled() {
-				return scaled;
+			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(type = InvalidTypeBridge.class))
+			public WrappedValue getWrap() {
+				return wrap;
 			}
 		}
 
@@ -280,60 +276,86 @@ public class ScaledNumberFieldIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".scaled" )
+						.pathContext( ".wrap" )
 						.failure(
-								"This property is mapped to a scaled number field, but with a value bridge that creates neither a BigDecimal nor a BigInteger field.",
-								"bind() method returned '",
+								"This property is mapped to a scaled number field, but with a value bridge that binds neither to a BigDecimal nor to a BigInteger field.",
+								"encountered type DSL step '",
 								"expected '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);
 	}
 
-	public static class ValidImplicitBindingBridge implements ValueBridge<WrappedValue, BigDecimal> {
+	@Test
+	public void customBridge_explicitFieldType_invalid() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			WrappedValue wrap;
 
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(builderType = InvalidTypeBridge.ExplictFieldTypeBuilder.class))
+			public WrappedValue getWrap() {
+				return wrap;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".wrap" )
+						.failure(
+								"This property is mapped to a scaled number field, but with a value bridge that binds neither to a BigDecimal nor to a BigInteger field.",
+								"encountered type DSL step '",
+								"expected '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	public static class ValidTypeBridge implements ValueBridge<WrappedValue, BigDecimal> {
 		@Override
-		public BigDecimal toIndexedValue(WrappedValue value,
-				ValueBridgeToIndexedValueContext context) {
+		public BigDecimal toIndexedValue(WrappedValue value, ValueBridgeToIndexedValueContext context) {
 			return value == null ? null : value.wrapped;
 		}
+
 		@Override
 		public WrappedValue cast(Object value) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
+
+		public static class ExplictFieldTypeBuilder implements ValueBridgeBuilder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.setBridge( WrappedValue.class, new ValidTypeBridge(), context.getTypeFactory().asBigDecimal() );
+			}
+		}
 	}
 
-	public static class ValidExplicitBindingBridge implements ValueBridge<WrappedValue, BigDecimal> {
+	public static class InvalidTypeBridge implements ValueBridge<WrappedValue, Integer> {
+		@Override
+		public Integer toIndexedValue(WrappedValue value, ValueBridgeToIndexedValueContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
 
-		@Override
-		public StandardIndexFieldTypeOptionsStep<?, BigDecimal> bind(ValueBridgeBindingContext<WrappedValue> context) {
-			return context.getTypeFactory().asBigDecimal();
-		}
-		@Override
-		public BigDecimal toIndexedValue(WrappedValue value,
-				ValueBridgeToIndexedValueContext context) {
-			return value == null ? null : value.wrapped;
-		}
 		@Override
 		public WrappedValue cast(Object value) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
-	}
 
-	public static class InvalidExplicitBindingBridge implements ValueBridge<BigDecimal, Integer> {
-
-		@Override
-		public StandardIndexFieldTypeOptionsStep<?, Integer> bind(ValueBridgeBindingContext<BigDecimal> context) {
-			return context.getTypeFactory().asInteger();
-		}
-		@Override
-		public Integer toIndexedValue(BigDecimal value,
-				ValueBridgeToIndexedValueContext context) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-		@Override
-		public BigDecimal cast(Object value) {
-			throw new UnsupportedOperationException( "Should not be called" );
+		public static class ExplictFieldTypeBuilder implements ValueBridgeBuilder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.setBridge( WrappedValue.class, new InvalidTypeBridge(), context.getTypeFactory().asInteger() );
+			}
 		}
 	}
 

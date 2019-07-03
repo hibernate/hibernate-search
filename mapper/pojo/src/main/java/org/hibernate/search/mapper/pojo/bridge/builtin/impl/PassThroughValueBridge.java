@@ -9,9 +9,10 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.util.common.impl.Contracts;
@@ -29,7 +30,7 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 	private final Class<F> fieldType;
 	private final Function<String, F> parsingFunction;
 
-	public PassThroughValueBridge(Class<F> fieldType, Function<String, F> parsingFunction) {
+	private PassThroughValueBridge(Class<F> fieldType, Function<String, F> parsingFunction) {
 		Contracts.assertNotNull( fieldType, "fieldType" );
 		this.fieldType = fieldType;
 		this.parsingFunction = parsingFunction;
@@ -38,11 +39,6 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[" + fieldType.getName() + "]";
-	}
-
-	@Override
-	public StandardIndexFieldTypeOptionsStep<?, F> bind(ValueBridgeBindingContext<F> context) {
-		return context.getTypeFactory().as( fieldType );
 	}
 
 	@Override
@@ -72,5 +68,24 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 		}
 		PassThroughValueBridge<?> castedOther = (PassThroughValueBridge<?>) other;
 		return fieldType.equals( castedOther.fieldType );
+	}
+
+	public static class Builder<F> implements ValueBridgeBuilder {
+		private final Class<F> rawValueType;
+		private final ValueBridge<F, F> bridge;
+
+		public Builder(Class<F> rawValueType, Function<String, F> parsingFunction) {
+			this.rawValueType = rawValueType;
+			this.bridge = new PassThroughValueBridge<>( rawValueType, parsingFunction );
+		}
+
+		@Override
+		public void bind(ValueBindingContext<?> context) {
+			context.<F, F>setBridge(
+					rawValueType,
+					BeanHolder.of( bridge ),
+					context.getTypeFactory().as( rawValueType )
+			);
+		}
 	}
 }

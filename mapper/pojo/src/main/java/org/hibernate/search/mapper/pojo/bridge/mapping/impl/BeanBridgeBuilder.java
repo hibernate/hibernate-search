@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
@@ -23,6 +24,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBr
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
+import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 
 /**
  * A bridge builder that simply retrieves the bridge as a bean from the bean provider.
@@ -70,13 +74,40 @@ public final class BeanBridgeBuilder
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public BeanHolder<? extends ValueBridge<?, ?>> buildForValue(BridgeBuildContext buildContext) {
-		return doBuild( buildContext, (Class<? extends ValueBridge<?, ?>>) (Class) ValueBridge.class );
+	@SuppressWarnings({"unchecked"})
+	public void bind(ValueBindingContext<?> context) {
+		BeanHolder<? extends ValueBridge> bridgeHolder = doBuild( context.getBeanResolver(), ValueBridge.class );
+		try {
+			doBind( bridgeHolder, context );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( bridgeHolder );
+			throw e;
+		}
+	}
+
+	private <B extends ValueBridge<V, F>, V, F> void doBind(BeanHolder<B> bridgeHolder, ValueBindingContext<?> context) {
+		ValueBridge<V, F> bridge = bridgeHolder.get();
+		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
+		// TODO HSEARCH-3243 We're assuming the field type is raw here, maybe we should enforce it?
+		@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
+		Class<V> bridgeParameterType = (Class<V>) bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
+				.map( ReflectionUtils::getRawType )
+				.orElseThrow( () -> new AssertionFailure(
+						"Could not auto-detect the input type for value bridge '"
+						+ bridge + "'."
+						+ " There is a bug in Hibernate Search, please report it."
+				) );
+		context.setBridge( bridgeParameterType, bridge );
+	}
+
+	private <T> BeanHolder<? extends T> doBuild(BeanResolver beanResolver, Class<T> expectedType) {
+		return beanReference.asSubTypeOf( expectedType ).resolve( beanResolver );
 	}
 
 	private <T> BeanHolder<? extends T> doBuild(BridgeBuildContext buildContext, Class<T> expectedType) {
-		BeanResolver beanResolver = buildContext.getBeanResolver();
-		return beanReference.asSubTypeOf( expectedType ).resolve( beanResolver );
+		return doBuild( buildContext.getBeanResolver(), expectedType );
 	}
 }

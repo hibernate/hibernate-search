@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingCo
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
@@ -196,8 +197,8 @@ public class StartupStubBridge
 		}
 
 		@Override
-		public BeanHolder<? extends ValueBridge<?, ?>> buildForValue(BridgeBuildContext buildContext) {
-			return build();
+		public void bind(ValueBindingContext<?> context) {
+			context.setBridge( Object.class, build(), null );
 		}
 
 		private BeanHolder<StartupStubBridge> build() {

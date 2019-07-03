@@ -39,6 +39,7 @@ import java.util.UUID;
 import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultCharacterValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultDurationValueBridge;
@@ -92,40 +93,40 @@ public final class BridgeResolver {
 		addIdentifierBridgeForExactRawType( BigInteger.class, ignored -> BeanHolder.of( new DefaultBigIntegerIdentifierBridge() ) );
 		addIdentifierBridgeForExactRawType( UUID.class, ignored -> BeanHolder.of( new DefaultUUIDIdentifierBridge() ) );
 
-		addValueBridgeForExactRawType( Integer.class, buildContext -> BeanHolder.of( new PassThroughValueBridge<>( Integer.class, ConvertUtils::convertInteger ) ) );
-		addValueBridgeForExactRawType( Long.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Long.class, ConvertUtils::convertLong ) ) );
-		addValueBridgeForExactRawType( Boolean.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Boolean.class, ConvertUtils::convertBoolean ) ) );
-		addValueBridgeForExactRawType( String.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( String.class, ParseUtils::parseString ) ) );
-		addValueBridgeForExactRawType( LocalDate.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( LocalDate.class, ParseUtils::parseLocalDate ) ) );
-		addValueBridgeForExactRawType( Instant.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Instant.class, ParseUtils::parseInstant ) ) );
-		addValueBridgeForExactRawType( Date.class, ignored -> BeanHolder.of( new DefaultJavaUtilDateValueBridge() ) );
-		addValueBridgeForExactRawType( Calendar.class, ignored -> BeanHolder.of( new DefaultJavaUtilCalendarValueBridge() ) );
-		addValueBridgeForTypePattern( concreteEnumPattern, ignored -> BeanHolder.of( new DefaultEnumValueBridge<>() ) );
-		addValueBridgeForExactRawType( Character.class, ignored -> BeanHolder.of( new DefaultCharacterValueBridge() ) );
-		addValueBridgeForExactRawType( Byte.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Byte.class, ConvertUtils::convertByte ) ) );
-		addValueBridgeForExactRawType( Short.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Short.class, ConvertUtils::convertShort ) ) );
-		addValueBridgeForExactRawType( Float.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Float.class, ConvertUtils::convertFloat ) ) );
-		addValueBridgeForExactRawType( Double.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Double.class, ConvertUtils::convertDouble ) ) );
-		addValueBridgeForExactRawType( BigDecimal.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( BigDecimal.class, ConvertUtils::convertBigDecimal ) ) );
-		addValueBridgeForExactRawType( BigInteger.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( BigInteger.class, ConvertUtils::convertBigInteger ) ) );
-		addValueBridgeForExactRawType( UUID.class, ignored -> BeanHolder.of( new DefaultUUIDValueBridge() ) );
-		addValueBridgeForExactRawType( LocalDateTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( LocalDateTime.class, ParseUtils::parseLocalDateTime ) ) );
-		addValueBridgeForExactRawType( LocalTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( LocalTime.class, ParseUtils::parseLocalTime ) ) );
-		addValueBridgeForExactRawType( ZonedDateTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( ZonedDateTime.class, ParseUtils::parseZonedDateTime ) ) );
-		addValueBridgeForExactRawType( Year.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Year.class, ParseUtils::parseYear ) ) );
-		addValueBridgeForExactRawType( YearMonth.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( YearMonth.class, ParseUtils::parseYearMonth ) ) );
-		addValueBridgeForExactRawType( MonthDay.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( MonthDay.class, ParseUtils::parseMonthDay ) ) );
-		addValueBridgeForExactRawType( OffsetDateTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( OffsetDateTime.class, ParseUtils::parseOffsetDateTime ) ) );
-		addValueBridgeForExactRawType( OffsetTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( OffsetTime.class, ParseUtils::parseOffsetTime ) ) );
-		addValueBridgeForExactRawType( ZoneOffset.class, ignored -> BeanHolder.of( new DefaultZoneOffsetValueBridge() ) );
-		addValueBridgeForExactRawType( ZoneId.class, ignored -> BeanHolder.of( new DefaultZoneIdValueBridge() ) );
-		addValueBridgeForExactRawType( Period.class, ignored -> BeanHolder.of( new DefaultPeriodValueBridge() ) );
-		addValueBridgeForExactRawType( Duration.class, ignored -> BeanHolder.of( new DefaultDurationValueBridge() ) );
-		addValueBridgeForExactRawType( URI.class, ignored -> BeanHolder.of( new DefaultJavaNetURIValueBridge() ) );
-		addValueBridgeForExactRawType( URL.class, ignored -> BeanHolder.of( new DefaultJavaNetURLValueBridge() ) );
-		addValueBridgeForExactRawType( java.sql.Date.class, ignored -> BeanHolder.of( new DefaultJavaSqlDateValueBridge() ) );
-		addValueBridgeForExactRawType( Timestamp.class, ignored -> BeanHolder.of( new DefaultJavaSqlTimestampValueBridge() ) );
-		addValueBridgeForExactRawType( Time.class, ignored -> BeanHolder.of( new DefaultJavaSqlTimeValueBridge() ) );
+		addValueBridgeForExactRawType( Integer.class, new PassThroughValueBridge.Builder<>( Integer.class, ConvertUtils::convertInteger ) );
+		addValueBridgeForExactRawType( Long.class, new PassThroughValueBridge.Builder<>( Long.class, ConvertUtils::convertLong ) );
+		addValueBridgeForExactRawType( Boolean.class, new PassThroughValueBridge.Builder<>( Boolean.class, ConvertUtils::convertBoolean ) );
+		addValueBridgeForExactRawType( String.class, new PassThroughValueBridge.Builder<>( String.class, ParseUtils::parseString ) );
+		addValueBridgeForExactRawType( LocalDate.class, new PassThroughValueBridge.Builder<>( LocalDate.class, ParseUtils::parseLocalDate ) );
+		addValueBridgeForExactRawType( Instant.class, new PassThroughValueBridge.Builder<>( Instant.class, ParseUtils::parseInstant ) );
+		addValueBridgeForExactRawType( Date.class, new DefaultJavaUtilDateValueBridge() );
+		addValueBridgeForExactRawType( Calendar.class, new DefaultJavaUtilCalendarValueBridge() );
+		addValueBridgeForTypePattern( concreteEnumPattern, new DefaultEnumValueBridge.Builder() );
+		addValueBridgeForExactRawType( Character.class, new DefaultCharacterValueBridge() );
+		addValueBridgeForExactRawType( Byte.class, new PassThroughValueBridge.Builder<>( Byte.class, ConvertUtils::convertByte ) );
+		addValueBridgeForExactRawType( Short.class, new PassThroughValueBridge.Builder<>( Short.class, ConvertUtils::convertShort ) );
+		addValueBridgeForExactRawType( Float.class, new PassThroughValueBridge.Builder<>( Float.class, ConvertUtils::convertFloat ) );
+		addValueBridgeForExactRawType( Double.class, new PassThroughValueBridge.Builder<>( Double.class, ConvertUtils::convertDouble ) );
+		addValueBridgeForExactRawType( BigDecimal.class, new PassThroughValueBridge.Builder<>( BigDecimal.class, ConvertUtils::convertBigDecimal ) );
+		addValueBridgeForExactRawType( BigInteger.class, new PassThroughValueBridge.Builder<>( BigInteger.class, ConvertUtils::convertBigInteger ) );
+		addValueBridgeForExactRawType( UUID.class, new DefaultUUIDValueBridge() );
+		addValueBridgeForExactRawType( LocalDateTime.class, new PassThroughValueBridge.Builder<>( LocalDateTime.class, ParseUtils::parseLocalDateTime ) );
+		addValueBridgeForExactRawType( LocalTime.class, new PassThroughValueBridge.Builder<>( LocalTime.class, ParseUtils::parseLocalTime ) );
+		addValueBridgeForExactRawType( ZonedDateTime.class, new PassThroughValueBridge.Builder<>( ZonedDateTime.class, ParseUtils::parseZonedDateTime ) );
+		addValueBridgeForExactRawType( Year.class, new PassThroughValueBridge.Builder<>( Year.class, ParseUtils::parseYear ) );
+		addValueBridgeForExactRawType( YearMonth.class, new PassThroughValueBridge.Builder<>( YearMonth.class, ParseUtils::parseYearMonth ) );
+		addValueBridgeForExactRawType( MonthDay.class, new PassThroughValueBridge.Builder<>( MonthDay.class, ParseUtils::parseMonthDay ) );
+		addValueBridgeForExactRawType( OffsetDateTime.class, new PassThroughValueBridge.Builder<>( OffsetDateTime.class, ParseUtils::parseOffsetDateTime ) );
+		addValueBridgeForExactRawType( OffsetTime.class, new PassThroughValueBridge.Builder<>( OffsetTime.class, ParseUtils::parseOffsetTime ) );
+		addValueBridgeForExactRawType( ZoneOffset.class, new DefaultZoneOffsetValueBridge() );
+		addValueBridgeForExactRawType( ZoneId.class, new DefaultZoneIdValueBridge() );
+		addValueBridgeForExactRawType( Period.class, new DefaultPeriodValueBridge() );
+		addValueBridgeForExactRawType( Duration.class, new DefaultDurationValueBridge() );
+		addValueBridgeForExactRawType( URI.class, new DefaultJavaNetURIValueBridge() );
+		addValueBridgeForExactRawType( URL.class, new DefaultJavaNetURLValueBridge() );
+		addValueBridgeForExactRawType( java.sql.Date.class, new DefaultJavaSqlDateValueBridge() );
+		addValueBridgeForExactRawType( Timestamp.class, new DefaultJavaSqlTimestampValueBridge() );
+		addValueBridgeForExactRawType( Time.class, new DefaultJavaSqlTimeValueBridge() );
 	}
 
 	public IdentifierBridgeBuilder resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {
@@ -163,6 +164,10 @@ public final class BridgeResolver {
 
 	private <V> void addValueBridgeForExactRawType(Class<V> type, ValueBridgeBuilder builder) {
 		exactRawTypeValueBridgeMappings.put( type, builder );
+	}
+
+	private <V> void addValueBridgeForExactRawType(Class<V> type, ValueBridge<V, ?> bridge) {
+		addValueBridgeForExactRawType( type, context -> context.setBridge( type, bridge ) );
 	}
 
 	private void addValueBridgeForTypePattern(TypePatternMatcher typePatternMatcher,
