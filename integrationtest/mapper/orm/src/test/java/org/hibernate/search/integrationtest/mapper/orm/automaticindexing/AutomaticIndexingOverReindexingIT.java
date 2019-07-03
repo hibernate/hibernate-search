@@ -19,9 +19,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -301,7 +302,7 @@ public class AutomaticIndexingOverReindexingIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(type = Level3Property1Bridge.class))
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(builderType = Level3Property1Bridge.Builder.class))
 	public @interface Level3Property1BridgeAnnotation {
 
 	}
@@ -311,8 +312,7 @@ public class AutomaticIndexingOverReindexingIT {
 		private PojoElementAccessor<String> level3Property1SourceAccessor;
 		private IndexFieldReference<String> property1FromBridgeFieldReference;
 
-		@Override
-		public void bind(TypeBridgeBindingContext context) {
+		private Level3Property1Bridge(TypeBindingContext context) {
 			level3Property1SourceAccessor = context.getBridgedElement().property( "level2" )
 					.property( "level3" )
 					.property( "property1" )
@@ -329,6 +329,13 @@ public class AutomaticIndexingOverReindexingIT {
 					property1FromBridgeFieldReference,
 					level3Property1SourceAccessor.read( bridgedElement )
 			);
+		}
+
+		public static class Builder implements TypeBridgeBuilder<Level3Property1BridgeAnnotation> {
+			@Override
+			public void bind(TypeBindingContext context) {
+				context.setBridge( new Level3Property1Bridge( context ) );
+			}
 		}
 	}
 }

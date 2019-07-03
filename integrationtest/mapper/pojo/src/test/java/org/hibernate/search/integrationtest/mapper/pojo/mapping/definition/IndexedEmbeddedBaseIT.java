@@ -20,13 +20,10 @@ import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappin
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;

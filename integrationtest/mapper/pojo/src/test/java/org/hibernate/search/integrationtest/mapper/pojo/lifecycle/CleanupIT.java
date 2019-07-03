@@ -22,9 +22,9 @@ import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubContainerExtractor;
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
@@ -541,22 +541,22 @@ public class CleanupIT {
 		}
 
 		@Override
+		public void bind(TypeBindingContext context) {
+			throw new SimulatedFailure();
+		}
+
+		@Override
+		public void bind(PropertyBindingContext context) {
+			throw new SimulatedFailure();
+		}
+
+		@Override
 		public BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext) {
 			throw new SimulatedFailure();
 		}
 
 		@Override
-		public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
-			throw new SimulatedFailure();
-		}
-
-		@Override
 		public BeanHolder<? extends RoutingKeyBridge> buildForRoutingKey(BridgeBuildContext buildContext) {
-			throw new SimulatedFailure();
-		}
-
-		@Override
-		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
 			throw new SimulatedFailure();
 		}
 

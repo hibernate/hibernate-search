@@ -6,14 +6,18 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import java.lang.annotation.Annotation;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
@@ -27,31 +31,30 @@ import org.hibernate.search.mapper.pojo.model.PojoModelType;
 public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexingBridgeIT {
 
 	@Override
-	protected Class<? extends TypeBridge> getContainingEntityTypeBridgeClass() {
-		return ContainingEntityTypeBridge.class;
+	protected TypeBridgeBuilder<?> createContainingEntityTypeBridgeBuilder() {
+		return new ContainingEntityTypeBridge.Builder();
 	}
 
 	@Override
-	protected Class<? extends PropertyBridge> getContainingEntitySingleValuedPropertyBridgeClass() {
-		return ContainingEntitySingleValuedPropertyBridge.class;
+	protected PropertyBridgeBuilder<?> createContainingEntitySingleValuedPropertyBridgeBuilder() {
+		return new ContainingEntitySingleValuedPropertyBridge.Builder();
 	}
 
 	@Override
-	protected Class<? extends PropertyBridge> getContainingEntityMultiValuedPropertyBridgeClass() {
+	protected PropertyBridgeBuilder<?> createContainingEntityMultiValuedPropertyBridgeBuilder() {
 		return null; // Not supported with accessors
 	}
 
 	public static class ContainingEntityTypeBridge implements TypeBridge {
 
-		private PojoElementAccessor<String> directFieldSourceAccessor;
-		private PojoElementAccessor<String> includedInTypeBridgeFieldSourceAccessor;
-		private IndexObjectFieldReference typeBridgeObjectFieldReference;
-		private IndexFieldReference<String> directFieldReference;
-		private IndexObjectFieldReference childObjectFieldReference;
-		private IndexFieldReference<String> includedInTypeBridgeFieldReference;
+		private final PojoElementAccessor<String> directFieldSourceAccessor;
+		private final PojoElementAccessor<String> includedInTypeBridgeFieldSourceAccessor;
+		private final IndexObjectFieldReference typeBridgeObjectFieldReference;
+		private final IndexFieldReference<String> directFieldReference;
+		private final IndexObjectFieldReference childObjectFieldReference;
+		private final IndexFieldReference<String> includedInTypeBridgeFieldReference;
 
-		@Override
-		public void bind(TypeBridgeBindingContext context) {
+		private ContainingEntityTypeBridge(TypeBindingContext context) {
 			PojoModelType bridgedElement = context.getBridgedElement();
 			directFieldSourceAccessor = bridgedElement.property( "directField" )
 					.createAccessor( String.class );
@@ -80,16 +83,22 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 					includedInTypeBridgeFieldReference, includedInTypeBridgeFieldSourceAccessor.read( bridgedElement )
 			);
 		}
+
+		public static class Builder implements TypeBridgeBuilder<Annotation> {
+			@Override
+			public void bind(TypeBindingContext context) {
+				context.setBridge( new ContainingEntityTypeBridge( context ) );
+			}
+		}
 	}
 
 	public static class ContainingEntitySingleValuedPropertyBridge implements PropertyBridge {
 
-		private PojoElementAccessor<String> includedInPropertyBridgeSourceAccessor;
-		private IndexObjectFieldReference propertyBridgeObjectFieldReference;
-		private IndexFieldReference<String> includedInPropertyBridgeFieldReference;
+		private final PojoElementAccessor<String> includedInPropertyBridgeSourceAccessor;
+		private final IndexObjectFieldReference propertyBridgeObjectFieldReference;
+		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
 
-		@Override
-		public void bind(PropertyBridgeBindingContext context) {
+		private ContainingEntitySingleValuedPropertyBridge(PropertyBindingContext context) {
 			includedInPropertyBridgeSourceAccessor = context.getBridgedElement().property( "containedSingle" )
 					.property( "includedInSingleValuedPropertyBridge" )
 					.createAccessor( String.class );
@@ -108,6 +117,13 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 					includedInPropertyBridgeFieldReference, includedInPropertyBridgeSourceAccessor.read(
 							bridgedElement )
 			);
+		}
+
+		public static class Builder implements PropertyBridgeBuilder<Annotation> {
+			@Override
+			public void bind(PropertyBindingContext context) {
+				context.setBridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
+			}
 		}
 	}
 }

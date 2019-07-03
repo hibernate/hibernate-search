@@ -19,9 +19,10 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.AutomaticIndexingBridgeAccessorsIT;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -201,7 +202,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.FIELD, ElementType.METHOD })
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(type = BridgeGoingThroughEntityBoundaries.class))
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(builderType = BridgeGoingThroughEntityBoundaries.Builder.class))
 	public @interface BridgeGoingThroughEntityBoundariesAnnotation {
 	}
 
@@ -209,8 +210,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 
 		private IndexFieldReference<Integer> indexFieldReference;
 
-		@Override
-		public void bind(PropertyBridgeBindingContext context) {
+		private BridgeGoingThroughEntityBoundaries(PropertyBindingContext context) {
 			context.getDependencies().use( "indexedInContaining" );
 
 			indexFieldReference = context.getIndexSchemaElement().field(
@@ -224,6 +224,13 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 			Contained castedBridgedElement = (Contained) bridgedElement;
 			Integer value = castedBridgedElement.getIndexedInContaining();
 			target.addValue( indexFieldReference, value );
+		}
+
+		public static class Builder implements PropertyBridgeBuilder<BridgeGoingThroughEntityBoundariesAnnotation> {
+			@Override
+			public void bind(PropertyBindingContext context) {
+				context.setBridge( new BridgeGoingThroughEntityBoundaries( context ) );
+			}
 		}
 	}
 }

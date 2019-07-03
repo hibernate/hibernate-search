@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.lang.annotation.Annotation;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -24,7 +25,8 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -69,7 +71,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 							@Override
 							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( IndexedEntity.class )
-										.bridge( QueryBasedTypeBridge.class );
+										.bridge( new QueryBasedTypeBridge.Builder() );
 							}
 						}
 				)
@@ -233,11 +235,10 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 
 	public static class QueryBasedTypeBridge implements TypeBridge {
 
-		private IndexObjectFieldReference typeBridgeObjectFieldReference;
-		private IndexFieldReference<String> includedInTypeBridgeFieldReference;
+		private final IndexObjectFieldReference typeBridgeObjectFieldReference;
+		private final IndexFieldReference<String> includedInTypeBridgeFieldReference;
 
-		@Override
-		public void bind(TypeBridgeBindingContext context) {
+		private QueryBasedTypeBridge(TypeBindingContext context) {
 			context.getDependencies()
 					.fromOtherEntity( ContainedEntity.class, "parent" )
 					.use( "includedInTypeBridge" );
@@ -270,6 +271,13 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 			DocumentElement typeBridgeObjectField = target.addObject( typeBridgeObjectFieldReference );
 			for ( String includedInTypeBridge : query.list() ) {
 				typeBridgeObjectField.addValue( includedInTypeBridgeFieldReference, includedInTypeBridge );
+			}
+		}
+
+		public static class Builder implements TypeBridgeBuilder<Annotation> {
+			@Override
+			public void bind(TypeBindingContext context) {
+				context.setBridge( new QueryBasedTypeBridge( context ) );
 			}
 		}
 	}

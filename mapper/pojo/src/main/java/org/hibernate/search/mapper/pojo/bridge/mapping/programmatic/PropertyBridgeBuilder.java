@@ -8,8 +8,10 @@ package org.hibernate.search.mapper.pojo.bridge.mapping.programmatic;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
 /**
  * A builder of {@link PropertyBridge}.
@@ -27,15 +29,22 @@ public interface PropertyBridgeBuilder<A extends Annotation> {
 	}
 
 	/**
-	 * Build a bridge.
+	 * Binds a property to index fields.
 	 * <p>
-	 * <strong>Warning:</strong> this method can be called multiple times and must return a new instance to each call.
+	 * The context passed in parameter provides various information about the property being bound.
+	 * Implementations are expected to take advantage of that information
+	 * and to call one of the {@code setBridge(...)} methods on the context
+	 * to set the bridge.
+	 * <p>
+	 * Implementations are also expected to declare dependencies, i.e. the properties
+	 * that will later be used in the
+	 * {@link PropertyBridge#write(DocumentElement, Object, PropertyBridgeWriteContext)} method,
+	 * using {@link PropertyBindingContext#getDependencies()}.
+	 * Failing that, Hibernate Search will not reindex entities properly when an indexed property is modified.
 	 *
-	 * @param buildContext A object providing access to other components involved in the build process.
-	 * @return A new bridge instance, enclosed in a {@link BeanHolder}.
-	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
+	 * @param context A context object providing information about the property being bound,
+	 * and expecting a call to one of its {@code setBridge(...)} methods.
 	 */
-	// FIXME use method parameter overload to avoid conflict between this build() method and the ones from other builders
-	BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext);
+	void bind(PropertyBindingContext context);
 
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.mapping.definition;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -24,13 +25,14 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -261,7 +263,7 @@ public class AnnotationMappingDiscoveryIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.METHOD, ElementType.FIELD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(type = CustomMarkerConsumingPropertyBridge.class))
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(builderType = CustomMarkerConsumingPropertyBridge.Builder.class))
 	private @interface CustomMarkerConsumingPropertyBridgeAnnotation {
 	}
 
@@ -285,8 +287,7 @@ public class AnnotationMappingDiscoveryIT {
 	public static final class CustomMarkerConsumingPropertyBridge implements PropertyBridge {
 		private List<IndexObjectFieldReference> objectFieldReferences = new ArrayList<>();
 
-		@Override
-		public void bind(PropertyBridgeBindingContext context) {
+		private CustomMarkerConsumingPropertyBridge(PropertyBindingContext context) {
 			List<PojoModelProperty> markedProperties = context.getBridgedElement().properties()
 					.filter( property -> property.markers( CustomMarker.class ).findAny().isPresent() )
 					.collect( Collectors.toList() );
@@ -302,6 +303,13 @@ public class AnnotationMappingDiscoveryIT {
 		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
 			for ( IndexObjectFieldReference reference : objectFieldReferences ) {
 				target.addObject( reference );
+			}
+		}
+
+		public static class Builder implements PropertyBridgeBuilder<Annotation> {
+			@Override
+			public void bind(PropertyBindingContext context) {
+				context.setBridge( new CustomMarkerConsumingPropertyBridge( context ) );
 			}
 		}
 	}

@@ -16,6 +16,8 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
@@ -53,13 +55,31 @@ public final class BeanBridgeBuilder
 	}
 
 	@Override
-	public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
-		return doBuild( buildContext, TypeBridge.class );
+	public void bind(TypeBindingContext context) {
+		BeanHolder<? extends TypeBridge> bridgeHolder = doBuild( context.getBeanResolver(), TypeBridge.class );
+		try {
+			context.setBridge( bridgeHolder );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( bridgeHolder );
+			throw e;
+		}
 	}
 
 	@Override
-	public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
-		return doBuild( buildContext, PropertyBridge.class );
+	public void bind(PropertyBindingContext context) {
+		BeanHolder<? extends PropertyBridge> bridgeHolder = doBuild( context.getBeanResolver(), PropertyBridge.class );
+		try {
+			context.setBridge( bridgeHolder );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( bridgeHolder );
+			throw e;
+		}
 	}
 
 	@Override
