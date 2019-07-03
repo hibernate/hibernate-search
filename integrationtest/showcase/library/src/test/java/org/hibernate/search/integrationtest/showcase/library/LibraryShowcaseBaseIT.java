@@ -52,7 +52,6 @@ import org.hibernate.search.integrationtest.showcase.library.service.LibraryServ
 import org.hibernate.search.integrationtest.showcase.library.service.TestDataService;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -376,8 +375,6 @@ public class LibraryShowcaseBaseIT {
 	 * This demonstrates how to define a projection for the query and how to set order.
 	 */
 	@Test
-	// FIXME: re-enable this test once we properly implement PassThroughValueBridge binding
-	@Ignore
 	public void projectionAndOrder() {
 		List<String> results = documentService.getAuthorsOfBooksHavingTerms( "java", SortOrder.ASC );
 		assertThat( results ).containsExactly( "Mark Red", "Michele Violet", "Stuart Green" );

@@ -12,8 +12,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributorBridgeContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
+import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorBridgeContext;
 
 class PojoCompositeFieldModelContributor<C extends StandardIndexFieldTypeOptionsStep<?, ?>>
 		implements FieldModelContributor {

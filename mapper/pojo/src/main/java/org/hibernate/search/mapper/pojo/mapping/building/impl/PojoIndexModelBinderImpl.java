@@ -9,12 +9,8 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
@@ -24,12 +20,12 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.IdentifierBridgeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.PropertyBridgeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingKeyBridgeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.TypeBridgeBindingContextImpl;
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBridgeBindingContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
@@ -42,7 +38,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.FieldModelContributor;
+import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.AbstractPojoBridgedElementDependencyContext;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyIndexingDependencyConfigurationContextImpl;
@@ -68,6 +64,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final BeanResolver beanResolver;
 	private final BridgeBuildContext bridgeBuildContext;
 	private final PojoBootstrapIntrospector introspector;
 	private final ContainerExtractorBinder extractorBinder;
@@ -78,6 +75,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			PojoBootstrapIntrospector introspector,
 			ContainerExtractorBinder extractorBinder, BridgeResolver bridgeResolver,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
+		this.beanResolver = buildContext.getBeanResolver();
 		this.bridgeBuildContext = new BridgeBuildContextImpl( buildContext );
 		this.introspector = introspector;
 		this.extractorBinder = extractorBinder;
@@ -252,7 +250,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexBindingContext bindingContext,
+	public <V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexBindingContext indexBindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
 			ValueBridgeBuilder builder,
 			String relativeFieldName, FieldModelContributor contributor) {
@@ -266,48 +264,14 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			defaultedBuilder = bridgeResolver.resolveValueBridgeForType( valueTypeModel );
 		}
 
-		BeanHolder<? extends ValueBridge<?, ?>> bridgeHolder = defaultedBuilder.buildForValue( bridgeBuildContext );
-		try {
+		ValueBindingContextImpl<V> bindingContext = new ValueBindingContextImpl<>(
+				beanResolver,
+				valueTypeModel, multiValued,
+				indexBindingContext, defaultsProvider,
+				relativeFieldName, contributor
+		);
 
-			PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
-			IndexSchemaElement schemaElement = bindingContext.getSchemaElement( listener );
-
-			/*
-			 * In general, this cast is illegal because SomeGenericType<? extends ValueBridge<?, ?>>,
-			 * for all we know, may always return a different bridge for each invocation of its get() method:
-			 * first a ValueBridge<Object, Integer>, then a ValueBridge<Long, String>, etc.
-			 * Thus there may not a be a single pair of values V and F such that the generic type can safely
-			 * be considered as implementing SomeGenericType<? extends ValueBridge<V, F>>.
-			 * But in the case of BeanHolder, only one instance of the bridge is ever returned by get(),
-			 * so there *is* a single pair of values V and F such that our bean holder can safely be considered
-			 * an instance of BeanHolder<? extends ValueBridge<V, F>>.
-			 */
-			@SuppressWarnings({"unchecked", "rawtypes"})
-			BoundValueBridge<V, ?> boundValueBridge = bindValueBridge(
-					bindingContext.createTypeFactory( defaultsProvider ),
-					schemaElement, valueTypeModel, multiValued,
-					(BeanHolder<? extends ValueBridge>) bridgeHolder,
-					relativeFieldName, contributor
-			);
-
-			// If all fields are filtered out, we should ignore the bridge
-			if ( listener.schemaContributed ) {
-				return Optional.of( boundValueBridge );
-			}
-			else {
-				try ( Closer<RuntimeException> closer = new Closer<>() ) {
-					closer.push( holder -> holder.get().close(), bridgeHolder );
-					closer.push( BeanHolder::close, bridgeHolder );
-				}
-				return Optional.empty();
-			}
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( holder -> holder.get().close(), bridgeHolder )
-					.push( BeanHolder::close, bridgeHolder );
-			throw e;
-		}
+		return bindingContext.applyBuilder( defaultedBuilder );
 	}
 
 	private <I, I2, B extends IdentifierBridge<I2>> BeanHolder<? extends IdentifierBridge<I>> bindIdentifierBridge(
@@ -344,80 +308,6 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		bindingContext.idDslConverter( new PojoIdentifierBridgeToDocumentIdentifierValueConverter<>( bridge ) );
 
 		return castedBridgeHolder;
-	}
-
-	private <V, V2, F, B extends ValueBridge<V2, F>> BoundValueBridge<V, ?> bindValueBridge(
-			IndexFieldTypeFactory indexFieldTypeFactory,
-			IndexSchemaElement schemaElement, PojoGenericTypeModel<V> valueTypeModel, boolean multiValued,
-			BeanHolder<? extends B> bridgeHolder,
-			String relativeFieldName, FieldModelContributor contributor) {
-		B bridge = bridgeHolder.get();
-
-		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
-		Class<?> bridgeParameterRawType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
-				.map( ReflectionUtils::getRawType )
-				.orElseThrow( () -> new AssertionFailure(
-						"Could not auto-detect the input type for value bridge '"
-						+ bridge + "'."
-						+ " There is a bug in Hibernate Search, please report it."
-				) );
-		// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
-		if ( !valueTypeModel.getRawType().isSubTypeOf( bridgeParameterRawType ) ) {
-			throw log.invalidInputTypeForBridge( bridge, valueTypeModel );
-		}
-
-		@SuppressWarnings("unchecked") // Checked using reflection just above
-		Class<? super V2> castedBridgeParameterRawType = (Class<? super V2>) bridgeParameterRawType;
-		@SuppressWarnings("unchecked") // Checked using reflection just above
-		PojoGenericTypeModel<? extends V2> castedValueTypeModel =
-				(PojoGenericTypeModel<? extends V2>) valueTypeModel;
-		@SuppressWarnings("unchecked") // Checked using reflection just above
-		BeanHolder<? extends ValueBridge<? super V, F>> castedBridgeHolder =
-				(BeanHolder<? extends ValueBridge<? super V, F>>) bridgeHolder;
-
-		// Then give the bridge a chance to contribute to the index schema
-		ValueBridgeBindingContextImpl<V2> bridgeBindingContext = new ValueBridgeBindingContextImpl<>(
-				new PojoModelValueElement<>( castedValueTypeModel ),
-				indexFieldTypeFactory
-		);
-		StandardIndexFieldTypeOptionsStep<?, F> fieldTypeContext = bridge.bind( bridgeBindingContext );
-
-		// If the bridge did not contribute anything, infer the field type and define it automatically
-		if ( fieldTypeContext == null ) {
-			// TODO HSEARCH-3243 We're assuming the field type is raw here, maybe we should enforce it?
-			@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
-			Class<F> returnType =
-					(Class<F>) bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )
-					.map( ReflectionUtils::getRawType )
-					.orElseThrow( () -> new AssertionFailure(
-							"Could not auto-detect the return type for value bridge '"
-							+ bridge + "'."
-							+ " There is a bug in Hibernate Search, please report it."
-					) );
-			fieldTypeContext = indexFieldTypeFactory.as( returnType );
-		}
-
-		// Then register the bridge itself as a converter to use in the DSL
-		fieldTypeContext.dslConverter(
-				new PojoValueBridgeToDocumentFieldValueConverter<>( bridge )
-		);
-
-		// Then register the bridge itself as a converter to use in projections
-		fieldTypeContext.projectionConverter(
-				new PojoValueBridgeFromDocumentFieldValueConverter<>( bridge, castedBridgeParameterRawType )
-		);
-
-		// Then give the mapping a chance to override some of the model (add storage, ...)
-		contributor.contribute( fieldTypeContext, new FieldModelContributorBridgeContextImpl<>( bridge, fieldTypeContext ) );
-
-		IndexSchemaFieldOptionsStep<?, ? extends IndexFieldReference<F>> fieldContext =
-				schemaElement.field( relativeFieldName, fieldTypeContext );
-		if ( multiValued ) {
-			fieldContext.multiValued();
-		}
-		IndexFieldReference<F> indexFieldReference = fieldContext.toReference();
-
-		return new BoundValueBridge<>( castedBridgeHolder, indexFieldReference );
 	}
 
 	private void checkBridgeDependencies(AbstractPojoModelCompositeElement<?> pojoModelRootElement,

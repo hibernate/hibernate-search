@@ -6,20 +6,18 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.bridge;
 
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 public class ISBNBridge implements ValueBridge<ISBN, String> {
 
-	@Override
-	public StandardIndexFieldTypeOptionsStep<?, String> bind(ValueBridgeBindingContext<ISBN> context) {
-		return context.getTypeFactory().asString()
-				.normalizer( LibraryAnalyzers.NORMALIZER_ISBN );
+	private ISBNBridge() {
+		// Private, use the builder instead
 	}
 
 	@Override
@@ -41,6 +39,16 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
+	}
+
+	public static class Builder implements ValueBridgeBuilder {
+		@Override
+		public void bind(ValueBindingContext<?> context) {
+			context.setBridge(
+					ISBN.class, new ISBNBridge(),
+					context.getTypeFactory().asString().normalizer( LibraryAnalyzers.NORMALIZER_ISBN )
+			);
+		}
 	}
 
 }

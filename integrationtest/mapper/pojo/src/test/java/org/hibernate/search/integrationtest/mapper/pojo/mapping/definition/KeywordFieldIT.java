@@ -11,12 +11,12 @@ import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Searchable;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -199,78 +199,75 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void customBridge_implicitBinding() {
+	public void customBridge_implicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
-			WrappedValue myProperty;
-			IndexedEntity(int id, WrappedValue myProperty) {
-				this.id = id;
-				this.myProperty = myProperty;
-			}
+			WrappedValue wrap;
+
 			@DocumentId
 			public Integer getId() {
 				return id;
 			}
-			@KeywordField(normalizer = NORMALIZER_NAME, valueBridge = @ValueBridgeRef(type = ValidImplicitBindingBridge.class))
-			public WrappedValue getMyProperty() {
-				return myProperty;
+
+			@KeywordField(normalizer = NORMALIZER_NAME,
+					valueBridge = @ValueBridgeRef(type = ValidTypeBridge.class))
+			public WrappedValue getWrap() {
+				return wrap;
 			}
 		}
 
-		WrappedValue value = new WrappedValue();
-		value.wrapped = "some value";
-		doTestValidMapping(
-				IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ),
-				WrappedValue.class, String.class,
-				value, value.wrapped
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "wrap", String.class, f -> f.normalizerName( NORMALIZER_NAME ) )
 		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	public void customBridge_explicitBinding() {
+	public void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
-			WrappedValue myProperty;
-			IndexedEntity(int id, WrappedValue myProperty) {
-				this.id = id;
-				this.myProperty = myProperty;
-			}
+			WrappedValue wrap;
+
 			@DocumentId
 			public Integer getId() {
 				return id;
 			}
-			@KeywordField(normalizer = NORMALIZER_NAME, valueBridge = @ValueBridgeRef(type = ValidExplicitBindingBridge.class))
-			public WrappedValue getMyProperty() {
-				return myProperty;
+
+			@KeywordField(normalizer = NORMALIZER_NAME,
+					valueBridge = @ValueBridgeRef(builderType = ValidTypeBridge.ExplictFieldTypeBuilder.class))
+			public WrappedValue getWrap() {
+				return wrap;
 			}
 		}
 
-		WrappedValue value = new WrappedValue();
-		value.wrapped = "some value";
-		doTestValidMapping(
-				IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ),
-				WrappedValue.class, String.class,
-				value, value.wrapped
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "wrap", String.class, f -> f.normalizerName( NORMALIZER_NAME ) )
 		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	public void error_invalidFieldType_defaultBridge() {
-		@Indexed
+	public void defaultBridge_invalidFieldType() {
+		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
-			Integer myProperty;
+			Integer notString;
+
 			@DocumentId
 			public Integer getId() {
 				return id;
 			}
+
 			@KeywordField(normalizer = NORMALIZER_NAME)
-			public Integer getMyProperty() {
-				return myProperty;
+			public Integer getNotString() {
+				return notString;
 			}
 		}
+
 		SubTest.expectException(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
@@ -278,10 +275,10 @@ public class KeywordFieldIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".myProperty" )
+						.pathContext( ".notString" )
 						.failure(
-								"This property is mapped to a keyword field, but with a value bridge that creates a non-String or otherwise incompatible field",
-								"bind() method returned '",
+								"This property is mapped to a keyword field, but with a value bridge that binds to a non-String or otherwise incompatible field",
+								"encountered type DSL step '",
 								"expected '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
@@ -289,20 +286,24 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void error_invalidFieldType_customBridge_explicitBinding() {
-		@Indexed
+	public void customBridge_implicitFieldType_invalid() {
+		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
-			String myProperty;
+			WrappedValue wrap;
+
 			@DocumentId
 			public Integer getId() {
 				return id;
 			}
-			@KeywordField(normalizer = NORMALIZER_NAME, valueBridge = @ValueBridgeRef(type = InvalidExplicitBindingBridge.class))
-			public String getMyProperty() {
-				return myProperty;
+
+			@KeywordField(normalizer = NORMALIZER_NAME,
+					valueBridge = @ValueBridgeRef(type = InvalidTypeBridge.class))
+			public WrappedValue getWrap() {
+				return wrap;
 			}
 		}
+
 		SubTest.expectException(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
@@ -310,10 +311,46 @@ public class KeywordFieldIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".myProperty" )
+						.pathContext( ".wrap" )
 						.failure(
-								"This property is mapped to a keyword field, but with a value bridge that creates a non-String or otherwise incompatible field",
-								"bind() method returned '",
+								"This property is mapped to a keyword field, but with a value bridge that binds to a non-String or otherwise incompatible field",
+								"encountered type DSL step '",
+								"expected '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	public void customBridge_explicitFieldType_invalid() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			WrappedValue wrap;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@KeywordField(normalizer = NORMALIZER_NAME,
+					valueBridge = @ValueBridgeRef(builderType = InvalidTypeBridge.ExplictFieldTypeBuilder.class))
+			public WrappedValue getWrap() {
+				return wrap;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".wrap" )
+						.failure(
+								"This property is mapped to a keyword field, but with a value bridge that binds to a non-String or otherwise incompatible field",
+								"encountered type DSL step '",
 								"expected '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
@@ -346,52 +383,46 @@ public class KeywordFieldIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	public static class ValidImplicitBindingBridge implements ValueBridge<WrappedValue, String> {
+	public static class ValidTypeBridge implements ValueBridge<WrappedValue, String> {
 		@Override
-		public String toIndexedValue(WrappedValue value,
-				ValueBridgeToIndexedValueContext context) {
+		public String toIndexedValue(WrappedValue value, ValueBridgeToIndexedValueContext context) {
 			return value == null ? null : value.wrapped;
 		}
+
 		@Override
 		public WrappedValue cast(Object value) {
 			throw new UnsupportedOperationException( "Should not be called" );
+		}
+
+		public static class ExplictFieldTypeBuilder implements ValueBridgeBuilder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.setBridge( WrappedValue.class, new ValidTypeBridge(), context.getTypeFactory().asString() );
+			}
 		}
 	}
 
-	public static class ValidExplicitBindingBridge implements ValueBridge<WrappedValue, String> {
+	public static class InvalidTypeBridge implements ValueBridge<WrappedValue, Integer> {
 		@Override
-		public StandardIndexFieldTypeOptionsStep<?, String> bind(ValueBridgeBindingContext<WrappedValue> context) {
-			return context.getTypeFactory().asString();
+		public Integer toIndexedValue(WrappedValue value, ValueBridgeToIndexedValueContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
 		}
-		@Override
-		public String toIndexedValue(WrappedValue value,
-				ValueBridgeToIndexedValueContext context) {
-			return value == null ? null : value.wrapped;
-		}
+
 		@Override
 		public WrappedValue cast(Object value) {
 			throw new UnsupportedOperationException( "Should not be called" );
+		}
+
+		public static class ExplictFieldTypeBuilder implements ValueBridgeBuilder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.setBridge( WrappedValue.class, new InvalidTypeBridge(), context.getTypeFactory().asInteger() );
+			}
 		}
 	}
 
 	private static class WrappedValue {
 		private String wrapped;
-	}
-
-	public static class InvalidExplicitBindingBridge implements ValueBridge<String, Integer> {
-		@Override
-		public StandardIndexFieldTypeOptionsStep<?, Integer> bind(ValueBridgeBindingContext<String> context) {
-			return context.getTypeFactory().asInteger();
-		}
-		@Override
-		public Integer toIndexedValue(String value,
-				ValueBridgeToIndexedValueContext context) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-		@Override
-		public String cast(Object value) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
 	}
 
 }
