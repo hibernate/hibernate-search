@@ -13,8 +13,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 
 /**
@@ -32,7 +32,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBrid
  * If an <b>annotation bridge builder</b> is provided, using the methods {@link #builderName()} or {@link #builderType()},
  * each time the mapped annotation is encountered, an instance of the property bridge builder will be created.
  * The builder will be passed the annotation through its {@link PropertyBridgeBuilder#initialize(Annotation)} method,
- * and then the bridge will be retrieved by calling {@link PropertyBridgeBuilder#buildForProperty(BridgeBuildContext)}.
+ * and then the bridge will be created and bound by {@link PropertyBridgeBuilder#bind(PropertyBindingContext)}.
  * <p>
  * Property bridges mapped this way can be parameterized:
  * the bridge will be able to take any attribute of the mapped annotation into account

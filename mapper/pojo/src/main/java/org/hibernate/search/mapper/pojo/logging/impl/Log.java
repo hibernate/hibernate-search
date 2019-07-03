@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
@@ -338,14 +337,14 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> otherType);
 
 	@Message(id = ID_OFFSET_2 + 49,
-			value = "The bridge did not declare any dependency to the entity model during binding."
+			value = "The bridge builder did not declare any dependency to the entity model during binding."
 					+ " Declare dependencies using context.getDependencies().use(...) or,"
 					+ " if the bridge really does not depend on the entity model, context.getDependencies().useRootOnly()."
 	)
 	SearchException missingBridgeDependencyDeclaration();
 
 	@Message(id = ID_OFFSET_2 + 50,
-			value = "The bridge called context.getDependencies().useRootOnly() during binding,"
+			value = "The bridge builder called context.getDependencies().useRootOnly() during binding,"
 					+ " but also declared extra dependencies to the entity model."
 	)
 	SearchException inconsistentBridgeDependencyDeclaration();

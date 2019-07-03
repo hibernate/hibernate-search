@@ -22,6 +22,8 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationC
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -624,11 +626,11 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	protected abstract Class<? extends TypeBridge> getContainingEntityTypeBridgeClass();
+	protected abstract TypeBridgeBuilder<?> createContainingEntityTypeBridgeBuilder();
 
-	protected abstract Class<? extends PropertyBridge> getContainingEntitySingleValuedPropertyBridgeClass();
+	protected abstract PropertyBridgeBuilder<?> createContainingEntitySingleValuedPropertyBridgeBuilder();
 
-	protected abstract Class<? extends PropertyBridge> getContainingEntityMultiValuedPropertyBridgeClass();
+	protected abstract PropertyBridgeBuilder<?> createContainingEntityMultiValuedPropertyBridgeBuilder();
 
 	private SessionFactory setupWithTypeBridge() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
@@ -647,7 +649,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 							@Override
 							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( ContainingEntity.class )
-										.bridge( getContainingEntityTypeBridgeClass() );
+										.bridge( createContainingEntityTypeBridgeBuilder() );
 							}
 						}
 				)
@@ -675,7 +677,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( ContainingEntity.class )
 										.property( "association1" )
-										.bridge( getContainingEntitySingleValuedPropertyBridgeClass() );
+										.bridge( createContainingEntitySingleValuedPropertyBridgeBuilder() );
 							}
 						}
 				)
@@ -689,11 +691,11 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	}
 
 	private SessionFactory setupWithMultiValuedPropertyBridge() {
-		Class<? extends PropertyBridge> bridgeClass = getContainingEntityMultiValuedPropertyBridgeClass();
+		PropertyBridgeBuilder<?> bridgeBuilder = createContainingEntityMultiValuedPropertyBridgeBuilder();
 
 		Assume.assumeTrue(
 				"Multi-valued property bridges must be supported",
-				bridgeClass != null
+				bridgeBuilder != null
 		);
 
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
@@ -710,7 +712,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( ContainingEntity.class )
 										.property( "association2" )
-										.bridge( bridgeClass );
+										.bridge( bridgeBuilder );
 							}
 						}
 				)

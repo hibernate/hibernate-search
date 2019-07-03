@@ -8,8 +8,10 @@ package org.hibernate.search.mapper.pojo.bridge.mapping.programmatic;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 
 /**
  * A builder of {@link TypeBridge}.
@@ -27,14 +29,22 @@ public interface TypeBridgeBuilder<A extends Annotation> {
 	}
 
 	/**
-	 * Build a bridge.
+	 * Binds a type to index fields.
 	 * <p>
-	 * <strong>Warning:</strong> this method can be called multiple times and must return a new instance to each call.
+	 * The context passed in parameter provides various information about the type being bound.
+	 * Implementations are expected to take advantage of that information
+	 * and to call one of the {@code setBridge(...)} methods on the context
+	 * to set the bridge.
+	 * <p>
+	 * Implementations are also expected to declare dependencies, i.e. the properties
+	 * that will later be used in the
+	 * {@link TypeBridge#write(DocumentElement, Object, TypeBridgeWriteContext)} method,
+	 * using {@link TypeBindingContext#getDependencies()}.
+	 * Failing that, Hibernate Search will not reindex entities properly when an indexed property is modified.
 	 *
-	 * @param buildContext A object providing access to other components involved in the build process.
-	 * @return A new bridge instance, enclosed in a {@link BeanHolder}.
-	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
+	 * @param context A context object providing information about the type being bound,
+	 * and expecting a call to one of its {@code setBridge(...)} methods.
 	 */
-	BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext);
+	void bind(TypeBindingContext context);
 
 }

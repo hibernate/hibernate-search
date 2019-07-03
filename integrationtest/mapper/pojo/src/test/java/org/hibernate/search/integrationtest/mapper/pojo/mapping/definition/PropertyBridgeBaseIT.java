@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,15 +17,13 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -92,27 +91,27 @@ public class PropertyBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.property( "stringProperty" ).bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-							private PojoElementAccessor<String> pojoPropertyAccessor;
-							private IndexFieldReference<String> indexFieldReference;
-
-							@Override
-							public void bind(PropertyBridgeBindingContext context) {
-								pojoPropertyAccessor = context.getBridgedElement()
-										.createAccessor( String.class );
-								indexFieldReference = context.getIndexSchemaElement().field(
-										"someField",
-										f -> f.asString().analyzer( "myAnalyzer" )
-								)
-										.toReference();
-							}
-
-							@Override
-							public void write(DocumentElement target, Object bridgedElement,
-									PropertyBridgeWriteContext context) {
-								target.addValue( indexFieldReference, pojoPropertyAccessor.read( bridgedElement ) );
-							}
-						} ) )
+						.property( "stringProperty" )
+						.bridge( (PropertyBridgeBuilder<?>) context -> {
+							PojoElementAccessor<String> pojoPropertyAccessor = context.getBridgedElement()
+									.createAccessor( String.class );
+							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
+									"someField",
+									f -> f.asString().analyzer( "myAnalyzer" )
+							)
+									.toReference();
+							context.setBridge(
+									new PropertyBridge() {
+										@Override
+										public void write(DocumentElement target, Object bridgedElement,
+												PropertyBridgeWriteContext context) {
+											target.addValue(
+													indexFieldReference, pojoPropertyAccessor.read( bridgedElement )
+											);
+										}
+									}
+							);
+						} )
 		)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -177,26 +176,27 @@ public class PropertyBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.property( "contained" ).bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-							private IndexFieldReference<String> indexFieldReference;
-
-							@Override
-							public void bind(PropertyBridgeBindingContext context) {
-								context.getDependencies().use( "stringProperty" );
-								indexFieldReference = context.getIndexSchemaElement().field(
-										"someField",
-										f -> f.asString().analyzer( "myAnalyzer" )
-								)
-										.toReference();
-							}
-
-							@Override
-							public void write(DocumentElement target, Object bridgedElement,
-									PropertyBridgeWriteContext context) {
-								Contained castedBridgedElement = (Contained) bridgedElement;
-								target.addValue( indexFieldReference, castedBridgedElement.getStringProperty() );
-							}
-						} ) )
+						.property( "contained" )
+						.bridge( (PropertyBridgeBuilder<?>) context -> {
+							context.getDependencies().use( "stringProperty" );
+							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
+									"someField",
+									f -> f.asString().analyzer( "myAnalyzer" )
+							)
+									.toReference();
+							context.setBridge(
+									new PropertyBridge() {
+										@Override
+										public void write(DocumentElement target, Object bridgedElement,
+												PropertyBridgeWriteContext context) {
+											Contained castedBridgedElement = (Contained) bridgedElement;
+											target.addValue(
+													indexFieldReference, castedBridgedElement.getStringProperty()
+											);
+										}
+									}
+							);
+						} )
 		)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -253,18 +253,10 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-									@Override
-									public void bind(PropertyBridgeBindingContext context) {
-										context.getDependencies().use( "doesNotExist.stringProperty" );
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											PropertyBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (PropertyBridgeBuilder<?>) context -> {
+									context.getDependencies().use( "doesNotExist.stringProperty" );
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
 				)
 						.withAnnotatedTypes( Contained.class )
 						.setup( IndexedEntity.class )
@@ -307,22 +299,14 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-									@Override
-									public void bind(PropertyBridgeBindingContext context) {
-										context.getDependencies()
-												.use(
-														ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
-														"stringProperty"
-												);
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											PropertyBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (PropertyBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.use(
+													ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
+													"stringProperty"
+											);
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
 				)
 						.setup( IndexedEntity.class )
 		)
@@ -359,35 +343,31 @@ public class PropertyBridgeBaseIT {
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 						.property( "child" )
-						.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-							private IndexFieldReference<String> indexFieldReference;
-
-							@Override
-							public void bind(PropertyBridgeBindingContext context) {
-								context.getDependencies()
-										.fromOtherEntity( PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class, "parent" )
-										.use( "stringProperty" );
-								indexFieldReference = context.getIndexSchemaElement().field(
-										"someField",
-										f -> f.asString().analyzer( "myAnalyzer" )
-								)
-										.toReference();
-							}
-
-							@Override
-							public void write(DocumentElement target, Object bridgedElement,
-									PropertyBridgeWriteContext context) {
-								PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity castedBridgedElement =
-										(PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity) bridgedElement;
-								/*
-								 * In a real application this would run a query,
-								 * but we don't have the necessary infrastructure here
-								 * so we'll cut short and just index a constant.
-								 * We just need to know the bridge is executed anyway.
-								 */
-								target.addValue( indexFieldReference, "constant" );
-							}
-						} ) )
+						.bridge( (PropertyBridgeBuilder<?>) context -> {
+							context.getDependencies()
+									.fromOtherEntity( PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class, "parent" )
+									.use( "stringProperty" );
+							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
+									"someField",
+									f -> f.asString().analyzer( "myAnalyzer" )
+							)
+									.toReference();
+							context.setBridge( new PropertyBridge() {
+								@Override
+								public void write(DocumentElement target, Object bridgedElement,
+										PropertyBridgeWriteContext context) {
+									PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity castedBridgedElement =
+											(PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity) bridgedElement;
+									/*
+									 * In a real application this would run a query,
+									 * but we don't have the necessary infrastructure here
+									 * so we'll cut short and just index a constant.
+									 * We just need to know the bridge is executed anyway.
+									 */
+									target.addValue( indexFieldReference, "constant" );
+								}
+							} );
+						} )
 		)
 				.setup(
 						PropertyBridgeExplicitIndexingClasses.IndexedEntity.class,
@@ -481,23 +461,15 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-									@Override
-									public void bind(PropertyBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
-														"parent"
-												)
-												.use( "doesNotExist" );
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											PropertyBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (PropertyBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
+													"parent"
+											)
+											.use( "doesNotExist" );
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
 				)
 						.setup(
 								PropertyBridgeExplicitIndexingClasses.IndexedEntity.class,
@@ -525,22 +497,14 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-									@Override
-									public void bind(PropertyBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
-														"doesNotExist"
-												);
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											PropertyBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (PropertyBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
+													"doesNotExist"
+											);
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
 				)
 						.setup(
 								PropertyBridgeExplicitIndexingClasses.IndexedEntity.class,
@@ -567,23 +531,15 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-									@Override
-									public void bind(PropertyBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
-														PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
-														PojoModelPath.parse( "parent" )
-												);
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											PropertyBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (PropertyBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
+													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
+													PojoModelPath.parse( "parent" )
+											);
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
 				)
 						.setup(
 								PropertyBridgeExplicitIndexingClasses.IndexedEntity.class,
@@ -613,22 +569,14 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "notEntity" )
-								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-									@Override
-									public void bind(PropertyBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
-														"doesNotMatter"
-												);
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											PropertyBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (PropertyBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
+													"doesNotMatter"
+											);
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
 				)
 						.withAnnotatedTypes( PropertyBridgeExplicitIndexingClasses.NotEntity.class )
 						.setup(
@@ -658,22 +606,14 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-									@Override
-									public void bind(PropertyBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														PropertyBridgeExplicitIndexingClasses.NotEntity.class,
-														"doesNotMatter"
-												);
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											PropertyBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (PropertyBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													PropertyBridgeExplicitIndexingClasses.NotEntity.class,
+													"doesNotMatter"
+											);
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
 				)
 						.withAnnotatedTypes( PropertyBridgeExplicitIndexingClasses.NotEntity.class )
 						.setup(
@@ -703,22 +643,14 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-									@Override
-									public void bind(PropertyBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
-														"associationToDifferentEntity"
-												);
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											PropertyBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (PropertyBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
+													"associationToDifferentEntity"
+											);
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
 				)
 						.setup(
 								PropertyBridgeExplicitIndexingClasses.IndexedEntity.class,
@@ -766,18 +698,10 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-									@Override
-									public void bind(PropertyBridgeBindingContext context) {
-										// Do not declare any dependency
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											PropertyBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (PropertyBridgeBuilder<?>) context -> {
+									// Do not declare any dependency
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
 				)
 						.setup( IndexedEntity.class )
 		)
@@ -787,7 +711,7 @@ public class PropertyBridgeBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".contained" )
 						.failure(
-								"The bridge did not declare any dependency to the entity model during binding."
+								"The bridge builder did not declare any dependency to the entity model during binding."
 										+ " Declare dependencies using context.getDependencies().use(...) or,"
 										+ " if the bridge really does not depend on the entity model, context.getDependencies().useRootOnly()"
 						)
@@ -821,21 +745,13 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-									@Override
-									public void bind(PropertyBridgeBindingContext context) {
-										// Declare no dependency, but also a dependency: this is inconsistent.
-										context.getDependencies()
-												.use( "stringProperty" )
-												.useRootOnly();
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											PropertyBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (PropertyBridgeBuilder<?>) context -> {
+									// Declare no dependency, but also a dependency: this is inconsistent.
+									context.getDependencies()
+											.use( "stringProperty" )
+											.useRootOnly();
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
 				)
 						.setup( IndexedEntity.class )
 		)
@@ -845,7 +761,7 @@ public class PropertyBridgeBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".contained" )
 						.failure(
-								"The bridge called context.getDependencies().useRootOnly() during binding,"
+								"The bridge builder called context.getDependencies().useRootOnly() during binding,"
 										+ " but also declared extra dependencies to the entity model."
 						)
 						.build()
@@ -876,28 +792,25 @@ public class PropertyBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.property( "stringProperty" ).bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-							private IndexFieldReference<String> indexFieldReference;
-
-							@Override
-							public void bind(PropertyBridgeBindingContext context) {
-								context.getDependencies().useRootOnly();
-								indexFieldReference = context.getIndexSchemaElement().field(
-										"someField",
-										f -> f.asString().analyzer( "myAnalyzer" )
-								)
-										.toReference();
-							}
-
-							@Override
-							public void write(DocumentElement target, Object bridgedElement,
-									PropertyBridgeWriteContext context) {
-								List<String> castedBridgedElement = (List<String>) bridgedElement;
-								for ( String string : castedBridgedElement ) {
-									target.addValue( indexFieldReference, string );
+						.property( "stringProperty" )
+						.bridge( (PropertyBridgeBuilder<?>) context -> {
+							context.getDependencies().useRootOnly();
+							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
+									"someField",
+									f -> f.asString().analyzer( "myAnalyzer" )
+							)
+									.toReference();
+							context.setBridge( new PropertyBridge() {
+								@Override
+								public void write(DocumentElement target, Object bridgedElement,
+										PropertyBridgeWriteContext context) {
+									List<String> castedBridgedElement = (List<String>) bridgedElement;
+									for ( String string : castedBridgedElement ) {
+										target.addValue( indexFieldReference, string );
+									}
 								}
-							}
-						} ) )
+							} );
+						} )
 		)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -959,27 +872,19 @@ public class PropertyBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
-						.bridge( (PropertyBridgeBuilder<?>) buildContext -> BeanHolder.of( new PropertyBridge() {
-							@Override
-							public void bind(PropertyBridgeBindingContext context) {
-								context.getDependencies().useRootOnly();
-								// Single-valued field
-								context.getIndexSchemaElement()
-										.field( "stringFromBridge", f -> f.asString() )
-										.toReference();
-								// Multi-valued field
-								context.getIndexSchemaElement()
-										.field( "listFromBridge", f -> f.asString() )
-										.multiValued()
-										.toReference();
-							}
-
-							@Override
-							public void write(DocumentElement target, Object bridgedElement,
-									PropertyBridgeWriteContext context) {
-								throw new UnsupportedOperationException( "This should not be called" );
-							}
-						} ) )
+						.bridge( (PropertyBridgeBuilder<?>) context -> {
+							context.getDependencies().useRootOnly();
+							// Single-valued field
+							context.getIndexSchemaElement()
+									.field( "stringFromBridge", f -> f.asString() )
+									.toReference();
+							// Multi-valued field
+							context.getIndexSchemaElement()
+									.field( "listFromBridge", f -> f.asString() )
+									.multiValued()
+									.toReference();
+							context.setBridge( new UnusedPropertyBridge() );
+						} )
 		)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -1069,9 +974,10 @@ public class PropertyBridgeBaseIT {
 		}
 
 		@Override
-		public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
+		public void bind(PropertyBindingContext context) {
 			throw new UnsupportedOperationException( "This should not be called" );
 		}
+
 		@Override
 		public String toString() {
 			return TOSTRING;
@@ -1146,19 +1052,22 @@ public class PropertyBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.METHOD, ElementType.FIELD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(type = IncompatibleTypeRequestingPropertyBridge.class))
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(builderType = IncompatibleTypeRequestingPropertyBridgeBuilder.class))
 	private @interface IncompatibleTypeRequestingPropertyBridgeAnnotation {
 	}
 
-	public static class IncompatibleTypeRequestingPropertyBridge implements PropertyBridge {
+	public static class IncompatibleTypeRequestingPropertyBridgeBuilder implements PropertyBridgeBuilder<Annotation> {
 		@Override
-		public void bind(PropertyBridgeBindingContext context) {
+		public void bind(PropertyBindingContext context) {
 			context.getBridgedElement().createAccessor( Integer.class );
+			context.setBridge( new UnusedPropertyBridge() );
 		}
+	}
 
+	private static class UnusedPropertyBridge implements PropertyBridge {
 		@Override
 		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-			throw new UnsupportedOperationException( "This should not be called" );
+			throw new AssertionFailure( "Should not be called" );
 		}
 	}
 

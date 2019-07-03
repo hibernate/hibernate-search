@@ -15,15 +15,13 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -86,28 +84,28 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-							private PojoElementAccessor<String> pojoPropertyAccessor;
-							private IndexFieldReference<String> indexFieldReference;
-
-							@Override
-							public void bind(TypeBridgeBindingContext context) {
-								pojoPropertyAccessor = context.getBridgedElement()
-										.property( "stringProperty" )
-										.createAccessor( String.class );
-								indexFieldReference = context.getIndexSchemaElement().field(
-										"someField",
-										f -> f.asString().analyzer( "myAnalyzer" )
-								)
-										.toReference();
-							}
-
-							@Override
-							public void write(DocumentElement target, Object bridgedElement,
-									TypeBridgeWriteContext context) {
-								target.addValue( indexFieldReference, pojoPropertyAccessor.read( bridgedElement ) );
-							}
-						} ) )
+						.bridge( (TypeBridgeBuilder<?>) context -> {
+							PojoElementAccessor<String> pojoPropertyAccessor =
+									context.getBridgedElement().property( "stringProperty" )
+											.createAccessor( String.class );
+							IndexFieldReference<String> indexFieldReference =
+									context.getIndexSchemaElement().field(
+											"someField",
+											f -> f.asString().analyzer( "myAnalyzer" )
+									)
+											.toReference();
+							context.setBridge(
+									new TypeBridge() {
+										@Override
+										public void write(DocumentElement target, Object bridgedElement,
+												TypeBridgeWriteContext context) {
+											target.addValue(
+													indexFieldReference, pojoPropertyAccessor.read( bridgedElement )
+											);
+										}
+									}
+							);
+						} )
 		)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -166,26 +164,27 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-							private IndexFieldReference<String> indexFieldReference;
-
-							@Override
-							public void bind(TypeBridgeBindingContext context) {
-								context.getDependencies().use( "stringProperty" );
-								indexFieldReference = context.getIndexSchemaElement().field(
-										"someField",
-										f -> f.asString().analyzer( "myAnalyzer" )
-								)
-										.toReference();
-							}
-
-							@Override
-							public void write(DocumentElement target, Object bridgedElement,
-									TypeBridgeWriteContext context) {
-								IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
-								target.addValue( indexFieldReference, castedBridgedElement.getStringProperty() );
-							}
-						} ) )
+						.bridge( (TypeBridgeBuilder<?>) context -> {
+							context.getDependencies().use( "stringProperty" );
+							IndexFieldReference<String> indexFieldReference =
+									context.getIndexSchemaElement().field(
+											"someField",
+											f -> f.asString().analyzer( "myAnalyzer" )
+									)
+											.toReference();
+							context.setBridge(
+									new TypeBridge() {
+										@Override
+										public void write(DocumentElement target, Object bridgedElement,
+												TypeBridgeWriteContext context) {
+											IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
+											target.addValue(
+													indexFieldReference, castedBridgedElement.getStringProperty()
+											);
+										}
+									}
+							);
+						} )
 		)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -233,18 +232,10 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-									@Override
-									public void bind(TypeBridgeBindingContext context) {
-										context.getDependencies().use( "doesNotExist" );
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											TypeBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (TypeBridgeBuilder<?>) context -> {
+									context.getDependencies().use( "doesNotExist" );
+									context.setBridge( new UnusedTypeBridge() );
+								} )
 				)
 						.setup( IndexedEntity.class )
 		)
@@ -295,34 +286,33 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-							private IndexFieldReference<String> indexFieldReference;
-
-							@Override
-							public void bind(TypeBridgeBindingContext context) {
-								context.getDependencies()
-										.fromOtherEntity( ContainedEntity.class, "parent" )
-										.use( "stringProperty" );
-								indexFieldReference = context.getIndexSchemaElement().field(
-										"someField",
-										f -> f.asString().analyzer( "myAnalyzer" )
-								)
-										.toReference();
-							}
-
-							@Override
-							public void write(DocumentElement target, Object bridgedElement,
-									TypeBridgeWriteContext context) {
-								IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
-								/*
-								 * In a real application this would run a query,
-								 * but we don't have the necessary infrastructure here
-								 * so we'll cut short and just index a constant.
-								 * We just need to know the bridge is executed anyway.
-								 */
-								target.addValue( indexFieldReference, "constant" );
-							}
-						} ) )
+						.bridge( (TypeBridgeBuilder<?>) context -> {
+							context.getDependencies()
+									.fromOtherEntity( ContainedEntity.class, "parent" )
+									.use( "stringProperty" );
+							IndexFieldReference<String> indexFieldReference =
+									context.getIndexSchemaElement().field(
+											"someField",
+											f -> f.asString().analyzer( "myAnalyzer" )
+									)
+											.toReference();
+							context.setBridge(
+									new TypeBridge() {
+										@Override
+										public void write(DocumentElement target, Object bridgedElement,
+												TypeBridgeWriteContext context) {
+											IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
+											/*
+											 * In a real application this would run a query,
+											 * but we don't have the necessary infrastructure here
+											 * so we'll cut short and just index a constant.
+											 * We just need to know the bridge is executed anyway.
+											 */
+											target.addValue( indexFieldReference, "constant" );
+										}
+									}
+							);
+						} )
 		)
 				.setup( IndexedEntity.class, ContainedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -380,23 +370,15 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-									@Override
-									public void bind(TypeBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														ContainedEntity.class,
-														"parent"
-												)
-												.use( "doesNotExist" );
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											TypeBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (TypeBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													ContainedEntity.class,
+													"parent"
+											)
+											.use( "doesNotExist" );
+									context.setBridge( new UnusedTypeBridge() );
+								} )
 				)
 						.setup( IndexedEntity.class, ContainedEntity.class )
 		)
@@ -436,22 +418,14 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-									@Override
-									public void bind(TypeBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														ContainedEntity.class,
-														"doesNotExist"
-												);
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											TypeBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (TypeBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													ContainedEntity.class,
+													"doesNotExist"
+											);
+									context.setBridge( new UnusedTypeBridge() );
+								} )
 				)
 						.setup( IndexedEntity.class, ContainedEntity.class )
 		)
@@ -492,22 +466,14 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( NotEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-									@Override
-									public void bind(TypeBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														IndexedEntity.class,
-														"doesNotMatter"
-												);
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											TypeBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (TypeBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													IndexedEntity.class,
+													"doesNotMatter"
+											);
+									context.setBridge( new UnusedTypeBridge() );
+								} )
 				)
 						.withAnnotatedTypes( NotEntity.class )
 						.setup( IndexedEntity.class )
@@ -543,22 +509,14 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-									@Override
-									public void bind(TypeBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														NotEntity.class,
-														"doesNotMatter"
-												);
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											TypeBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (TypeBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													NotEntity.class,
+													"doesNotMatter"
+											);
+									context.setBridge( new UnusedTypeBridge() );
+								} )
 				)
 						.withAnnotatedTypes( NotEntity.class )
 						.setup( IndexedEntity.class )
@@ -606,22 +564,14 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-									@Override
-									public void bind(TypeBridgeBindingContext context) {
-										context.getDependencies()
-												.fromOtherEntity(
-														ContainedEntity.class,
-														"associationToDifferentEntity"
-												);
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											TypeBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (TypeBridgeBuilder<?>) context -> {
+									context.getDependencies()
+											.fromOtherEntity(
+													ContainedEntity.class,
+													"associationToDifferentEntity"
+											);
+									context.setBridge( new UnusedTypeBridge() );
+								} )
 				)
 						.setup( IndexedEntity.class, ContainedEntity.class )
 		)
@@ -656,18 +606,10 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-									@Override
-									public void bind(TypeBridgeBindingContext context) {
-										// Do not declare any dependency
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											TypeBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (TypeBridgeBuilder<?>) context -> {
+									// Do not declare any dependency
+									context.setBridge( new UnusedTypeBridge() );
+								} )
 				)
 						.setup( IndexedEntity.class )
 		)
@@ -676,7 +618,7 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"The bridge did not declare any dependency to the entity model during binding."
+								"The bridge builder did not declare any dependency to the entity model during binding."
 								+ " Declare dependencies using context.getDependencies().use(...) or,"
 								+ " if the bridge really does not depend on the entity model, context.getDependencies().useRootOnly()"
 						)
@@ -703,21 +645,13 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-									@Override
-									public void bind(TypeBridgeBindingContext context) {
-										// Declare no dependency, but also a dependency: this is inconsistent.
-										context.getDependencies()
-												.use( "stringProperty" )
-												.useRootOnly();
-									}
-
-									@Override
-									public void write(DocumentElement target, Object bridgedElement,
-											TypeBridgeWriteContext context) {
-										throw new AssertionFailure( "Should not be called" );
-									}
-								} ) )
+								.bridge( (TypeBridgeBuilder<?>) context -> {
+									// Declare no dependency, but also a dependency: this is inconsistent.
+									context.getDependencies()
+											.use( "stringProperty" )
+											.useRootOnly();
+									context.setBridge( new UnusedTypeBridge() );
+								} )
 				)
 						.setup( IndexedEntity.class )
 		)
@@ -726,7 +660,7 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"The bridge called context.getDependencies().useRootOnly() during binding,"
+								"The bridge builder called context.getDependencies().useRootOnly() during binding,"
 										+ " but also declared extra dependencies to the entity model."
 						)
 						.build()
@@ -758,28 +692,24 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( CustomEnum.class )
-						.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-							private IndexFieldReference<String> indexFieldReference;
-
-							@Override
-							public void bind(TypeBridgeBindingContext context) {
-								context.getDependencies().useRootOnly();
-								indexFieldReference = context.getIndexSchemaElement().field(
-										"someField",
-										f -> f.asString()
-								)
-										.toReference();
-							}
-
-							@Override
-							public void write(DocumentElement target, Object bridgedElement,
-									TypeBridgeWriteContext context) {
-								CustomEnum castedBridgedElement = (CustomEnum) bridgedElement;
-								// This is a strange way to use bridges,
-								// but then again a type bridges that only use the root *is* strange
-								target.addValue( indexFieldReference, castedBridgedElement.stringProperty );
-							}
-						} ) )
+						.bridge( (TypeBridgeBuilder<?>) context -> {
+							context.getDependencies().useRootOnly();
+							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
+									"someField",
+									f -> f.asString()
+							)
+									.toReference();
+							context.setBridge( new TypeBridge() {
+								@Override
+								public void write(DocumentElement target, Object bridgedElement,
+										TypeBridgeWriteContext context) {
+									CustomEnum castedBridgedElement = (CustomEnum) bridgedElement;
+									// This is a strange way to use bridges,
+									// but then again a type bridges that only uses the root *is* strange
+									target.addValue( indexFieldReference, castedBridgedElement.stringProperty );
+								}
+							} );
+						} )
 		)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -863,27 +793,19 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( Contained.class )
-						.bridge( (TypeBridgeBuilder<?>) buildContext -> BeanHolder.of( new TypeBridge() {
-							@Override
-							public void bind(TypeBridgeBindingContext context) {
-								context.getDependencies().useRootOnly();
-								// Single-valued field
-								context.getIndexSchemaElement()
-										.field( "stringFromBridge", f -> f.asString() )
-										.toReference();
-								// Multi-valued field
-								context.getIndexSchemaElement()
-										.field( "listFromBridge", f -> f.asString() )
-										.multiValued()
-										.toReference();
-							}
-
-							@Override
-							public void write(DocumentElement target, Object bridgedElement,
-									TypeBridgeWriteContext context) {
-								throw new UnsupportedOperationException( "This should not be called" );
-							}
-						} ) )
+						.bridge( (TypeBridgeBuilder<?>) context -> {
+							context.getDependencies().useRootOnly();
+							// Single-valued field
+							context.getIndexSchemaElement()
+									.field( "stringFromBridge", f -> f.asString() )
+									.toReference();
+							// Multi-valued field
+							context.getIndexSchemaElement()
+									.field( "listFromBridge", f -> f.asString() )
+									.multiValued()
+									.toReference();
+							context.setBridge( new UnusedTypeBridge() );
+						} )
 		)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -964,15 +886,17 @@ public class TypeBridgeBaseIT {
 	public static class BridgeBuilderWithDifferentAnnotationType
 			implements TypeBridgeBuilder<DifferentAnnotationType> {
 		private static String TOSTRING = "<BridgeBuilderWithDifferentAnnotationType toString() result>";
+
 		@Override
 		public void initialize(DifferentAnnotationType annotation) {
 			throw new UnsupportedOperationException( "This should not be called" );
 		}
 
 		@Override
-		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
+		public void bind(TypeBindingContext context) {
 			throw new UnsupportedOperationException( "This should not be called" );
 		}
+
 		@Override
 		public String toString() {
 			return TOSTRING;
@@ -1045,20 +969,23 @@ public class TypeBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(type = IncompatibleTypeRequestingTypeBridge.class))
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(builderType = IncompatibleTypeRequestingTypeBridgeBuilder.class))
 	private @interface IncompatibleTypeRequestingTypeBridgeAnnotation {
 	}
 
-	public static class IncompatibleTypeRequestingTypeBridge implements TypeBridge {
+	public static class IncompatibleTypeRequestingTypeBridgeBuilder
+			implements TypeBridgeBuilder<IncompatibleTypeRequestingTypeBridgeAnnotation> {
 		@Override
-		public void bind(TypeBridgeBindingContext context) {
+		public void bind(TypeBindingContext context) {
 			context.getBridgedElement().property( "stringProperty" ).createAccessor( Integer.class );
-		}
-
-		@Override
-		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			throw new UnsupportedOperationException( "This should not be called" );
+			context.setBridge( new UnusedTypeBridge() );
 		}
 	}
 
+	private static class UnusedTypeBridge implements TypeBridge {
+		@Override
+		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
+			throw new AssertionFailure( "Should not be called" );
+		}
+	}
 }

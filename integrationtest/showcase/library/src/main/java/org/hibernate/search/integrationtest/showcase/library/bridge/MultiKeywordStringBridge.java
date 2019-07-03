@@ -10,16 +10,40 @@ import java.util.regex.Pattern;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
 public class MultiKeywordStringBridge implements PropertyBridge {
 
 	public static final String SEPARATOR_PATTERN_DEFAULT = ",";
+
+	private final Pattern separatorPattern;
+
+	private final IndexFieldReference<String> valueFieldReference;
+
+	private MultiKeywordStringBridge(String fieldName, Pattern separatorPattern,
+			IndexSchemaElement indexSchemaElement) {
+		this.separatorPattern = separatorPattern;
+		this.valueFieldReference = indexSchemaElement.field(
+				fieldName, f -> f.asString()
+		)
+				.multiValued()
+				.toReference();
+	}
+
+	@Override
+	public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
+		String sourceValue = (String) bridgedElement;
+		if ( sourceValue != null ) {
+			String[] items = separatorPattern.split( sourceValue );
+			for ( String item : items ) {
+				target.addValue( valueFieldReference, item );
+			}
+		}
+	}
 
 	public static class Builder implements PropertyBridgeBuilder<org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge> {
 		private String fieldName;
@@ -42,42 +66,19 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 		}
 
 		@Override
-		public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
+		public void bind(PropertyBindingContext context) {
 			if ( fieldName == null || fieldName.isEmpty() ) {
 				throw new IllegalArgumentException( "fieldName is a mandatory parameter" );
 			}
-			return BeanHolder.of( new MultiKeywordStringBridge( this ) );
-		}
-	}
+			context.getDependencies().useRootOnly();
 
-	private final String fieldName;
-	private final Pattern separatorPattern;
-
-	private IndexFieldReference<String> valueFieldReference;
-
-	private MultiKeywordStringBridge(Builder builder) {
-		this.fieldName = builder.fieldName;
-		this.separatorPattern = builder.separatorPattern;
-	}
-
-	@Override
-	public void bind(PropertyBridgeBindingContext context) {
-		context.getDependencies().useRootOnly();
-		valueFieldReference = context.getIndexSchemaElement().field(
-				fieldName, f -> f.asString()
-		)
-				.multiValued()
-				.toReference();
-	}
-
-	@Override
-	public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-		String sourceValue = (String) bridgedElement;
-		if ( sourceValue != null ) {
-			String[] items = separatorPattern.split( sourceValue );
-			for ( String item : items ) {
-				target.addValue( valueFieldReference, item );
-			}
+			context.setBridge(
+					new MultiKeywordStringBridge(
+							fieldName,
+							separatorPattern,
+							context.getIndexSchemaElement()
+					)
+			);
 		}
 	}
 

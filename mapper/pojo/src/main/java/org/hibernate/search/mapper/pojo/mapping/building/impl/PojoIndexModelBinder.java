@@ -10,10 +10,12 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundPropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
@@ -22,8 +24,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBu
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
@@ -38,8 +38,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
  * by creating the appropriate {@link ContainerExtractor extractors} and bridges.
  * <p>
  * Also binds the bridges where appropriate:
- * {@link TypeBridge#bind(TypeBridgeBindingContext)},
- * {@link PropertyBridge#bind(PropertyBridgeBindingContext)},
+ * {@link TypeBridgeBuilder#bind(TypeBindingContext)},
+ * {@link PropertyBridgeBuilder#bind(PropertyBindingContext)},
  * {@link ValueBridgeBuilder#bind(ValueBindingContext)}.
  * <p>
  * Incidentally, this will also generate the index model,

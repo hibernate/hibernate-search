@@ -12,11 +12,11 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
@@ -89,28 +89,6 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public void bind(PropertyBridgeBindingContext context) {
-		context.getDependencies().useRootOnly();
-		// Add at least one field so that the bridge is not removed
-		context.getIndexSchemaElement().field(
-				"startupStubBridgeFieldFromPropertyBridge",
-				f -> f.asString()
-		)
-				.toReference();
-	}
-
-	@Override
-	public void bind(TypeBridgeBindingContext context) {
-		context.getDependencies().useRootOnly();
-		// Add at least one field so that the bridge is not removed
-		context.getIndexSchemaElement().field(
-				"startupStubBridgeFieldFromTypeBridge",
-				f -> f.asString()
-		)
-				.toReference();
-	}
-
-	@Override
 	public void bind(RoutingKeyBridgeBindingContext context) {
 		context.getDependencies().useRootOnly();
 	}
@@ -177,13 +155,27 @@ public class StartupStubBridge
 		}
 
 		@Override
-		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
-			return build();
+		public void bind(TypeBindingContext context) {
+			context.getDependencies().useRootOnly();
+			// Add at least one field so that the bridge is not removed
+			context.getIndexSchemaElement().field(
+					"startupStubBridgeFieldFromTypeBridge",
+					f -> f.asString()
+			)
+					.toReference();
+			context.setBridge( build() );
 		}
 
 		@Override
-		public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
-			return build();
+		public void bind(PropertyBindingContext context) {
+			context.getDependencies().useRootOnly();
+			// Add at least one field so that the bridge is not removed
+			context.getIndexSchemaElement().field(
+					"startupStubBridgeFieldFromPropertyBridge",
+					f -> f.asString()
+			)
+					.toReference();
+			context.setBridge( build() );
 		}
 
 		@Override

@@ -12,9 +12,9 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
@@ -58,24 +58,24 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends A
 	}
 
 	@Override
-	public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
+	public void bind(TypeBindingContext context) {
 		try ( BeanHolder<? extends TypeBridgeBuilder> delegateHolder =
-				createDelegate( buildContext, TypeBridgeBuilder.class ) ) {
+				createDelegate( context.getBeanResolver(), TypeBridgeBuilder.class ) ) {
 			@SuppressWarnings("unchecked") // Checked using reflection in createDelegate
 			TypeBridgeBuilder<A> castedDelegate = delegateHolder.get();
 			castedDelegate.initialize( annotation );
-			return castedDelegate.buildForType( buildContext );
+			castedDelegate.bind( context );
 		}
 	}
 
 	@Override
-	public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
+	public void bind(PropertyBindingContext context) {
 		try ( BeanHolder<? extends PropertyBridgeBuilder> delegateHolder =
-				createDelegate( buildContext, PropertyBridgeBuilder.class ) ) {
+				createDelegate( context.getBeanResolver(), PropertyBridgeBuilder.class ) ) {
 			@SuppressWarnings("unchecked") // Checked using reflection in createDelegate
 			PropertyBridgeBuilder<A> castedDelegate = delegateHolder.get();
 			castedDelegate.initialize( annotation );
-			return castedDelegate.buildForProperty( buildContext );
+			castedDelegate.bind( context );
 		}
 	}
 
@@ -90,8 +90,7 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends A
 		}
 	}
 
-	private <B> BeanHolder<? extends B> createDelegate(BridgeBuildContext buildContext, Class<B> expectedType) {
-		BeanResolver beanResolver = buildContext.getBeanResolver();
+	private <B> BeanHolder<? extends B> createDelegate(BeanResolver beanResolver, Class<B> expectedType) {
 		BeanHolder<? extends B> delegateHolder = delegateReference.asSubTypeOf( expectedType ).resolve( beanResolver );
 		try {
 			B delegate = delegateHolder.get();
@@ -114,6 +113,10 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends A
 			new SuppressingCloser( e ).push( delegateHolder );
 			throw e;
 		}
+	}
+
+	private <B> BeanHolder<? extends B> createDelegate(BridgeBuildContext buildContext, Class<B> expectedType) {
+		return createDelegate( buildContext.getBeanResolver(), expectedType );
 	}
 
 }

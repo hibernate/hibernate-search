@@ -11,11 +11,10 @@ import java.time.LocalDate;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
@@ -28,49 +27,23 @@ public final class CustomTypeBridge implements TypeBridge {
 	private static final String TEXT_FIELD_NAME = "text";
 	private static final String LOCAL_DATE_FIELD_NAME = "date";
 
-	public static final class Builder implements TypeBridgeBuilder<CustomTypeBridgeAnnotation> {
+	private final PojoElementAccessor<String> textPropertyAccessor;
+	private final PojoElementAccessor<LocalDate> localDatePropertyAccessor;
+	private final IndexObjectFieldReference objectFieldReference;
+	private final IndexFieldReference<String> textFieldReference;
+	private final IndexFieldReference<LocalDate> localDateFieldReference;
 
-		private String objectName;
+	private CustomTypeBridge(PojoElementAccessor<String> textPropertyAccessor,
+			PojoElementAccessor<LocalDate> localDatePropertyAccessor,
+			IndexSchemaElement indexSchemaElement,
+			String objectName) {
+		this.textPropertyAccessor = textPropertyAccessor;
+		this.localDatePropertyAccessor = localDatePropertyAccessor;
 
-		@Override
-		public void initialize(CustomTypeBridgeAnnotation annotation) {
-			objectName( annotation.objectName() );
-		}
-
-		public Builder objectName(String value) {
-			this.objectName = value;
-			return this;
-		}
-
-		@Override
-		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
-			return BeanHolder.of( new CustomTypeBridge( objectName ) );
-		}
-	}
-
-	private final String objectName;
-
-	private PojoElementAccessor<String> textPropertyAccessor;
-	private PojoElementAccessor<LocalDate> localDatePropertyAccessor;
-	private IndexObjectFieldReference objectFieldReference;
-	private IndexFieldReference<String> textFieldReference;
-	private IndexFieldReference<LocalDate> localDateFieldReference;
-
-	private CustomTypeBridge(String objectName) {
-		this.objectName = objectName;
-	}
-
-	@Override
-	public void bind(TypeBridgeBindingContext context) {
-		PojoModelType bridgedElement = context.getBridgedElement();
-		textPropertyAccessor = bridgedElement.property( TEXT_PROPERTY_NAME ).createAccessor( String.class );
-		localDatePropertyAccessor = bridgedElement.property( LOCAL_DATE_PROPERTY_NAME ).createAccessor( LocalDate.class );
-
-		IndexSchemaObjectField objectField = context.getIndexSchemaElement().objectField( objectName );
-		objectFieldReference = objectField.toReference();
-		textFieldReference = objectField.field( TEXT_FIELD_NAME, f -> f.asString() )
-				.toReference();
-		localDateFieldReference = objectField.field( LOCAL_DATE_FIELD_NAME, f -> f.asLocalDate() )
+		IndexSchemaObjectField objectField = indexSchemaElement.objectField( objectName );
+		this.objectFieldReference = objectField.toReference();
+		this.textFieldReference = objectField.field( TEXT_FIELD_NAME, f -> f.asString() ).toReference();
+		this.localDateFieldReference = objectField.field( LOCAL_DATE_FIELD_NAME, f -> f.asLocalDate() )
 				.toReference();
 	}
 
@@ -88,5 +61,38 @@ public final class CustomTypeBridge implements TypeBridge {
 	@Override
 	public void close() {
 		// Nothing to do
+	}
+
+	public static final class Builder implements TypeBridgeBuilder<CustomTypeBridgeAnnotation> {
+
+		private String objectName;
+
+		@Override
+		public void initialize(CustomTypeBridgeAnnotation annotation) {
+			objectName( annotation.objectName() );
+		}
+
+		public Builder objectName(String value) {
+			this.objectName = value;
+			return this;
+		}
+
+		@Override
+		public void bind(TypeBindingContext context) {
+			PojoModelType bridgedElement = context.getBridgedElement();
+			PojoElementAccessor<String> textPropertyAccessor =
+					bridgedElement.property( TEXT_PROPERTY_NAME ).createAccessor( String.class );
+			PojoElementAccessor<LocalDate> localDatePropertyAccessor =
+					bridgedElement.property( LOCAL_DATE_PROPERTY_NAME ).createAccessor( LocalDate.class );
+
+			context.setBridge(
+					new CustomTypeBridge(
+							textPropertyAccessor,
+							localDatePropertyAccessor,
+							context.getIndexSchemaElement(),
+							objectName
+					)
+			);
+		}
 	}
 }

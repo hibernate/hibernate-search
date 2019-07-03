@@ -7,7 +7,8 @@
 package org.hibernate.search.mapper.pojo.bridge;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExtension;
 
@@ -21,44 +22,17 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExt
 public interface TypeBridge extends AutoCloseable {
 
 	/**
-	 * Bind this bridge instance to the given context,
-	 * i.e. to an object type in the POJO model and to an element in the index schema.
-	 * <p>
-	 * This method is called exactly once for each bridge instance, before any other method.
-	 * It allows the bridge to:
-	 * <ul>
-	 *     <li>Declare its expectations regarding the index schema (field names and field types, storage options, ...)
-	 *     and retrieve references to the index fields that will later be used in the
-	 * 	   {@link #write(DocumentElement, Object, TypeBridgeWriteContext)} method
-	 *     using {@link TypeBridgeBindingContext#getIndexSchemaElement()}.
-	 *     <li>Check the type of bridged elements
-	 *     using {@link TypeBridgeBindingContext#getBridgedElement()}.
-	 *     <li>Declare its dependencies, i.e. the properties
-	 * 	   that will later be used in the
-	 *     {@link #write(DocumentElement, Object, TypeBridgeWriteContext)} method
-	 * 	   using {@link TypeBridgeBindingContext#getDependencies()}.
-	 *     <li>Optionally (advanced use) use reflection to retrieve accessors to the bridged element
-	 *     that will later be used in the
-	 *     {@link #write(DocumentElement, Object, TypeBridgeWriteContext)} method
-	 *     using {@link TypeBridgeBindingContext#getBridgedElement()}.
-	 * </ul>
-	 *
-	 * @param context An entry point allowing to perform the operations listed above.
-	 */
-	void bind(TypeBridgeBindingContext context);
-
-	/**
 	 * Write to fields in the given {@link DocumentElement},
 	 * using the given {@code bridgedElement} as input and transforming it as necessary.
 	 * <p>
 	 * Writing to the {@link DocumentElement} should be done using
-	 * {@link org.hibernate.search.engine.backend.document.IndexFieldReference}s retrieved when the
-	 * {@link #bind(TypeBridgeBindingContext)} method was called.
+	 * {@link org.hibernate.search.engine.backend.document.IndexFieldReference}s retrieved
+	 * when the bridge was {@link TypeBridgeBuilder#bind(TypeBindingContext) bound}.
 	 * <p>
 	 * <strong>Warning:</strong> Reading from {@code bridgedElement} should be done with care.
-	 * Any read that was not declared in the {@link #bind(TypeBridgeBindingContext)} method
-	 * (by declaring dependencies using {@link TypeBridgeBindingContext#getDependencies()}
-	 * or (advanced use) creating an accessor using {@link TypeBridgeBindingContext#getBridgedElement()})
+	 * Any read that was not declared during {@link TypeBridgeBuilder#bind(TypeBindingContext) binding}
+	 * (by declaring dependencies using {@link TypeBindingContext#getDependencies()}
+	 * or (advanced use) creating an accessor using {@link TypeBindingContext#getBridgedElement()})
 	 * may lead to out-of-sync indexes,
 	 * because Hibernate Search will consider the read property irrelevant to indexing
 	 * and will not reindex entities when that property changes.

@@ -17,13 +17,11 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -37,6 +35,38 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private final Function<Object, GeoPoint> coordinatesExtractor;
+	private final IndexFieldReference<GeoPoint> indexFieldReference;
+
+	/**
+	 * Private constructor, use {@link GeoPointBridgeBuilder#create()} instead.
+	 */
+	private GeoPointBridge(Function<Object, GeoPoint> coordinatesExtractor,
+			IndexFieldReference<GeoPoint> indexFieldReference) {
+		this.coordinatesExtractor = coordinatesExtractor;
+		this.indexFieldReference = indexFieldReference;
+	}
+
+	@Override
+	public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
+		doWrite( target, bridgedElement );
+	}
+
+	@Override
+	public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
+		doWrite( target, bridgedElement );
+	}
+
+	private void doWrite(DocumentElement target, Object bridgedElement) {
+		GeoPoint coordinates = coordinatesExtractor.apply( bridgedElement );
+		target.addValue( indexFieldReference, coordinates );
+	}
+
+	@Override
+	public void close() {
+		// Nothing to do
+	}
 
 	public static class Builder implements GeoPointBridgeBuilder {
 
@@ -79,119 +109,89 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 		}
 
 		@Override
-		public BeanHolder<? extends TypeBridge> buildForType(BridgeBuildContext buildContext) {
-			return BeanHolder.of( new GeoPointBridge( fieldName, projectable, sortable, markerSet ) );
+		public void bind(TypeBindingContext context) {
+			if ( fieldName == null || fieldName.isEmpty() ) {
+				throw log.missingFieldNameForGeoPointBridgeOnType( context.getBridgedElement().toString() );
+			}
+
+			GeoPointBridge bridge = doBind(
+					fieldName,
+					context.getTypeFactory(),
+					context.getIndexSchemaElement(),
+					context.getBridgedElement()
+			);
+			context.setBridge( bridge );
 		}
 
 		@Override
-		public BeanHolder<? extends PropertyBridge> buildForProperty(BridgeBuildContext buildContext) {
-			return BeanHolder.of( new GeoPointBridge( fieldName, projectable, sortable, markerSet ) );
-		}
-	}
+		public void bind(PropertyBindingContext context) {
+			String defaultedFieldName;
+			if ( fieldName != null && !fieldName.isEmpty() ) {
+				defaultedFieldName = fieldName;
+			}
+			else {
+				defaultedFieldName = context.getBridgedElement().getName();
+			}
 
-	private final String fieldName;
-	private final Projectable projectable;
-	private final Sortable sortable;
-	private final String markerSet;
-
-	private IndexFieldReference<GeoPoint> indexFieldReference;
-	private Function<Object, GeoPoint> coordinatesExtractor;
-
-	/**
-	 * Private constructor, use {@link GeoPointBridgeBuilder#create()} instead.
-	 */
-	private GeoPointBridge(String fieldName, Projectable projectable, Sortable sortable, String markerSet) {
-		this.fieldName = fieldName;
-		this.projectable = projectable;
-		this.sortable = sortable;
-		this.markerSet = markerSet;
-	}
-
-	@Override
-	public void bind(TypeBridgeBindingContext context) {
-		if ( fieldName == null || fieldName.isEmpty() ) {
-			throw log.missingFieldNameForGeoPointBridgeOnType( context.getBridgedElement().toString() );
+			GeoPointBridge bridge = doBind(
+					defaultedFieldName,
+					context.getTypeFactory(),
+					context.getIndexSchemaElement(),
+					context.getBridgedElement()
+			);
+			context.setBridge( bridge );
 		}
 
-		bind( fieldName, context.getTypeFactory(), context.getIndexSchemaElement(), context.getBridgedElement() );
-	}
+		private GeoPointBridge doBind(String defaultedFieldName, IndexFieldTypeFactory typeFactory,
+				IndexSchemaElement indexSchemaElement,
+				PojoModelCompositeElement bridgedPojoModelElement) {
+			IndexFieldReference<GeoPoint> indexFieldReference = indexSchemaElement.field(
+					defaultedFieldName,
+					typeFactory.asGeoPoint().projectable( projectable ).sortable( sortable ).toIndexFieldType()
+			)
+					.toReference();
 
-	@Override
-	public void bind(PropertyBridgeBindingContext context) {
-		String defaultedFieldName;
-		if ( fieldName != null && !fieldName.isEmpty() ) {
-			defaultedFieldName = fieldName;
+			Function<Object, GeoPoint> coordinatesExtractor;
+			if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
+				PojoElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );
+				coordinatesExtractor = sourceAccessor::read;
+			}
+			else {
+				PojoElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
+						.filter( model -> model.markers( LatitudeMarker.class )
+								.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
+						.collect( singleMarkedProperty( "latitude", defaultedFieldName, markerSet ) )
+						.createAccessor( Double.class );
+				PojoElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
+						.filter( model -> model.markers( LongitudeMarker.class )
+								.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
+						.collect( singleMarkedProperty( "longitude", defaultedFieldName, markerSet ) )
+						.createAccessor( Double.class );
+
+				coordinatesExtractor = bridgedElement -> {
+					Double latitude = latitudeAccessor.read( bridgedElement );
+					Double longitude = longitudeAccessor.read( bridgedElement );
+
+					if ( latitude == null || longitude == null ) {
+						return null;
+					}
+
+					return GeoPoint.of( latitude, longitude );
+				};
+			}
+
+			return new GeoPointBridge(
+					coordinatesExtractor,
+					indexFieldReference
+			);
 		}
-		else {
-			defaultedFieldName = context.getBridgedElement().getName();
+
+		private static Collector<PojoModelCompositeElement, ?, PojoModelCompositeElement> singleMarkedProperty(
+				String markerName, String fieldName, String markerSet) {
+			return StreamHelper.singleElement(
+					() -> log.propertyMarkerNotFound( markerName, fieldName, markerSet ),
+					() -> log.multiplePropertiesForMarker( markerName, fieldName, markerSet )
+			);
 		}
-
-		bind( defaultedFieldName, context.getTypeFactory(), context.getIndexSchemaElement(), context.getBridgedElement() );
-	}
-
-	private void bind(String defaultedFieldName, IndexFieldTypeFactory typeFactory,
-			IndexSchemaElement indexSchemaElement,
-			PojoModelCompositeElement bridgedPojoModelElement) {
-		indexFieldReference = indexSchemaElement.field(
-				defaultedFieldName,
-				typeFactory.asGeoPoint().projectable( projectable ).sortable( sortable ).toIndexFieldType()
-		)
-				.toReference();
-
-		if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
-			PojoElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );
-			coordinatesExtractor = sourceAccessor::read;
-		}
-		else {
-			PojoElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
-					.filter( model -> model.markers( LatitudeMarker.class )
-							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
-					.collect( singleMarkedProperty( "latitude", defaultedFieldName, markerSet ) )
-					.createAccessor( Double.class );
-			PojoElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
-					.filter( model -> model.markers( LongitudeMarker.class )
-							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
-					.collect( singleMarkedProperty( "longitude", defaultedFieldName, markerSet ) )
-					.createAccessor( Double.class );
-
-			coordinatesExtractor = bridgedElement -> {
-				Double latitude = latitudeAccessor.read( bridgedElement );
-				Double longitude = longitudeAccessor.read( bridgedElement );
-
-				if ( latitude == null || longitude == null ) {
-					return null;
-				}
-
-				return GeoPoint.of( latitude, longitude );
-			};
-		}
-	}
-
-	private static Collector<PojoModelCompositeElement, ?, PojoModelCompositeElement> singleMarkedProperty(
-			String markerName, String fieldName, String markerSet) {
-		return StreamHelper.singleElement(
-				() -> log.propertyMarkerNotFound( markerName, fieldName, markerSet ),
-				() -> log.multiplePropertiesForMarker( markerName, fieldName, markerSet )
-				);
-	}
-
-	@Override
-	public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-		doWrite( target, bridgedElement );
-	}
-
-	@Override
-	public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-		doWrite( target, bridgedElement );
-	}
-
-	private void doWrite(DocumentElement target, Object bridgedElement) {
-		GeoPoint coordinates = coordinatesExtractor.apply( bridgedElement );
-		target.addValue( indexFieldReference, coordinates );
-	}
-
-	@Override
-	public void close() {
-		// Nothing to do
 	}
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,9 +28,10 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -279,18 +281,17 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(type = FirstTypeBridge.class))
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(builderType = FirstTypeBridge.Builder.class))
 	public @interface FirstTypeBridgeAnnotation {
 	}
 
 	public static class FirstTypeBridge implements TypeBridge {
 
-		private PojoElementAccessor<String> valueSourcePropertyAccessor;
-		private IndexObjectFieldReference firstBridgeObjectFieldReference;
-		private IndexFieldReference<String> valueFieldReference;
+		private final PojoElementAccessor<String> valueSourcePropertyAccessor;
+		private final IndexObjectFieldReference firstBridgeObjectFieldReference;
+		private final IndexFieldReference<String> valueFieldReference;
 
-		@Override
-		public void bind(TypeBridgeBindingContext context) {
+		private FirstTypeBridge(TypeBindingContext context) {
 			valueSourcePropertyAccessor = context.getBridgedElement().property( "firstContained" )
 					.property( "includedInFirstBridge" )
 					.createAccessor( String.class );
@@ -305,11 +306,18 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 			DocumentElement objectField = target.addObject( firstBridgeObjectFieldReference );
 			objectField.addValue( valueFieldReference, valueSourcePropertyAccessor.read( bridgedElement ) );
 		}
+
+		public static class Builder implements TypeBridgeBuilder<Annotation> {
+			@Override
+			public void bind(TypeBindingContext context) {
+				context.setBridge( new FirstTypeBridge( context ) );
+			}
+		}
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(type = SecondTypeBridge.class))
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(builderType = SecondTypeBridge.Builder.class))
 	public @interface SecondTypeBridgeAnnotation {
 	}
 
@@ -319,8 +327,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		private IndexObjectFieldReference secondBridgeObjectFieldReference;
 		private IndexFieldReference<String> valueFieldReference;
 
-		@Override
-		public void bind(TypeBridgeBindingContext context) {
+		private SecondTypeBridge(TypeBindingContext context) {
 			valueSourcePropertyAccessor = context.getBridgedElement().property( "secondContained" )
 					.property( "includedInSecondBridge" )
 					.createAccessor( String.class );
@@ -334,6 +341,13 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 			DocumentElement objectField = target.addObject( secondBridgeObjectFieldReference );
 			objectField.addValue( valueFieldReference, valueSourcePropertyAccessor.read( bridgedElement ) );
+		}
+
+		public static class Builder implements TypeBridgeBuilder<Annotation> {
+			@Override
+			public void bind(TypeBindingContext context) {
+				context.setBridge( new SecondTypeBridge( context ) );
+			}
 		}
 	}
 }

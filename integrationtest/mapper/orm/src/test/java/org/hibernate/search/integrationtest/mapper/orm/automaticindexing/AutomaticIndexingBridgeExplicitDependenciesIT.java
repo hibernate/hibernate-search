@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,8 +16,10 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -30,29 +33,28 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutomaticIndexingBridgeIT {
 
 	@Override
-	protected Class<? extends TypeBridge> getContainingEntityTypeBridgeClass() {
-		return ContainingEntityTypeBridge.class;
+	protected TypeBridgeBuilder<?> createContainingEntityTypeBridgeBuilder() {
+		return new ContainingEntityTypeBridge.Builder();
 	}
 
 	@Override
-	protected Class<? extends PropertyBridge> getContainingEntitySingleValuedPropertyBridgeClass() {
-		return ContainingEntitySingleValuedPropertyBridge.class;
+	protected PropertyBridgeBuilder<?> createContainingEntitySingleValuedPropertyBridgeBuilder() {
+		return new ContainingEntitySingleValuedPropertyBridge.Builder();
 	}
 
 	@Override
-	protected Class<? extends PropertyBridge> getContainingEntityMultiValuedPropertyBridgeClass() {
-		return ContainingEntityMultiValuedPropertyBridge.class;
+	protected PropertyBridgeBuilder<?> createContainingEntityMultiValuedPropertyBridgeBuilder() {
+		return new ContainingEntityMultiValuedPropertyBridge.Builder();
 	}
 
 	public static class ContainingEntityTypeBridge implements TypeBridge {
 
-		private IndexObjectFieldReference typeBridgeObjectFieldReference;
-		private IndexFieldReference<String> directFieldReference;
-		private IndexObjectFieldReference childObjectFieldReference;
-		private IndexFieldReference<String> includedInTypeBridgeFieldReference;
+		private final IndexObjectFieldReference typeBridgeObjectFieldReference;
+		private final IndexFieldReference<String> directFieldReference;
+		private final IndexObjectFieldReference childObjectFieldReference;
+		private final IndexFieldReference<String> includedInTypeBridgeFieldReference;
 
-		@Override
-		public void bind(TypeBridgeBindingContext context) {
+		private ContainingEntityTypeBridge(TypeBindingContext context) {
 			context.getDependencies()
 					.use( "directField" )
 					.use( "association1.containedSingle.includedInTypeBridge" );
@@ -88,15 +90,21 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 					containedSingle == null ? null : containedSingle.getIncludedInTypeBridge()
 			);
 		}
+
+		public static class Builder implements TypeBridgeBuilder<Annotation> {
+			@Override
+			public void bind(TypeBindingContext context) {
+				context.setBridge( new ContainingEntityTypeBridge( context ) );
+			}
+		}
 	}
 
 	public static class ContainingEntitySingleValuedPropertyBridge implements PropertyBridge {
 
-		private IndexObjectFieldReference propertyBridgeObjectFieldReference;
-		private IndexFieldReference<String> includedInPropertyBridgeFieldReference;
+		private final IndexObjectFieldReference propertyBridgeObjectFieldReference;
+		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
 
-		@Override
-		public void bind(PropertyBridgeBindingContext context) {
+		private ContainingEntitySingleValuedPropertyBridge(PropertyBindingContext context) {
 			context.getDependencies()
 					.use( "containedSingle.includedInSingleValuedPropertyBridge" );
 
@@ -120,15 +128,21 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 					containedSingle == null ? null : containedSingle.getIncludedInSingleValuedPropertyBridge()
 			);
 		}
+
+		public static class Builder implements PropertyBridgeBuilder<Annotation> {
+			@Override
+			public void bind(PropertyBindingContext context) {
+				context.setBridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
+			}
+		}
 	}
 
 	public static class ContainingEntityMultiValuedPropertyBridge implements PropertyBridge {
 
-		private IndexObjectFieldReference propertyBridgeObjectFieldReference;
-		private IndexFieldReference<String> includedInPropertyBridgeFieldReference;
+		private final IndexObjectFieldReference propertyBridgeObjectFieldReference;
+		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
 
-		@Override
-		public void bind(PropertyBridgeBindingContext context) {
+		private ContainingEntityMultiValuedPropertyBridge(PropertyBindingContext context) {
 			context.getDependencies()
 					.use( "containedSingle.includedInMultiValuedPropertyBridge" );
 
@@ -160,6 +174,13 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 					includedInPropertyBridgeFieldReference,
 					concatenatedValue
 			);
+		}
+
+		public static class Builder implements PropertyBridgeBuilder<Annotation> {
+			@Override
+			public void bind(PropertyBindingContext context) {
+				context.setBridge( new ContainingEntityMultiValuedPropertyBridge( context ) );
+			}
 		}
 	}
 }
