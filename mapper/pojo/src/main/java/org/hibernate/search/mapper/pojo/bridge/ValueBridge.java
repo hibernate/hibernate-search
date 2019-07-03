@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContextExtension;
 
@@ -31,10 +35,14 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * <ul>
 	 *     <li>Declare its expectations regarding the index field type
 	 *     using {@link ValueBridgeBindingContext#getTypeFactory()}.
+	 *     <p>
+	 *     Note the {@link IndexFieldTypeConverterStep#dslConverter(ToDocumentFieldValueConverter) DSL converter}
+	 *     and {@link IndexFieldTypeConverterStep#projectionConverter(FromDocumentFieldValueConverter) projection converter}
+	 *     will be ignored, since they are already implemented by the value bridge itself
+	 *     through its {@link #toIndexedValue(Object, ValueBridgeToIndexedValueContext)}
+	 *     and {@link #fromIndexedValue(Object, ValueBridgeFromIndexedValueContext)} methods.
 	 *     <li>Inspect the type of values extracted from the POJO model that will be passed to this bridge
 	 *     using {@link ValueBridgeBindingContext#getBridgedElement()}.
-	 *     <li>Define a reverse function to apply to projections on the field value
-	 *     using {@link ValueBridgeBindingContext#getTypeFactory()}.
 	 * </ul>
 	 *
 	 * @param context An entry point allowing to perform the operations listed above.
@@ -48,7 +56,7 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	}
 
 	/**
-	 * Transform the given POJO-extracted value to the value of the indexed field.
+	 * Transform the given POJO-extracted value into the value of the indexed field.
 	 *
 	 * @param value The POJO-extracted value to be transformed.
 	 * @param context A context that can be
@@ -57,6 +65,20 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * @return The value of the indexed field.
 	 */
 	F toIndexedValue(V value, ValueBridgeToIndexedValueContext context);
+
+	/**
+	 * Transform the given indexed field value to the corresponding POJO-extracted value.
+	 *
+	 * @param value The value of the indexed field to be transformed.
+	 * @param context A context that can be
+	 * {@link ValueBridgeToIndexedValueContext#extension(ValueBridgeToIndexedValueContextExtension) extended}
+	 * to a more useful type, giving access to such things as a Hibernate ORM SessionFactory (if using the Hibernate ORM mapper).
+	 * @return The POJO-extracted value.
+	 * @throws UnsupportedOperationException If conversion is not supported.
+	 */
+	default V fromIndexedValue(F value, ValueBridgeFromIndexedValueContext context) {
+		throw new UnsupportedOperationException( "Bridge " + this + " does not implement fromIndexedValue(...)." );
+	}
 
 	/**
 	 * Cast an input value to the expected type {@link V}.

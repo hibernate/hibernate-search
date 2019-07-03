@@ -354,7 +354,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		B bridge = bridgeHolder.get();
 
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
-		Class<?> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
+		Class<?> bridgeParameterRawType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
 				.map( ReflectionUtils::getRawType )
 				.orElseThrow( () -> new AssertionFailure(
 						"Could not auto-detect the input type for value bridge '"
@@ -362,10 +362,12 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 						+ " There is a bug in Hibernate Search, please report it."
 				) );
 		// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
-		if ( !valueTypeModel.getRawType().isSubTypeOf( bridgeParameterType ) ) {
+		if ( !valueTypeModel.getRawType().isSubTypeOf( bridgeParameterRawType ) ) {
 			throw log.invalidInputTypeForBridge( bridge, valueTypeModel );
 		}
 
+		@SuppressWarnings("unchecked") // Checked using reflection just above
+		Class<? super V2> castedBridgeParameterRawType = (Class<? super V2>) bridgeParameterRawType;
 		@SuppressWarnings("unchecked") // Checked using reflection just above
 		PojoGenericTypeModel<? extends V2> castedValueTypeModel =
 				(PojoGenericTypeModel<? extends V2>) valueTypeModel;
@@ -378,13 +380,14 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				new PojoModelValueElement<>( castedValueTypeModel ),
 				indexFieldTypeFactory
 		);
-		StandardIndexFieldTypeOptionsStep<?, ? super F> fieldTypeContext = bridge.bind( bridgeBindingContext );
+		StandardIndexFieldTypeOptionsStep<?, F> fieldTypeContext = bridge.bind( bridgeBindingContext );
 
 		// If the bridge did not contribute anything, infer the field type and define it automatically
 		if ( fieldTypeContext == null ) {
+			// TODO HSEARCH-3243 We're assuming the field type is raw here, maybe we should enforce it?
 			@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
-			Class<? super F> returnType =
-					(Class<? super F>) bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )
+			Class<F> returnType =
+					(Class<F>) bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )
 					.map( ReflectionUtils::getRawType )
 					.orElseThrow( () -> new AssertionFailure(
 							"Could not auto-detect the return type for value bridge '"
@@ -399,15 +402,20 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				new PojoValueBridgeToDocumentFieldValueConverter<>( bridge )
 		);
 
+		// Then register the bridge itself as a converter to use in projections
+		fieldTypeContext.projectionConverter(
+				new PojoValueBridgeFromDocumentFieldValueConverter<>( bridge, castedBridgeParameterRawType )
+		);
+
 		// Then give the mapping a chance to override some of the model (add storage, ...)
 		contributor.contribute( fieldTypeContext, new FieldModelContributorBridgeContextImpl<>( bridge, fieldTypeContext ) );
 
-		IndexSchemaFieldOptionsStep<?, ? extends IndexFieldReference<? super F>> fieldContext =
+		IndexSchemaFieldOptionsStep<?, ? extends IndexFieldReference<F>> fieldContext =
 				schemaElement.field( relativeFieldName, fieldTypeContext );
 		if ( multiValued ) {
 			fieldContext.multiValued();
 		}
-		IndexFieldReference<? super F> indexFieldReference = fieldContext.toReference();
+		IndexFieldReference<F> indexFieldReference = fieldContext.toReference();
 
 		return new BoundValueBridge<>( castedBridgeHolder, indexFieldReference );
 	}

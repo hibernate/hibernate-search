@@ -8,12 +8,9 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import java.time.ZoneId;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ValidateUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 public final class DefaultZoneIdValueBridge implements ValueBridge<ZoneId, String> {
@@ -24,15 +21,13 @@ public final class DefaultZoneIdValueBridge implements ValueBridge<ZoneId, Strin
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexFieldTypeOptionsStep<?, String> bind(ValueBridgeBindingContext<ZoneId> context) {
-		return context.getTypeFactory().asString()
-				.projectionConverter( PojoDefaultZoneIdFromDocumentFieldValueConverter.INSTANCE );
+	public String toIndexedValue(ZoneId value, ValueBridgeToIndexedValueContext context) {
+		return value == null ? null : value.getId();
 	}
 
 	@Override
-	public String toIndexedValue(ZoneId value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : value.getId();
+	public ZoneId fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) {
+		return value == null ? null : ZoneId.of( value );
 	}
 
 	@Override
@@ -51,23 +46,4 @@ public final class DefaultZoneIdValueBridge implements ValueBridge<ZoneId, Strin
 		return getClass().equals( other.getClass() );
 	}
 
-	private static class PojoDefaultZoneIdFromDocumentFieldValueConverter
-			implements FromDocumentFieldValueConverter<String, ZoneId> {
-		private static final PojoDefaultZoneIdFromDocumentFieldValueConverter INSTANCE = new PojoDefaultZoneIdFromDocumentFieldValueConverter();
-
-		@Override
-		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-			return superTypeCandidate.isAssignableFrom( ZoneId.class );
-		}
-
-		@Override
-		public ZoneId convert(String value, FromDocumentFieldValueConvertContext context) {
-			return value == null ? null : ZoneId.of( value );
-		}
-
-		@Override
-		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
-			return INSTANCE.equals( other );
-		}
-	}
 }

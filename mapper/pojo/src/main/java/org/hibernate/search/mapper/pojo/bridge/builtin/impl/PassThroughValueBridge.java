@@ -8,11 +8,11 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -42,8 +42,17 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, F> bind(ValueBridgeBindingContext<F> context) {
-		return context.getTypeFactory().as( fieldType )
-				.projectionConverter( new PassThroughFromDocumentFieldValueConverter<>( fieldType ) );
+		return context.getTypeFactory().as( fieldType );
+	}
+
+	@Override
+	public F toIndexedValue(F value, ValueBridgeToIndexedValueContext context) {
+		return value;
+	}
+
+	@Override
+	public F fromIndexedValue(F value, ValueBridgeFromIndexedValueContext context) {
+		return value;
 	}
 
 	@Override
@@ -54,12 +63,6 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 	@Override
 	public F parse(String value) {
 		return parsingFunction.apply( value );
-	}
-
-	@Override
-	public F toIndexedValue(F value,
-			ValueBridgeToIndexedValueContext context) {
-		return value;
 	}
 
 	@Override

@@ -26,6 +26,8 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRouting
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExtension;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContextExtension;
 
@@ -45,6 +47,7 @@ public final class HibernateOrmExtension
 		TypeBridgeWriteContextExtension<HibernateOrmSessionContext>,
 		PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
 		ValueBridgeToIndexedValueContextExtension<HibernateOrmMappingContext>,
+		ValueBridgeFromIndexedValueContextExtension<HibernateOrmSessionContext>,
 		ToDocumentFieldValueConvertContextExtension<HibernateOrmMappingContext>,
 		FromDocumentFieldValueConvertContextExtension<HibernateOrmSessionContext> {
 
@@ -110,6 +113,15 @@ public final class HibernateOrmExtension
 	public Optional<HibernateOrmMappingContext> extendOptional(ValueBridgeToIndexedValueContext original,
 			MappingContextImplementor mappingContext) {
 		return extendToOrmMappingContext( mappingContext );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<HibernateOrmSessionContext> extendOptional(ValueBridgeFromIndexedValueContext original,
+			SessionContextImplementor sessionContext) {
+		return extendToOrmSessionContext( sessionContext );
 	}
 
 	/**

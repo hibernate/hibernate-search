@@ -15,12 +15,9 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 public final class DefaultJavaUtilCalendarValueBridge implements ValueBridge<Calendar, ZonedDateTime> {
@@ -28,12 +25,6 @@ public final class DefaultJavaUtilCalendarValueBridge implements ValueBridge<Cal
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
-	}
-
-	@Override
-	public StandardIndexFieldTypeOptionsStep<?, ZonedDateTime> bind(ValueBridgeBindingContext<Calendar> context) {
-		return context.getTypeFactory().asZonedDateTime()
-				.projectionConverter( PojoDefaultCalendarFromDocumentFieldValueConverter.INSTANCE );
 	}
 
 	@Override
@@ -55,6 +46,11 @@ public final class DefaultJavaUtilCalendarValueBridge implements ValueBridge<Cal
 	}
 
 	@Override
+	public Calendar fromIndexedValue(ZonedDateTime value, ValueBridgeFromIndexedValueContext context) {
+		return value == null ? null : from( value );
+	}
+
+	@Override
 	public Calendar cast(Object value) {
 		return (Calendar) value;
 	}
@@ -69,38 +65,18 @@ public final class DefaultJavaUtilCalendarValueBridge implements ValueBridge<Cal
 		return getClass().equals( other.getClass() );
 	}
 
-	private static class PojoDefaultCalendarFromDocumentFieldValueConverter
-			implements FromDocumentFieldValueConverter<ZonedDateTime, Calendar> {
-		private static final PojoDefaultCalendarFromDocumentFieldValueConverter INSTANCE = new PojoDefaultCalendarFromDocumentFieldValueConverter();
-
-		@Override
-		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-			return superTypeCandidate.isAssignableFrom( Calendar.class );
+	private static Calendar from(ZonedDateTime value) {
+		// We had some troubles using `GregorianCalendar.from( value )`:
+		// it seems that the method calculates firstDayOfWeek and minimalDaysInFirstWeek
+		// in a different way GregorianCalendar.getInstance does.
+		Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( value.getZone() ), Locale.getDefault() );
+		if ( calendar instanceof GregorianCalendar ) {
+			calendar.setTimeInMillis( Math.addExact( Math.multiplyExact( value.toEpochSecond(), 1000 ), value.get( ChronoField.MILLI_OF_SECOND ) ) );
+		}
+		else {
+			calendar.setTime( Date.from( value.toInstant() ) );
 		}
 
-		@Override
-		public Calendar convert(ZonedDateTime value, FromDocumentFieldValueConvertContext context) {
-			return value == null ? null : from( value );
-		}
-
-		@Override
-		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
-			return INSTANCE.equals( other );
-		}
-
-		private static Calendar from(ZonedDateTime value) {
-			// We had some troubles using `GregorianCalendar.from( value )`:
-			// it seems that the method calculates firstDayOfWeek and minimalDaysInFirstWeek
-			// in a different way GregorianCalendar.getInstance does.
-			Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( value.getZone() ), Locale.getDefault() );
-			if ( calendar instanceof GregorianCalendar ) {
-				calendar.setTimeInMillis( Math.addExact( Math.multiplyExact( value.toEpochSecond(), 1000 ), value.get( ChronoField.MILLI_OF_SECOND ) ) );
-			}
-			else {
-				calendar.setTime( Date.from( value.toInstant() ) );
-			}
-
-			return calendar;
-		}
+		return calendar;
 	}
 }

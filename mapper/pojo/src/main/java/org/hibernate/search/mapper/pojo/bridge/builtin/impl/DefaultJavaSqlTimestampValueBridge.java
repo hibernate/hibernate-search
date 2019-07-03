@@ -9,12 +9,9 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 public final class DefaultJavaSqlTimestampValueBridge implements ValueBridge<Timestamp, Instant> {
@@ -25,14 +22,13 @@ public final class DefaultJavaSqlTimestampValueBridge implements ValueBridge<Tim
 	}
 
 	@Override
-	public StandardIndexFieldTypeOptionsStep<?, Instant> bind(ValueBridgeBindingContext<Timestamp> context) {
-		return context.getTypeFactory().asInstant()
-				.projectionConverter( PojoDefaultSqlDateFromDocumentFieldValueConverter.INSTANCE );
+	public Instant toIndexedValue(Timestamp value, ValueBridgeToIndexedValueContext context) {
+		return value == null ? null : Instant.ofEpochMilli( value.getTime() );
 	}
 
 	@Override
-	public Instant toIndexedValue(Timestamp value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : Instant.ofEpochMilli( value.getTime() );
+	public Timestamp fromIndexedValue(Instant value, ValueBridgeFromIndexedValueContext context) {
+		return value == null ? null : new Timestamp( value.toEpochMilli() );
 	}
 
 	@Override
@@ -48,26 +44,6 @@ public final class DefaultJavaSqlTimestampValueBridge implements ValueBridge<Tim
 	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
-	}
-
-	private static class PojoDefaultSqlDateFromDocumentFieldValueConverter
-			implements FromDocumentFieldValueConverter<Instant, Timestamp> {
-		private static final PojoDefaultSqlDateFromDocumentFieldValueConverter INSTANCE = new PojoDefaultSqlDateFromDocumentFieldValueConverter();
-
-		@Override
-		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-			return superTypeCandidate.isAssignableFrom( Timestamp.class );
-		}
-
-		@Override
-		public Timestamp convert(Instant value, FromDocumentFieldValueConvertContext context) {
-			return value == null ? null : new Timestamp( value.toEpochMilli() );
-		}
-
-		@Override
-		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
-			return INSTANCE.equals( other );
-		}
 	}
 
 }

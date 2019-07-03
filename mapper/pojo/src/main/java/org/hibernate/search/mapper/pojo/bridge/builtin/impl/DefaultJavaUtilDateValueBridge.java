@@ -9,12 +9,9 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import java.time.Instant;
 import java.util.Date;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, Instant> {
@@ -25,14 +22,13 @@ public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, I
 	}
 
 	@Override
-	public StandardIndexFieldTypeOptionsStep<?, Instant> bind(ValueBridgeBindingContext<Date> context) {
-		return context.getTypeFactory().asInstant()
-				.projectionConverter( PojoDefaultDateFromDocumentFieldValueConverter.INSTANCE );
+	public Instant toIndexedValue(Date value, ValueBridgeToIndexedValueContext context) {
+		return value == null ? null : value.toInstant();
 	}
 
 	@Override
-	public Instant toIndexedValue(Date value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : value.toInstant();
+	public Date fromIndexedValue(Instant value, ValueBridgeFromIndexedValueContext context) {
+		return value == null ? null : Date.from( value );
 	}
 
 	@Override
@@ -48,26 +44,6 @@ public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, I
 	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
-	}
-
-	private static class PojoDefaultDateFromDocumentFieldValueConverter
-			implements FromDocumentFieldValueConverter<Instant, Date> {
-		private static final PojoDefaultDateFromDocumentFieldValueConverter INSTANCE = new PojoDefaultDateFromDocumentFieldValueConverter();
-
-		@Override
-		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-			return superTypeCandidate.isAssignableFrom( Date.class );
-		}
-
-		@Override
-		public Date convert(Instant value, FromDocumentFieldValueConvertContext context) {
-			return value == null ? null : Date.from( value );
-		}
-
-		@Override
-		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
-			return INSTANCE.equals( other );
-		}
 	}
 
 }

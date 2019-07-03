@@ -6,15 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 
 final class PojoValueBridgeToDocumentFieldValueConverter<U, V extends U, F> implements
 		ToDocumentFieldValueConverter<V, F> {
@@ -48,22 +43,5 @@ final class PojoValueBridgeToDocumentFieldValueConverter<U, V extends U, F> impl
 		PojoValueBridgeToDocumentFieldValueConverter<?, ?, ?> castedOther =
 				(PojoValueBridgeToDocumentFieldValueConverter<?, ?, ?>) other;
 		return bridge.isCompatibleWith( castedOther.bridge );
-	}
-
-	private static class PojoValueBridgeContextExtension
-			implements ToDocumentFieldValueConvertContextExtension<ValueBridgeToIndexedValueContext> {
-		private static final PojoValueBridgeContextExtension INSTANCE = new PojoValueBridgeContextExtension();
-
-		@Override
-		public Optional<ValueBridgeToIndexedValueContext> extendOptional(ToDocumentFieldValueConvertContext original,
-			MappingContextImplementor mappingContext) {
-			if ( mappingContext instanceof AbstractPojoMappingContextImplementor ) {
-				AbstractPojoMappingContextImplementor pojoMappingContext = (AbstractPojoMappingContextImplementor) mappingContext;
-				return Optional.of( pojoMappingContext.getToIndexedValueContext() );
-			}
-			else {
-				return Optional.empty();
-			}
-		}
 	}
 }
