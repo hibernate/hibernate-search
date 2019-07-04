@@ -12,9 +12,11 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
@@ -33,7 +35,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 @SuppressWarnings("rawtypes") // Clients cannot provide a level of guarantee stronger than raw types
 public final class AnnotationInitializingBeanDelegatingBinder<A extends Annotation>
-		implements TypeBinder<A>, PropertyBinder<A>, RoutingKeyBinder<A> {
+		implements TypeBinder<A>, PropertyBinder<A>, RoutingKeyBinder<A>, MarkerBinder<A> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -52,7 +54,7 @@ public final class AnnotationInitializingBeanDelegatingBinder<A extends Annotati
 
 	@Override
 	public void initialize(A annotation) {
-		// Delay initialization to the build() call
+		// Delay initialization to the bind() call
 		this.annotation = annotation;
 	}
 
@@ -84,6 +86,17 @@ public final class AnnotationInitializingBeanDelegatingBinder<A extends Annotati
 				createDelegate( context.getBeanResolver(), RoutingKeyBinder.class ) ) {
 			@SuppressWarnings("unchecked") // Checked using reflection in createDelegate
 			RoutingKeyBinder<A> castedDelegate = delegateHolder.get();
+			castedDelegate.initialize( annotation );
+			castedDelegate.bind( context );
+		}
+	}
+
+	@Override
+	public void bind(MarkerBindingContext context) {
+		try ( BeanHolder<? extends MarkerBinder> delegateHolder =
+				createDelegate( context.getBeanResolver(), MarkerBinder.class ) ) {
+			@SuppressWarnings("unchecked") // Checked using reflection in createDelegate
+			MarkerBinder<A> castedDelegate = delegateHolder.get();
 			castedDelegate.initialize( annotation );
 			castedDelegate.bind( context );
 		}

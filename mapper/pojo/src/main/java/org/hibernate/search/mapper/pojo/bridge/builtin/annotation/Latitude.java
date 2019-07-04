@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
  *
  * @author Nicolas Helleringer
  */
-@MarkerMapping(marker = @MarkerRef(builderType = LatitudeMarker.Builder.class))
+@MarkerMapping(marker = @MarkerRef(binderType = LatitudeMarker.Binder.class))
 @Retention( RetentionPolicy.RUNTIME )
 @Target( { ElementType.METHOD, ElementType.FIELD } )
 @Documented

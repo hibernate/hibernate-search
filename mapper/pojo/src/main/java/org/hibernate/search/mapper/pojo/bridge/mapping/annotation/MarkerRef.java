@@ -13,22 +13,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
+import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 
 /**
- * Reference a marker mapping builder in a {@link MarkerMapping}.
+ * Reference a marker for a {@link MarkerMapping}.
  * <p>
- * Reference can be obtained using either a name or a type.
+ * References can use either a name, a type, or both.
  * <p>
- * Each time the mapped annotation is encountered, an instance of the marker mapping builder will be created.
- * The builder will be passed the annotation through its {@link AnnotationMarkerBuilder#initialize(Annotation)} method,
- * and then the marker will be retrieved by calling {@link MarkerBuilder#build(MarkerBuildContext)}.
+ * Each time the mapped annotation is encountered, an instance of the marker binder will be created.
+ * The binder will be passed the annotation through its {@link MarkerBinder#initialize(Annotation)} method,
+ * and then the bridge will be created and bound by {@link MarkerBinder#bind(MarkerBindingContext)}.
  * <p>
  * Markers mapped this way can be parameterized:
  * the marker mapping will be able to take any attribute of the mapped annotation into account
- * in its {@link AnnotationMarkerBuilder#initialize(Annotation)} method.
+ * in its {@link MarkerBinder#initialize(Annotation)} method.
  */
 @Documented
 @Target({}) // Only used as a component in other annotations
@@ -36,22 +35,22 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuildC
 public @interface MarkerRef {
 
 	/**
-	 * Reference a marker by the the bean name of its builder.
-	 * @return The marker builder bean name.
+	 * Reference a marker by the the bean name of its binder.
+	 * @return The bean name of the marker binder.
 	 */
-	String builderName() default "";
+	String binderName() default "";
 
 	/**
-	 * Reference a marker by the type of its builder.
-	 * @return The marker builder type.
+	 * Reference a marker by the type of its binder.
+	 * @return The bean type of the marker binder.
 	 */
-	Class<? extends AnnotationMarkerBuilder<?>> builderType() default UndefinedBuilderImplementationType.class;
+	Class<? extends MarkerBinder<?>> binderType() default UndefinedBinderImplementationType.class;
 
 	/**
-	 * Class used as a marker for the default value of the {@link #builderType()} attribute.
+	 * Class used as a marker for the default value of the {@link #binderType()} attribute.
 	 */
-	abstract class UndefinedBuilderImplementationType implements AnnotationMarkerBuilder<Annotation> {
-		private UndefinedBuilderImplementationType() {
+	abstract class UndefinedBinderImplementationType implements MarkerBinder<Annotation> {
+		private UndefinedBinderImplementationType() {
 		}
 	}
 }

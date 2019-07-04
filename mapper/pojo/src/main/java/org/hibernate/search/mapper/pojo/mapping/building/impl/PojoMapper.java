@@ -80,7 +80,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		this.delegate = delegate;
 
 		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider(
-				new MarkerBuildContextImpl( buildContext ), failureCollector, contributorProvider
+				buildContext.getBeanResolver(), failureCollector, contributorProvider
 		);
 
 		TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );

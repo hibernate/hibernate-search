@@ -15,8 +15,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
+import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -69,7 +69,7 @@ public class MarkerBaseIT {
 						.failure(
 								"Annotation type '" + MarkerAnnotationWithEmptyMarkerMapping.class.getName()
 										+ "' is annotated with '" + MarkerMapping.class.getName() + "',"
-										+ " but the marker builder reference is empty"
+										+ " but the binder reference is empty"
 						)
 						.build()
 				);
@@ -87,7 +87,7 @@ public class MarkerBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@MarkerAnnotationMappedToMarkerBuilderWithDifferentAnnotationType
+			@MarkerAnnotationMappedToMarkerBinderWithDifferentAnnotationType
 			public Integer getId() {
 				return id;
 			}
@@ -101,9 +101,9 @@ public class MarkerBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
-								"Binder '" + MarkerBuilderWithDifferentAnnotationType.TOSTRING
+								"Binder '" + MarkerBinderWithDifferentAnnotationType.TOSTRING
 										+ "' cannot be initialized with annotations of type '"
-										+ MarkerAnnotationMappedToMarkerBuilderWithDifferentAnnotationType.class.getName() + "'"
+										+ MarkerAnnotationMappedToMarkerBinderWithDifferentAnnotationType.class.getName() + "'"
 						)
 						.build()
 				);
@@ -111,8 +111,8 @@ public class MarkerBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@MarkerMapping(marker = @MarkerRef(builderType = MarkerBuilderWithDifferentAnnotationType.class))
-	private @interface MarkerAnnotationMappedToMarkerBuilderWithDifferentAnnotationType {
+	@MarkerMapping(marker = @MarkerRef(binderType = MarkerBinderWithDifferentAnnotationType.class))
+	private @interface MarkerAnnotationMappedToMarkerBinderWithDifferentAnnotationType {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -120,17 +120,20 @@ public class MarkerBaseIT {
 	private @interface DifferentAnnotationType {
 	}
 
-	public static class MarkerBuilderWithDifferentAnnotationType
-			implements AnnotationMarkerBuilder<DifferentAnnotationType> {
-		private static String TOSTRING = "<MarkerBuilderWithDifferentAnnotationType toString() result>";
+	public static class MarkerBinderWithDifferentAnnotationType
+			implements MarkerBinder<DifferentAnnotationType> {
+		private static String TOSTRING = "<MarkerBinderWithDifferentAnnotationType toString() result>";
+
 		@Override
 		public void initialize(DifferentAnnotationType annotation) {
 			throw new UnsupportedOperationException( "This should not be called" );
 		}
+
 		@Override
-		public Object build(MarkerBuildContext buildContext) {
+		public void bind(MarkerBindingContext context) {
 			throw new UnsupportedOperationException( "This should not be called" );
 		}
+
 		@Override
 		public String toString() {
 			return TOSTRING;

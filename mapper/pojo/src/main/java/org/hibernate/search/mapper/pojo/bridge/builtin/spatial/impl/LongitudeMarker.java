@@ -7,33 +7,11 @@
 package org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
-import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.LatitudeLongitudeMarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.LatitudeLongitudeMarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 
 public class LongitudeMarker {
-
-	public static class Builder implements LatitudeLongitudeMarkerBuilder, AnnotationMarkerBuilder<Longitude> {
-
-		private String markerSet;
-
-		@Override
-		public void initialize(Longitude annotation) {
-			markerSet( annotation.markerSet() );
-		}
-
-		@Override
-		public Builder markerSet(String markerSet) {
-			this.markerSet = markerSet;
-			return this;
-		}
-
-		@Override
-		public Object build(MarkerBuildContext buildContext) {
-			return new LongitudeMarker( markerSet );
-		}
-	}
 
 	private final String markerSet;
 
@@ -47,4 +25,26 @@ public class LongitudeMarker {
 	public String getMarkerSet() {
 		return markerSet;
 	}
+
+	public static class Binder implements LatitudeLongitudeMarkerBinder<Longitude> {
+
+		private String markerSet;
+
+		@Override
+		public void initialize(Longitude annotation) {
+			markerSet( annotation.markerSet() );
+		}
+
+		@Override
+		public Binder markerSet(String markerSet) {
+			this.markerSet = markerSet;
+			return this;
+		}
+
+		@Override
+		public void bind(MarkerBindingContext context) {
+			context.setMarker( new LongitudeMarker( markerSet ) );
+		}
+	}
+
 }

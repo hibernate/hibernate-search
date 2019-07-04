@@ -27,12 +27,10 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBrid
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
@@ -100,21 +98,24 @@ class AnnotationProcessorHelper {
 		}
 	}
 
-	<A extends Annotation> MarkerBuilder createMarkerBuilder(A annotation) {
+	<A extends Annotation> MarkerBinder createMarkerBinder(A annotation) {
 		MarkerMapping markerMapping = annotation.annotationType().getAnnotation( MarkerMapping.class );
-		MarkerRef markerBuilderReferenceAnnotation = markerMapping.marker();
-
-		return new AnnotationInitializingBeanDelegatingMarkerBuilder<>(
-				toBeanReference(
-						AnnotationMarkerBuilder.class,
-						MarkerRef.UndefinedBuilderImplementationType.class,
-						markerBuilderReferenceAnnotation.builderType(), markerBuilderReferenceAnnotation.builderName()
-				)
-						.orElseThrow( () -> log.missingBuilderReferenceInMarkerMapping(
-								MarkerMapping.class, annotation.annotationType()
-						) ),
-				annotation
+		MarkerRef binderReferenceAnnotation = markerMapping.marker();
+		Optional<BeanReference<? extends MarkerBinder>> binderReference = toBeanReference(
+				MarkerBinder.class,
+				MarkerRef.UndefinedBinderImplementationType.class,
+				binderReferenceAnnotation.binderType(), binderReferenceAnnotation.binderName()
 		);
+
+		if ( !binderReference.isPresent() ) {
+			throw log.missingBinderReferenceInMarkerMapping(
+					MarkerMapping.class, annotation.annotationType()
+			);
+		}
+
+		MarkerBinder<A> binder = new AnnotationInitializingBeanDelegatingBinder<>( binderReference.get() );
+		binder.initialize( annotation );
+		return binder;
 	}
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here

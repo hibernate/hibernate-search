@@ -12,6 +12,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -57,7 +58,7 @@ public interface GeoPointBinder
 	/**
 	 * @param markerSet The name of the "marker set".
 	 * This is used to discriminate between multiple pairs of latitude/longitude markers:
-	 * {@link LatitudeLongitudeMarkerBuilder#markerSet(String) assign a marker set when building each marker},
+	 * {@link LatitudeLongitudeMarkerBinder#markerSet(String) assign a marker set when building each marker},
 	 * then select the marker set here.
 	 * @return {@code this}, for method chaining.
 	 */
@@ -75,19 +76,19 @@ public interface GeoPointBinder
 	}
 
 	/**
-	 * @return A marker builder for the latitude, to be applied on a property.
-	 * @see LatitudeLongitudeMarkerBuilder
+	 * @return A {@link MarkerBinder} for the latitude, to be applied on a property.
+	 * @see LatitudeLongitudeMarkerBinder
 	 */
-	static LatitudeLongitudeMarkerBuilder latitude() {
-		return new LatitudeMarker.Builder();
+	static LatitudeLongitudeMarkerBinder latitude() {
+		return new LatitudeMarker.Binder();
 	}
 
 	/**
-	 * @return A marker builder for the longitude, to be applied on a property.
-	 * @see LatitudeLongitudeMarkerBuilder
+	 * @return A {@link MarkerBinder} for the longitude, to be applied on a property.
+	 * @see LatitudeLongitudeMarkerBinder
 	 */
-	static LatitudeLongitudeMarkerBuilder longitude() {
-		return new LongitudeMarker.Builder();
+	static LatitudeLongitudeMarkerBinder longitude() {
+		return new LongitudeMarker.Binder();
 	}
 
 }
