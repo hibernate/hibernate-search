@@ -87,8 +87,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 3,
 			value = "Annotation type '%2$s' is annotated with '%1$s',"
-					+ " but neither a bridge reference nor a binder reference was provided.")
-	SearchException missingBridgeReferenceInBridgeMapping(
+					+ " but the binder reference is empty.")
+	SearchException missingBinderReferenceInBridgeMapping(
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> metaAnnotationType,
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> annotationType);
 

@@ -28,7 +28,7 @@ public @interface PropertyBridgeMapping {
 	 * Map a property bridge to an annotation type.
 	 *
 	 * @see PropertyBridgeRef
-	 * @return A reference to the property bridge to use.
+	 * @return A reference to the property binder to use.
 	 */
 	PropertyBridgeRef bridge();
 }

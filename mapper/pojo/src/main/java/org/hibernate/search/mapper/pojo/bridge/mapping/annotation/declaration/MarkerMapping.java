@@ -28,7 +28,7 @@ public @interface MarkerMapping {
 	 * Map a marker to an annotation type.
 	 *
 	 * @see MarkerRef
-	 * @return A reference to the marker to use.
+	 * @return A reference to the marker binder to use.
 	 */
 	MarkerRef marker();
 
