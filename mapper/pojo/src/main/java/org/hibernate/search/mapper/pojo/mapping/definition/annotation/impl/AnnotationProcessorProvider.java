@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.Pr
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
@@ -109,8 +109,8 @@ class AnnotationProcessorProvider {
 		@Override
 		void doProcess(PropertyMappingStep mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel, Annotation annotation) {
-			MarkerBuilder builder = helper.createMarkerBuilder( annotation );
-			mappingContext.marker( builder );
+			MarkerBinder<?> binder = helper.createMarkerBinder( annotation );
+			mappingContext.marker( binder );
 		}
 	}
 

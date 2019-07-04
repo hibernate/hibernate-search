@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
@@ -86,8 +86,8 @@ class InitialPropertyMappingStep
 	}
 
 	@Override
-	public PropertyMappingStep marker(MarkerBuilder builder) {
-		children.add( new MarkerMappingContributor( builder ) );
+	public PropertyMappingStep marker(MarkerBinder<?> binder) {
+		children.add( new MarkerMappingContributor( binder ) );
 		return this;
 	}
 

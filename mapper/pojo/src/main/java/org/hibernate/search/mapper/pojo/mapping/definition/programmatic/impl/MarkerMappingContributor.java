@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
@@ -15,15 +15,15 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 
 class MarkerMappingContributor implements PojoPropertyMetadataContributor {
 
-	private final MarkerBuilder markerBuilder;
+	private final MarkerBinder<?> binder;
 
-	MarkerMappingContributor(MarkerBuilder markerBuilder) {
-		this.markerBuilder = markerBuilder;
+	MarkerMappingContributor(MarkerBinder<?> binder) {
+		this.binder = binder;
 	}
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
-		collector.marker( markerBuilder );
+		collector.markerBinder( binder );
 	}
 
 	@Override

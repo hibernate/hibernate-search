@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
@@ -52,8 +52,8 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 	}
 
 	@Override
-	public final void marker(MarkerBuilder builder) {
-		doAddMarker( builder.build( rootBuilder.getMarkerBuildContext() ) );
+	public final void markerBinder(MarkerBinder<?> builder) {
+		doAddMarker( rootBuilder.bindMarker( builder ) );
 	}
 
 	@SuppressWarnings("unchecked")

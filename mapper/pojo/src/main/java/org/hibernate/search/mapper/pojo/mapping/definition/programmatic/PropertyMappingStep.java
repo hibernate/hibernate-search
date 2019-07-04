@@ -8,7 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
@@ -69,13 +70,13 @@ public interface PropertyMappingStep {
 	PropertyMappingStep bridge(PropertyBinder<?> binder);
 
 	/**
-	 * @param builder A marker builder.
+	 * @param binder A {@link MarkerBinder} responsible for creating a marker object.
 	 * @return {@code this}, for method chaining.
-	 * @see MarkerBuilder
-	 * @see org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker.Builder
-	 * @see org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker.Builder
+	 * @see MarkerBinder
+	 * @see GeoPointBinder#latitude()
+	 * @see GeoPointBinder#longitude()
 	 */
-	PropertyMappingStep marker(MarkerBuilder builder);
+	PropertyMappingStep marker(MarkerBinder<?> binder);
 
 	/**
 	 * Maps the property to a field in the index with the same name as this property.

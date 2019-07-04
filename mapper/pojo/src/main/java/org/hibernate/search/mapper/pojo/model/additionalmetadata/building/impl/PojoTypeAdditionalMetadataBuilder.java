@@ -12,7 +12,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuildContext;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.MarkerBindingContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
@@ -24,7 +26,7 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 
 class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorTypeNode {
-	private final MarkerBuildContext markerBuildContext;
+	private final BeanResolver beanResolver;
 	private final FailureCollector failureCollector;
 	private final PojoRawTypeModel<?> rawTypeModel;
 
@@ -32,9 +34,9 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoPropertyAdditionalMetadataBuilder> propertyBuilders = new LinkedHashMap<>();
 
-	PojoTypeAdditionalMetadataBuilder(MarkerBuildContext markerBuildContext,
+	PojoTypeAdditionalMetadataBuilder(BeanResolver beanResolver,
 			FailureCollector failureCollector, PojoRawTypeModel<?> rawTypeModel) {
-		this.markerBuildContext = markerBuildContext;
+		this.beanResolver = beanResolver;
 		this.failureCollector = failureCollector;
 		this.rawTypeModel = rawTypeModel;
 	}
@@ -58,8 +60,9 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 		);
 	}
 
-	MarkerBuildContext getMarkerBuildContext() {
-		return markerBuildContext;
+	Object bindMarker(MarkerBinder<?> binder) {
+		MarkerBindingContextImpl bindingContext = new MarkerBindingContextImpl( beanResolver );
+		return bindingContext.applyBinder( binder );
 	}
 
 	public PojoTypeAdditionalMetadata build() {

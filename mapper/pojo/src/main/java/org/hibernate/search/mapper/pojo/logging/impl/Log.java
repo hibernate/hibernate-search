@@ -94,8 +94,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 4,
 			value = "Annotation type '%2$s' is annotated with '%1$s',"
-					+ " but the marker builder reference is empty.")
-	SearchException missingBuilderReferenceInMarkerMapping(
+					+ " but the binder reference is empty.")
+	SearchException missingBinderReferenceInMarkerMapping(
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> metaAnnotationType,
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> annotationType);
 
@@ -398,4 +398,9 @@ public interface Log extends BasicLogger {
 			value = "The bind() method of binder '%1$s' is not implemented correctly:"
 					+ " it did not call context.setBridge().")
 	SearchException missingBridgeForBinder(Object binder);
+
+	@Message(id = ID_OFFSET_2 + 59,
+			value = "The bind() method of binder '%1$s' is not implemented correctly:"
+					+ " it did not call context.setMarker(...).")
+	SearchException missingMarkerForBinder(Object binder);
 }

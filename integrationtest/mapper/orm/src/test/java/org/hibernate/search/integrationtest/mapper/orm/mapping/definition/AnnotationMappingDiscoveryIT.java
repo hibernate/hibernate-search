@@ -30,8 +30,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.Ma
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
+import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -257,7 +257,7 @@ public class AnnotationMappingDiscoveryIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.METHOD, ElementType.FIELD})
-	@MarkerMapping(marker = @MarkerRef(builderType = CustomMarker.Builder.class))
+	@MarkerMapping(marker = @MarkerRef(binderType = CustomMarker.Binder.class))
 	private @interface CustomMarkerAnnotation {
 	}
 
@@ -268,19 +268,19 @@ public class AnnotationMappingDiscoveryIT {
 	}
 
 	private static final class CustomMarker {
-		public static class Builder implements AnnotationMarkerBuilder<CustomMarkerAnnotation> {
+		private CustomMarker() {
+		}
+
+		public static class Binder implements MarkerBinder<CustomMarkerAnnotation> {
 			@Override
 			public void initialize(CustomMarkerAnnotation annotation) {
 				// Nothing to do
 			}
 
 			@Override
-			public Object build(MarkerBuildContext buildContext) {
-				return new CustomMarker();
+			public void bind(MarkerBindingContext context) {
+				context.setMarker( new CustomMarker() );
 			}
-		}
-
-		private CustomMarker() {
 		}
 	}
 

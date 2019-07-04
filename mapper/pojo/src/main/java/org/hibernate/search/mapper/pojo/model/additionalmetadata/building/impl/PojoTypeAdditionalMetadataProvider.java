@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuildContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoValueAdditionalMetadata;
@@ -23,15 +23,15 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 public class PojoTypeAdditionalMetadataProvider {
 
-	private final MarkerBuildContext markerBuildContext;
+	private final BeanResolver beanResolver;
 	private final FailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider;
 	private final Map<PojoRawTypeModel<?>, PojoTypeAdditionalMetadata> cache = new HashMap<>();
 
-	public PojoTypeAdditionalMetadataProvider(MarkerBuildContext markerBuildContext,
+	public PojoTypeAdditionalMetadataProvider(BeanResolver beanResolver,
 			FailureCollector failureCollector,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
-		this.markerBuildContext = markerBuildContext;
+		this.beanResolver = beanResolver;
 		this.failureCollector = failureCollector;
 		this.modelContributorProvider = modelContributorProvider;
 	}
@@ -51,7 +51,7 @@ public class PojoTypeAdditionalMetadataProvider {
 
 	private PojoTypeAdditionalMetadata createTypeAdditionalMetadata(PojoRawTypeModel<?> typeModel) {
 		PojoTypeAdditionalMetadataBuilder builder = new PojoTypeAdditionalMetadataBuilder(
-				markerBuildContext, failureCollector, typeModel
+				beanResolver, failureCollector, typeModel
 		);
 		modelContributorProvider.forEach( typeModel, c -> c.contributeAdditionalMetadata( builder ) );
 		return builder.build();
