@@ -140,7 +140,7 @@ public interface Log extends BasicLogger {
 					+ " and setting the second type parameter to the same type variable,"
 					+ " e.g. MyExtractor<T> implements ContainerExtractor<MyParameterizedBean<?, T, ?>, T>")
 	SearchException cannotInferContainerExtractorClassTypePattern(
-			@FormatWith(ClassFormatter.class) Class<?> extractorClass);
+			@FormatWith(ClassFormatter.class) Class<?> extractorClass, @Cause Exception e);
 
 	@SuppressWarnings("rawtypes")
 	@Message(id = ID_OFFSET_2 + 16,
