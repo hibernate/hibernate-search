@@ -209,15 +209,15 @@ public class ContainerExtractorBinder {
 		Class<? extends ContainerExtractor> extractorClass = containerExtractorRegistry.getForName( extractorName );
 		GenericTypeContext typeContext = new GenericTypeContext( extractorClass );
 		Type typePattern = typeContext.resolveTypeArgument( ContainerExtractor.class, 0 )
-				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass ) );
+				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass, null ) );
 		Type typeToExtract = typeContext.resolveTypeArgument( ContainerExtractor.class, 1 )
-				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass ) );
+				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass, null ) );
 		ExtractingTypePatternMatcher typePatternMatcher;
 		try {
 			typePatternMatcher = typePatternMatcherFactory.createExtractingMatcher( typePattern, typeToExtract );
 		}
 		catch (UnsupportedOperationException e) {
-			throw log.cannotInferContainerExtractorClassTypePattern( extractorClass );
+			throw log.cannotInferContainerExtractorClassTypePattern( extractorClass, e );
 		}
 		return new SingleExtractorContributor( typePatternMatcher, extractorName, extractorClass );
 	}
