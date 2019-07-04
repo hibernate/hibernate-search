@@ -346,7 +346,7 @@ public class ProgrammaticMappingSmokeIT {
 			ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )
-					.bridge(
+					.binder(
 							new CustomTypeBridge.Binder()
 							.objectName( "customBridgeOnClass" )
 					)
@@ -365,7 +365,7 @@ public class ProgrammaticMappingSmokeIT {
 					.property( "localDate" )
 							.genericField( "myLocalDateField" )
 					.property( "embedded" )
-							.bridge(
+							.binder(
 									new CustomPropertyBridge.Binder()
 									.objectName( "customBridgeOnProperty" )
 							);

@@ -211,7 +211,7 @@ class AnnotationProcessorProvider {
 		@Override
 		void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
 			RoutingKeyBinder<?> binder = helper.createRoutingKeyBinder( annotation );
-			mappingContext.routingKeyBridge( binder );
+			mappingContext.routingKeyBinder( binder );
 		}
 	}
 
@@ -228,7 +228,7 @@ class AnnotationProcessorProvider {
 		@Override
 		void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
 			TypeBinder<?> binder = helper.createTypeBinder( annotation );
-			mappingContext.bridge( binder );
+			mappingContext.binder( binder );
 		}
 	}
 
@@ -247,7 +247,7 @@ class AnnotationProcessorProvider {
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				Annotation annotation) {
 			PropertyBinder<?> binder = helper.createPropertyBinder( annotation );
-			mappingContext.bridge( binder );
+			mappingContext.binder( binder );
 		}
 	}
 

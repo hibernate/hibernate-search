@@ -649,7 +649,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 							@Override
 							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( ContainingEntity.class )
-										.bridge( createContainingEntityTypeBinder() );
+										.binder( createContainingEntityTypeBinder() );
 							}
 						}
 				)
@@ -677,7 +677,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( ContainingEntity.class )
 										.property( "association1" )
-										.bridge( createContainingEntitySingleValuedPropertyBinder() );
+										.binder( createContainingEntitySingleValuedPropertyBinder() );
 							}
 						}
 				)
@@ -712,7 +712,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( ContainingEntity.class )
 										.property( "association2" )
-										.bridge( binder );
+										.binder( binder );
 							}
 						}
 				)

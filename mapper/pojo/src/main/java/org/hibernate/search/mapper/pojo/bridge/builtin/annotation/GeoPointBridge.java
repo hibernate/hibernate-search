@@ -16,10 +16,10 @@ import java.lang.annotation.Target;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 
 /**
  * Defines a {@link GeoPoint} bridge, mapping a type or a property
@@ -59,11 +59,11 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
  *
  * @author Nicolas Helleringer
  */
-@PropertyBinding(bridge = @PropertyBridgeRef(
-		binderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder.class
+@PropertyBinding(binder = @PropertyBinderRef(
+		type = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder.class
 ))
-@TypeBinding(bridge = @TypeBridgeRef(
-		binderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder.class
+@TypeBinding(binder = @TypeBinderRef(
+		type = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder.class
 ))
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })

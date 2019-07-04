@@ -67,7 +67,7 @@ public interface PropertyMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see PropertyBinder
 	 */
-	PropertyMappingStep bridge(PropertyBinder<?> binder);
+	PropertyMappingStep binder(PropertyBinder<?> binder);
 
 	/**
 	 * @param binder A {@link MarkerBinder} responsible for creating a marker object.

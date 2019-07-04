@@ -52,8 +52,8 @@ class DelegatingPropertyMappingStep implements PropertyMappingStep {
 	}
 
 	@Override
-	public PropertyMappingStep bridge(PropertyBinder<?> binder) {
-		return delegate.bridge( binder );
+	public PropertyMappingStep binder(PropertyBinder<?> binder) {
+		return delegate.binder( binder );
 	}
 
 	@Override

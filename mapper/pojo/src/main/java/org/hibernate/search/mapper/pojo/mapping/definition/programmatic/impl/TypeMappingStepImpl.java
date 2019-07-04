@@ -90,11 +90,11 @@ public class TypeMappingStepImpl
 
 	@Override
 	public TypeMappingStep routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference) {
-		return routingKeyBridge( new BeanBinder( bridgeReference ) );
+		return routingKeyBinder( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override
-	public TypeMappingStep routingKeyBridge(RoutingKeyBinder<?> binder) {
+	public TypeMappingStep routingKeyBinder(RoutingKeyBinder<?> binder) {
 		children.add( new RoutingKeyBridgeMappingContributor( binder ) );
 		return this;
 	}
@@ -106,11 +106,11 @@ public class TypeMappingStepImpl
 
 	@Override
 	public TypeMappingStep bridge(BeanReference<? extends TypeBridge> bridgeReference) {
-		return bridge( new BeanBinder( bridgeReference ) );
+		return binder( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override
-	public TypeMappingStep bridge(TypeBinder<?> binder) {
+	public TypeMappingStep binder(TypeBinder<?> binder) {
 		children.add( new TypeBridgeMappingContributor( binder ) );
 		return this;
 	}

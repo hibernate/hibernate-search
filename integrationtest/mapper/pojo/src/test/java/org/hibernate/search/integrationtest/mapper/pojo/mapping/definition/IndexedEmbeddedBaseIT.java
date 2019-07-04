@@ -593,12 +593,12 @@ public class IndexedEmbeddedBaseIT {
 									.indexedEmbedded()
 											.includePaths( "level1IncludedField" );
 					b.programmaticMapping().type( IndexedEmbeddedLevel1.class )
-							.bridge( StartupStubBridge.binder( filteredOutBridgeCounterKeys ) )
-							.bridge( new GeoPointBridge.Binder().fieldName( "location" ) )
+							.binder( StartupStubBridge.binder( filteredOutBridgeCounterKeys ) )
+							.binder( new GeoPointBridge.Binder().fieldName( "location" ) )
 							.property( "latitude" ).marker( new LatitudeMarker.Binder() )
 							.property( "longitude" ).marker( new LongitudeMarker.Binder() )
 							.property( "level1Property" )
-									.bridge( StartupStubBridge.binder( filteredOutBridgeCounterKeys ) )
+									.binder( StartupStubBridge.binder( filteredOutBridgeCounterKeys ) )
 									.genericField( "level1IncludedField" )
 									.genericField( "filteredOut" )
 											.valueBridge( StartupStubBridge.binder( String.class, filteredOutBridgeCounterKeys ) );
