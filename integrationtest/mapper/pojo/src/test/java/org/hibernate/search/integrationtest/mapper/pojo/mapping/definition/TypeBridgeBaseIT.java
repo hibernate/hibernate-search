@@ -812,7 +812,7 @@ public class TypeBridgeBaseIT {
 	}
 
 	@Test
-	public void mapping_error_missingBridgeReference() {
+	public void mapping_error_missingBinderReference() {
 		@Indexed
 		@BridgeAnnotationWithEmptyTypeBridgeRef
 		class IndexedEntity {
@@ -833,7 +833,7 @@ public class TypeBridgeBaseIT {
 						.failure(
 								"Annotation type '" + BridgeAnnotationWithEmptyTypeBridgeRef.class.getName()
 										+ "' is annotated with '" + TypeBridgeMapping.class.getName() + "',"
-										+ " but neither a bridge reference nor a binder reference was provided."
+										+ " but the binder reference is empty."
 						)
 						.build()
 				);
@@ -901,40 +901,6 @@ public class TypeBridgeBaseIT {
 		public String toString() {
 			return TOSTRING;
 		}
-	}
-
-	@Test
-	public void mapping_error_conflictingBridgeReferenceInBridgeMapping() {
-		@Indexed
-		@BridgeAnnotationWithConflictingReferencesInTypeBridgeMapping
-		class IndexedEntity {
-			Integer id;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-		}
-		SubTest.expectException(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.annotationContextAnyParameters( BridgeAnnotationWithConflictingReferencesInTypeBridgeMapping.class )
-						.failure(
-								"Annotation type '" + BridgeAnnotationWithConflictingReferencesInTypeBridgeMapping.class.getName()
-										+ "' is annotated with '" + TypeBridgeMapping.class.getName() + "',"
-										+ " but both a bridge reference and a binder reference were provided"
-						)
-						.build()
-				);
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(name = "foo", binderName = "bar"))
-	private @interface BridgeAnnotationWithConflictingReferencesInTypeBridgeMapping {
 	}
 
 	@Test

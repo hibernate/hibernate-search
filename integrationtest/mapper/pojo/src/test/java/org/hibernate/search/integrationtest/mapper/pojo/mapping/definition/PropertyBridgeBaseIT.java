@@ -985,41 +985,6 @@ public class PropertyBridgeBaseIT {
 	}
 
 	@Test
-	public void mapping_error_conflictingBridgeReferenceInBridgeMapping() {
-		@Indexed
-		class IndexedEntity {
-			Integer id;
-			@DocumentId
-			@BridgeAnnotationWithConflictingReferencesInPropertyBridgeMapping
-			public Integer getId() {
-				return id;
-			}
-		}
-		SubTest.expectException(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".id" )
-						.annotationContextAnyParameters( BridgeAnnotationWithConflictingReferencesInPropertyBridgeMapping.class )
-						.failure(
-								"Annotation type '" + BridgeAnnotationWithConflictingReferencesInPropertyBridgeMapping.class.getName()
-										+ "' is annotated with '" + PropertyBridgeMapping.class.getName() + "',"
-										+ " but both a bridge reference and a bridge builder reference were provided"
-						)
-						.build()
-				);
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(name = "foo", binderName = "bar"))
-	private @interface BridgeAnnotationWithConflictingReferencesInPropertyBridgeMapping {
-	}
-
-	@Test
 	public void mapping_error_incompatibleRequestedType() {
 		@Indexed
 		class IndexedEntity {

@@ -20,17 +20,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBind
 /**
  * Reference a property bridge for a {@link TypeBridgeMapping}.
  * <p>
- * Either a bridge or a binder can be referenced, but never both.
  * References can use either a name, a type, or both.
  * <p>
- * If a <b>bridge</b> is referenced directly, using the methods {@link #name()} or {@link #type()},
- * each time the mapped annotation is encountered, an instance of the property bridge will be created.
- * <p>
- * Property bridges mapped this way cannot be parameterized:
- * any attribute of the mapped annotation will be ignored.
- * <p>
- * If a <b>binder</b> is referenced, using the methods {@link #binderName()} or {@link #binderType()},
- * each time the mapped annotation is encountered, an instance of the property binder will be created.
+ * Each time the mapped annotation is encountered, an instance of the property binder will be created.
  * The binder will be passed the annotation through its {@link PropertyBinder#initialize(Annotation)} method,
  * and then the bridge will be created and bound by {@link PropertyBinder#bind(PropertyBindingContext)}.
  * <p>
@@ -44,18 +36,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBind
 public @interface PropertyBridgeRef {
 
 	/**
-	 * Reference a property bridge by its bean name.
-	 * @return The bean name of the  property bridge.
-	 */
-	String name() default "";
-
-	/**
-	 * Reference a property bridge by its type.
-	 * @return The type of the  property bridge.
-	 */
-	Class<? extends PropertyBridge> type() default UndefinedBridgeImplementationType.class;
-
-	/**
 	 * Reference a property bridge by the bean name of its binder.
 	 * @return The bean name of the property binder.
 	 */
@@ -66,14 +46,6 @@ public @interface PropertyBridgeRef {
 	 * @return The type of the property binder.
 	 */
 	Class<? extends PropertyBinder<?>> binderType() default UndefinedBinderImplementationType.class;
-
-	/**
-	 * Class used as a marker for the default value of the {@link #type()} attribute.
-	 */
-	abstract class UndefinedBridgeImplementationType implements PropertyBridge {
-		private UndefinedBridgeImplementationType() {
-		}
-	}
 
 	/**
 	 * Class used as a marker for the default value of the {@link #binderType()} attribute.

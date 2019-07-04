@@ -28,7 +28,7 @@ public @interface RoutingKeyBridgeMapping {
 	 * Map a routing key bridge to an annotation type.
 	 *
 	 * @see RoutingKeyBridgeRef
-	 * @return A reference to the routing bridge to use.
+	 * @return A reference to the routing key binder to use.
 	 */
 	RoutingKeyBridgeRef bridge();
 
