@@ -45,9 +45,9 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
  * <p>
  * For our own convenience, all bridge types are implemented in the same class.
  */
-public class StartupStubBridge
-		implements TypeBridge, PropertyBridge, ValueBridge<Object, String>,
-		RoutingKeyBridge, IdentifierBridge<Object> {
+public class StartupStubBridge<T>
+		implements TypeBridge, PropertyBridge, ValueBridge<T, String>,
+		RoutingKeyBridge, IdentifierBridge<T> {
 	public static class CounterKeys {
 		public final StaticCounters.Key instance = StaticCounters.createKey();
 		public final StaticCounters.Key runtimeUse = StaticCounters.createKey();
@@ -62,8 +62,12 @@ public class StartupStubBridge
 		return new CounterKeys();
 	}
 
-	public static Builder builder(CounterKeys counterKeys) {
-		return new Builder( counterKeys );
+	public static Builder<Object> builder(CounterKeys counterKeys) {
+		return new Builder<>( Object.class, counterKeys );
+	}
+
+	public static <T> Builder<T> builder(Class<T> bridgeInputType, CounterKeys counterKeys) {
+		return new Builder<>( bridgeInputType, counterKeys );
 	}
 
 	private final CounterKeys counterKeys;
@@ -99,7 +103,7 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public Object cast(Object value) {
+	public T cast(Object value) {
 		throw unexpectedRuntimeUse();
 	}
 
@@ -122,7 +126,7 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public Object fromDocumentIdentifier(String documentIdentifier,
+	public T fromDocumentIdentifier(String documentIdentifier,
 			IdentifierBridgeFromDocumentIdentifierContext context) {
 		throw unexpectedRuntimeUse();
 	}
@@ -135,12 +139,14 @@ public class StartupStubBridge
 		);
 	}
 
-	public static class Builder implements TypeBridgeBuilder<Annotation>,
+	public static class Builder<T> implements TypeBridgeBuilder<Annotation>,
 			PropertyBridgeBuilder<Annotation>, RoutingKeyBridgeBuilder<Annotation>,
 			IdentifierBridgeBuilder, ValueBridgeBuilder {
+		private final Class<T> bridgeInputType;
 		private final StartupStubBridge.CounterKeys counterKeys;
 
-		private Builder(StartupStubBridge.CounterKeys counterKeys) {
+		private Builder(Class<T> bridgeInputType, StartupStubBridge.CounterKeys counterKeys) {
+			this.bridgeInputType = bridgeInputType;
 			this.counterKeys = counterKeys;
 		}
 
@@ -186,11 +192,11 @@ public class StartupStubBridge
 
 		@Override
 		public void bind(ValueBindingContext<?> context) {
-			context.setBridge( Object.class, build(), null );
+			context.setBridge( bridgeInputType, build(), null );
 		}
 
-		private BeanHolder<StartupStubBridge> build() {
-			StartupStubBridge bridge = new StartupStubBridge( counterKeys );
+		private BeanHolder<StartupStubBridge<T>> build() {
+			StartupStubBridge<T> bridge = new StartupStubBridge<>( counterKeys );
 			return new CloseCountingBeanHolder<>( bridge, counterKeys.holderClose );
 		}
 	}

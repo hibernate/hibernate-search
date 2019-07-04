@@ -85,11 +85,12 @@ public class CleanupIT {
 					.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
 					.property( "id" )
 							.documentId()
-									.identifierBridge( StartupStubBridge.builder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+									.identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 					.property( "text" )
 							.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
-									.valueBridge( StartupStubBridge.builder( VALUE_BRIDGE_COUNTER_KEYS ) )
+									// The extractor returns type Object, not String
+									.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 									.withExtractor( StartupStubContainerExtractor.NAME );
 		} );
 
@@ -132,11 +133,12 @@ public class CleanupIT {
 					.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
 					.property( "id" )
 							.documentId()
-									.identifierBridge( StartupStubBridge.builder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+									.identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 					.property( "text" )
 							.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
-									.valueBridge( StartupStubBridge.builder( VALUE_BRIDGE_COUNTER_KEYS ) )
+									// The extractor returns type Object, not String
+									.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 									.withExtractor( StartupStubContainerExtractor.NAME );
 			typeContext.routingKeyBridge( new FailingBridgeBuilder() );
 		} );
@@ -166,11 +168,12 @@ public class CleanupIT {
 					.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
 					.property( "id" )
 							.documentId()
-									.identifierBridge( StartupStubBridge.builder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+									.identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 					.property( "text" )
 							.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
-									.valueBridge( StartupStubBridge.builder( VALUE_BRIDGE_COUNTER_KEYS ) )
+									// The extractor returns type Object, not String
+									.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 									.withExtractor( StartupStubContainerExtractor.NAME );
 			typeContext.bridge( new FailingBridgeBuilder() );
 		} );
@@ -201,7 +204,8 @@ public class CleanupIT {
 				.property( "text" )
 						.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
-								.valueBridge( StartupStubBridge.builder( VALUE_BRIDGE_COUNTER_KEYS ) )
+								// The extractor returns type Object, not String
+								.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractor( StartupStubContainerExtractor.NAME )
 				.property( "id" )
 						.documentId()
@@ -233,10 +237,11 @@ public class CleanupIT {
 				.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
 				.property( "id" )
 						.documentId()
-								.identifierBridge( StartupStubBridge.builder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+								.identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
 						.genericField( "otherText" )
-								.valueBridge( StartupStubBridge.builder( VALUE_BRIDGE_COUNTER_KEYS ) )
+								// The extractor returns type Object, not String
+								.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractor( StartupStubContainerExtractor.NAME )
 						.bridge( new FailingBridgeBuilder() )
 		);
@@ -265,11 +270,12 @@ public class CleanupIT {
 				.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
 				.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
 				.property( "id" )
-						.documentId().identifierBridge( StartupStubBridge.builder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+						.documentId().identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
 						.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
-								.valueBridge( StartupStubBridge.builder( VALUE_BRIDGE_COUNTER_KEYS ) )
+								// The extractor returns type Object, not String
+								.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractor( StartupStubContainerExtractor.NAME )
 						.genericField( "yetAnotherText" )
 								.valueBridge( new FailingBridgeBuilder() )
@@ -301,14 +307,16 @@ public class CleanupIT {
 				.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
 				.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
 				.property( "id" )
-						.documentId().identifierBridge( StartupStubBridge.builder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+						.documentId().identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
 						.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
-								.valueBridge( StartupStubBridge.builder( VALUE_BRIDGE_COUNTER_KEYS ) )
+								// The extractor returns type Object, not String
+								.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractor( StartupStubContainerExtractor.NAME )
 						.genericField( "yetAnotherText" )
-								.valueBridge( StartupStubBridge.builder( VALUE_BRIDGE_COUNTER_KEYS ) )
+								// The extractor returns type Object, not String
+								.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractors( ContainerExtractorPath.explicitExtractors( Arrays.asList(
 										StartupStubContainerExtractor.NAME, // The first one succeeds, but...
 										FailingContainerExtractor.NAME // This one fails.
@@ -377,11 +385,12 @@ public class CleanupIT {
 									.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
 									.property( "id" )
 											.documentId().identifierBridge(
-													StartupStubBridge.builder( IDENTIFIER_BRIDGE_COUNTER_KEYS )
+													StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS )
 											)
 									.property( "text" )
 											.genericField()
-													.valueBridge( StartupStubBridge.builder( VALUE_BRIDGE_COUNTER_KEYS ) )
+													// The extractor returns type Object, not String
+													.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 													.withExtractor( StartupStubContainerExtractor.NAME )
 									.property( "embedded" )
 											.associationInverseSide(
