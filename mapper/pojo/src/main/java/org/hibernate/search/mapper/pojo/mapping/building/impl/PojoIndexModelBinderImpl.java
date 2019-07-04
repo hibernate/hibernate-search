@@ -13,17 +13,16 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundPropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.IdentifierBridgeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.PropertyBindingContextImpl;
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingKeyBridgeBindingContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingKeyBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.TypeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
@@ -40,10 +39,8 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
-import org.hibernate.search.mapper.pojo.model.dependency.impl.AbstractPojoBridgedElementDependencyContext;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeIndexingDependencyConfigurationContextImpl;
-import org.hibernate.search.mapper.pojo.model.impl.AbstractPojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
@@ -124,36 +121,25 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexedEntityBindingContext bindingContext,
+	public <T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexedEntityBindingContext indexedEntityBindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBridgeBuilder<?> builder) {
-		BeanHolder<? extends RoutingKeyBridge> bridgeHolder = builder.buildForRoutingKey( bridgeBuildContext );
-		try {
-			PojoModelTypeRootElement<T> pojoModelRootElement =
-					new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
-			PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
-					new PojoTypeIndexingDependencyConfigurationContextImpl<>(
-							introspector,
-							extractorBinder,
-							typeAdditionalMetadataProvider,
-							modelPath.getTypeModel()
-					);
-			bridgeHolder.get().bind( new RoutingKeyBridgeBindingContextImpl(
-					pojoModelRootElement,
-					pojoDependencyContext
-			) );
+		PojoModelTypeRootElement<T> pojoModelRootElement =
+				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
+		PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
+				new PojoTypeIndexingDependencyConfigurationContextImpl<>(
+						introspector,
+						extractorBinder,
+						typeAdditionalMetadataProvider,
+						modelPath.getTypeModel()
+				);
+		RoutingKeyBindingContextImpl<T> bindingContext = new RoutingKeyBindingContextImpl<>(
+				beanResolver,
+				indexedEntityBindingContext,
+				pojoModelRootElement,
+				pojoDependencyContext
+		);
 
-			bindingContext.explicitRouting();
-
-			checkBridgeDependencies( pojoModelRootElement, pojoDependencyContext );
-
-			return new BoundRoutingKeyBridge<>( bridgeHolder, pojoModelRootElement, pojoDependencyContext );
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( holder -> holder.get().close(), bridgeHolder )
-					.push( BeanHolder::close, bridgeHolder );
-			throw e;
-		}
+		return bindingContext.applyBuilder( builder );
 	}
 
 	@Override
@@ -259,29 +245,5 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		bindingContext.idDslConverter( new PojoIdentifierBridgeToDocumentIdentifierValueConverter<>( bridge ) );
 
 		return castedBridgeHolder;
-	}
-
-	private void checkBridgeDependencies(AbstractPojoModelCompositeElement<?> pojoModelRootElement,
-			AbstractPojoBridgedElementDependencyContext pojoDependencyContext) {
-		boolean isUseRootOnly = pojoDependencyContext.isUseRootOnly();
-		boolean hasDependency = pojoModelRootElement.hasDependency()
-				|| pojoDependencyContext.hasNonRootDependency();
-		boolean hasNonRootDependency = pojoModelRootElement.hasNonRootDependency()
-				|| pojoDependencyContext.hasNonRootDependency();
-		if ( isUseRootOnly && hasNonRootDependency ) {
-			throw log.inconsistentBridgeDependencyDeclaration();
-		}
-		else if ( !isUseRootOnly && !hasDependency ) {
-			throw log.missingBridgeDependencyDeclaration();
-		}
-	}
-
-	private class PojoIndexSchemaContributionListener implements IndexSchemaContributionListener {
-		private boolean schemaContributed = false;
-
-		@Override
-		public void onSchemaContributed() {
-			schemaContributed = true;
-		}
 	}
 }

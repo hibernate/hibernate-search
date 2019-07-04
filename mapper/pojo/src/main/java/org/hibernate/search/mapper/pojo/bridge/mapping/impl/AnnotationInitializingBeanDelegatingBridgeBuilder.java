@@ -12,10 +12,9 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
@@ -80,13 +79,13 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends A
 	}
 
 	@Override
-	public BeanHolder<? extends RoutingKeyBridge> buildForRoutingKey(BridgeBuildContext buildContext) {
+	public void bind(RoutingKeyBindingContext context) {
 		try ( BeanHolder<? extends RoutingKeyBridgeBuilder> delegateHolder =
-				createDelegate( buildContext, RoutingKeyBridgeBuilder.class ) ) {
+				createDelegate( context.getBeanResolver(), RoutingKeyBridgeBuilder.class ) ) {
 			@SuppressWarnings("unchecked") // Checked using reflection in createDelegate
 			RoutingKeyBridgeBuilder<A> castedDelegate = delegateHolder.get();
 			castedDelegate.initialize( annotation );
-			return castedDelegate.buildForRoutingKey( buildContext );
+			castedDelegate.bind( context );
 		}
 	}
 
@@ -113,10 +112,6 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends A
 			new SuppressingCloser( e ).push( delegateHolder );
 			throw e;
 		}
-	}
-
-	private <B> BeanHolder<? extends B> createDelegate(BridgeBuildContext buildContext, Class<B> expectedType) {
-		return createDelegate( buildContext.getBeanResolver(), expectedType );
 	}
 
 }

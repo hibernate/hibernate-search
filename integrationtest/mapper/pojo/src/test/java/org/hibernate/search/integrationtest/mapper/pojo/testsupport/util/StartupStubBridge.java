@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -86,11 +86,6 @@ public class StartupStubBridge
 		}
 		StaticCounters.get().increment( counterKeys.close );
 		closed = true;
-	}
-
-	@Override
-	public void bind(RoutingKeyBridgeBindingContext context) {
-		context.getDependencies().useRootOnly();
 	}
 
 	@Override
@@ -179,13 +174,14 @@ public class StartupStubBridge
 		}
 
 		@Override
-		public BeanHolder<? extends RoutingKeyBridge> buildForRoutingKey(BridgeBuildContext buildContext) {
+		public BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext) {
 			return build();
 		}
 
 		@Override
-		public BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext) {
-			return build();
+		public void bind(RoutingKeyBindingContext context) {
+			context.getDependencies().useRootOnly();
+			context.setBridge( build() );
 		}
 
 		@Override
