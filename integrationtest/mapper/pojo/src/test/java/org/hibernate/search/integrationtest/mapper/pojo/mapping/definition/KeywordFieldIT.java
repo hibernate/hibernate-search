@@ -16,6 +16,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
@@ -237,7 +238,7 @@ public class KeywordFieldIT {
 			}
 
 			@KeywordField(normalizer = NORMALIZER_NAME,
-					valueBridge = @ValueBridgeRef(binderType = ValidTypeBridge.ExplictFieldTypeBinder.class))
+					valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplictFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -334,7 +335,7 @@ public class KeywordFieldIT {
 			}
 
 			@KeywordField(normalizer = NORMALIZER_NAME,
-					valueBridge = @ValueBridgeRef(binderType = InvalidTypeBridge.ExplictFieldTypeBinder.class))
+					valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplictFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}

@@ -601,7 +601,7 @@ public class IndexedEmbeddedBaseIT {
 									.binder( StartupStubBridge.binder( filteredOutBridgeCounterKeys ) )
 									.genericField( "level1IncludedField" )
 									.genericField( "filteredOut" )
-											.valueBridge( StartupStubBridge.binder( String.class, filteredOutBridgeCounterKeys ) );
+											.valueBinder( StartupStubBridge.binder( String.class, filteredOutBridgeCounterKeys ) );
 				} )
 				.setup();
 		backendMock.verifyExpectationsMet();

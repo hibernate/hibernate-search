@@ -11,7 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -27,26 +27,25 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValueBridgeRef {
+public @interface ValueBinderRef {
 
 	/**
-	 * Reference a value bridge by its bean name.
-	 * @return The bean name of the value bridge.
+	 * Reference a value binder by its bean name.
+	 * @return The bean name of the value binder.
 	 */
 	String name() default "";
 
 	/**
-	 * Reference a value bridge by its type.
-	 * @return The type of the value bridge.
+	 * Reference a value binder by its type.
+	 * @return The type of the value binder.
 	 */
-	Class<? extends ValueBridge> type() default UndefinedBridgeImplementationType.class;
+	Class<? extends ValueBinder> type() default UndefinedBinderImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
-	abstract class UndefinedBridgeImplementationType implements ValueBridge {
-		private UndefinedBridgeImplementationType() {
+	abstract class UndefinedBinderImplementationType implements ValueBinder {
+		private UndefinedBinderImplementationType() {
 		}
 	}
-
 }

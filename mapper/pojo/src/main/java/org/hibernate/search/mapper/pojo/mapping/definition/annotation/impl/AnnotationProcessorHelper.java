@@ -15,6 +15,8 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
@@ -119,6 +121,7 @@ class AnnotationProcessorHelper {
 	IdentifierBinder createIdentifierBinder(
 			DocumentId annotation, PojoPropertyModel<?> annotationHolder) {
 		IdentifierBridgeRef bridgeReferenceAnnotation = annotation.identifierBridge();
+		IdentifierBinderRef binderReferenceAnnotation = annotation.identifierBinder();
 		Optional<BeanReference<? extends IdentifierBridge>> bridgeReference = toBeanReference(
 				IdentifierBridge.class,
 				IdentifierBridgeRef.UndefinedBridgeImplementationType.class,
@@ -126,8 +129,8 @@ class AnnotationProcessorHelper {
 		);
 		Optional<BeanReference<? extends IdentifierBinder>> binderReference = toBeanReference(
 				IdentifierBinder.class,
-				IdentifierBridgeRef.UndefinedBinderImplementationType.class,
-				bridgeReferenceAnnotation.binderType(), bridgeReferenceAnnotation.binderName()
+				IdentifierBinderRef.UndefinedBinderImplementationType.class,
+				binderReferenceAnnotation.type(), binderReferenceAnnotation.name()
 		);
 
 		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
@@ -210,6 +213,7 @@ class AnnotationProcessorHelper {
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
 	ValueBinder createValueBinder(
 			ValueBridgeRef bridgeReferenceAnnotation,
+			ValueBinderRef binderReferenceAnnotation,
 			PojoPropertyModel<?> annotationHolder) {
 		Optional<BeanReference<? extends ValueBridge>> bridgeReference = toBeanReference(
 				ValueBridge.class,
@@ -218,8 +222,8 @@ class AnnotationProcessorHelper {
 		);
 		Optional<BeanReference<? extends ValueBinder>> binderReference = toBeanReference(
 				ValueBinder.class,
-				ValueBridgeRef.UndefinedBinderImplementationType.class,
-				bridgeReferenceAnnotation.binderType(), bridgeReferenceAnnotation.binderName()
+				ValueBinderRef.UndefinedBinderImplementationType.class,
+				binderReferenceAnnotation.type(), binderReferenceAnnotation.name()
 		);
 
 		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {

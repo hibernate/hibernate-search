@@ -56,10 +56,10 @@ public interface PropertyMappingFieldOptionsStep<S extends PropertyMappingFieldO
 	/**
 	 * @param binder A {@link ValueBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
-	 * @see GenericField#valueBridge()
+	 * @see GenericField#valueBinder()
 	 * @see ValueBinder
 	 */
-	S valueBridge(ValueBinder binder);
+	S valueBinder(ValueBinder binder);
 
 	/**
 	 * @param extractorName The name of the container extractor to use.

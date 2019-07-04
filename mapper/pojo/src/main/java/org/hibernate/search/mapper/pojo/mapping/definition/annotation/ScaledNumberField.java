@@ -16,6 +16,7 @@ import java.lang.annotation.Target;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 
@@ -82,10 +83,19 @@ public @interface ScaledNumberField {
 
 	/**
 	 * @return A reference to the value bridge to use for this field.
+	 * Must not be set if {@link #valueBinder()} is set.
 	 * @see GenericField#valueBridge()
 	 * @see ValueBridgeRef
 	 */
 	ValueBridgeRef valueBridge() default @ValueBridgeRef;
+
+	/**
+	 * @return A reference to the value binder to use for this field.
+	 * Must not be set if {@link #valueBridge()} is set.
+	 * @see GenericField#valueBridge()
+	 * @see ValueBinderRef
+	 */
+	ValueBinderRef valueBinder() default @ValueBinderRef;
 
 	/**
 	 * @return A definition of container extractors to be applied to the property
