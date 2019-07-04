@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -84,7 +84,7 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( (TypeBridgeBuilder<?>) context -> {
+						.bridge( (TypeBinder<?>) context -> {
 							PojoElementAccessor<String> pojoPropertyAccessor =
 									context.getBridgedElement().property( "stringProperty" )
 											.createAccessor( String.class );
@@ -164,7 +164,7 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( (TypeBridgeBuilder<?>) context -> {
+						.bridge( (TypeBinder<?>) context -> {
 							context.getDependencies().use( "stringProperty" );
 							IndexFieldReference<String> indexFieldReference =
 									context.getIndexSchemaElement().field(
@@ -232,7 +232,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) context -> {
+								.bridge( (TypeBinder<?>) context -> {
 									context.getDependencies().use( "doesNotExist" );
 									context.setBridge( new UnusedTypeBridge() );
 								} )
@@ -286,7 +286,7 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( (TypeBridgeBuilder<?>) context -> {
+						.bridge( (TypeBinder<?>) context -> {
 							context.getDependencies()
 									.fromOtherEntity( ContainedEntity.class, "parent" )
 									.use( "stringProperty" );
@@ -370,7 +370,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) context -> {
+								.bridge( (TypeBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													ContainedEntity.class,
@@ -418,7 +418,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) context -> {
+								.bridge( (TypeBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													ContainedEntity.class,
@@ -466,7 +466,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( NotEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) context -> {
+								.bridge( (TypeBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													IndexedEntity.class,
@@ -509,7 +509,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) context -> {
+								.bridge( (TypeBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													NotEntity.class,
@@ -564,7 +564,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) context -> {
+								.bridge( (TypeBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													ContainedEntity.class,
@@ -606,7 +606,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) context -> {
+								.bridge( (TypeBinder<?>) context -> {
 									// Do not declare any dependency
 									context.setBridge( new UnusedTypeBridge() );
 								} )
@@ -618,7 +618,7 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"The bridge builder did not declare any dependency to the entity model during binding."
+								"The binder did not declare any dependency to the entity model during binding."
 								+ " Declare dependencies using context.getDependencies().use(...) or,"
 								+ " if the bridge really does not depend on the entity model, context.getDependencies().useRootOnly()"
 						)
@@ -645,7 +645,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.bridge( (TypeBridgeBuilder<?>) context -> {
+								.bridge( (TypeBinder<?>) context -> {
 									// Declare no dependency, but also a dependency: this is inconsistent.
 									context.getDependencies()
 											.use( "stringProperty" )
@@ -660,7 +660,7 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"The bridge builder called context.getDependencies().useRootOnly() during binding,"
+								"The binder called context.getDependencies().useRootOnly() during binding,"
 										+ " but also declared extra dependencies to the entity model."
 						)
 						.build()
@@ -692,7 +692,7 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( CustomEnum.class )
-						.bridge( (TypeBridgeBuilder<?>) context -> {
+						.bridge( (TypeBinder<?>) context -> {
 							context.getDependencies().useRootOnly();
 							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
 									"someField",
@@ -793,7 +793,7 @@ public class TypeBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( Contained.class )
-						.bridge( (TypeBridgeBuilder<?>) context -> {
+						.bridge( (TypeBinder<?>) context -> {
 							context.getDependencies().useRootOnly();
 							// Single-valued field
 							context.getIndexSchemaElement()
@@ -833,7 +833,7 @@ public class TypeBridgeBaseIT {
 						.failure(
 								"Annotation type '" + BridgeAnnotationWithEmptyTypeBridgeRef.class.getName()
 										+ "' is annotated with '" + TypeBridgeMapping.class.getName() + "',"
-										+ " but neither a bridge reference nor a bridge builder reference was provided."
+										+ " but neither a bridge reference nor a binder reference was provided."
 						)
 						.build()
 				);
@@ -848,7 +848,7 @@ public class TypeBridgeBaseIT {
 	@Test
 	public void mapping_error_invalidAnnotationType() {
 		@Indexed
-		@BridgeAnnotationMappedToBridgeBuilderWithDifferentAnnotationType
+		@BridgeAnnotationMappedToBinderWithDifferentAnnotationType
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
@@ -864,9 +864,9 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"Builder '" + BridgeBuilderWithDifferentAnnotationType.TOSTRING
+								"Binder '" + BinderWithDifferentAnnotationType.TOSTRING
 										+ "' cannot be initialized with annotations of type '"
-										+ BridgeAnnotationMappedToBridgeBuilderWithDifferentAnnotationType.class.getName() + "'"
+										+ BridgeAnnotationMappedToBinderWithDifferentAnnotationType.class.getName() + "'"
 						)
 						.build()
 				);
@@ -874,8 +874,8 @@ public class TypeBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(builderType = BridgeBuilderWithDifferentAnnotationType.class))
-	private @interface BridgeAnnotationMappedToBridgeBuilderWithDifferentAnnotationType {
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(binderType = BinderWithDifferentAnnotationType.class))
+	private @interface BridgeAnnotationMappedToBinderWithDifferentAnnotationType {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -883,9 +883,9 @@ public class TypeBridgeBaseIT {
 	private @interface DifferentAnnotationType {
 	}
 
-	public static class BridgeBuilderWithDifferentAnnotationType
-			implements TypeBridgeBuilder<DifferentAnnotationType> {
-		private static String TOSTRING = "<BridgeBuilderWithDifferentAnnotationType toString() result>";
+	public static class BinderWithDifferentAnnotationType
+			implements TypeBinder<DifferentAnnotationType> {
+		private static String TOSTRING = "<BinderWithDifferentAnnotationType toString() result>";
 
 		@Override
 		public void initialize(DifferentAnnotationType annotation) {
@@ -925,7 +925,7 @@ public class TypeBridgeBaseIT {
 						.failure(
 								"Annotation type '" + BridgeAnnotationWithConflictingReferencesInTypeBridgeMapping.class.getName()
 										+ "' is annotated with '" + TypeBridgeMapping.class.getName() + "',"
-										+ " but both a bridge reference and a bridge builder reference were provided"
+										+ " but both a bridge reference and a binder reference were provided"
 						)
 						.build()
 				);
@@ -933,7 +933,7 @@ public class TypeBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(name = "foo", builderName = "bar"))
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(name = "foo", binderName = "bar"))
 	private @interface BridgeAnnotationWithConflictingReferencesInTypeBridgeMapping {
 	}
 
@@ -969,12 +969,12 @@ public class TypeBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(builderType = IncompatibleTypeRequestingTypeBridgeBuilder.class))
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(binderType = IncompatibleTypeRequestingTypeBinder.class))
 	private @interface IncompatibleTypeRequestingTypeBridgeAnnotation {
 	}
 
-	public static class IncompatibleTypeRequestingTypeBridgeBuilder
-			implements TypeBridgeBuilder<IncompatibleTypeRequestingTypeBridgeAnnotation> {
+	public static class IncompatibleTypeRequestingTypeBinder
+			implements TypeBinder<IncompatibleTypeRequestingTypeBridgeAnnotation> {
 		@Override
 		public void bind(TypeBindingContext context) {
 			context.getBridgedElement().property( "stringProperty" ).createAccessor( Integer.class );

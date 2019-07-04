@@ -16,7 +16,7 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -62,16 +62,16 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 	}
 
 	@Override
-	public void valueBridge(ValueBridgeBuilder builder, String relativeFieldName,
+	public void valueBinder(ValueBinder binder, String relativeFieldName,
 			FieldModelContributor fieldModelContributor) {
 		String defaultedRelativeFieldName = relativeFieldName;
 		if ( defaultedRelativeFieldName == null ) {
 			defaultedRelativeFieldName = modelPath.getParent().getPropertyModel().getName();
 		}
 
-		mappingHelper.getIndexModelBinder().addValueBridge(
+		mappingHelper.getIndexModelBinder().bindValue(
 				bindingContext, modelPath, multiValuedFromContainerExtractor,
-				builder, defaultedRelativeFieldName,
+				binder, defaultedRelativeFieldName,
 				fieldModelContributor
 		)
 				.ifPresent( boundBridges::add );

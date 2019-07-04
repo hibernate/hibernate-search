@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingDocumentIdOptionsStep;
@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 class PropertyMappingDocumentIdOptionsStepImpl extends DelegatingPropertyMappingStep
 		implements PropertyMappingDocumentIdOptionsStep, PojoPropertyMetadataContributor {
 
-	private IdentifierBridgeBuilder bridgeBuilder;
+	private IdentifierBinder binder;
 
 	PropertyMappingDocumentIdOptionsStepImpl(PropertyMappingStep parent) {
 		super( parent );
@@ -34,7 +34,7 @@ class PropertyMappingDocumentIdOptionsStepImpl extends DelegatingPropertyMapping
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
-		collector.identifierBridge( bridgeBuilder );
+		collector.identifierBinder( binder );
 	}
 
 	@Override
@@ -44,12 +44,12 @@ class PropertyMappingDocumentIdOptionsStepImpl extends DelegatingPropertyMapping
 
 	@Override
 	public PropertyMappingDocumentIdOptionsStep identifierBridge(BeanReference<? extends IdentifierBridge<?>> bridgeReference) {
-		return identifierBridge( new BeanBridgeBuilder( bridgeReference ) );
+		return identifierBridge( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override
-	public PropertyMappingDocumentIdOptionsStep identifierBridge(IdentifierBridgeBuilder builder) {
-		this.bridgeBuilder = builder;
+	public PropertyMappingDocumentIdOptionsStep identifierBridge(IdentifierBinder binder) {
+		this.binder = binder;
 		return this;
 	}
 }

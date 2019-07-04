@@ -24,11 +24,11 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingKeyBindingCon
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.TypeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
@@ -78,15 +78,15 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <I> BoundIdentifierBridge<I> addIdentifierBridge(
+	public <I> BoundIdentifierBridge<I> bindIdentifier(
 			IndexedEntityBindingContext indexedEntityBindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath,
-			IdentifierBridgeBuilder builder) {
+			IdentifierBinder binder) {
 		PojoGenericTypeModel<I> identifierTypeModel = modelPath.valueWithoutExtractors().getTypeModel();
 
-		IdentifierBridgeBuilder defaultedBuilder = builder;
-		if ( builder == null ) {
-			defaultedBuilder = bridgeResolver.resolveIdentifierBridgeForType( identifierTypeModel );
+		IdentifierBinder defaultedBinder = binder;
+		if ( binder == null ) {
+			defaultedBinder = bridgeResolver.resolveIdentifierBinderForType( identifierTypeModel );
 		}
 
 		IdentifierBindingContextImpl<I> bindingContext = new IdentifierBindingContextImpl<>(
@@ -95,12 +95,12 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				identifierTypeModel
 		);
 
-		return bindingContext.applyBuilder( defaultedBuilder );
+		return bindingContext.applyBinder( defaultedBinder );
 	}
 
 	@Override
-	public <T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexedEntityBindingContext indexedEntityBindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBridgeBuilder<?> builder) {
+	public <T> BoundRoutingKeyBridge<T> bindRoutingKey(IndexedEntityBindingContext indexedEntityBindingContext,
+			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder<?> binder) {
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
 		PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
@@ -117,12 +117,12 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				pojoDependencyContext
 		);
 
-		return bindingContext.applyBuilder( builder );
+		return bindingContext.applyBinder( binder );
 	}
 
 	@Override
-	public <T> Optional<BoundTypeBridge<T>> addTypeBridge(IndexBindingContext indexBindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, TypeBridgeBuilder<?> builder) {
+	public <T> Optional<BoundTypeBridge<T>> bindType(IndexBindingContext indexBindingContext,
+			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder<?> binder) {
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
 		PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
@@ -139,12 +139,12 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				pojoDependencyContext
 		);
 
-		return bindingContext.applyBuilder( builder );
+		return bindingContext.applyBinder( binder );
 	}
 
 	@Override
-	public <P> Optional<BoundPropertyBridge<P>> addPropertyBridge(IndexBindingContext indexBindingContext,
-			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBridgeBuilder<?> builder) {
+	public <P> Optional<BoundPropertyBridge<P>> bindProperty(IndexBindingContext indexBindingContext,
+			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder<?> binder) {
 		PojoModelPropertyRootElement<P> pojoModelRootElement =
 				new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
 		PojoPropertyIndexingDependencyConfigurationContextImpl<P> pojoDependencyContext =
@@ -161,22 +161,22 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				pojoDependencyContext
 		);
 
-		return bindingContext.applyBuilder( builder );
+		return bindingContext.applyBinder( binder );
 	}
 
 	@Override
-	public <V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexBindingContext indexBindingContext,
+	public <V> Optional<BoundValueBridge<V, ?>> bindValue(IndexBindingContext indexBindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
-			ValueBridgeBuilder builder,
+			ValueBinder binder,
 			String relativeFieldName, FieldModelContributor contributor) {
 		Integer decimalScale = typeAdditionalMetadataProvider.get( modelPath ).getDecimalScale();
 		IndexFieldTypeDefaultsProvider defaultsProvider = new IndexFieldTypeDefaultsProvider( decimalScale );
 
 		PojoGenericTypeModel<V> valueTypeModel = modelPath.getTypeModel();
 
-		ValueBridgeBuilder defaultedBuilder = builder;
-		if ( builder == null ) {
-			defaultedBuilder = bridgeResolver.resolveValueBridgeForType( valueTypeModel );
+		ValueBinder defaultedBinder = binder;
+		if ( binder == null ) {
+			defaultedBinder = bridgeResolver.resolveValueBinderForType( valueTypeModel );
 		}
 
 		ValueBindingContextImpl<V> bindingContext = new ValueBindingContextImpl<>(
@@ -186,6 +186,6 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				relativeFieldName, contributor
 		);
 
-		return bindingContext.applyBuilder( defaultedBuilder );
+		return bindingContext.applyBinder( defaultedBinder );
 	}
 }

@@ -248,13 +248,13 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void error_definingBothBridgeReferenceAndBridgeBuilderReference() {
+	public void error_definingBothBridgeReferenceAndBinderReference() {
 		@Indexed
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
 			@GenericField(
-					valueBridge = @ValueBridgeRef(name = "foo", builderName = "bar")
+					valueBridge = @ValueBridgeRef(name = "foo", binderName = "bar")
 			)
 			public Integer getId() {
 				return id;
@@ -270,7 +270,7 @@ public class FieldBaseIT {
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( GenericField.class )
 						.failure(
-								"Annotation @GenericField on property 'id' defines both valueBridge and valueBridgeBuilder."
+								"Annotation @GenericField on property 'id' defines both valueBridge and valueBinder."
 										+ " Only one of those can be defined, not both."
 						)
 						.build()

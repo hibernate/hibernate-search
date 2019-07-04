@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import org.hibernate.search.engine.cfg.spi.ValidateUtils;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
@@ -56,7 +56,7 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 		return enumType.equals( castedOther.enumType );
 	}
 
-	public static class Builder implements ValueBridgeBuilder {
+	public static class Binder implements ValueBinder {
 		@Override
 		@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
 		public void bind(ValueBindingContext<?> context) {

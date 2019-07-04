@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
@@ -63,7 +63,7 @@ public final class CustomTypeBridge implements TypeBridge {
 		// Nothing to do
 	}
 
-	public static final class Builder implements TypeBridgeBuilder<CustomTypeBridgeAnnotation> {
+	public static final class Binder implements TypeBinder<CustomTypeBridgeAnnotation> {
 
 		private String objectName;
 
@@ -72,7 +72,7 @@ public final class CustomTypeBridge implements TypeBridge {
 			objectName( annotation.objectName() );
 		}
 
-		public Builder objectName(String value) {
+		public Binder objectName(String value) {
 			this.objectName = value;
 			return this;
 		}

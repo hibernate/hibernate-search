@@ -20,7 +20,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
@@ -114,12 +114,12 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		return indexFieldTypeFactory;
 	}
 
-	public Optional<BoundValueBridge<V, ?>> applyBuilder(ValueBridgeBuilder bridgeBuilder) {
+	public Optional<BoundValueBridge<V, ?>> applyBinder(ValueBinder binder) {
 		try {
 			// This call should set the partial binding
-			bridgeBuilder.bind( this );
+			binder.bind( this );
 			if ( partialBinding == null ) {
-				throw log.missingBridgeForBridgeBuilder( bridgeBuilder );
+				throw log.missingBridgeForBinder( binder );
 			}
 
 			// If all fields are filtered out, we should ignore the bridge

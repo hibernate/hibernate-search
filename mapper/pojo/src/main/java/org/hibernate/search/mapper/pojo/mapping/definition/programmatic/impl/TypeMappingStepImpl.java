@@ -11,9 +11,9 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
@@ -90,12 +90,12 @@ public class TypeMappingStepImpl
 
 	@Override
 	public TypeMappingStep routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference) {
-		return routingKeyBridge( new BeanBridgeBuilder( bridgeReference ) );
+		return routingKeyBridge( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override
-	public TypeMappingStep routingKeyBridge(RoutingKeyBridgeBuilder<?> builder) {
-		children.add( new RoutingKeyBridgeMappingContributor( builder ) );
+	public TypeMappingStep routingKeyBridge(RoutingKeyBinder<?> binder) {
+		children.add( new RoutingKeyBridgeMappingContributor( binder ) );
 		return this;
 	}
 
@@ -106,12 +106,12 @@ public class TypeMappingStepImpl
 
 	@Override
 	public TypeMappingStep bridge(BeanReference<? extends TypeBridge> bridgeReference) {
-		return bridge( new BeanBridgeBuilder( bridgeReference ) );
+		return bridge( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override
-	public TypeMappingStep bridge(TypeBridgeBuilder<?> builder) {
-		children.add( new TypeBridgeMappingContributor( builder ) );
+	public TypeMappingStep bridge(TypeBinder<?> binder) {
+		children.add( new TypeBridgeMappingContributor( binder ) );
 		return this;
 	}
 

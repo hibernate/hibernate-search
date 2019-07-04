@@ -87,7 +87,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 3,
 			value = "Annotation type '%2$s' is annotated with '%1$s',"
-					+ " but neither a bridge reference nor a bridge builder reference was provided.")
+					+ " but neither a bridge reference nor a binder reference was provided.")
 	SearchException missingBridgeReferenceInBridgeMapping(
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> metaAnnotationType,
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> annotationType);
@@ -100,16 +100,16 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> annotationType);
 
 	@Message(id = ID_OFFSET_2 + 5,
-			value = "Annotation @GenericField on property '%1$s' defines both valueBridge and valueBridgeBuilder."
+			value = "Annotation @GenericField on property '%1$s' defines both valueBridge and valueBinder."
 					+ " Only one of those can be defined, not both."
 	)
-	SearchException invalidFieldDefiningBothBridgeReferenceAndBridgeBuilderReference(String property);
+	SearchException invalidFieldDefiningBothBridgeReferenceAndBinderReference(String property);
 
 	@Message(id = ID_OFFSET_2 + 6,
-			value = "Annotation @DocumentId on property '%1$s' defines both identifierBridge and identifierBridgeBuilder."
+			value = "Annotation @DocumentId on property '%1$s' defines both identifierBridge and identifierBinder."
 					+ " Only one of those can be defined, not both."
 	)
-	SearchException invalidDocumentIdDefiningBothBridgeReferenceAndBridgeBuilderReference(String property);
+	SearchException invalidDocumentIdDefiningBothBridgeReferenceAndBinderReference(String property);
 
 	@Message(id = ID_OFFSET_2 + 7,
 			value = "Invalid empty target for a scoped operation."
@@ -215,7 +215,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 26,
 			value = "Annotation type '%2$s' is annotated with '%1$s',"
-					+ " but both a bridge reference and a bridge builder reference were provided."
+					+ " but both a bridge reference and a binder reference were provided."
 					+ " Only one can be provided.")
 	SearchException conflictingBridgeReferenceInBridgeMapping(
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> metaAnnotationType,
@@ -337,14 +337,14 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> otherType);
 
 	@Message(id = ID_OFFSET_2 + 49,
-			value = "The bridge builder did not declare any dependency to the entity model during binding."
+			value = "The binder did not declare any dependency to the entity model during binding."
 					+ " Declare dependencies using context.getDependencies().use(...) or,"
 					+ " if the bridge really does not depend on the entity model, context.getDependencies().useRootOnly()."
 	)
 	SearchException missingBridgeDependencyDeclaration();
 
 	@Message(id = ID_OFFSET_2 + 50,
-			value = "The bridge builder called context.getDependencies().useRootOnly() during binding,"
+			value = "The binder called context.getDependencies().useRootOnly() during binding,"
 					+ " but also declared extra dependencies to the entity model."
 	)
 	SearchException inconsistentBridgeDependencyDeclaration();
@@ -376,8 +376,8 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> builtinExtractorConstantsClass);
 
 	@Message(id = ID_OFFSET_2 + 54,
-			value = "Builder '%1$s' cannot be initialized with annotations of type '%2$s'.")
-	SearchException invalidAnnotationTypeForBuilder(Object builder,
+			value = "Binder '%1$s' cannot be initialized with annotations of type '%2$s'.")
+	SearchException invalidAnnotationTypeForBinder(Object binder,
 			@FormatWith(ClassFormatter.class) Class<?> annotationType);
 
 	@Message(id = ID_OFFSET_2 + 55,
@@ -395,7 +395,7 @@ public interface Log extends BasicLogger {
 	SearchException cannotAccessPropertyMethod(String propertyName);
 
 	@Message(id = ID_OFFSET_2 + 58,
-			value = "The bind() method of bridge builder '%1$s' is not implemented correctly:"
-					+ " it did not call context.setBridge(...).")
-	SearchException missingBridgeForBridgeBuilder(Object binder);
+			value = "The bind() method of binder '%1$s' is not implemented correctly:"
+					+ " it did not call context.setBridge().")
+	SearchException missingBridgeForBinder(Object binder);
 }

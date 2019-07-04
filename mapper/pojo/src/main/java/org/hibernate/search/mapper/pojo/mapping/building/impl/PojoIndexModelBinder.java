@@ -19,11 +19,11 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridg
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
@@ -38,9 +38,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
  * by creating the appropriate {@link ContainerExtractor extractors} and bridges.
  * <p>
  * Also binds the bridges where appropriate:
- * {@link TypeBridgeBuilder#bind(TypeBindingContext)},
- * {@link PropertyBridgeBuilder#bind(PropertyBindingContext)},
- * {@link ValueBridgeBuilder#bind(ValueBindingContext)}.
+ * {@link TypeBinder#bind(TypeBindingContext)},
+ * {@link PropertyBinder#bind(PropertyBindingContext)},
+ * {@link ValueBinder#bind(ValueBindingContext)}.
  * <p>
  * Incidentally, this will also generate the index model,
  * due to bridges contributing to the index model as we bind them.
@@ -54,22 +54,22 @@ public interface PojoIndexModelBinder {
 	<C, V> ContainerExtractorHolder<C, V> createExtractors(
 			BoundContainerExtractorPath<C, V> boundExtractorPath);
 
-	<I> BoundIdentifierBridge<I> addIdentifierBridge(
+	<I> BoundIdentifierBridge<I> bindIdentifier(
 			IndexedEntityBindingContext bindingContext,
-			BoundPojoModelPathPropertyNode<?, I> modelPath, IdentifierBridgeBuilder bridgeBuilder);
+			BoundPojoModelPathPropertyNode<?, I> modelPath, IdentifierBinder binder);
 
-	<T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexedEntityBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBridgeBuilder<?> bridgeBuilder);
+	<T> BoundRoutingKeyBridge<T> bindRoutingKey(IndexedEntityBindingContext bindingContext,
+			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder<?> binder);
 
-	<T> Optional<BoundTypeBridge<T>> addTypeBridge(IndexBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, TypeBridgeBuilder<?> bridgeBuilder);
+	<T> Optional<BoundTypeBridge<T>> bindType(IndexBindingContext bindingContext,
+			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder<?> binder);
 
-	<P> Optional<BoundPropertyBridge<P>> addPropertyBridge(IndexBindingContext bindingContext,
-			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBridgeBuilder<?> bridgeBuilder);
+	<P> Optional<BoundPropertyBridge<P>> bindProperty(IndexBindingContext bindingContext,
+			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder<?> binder);
 
-	<V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexBindingContext bindingContext,
+	<V> Optional<BoundValueBridge<V, ?>> bindValue(IndexBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
-			ValueBridgeBuilder bridgeBuilder,
+			ValueBinder binder,
 			String relativeFieldName, FieldModelContributor contributor);
 
 }

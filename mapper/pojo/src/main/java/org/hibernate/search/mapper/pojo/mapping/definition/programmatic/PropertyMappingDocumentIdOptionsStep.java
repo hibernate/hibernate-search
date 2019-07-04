@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 
 /**
  * The step in a property-to-document-ID mapping where optional parameters can be set.
@@ -32,10 +32,10 @@ public interface PropertyMappingDocumentIdOptionsStep extends PropertyMappingSte
 	PropertyMappingDocumentIdOptionsStep identifierBridge(BeanReference<? extends IdentifierBridge<?>> bridgeReference);
 
 	/**
-	 * @param builder A bridge builder.
+	 * @param binder A {@link IdentifierBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
-	 * @see IdentifierBridge
+	 * @see IdentifierBinder
 	 */
-	PropertyMappingDocumentIdOptionsStep identifierBridge(IdentifierBridgeBuilder builder);
+	PropertyMappingDocumentIdOptionsStep identifierBridge(IdentifierBinder binder);
 
 }

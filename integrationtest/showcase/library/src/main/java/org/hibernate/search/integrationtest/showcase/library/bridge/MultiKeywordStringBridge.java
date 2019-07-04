@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
 public class MultiKeywordStringBridge implements PropertyBridge {
@@ -45,7 +45,8 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 		}
 	}
 
-	public static class Builder implements PropertyBridgeBuilder<org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge> {
+	public static class Binder implements
+			PropertyBinder<org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge> {
 		private String fieldName;
 		private Pattern separatorPattern = Pattern.compile( SEPARATOR_PATTERN_DEFAULT );
 
@@ -55,12 +56,12 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 			separatorPattern( Pattern.compile( annotation.separatorPattern() ) );
 		}
 
-		public Builder fieldName(String fieldName) {
+		public Binder fieldName(String fieldName) {
 			this.fieldName = fieldName;
 			return this;
 		}
 
-		public Builder separatorPattern(Pattern separatorPattern) {
+		public Binder separatorPattern(Pattern separatorPattern) {
 			this.separatorPattern = separatorPattern;
 			return this;
 		}

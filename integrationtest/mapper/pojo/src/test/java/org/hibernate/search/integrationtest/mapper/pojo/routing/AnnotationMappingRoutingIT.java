@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -177,7 +177,7 @@ public class AnnotationMappingRoutingIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@RoutingKeyBridgeMapping(bridge = @RoutingKeyBridgeRef(builderType = MyRoutingKeyBridge.Builder.class))
+	@RoutingKeyBridgeMapping(bridge = @RoutingKeyBridgeRef(binderType = MyRoutingKeyBridge.Binder.class))
 	public @interface MyRoutingKeyBridgeAnnotation {
 	}
 
@@ -210,7 +210,7 @@ public class AnnotationMappingRoutingIT {
 			return keyBuilder.toString();
 		}
 
-		public static class Builder implements RoutingKeyBridgeBuilder<MyRoutingKeyBridgeAnnotation> {
+		public static class Binder implements RoutingKeyBinder<MyRoutingKeyBridgeAnnotation> {
 			@Override
 			public void bind(RoutingKeyBindingContext context) {
 				PojoElementAccessor<EntityCategory> categoryAccessor =

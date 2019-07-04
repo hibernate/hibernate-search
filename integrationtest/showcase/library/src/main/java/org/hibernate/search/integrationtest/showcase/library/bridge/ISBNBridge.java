@@ -10,7 +10,7 @@ import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAna
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
@@ -41,7 +41,7 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 		return getClass().equals( other.getClass() );
 	}
 
-	public static class Builder implements ValueBridgeBuilder {
+	public static class Binder implements ValueBinder {
 		@Override
 		public void bind(ValueBindingContext<?> context) {
 			context.setBridge(

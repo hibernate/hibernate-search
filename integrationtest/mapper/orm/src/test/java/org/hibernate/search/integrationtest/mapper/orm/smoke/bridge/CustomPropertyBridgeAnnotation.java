@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridge
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD })
-@PropertyBridgeMapping(bridge = @PropertyBridgeRef( builderType = CustomPropertyBridge.Builder.class))
+@PropertyBridgeMapping(bridge = @PropertyBridgeRef( binderType = CustomPropertyBridge.Binder.class))
 public @interface CustomPropertyBridgeAnnotation {
 
 	String objectName();

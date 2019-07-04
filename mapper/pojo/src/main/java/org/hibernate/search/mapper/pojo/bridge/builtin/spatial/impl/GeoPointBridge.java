@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -40,7 +40,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	private final IndexFieldReference<GeoPoint> indexFieldReference;
 
 	/**
-	 * Private constructor, use {@link GeoPointBridgeBuilder#create()} instead.
+	 * Private constructor, use {@link GeoPointBinder#create()} instead.
 	 */
 	private GeoPointBridge(Function<Object, GeoPoint> coordinatesExtractor,
 			IndexFieldReference<GeoPoint> indexFieldReference) {
@@ -68,7 +68,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 		// Nothing to do
 	}
 
-	public static class Builder implements GeoPointBridgeBuilder {
+	public static class Binder implements GeoPointBinder {
 
 		private String fieldName;
 		private Projectable projectable = Projectable.DEFAULT;
@@ -85,25 +85,25 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 		}
 
 		@Override
-		public Builder fieldName(String fieldName) {
+		public Binder fieldName(String fieldName) {
 			this.fieldName = fieldName;
 			return this;
 		}
 
 		@Override
-		public Builder projectable(Projectable projectable) {
+		public Binder projectable(Projectable projectable) {
 			this.projectable = projectable;
 			return this;
 		}
 
 		@Override
-		public Builder sortable(Sortable sortable) {
+		public Binder sortable(Sortable sortable) {
 			this.sortable = sortable;
 			return this;
 		}
 
 		@Override
-		public Builder markerSet(String markerSet) {
+		public Binder markerSet(String markerSet) {
 			this.markerSet = markerSet;
 			return this;
 		}

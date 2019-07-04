@@ -16,7 +16,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeIndexingDependencyConfigurationContext;
@@ -82,12 +82,12 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 		return indexSchemaElement;
 	}
 
-	public Optional<BoundTypeBridge<T>> applyBuilder(TypeBridgeBuilder bridgeBuilder) {
+	public Optional<BoundTypeBridge<T>> applyBinder(TypeBinder binder) {
 		try {
 			// This call should set the partial binding
-			bridgeBuilder.bind( this );
+			binder.bind( this );
 			if ( partialBinding == null ) {
-				throw log.missingBridgeForBridgeBuilder( bridgeBuilder );
+				throw log.missingBridgeForBinder( binder );
 			}
 
 			checkBridgeDependencies( bridgedElement, dependencyContext );

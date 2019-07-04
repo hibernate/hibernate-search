@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 
@@ -45,7 +45,7 @@ public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements Ide
 		return enumType.equals( castedOther.enumType );
 	}
 
-	public static class Builder implements IdentifierBridgeBuilder {
+	public static class Binder implements IdentifierBinder {
 		@Override
 		@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
 		public void bind(IdentifierBindingContext<?> context) {

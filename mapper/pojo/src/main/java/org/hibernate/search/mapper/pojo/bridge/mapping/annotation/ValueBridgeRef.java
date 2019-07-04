@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -22,8 +22,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
  * for example in {@link GenericField#valueBridge()}, {@link KeywordField#valueBridge()},
  * or {@link FullTextField#valueBridge()}.
  * <p>
- * Either a bridge or a bridge builder can be provided, but never both.
- * Reference can be obtained using either a name or a type.
+ * Either a bridge or a binder can be referenced, but never both.
+ * References can use either a name, a type, or both.
  */
 @Documented
 @Target({}) // Only used as a component in other annotations
@@ -43,16 +43,16 @@ public @interface ValueBridgeRef {
 	Class<? extends ValueBridge> type() default UndefinedBridgeImplementationType.class;
 
 	/**
-	 * Reference a value bridge by the bean name of its builder.
-	 * @return The bean name of the value bridge builder.
+	 * Reference a value bridge by the bean name of its binder.
+	 * @return The bean name of the value binder.
 	 */
-	String builderName() default "";
+	String binderName() default "";
 
 	/**
-	 * Reference a value bridge by the type of its builder.
-	 * @return The type of the value bridge builder.
+	 * Reference a value bridge by the type of its binder.
+	 * @return The type of the value binder.
 	 */
-	Class<? extends ValueBridgeBuilder> builderType() default UndefinedBuilderImplementationType.class;
+	Class<? extends ValueBinder> binderType() default UndefinedBinderImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
@@ -63,10 +63,10 @@ public @interface ValueBridgeRef {
 	}
 
 	/**
-	 * Class used as a marker for the default value of the {@link #builderType()} attribute.
+	 * Class used as a marker for the default value of the {@link #binderType()} attribute.
 	 */
-	abstract class UndefinedBuilderImplementationType implements ValueBridgeBuilder {
-		private UndefinedBuilderImplementationType() {
+	abstract class UndefinedBinderImplementationType implements ValueBinder {
+		private UndefinedBinderImplementationType() {
 		}
 	}
 }

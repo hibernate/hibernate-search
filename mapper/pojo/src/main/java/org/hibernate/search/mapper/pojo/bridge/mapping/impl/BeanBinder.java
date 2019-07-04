@@ -21,27 +21,27 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 
 /**
- * A bridge builder that simply retrieves the bridge as a bean from the bean provider.
+ * A binder that simply retrieves the bridge as a bean from the bean provider.
  */
-public final class BeanBridgeBuilder
-		implements TypeBridgeBuilder<Annotation>, PropertyBridgeBuilder<Annotation>,
-				RoutingKeyBridgeBuilder<Annotation>,
-				IdentifierBridgeBuilder, ValueBridgeBuilder {
+public final class BeanBinder
+		implements TypeBinder<Annotation>, PropertyBinder<Annotation>,
+		RoutingKeyBinder<Annotation>,
+		IdentifierBinder, ValueBinder {
 
 	private final BeanReference<?> beanReference;
 
-	public BeanBridgeBuilder(BeanReference<?> beanReference) {
+	public BeanBinder(BeanReference<?> beanReference) {
 		this.beanReference = beanReference;
 	}
 

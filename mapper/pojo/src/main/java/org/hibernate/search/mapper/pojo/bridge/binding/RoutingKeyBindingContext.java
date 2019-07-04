@@ -8,12 +8,12 @@ package org.hibernate.search.mapper.pojo.bridge.binding;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeIndexingDependencyConfigurationContext;
 
 /**
- * The context provided to the {@link RoutingKeyBridgeBuilder#bind(RoutingKeyBindingContext)} method.
+ * The context provided to the {@link RoutingKeyBinder#bind(RoutingKeyBindingContext)} method.
  */
 public interface RoutingKeyBindingContext extends BindingContext {
 

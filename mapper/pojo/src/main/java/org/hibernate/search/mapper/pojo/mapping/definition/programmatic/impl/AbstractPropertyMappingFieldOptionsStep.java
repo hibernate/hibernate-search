@@ -13,8 +13,8 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
@@ -32,7 +32,7 @@ abstract class AbstractPropertyMappingFieldOptionsStep<
 
 	private final String relativeFieldName;
 
-	private ValueBridgeBuilder bridgeBuilder;
+	private ValueBinder binder;
 
 	final PojoCompositeFieldModelContributor<C> fieldModelContributor;
 
@@ -53,7 +53,7 @@ abstract class AbstractPropertyMappingFieldOptionsStep<
 	@Override
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
 		collector.value( extractorPath )
-				.valueBridge( bridgeBuilder, relativeFieldName, fieldModelContributor );
+				.valueBinder( binder, relativeFieldName, fieldModelContributor );
 	}
 
 	abstract S thisAsS();
@@ -77,12 +77,12 @@ abstract class AbstractPropertyMappingFieldOptionsStep<
 
 	@Override
 	public S valueBridge(BeanReference<? extends ValueBridge<?, ?>> bridgeReference) {
-		return valueBridge( new BeanBridgeBuilder( bridgeReference ) );
+		return valueBridge( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override
-	public S valueBridge(ValueBridgeBuilder builder) {
-		this.bridgeBuilder = builder;
+	public S valueBridge(ValueBinder binder) {
+		this.binder = binder;
 		return thisAsS();
 	}
 

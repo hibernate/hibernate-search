@@ -15,28 +15,28 @@ import java.lang.annotation.Target;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 
 /**
  * Reference a property bridge for a {@link TypeBridgeMapping}.
  * <p>
- * Either a bridge or a bridge builder can be provided, but never both.
- * Reference can be obtained using either a name or a type.
+ * Either a bridge or a binder can be referenced, but never both.
+ * References can use either a name, a type, or both.
  * <p>
- * If a <b>direct bridge</b> is provided, using the methods {@link #name()} or {@link #type()},
+ * If a <b>bridge</b> is referenced directly, using the methods {@link #name()} or {@link #type()},
  * each time the mapped annotation is encountered, an instance of the property bridge will be created.
  * <p>
  * Property bridges mapped this way cannot be parameterized:
  * any attribute of the mapped annotation will be ignored.
  * <p>
- * If an <b>annotation bridge builder</b> is provided, using the methods {@link #builderName()} or {@link #builderType()},
- * each time the mapped annotation is encountered, an instance of the property bridge builder will be created.
- * The builder will be passed the annotation through its {@link PropertyBridgeBuilder#initialize(Annotation)} method,
- * and then the bridge will be created and bound by {@link PropertyBridgeBuilder#bind(PropertyBindingContext)}.
+ * If a <b>binder</b> is referenced, using the methods {@link #binderName()} or {@link #binderType()},
+ * each time the mapped annotation is encountered, an instance of the property binder will be created.
+ * The binder will be passed the annotation through its {@link PropertyBinder#initialize(Annotation)} method,
+ * and then the bridge will be created and bound by {@link PropertyBinder#bind(PropertyBindingContext)}.
  * <p>
  * Property bridges mapped this way can be parameterized:
- * the bridge will be able to take any attribute of the mapped annotation into account
- * in its {@link PropertyBridgeBuilder#initialize(Annotation)} method.
+ * the binder will be able to take any attribute of the mapped annotation into account
+ * in its {@link PropertyBinder#initialize(Annotation)} method.
  */
 @Documented
 @Target({}) // Only used as a component in other annotations
@@ -56,16 +56,16 @@ public @interface PropertyBridgeRef {
 	Class<? extends PropertyBridge> type() default UndefinedBridgeImplementationType.class;
 
 	/**
-	 * Reference a property bridge by the bean name of its builder.
-	 * @return The bean name of the  property bridge builder.
+	 * Reference a property bridge by the bean name of its binder.
+	 * @return The bean name of the property binder.
 	 */
-	String builderName() default "";
+	String binderName() default "";
 
 	/**
-	 * Reference a property bridge by the type of its builder.
-	 * @return The type of the  property bridge builder.
+	 * Reference a property bridge by the type of its binder.
+	 * @return The type of the property binder.
 	 */
-	Class<? extends PropertyBridgeBuilder<?>> builderType() default UndefinedBuilderImplementationType.class;
+	Class<? extends PropertyBinder<?>> binderType() default UndefinedBinderImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
@@ -76,10 +76,10 @@ public @interface PropertyBridgeRef {
 	}
 
 	/**
-	 * Class used as a marker for the default value of the {@link #builderType()} attribute.
+	 * Class used as a marker for the default value of the {@link #binderType()} attribute.
 	 */
-	abstract class UndefinedBuilderImplementationType implements PropertyBridgeBuilder<Annotation> {
-		private UndefinedBuilderImplementationType() {
+	abstract class UndefinedBinderImplementationType implements PropertyBinder<Annotation> {
+		private UndefinedBinderImplementationType() {
 		}
 	}
 }

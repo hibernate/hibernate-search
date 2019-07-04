@@ -141,7 +141,7 @@ public class ProgrammaticMappingSmokeIT {
 					mappingDefinition.type( IndexedEntity.class )
 							.indexed( IndexedEntity.INDEX )
 							.bridge(
-									new CustomTypeBridge.Builder()
+									new CustomTypeBridge.Binder()
 									.objectName( "customBridgeOnClass" )
 							)
 							.property( "id" )
@@ -163,7 +163,7 @@ public class ProgrammaticMappingSmokeIT {
 											PojoModelPath.ofValue( "embeddingAsSingle" )
 									)
 									.bridge(
-											new CustomPropertyBridge.Builder()
+											new CustomPropertyBridge.Binder()
 											.objectName( "customBridgeOnProperty" )
 									);
 					secondMappingDefinition.type( OtherIndexedEntity.class )

@@ -8,11 +8,11 @@ package org.hibernate.search.mapper.pojo.bridge.binding;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 
 /**
- * The context provided to the {@link IdentifierBridgeBuilder#bind(IdentifierBindingContext)} method.
+ * The context provided to the {@link IdentifierBinder#bind(IdentifierBindingContext)} method.
  *
  * @param <I> The type of identifiers on the POJO side of the bridge.
  */

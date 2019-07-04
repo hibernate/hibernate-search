@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
@@ -54,7 +54,7 @@ public class ProgrammaticMappingRoutingIT {
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 					mappingDefinition.type( IndexedEntity.class )
 							.indexed( IndexedEntity.INDEX )
-							.routingKeyBridge( new MyRoutingKeyBridge.Builder() )
+							.routingKeyBridge( new MyRoutingKeyBridge.Binder() )
 							.property( "id" )
 									.documentId()
 							.property( "value" ).genericField();
@@ -205,7 +205,7 @@ public class ProgrammaticMappingRoutingIT {
 			return keyBuilder.toString();
 		}
 
-		public static class Builder implements RoutingKeyBridgeBuilder<Annotation> {
+		public static class Binder implements RoutingKeyBinder<Annotation> {
 			@Override
 			public void bind(RoutingKeyBindingContext context) {
 				PojoElementAccessor<EntityCategory> categoryAccessor =

@@ -15,9 +15,9 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
@@ -26,14 +26,14 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * A bridge builder that upon building retrieves a delegate bridge builder from the bean provider,
- * initializes it using a pre-defined annotation, and then delegates to that bridge builder.
+ * A binder that upon binding retrieves a delegate binder from the bean provider,
+ * initializes it using a pre-defined annotation, and then delegates to that binder.
  *
- * @param <A> The type of annotations accepted by the delegate builder.
+ * @param <A> The type of annotations accepted by the delegate binder.
  */
 @SuppressWarnings("rawtypes") // Clients cannot provide a level of guarantee stronger than raw types
-public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends Annotation>
-		implements TypeBridgeBuilder<A>, PropertyBridgeBuilder<A>, RoutingKeyBridgeBuilder<A> {
+public final class AnnotationInitializingBeanDelegatingBinder<A extends Annotation>
+		implements TypeBinder<A>, PropertyBinder<A>, RoutingKeyBinder<A> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -41,7 +41,7 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends A
 
 	private A annotation;
 
-	public AnnotationInitializingBeanDelegatingBridgeBuilder(BeanReference<?> delegateReference) {
+	public AnnotationInitializingBeanDelegatingBinder(BeanReference<?> delegateReference) {
 		this.delegateReference = delegateReference;
 	}
 
@@ -58,10 +58,10 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends A
 
 	@Override
 	public void bind(TypeBindingContext context) {
-		try ( BeanHolder<? extends TypeBridgeBuilder> delegateHolder =
-				createDelegate( context.getBeanResolver(), TypeBridgeBuilder.class ) ) {
+		try ( BeanHolder<? extends TypeBinder> delegateHolder =
+				createDelegate( context.getBeanResolver(), TypeBinder.class ) ) {
 			@SuppressWarnings("unchecked") // Checked using reflection in createDelegate
-			TypeBridgeBuilder<A> castedDelegate = delegateHolder.get();
+			TypeBinder<A> castedDelegate = delegateHolder.get();
 			castedDelegate.initialize( annotation );
 			castedDelegate.bind( context );
 		}
@@ -69,10 +69,10 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends A
 
 	@Override
 	public void bind(PropertyBindingContext context) {
-		try ( BeanHolder<? extends PropertyBridgeBuilder> delegateHolder =
-				createDelegate( context.getBeanResolver(), PropertyBridgeBuilder.class ) ) {
+		try ( BeanHolder<? extends PropertyBinder> delegateHolder =
+				createDelegate( context.getBeanResolver(), PropertyBinder.class ) ) {
 			@SuppressWarnings("unchecked") // Checked using reflection in createDelegate
-			PropertyBridgeBuilder<A> castedDelegate = delegateHolder.get();
+			PropertyBinder<A> castedDelegate = delegateHolder.get();
 			castedDelegate.initialize( annotation );
 			castedDelegate.bind( context );
 		}
@@ -80,10 +80,10 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends A
 
 	@Override
 	public void bind(RoutingKeyBindingContext context) {
-		try ( BeanHolder<? extends RoutingKeyBridgeBuilder> delegateHolder =
-				createDelegate( context.getBeanResolver(), RoutingKeyBridgeBuilder.class ) ) {
+		try ( BeanHolder<? extends RoutingKeyBinder> delegateHolder =
+				createDelegate( context.getBeanResolver(), RoutingKeyBinder.class ) ) {
 			@SuppressWarnings("unchecked") // Checked using reflection in createDelegate
-			RoutingKeyBridgeBuilder<A> castedDelegate = delegateHolder.get();
+			RoutingKeyBinder<A> castedDelegate = delegateHolder.get();
 			castedDelegate.initialize( annotation );
 			castedDelegate.bind( context );
 		}
@@ -95,15 +95,15 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<A extends A
 			B delegate = delegateHolder.get();
 			Class<?> annotationType = annotation.annotationType();
 			GenericTypeContext bridgeTypeContext = new GenericTypeContext( delegate.getClass() );
-			Class<?> builderAnnotationType = bridgeTypeContext.resolveTypeArgument( expectedType, 0 )
+			Class<?> binderAnnotationType = bridgeTypeContext.resolveTypeArgument( expectedType, 0 )
 					.map( ReflectionUtils::getRawType )
 					.orElseThrow( () -> new AssertionFailure(
-							"Could not auto-detect the annotation type accepted by builder '"
+							"Could not auto-detect the annotation type accepted by binder '"
 									+ delegate + "'."
 									+ " There is a bug in Hibernate Search, please report it."
 					) );
-			if ( !builderAnnotationType.isAssignableFrom( annotationType ) ) {
-				throw log.invalidAnnotationTypeForBuilder( delegate, annotationType );
+			if ( !binderAnnotationType.isAssignableFrom( annotationType ) ) {
+				throw log.invalidAnnotationTypeForBinder( delegate, annotationType );
 			}
 
 			return delegateHolder;

@@ -60,10 +60,10 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
  * @author Nicolas Helleringer
  */
 @PropertyBridgeMapping(bridge = @PropertyBridgeRef(
-		builderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Builder.class
+		binderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder.class
 ))
 @TypeBridgeMapping(bridge = @TypeBridgeRef(
-		builderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Builder.class
+		binderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder.class
 ))
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })

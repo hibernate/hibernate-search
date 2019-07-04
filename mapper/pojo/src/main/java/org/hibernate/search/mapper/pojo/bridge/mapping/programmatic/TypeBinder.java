@@ -14,15 +14,18 @@ import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 
 /**
- * A builder of {@link TypeBridge}.
+ * A binder from a POJO type to index fields.
+ * <p>
+ * This binder takes advantage of provided metadata
+ * to pick, configure and create a {@link TypeBridge}.
  *
  * @param <A> The type of annotations accepted by the {@link #initialize(Annotation)} method.
  * @see TypeBridge
  */
-public interface TypeBridgeBuilder<A extends Annotation> {
+public interface TypeBinder<A extends Annotation> {
 
 	/**
-	 * Initializes the parameters of this builder with the attributes of the given annotation.
+	 * Initializes the parameters of this binder with the attributes of the given annotation.
 	 * @param annotation An annotation to extract parameters from.
 	 */
 	default void initialize(A annotation) {

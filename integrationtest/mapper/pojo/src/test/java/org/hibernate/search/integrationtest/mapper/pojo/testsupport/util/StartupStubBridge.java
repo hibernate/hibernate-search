@@ -20,11 +20,11 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
@@ -62,12 +62,12 @@ public class StartupStubBridge<T>
 		return new CounterKeys();
 	}
 
-	public static Builder<Object> builder(CounterKeys counterKeys) {
-		return new Builder<>( Object.class, counterKeys );
+	public static Binder<Object> binder(CounterKeys counterKeys) {
+		return new Binder<>( Object.class, counterKeys );
 	}
 
-	public static <T> Builder<T> builder(Class<T> bridgeInputType, CounterKeys counterKeys) {
-		return new Builder<>( bridgeInputType, counterKeys );
+	public static <T> Binder<T> binder(Class<T> bridgeInputType, CounterKeys counterKeys) {
+		return new Binder<>( bridgeInputType, counterKeys );
 	}
 
 	private final CounterKeys counterKeys;
@@ -139,13 +139,13 @@ public class StartupStubBridge<T>
 		);
 	}
 
-	public static class Builder<T> implements TypeBridgeBuilder<Annotation>,
-			PropertyBridgeBuilder<Annotation>, RoutingKeyBridgeBuilder<Annotation>,
-			IdentifierBridgeBuilder, ValueBridgeBuilder {
+	public static class Binder<T> implements TypeBinder<Annotation>,
+			PropertyBinder<Annotation>, RoutingKeyBinder<Annotation>,
+			IdentifierBinder, ValueBinder {
 		private final Class<T> bridgeInputType;
 		private final StartupStubBridge.CounterKeys counterKeys;
 
-		private Builder(Class<T> bridgeInputType, StartupStubBridge.CounterKeys counterKeys) {
+		private Binder(Class<T> bridgeInputType, StartupStubBridge.CounterKeys counterKeys) {
 			this.bridgeInputType = bridgeInputType;
 			this.counterKeys = counterKeys;
 		}

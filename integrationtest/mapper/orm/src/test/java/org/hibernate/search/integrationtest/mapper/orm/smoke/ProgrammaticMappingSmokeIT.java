@@ -347,7 +347,7 @@ public class ProgrammaticMappingSmokeIT {
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )
 					.bridge(
-							new CustomTypeBridge.Builder()
+							new CustomTypeBridge.Binder()
 							.objectName( "customBridgeOnClass" )
 					)
 					.property( "id" )
@@ -366,7 +366,7 @@ public class ProgrammaticMappingSmokeIT {
 							.genericField( "myLocalDateField" )
 					.property( "embedded" )
 							.bridge(
-									new CustomPropertyBridge.Builder()
+									new CustomPropertyBridge.Binder()
 									.objectName( "customBridgeOnProperty" )
 							);
 			secondMapping.type( OtherIndexedEntity.class )

@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -202,7 +202,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.FIELD, ElementType.METHOD })
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(builderType = BridgeGoingThroughEntityBoundaries.Builder.class))
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(binderType = BridgeGoingThroughEntityBoundaries.Binder.class))
 	public @interface BridgeGoingThroughEntityBoundariesAnnotation {
 	}
 
@@ -226,7 +226,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 			target.addValue( indexFieldReference, value );
 		}
 
-		public static class Builder implements PropertyBridgeBuilder<BridgeGoingThroughEntityBoundariesAnnotation> {
+		public static class Binder implements PropertyBinder<BridgeGoingThroughEntityBoundariesAnnotation> {
 			@Override
 			public void bind(PropertyBindingContext context) {
 				context.setBridge( new BridgeGoingThroughEntityBoundaries( context ) );
