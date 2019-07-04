@@ -17,9 +17,10 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -176,18 +177,16 @@ public class AnnotationMappingRoutingIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@RoutingKeyBridgeMapping(bridge = @RoutingKeyBridgeRef(type = MyRoutingKeyBridge.class))
+	@RoutingKeyBridgeMapping(bridge = @RoutingKeyBridgeRef(builderType = MyRoutingKeyBridge.Builder.class))
 	public @interface MyRoutingKeyBridgeAnnotation {
 	}
 
 	public static final class MyRoutingKeyBridge implements RoutingKeyBridge {
 
-		private PojoElementAccessor<EntityCategory> categoryAccessor;
+		private final PojoElementAccessor<EntityCategory> categoryAccessor;
 
-		@Override
-		public void bind(RoutingKeyBridgeBindingContext context) {
-			categoryAccessor = context.getBridgedElement().property( "category" )
-					.createAccessor( EntityCategory.class );
+		private MyRoutingKeyBridge(PojoElementAccessor<EntityCategory> categoryAccessor) {
+			this.categoryAccessor = categoryAccessor;
 		}
 
 		@Override
@@ -209,6 +208,16 @@ public class AnnotationMappingRoutingIT {
 					throw new RuntimeException( "Unknown category: " + category );
 			}
 			return keyBuilder.toString();
+		}
+
+		public static class Builder implements RoutingKeyBridgeBuilder<MyRoutingKeyBridgeAnnotation> {
+			@Override
+			public void bind(RoutingKeyBindingContext context) {
+				PojoElementAccessor<EntityCategory> categoryAccessor =
+						context.getBridgedElement().property( "category" )
+								.createAccessor( EntityCategory.class );
+				context.setBridge( new MyRoutingKeyBridge( categoryAccessor ) );
+			}
 		}
 	}
 

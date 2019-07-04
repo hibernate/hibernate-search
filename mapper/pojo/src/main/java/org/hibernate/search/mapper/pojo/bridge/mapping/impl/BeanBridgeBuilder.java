@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
@@ -89,8 +90,17 @@ public final class BeanBridgeBuilder
 	}
 
 	@Override
-	public BeanHolder<? extends RoutingKeyBridge> buildForRoutingKey(BridgeBuildContext buildContext) {
-		return doBuild( buildContext, RoutingKeyBridge.class );
+	public void bind(RoutingKeyBindingContext context) {
+		BeanHolder<? extends RoutingKeyBridge> bridgeHolder = doBuild( context.getBeanResolver(), RoutingKeyBridge.class );
+		try {
+			context.setBridge( bridgeHolder );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( bridgeHolder );
+			throw e;
+		}
 	}
 
 	@Override

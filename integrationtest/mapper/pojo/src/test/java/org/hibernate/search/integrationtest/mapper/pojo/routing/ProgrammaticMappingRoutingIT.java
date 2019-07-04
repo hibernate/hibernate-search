@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.routing;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
@@ -13,7 +14,8 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
@@ -52,7 +54,7 @@ public class ProgrammaticMappingRoutingIT {
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 					mappingDefinition.type( IndexedEntity.class )
 							.indexed( IndexedEntity.INDEX )
-							.routingKeyBridge( MyRoutingKeyBridge.class )
+							.routingKeyBridge( new MyRoutingKeyBridge.Builder() )
 							.property( "id" )
 									.documentId()
 							.property( "value" ).genericField();
@@ -176,12 +178,10 @@ public class ProgrammaticMappingRoutingIT {
 
 	public static final class MyRoutingKeyBridge implements RoutingKeyBridge {
 
-		private PojoElementAccessor<EntityCategory> categoryAccessor;
+		private final PojoElementAccessor<EntityCategory> categoryAccessor;
 
-		@Override
-		public void bind(RoutingKeyBridgeBindingContext context) {
-			categoryAccessor = context.getBridgedElement().property( "category" )
-					.createAccessor( EntityCategory.class );
+		private MyRoutingKeyBridge(PojoElementAccessor<EntityCategory> categoryAccessor) {
+			this.categoryAccessor = categoryAccessor;
 		}
 
 		@Override
@@ -204,6 +204,15 @@ public class ProgrammaticMappingRoutingIT {
 			}
 			return keyBuilder.toString();
 		}
-	}
 
+		public static class Builder implements RoutingKeyBridgeBuilder<Annotation> {
+			@Override
+			public void bind(RoutingKeyBindingContext context) {
+				PojoElementAccessor<EntityCategory> categoryAccessor =
+						context.getBridgedElement().property( "category" )
+								.createAccessor( EntityCategory.class );
+				context.setBridge( new MyRoutingKeyBridge( categoryAccessor ) );
+			}
+		}
+	}
 }

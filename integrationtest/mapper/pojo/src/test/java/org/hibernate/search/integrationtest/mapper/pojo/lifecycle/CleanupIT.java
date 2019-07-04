@@ -22,8 +22,8 @@ import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubContainerExtractor;
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
@@ -556,7 +556,7 @@ public class CleanupIT {
 		}
 
 		@Override
-		public BeanHolder<? extends RoutingKeyBridge> buildForRoutingKey(BridgeBuildContext buildContext) {
+		public void bind(RoutingKeyBindingContext context) {
 			throw new SimulatedFailure();
 		}
 

@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.ProvidedStringIdentifierMapping;
