@@ -12,11 +12,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD })
-@PropertyBinding(bridge = @PropertyBridgeRef(binderType = CustomPropertyBridge.Binder.class))
+@PropertyBinding(binder = @PropertyBinderRef(type = CustomPropertyBridge.Binder.class))
 public @interface CustomPropertyBridgeAnnotation {
 
 	String objectName();

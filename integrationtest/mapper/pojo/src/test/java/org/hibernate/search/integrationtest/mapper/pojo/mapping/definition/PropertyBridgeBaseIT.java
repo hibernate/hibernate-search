@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -92,7 +92,7 @@ public class PropertyBridgeBaseIT {
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" )
-						.bridge( (PropertyBinder<?>) context -> {
+						.binder( (PropertyBinder<?>) context -> {
 							PojoElementAccessor<String> pojoPropertyAccessor = context.getBridgedElement()
 									.createAccessor( String.class );
 							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
@@ -177,7 +177,7 @@ public class PropertyBridgeBaseIT {
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "contained" )
-						.bridge( (PropertyBinder<?>) context -> {
+						.binder( (PropertyBinder<?>) context -> {
 							context.getDependencies().use( "stringProperty" );
 							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
 									"someField",
@@ -253,7 +253,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (PropertyBinder<?>) context -> {
+								.binder( (PropertyBinder<?>) context -> {
 									context.getDependencies().use( "doesNotExist.stringProperty" );
 									context.setBridge( new UnusedPropertyBridge() );
 								} )
@@ -299,7 +299,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (PropertyBinder<?>) context -> {
+								.binder( (PropertyBinder<?>) context -> {
 									context.getDependencies()
 											.use(
 													ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
@@ -343,7 +343,7 @@ public class PropertyBridgeBaseIT {
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 						.property( "child" )
-						.bridge( (PropertyBinder<?>) context -> {
+						.binder( (PropertyBinder<?>) context -> {
 							context.getDependencies()
 									.fromOtherEntity( PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class, "parent" )
 									.use( "stringProperty" );
@@ -461,7 +461,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (PropertyBinder<?>) context -> {
+								.binder( (PropertyBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
@@ -497,7 +497,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (PropertyBinder<?>) context -> {
+								.binder( (PropertyBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
@@ -531,7 +531,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (PropertyBinder<?>) context -> {
+								.binder( (PropertyBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
@@ -569,7 +569,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "notEntity" )
-								.bridge( (PropertyBinder<?>) context -> {
+								.binder( (PropertyBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
@@ -606,7 +606,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (PropertyBinder<?>) context -> {
+								.binder( (PropertyBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.NotEntity.class,
@@ -643,7 +643,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.bridge( (PropertyBinder<?>) context -> {
+								.binder( (PropertyBinder<?>) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
@@ -698,7 +698,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (PropertyBinder<?>) context -> {
+								.binder( (PropertyBinder<?>) context -> {
 									// Do not declare any dependency
 									context.setBridge( new UnusedPropertyBridge() );
 								} )
@@ -745,7 +745,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.bridge( (PropertyBinder<?>) context -> {
+								.binder( (PropertyBinder<?>) context -> {
 									// Declare no dependency, but also a dependency: this is inconsistent.
 									context.getDependencies()
 											.use( "stringProperty" )
@@ -793,7 +793,7 @@ public class PropertyBridgeBaseIT {
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" )
-						.bridge( (PropertyBinder<?>) context -> {
+						.binder( (PropertyBinder<?>) context -> {
 							context.getDependencies().useRootOnly();
 							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
 									"someField",
@@ -872,7 +872,7 @@ public class PropertyBridgeBaseIT {
 
 		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
-						.bridge( (PropertyBinder<?>) context -> {
+						.binder( (PropertyBinder<?>) context -> {
 							context.getDependencies().useRootOnly();
 							// Single-valued field
 							context.getIndexSchemaElement()
@@ -922,7 +922,7 @@ public class PropertyBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@PropertyBinding(bridge = @PropertyBridgeRef())
+	@PropertyBinding(binder = @PropertyBinderRef())
 	private @interface BridgeAnnotationWithEmptyPropertyBridgeMapping {
 	}
 
@@ -956,7 +956,7 @@ public class PropertyBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@PropertyBinding(bridge = @PropertyBridgeRef(binderType = BinderWithDifferentAnnotationType.class))
+	@PropertyBinding(binder = @PropertyBinderRef(type = BinderWithDifferentAnnotationType.class))
 	private @interface BridgeAnnotationMappedToBinderWithDifferentAnnotationType {
 	}
 
@@ -1017,7 +1017,7 @@ public class PropertyBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.METHOD, ElementType.FIELD})
-	@PropertyBinding(bridge = @PropertyBridgeRef(binderType = IncompatibleTypeRequestingPropertyBinder.class))
+	@PropertyBinding(binder = @PropertyBinderRef(type = IncompatibleTypeRequestingPropertyBinder.class))
 	private @interface IncompatibleTypeRequestingPropertyBridgeAnnotation {
 	}
 

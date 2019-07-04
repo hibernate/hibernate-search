@@ -12,7 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef;
 
 /**
  * Meta-annotation for annotations that bind a routing key bridge to a type.
@@ -28,8 +28,8 @@ public @interface RoutingKeyBinding {
 
 	/**
 	 * @return A reference to the routing key binder to use.
-	 * @see RoutingKeyBridgeRef
+	 * @see RoutingKeyBinderRef
 	 */
-	RoutingKeyBridgeRef bridge();
+	RoutingKeyBinderRef binder();
 
 }

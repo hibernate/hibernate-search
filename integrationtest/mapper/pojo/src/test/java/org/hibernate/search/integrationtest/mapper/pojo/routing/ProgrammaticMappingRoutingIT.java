@@ -54,7 +54,7 @@ public class ProgrammaticMappingRoutingIT {
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 					mappingDefinition.type( IndexedEntity.class )
 							.indexed( IndexedEntity.INDEX )
-							.routingKeyBridge( new MyRoutingKeyBridge.Binder() )
+							.routingKeyBinder( new MyRoutingKeyBridge.Binder() )
 							.property( "id" )
 									.documentId()
 							.property( "value" ).genericField();

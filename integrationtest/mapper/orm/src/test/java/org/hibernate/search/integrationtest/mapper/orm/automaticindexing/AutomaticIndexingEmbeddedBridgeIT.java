@@ -30,7 +30,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -281,7 +281,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBinding(bridge = @TypeBridgeRef(binderType = FirstTypeBridge.Binder.class))
+	@TypeBinding(binder = @TypeBinderRef(type = FirstTypeBridge.Binder.class))
 	public @interface FirstTypeBridgeAnnotation {
 	}
 
@@ -317,7 +317,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBinding(bridge = @TypeBridgeRef(binderType = SecondTypeBridge.Binder.class))
+	@TypeBinding(binder = @TypeBinderRef(type = SecondTypeBridge.Binder.class))
 	public @interface SecondTypeBridgeAnnotation {
 	}
 

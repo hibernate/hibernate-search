@@ -12,7 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 
 /**
  * Meta-annotation for annotations that bind a bridge to a property.
@@ -28,7 +28,7 @@ public @interface PropertyBinding {
 
 	/**
 	 * @return A reference to the property binder to use.
-	 * @see PropertyBridgeRef
+	 * @see PropertyBinderRef
 	 */
-	PropertyBridgeRef bridge();
+	PropertyBinderRef binder();
 }

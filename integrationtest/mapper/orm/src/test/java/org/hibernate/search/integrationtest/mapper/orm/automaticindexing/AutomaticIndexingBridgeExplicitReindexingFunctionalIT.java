@@ -71,7 +71,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 							@Override
 							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( IndexedEntity.class )
-										.bridge( new QueryBasedTypeBridge.Binder() );
+										.binder( new QueryBasedTypeBridge.Binder() );
 							}
 						}
 				)

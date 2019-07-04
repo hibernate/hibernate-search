@@ -67,7 +67,7 @@ public interface TypeMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see RoutingKeyBinder
 	 */
-	TypeMappingStep routingKeyBridge(RoutingKeyBinder<?> binder);
+	TypeMappingStep routingKeyBinder(RoutingKeyBinder<?> binder);
 
 	/**
 	 * @param bridgeClass The class of the bridge to use.
@@ -90,7 +90,7 @@ public interface TypeMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see TypeBinder
 	 */
-	TypeMappingStep bridge(TypeBinder<?> binder);
+	TypeMappingStep binder(TypeBinder<?> binder);
 
 	/**
 	 * Starts the definition of the mapping of a specific property.

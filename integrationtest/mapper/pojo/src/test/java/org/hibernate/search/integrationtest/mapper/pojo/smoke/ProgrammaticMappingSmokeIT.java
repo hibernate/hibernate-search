@@ -140,7 +140,7 @@ public class ProgrammaticMappingSmokeIT {
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 					mappingDefinition.type( IndexedEntity.class )
 							.indexed( IndexedEntity.INDEX )
-							.bridge(
+							.binder(
 									new CustomTypeBridge.Binder()
 									.objectName( "customBridgeOnClass" )
 							)
@@ -162,7 +162,7 @@ public class ProgrammaticMappingSmokeIT {
 									.associationInverseSide(
 											PojoModelPath.ofValue( "embeddingAsSingle" )
 									)
-									.bridge(
+									.binder(
 											new CustomPropertyBridge.Binder()
 											.objectName( "customBridgeOnProperty" )
 									);

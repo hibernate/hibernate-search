@@ -76,11 +76,11 @@ class InitialPropertyMappingStep
 
 	@Override
 	public PropertyMappingStep bridge(BeanReference<? extends PropertyBridge> bridgeReference) {
-		return bridge( new BeanBinder( bridgeReference ) );
+		return binder( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override
-	public PropertyMappingStep bridge(PropertyBinder<?> binder) {
+	public PropertyMappingStep binder(PropertyBinder<?> binder) {
 		children.add( new PropertyBridgeMappingContributor( binder ) );
 		return this;
 	}

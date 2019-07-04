@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 
 /**
- * Reference a marker for a {@link MarkerBinding}.
+ * References a marker binder for a {@link MarkerBinding}.
  * <p>
  * References can use either a name, a type, or both.
  * <p>
@@ -32,22 +32,22 @@ import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MarkerRef {
+public @interface MarkerBinderRef {
 
 	/**
-	 * Reference a marker by the the bean name of its binder.
+	 * Reference a marker binder by its bean name.
 	 * @return The bean name of the marker binder.
 	 */
-	String binderName() default "";
+	String name() default "";
 
 	/**
-	 * Reference a marker by the type of its binder.
+	 * Reference a marker binder by its bean type.
 	 * @return The bean type of the marker binder.
 	 */
-	Class<? extends MarkerBinder<?>> binderType() default UndefinedBinderImplementationType.class;
+	Class<? extends MarkerBinder<?>> type() default UndefinedBinderImplementationType.class;
 
 	/**
-	 * Class used as a marker for the default value of the {@link #binderType()} attribute.
+	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
 	abstract class UndefinedBinderImplementationType implements MarkerBinder<Annotation> {
 		private UndefinedBinderImplementationType() {

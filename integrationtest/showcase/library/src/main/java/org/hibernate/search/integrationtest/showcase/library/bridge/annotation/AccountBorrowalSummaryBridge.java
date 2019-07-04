@@ -13,11 +13,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 
 @TypeBinding(
-		bridge = @TypeBridgeRef(
-				binderType = org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge.Binder.class
+		binder = @TypeBinderRef(
+				type = org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge.Binder.class
 		)
 )
 @Retention(RetentionPolicy.RUNTIME)

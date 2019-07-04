@@ -14,9 +14,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 
-@PropertyBinding(bridge = @PropertyBridgeRef(binderType = org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge.Binder.class))
+@PropertyBinding(binder = @PropertyBinderRef(type = org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge.Binder.class))
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented

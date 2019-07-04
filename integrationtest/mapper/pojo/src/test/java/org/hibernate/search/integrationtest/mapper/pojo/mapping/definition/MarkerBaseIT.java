@@ -14,7 +14,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -77,7 +77,7 @@ public class MarkerBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@MarkerBinding(marker = @MarkerRef)
+	@MarkerBinding(binder = @MarkerBinderRef)
 	private @interface MarkerAnnotationWithEmptyMarkerMapping {
 	}
 
@@ -111,7 +111,7 @@ public class MarkerBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@MarkerBinding(marker = @MarkerRef(binderType = MarkerBinderWithDifferentAnnotationType.class))
+	@MarkerBinding(binder = @MarkerBinderRef(type = MarkerBinderWithDifferentAnnotationType.class))
 	private @interface MarkerAnnotationMappedToMarkerBinderWithDifferentAnnotationType {
 	}
 

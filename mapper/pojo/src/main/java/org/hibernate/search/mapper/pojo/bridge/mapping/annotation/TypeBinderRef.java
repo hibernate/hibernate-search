@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.Ty
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 
 /**
- * Reference a type bridge for a {@link TypeBinding}.
+ * References a type binder for a {@link TypeBinding}.
  * <p>
  * References can use either a name, a type, or both.
  * <p>
@@ -32,22 +32,22 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TypeBridgeRef {
+public @interface TypeBinderRef {
 
 	/**
-	 * Reference a type bridge by the bean name of its binder.
+	 * Reference a type binder by its bean name.
 	 * @return The bean name of the type binder.
 	 */
-	String binderName() default "";
+	String name() default "";
 
 	/**
-	 * Reference a type bridge by the type of its binder.
+	 * Reference a type binder by its bean type.
 	 * @return The type of the type binder.
 	 */
-	Class<? extends TypeBinder<?>> binderType() default UndefinedBinderImplementationType.class;
+	Class<? extends TypeBinder<?>> type() default UndefinedBinderImplementationType.class;
 
 	/**
-	 * Class used as a marker for the default value of the {@link #binderType()} attribute.
+	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
 	abstract class UndefinedBinderImplementationType implements TypeBinder<Annotation> {
 		private UndefinedBinderImplementationType() {

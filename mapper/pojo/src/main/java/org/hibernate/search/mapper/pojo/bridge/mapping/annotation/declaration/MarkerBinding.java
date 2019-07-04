@@ -12,7 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
 
 /**
  * Meta-annotation for annotations that bind a marker to a property.
@@ -28,8 +28,8 @@ public @interface MarkerBinding {
 
 	/**
 	 * @return A reference to the marker binder to use.
-	 * @see MarkerRef
+	 * @see MarkerBinderRef
 	 */
-	MarkerRef marker();
+	MarkerBinderRef binder();
 
 }
