@@ -13,7 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
 
 /**
@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
  *
  * @author Nicolas Helleringer
  */
-@MarkerMapping(marker = @MarkerRef(binderType = LongitudeMarker.Binder.class))
+@MarkerBinding(marker = @MarkerRef(binderType = LongitudeMarker.Binder.class))
 @Retention( RetentionPolicy.RUNTIME )
 @Target( { ElementType.METHOD, ElementType.FIELD } )
 @Documented

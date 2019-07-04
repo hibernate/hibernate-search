@@ -11,12 +11,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@TypeBridgeMapping(bridge = @TypeBridgeRef(binderType = CustomTypeBridge.Binder.class))
+@TypeBinding(bridge = @TypeBridgeRef(binderType = CustomTypeBridge.Binder.class))
 public @interface CustomTypeBridgeAnnotation {
 
 	String objectName();

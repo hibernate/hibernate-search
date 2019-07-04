@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
@@ -68,7 +68,7 @@ public class MarkerBaseIT {
 						.annotationContextAnyParameters( MarkerAnnotationWithEmptyMarkerMapping.class )
 						.failure(
 								"Annotation type '" + MarkerAnnotationWithEmptyMarkerMapping.class.getName()
-										+ "' is annotated with '" + MarkerMapping.class.getName() + "',"
+										+ "' is annotated with '" + MarkerBinding.class.getName() + "',"
 										+ " but the binder reference is empty"
 						)
 						.build()
@@ -77,7 +77,7 @@ public class MarkerBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@MarkerMapping(marker = @MarkerRef)
+	@MarkerBinding(marker = @MarkerRef)
 	private @interface MarkerAnnotationWithEmptyMarkerMapping {
 	}
 
@@ -111,7 +111,7 @@ public class MarkerBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@MarkerMapping(marker = @MarkerRef(binderType = MarkerBinderWithDifferentAnnotationType.class))
+	@MarkerBinding(marker = @MarkerRef(binderType = MarkerBinderWithDifferentAnnotationType.class))
 	private @interface MarkerAnnotationMappedToMarkerBinderWithDifferentAnnotationType {
 	}
 

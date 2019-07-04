@@ -15,13 +15,13 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
@@ -96,8 +96,8 @@ class AnnotationProcessorHelper {
 	}
 
 	<A extends Annotation> MarkerBinder createMarkerBinder(A annotation) {
-		MarkerMapping markerMapping = annotation.annotationType().getAnnotation( MarkerMapping.class );
-		MarkerRef binderReferenceAnnotation = markerMapping.marker();
+		MarkerBinding markerBinding = annotation.annotationType().getAnnotation( MarkerBinding.class );
+		MarkerRef binderReferenceAnnotation = markerBinding.marker();
 		Optional<BeanReference<? extends MarkerBinder>> binderReference = toBeanReference(
 				MarkerBinder.class,
 				MarkerRef.UndefinedBinderImplementationType.class,
@@ -106,7 +106,7 @@ class AnnotationProcessorHelper {
 
 		if ( !binderReference.isPresent() ) {
 			throw log.missingBinderReferenceInMarkerMapping(
-					MarkerMapping.class, annotation.annotationType()
+					MarkerBinding.class, annotation.annotationType()
 			);
 		}
 
@@ -146,7 +146,7 @@ class AnnotationProcessorHelper {
 	}
 
 	<A extends Annotation> RoutingKeyBinder createRoutingKeyBinder(A annotation) {
-		RoutingKeyBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( RoutingKeyBridgeMapping.class );
+		RoutingKeyBinding bridgeMapping = annotation.annotationType().getAnnotation( RoutingKeyBinding.class );
 		RoutingKeyBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
 		Optional<BeanReference<? extends RoutingKeyBinder>> binderReference = toBeanReference(
 				RoutingKeyBinder.class,
@@ -167,7 +167,7 @@ class AnnotationProcessorHelper {
 	}
 
 	<A extends Annotation> TypeBinder createTypeBinder(A annotation) {
-		TypeBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( TypeBridgeMapping.class );
+		TypeBinding bridgeMapping = annotation.annotationType().getAnnotation( TypeBinding.class );
 		TypeBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
 		Optional<BeanReference<? extends TypeBinder>> binderReference = toBeanReference(
 				TypeBinder.class,
@@ -187,7 +187,7 @@ class AnnotationProcessorHelper {
 	}
 
 	<A extends Annotation> PropertyBinder createPropertyBinder(A annotation) {
-		PropertyBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( PropertyBridgeMapping.class );
+		PropertyBinding bridgeMapping = annotation.annotationType().getAnnotation( PropertyBinding.class );
 		PropertyBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
 		Optional<BeanReference<? extends PropertyBinder>> binderReference = toBeanReference(
 				PropertyBinder.class,

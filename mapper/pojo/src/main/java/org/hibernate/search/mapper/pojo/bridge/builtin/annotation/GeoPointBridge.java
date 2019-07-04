@@ -15,9 +15,9 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
 
@@ -59,10 +59,10 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
  *
  * @author Nicolas Helleringer
  */
-@PropertyBridgeMapping(bridge = @PropertyBridgeRef(
+@PropertyBinding(bridge = @PropertyBridgeRef(
 		binderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder.class
 ))
-@TypeBridgeMapping(bridge = @TypeBridgeRef(
+@TypeBinding(bridge = @TypeBridgeRef(
 		binderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder.class
 ))
 @Retention(RetentionPolicy.RUNTIME)

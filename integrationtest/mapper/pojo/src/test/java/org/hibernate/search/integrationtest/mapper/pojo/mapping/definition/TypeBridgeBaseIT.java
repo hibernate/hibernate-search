@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
@@ -832,7 +832,7 @@ public class TypeBridgeBaseIT {
 						.annotationContextAnyParameters( BridgeAnnotationWithEmptyTypeBridgeRef.class )
 						.failure(
 								"Annotation type '" + BridgeAnnotationWithEmptyTypeBridgeRef.class.getName()
-										+ "' is annotated with '" + TypeBridgeMapping.class.getName() + "',"
+										+ "' is annotated with '" + TypeBinding.class.getName() + "',"
 										+ " but the binder reference is empty."
 						)
 						.build()
@@ -841,7 +841,7 @@ public class TypeBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeRef)
+	@TypeBinding(bridge = @TypeBridgeRef)
 	private @interface BridgeAnnotationWithEmptyTypeBridgeRef {
 	}
 
@@ -874,7 +874,7 @@ public class TypeBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(binderType = BinderWithDifferentAnnotationType.class))
+	@TypeBinding(bridge = @TypeBridgeRef(binderType = BinderWithDifferentAnnotationType.class))
 	private @interface BridgeAnnotationMappedToBinderWithDifferentAnnotationType {
 	}
 
@@ -935,7 +935,7 @@ public class TypeBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(binderType = IncompatibleTypeRequestingTypeBinder.class))
+	@TypeBinding(bridge = @TypeBridgeRef(binderType = IncompatibleTypeRequestingTypeBinder.class))
 	private @interface IncompatibleTypeRequestingTypeBridgeAnnotation {
 	}
 

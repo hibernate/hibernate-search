@@ -12,24 +12,23 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
 
 /**
- * Maps a routing key bridge to an annotation type,
- * so that whenever the annotation is found on a type in the domain model,
- * the routing bridge mapped to the annotation will be applied.
+ * Meta-annotation for annotations that bind a bridge to a property.
+ * <p>
+ * Whenever an annotation meta-annotated with {@link PropertyBinding}
+ * is found on a property in the domain model,
+ * the corresponding binder will be applied to this property.
  */
 @Documented
 @Target(value = ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RoutingKeyBridgeMapping {
+public @interface PropertyBinding {
 
 	/**
-	 * Map a routing key bridge to an annotation type.
-	 *
-	 * @see RoutingKeyBridgeRef
-	 * @return A reference to the routing key binder to use.
+	 * @return A reference to the property binder to use.
+	 * @see PropertyBridgeRef
 	 */
-	RoutingKeyBridgeRef bridge();
-
+	PropertyBridgeRef bridge();
 }
