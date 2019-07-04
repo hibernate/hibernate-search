@@ -7,18 +7,17 @@
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 
 public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements IdentifierBridge<T> {
 
-	private Class<T> enumType;
+	private final Class<T> enumType;
 
-	@Override
-	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public void bind(IdentifierBridgeBindingContext<T> context) {
-		this.enumType = (Class<T>) context.getBridgedElement().getRawType();
+	public DefaultEnumIdentifierBridge(Class<T> enumType) {
+		this.enumType = enumType;
 	}
 
 	@Override
@@ -44,6 +43,18 @@ public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements Ide
 		}
 		DefaultEnumIdentifierBridge<?> castedOther = (DefaultEnumIdentifierBridge<?>) other;
 		return enumType.equals( castedOther.enumType );
+	}
+
+	public static class Builder implements IdentifierBridgeBuilder {
+		@Override
+		@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
+		public void bind(IdentifierBindingContext<?> context) {
+			doBind( context, (Class) context.getBridgedElement().getRawType() );
+		}
+
+		private <V extends Enum<V>> void doBind(IdentifierBindingContext<?> context, Class<V> enumType) {
+			context.setBridge( enumType, new DefaultEnumIdentifierBridge<>( enumType ) );
+		}
 	}
 
 }

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping.programmatic;
 
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 
 /**
  * A builder of {@link IdentifierBridge}.
@@ -17,15 +17,16 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 public interface IdentifierBridgeBuilder {
 
 	/**
-	 * Build a bridge.
+	 * Binds a POJO property to a document identifier.
 	 * <p>
-	 * <strong>Warning:</strong> this method can be called multiple times and must return a new instance to each call.
+	 * The context passed in parameter provides various information about the identifier being bound.
+	 * Implementations are expected to take advantage of that information
+	 * and to call one of the {@code setBridge(...)} methods on the context
+	 * to set the bridge.
 	 *
-	 * @param buildContext A object providing access to other components involved in the build process.
-	 * @return A new bridge instance, enclosed in a {@link BeanHolder}.
-	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
+	 * @param context A context object providing information about the identifier being bound,
+	 * and expecting a call to one of its {@code setBridge(...)} methods.
 	 */
-	// FIXME use method parameter overload to avoid conflict between this build() method and the ones from other builders
-	BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext);
+	void bind(IdentifierBindingContext<?> context);
 
 }

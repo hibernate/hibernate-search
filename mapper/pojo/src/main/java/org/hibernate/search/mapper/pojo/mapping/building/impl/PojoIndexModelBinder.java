@@ -13,22 +13,21 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundPropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -55,7 +54,7 @@ public interface PojoIndexModelBinder {
 	<C, V> ContainerExtractorHolder<C, V> createExtractors(
 			BoundContainerExtractorPath<C, V> boundExtractorPath);
 
-	<I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(
+	<I> BoundIdentifierBridge<I> addIdentifierBridge(
 			IndexedEntityBindingContext bindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath, IdentifierBridgeBuilder bridgeBuilder);
 
