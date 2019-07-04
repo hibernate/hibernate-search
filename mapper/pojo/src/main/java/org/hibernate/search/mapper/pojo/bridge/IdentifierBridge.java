@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.bridge;
 
 
-import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
@@ -19,20 +18,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
  * @param <I> The type of identifiers on the POJO side of the bridge.
  */
 public interface IdentifierBridge<I> extends AutoCloseable {
-
-	/**
-	 * Bind this bridge instance to the given context,
-	 * i.e. to an object property in the POJO model.
-	 * <p>
-	 * This method is called exactly once for each bridge instance, before any other method.
-	 * It allows the bridge to check the type of bridged elements
-	 * using {@link IdentifierBridgeBindingContext#getBridgedElement()}.
-	 *
-	 * @param context An entry point to perform the operations listed above.
-	 */
-	default void bind(IdentifierBridgeBindingContext<I> context) {
-		// No-op by default
-	}
 
 	/**
 	 * Transform the given POJO property value to the value of the document identifier.

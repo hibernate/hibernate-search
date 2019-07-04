@@ -38,7 +38,7 @@ import java.util.UUID;
 
 import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultCharacterValueBridge;
@@ -86,12 +86,12 @@ public final class BridgeResolver {
 		TypePatternMatcher concreteEnumPattern = typePatternMatcherFactory.createRawSuperTypeMatcher( Enum.class )
 				.and( typePatternMatcherFactory.createExactRawTypeMatcher( Enum.class ).negate() );
 
-		addIdentifierBridgeForExactRawType( Integer.class, ignored -> BeanHolder.of( new DefaultIntegerIdentifierBridge() ) );
-		addIdentifierBridgeForExactRawType( Long.class, ignored -> BeanHolder.of( new DefaultLongIdentifierBridge() ) );
-		addIdentifierBridgeForTypePattern( concreteEnumPattern, ignored -> BeanHolder.of( new DefaultEnumIdentifierBridge<>() ) );
-		addIdentifierBridgeForExactRawType( Short.class, ignored -> BeanHolder.of( new DefaultShortIdentifierBridge() ) );
-		addIdentifierBridgeForExactRawType( BigInteger.class, ignored -> BeanHolder.of( new DefaultBigIntegerIdentifierBridge() ) );
-		addIdentifierBridgeForExactRawType( UUID.class, ignored -> BeanHolder.of( new DefaultUUIDIdentifierBridge() ) );
+		addIdentifierBridgeForExactRawType( Integer.class, new DefaultIntegerIdentifierBridge() );
+		addIdentifierBridgeForExactRawType( Long.class, new DefaultLongIdentifierBridge() );
+		addIdentifierBridgeForTypePattern( concreteEnumPattern, new DefaultEnumIdentifierBridge.Builder() );
+		addIdentifierBridgeForExactRawType( Short.class, new DefaultShortIdentifierBridge() );
+		addIdentifierBridgeForExactRawType( BigInteger.class, new DefaultBigIntegerIdentifierBridge() );
+		addIdentifierBridgeForExactRawType( UUID.class, new DefaultUUIDIdentifierBridge() );
 
 		addValueBridgeForExactRawType( Integer.class, new PassThroughValueBridge.Builder<>( Integer.class, ConvertUtils::convertInteger ) );
 		addValueBridgeForExactRawType( Long.class, new PassThroughValueBridge.Builder<>( Long.class, ConvertUtils::convertLong ) );
@@ -155,6 +155,10 @@ public final class BridgeResolver {
 
 	private <I> void addIdentifierBridgeForExactRawType(Class<I> type, IdentifierBridgeBuilder builder) {
 		exactRawTypeIdentifierBridgeMappings.put( type, builder );
+	}
+
+	private <I> void addIdentifierBridgeForExactRawType(Class<I> type, IdentifierBridge<I> bridge) {
+		addIdentifierBridgeForExactRawType( type, context -> context.setBridge( type, bridge ) );
 	}
 
 	private void addIdentifierBridgeForTypePattern(TypePatternMatcher typePatternMatcher,

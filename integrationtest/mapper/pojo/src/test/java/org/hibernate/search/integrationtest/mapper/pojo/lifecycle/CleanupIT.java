@@ -16,17 +16,15 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubContainerExtractor;
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
@@ -560,7 +558,7 @@ public class CleanupIT {
 		}
 
 		@Override
-		public BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext) {
+		public void bind(IdentifierBindingContext<?> context) {
 			throw new SimulatedFailure();
 		}
 

@@ -9,9 +9,8 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.PropertyIdentifierMapping;
@@ -76,13 +75,13 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 	@Override
 	public <T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
 			IdentifierBridgeBuilder builder) {
-		BeanHolder<? extends IdentifierBridge<T>> bridgeHolder = mappingHelper.getIndexModelBinder()
+		BoundIdentifierBridge<T> boundIdentifierBridge = mappingHelper.getIndexModelBinder()
 				.addIdentifierBridge( indexManagerBuildingState.getIndexedEntityBindingContext(), modelPath, builder );
 		PojoPropertyModel<T> propertyModel = modelPath.getPropertyModel();
 		this.identifierMapping = new PropertyIdentifierMapping<>(
 				propertyModel.getTypeModel().getRawType().getCaster(),
 				propertyModel.getHandle(),
-				bridgeHolder
+				boundIdentifierBridge.getBridgeHolder()
 		);
 		this.documentIdSourceProperty = Optional.of( propertyModel );
 	}

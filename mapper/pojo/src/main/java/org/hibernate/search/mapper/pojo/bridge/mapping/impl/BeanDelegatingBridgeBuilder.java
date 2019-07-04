@@ -9,9 +9,8 @@ package org.hibernate.search.mapper.pojo.bridge.mapping.impl;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
 
@@ -34,10 +33,10 @@ public final class BeanDelegatingBridgeBuilder
 	}
 
 	@Override
-	public BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext) {
+	public void bind(IdentifierBindingContext<?> context) {
 		try ( BeanHolder<? extends IdentifierBridgeBuilder> delegateHolder =
-				createDelegate( buildContext, IdentifierBridgeBuilder.class ) ) {
-			return delegateHolder.get().buildForIdentifier( buildContext );
+				createDelegate( context.getBeanResolver(), IdentifierBridgeBuilder.class ) ) {
+			delegateHolder.get().bind( context );
 		}
 	}
 
@@ -51,10 +50,6 @@ public final class BeanDelegatingBridgeBuilder
 
 	private <B> BeanHolder<? extends B> createDelegate(BeanResolver beanResolver, Class<B> expectedType) {
 		return delegateReference.asSubTypeOf( expectedType ).resolve( beanResolver );
-	}
-
-	private <B> BeanHolder<? extends B> createDelegate(BridgeBuildContext buildContext, Class<B> expectedType) {
-		return createDelegate( buildContext.getBeanResolver(), expectedType );
 	}
 
 }

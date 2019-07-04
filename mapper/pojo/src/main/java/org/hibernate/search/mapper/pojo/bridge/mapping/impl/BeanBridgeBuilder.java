@@ -16,11 +16,11 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
@@ -84,9 +84,18 @@ public final class BeanBridgeBuilder
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public BeanHolder<? extends IdentifierBridge<?>> buildForIdentifier(BridgeBuildContext buildContext) {
-		return doBuild( buildContext, (Class<? extends IdentifierBridge<?>>) (Class) IdentifierBridge.class );
+	@SuppressWarnings({"unchecked"})
+	public void bind(IdentifierBindingContext<?> context) {
+		BeanHolder<? extends IdentifierBridge> bridgeHolder = doBuild( context.getBeanResolver(), IdentifierBridge.class );
+		try {
+			doBind( bridgeHolder, context );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( bridgeHolder );
+			throw e;
+		}
 	}
 
 	@Override
@@ -118,6 +127,21 @@ public final class BeanBridgeBuilder
 		}
 	}
 
+	private <B extends IdentifierBridge<I>, I> void doBind(BeanHolder<B> bridgeHolder, IdentifierBindingContext<?> context) {
+		IdentifierBridge<I> bridge = bridgeHolder.get();
+		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
+		// TODO HSEARCH-3243 We're assuming the field type is raw here, maybe we should enforce it?
+		@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
+		Class<I> bridgeParameterType = (Class<I>) bridgeTypeContext.resolveTypeArgument( IdentifierBridge.class, 0 )
+				.map( ReflectionUtils::getRawType )
+				.orElseThrow( () -> new AssertionFailure(
+						"Could not auto-detect the input type for identifier bridge '"
+						+ bridge + "'."
+						+ " There is a bug in Hibernate Search, please report it."
+				) );
+		context.setBridge( bridgeParameterType, bridge );
+	}
+
 	private <B extends ValueBridge<V, F>, V, F> void doBind(BeanHolder<B> bridgeHolder, ValueBindingContext<?> context) {
 		ValueBridge<V, F> bridge = bridgeHolder.get();
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
@@ -135,9 +159,5 @@ public final class BeanBridgeBuilder
 
 	private <T> BeanHolder<? extends T> doBuild(BeanResolver beanResolver, Class<T> expectedType) {
 		return beanReference.asSubTypeOf( expectedType ).resolve( beanResolver );
-	}
-
-	private <T> BeanHolder<? extends T> doBuild(BridgeBuildContext buildContext, Class<T> expectedType) {
-		return doBuild( buildContext.getBeanResolver(), expectedType );
 	}
 }
