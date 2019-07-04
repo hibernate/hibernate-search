@@ -61,8 +61,8 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDValueBrid
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneIdValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneOffsetValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.PassThroughValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
@@ -74,11 +74,11 @@ public final class BridgeResolver {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<Class<?>, IdentifierBridgeBuilder> exactRawTypeIdentifierBridgeMappings = new HashMap<>();
-	private final Map<Class<?>, ValueBridgeBuilder> exactRawTypeValueBridgeMappings = new HashMap<>();
+	private final Map<Class<?>, IdentifierBinder> exactRawTypeIdentifierBridgeMappings = new HashMap<>();
+	private final Map<Class<?>, ValueBinder> exactRawTypeValueBridgeMappings = new HashMap<>();
 
-	private final List<TypePatternBridgeMapping<IdentifierBridgeBuilder>> typePatternIdentifierBridgeMappings = new ArrayList<>();
-	private final List<TypePatternBridgeMapping<ValueBridgeBuilder>> typePatternValueBridgeMappings = new ArrayList<>();
+	private final List<TypePatternBinderMapping<IdentifierBinder>> typePatternIdentifierBridgeMappings = new ArrayList<>();
+	private final List<TypePatternBinderMapping<ValueBinder>> typePatternValueBridgeMappings = new ArrayList<>();
 
 	public BridgeResolver(TypePatternMatcherFactory typePatternMatcherFactory) {
 		// TODO HSEARCH-3096 add an extension point to override these maps, or at least to add defaults for other types
@@ -88,36 +88,36 @@ public final class BridgeResolver {
 
 		addIdentifierBridgeForExactRawType( Integer.class, new DefaultIntegerIdentifierBridge() );
 		addIdentifierBridgeForExactRawType( Long.class, new DefaultLongIdentifierBridge() );
-		addIdentifierBridgeForTypePattern( concreteEnumPattern, new DefaultEnumIdentifierBridge.Builder() );
+		addIdentifierBinderForTypePattern( concreteEnumPattern, new DefaultEnumIdentifierBridge.Binder() );
 		addIdentifierBridgeForExactRawType( Short.class, new DefaultShortIdentifierBridge() );
 		addIdentifierBridgeForExactRawType( BigInteger.class, new DefaultBigIntegerIdentifierBridge() );
 		addIdentifierBridgeForExactRawType( UUID.class, new DefaultUUIDIdentifierBridge() );
 
-		addValueBridgeForExactRawType( Integer.class, new PassThroughValueBridge.Builder<>( Integer.class, ConvertUtils::convertInteger ) );
-		addValueBridgeForExactRawType( Long.class, new PassThroughValueBridge.Builder<>( Long.class, ConvertUtils::convertLong ) );
-		addValueBridgeForExactRawType( Boolean.class, new PassThroughValueBridge.Builder<>( Boolean.class, ConvertUtils::convertBoolean ) );
-		addValueBridgeForExactRawType( String.class, new PassThroughValueBridge.Builder<>( String.class, ParseUtils::parseString ) );
-		addValueBridgeForExactRawType( LocalDate.class, new PassThroughValueBridge.Builder<>( LocalDate.class, ParseUtils::parseLocalDate ) );
-		addValueBridgeForExactRawType( Instant.class, new PassThroughValueBridge.Builder<>( Instant.class, ParseUtils::parseInstant ) );
+		addValueBinderForExactRawType( Integer.class, new PassThroughValueBridge.Binder<>( Integer.class, ConvertUtils::convertInteger ) );
+		addValueBinderForExactRawType( Long.class, new PassThroughValueBridge.Binder<>( Long.class, ConvertUtils::convertLong ) );
+		addValueBinderForExactRawType( Boolean.class, new PassThroughValueBridge.Binder<>( Boolean.class, ConvertUtils::convertBoolean ) );
+		addValueBinderForExactRawType( String.class, new PassThroughValueBridge.Binder<>( String.class, ParseUtils::parseString ) );
+		addValueBinderForExactRawType( LocalDate.class, new PassThroughValueBridge.Binder<>( LocalDate.class, ParseUtils::parseLocalDate ) );
+		addValueBinderForExactRawType( Instant.class, new PassThroughValueBridge.Binder<>( Instant.class, ParseUtils::parseInstant ) );
 		addValueBridgeForExactRawType( Date.class, new DefaultJavaUtilDateValueBridge() );
 		addValueBridgeForExactRawType( Calendar.class, new DefaultJavaUtilCalendarValueBridge() );
-		addValueBridgeForTypePattern( concreteEnumPattern, new DefaultEnumValueBridge.Builder() );
+		addValueBinderForTypePattern( concreteEnumPattern, new DefaultEnumValueBridge.Binder() );
 		addValueBridgeForExactRawType( Character.class, new DefaultCharacterValueBridge() );
-		addValueBridgeForExactRawType( Byte.class, new PassThroughValueBridge.Builder<>( Byte.class, ConvertUtils::convertByte ) );
-		addValueBridgeForExactRawType( Short.class, new PassThroughValueBridge.Builder<>( Short.class, ConvertUtils::convertShort ) );
-		addValueBridgeForExactRawType( Float.class, new PassThroughValueBridge.Builder<>( Float.class, ConvertUtils::convertFloat ) );
-		addValueBridgeForExactRawType( Double.class, new PassThroughValueBridge.Builder<>( Double.class, ConvertUtils::convertDouble ) );
-		addValueBridgeForExactRawType( BigDecimal.class, new PassThroughValueBridge.Builder<>( BigDecimal.class, ConvertUtils::convertBigDecimal ) );
-		addValueBridgeForExactRawType( BigInteger.class, new PassThroughValueBridge.Builder<>( BigInteger.class, ConvertUtils::convertBigInteger ) );
+		addValueBinderForExactRawType( Byte.class, new PassThroughValueBridge.Binder<>( Byte.class, ConvertUtils::convertByte ) );
+		addValueBinderForExactRawType( Short.class, new PassThroughValueBridge.Binder<>( Short.class, ConvertUtils::convertShort ) );
+		addValueBinderForExactRawType( Float.class, new PassThroughValueBridge.Binder<>( Float.class, ConvertUtils::convertFloat ) );
+		addValueBinderForExactRawType( Double.class, new PassThroughValueBridge.Binder<>( Double.class, ConvertUtils::convertDouble ) );
+		addValueBinderForExactRawType( BigDecimal.class, new PassThroughValueBridge.Binder<>( BigDecimal.class, ConvertUtils::convertBigDecimal ) );
+		addValueBinderForExactRawType( BigInteger.class, new PassThroughValueBridge.Binder<>( BigInteger.class, ConvertUtils::convertBigInteger ) );
 		addValueBridgeForExactRawType( UUID.class, new DefaultUUIDValueBridge() );
-		addValueBridgeForExactRawType( LocalDateTime.class, new PassThroughValueBridge.Builder<>( LocalDateTime.class, ParseUtils::parseLocalDateTime ) );
-		addValueBridgeForExactRawType( LocalTime.class, new PassThroughValueBridge.Builder<>( LocalTime.class, ParseUtils::parseLocalTime ) );
-		addValueBridgeForExactRawType( ZonedDateTime.class, new PassThroughValueBridge.Builder<>( ZonedDateTime.class, ParseUtils::parseZonedDateTime ) );
-		addValueBridgeForExactRawType( Year.class, new PassThroughValueBridge.Builder<>( Year.class, ParseUtils::parseYear ) );
-		addValueBridgeForExactRawType( YearMonth.class, new PassThroughValueBridge.Builder<>( YearMonth.class, ParseUtils::parseYearMonth ) );
-		addValueBridgeForExactRawType( MonthDay.class, new PassThroughValueBridge.Builder<>( MonthDay.class, ParseUtils::parseMonthDay ) );
-		addValueBridgeForExactRawType( OffsetDateTime.class, new PassThroughValueBridge.Builder<>( OffsetDateTime.class, ParseUtils::parseOffsetDateTime ) );
-		addValueBridgeForExactRawType( OffsetTime.class, new PassThroughValueBridge.Builder<>( OffsetTime.class, ParseUtils::parseOffsetTime ) );
+		addValueBinderForExactRawType( LocalDateTime.class, new PassThroughValueBridge.Binder<>( LocalDateTime.class, ParseUtils::parseLocalDateTime ) );
+		addValueBinderForExactRawType( LocalTime.class, new PassThroughValueBridge.Binder<>( LocalTime.class, ParseUtils::parseLocalTime ) );
+		addValueBinderForExactRawType( ZonedDateTime.class, new PassThroughValueBridge.Binder<>( ZonedDateTime.class, ParseUtils::parseZonedDateTime ) );
+		addValueBinderForExactRawType( Year.class, new PassThroughValueBridge.Binder<>( Year.class, ParseUtils::parseYear ) );
+		addValueBinderForExactRawType( YearMonth.class, new PassThroughValueBridge.Binder<>( YearMonth.class, ParseUtils::parseYearMonth ) );
+		addValueBinderForExactRawType( MonthDay.class, new PassThroughValueBridge.Binder<>( MonthDay.class, ParseUtils::parseMonthDay ) );
+		addValueBinderForExactRawType( OffsetDateTime.class, new PassThroughValueBridge.Binder<>( OffsetDateTime.class, ParseUtils::parseOffsetDateTime ) );
+		addValueBinderForExactRawType( OffsetTime.class, new PassThroughValueBridge.Binder<>( OffsetTime.class, ParseUtils::parseOffsetTime ) );
 		addValueBridgeForExactRawType( ZoneOffset.class, new DefaultZoneOffsetValueBridge() );
 		addValueBridgeForExactRawType( ZoneId.class, new DefaultZoneIdValueBridge() );
 		addValueBridgeForExactRawType( Period.class, new DefaultPeriodValueBridge() );
@@ -129,8 +129,8 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( Time.class, new DefaultJavaSqlTimeValueBridge() );
 	}
 
-	public IdentifierBridgeBuilder resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {
-		IdentifierBridgeBuilder result = getBridgeBuilderOrNull(
+	public IdentifierBinder resolveIdentifierBinderForType(PojoGenericTypeModel<?> sourceType) {
+		IdentifierBinder result = getBinderOrNull(
 				sourceType,
 				exactRawTypeIdentifierBridgeMappings,
 				typePatternIdentifierBridgeMappings
@@ -141,8 +141,8 @@ public final class BridgeResolver {
 		return result;
 	}
 
-	public ValueBridgeBuilder resolveValueBridgeForType(PojoGenericTypeModel<?> sourceType) {
-		ValueBridgeBuilder result = getBridgeBuilderOrNull(
+	public ValueBinder resolveValueBinderForType(PojoGenericTypeModel<?> sourceType) {
+		ValueBinder result = getBinderOrNull(
 				sourceType,
 				exactRawTypeValueBridgeMappings,
 				typePatternValueBridgeMappings
@@ -153,60 +153,60 @@ public final class BridgeResolver {
 		return result;
 	}
 
-	private <I> void addIdentifierBridgeForExactRawType(Class<I> type, IdentifierBridgeBuilder builder) {
-		exactRawTypeIdentifierBridgeMappings.put( type, builder );
+	private <I> void addIdentifierBinderForExactRawType(Class<I> type, IdentifierBinder binder) {
+		exactRawTypeIdentifierBridgeMappings.put( type, binder );
 	}
 
 	private <I> void addIdentifierBridgeForExactRawType(Class<I> type, IdentifierBridge<I> bridge) {
-		addIdentifierBridgeForExactRawType( type, context -> context.setBridge( type, bridge ) );
+		addIdentifierBinderForExactRawType( type, context -> context.setBridge( type, bridge ) );
 	}
 
-	private void addIdentifierBridgeForTypePattern(TypePatternMatcher typePatternMatcher,
-			IdentifierBridgeBuilder builder) {
-		typePatternIdentifierBridgeMappings.add( new TypePatternBridgeMapping<>( typePatternMatcher, builder ) );
+	private void addIdentifierBinderForTypePattern(TypePatternMatcher typePatternMatcher,
+			IdentifierBinder binder) {
+		typePatternIdentifierBridgeMappings.add( new TypePatternBinderMapping<>( typePatternMatcher, binder ) );
 	}
 
-	private <V> void addValueBridgeForExactRawType(Class<V> type, ValueBridgeBuilder builder) {
-		exactRawTypeValueBridgeMappings.put( type, builder );
+	private <V> void addValueBinderForExactRawType(Class<V> type, ValueBinder binder) {
+		exactRawTypeValueBridgeMappings.put( type, binder );
 	}
 
 	private <V> void addValueBridgeForExactRawType(Class<V> type, ValueBridge<V, ?> bridge) {
-		addValueBridgeForExactRawType( type, context -> context.setBridge( type, bridge ) );
+		addValueBinderForExactRawType( type, context -> context.setBridge( type, bridge ) );
 	}
 
-	private void addValueBridgeForTypePattern(TypePatternMatcher typePatternMatcher,
-			ValueBridgeBuilder builder) {
-		typePatternValueBridgeMappings.add( new TypePatternBridgeMapping<>( typePatternMatcher, builder ) );
+	private void addValueBinderForTypePattern(TypePatternMatcher typePatternMatcher,
+			ValueBinder binder) {
+		typePatternValueBridgeMappings.add( new TypePatternBinderMapping<>( typePatternMatcher, binder ) );
 	}
 
-	private static <B> B getBridgeBuilderOrNull(PojoGenericTypeModel<?> sourceType,
+	private static <B> B getBinderOrNull(PojoGenericTypeModel<?> sourceType,
 			Map<Class<?>, B> exactRawTypeBridgeMappings,
-			List<TypePatternBridgeMapping<B>> typePatternBridgeMappings) {
+			List<TypePatternBinderMapping<B>> typePatternBinderMappings) {
 		Class<?> rawType = sourceType.getRawType().getJavaClass();
 		B result = exactRawTypeBridgeMappings.get( rawType );
 
 		if ( result == null ) {
-			Iterator<TypePatternBridgeMapping<B>> mappingIterator = typePatternBridgeMappings.iterator();
+			Iterator<TypePatternBinderMapping<B>> mappingIterator = typePatternBinderMappings.iterator();
 			while ( result == null && mappingIterator.hasNext() ) {
-				result = mappingIterator.next().getBuilderIfMatching( sourceType );
+				result = mappingIterator.next().getBinderIfMatching( sourceType );
 			}
 		}
 
 		return result;
 	}
 
-	private static final class TypePatternBridgeMapping<B> {
+	private static final class TypePatternBinderMapping<B> {
 		private final TypePatternMatcher matcher;
-		private final B builder;
+		private final B binder;
 
-		TypePatternBridgeMapping(TypePatternMatcher matcher, B builder) {
+		TypePatternBinderMapping(TypePatternMatcher matcher, B binder) {
 			this.matcher = matcher;
-			this.builder = builder;
+			this.binder = binder;
 		}
 
-		B getBuilderIfMatching(PojoGenericTypeModel<?> typeModel) {
+		B getBinderIfMatching(PojoGenericTypeModel<?> typeModel) {
 			if ( matcher.matches( typeModel ) ) {
-				return builder;
+				return binder;
 			}
 			else {
 				return null;

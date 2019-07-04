@@ -66,7 +66,7 @@ public final class AnnotationInitializingBeanDelegatingMarkerBuilder<A extends A
 								+ " There is a bug in Hibernate Search, please report it."
 				) );
 		if ( !builderAnnotationType.isAssignableFrom( annotationType ) ) {
-			throw log.invalidAnnotationTypeForBuilder( delegate, annotationType );
+			throw log.invalidAnnotationTypeForBinder( delegate, annotationType );
 		}
 
 		@SuppressWarnings("unchecked") // Checked using reflection just above

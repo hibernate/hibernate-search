@@ -10,11 +10,14 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 
 /**
- * A builder of {@link IdentifierBridge}.
+ * A binder from a POJO property to a document identifier.
+ * <p>
+ * This binder takes advantage of provided metadata
+ * to pick, configure and create a {@link IdentifierBridge}.
  *
  * @see IdentifierBridge
  */
-public interface IdentifierBridgeBuilder {
+public interface IdentifierBinder {
 
 	/**
 	 * Binds a POJO property to a document identifier.

@@ -17,8 +17,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.impl.PropertyIdentifierMa
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.ProvidedStringIdentifierMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.RoutingKeyBridgeRoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.RoutingKeyProvider;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
@@ -74,9 +74,9 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 
 	@Override
 	public <T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
-			IdentifierBridgeBuilder builder) {
+			IdentifierBinder binder) {
 		BoundIdentifierBridge<T> boundIdentifierBridge = mappingHelper.getIndexModelBinder()
-				.addIdentifierBridge( indexManagerBuildingState.getIndexedEntityBindingContext(), modelPath, builder );
+				.bindIdentifier( indexManagerBuildingState.getIndexedEntityBindingContext(), modelPath, binder );
 		PojoPropertyModel<T> propertyModel = modelPath.getPropertyModel();
 		this.identifierMapping = new PropertyIdentifierMapping<>(
 				propertyModel.getTypeModel().getRawType().getCaster(),
@@ -88,9 +88,9 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 
 	@Override
 	public <T> BoundRoutingKeyBridge<T> routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
-			RoutingKeyBridgeBuilder<?> builder) {
+			RoutingKeyBinder<?> binder) {
 		BoundRoutingKeyBridge<T> boundRoutingKeyBridge = mappingHelper.getIndexModelBinder()
-				.addRoutingKeyBridge( indexManagerBuildingState.getIndexedEntityBindingContext(), modelPath, builder );
+				.bindRoutingKey( indexManagerBuildingState.getIndexedEntityBindingContext(), modelPath, binder );
 		this.routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( boundRoutingKeyBridge.getBridgeHolder() );
 		return boundRoutingKeyBridge;
 	}

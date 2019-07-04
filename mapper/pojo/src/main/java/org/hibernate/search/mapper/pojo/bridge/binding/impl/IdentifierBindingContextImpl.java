@@ -13,7 +13,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
@@ -74,12 +74,12 @@ public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
 		return bridgedElement;
 	}
 
-	public BoundIdentifierBridge<I> applyBuilder(IdentifierBridgeBuilder bridgeBuilder) {
+	public BoundIdentifierBridge<I> applyBinder(IdentifierBinder binder) {
 		try {
 			// This call should set the partial binding
-			bridgeBuilder.bind( this );
+			binder.bind( this );
 			if ( partialBinding == null ) {
-				throw log.missingBridgeForBridgeBuilder( bridgeBuilder );
+				throw log.missingBridgeForBinder( binder );
 			}
 
 			return partialBinding.complete( indexedEntityBindingContext );

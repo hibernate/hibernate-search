@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
@@ -62,8 +62,8 @@ public final class CustomPropertyBridge implements PropertyBridge {
 		// Nothing to do
 	}
 
-	public static final class Builder
-			implements PropertyBridgeBuilder<CustomPropertyBridgeAnnotation> {
+	public static final class Binder
+			implements PropertyBinder<CustomPropertyBridgeAnnotation> {
 
 		private String objectName;
 
@@ -72,7 +72,7 @@ public final class CustomPropertyBridge implements PropertyBridge {
 			objectName( annotation.objectName() );
 		}
 
-		public Builder objectName(String value) {
+		public Binder objectName(String value) {
 			this.objectName = value;
 			return this;
 		}

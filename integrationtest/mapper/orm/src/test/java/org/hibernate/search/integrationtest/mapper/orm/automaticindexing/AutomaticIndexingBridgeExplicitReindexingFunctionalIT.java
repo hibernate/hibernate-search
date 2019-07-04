@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationC
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -71,7 +71,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 							@Override
 							public void configure(HibernateOrmMappingConfigurationContext context) {
 								context.programmaticMapping().type( IndexedEntity.class )
-										.bridge( new QueryBasedTypeBridge.Builder() );
+										.bridge( new QueryBasedTypeBridge.Binder() );
 							}
 						}
 				)
@@ -274,7 +274,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 			}
 		}
 
-		public static class Builder implements TypeBridgeBuilder<Annotation> {
+		public static class Binder implements TypeBinder<Annotation> {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new QueryBasedTypeBridge( context ) );

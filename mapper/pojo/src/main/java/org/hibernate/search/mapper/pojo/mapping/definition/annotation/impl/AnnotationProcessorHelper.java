@@ -26,17 +26,17 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.Ro
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingMarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
@@ -118,7 +118,7 @@ class AnnotationProcessorHelper {
 	}
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
-	IdentifierBridgeBuilder createIdentifierBridgeBuilder(
+	IdentifierBinder createIdentifierBinder(
 			DocumentId annotation, PojoPropertyModel<?> annotationHolder) {
 		IdentifierBridgeRef bridgeReferenceAnnotation = annotation.identifierBridge();
 		Optional<BeanReference<? extends IdentifierBridge>> bridgeReference = toBeanReference(
@@ -126,20 +126,20 @@ class AnnotationProcessorHelper {
 				IdentifierBridgeRef.UndefinedBridgeImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
-		Optional<BeanReference<? extends IdentifierBridgeBuilder>> bridgeBuilderReference = toBeanReference(
-				IdentifierBridgeBuilder.class,
-				IdentifierBridgeRef.UndefinedBuilderImplementationType.class,
-				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
+		Optional<BeanReference<? extends IdentifierBinder>> binderReference = toBeanReference(
+				IdentifierBinder.class,
+				IdentifierBridgeRef.UndefinedBinderImplementationType.class,
+				bridgeReferenceAnnotation.binderType(), bridgeReferenceAnnotation.binderName()
 		);
 
-		if ( bridgeReference.isPresent() && bridgeBuilderReference.isPresent() ) {
-			throw log.invalidDocumentIdDefiningBothBridgeReferenceAndBridgeBuilderReference( annotationHolder.getName() );
+		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
+			throw log.invalidDocumentIdDefiningBothBridgeReferenceAndBinderReference( annotationHolder.getName() );
 		}
 		else if ( bridgeReference.isPresent() ) {
-			return new BeanBridgeBuilder( bridgeReference.get() );
+			return new BeanBinder( bridgeReference.get() );
 		}
-		else if ( bridgeBuilderReference.isPresent() ) {
-			return new BeanDelegatingBridgeBuilder( bridgeBuilderReference.get() );
+		else if ( binderReference.isPresent() ) {
+			return new BeanDelegatingBinder( binderReference.get() );
 		}
 		else {
 			// The bridge will be auto-detected from the property type
@@ -147,7 +147,7 @@ class AnnotationProcessorHelper {
 		}
 	}
 
-	<A extends Annotation> RoutingKeyBridgeBuilder createRoutingKeyBridgeBuilder(A annotation) {
+	<A extends Annotation> RoutingKeyBinder createRoutingKeyBinder(A annotation) {
 		RoutingKeyBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( RoutingKeyBridgeMapping.class );
 		RoutingKeyBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
 		Optional<BeanReference<? extends RoutingKeyBridge>> bridgeReference = toBeanReference(
@@ -155,25 +155,25 @@ class AnnotationProcessorHelper {
 				RoutingKeyBridgeRef.UndefinedBridgeImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
-		Optional<BeanReference<? extends RoutingKeyBridgeBuilder>> builderReference = toBeanReference(
-				RoutingKeyBridgeBuilder.class,
-				RoutingKeyBridgeRef.UndefinedBuilderImplementationType.class,
-				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
+		Optional<BeanReference<? extends RoutingKeyBinder>> binderReference = toBeanReference(
+				RoutingKeyBinder.class,
+				RoutingKeyBridgeRef.UndefinedBinderImplementationType.class,
+				bridgeReferenceAnnotation.binderType(), bridgeReferenceAnnotation.binderName()
 		);
 
-		if ( bridgeReference.isPresent() && builderReference.isPresent() ) {
+		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
 			throw log.conflictingBridgeReferenceInBridgeMapping(
 					bridgeMapping.annotationType(), annotation.annotationType()
 			);
 		}
 		else if ( bridgeReference.isPresent() ) {
-			return new BeanBridgeBuilder( bridgeReference.get() );
+			return new BeanBinder( bridgeReference.get() );
 		}
-		else if ( builderReference.isPresent() ) {
-			RoutingKeyBridgeBuilder<A> builder =
-					new AnnotationInitializingBeanDelegatingBridgeBuilder<>( builderReference.get() );
-			builder.initialize( annotation );
-			return builder;
+		else if ( binderReference.isPresent() ) {
+			RoutingKeyBinder<A> binder =
+					new AnnotationInitializingBeanDelegatingBinder<>( binderReference.get() );
+			binder.initialize( annotation );
+			return binder;
 		}
 		else {
 			throw log.missingBridgeReferenceInBridgeMapping(
@@ -182,7 +182,7 @@ class AnnotationProcessorHelper {
 		}
 	}
 
-	<A extends Annotation> TypeBridgeBuilder createTypeBridgeBuilder(A annotation) {
+	<A extends Annotation> TypeBinder createTypeBinder(A annotation) {
 		TypeBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( TypeBridgeMapping.class );
 		TypeBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
 		Optional<BeanReference<? extends TypeBridge>> bridgeReference = toBeanReference(
@@ -190,25 +190,25 @@ class AnnotationProcessorHelper {
 				TypeBridgeRef.UndefinedBridgeImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
-		Optional<BeanReference<? extends TypeBridgeBuilder>> builderReference = toBeanReference(
-				TypeBridgeBuilder.class,
-				TypeBridgeRef.UndefinedBuilderImplementationType.class,
-				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
+		Optional<BeanReference<? extends TypeBinder>> binderReference = toBeanReference(
+				TypeBinder.class,
+				TypeBridgeRef.UndefinedBinderImplementationType.class,
+				bridgeReferenceAnnotation.binderType(), bridgeReferenceAnnotation.binderName()
 		);
 
-		if ( bridgeReference.isPresent() && builderReference.isPresent() ) {
+		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
 			throw log.conflictingBridgeReferenceInBridgeMapping(
 					bridgeMapping.annotationType(), annotation.annotationType()
 			);
 		}
 		else if ( bridgeReference.isPresent() ) {
-			return new BeanBridgeBuilder( bridgeReference.get() );
+			return new BeanBinder( bridgeReference.get() );
 		}
-		else if ( builderReference.isPresent() ) {
-			TypeBridgeBuilder<A> builder =
-					new AnnotationInitializingBeanDelegatingBridgeBuilder<>( builderReference.get() );
-			builder.initialize( annotation );
-			return builder;
+		else if ( binderReference.isPresent() ) {
+			TypeBinder<A> binder =
+					new AnnotationInitializingBeanDelegatingBinder<>( binderReference.get() );
+			binder.initialize( annotation );
+			return binder;
 		}
 		else {
 			throw log.missingBridgeReferenceInBridgeMapping(
@@ -217,7 +217,7 @@ class AnnotationProcessorHelper {
 		}
 	}
 
-	<A extends Annotation> PropertyBridgeBuilder createPropertyBridgeBuilder(A annotation) {
+	<A extends Annotation> PropertyBinder createPropertyBinder(A annotation) {
 		PropertyBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( PropertyBridgeMapping.class );
 		PropertyBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
 		Optional<BeanReference<? extends PropertyBridge>> bridgeReference = toBeanReference(
@@ -225,25 +225,25 @@ class AnnotationProcessorHelper {
 				PropertyBridgeRef.UndefinedBridgeImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
-		Optional<BeanReference<? extends PropertyBridgeBuilder>> builderReference = toBeanReference(
-				PropertyBridgeBuilder.class,
-				PropertyBridgeRef.UndefinedBuilderImplementationType.class,
-				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
+		Optional<BeanReference<? extends PropertyBinder>> binderReference = toBeanReference(
+				PropertyBinder.class,
+				PropertyBridgeRef.UndefinedBinderImplementationType.class,
+				bridgeReferenceAnnotation.binderType(), bridgeReferenceAnnotation.binderName()
 		);
 
-		if ( bridgeReference.isPresent() && builderReference.isPresent() ) {
+		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
 			throw log.conflictingBridgeReferenceInBridgeMapping(
 					bridgeMapping.annotationType(), annotation.annotationType()
 			);
 		}
 		else if ( bridgeReference.isPresent() ) {
-			return new BeanBridgeBuilder( bridgeReference.get() );
+			return new BeanBinder( bridgeReference.get() );
 		}
-		else if ( builderReference.isPresent() ) {
-			PropertyBridgeBuilder<A> builder =
-					new AnnotationInitializingBeanDelegatingBridgeBuilder<>( builderReference.get() );
-			builder.initialize( annotation );
-			return builder;
+		else if ( binderReference.isPresent() ) {
+			PropertyBinder<A> binder =
+					new AnnotationInitializingBeanDelegatingBinder<>( binderReference.get() );
+			binder.initialize( annotation );
+			return binder;
 		}
 		else {
 			throw log.missingBridgeReferenceInBridgeMapping(
@@ -253,7 +253,7 @@ class AnnotationProcessorHelper {
 	}
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
-	ValueBridgeBuilder createValueBridgeBuilder(
+	ValueBinder createValueBinder(
 			ValueBridgeRef bridgeReferenceAnnotation,
 			PojoPropertyModel<?> annotationHolder) {
 		Optional<BeanReference<? extends ValueBridge>> bridgeReference = toBeanReference(
@@ -261,20 +261,20 @@ class AnnotationProcessorHelper {
 				ValueBridgeRef.UndefinedBridgeImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
-		Optional<BeanReference<? extends ValueBridgeBuilder>> bridgeBuilderReference = toBeanReference(
-				ValueBridgeBuilder.class,
-				ValueBridgeRef.UndefinedBuilderImplementationType.class,
-				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
+		Optional<BeanReference<? extends ValueBinder>> binderReference = toBeanReference(
+				ValueBinder.class,
+				ValueBridgeRef.UndefinedBinderImplementationType.class,
+				bridgeReferenceAnnotation.binderType(), bridgeReferenceAnnotation.binderName()
 		);
 
-		if ( bridgeReference.isPresent() && bridgeBuilderReference.isPresent() ) {
-			throw log.invalidFieldDefiningBothBridgeReferenceAndBridgeBuilderReference( annotationHolder.getName() );
+		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
+			throw log.invalidFieldDefiningBothBridgeReferenceAndBinderReference( annotationHolder.getName() );
 		}
 		else if ( bridgeReference.isPresent() ) {
-			return new BeanBridgeBuilder( bridgeReference.get() );
+			return new BeanBinder( bridgeReference.get() );
 		}
-		else if ( bridgeBuilderReference.isPresent() ) {
-			return new BeanDelegatingBridgeBuilder( bridgeBuilderReference.get() );
+		else if ( binderReference.isPresent() ) {
+			return new BeanDelegatingBinder( binderReference.get() );
 		}
 		else {
 			// The bridge will be auto-detected from the property type

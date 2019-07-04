@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.Pr
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -229,7 +229,7 @@ public class AnnotationMappingDiscoveryIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.METHOD, ElementType.FIELD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(builderType = CustomMarkerConsumingPropertyBridge.Builder.class))
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(binderType = CustomMarkerConsumingPropertyBridge.Binder.class))
 	private @interface CustomMarkerConsumingPropertyBridgeAnnotation {
 
 	}
@@ -273,7 +273,7 @@ public class AnnotationMappingDiscoveryIT {
 			}
 		}
 
-		public static class Builder implements PropertyBridgeBuilder<Annotation> {
+		public static class Binder implements PropertyBinder<Annotation> {
 			@Override
 			public void bind(PropertyBindingContext context) {
 				context.setBridge( new CustomMarkerConsumingPropertyBridge( context ) );

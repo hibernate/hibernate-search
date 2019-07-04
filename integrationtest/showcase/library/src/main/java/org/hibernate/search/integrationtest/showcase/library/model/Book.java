@@ -29,7 +29,7 @@ public class Book extends Document<BookCopy> {
 
 	@Basic
 	@Type(type = ISBNUserType.NAME)
-	@GenericField(valueBridge = @ValueBridgeRef(builderType = ISBNBridge.Builder.class))
+	@GenericField(valueBridge = @ValueBridgeRef(binderType = ISBNBridge.Binder.class))
 	private ISBN isbn;
 
 	public Book() {

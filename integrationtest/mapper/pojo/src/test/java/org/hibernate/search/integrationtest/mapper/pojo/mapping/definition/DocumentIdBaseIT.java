@@ -193,12 +193,12 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void error_definingBothBridgeReferenceAndBridgeBuilderReference() {
+	public void error_definingBothBridgeReferenceAndBinderReference() {
 		@Indexed
 		class IndexedEntity {
 			Object id;
 			@DocumentId(
-					identifierBridge = @IdentifierBridgeRef(name = "foo", builderName = "bar")
+					identifierBridge = @IdentifierBridgeRef(name = "foo", binderName = "bar")
 			)
 			public Object getId() {
 				return id;
@@ -214,7 +214,7 @@ public class DocumentIdBaseIT {
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( DocumentId.class )
 						.failure(
-								"Annotation @DocumentId on property 'id' defines both identifierBridge and identifierBridgeBuilder."
+								"Annotation @DocumentId on property 'id' defines both identifierBridge and identifierBinder."
 										+ " Only one of those can be defined, not both."
 						)
 						.build()

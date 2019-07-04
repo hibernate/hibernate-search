@@ -15,29 +15,29 @@ import java.lang.annotation.Target;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 
 /**
  * Reference a bridge for a {@link RoutingKeyBridgeMapping}.
  * <p>
- * Either a bridge or a bridge builder can be provided, but never both.
- * Reference can be obtained using either a name or a type.
+ * Either a bridge or a binder can be referenced, but never both.
+ * References can use either a name, a type, or both.
  * <p>
- * If a <b>direct bridge</b> is provided, using the methods {@link #name()} or {@link #type()},
+ * If a <b>bridge</b> is referenced directly, using the methods {@link #name()} or {@link #type()},
  * each time the mapped annotation is encountered, an instance of the routing key bridge will be created
  * and applied to the location where the annotation was found.
  * <p>
  * Routing key bridges mapped this way cannot be parameterized:
  * any attribute of the mapped annotation will be ignored.
  * <p>
- * If an <b>annotation bridge builder</b> is provided, using the methods {@link #builderName()} or {@link #builderType()},
- * each time the mapped annotation is encountered, an instance of the routing key bridge builder will be created.
- * The builder will be passed the annotation through its {@link RoutingKeyBridgeBuilder#initialize(Annotation)} method,
- * and then the bridge will be created and bound by {@link RoutingKeyBridgeBuilder#bind(RoutingKeyBindingContext)}.
+ * If a <b>binder</b> is referenced, using the methods {@link #binderName()} or {@link #binderType()},
+ * each time the mapped annotation is encountered, an instance of the routing key binder will be created.
+ * The binder will be passed the annotation through its {@link RoutingKeyBinder#initialize(Annotation)} method,
+ * and then the bridge will be created and bound by {@link RoutingKeyBinder#bind(RoutingKeyBindingContext)}.
  * <p>
  * Routing key bridges mapped this way can be parameterized:
- * the bridge will be able to take any attribute of the mapped annotation into account
- * in its {@link RoutingKeyBridgeBuilder#initialize(Annotation)} method.
+ * the binder will be able to take any attribute of the mapped annotation into account
+ * in its {@link RoutingKeyBinder#initialize(Annotation)} method.
  *
  */
 @Documented
@@ -58,16 +58,16 @@ public @interface RoutingKeyBridgeRef {
 	Class<? extends RoutingKeyBridge> type() default UndefinedBridgeImplementationType.class;
 
 	/**
-	 * Reference a routing key bridge by the bean name of its builder.
-	 * @return The bean name of the routing key bridge builder.
+	 * Reference a routing key bridge by the bean name of its binder.
+	 * @return The bean name of the routing key binder.
 	 */
-	String builderName() default "";
+	String binderName() default "";
 
 	/**
-	 * Reference a routing key bridge by the type of its builder.
-	 * @return The type of the routing key bridge builder.
+	 * Reference a routing key bridge by the type of its binder.
+	 * @return The type of the routing key binder.
 	 */
-	Class<? extends RoutingKeyBridgeBuilder<?>> builderType() default UndefinedBuilderImplementationType.class;
+	Class<? extends RoutingKeyBinder<?>> binderType() default UndefinedBinderImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
@@ -78,10 +78,10 @@ public @interface RoutingKeyBridgeRef {
 	}
 
 	/**
-	 * Class used as a marker for the default value of the {@link #builderType()} attribute.
+	 * Class used as a marker for the default value of the {@link #binderType()} attribute.
 	 */
-	abstract class UndefinedBuilderImplementationType implements RoutingKeyBridgeBuilder<Annotation> {
-		private UndefinedBuilderImplementationType() {
+	abstract class UndefinedBinderImplementationType implements RoutingKeyBinder<Annotation> {
+		private UndefinedBinderImplementationType() {
 		}
 	}
 }

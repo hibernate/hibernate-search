@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.integrationtest.showcase.library.model.Account;
 import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
@@ -85,7 +85,7 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 		borrowalsObject.addValue( totalBorrowalCountReference, borrowals.size() );
 	}
 
-	public static class Builder implements TypeBridgeBuilder<Annotation> {
+	public static class Binder implements TypeBinder<Annotation> {
 		@Override
 		public void bind(TypeBindingContext context) {
 			context.getDependencies()

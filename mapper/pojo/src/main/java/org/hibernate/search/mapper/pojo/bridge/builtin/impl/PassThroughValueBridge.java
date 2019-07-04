@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.util.common.impl.Contracts;
@@ -70,11 +70,11 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 		return fieldType.equals( castedOther.fieldType );
 	}
 
-	public static class Builder<F> implements ValueBridgeBuilder {
+	public static class Binder<F> implements ValueBinder {
 		private final Class<F> rawValueType;
 		private final ValueBridge<F, F> bridge;
 
-		public Builder(Class<F> rawValueType, Function<String, F> parsingFunction) {
+		public Binder(Class<F> rawValueType, Function<String, F> parsingFunction) {
 			this.rawValueType = rawValueType;
 			this.bridge = new PassThroughValueBridge<>( rawValueType, parsingFunction );
 		}

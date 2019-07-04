@@ -16,8 +16,8 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
@@ -31,17 +31,17 @@ import org.hibernate.search.mapper.pojo.model.PojoModelType;
 public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexingBridgeIT {
 
 	@Override
-	protected TypeBridgeBuilder<?> createContainingEntityTypeBridgeBuilder() {
-		return new ContainingEntityTypeBridge.Builder();
+	protected TypeBinder<?> createContainingEntityTypeBinder() {
+		return new ContainingEntityTypeBridge.Binder();
 	}
 
 	@Override
-	protected PropertyBridgeBuilder<?> createContainingEntitySingleValuedPropertyBridgeBuilder() {
-		return new ContainingEntitySingleValuedPropertyBridge.Builder();
+	protected PropertyBinder<?> createContainingEntitySingleValuedPropertyBinder() {
+		return new ContainingEntitySingleValuedPropertyBridge.Binder();
 	}
 
 	@Override
-	protected PropertyBridgeBuilder<?> createContainingEntityMultiValuedPropertyBridgeBuilder() {
+	protected PropertyBinder<?> createContainingEntityMultiValuedPropertyBinder() {
 		return null; // Not supported with accessors
 	}
 
@@ -84,7 +84,7 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 			);
 		}
 
-		public static class Builder implements TypeBridgeBuilder<Annotation> {
+		public static class Binder implements TypeBinder<Annotation> {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new ContainingEntityTypeBridge( context ) );
@@ -119,7 +119,7 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 			);
 		}
 
-		public static class Builder implements PropertyBridgeBuilder<Annotation> {
+		public static class Binder implements PropertyBinder<Annotation> {
 			@Override
 			public void bind(PropertyBindingContext context) {
 				context.setBridge( new ContainingEntitySingleValuedPropertyBridge( context ) );

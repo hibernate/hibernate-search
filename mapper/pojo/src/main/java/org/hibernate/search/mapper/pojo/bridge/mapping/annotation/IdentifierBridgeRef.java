@@ -12,14 +12,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
 /**
  * A reference to the identifier bridge to use for a {@link DocumentId}.
  * <p>
- * Either a bridge or a bridge builder can be provided, but never both.
- * Reference can be obtained using either a name or a type.
+ * Either a bridge or a binder can be referenced, but never both.
+ * References can use either a name, a type, or both.
  */
 @Documented
 @Target({}) // Only used as a component in other annotations
@@ -39,16 +39,16 @@ public @interface IdentifierBridgeRef {
 	Class<? extends IdentifierBridge> type() default UndefinedBridgeImplementationType.class;
 
 	/**
-	 * Reference an identifier bridge by the bean name of its builder.
-	 * @return The bean name of the  identifier bridge builder.
+	 * Reference an identifier bridge by the bean name of its binder.
+	 * @return The bean name of the identifier binder.
 	 */
-	String builderName() default "";
+	String binderName() default "";
 
 	/**
-	 * Reference an identifier bridge by the type of its builder.
-	 * @return The type of the  identifier bridge builder.
+	 * Reference an identifier bridge by the type of its binder.
+	 * @return The type of the identifier binder.
 	 */
-	Class<? extends IdentifierBridgeBuilder> builderType() default UndefinedBuilderImplementationType.class;
+	Class<? extends IdentifierBinder> binderType() default UndefinedBinderImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
@@ -59,10 +59,10 @@ public @interface IdentifierBridgeRef {
 	}
 
 	/**
-	 * Class used as a marker for the default value of the {@link #builderType()} attribute.
+	 * Class used as a marker for the default value of the {@link #binderType()} attribute.
 	 */
-	abstract class UndefinedBuilderImplementationType implements IdentifierBridgeBuilder {
-		private UndefinedBuilderImplementationType() {
+	abstract class UndefinedBinderImplementationType implements IdentifierBinder {
+		private UndefinedBinderImplementationType() {
 		}
 	}
 }

@@ -12,13 +12,12 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 /**
- * A builder of type or property bridges that map types or property values
- * to a {@link GeoPoint} field, representing a point on earth.
+ * A binder from a type or property to a {@link GeoPoint} field, representing a point on earth.
  * <p>
  * These fields allow spatial predicates such as "within" (is the point within a circle, a bounding box, ...),
  * sorts by distance to another point, ...
@@ -28,8 +27,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
  * @see #latitude()
  * @see #longitude()
  */
-public interface GeoPointBridgeBuilder
-		extends TypeBridgeBuilder<GeoPointBridge>, PropertyBridgeBuilder<GeoPointBridge> {
+public interface GeoPointBinder
+		extends TypeBinder<GeoPointBridge>, PropertyBinder<GeoPointBridge> {
 
 	/**
 	 * @param fieldName The name of the {@link GeoPoint} field.
@@ -37,7 +36,7 @@ public interface GeoPointBridgeBuilder
 	 * Otherwise, the name must be defined explicitly.
 	 * @return {@code this}, for method chaining.
 	 */
-	GeoPointBridgeBuilder fieldName(String fieldName);
+	GeoPointBinder fieldName(String fieldName);
 
 	/**
 	 * @param projectable Whether projections are enabled for the {@link GeoPoint} field.
@@ -45,7 +44,7 @@ public interface GeoPointBridgeBuilder
 	 * @see GenericField#projectable()
 	 * @see Projectable
 	 */
-	GeoPointBridgeBuilder projectable(Projectable projectable);
+	GeoPointBinder projectable(Projectable projectable);
 
 	/**
 	 * @param sortable Whether the {@link GeoPoint} field should be sortable by distance.
@@ -53,7 +52,7 @@ public interface GeoPointBridgeBuilder
 	 * @see GenericField#sortable()
 	 * @see Sortable
 	 */
-	GeoPointBridgeBuilder sortable(Sortable sortable);
+	GeoPointBinder sortable(Sortable sortable);
 
 	/**
 	 * @param markerSet The name of the "marker set".
@@ -62,17 +61,17 @@ public interface GeoPointBridgeBuilder
 	 * then select the marker set here.
 	 * @return {@code this}, for method chaining.
 	 */
-	GeoPointBridgeBuilder markerSet(String markerSet);
+	GeoPointBinder markerSet(String markerSet);
 
 	@Override
 	default void initialize(GeoPointBridge annotation) {
 	}
 
 	/**
-	 * @return A {@link GeoPointBridgeBuilder}.
+	 * @return A {@link GeoPointBinder}.
 	 */
-	static GeoPointBridgeBuilder create() {
-		return new org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Builder();
+	static GeoPointBinder create() {
+		return new org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder();
 	}
 
 	/**

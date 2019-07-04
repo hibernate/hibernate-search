@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl;
 
-import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.LatitudeLongitudeMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.AnnotationMarkerBuilder;
@@ -38,7 +38,7 @@ public class LongitudeMarker {
 	private final String markerSet;
 
 	/**
-	 * Private constructor, use {@link GeoPointBridgeBuilder#longitude()} instead.
+	 * Private constructor, use {@link GeoPointBinder#longitude()} instead.
 	 */
 	private LongitudeMarker(String markerSet) {
 		this.markerSet = markerSet;

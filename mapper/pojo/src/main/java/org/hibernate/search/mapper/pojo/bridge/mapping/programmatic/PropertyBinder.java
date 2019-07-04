@@ -14,15 +14,18 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
 /**
- * A builder of {@link PropertyBridge}.
+ * A binder from a POJO property to index fields.
+ * <p>
+ * This binder takes advantage of provided metadata
+ * to pick, configure and create a {@link PropertyBridge}.
  *
  * @param <A> The type of annotations accepted by the {@link #initialize(Annotation)} method.
  * @see PropertyBridge
  */
-public interface PropertyBridgeBuilder<A extends Annotation> {
+public interface PropertyBinder<A extends Annotation> {
 
 	/**
-	 * Initializes the parameters of this builder with the attributes of the given annotation.
+	 * Initializes the parameters of this binder with the attributes of the given annotation.
 	 * @param annotation An annotation to extract parameters from.
 	 */
 	default void initialize(A annotation) {

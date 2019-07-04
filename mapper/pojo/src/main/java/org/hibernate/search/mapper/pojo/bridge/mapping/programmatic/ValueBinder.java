@@ -10,11 +10,14 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 
 /**
- * A builder of {@link ValueBridge}.
+ * A binder from a value to a single index field.
+ * <p>
+ * This binder takes advantage of provided metadata
+ * to pick, configure and create a {@link ValueBridge}.
  *
  * @see ValueBridge
  */
-public interface ValueBridgeBuilder {
+public interface ValueBinder {
 
 	/**
 	 * Binds a value to an index field.

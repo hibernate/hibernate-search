@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContextExtension;
 
@@ -27,10 +27,10 @@ public interface PropertyBridge extends AutoCloseable {
 	 * <p>
 	 * Writing to the {@link DocumentElement} should be done using
 	 * {@link org.hibernate.search.engine.backend.document.IndexFieldReference}s retrieved
-	 * when the bridge was {@link PropertyBridgeBuilder#bind(PropertyBindingContext) bound}.
+	 * when the bridge was {@link PropertyBinder#bind(PropertyBindingContext) bound}.
 	 * <p>
 	 * <strong>Warning:</strong> Reading from {@code bridgedElement} should be done with care.
-	 * Any read that was not declared during {@link PropertyBridgeBuilder#bind(PropertyBindingContext) binding}
+	 * Any read that was not declared during {@link PropertyBinder#bind(PropertyBindingContext) binding}
 	 * (by declaring dependencies using {@link PropertyBindingContext#getDependencies()}
 	 * or (advanced use) creating an accessor using {@link PropertyBindingContext#getBridgedElement()})
 	 * may lead to out-of-sync indexes,

@@ -13,7 +13,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeIndexingDependencyConfigurationContext;
@@ -64,12 +64,12 @@ public class RoutingKeyBindingContextImpl<T> extends AbstractCompositeBindingCon
 		return dependencyContext;
 	}
 
-	public BoundRoutingKeyBridge<T> applyBuilder(RoutingKeyBridgeBuilder bridgeBuilder) {
+	public BoundRoutingKeyBridge<T> applyBinder(RoutingKeyBinder binder) {
 		try {
 			// This call should set the partial binding
-			bridgeBuilder.bind( this );
+			binder.bind( this );
 			if ( partialBinding == null ) {
-				throw log.missingBridgeForBridgeBuilder( bridgeBuilder );
+				throw log.missingBridgeForBinder( binder );
 			}
 
 			checkBridgeDependencies( bridgedElement, dependencyContext );

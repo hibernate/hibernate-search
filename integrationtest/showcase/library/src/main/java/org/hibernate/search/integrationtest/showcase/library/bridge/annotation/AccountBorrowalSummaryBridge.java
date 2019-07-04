@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
 
 @TypeBridgeMapping(
 		bridge = @TypeBridgeRef(
-				builderType = org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge.Builder.class
+				binderType = org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge.Binder.class
 		)
 )
 @Retention(RetentionPolicy.RUNTIME)

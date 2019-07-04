@@ -11,19 +11,19 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 
 /**
- * A bridge builder that upon building retrieves a delegate bridge builder from the bean provider,
- * then delegates to that bridge builder.
+ * A binder that upon building retrieves a delegate binder from the bean provider,
+ * then delegates to that binder.
  */
-public final class BeanDelegatingBridgeBuilder
-		implements IdentifierBridgeBuilder, ValueBridgeBuilder {
+public final class BeanDelegatingBinder
+		implements IdentifierBinder, ValueBinder {
 
 	private final BeanReference<?> delegateReference;
 
-	public BeanDelegatingBridgeBuilder(BeanReference<?> delegateReference) {
+	public BeanDelegatingBinder(BeanReference<?> delegateReference) {
 		this.delegateReference = delegateReference;
 	}
 
@@ -34,16 +34,16 @@ public final class BeanDelegatingBridgeBuilder
 
 	@Override
 	public void bind(IdentifierBindingContext<?> context) {
-		try ( BeanHolder<? extends IdentifierBridgeBuilder> delegateHolder =
-				createDelegate( context.getBeanResolver(), IdentifierBridgeBuilder.class ) ) {
+		try ( BeanHolder<? extends IdentifierBinder> delegateHolder =
+				createDelegate( context.getBeanResolver(), IdentifierBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}
 
 	@Override
 	public void bind(ValueBindingContext<?> context) {
-		try ( BeanHolder<? extends ValueBridgeBuilder> delegateHolder =
-				createDelegate( context.getBeanResolver(), ValueBridgeBuilder.class ) ) {
+		try ( BeanHolder<? extends ValueBinder> delegateHolder =
+				createDelegate( context.getBeanResolver(), ValueBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}

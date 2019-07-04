@@ -17,7 +17,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -268,7 +268,7 @@ public class FullTextFieldIT {
 			}
 
 			@FullTextField(analyzer = ANALYZER_NAME,
-					valueBridge = @ValueBridgeRef(builderType = ValidTypeBridge.ExplictFieldTypeBuilder.class))
+					valueBridge = @ValueBridgeRef(binderType = ValidTypeBridge.ExplictFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -362,7 +362,7 @@ public class FullTextFieldIT {
 			}
 
 			@FullTextField(analyzer = ANALYZER_NAME,
-					valueBridge = @ValueBridgeRef(builderType = InvalidTypeBridge.ExplictFieldTypeBuilder.class))
+					valueBridge = @ValueBridgeRef(binderType = InvalidTypeBridge.ExplictFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -422,7 +422,7 @@ public class FullTextFieldIT {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 
-		public static class ExplictFieldTypeBuilder implements ValueBridgeBuilder {
+		public static class ExplictFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
 				context.setBridge( WrappedValue.class, new ValidTypeBridge(), context.getTypeFactory().asString() );
@@ -441,7 +441,7 @@ public class FullTextFieldIT {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 
-		public static class ExplictFieldTypeBuilder implements ValueBridgeBuilder {
+		public static class ExplictFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
 				context.setBridge( WrappedValue.class, new InvalidTypeBridge(), context.getTypeFactory().asInteger() );

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExtension;
 
@@ -27,10 +27,10 @@ public interface TypeBridge extends AutoCloseable {
 	 * <p>
 	 * Writing to the {@link DocumentElement} should be done using
 	 * {@link org.hibernate.search.engine.backend.document.IndexFieldReference}s retrieved
-	 * when the bridge was {@link TypeBridgeBuilder#bind(TypeBindingContext) bound}.
+	 * when the bridge was {@link TypeBinder#bind(TypeBindingContext) bound}.
 	 * <p>
 	 * <strong>Warning:</strong> Reading from {@code bridgedElement} should be done with care.
-	 * Any read that was not declared during {@link TypeBridgeBuilder#bind(TypeBindingContext) binding}
+	 * Any read that was not declared during {@link TypeBinder#bind(TypeBindingContext) binding}
 	 * (by declaring dependencies using {@link TypeBindingContext#getDependencies()}
 	 * or (advanced use) creating an accessor using {@link TypeBindingContext#getBridgedElement()})
 	 * may lead to out-of-sync indexes,

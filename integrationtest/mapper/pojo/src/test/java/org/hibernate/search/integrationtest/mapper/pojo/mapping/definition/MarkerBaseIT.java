@@ -101,7 +101,7 @@ public class MarkerBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
-								"Builder '" + MarkerBuilderWithDifferentAnnotationType.TOSTRING
+								"Binder '" + MarkerBuilderWithDifferentAnnotationType.TOSTRING
 										+ "' cannot be initialized with annotations of type '"
 										+ MarkerAnnotationMappedToMarkerBuilderWithDifferentAnnotationType.class.getName() + "'"
 						)

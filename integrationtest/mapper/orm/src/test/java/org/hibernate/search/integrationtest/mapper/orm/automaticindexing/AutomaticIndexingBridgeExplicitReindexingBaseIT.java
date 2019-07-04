@@ -18,8 +18,8 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -33,18 +33,18 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAutomaticIndexingBridgeIT {
 
 	@Override
-	protected TypeBridgeBuilder<?> createContainingEntityTypeBridgeBuilder() {
-		return new ContainingEntityTypeBridge.Builder();
+	protected TypeBinder<?> createContainingEntityTypeBinder() {
+		return new ContainingEntityTypeBridge.Binder();
 	}
 
 	@Override
-	protected PropertyBridgeBuilder<?> createContainingEntitySingleValuedPropertyBridgeBuilder() {
-		return new ContainingEntitySingleValuedPropertyBridge.Builder();
+	protected PropertyBinder<?> createContainingEntitySingleValuedPropertyBinder() {
+		return new ContainingEntitySingleValuedPropertyBridge.Binder();
 	}
 
 	@Override
-	protected PropertyBridgeBuilder<?> createContainingEntityMultiValuedPropertyBridgeBuilder() {
-		return new ContainingEntityMultiValuedPropertyBridge.Builder();
+	protected PropertyBinder<?> createContainingEntityMultiValuedPropertyBinder() {
+		return new ContainingEntityMultiValuedPropertyBridge.Binder();
 	}
 
 	public static class ContainingEntityTypeBridge implements TypeBridge {
@@ -94,7 +94,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 			);
 		}
 
-		public static class Builder implements TypeBridgeBuilder<Annotation> {
+		public static class Binder implements TypeBinder<Annotation> {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new ContainingEntityTypeBridge( context ) );
@@ -135,7 +135,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 			);
 		}
 
-		public static class Builder implements PropertyBridgeBuilder<Annotation> {
+		public static class Binder implements PropertyBinder<Annotation> {
 			@Override
 			public void bind(PropertyBindingContext context) {
 				context.setBridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
@@ -183,7 +183,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 			);
 		}
 
-		public static class Builder implements PropertyBridgeBuilder<Annotation> {
+		public static class Binder implements PropertyBinder<Annotation> {
 			@Override
 			public void bind(PropertyBindingContext context) {
 				context.setBridge( new ContainingEntityMultiValuedPropertyBridge( context ) );

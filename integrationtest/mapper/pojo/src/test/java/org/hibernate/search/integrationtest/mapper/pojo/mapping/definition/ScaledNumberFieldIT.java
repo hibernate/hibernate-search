@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeO
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -238,7 +238,7 @@ public class ScaledNumberFieldIT {
 				return id;
 			}
 
-			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(builderType = ValidTypeBridge.ExplictFieldTypeBuilder.class))
+			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(binderType = ValidTypeBridge.ExplictFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -298,7 +298,7 @@ public class ScaledNumberFieldIT {
 				return id;
 			}
 
-			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(builderType = InvalidTypeBridge.ExplictFieldTypeBuilder.class))
+			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(binderType = InvalidTypeBridge.ExplictFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -332,7 +332,7 @@ public class ScaledNumberFieldIT {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 
-		public static class ExplictFieldTypeBuilder implements ValueBridgeBuilder {
+		public static class ExplictFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
 				context.setBridge( WrappedValue.class, new ValidTypeBridge(), context.getTypeFactory().asBigDecimal() );
@@ -351,7 +351,7 @@ public class ScaledNumberFieldIT {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 
-		public static class ExplictFieldTypeBuilder implements ValueBridgeBuilder {
+		public static class ExplictFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
 				context.setBridge( WrappedValue.class, new InvalidTypeBridge(), context.getTypeFactory().asInteger() );

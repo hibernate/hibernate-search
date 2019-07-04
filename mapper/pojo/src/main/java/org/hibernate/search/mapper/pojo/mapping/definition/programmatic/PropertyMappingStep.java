@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -62,11 +62,11 @@ public interface PropertyMappingStep {
 	PropertyMappingStep bridge(BeanReference<? extends PropertyBridge> bridgeReference);
 
 	/**
-	 * @param builder A bridge builder.
+	 * @param binder A {@link PropertyBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
-	 * @see PropertyBridge
+	 * @see PropertyBinder
 	 */
-	PropertyMappingStep bridge(PropertyBridgeBuilder<?> builder);
+	PropertyMappingStep bridge(PropertyBinder<?> binder);
 
 	/**
 	 * @param builder A marker builder.

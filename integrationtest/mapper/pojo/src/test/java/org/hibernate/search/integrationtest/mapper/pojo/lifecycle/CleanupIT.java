@@ -25,11 +25,11 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -79,16 +79,16 @@ public class CleanupIT {
 		startup( mappingDefinition -> {
 			TypeMappingStep typeContext = mappingDefinition.type( OtherIndexedEntity.class );
 			typeContext.indexed( OtherIndexedEntity.INDEX )
-					.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
-					.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
+					.routingKeyBridge( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
+					.bridge( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) )
 					.property( "id" )
 							.documentId()
-									.identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+									.identifierBridge( StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 					.property( "text" )
-							.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
+							.bridge( StartupStubBridge.binder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
 									// The extractor returns type Object, not String
-									.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
+									.valueBridge( StartupStubBridge.binder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 									.withExtractor( StartupStubContainerExtractor.NAME );
 		} );
 
@@ -124,21 +124,21 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingRoutingKeyBridgeBuilding() {
+	public void failingRoutingKeyBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep typeContext = mappingDefinition.type( OtherIndexedEntity.class );
 			typeContext.indexed( OtherIndexedEntity.INDEX )
-					.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
+					.bridge( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) )
 					.property( "id" )
 							.documentId()
-									.identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+									.identifierBridge( StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 					.property( "text" )
-							.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
+							.bridge( StartupStubBridge.binder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
 									// The extractor returns type Object, not String
-									.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
+									.valueBridge( StartupStubBridge.binder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 									.withExtractor( StartupStubContainerExtractor.NAME );
-			typeContext.routingKeyBridge( new FailingBridgeBuilder() );
+			typeContext.routingKeyBridge( new FailingBinder() );
 		} );
 
 		// We must have instantiated objects...
@@ -159,21 +159,21 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingTypeBridgeBuilding() {
+	public void failingTypeBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep typeContext = mappingDefinition.type( OtherIndexedEntity.class );
 			typeContext.indexed( OtherIndexedEntity.INDEX )
-					.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
+					.routingKeyBridge( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
 					.property( "id" )
 							.documentId()
-									.identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+									.identifierBridge( StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 					.property( "text" )
-							.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
+							.bridge( StartupStubBridge.binder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
 									// The extractor returns type Object, not String
-									.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
+									.valueBridge( StartupStubBridge.binder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 									.withExtractor( StartupStubContainerExtractor.NAME );
-			typeContext.bridge( new FailingBridgeBuilder() );
+			typeContext.bridge( new FailingBinder() );
 		} );
 
 		// We must have instantiated objects...
@@ -194,20 +194,20 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingIdentifierBridgeBuilding() {
+	public void failingIdentifierBinding() {
 		failingStartup( mappingDefinition -> mappingDefinition.type( OtherIndexedEntity.class )
 				.indexed( OtherIndexedEntity.INDEX )
-				.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
-				.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
+				.routingKeyBridge( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
+				.bridge( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
-						.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
+						.bridge( StartupStubBridge.binder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
 								// The extractor returns type Object, not String
-								.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
+								.valueBridge( StartupStubBridge.binder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractor( StartupStubContainerExtractor.NAME )
 				.property( "id" )
 						.documentId()
-								.identifierBridge( new FailingBridgeBuilder() )
+								.identifierBridge( new FailingBinder() )
 		);
 
 		// We must have instantiated objects...
@@ -228,20 +228,20 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingPropertyBridgeBuilding() {
+	public void failingPropertyBinding() {
 		failingStartup( mappingDefinition -> mappingDefinition.type( OtherIndexedEntity.class )
 				.indexed( OtherIndexedEntity.INDEX )
-				.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
-				.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
+				.routingKeyBridge( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
+				.bridge( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) )
 				.property( "id" )
 						.documentId()
-								.identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+								.identifierBridge( StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
 						.genericField( "otherText" )
 								// The extractor returns type Object, not String
-								.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
+								.valueBridge( StartupStubBridge.binder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractor( StartupStubContainerExtractor.NAME )
-						.bridge( new FailingBridgeBuilder() )
+						.bridge( new FailingBinder() )
 		);
 
 		// We must have instantiated objects...
@@ -262,21 +262,21 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingValueBridgeBuilding() {
+	public void failingValueBinding() {
 		failingStartup( mappingDefinition -> mappingDefinition.type( OtherIndexedEntity.class )
 				.indexed( OtherIndexedEntity.INDEX )
-				.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
-				.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
+				.routingKeyBridge( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
+				.bridge( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) )
 				.property( "id" )
-						.documentId().identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+						.documentId().identifierBridge( StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
-						.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
+						.bridge( StartupStubBridge.binder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
 								// The extractor returns type Object, not String
-								.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
+								.valueBridge( StartupStubBridge.binder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractor( StartupStubContainerExtractor.NAME )
 						.genericField( "yetAnotherText" )
-								.valueBridge( new FailingBridgeBuilder() )
+								.valueBridge( new FailingBinder() )
 								.withExtractor( StartupStubContainerExtractor.NAME )
 		);
 
@@ -302,19 +302,19 @@ public class CleanupIT {
 	public void failingContainerExtractorBuilding() {
 		failingStartup( mappingDefinition -> mappingDefinition.type( OtherIndexedEntity.class )
 				.indexed( OtherIndexedEntity.INDEX )
-				.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
-				.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
+				.routingKeyBridge( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
+				.bridge( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) )
 				.property( "id" )
-						.documentId().identifierBridge( StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+						.documentId().identifierBridge( StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
-						.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
+						.bridge( StartupStubBridge.binder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
 								// The extractor returns type Object, not String
-								.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
+								.valueBridge( StartupStubBridge.binder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractor( StartupStubContainerExtractor.NAME )
 						.genericField( "yetAnotherText" )
 								// The extractor returns type Object, not String
-								.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
+								.valueBridge( StartupStubBridge.binder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 								.withExtractors( ContainerExtractorPath.explicitExtractors( Arrays.asList(
 										StartupStubContainerExtractor.NAME, // The first one succeeds, but...
 										FailingContainerExtractor.NAME // This one fails.
@@ -379,16 +379,16 @@ public class CleanupIT {
 							ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 							mappingDefinition.type( IndexedEntity.class )
 									.indexed( IndexedEntity.INDEX )
-									.bridge( StartupStubBridge.builder( TYPE_BRIDGE_COUNTER_KEYS ) )
-									.routingKeyBridge( StartupStubBridge.builder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
+									.bridge( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) )
+									.routingKeyBridge( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
 									.property( "id" )
 											.documentId().identifierBridge(
-													StartupStubBridge.builder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS )
+													StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS )
 											)
 									.property( "text" )
 											.genericField()
 													// The extractor returns type Object, not String
-													.valueBridge( StartupStubBridge.builder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
+													.valueBridge( StartupStubBridge.binder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 													.withExtractor( StartupStubContainerExtractor.NAME )
 									.property( "embedded" )
 											.associationInverseSide(
@@ -396,7 +396,7 @@ public class CleanupIT {
 															.value( StartupStubContainerExtractor.NAME )
 															.toValuePath()
 											)
-											.bridge( StartupStubBridge.builder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
+											.bridge( StartupStubBridge.binder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 											/*
 											 * This is important so that there are bridges that only contribute fields that are filtered out.
 											 * These bridges are created to check what they want to contribute,
@@ -539,9 +539,9 @@ public class CleanupIT {
 		}
 	}
 
-	private static class FailingBridgeBuilder implements TypeBridgeBuilder<Annotation>,
-			PropertyBridgeBuilder<Annotation>, RoutingKeyBridgeBuilder<Annotation>,
-			IdentifierBridgeBuilder, ValueBridgeBuilder {
+	private static class FailingBinder implements TypeBinder<Annotation>,
+			PropertyBinder<Annotation>, RoutingKeyBinder<Annotation>,
+			IdentifierBinder, ValueBinder {
 		@Override
 		public void initialize(Annotation annotation) {
 			// Nothing to do

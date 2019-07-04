@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@TypeBridgeMapping(bridge = @TypeBridgeRef(builderType = CustomTypeBridge.Builder.class))
+@TypeBridgeMapping(bridge = @TypeBridgeRef(binderType = CustomTypeBridge.Binder.class))
 public @interface CustomTypeBridgeAnnotation {
 
 	String objectName();

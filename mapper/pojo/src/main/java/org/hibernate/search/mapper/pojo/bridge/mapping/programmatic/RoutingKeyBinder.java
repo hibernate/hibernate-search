@@ -13,15 +13,18 @@ import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 
 /**
- * A builder of {@link RoutingKeyBridge}.
+ * A binder from a POJO type to a routing key.
+ * <p>
+ * This binder takes advantage of provided metadata
+ * to pick, configure and create a {@link RoutingKeyBridge}.
  *
  * @param <A> The type of annotations accepted by the {@link #initialize(Annotation)} method.
  * @see RoutingKeyBridge
  */
-public interface RoutingKeyBridgeBuilder<A extends Annotation> {
+public interface RoutingKeyBinder<A extends Annotation> {
 
 	/**
-	 * Initializes the parameters of this builder with the attributes of the given annotation.
+	 * Initializes the parameters of this binder with the attributes of the given annotation.
 	 * @param annotation An annotation to extract parameters from.
 	 */
 	default void initialize(A annotation) {

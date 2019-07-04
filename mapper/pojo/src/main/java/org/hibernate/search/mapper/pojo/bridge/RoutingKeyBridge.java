@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge;
 
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension;
 
@@ -21,7 +21,7 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	 * as input and transforming them as necessary.
 	 * <p>
 	 * <strong>Warning:</strong> Reading from {@code bridgedElement} should be done with care.
-	 * Any read that was not declared during {@link RoutingKeyBridgeBuilder#bind(RoutingKeyBindingContext) binding}
+	 * Any read that was not declared during {@link RoutingKeyBinder#bind(RoutingKeyBindingContext) binding}
 	 * (by declaring dependencies using {@link RoutingKeyBindingContext#getDependencies()}
 	 * or (advanced use) creating an accessor using {@link RoutingKeyBindingContext#getBridgedElement()})
 	 * may lead to out-of-sync indexes,

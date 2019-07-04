@@ -12,12 +12,12 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilde
 
 /**
  * A builder of markers that mark a property as the latitude or longitude
- * for a {@link GeoPointBridgeBuilder GeoPoint bridge}.
+ * for a {@link GeoPointBinder GeoPoint bridge}.
  *
  * @see Latitude
  * @see Longitude
- * @see GeoPointBridgeBuilder#latitude()
- * @see GeoPointBridgeBuilder#longitude()
+ * @see GeoPointBinder#latitude()
+ * @see GeoPointBinder#longitude()
  */
 public interface LatitudeLongitudeMarkerBuilder extends MarkerBuilder {
 
@@ -25,7 +25,7 @@ public interface LatitudeLongitudeMarkerBuilder extends MarkerBuilder {
 	 * @param markerSet The name of the "marker set".
 	 * This is used to discriminate between multiple pairs of latitude/longitude markers.
 	 * @return {@code this}, for method chaining.
-	 * @see GeoPointBridgeBuilder#markerSet(String)
+	 * @see GeoPointBinder#markerSet(String)
 	 */
 	LatitudeLongitudeMarkerBuilder markerSet(String markerSet);
 

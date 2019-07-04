@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 /**
@@ -63,11 +63,11 @@ public interface TypeMappingStep {
 	TypeMappingStep routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference);
 
 	/**
-	 * @param builder A bridge builder.
+	 * @param binder A {@link RoutingKeyBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
-	 * @see RoutingKeyBridge
+	 * @see RoutingKeyBinder
 	 */
-	TypeMappingStep routingKeyBridge(RoutingKeyBridgeBuilder<?> builder);
+	TypeMappingStep routingKeyBridge(RoutingKeyBinder<?> binder);
 
 	/**
 	 * @param bridgeClass The class of the bridge to use.
@@ -86,11 +86,11 @@ public interface TypeMappingStep {
 	TypeMappingStep bridge(BeanReference<? extends TypeBridge> bridgeReference);
 
 	/**
-	 * @param builder A bridge builder.
+	 * @param binder A {@link TypeBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
-	 * @see TypeBridge
+	 * @see TypeBinder
 	 */
-	TypeMappingStep bridge(TypeBridgeBuilder<?> builder);
+	TypeMappingStep bridge(TypeBinder<?> binder);
 
 	/**
 	 * Starts the definition of the mapping of a specific property.

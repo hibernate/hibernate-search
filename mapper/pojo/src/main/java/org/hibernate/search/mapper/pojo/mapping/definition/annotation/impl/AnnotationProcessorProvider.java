@@ -26,11 +26,11 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.Ma
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -191,10 +191,10 @@ class AnnotationProcessorProvider {
 		void doProcess(PropertyMappingStep mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				DocumentId annotation) {
-			IdentifierBridgeBuilder builder =
-					helper.createIdentifierBridgeBuilder( annotation, propertyModel );
+			IdentifierBinder binder =
+					helper.createIdentifierBinder( annotation, propertyModel );
 
-			mappingContext.documentId().identifierBridge( builder );
+			mappingContext.documentId().identifierBridge( binder );
 		}
 	}
 
@@ -210,8 +210,8 @@ class AnnotationProcessorProvider {
 
 		@Override
 		void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
-			RoutingKeyBridgeBuilder<?> builder = helper.createRoutingKeyBridgeBuilder( annotation );
-			mappingContext.routingKeyBridge( builder );
+			RoutingKeyBinder<?> binder = helper.createRoutingKeyBinder( annotation );
+			mappingContext.routingKeyBridge( binder );
 		}
 	}
 
@@ -227,8 +227,8 @@ class AnnotationProcessorProvider {
 
 		@Override
 		void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
-			TypeBridgeBuilder<?> builder = helper.createTypeBridgeBuilder( annotation );
-			mappingContext.bridge( builder );
+			TypeBinder<?> binder = helper.createTypeBinder( annotation );
+			mappingContext.bridge( binder );
 		}
 	}
 
@@ -246,8 +246,8 @@ class AnnotationProcessorProvider {
 		void doProcess(PropertyMappingStep mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				Annotation annotation) {
-			PropertyBridgeBuilder<?> builder = helper.createPropertyBridgeBuilder( annotation );
-			mappingContext.bridge( builder );
+			PropertyBinder<?> binder = helper.createPropertyBinder( annotation );
+			mappingContext.bridge( binder );
 		}
 	}
 

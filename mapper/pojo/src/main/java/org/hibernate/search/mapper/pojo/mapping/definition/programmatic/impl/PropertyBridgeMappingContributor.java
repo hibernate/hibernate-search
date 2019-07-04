@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
@@ -15,10 +15,10 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 
 class PropertyBridgeMappingContributor implements PojoPropertyMetadataContributor {
 
-	private final PropertyBridgeBuilder<?> bridgeBuilder;
+	private final PropertyBinder<?> binder;
 
-	PropertyBridgeMappingContributor(PropertyBridgeBuilder<?> bridgeBuilder) {
-		this.bridgeBuilder = bridgeBuilder;
+	PropertyBridgeMappingContributor(PropertyBinder<?> binder) {
+		this.binder = binder;
 	}
 
 	@Override
@@ -28,8 +28,8 @@ class PropertyBridgeMappingContributor implements PojoPropertyMetadataContributo
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
-		collector.bridge(
-				bridgeBuilder
+		collector.propertyBinder(
+				binder
 				/*
 				 * Ignore mapped types, we don't need to discover new mappings automatically
 				 * like in the annotation mappings.

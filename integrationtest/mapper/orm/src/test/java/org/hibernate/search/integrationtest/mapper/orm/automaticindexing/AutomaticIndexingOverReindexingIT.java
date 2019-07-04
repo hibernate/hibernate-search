@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -302,7 +302,7 @@ public class AutomaticIndexingOverReindexingIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(builderType = Level3Property1Bridge.Builder.class))
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(binderType = Level3Property1Bridge.Binder.class))
 	public @interface Level3Property1BridgeAnnotation {
 
 	}
@@ -331,7 +331,7 @@ public class AutomaticIndexingOverReindexingIT {
 			);
 		}
 
-		public static class Builder implements TypeBridgeBuilder<Level3Property1BridgeAnnotation> {
+		public static class Binder implements TypeBinder<Level3Property1BridgeAnnotation> {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new Level3Property1Bridge( context ) );
