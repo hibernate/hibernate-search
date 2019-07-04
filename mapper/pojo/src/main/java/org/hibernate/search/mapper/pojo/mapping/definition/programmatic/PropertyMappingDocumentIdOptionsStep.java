@@ -36,6 +36,6 @@ public interface PropertyMappingDocumentIdOptionsStep extends PropertyMappingSte
 	 * @return {@code this}, for method chaining.
 	 * @see IdentifierBinder
 	 */
-	PropertyMappingDocumentIdOptionsStep identifierBridge(IdentifierBinder binder);
+	PropertyMappingDocumentIdOptionsStep identifierBinder(IdentifierBinder binder);
 
 }

@@ -77,11 +77,11 @@ abstract class AbstractPropertyMappingFieldOptionsStep<
 
 	@Override
 	public S valueBridge(BeanReference<? extends ValueBridge<?, ?>> bridgeReference) {
-		return valueBridge( new BeanBinder( bridgeReference ) );
+		return valueBinder( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override
-	public S valueBridge(ValueBinder binder) {
+	public S valueBinder(ValueBinder binder) {
 		this.binder = binder;
 		return thisAsS();
 	}

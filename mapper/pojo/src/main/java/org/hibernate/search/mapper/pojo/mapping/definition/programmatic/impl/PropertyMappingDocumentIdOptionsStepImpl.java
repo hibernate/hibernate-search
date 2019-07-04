@@ -44,11 +44,11 @@ class PropertyMappingDocumentIdOptionsStepImpl extends DelegatingPropertyMapping
 
 	@Override
 	public PropertyMappingDocumentIdOptionsStep identifierBridge(BeanReference<? extends IdentifierBridge<?>> bridgeReference) {
-		return identifierBridge( new BeanBinder( bridgeReference ) );
+		return identifierBinder( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override
-	public PropertyMappingDocumentIdOptionsStep identifierBridge(IdentifierBinder binder) {
+	public PropertyMappingDocumentIdOptionsStep identifierBinder(IdentifierBinder binder) {
 		this.binder = binder;
 		return this;
 	}

@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
@@ -194,7 +195,7 @@ class AnnotationProcessorProvider {
 			IdentifierBinder binder =
 					helper.createIdentifierBinder( annotation, propertyModel );
 
-			mappingContext.documentId().identifierBridge( binder );
+			mappingContext.documentId().identifierBinder( binder );
 		}
 	}
 
@@ -293,6 +294,11 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
+		ValueBinderRef getValueBinder(GenericField annotation) {
+			return annotation.valueBinder();
+		}
+
+		@Override
 		ContainerExtraction getExtraction(GenericField annotation) {
 			return annotation.extraction();
 		}
@@ -340,6 +346,11 @@ class AnnotationProcessorProvider {
 		@Override
 		ValueBridgeRef getValueBridge(FullTextField annotation) {
 			return annotation.valueBridge();
+		}
+
+		@Override
+		ValueBinderRef getValueBinder(FullTextField annotation) {
+			return annotation.valueBinder();
 		}
 
 		@Override
@@ -402,6 +413,11 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
+		ValueBinderRef getValueBinder(KeywordField annotation) {
+			return annotation.valueBinder();
+		}
+
+		@Override
 		ContainerExtraction getExtraction(KeywordField annotation) {
 			return annotation.extraction();
 		}
@@ -451,6 +467,11 @@ class AnnotationProcessorProvider {
 		@Override
 		ValueBridgeRef getValueBridge(ScaledNumberField annotation) {
 			return annotation.valueBridge();
+		}
+
+		@Override
+		ValueBinderRef getValueBinder(ScaledNumberField annotation) {
+			return annotation.valueBinder();
 		}
 
 		@Override

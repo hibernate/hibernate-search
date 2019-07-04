@@ -13,6 +13,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -254,7 +255,8 @@ public class FieldBaseIT {
 			Integer id;
 			@DocumentId
 			@GenericField(
-					valueBridge = @ValueBridgeRef(name = "foo", binderName = "bar")
+					valueBridge = @ValueBridgeRef(name = "foo"),
+					valueBinder = @ValueBinderRef(name = "bar")
 			)
 			public Integer getId() {
 				return id;

@@ -11,11 +11,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
 /**
- * A reference to the identifier bridge to use for a {@link DocumentId}.
+ * References the identifier binder to use for a {@link DocumentId}.
  * <p>
  * Either a bridge or a binder can be referenced, but never both.
  * References can use either a name, a type, or both.
@@ -23,26 +23,25 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IdentifierBridgeRef {
+public @interface IdentifierBinderRef {
 
 	/**
-	 * Reference an identifier bridge by its bean name.
-	 * @return The bean name of the  identifier bridge.
+	 * Reference an identifier binder by its bean name.
+	 * @return The bean name of the identifier binder.
 	 */
 	String name() default "";
 
 	/**
-	 * Reference an identifier bridge by its type.
-	 * @return The type of the  identifier bridge.
+	 * Reference an identifier binder by its type.
+	 * @return The type of the identifier binder.
 	 */
-	Class<? extends IdentifierBridge> type() default UndefinedBridgeImplementationType.class;
+	Class<? extends IdentifierBinder> type() default UndefinedBinderImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
-	abstract class UndefinedBridgeImplementationType implements IdentifierBridge<Object> {
-		private UndefinedBridgeImplementationType() {
+	abstract class UndefinedBinderImplementationType implements IdentifierBinder {
+		private UndefinedBinderImplementationType() {
 		}
 	}
-
 }

@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeO
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -238,7 +239,7 @@ public class ScaledNumberFieldIT {
 				return id;
 			}
 
-			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(binderType = ValidTypeBridge.ExplictFieldTypeBinder.class))
+			@ScaledNumberField(decimalScale = 3, valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplictFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -298,7 +299,7 @@ public class ScaledNumberFieldIT {
 				return id;
 			}
 
-			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(binderType = InvalidTypeBridge.ExplictFieldTypeBinder.class))
+			@ScaledNumberField(decimalScale = 3, valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplictFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
