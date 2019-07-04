@@ -14,11 +14,11 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 
 /**
- * Reference a bridge for a {@link RoutingKeyBridgeMapping}.
+ * Reference a bridge for a {@link RoutingKeyBinding}.
  * <p>
  * References can use either a name, a type, or both.
  * <p>

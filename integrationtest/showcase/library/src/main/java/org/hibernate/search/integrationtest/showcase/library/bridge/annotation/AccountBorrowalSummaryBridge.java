@@ -12,10 +12,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
 
-@TypeBridgeMapping(
+@TypeBinding(
 		bridge = @TypeBridgeRef(
 				binderType = org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge.Binder.class
 		)

@@ -15,20 +15,20 @@ import java.lang.annotation.Target;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBridgeRef;
 
 /**
- * Maps a type bridge to an annotation type,
- * so that whenever the annotation is found on a type in the domain model,
- * the type bridge mapped to the annotation will be applied.
+ * Meta-annotation for annotations that bind a bridge to a property.
+ * <p>
+ * Whenever an annotation meta-annotated with {@link TypeBinding}
+ * is found on a type in the domain model,
+ * the corresponding binder will be applied to this type.
  */
 @Documented
 @Target(value = ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TypeBridgeMapping {
+public @interface TypeBinding {
 
 	/**
-	 * Map a type bridge to an annotation type.
-	 *
-	 * @see TypeBridgeRef
 	 * @return A reference to the type binder to use.
+	 * @see TypeBridgeRef
 	 */
 	TypeBridgeRef bridge();
 

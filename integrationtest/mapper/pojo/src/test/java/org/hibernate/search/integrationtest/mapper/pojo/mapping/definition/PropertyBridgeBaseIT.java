@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
@@ -913,7 +913,7 @@ public class PropertyBridgeBaseIT {
 						.annotationContextAnyParameters( BridgeAnnotationWithEmptyPropertyBridgeMapping.class )
 						.failure(
 								"Annotation type '" + BridgeAnnotationWithEmptyPropertyBridgeMapping.class.getName()
-										+ "' is annotated with '" + PropertyBridgeMapping.class.getName() + "',"
+										+ "' is annotated with '" + PropertyBinding.class.getName() + "',"
 										+ " but the binder reference is empty."
 						)
 						.build()
@@ -922,7 +922,7 @@ public class PropertyBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef())
+	@PropertyBinding(bridge = @PropertyBridgeRef())
 	private @interface BridgeAnnotationWithEmptyPropertyBridgeMapping {
 	}
 
@@ -956,7 +956,7 @@ public class PropertyBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(binderType = BinderWithDifferentAnnotationType.class))
+	@PropertyBinding(bridge = @PropertyBridgeRef(binderType = BinderWithDifferentAnnotationType.class))
 	private @interface BridgeAnnotationMappedToBinderWithDifferentAnnotationType {
 	}
 
@@ -1017,7 +1017,7 @@ public class PropertyBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.METHOD, ElementType.FIELD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(binderType = IncompatibleTypeRequestingPropertyBinder.class))
+	@PropertyBinding(bridge = @PropertyBridgeRef(binderType = IncompatibleTypeRequestingPropertyBinder.class))
 	private @interface IncompatibleTypeRequestingPropertyBridgeAnnotation {
 	}
 

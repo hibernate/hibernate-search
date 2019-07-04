@@ -26,9 +26,9 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationC
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
@@ -257,13 +257,13 @@ public class AnnotationMappingDiscoveryIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.METHOD, ElementType.FIELD})
-	@MarkerMapping(marker = @MarkerRef(binderType = CustomMarker.Binder.class))
+	@MarkerBinding(marker = @MarkerRef(binderType = CustomMarker.Binder.class))
 	private @interface CustomMarkerAnnotation {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.METHOD, ElementType.FIELD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(binderType = CustomMarkerConsumingPropertyBridge.Binder.class))
+	@PropertyBinding(bridge = @PropertyBridgeRef(binderType = CustomMarkerConsumingPropertyBridge.Binder.class))
 	private @interface CustomMarkerConsumingPropertyBridgeAnnotation {
 	}
 

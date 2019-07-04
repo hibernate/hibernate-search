@@ -22,10 +22,10 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBinding;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -103,7 +103,7 @@ class AnnotationProcessorProvider {
 
 		@Override
 		Stream<? extends Annotation> extractAnnotations(PojoPropertyModel<?> propertyModel) {
-			return propertyModel.getAnnotationsByMetaAnnotationType( MarkerMapping.class );
+			return propertyModel.getAnnotationsByMetaAnnotationType( MarkerBinding.class );
 		}
 
 		@Override
@@ -205,7 +205,7 @@ class AnnotationProcessorProvider {
 
 		@Override
 		Stream<? extends Annotation> extractAnnotations(PojoRawTypeModel<?> typeModel) {
-			return typeModel.getAnnotationsByMetaAnnotationType( RoutingKeyBridgeMapping.class );
+			return typeModel.getAnnotationsByMetaAnnotationType( RoutingKeyBinding.class );
 		}
 
 		@Override
@@ -222,7 +222,7 @@ class AnnotationProcessorProvider {
 
 		@Override
 		Stream<? extends Annotation> extractAnnotations(PojoRawTypeModel<?> typeModel) {
-			return typeModel.getAnnotationsByMetaAnnotationType( TypeBridgeMapping.class );
+			return typeModel.getAnnotationsByMetaAnnotationType( TypeBinding.class );
 		}
 
 		@Override
@@ -239,7 +239,7 @@ class AnnotationProcessorProvider {
 
 		@Override
 		Stream<? extends Annotation> extractAnnotations(PojoPropertyModel<?> propertyModel) {
-			return propertyModel.getAnnotationsByMetaAnnotationType( PropertyBridgeMapping.class );
+			return propertyModel.getAnnotationsByMetaAnnotationType( PropertyBinding.class );
 		}
 
 		@Override

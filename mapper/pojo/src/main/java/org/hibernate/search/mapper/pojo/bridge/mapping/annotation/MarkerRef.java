@@ -12,12 +12,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 
 /**
- * Reference a marker for a {@link MarkerMapping}.
+ * Reference a marker for a {@link MarkerBinding}.
  * <p>
  * References can use either a name, a type, or both.
  * <p>

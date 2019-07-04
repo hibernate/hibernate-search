@@ -15,20 +15,20 @@ import java.lang.annotation.Target;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerRef;
 
 /**
- * Maps a marker to an annotation type,
- * so that whenever the annotation is found on a property in the domain model,
- * the marker mapped to the annotation will be applied.
+ * Meta-annotation for annotations that bind a marker to a property.
+ * <p>
+ * Whenever an annotation meta-annotated with {@link MarkerBinding}
+ * is found on a property in the domain model,
+ * the corresponding binder will be applied to this property.
  */
 @Documented
 @Target(value = ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MarkerMapping {
+public @interface MarkerBinding {
 
 	/**
-	 * Map a marker to an annotation type.
-	 *
-	 * @see MarkerRef
 	 * @return A reference to the marker binder to use.
+	 * @see MarkerRef
 	 */
 	MarkerRef marker();
 

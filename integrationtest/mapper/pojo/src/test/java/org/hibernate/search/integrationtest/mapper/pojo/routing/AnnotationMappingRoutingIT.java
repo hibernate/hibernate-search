@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
@@ -177,7 +177,7 @@ public class AnnotationMappingRoutingIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@RoutingKeyBridgeMapping(bridge = @RoutingKeyBridgeRef(binderType = MyRoutingKeyBridge.Binder.class))
+	@RoutingKeyBinding(bridge = @RoutingKeyBridgeRef(binderType = MyRoutingKeyBridge.Binder.class))
 	public @interface MyRoutingKeyBridgeAnnotation {
 	}
 
