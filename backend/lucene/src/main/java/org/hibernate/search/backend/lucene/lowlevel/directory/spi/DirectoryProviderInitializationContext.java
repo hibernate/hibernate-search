@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.lowlevel.directory.spi;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public interface DirectoryProviderInitializationContext {
@@ -15,6 +16,11 @@ public interface DirectoryProviderInitializationContext {
 	 * @return The event context to use for exceptions.
 	 */
 	EventContext getEventContext();
+
+	/**
+	 * @return A {@link BeanResolver}.
+	 */
+	BeanResolver getBeanResolver();
 
 	/**
 	 * @return A configuration property source, appropriately masked so that the factory

@@ -190,10 +190,6 @@ public interface Log extends BasicLogger {
 			value = "Unable to create root directory '%1$s'.")
 	SearchException unableToCreateRootDirectoryForLocalDirectoryBackend(Path rootDirectory, @Cause Exception e);
 
-	@Message(id = ID_OFFSET_2 + 4,
-			value = "Unrecognized Lucene directory provider '%1$s'.")
-	SearchException unrecognizedLuceneDirectoryProvider(String directoryProvider);
-
 	@Message(id = ID_OFFSET_2 + 5,
 			value = "The Lucene extension can only be applied to objects"
 			+ " derived from the Lucene backend. Was applied to '%1$s' instead.")

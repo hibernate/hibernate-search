@@ -28,6 +28,7 @@ import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.common.spi.LogErrorHandler;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
@@ -40,7 +41,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 
 	private final String name;
 
-	private final DirectoryProvider directoryProvider;
+	private final BeanHolder<? extends DirectoryProvider> directoryProviderHolder;
 
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
@@ -51,11 +52,12 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
-	LuceneBackendImpl(String name, DirectoryProvider directoryProvider, LuceneWorkFactory workFactory,
+	LuceneBackendImpl(String name, BeanHolder<? extends DirectoryProvider> directoryProviderHolder,
+			LuceneWorkFactory workFactory,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.name = name;
-		this.directoryProvider = directoryProvider;
+		this.directoryProviderHolder = directoryProviderHolder;
 
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 
@@ -66,7 +68,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexingContext = new IndexingBackendContext(
-				eventContext, directoryProvider,
+				eventContext, directoryProviderHolder.get(),
 				workFactory, multiTenancyStrategy,
 				// TODO the LogErrorHandler should be replaced with a user-configurable instance at some point. See HSEARCH-3110.
 				new LogErrorHandler()
@@ -123,7 +125,8 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( LuceneReadWorkOrchestratorImplementor::close, readOrchestrator );
-			closer.push( DirectoryProvider::close, directoryProvider );
+			closer.push( holder -> holder.get().close(), directoryProviderHolder );
+			closer.push( BeanHolder::close, directoryProviderHolder );
 		}
 	}
 
@@ -132,7 +135,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "name=" ).append( name ).append( ", " )
-				.append( "directoryProvider=" ).append( directoryProvider )
+				.append( "directoryProvider=" ).append( directoryProviderHolder.get() )
 				.append( "]" )
 				.toString();
 	}
