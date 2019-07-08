@@ -14,19 +14,21 @@ import java.nio.file.Paths;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.MMapDirectory;
+import org.apache.lucene.store.FSLockFactory;
 
-public class MMapDirectoryProvider implements DirectoryProvider {
+public class LocalDirectoryProvider implements DirectoryProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -36,7 +38,14 @@ public class MMapDirectoryProvider implements DirectoryProvider {
 					.withDefault( () -> Paths.get( LuceneBackendSettings.Defaults.DIRECTORY_ROOT ) )
 					.build();
 
+	private static final ConfigurationProperty<FileSystemAccessStrategyName> FILESYSTEM_ACCESS_STRATEGY =
+			ConfigurationProperty.forKey( LuceneBackendSettings.DirectoryRadicals.FILESYSTEM_ACCESS_STRATEGY )
+					.as( FileSystemAccessStrategyName.class, FileSystemAccessStrategyName::of )
+					.withDefault( LuceneBackendSettings.Defaults.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY )
+					.build();
+
 	private Path root;
+	private FileSystemAccessStrategy accessStrategy;
 
 	@Override
 	public String toString() {
@@ -45,7 +54,10 @@ public class MMapDirectoryProvider implements DirectoryProvider {
 
 	@Override
 	public void initialize(DirectoryProviderInitializationContext context) {
-		this.root = ROOT.get( context.getConfigurationPropertySource() ).toAbsolutePath();
+		ConfigurationPropertySource propertySource = context.getConfigurationPropertySource();
+		this.root = ROOT.get( propertySource ).toAbsolutePath();
+		FileSystemAccessStrategyName accessStrategyName = FILESYSTEM_ACCESS_STRATEGY.get( propertySource );
+		this.accessStrategy = FileSystemAccessStrategy.get( accessStrategyName );
 		initializeRootDirectory( root );
 	}
 
@@ -53,7 +65,9 @@ public class MMapDirectoryProvider implements DirectoryProvider {
 	public DirectoryHolder createDirectory(DirectoryCreationContext context) throws IOException {
 		Path directoryPath = root.resolve( context.getIndexName() );
 		makeSanityCheckedFilesystemDirectory( directoryPath, context.getEventContext() );
-		Directory directory = new MMapDirectory( directoryPath );
+		// TODO HSEARCH-3440 re-allow configuring the lock factory
+		//  see org.hibernate.search.store.impl.DefaultLockFactoryCreator.createLockFactory
+		Directory directory = accessStrategy.createDirectory( directoryPath, FSLockFactory.getDefault() );
 		try {
 			context.initializeIndexIfNeeded( directory );
 			return DirectoryHolder.of( directory );

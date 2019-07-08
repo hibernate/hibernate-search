@@ -504,4 +504,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 86, value = "The projection '%1$s' is defined on a scope targeting different indexes."
 			+ " Projection is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
 	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
+
+	@Message(id = ID_OFFSET_2 + 87,
+			value = "Invalid filesystem access strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidFileSystemAccessStrategyName(String invalidRepresentation, List<String> validRepresentations);
 }
