@@ -146,11 +146,10 @@ The minimal working configuration is short, but depends on your setup:
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_lucene]
 ----
 <1> Define a backend named "myBackend" relying on Lucene technology.
-<2> Define the storage for that backend as a local filesystem directory.
-<3> The backend will store indexes in the current working directory by default.
+<2> The backend will store indexes in the current working directory by default.
 If you want to store the indexes elsewhere,
 uncomment this line and set the value of the property.
-<4> Make sure to use the backend we just defined for all indexes.
+<3> Make sure to use the backend we just defined for all indexes.
 ====
 
 .Hibernate Search properties in `persistence.xml` for a "Hibernate ORM + Elasticsearch" setup

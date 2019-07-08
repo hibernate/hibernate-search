@@ -24,14 +24,12 @@
             <!-- tag::gettingstarted-configuration-orm_lucene[] -->
             <property name="hibernate.search.backends.myBackend.type"
                       value="lucene"/> <!--1-->
-            <property name="hibernate.search.backends.myBackend.directory.type"
-                      value="local-directory"/> <!--2-->
             <!--
             <property name="hibernate.search.backends.myBackend.directory.root"
                       value="some/filesystem/path"/>
-             --> <!--3-->
+             --> <!--2-->
             <property name="hibernate.search.default_backend"
-                      value="myBackend"/> <!--4-->
+                      value="myBackend"/> <!--3-->
             <!-- end::gettingstarted-configuration-orm_lucene[] -->
 
             <!--
@@ -102,8 +100,6 @@
         <properties>
             <property name="hibernate.search.backends.myBackend.type"
                       value="lucene"/>
-            <property name="hibernate.search.backends.myBackend.directory.type"
-                      value="local-directory"/>
             <!-- tag::gettingstarted-configuration-orm_lucene-analysis[] -->
             <property name="hibernate.search.backends.myBackend.analysis_configurer"
                       value="org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.MyLuceneAnalysisConfigurer"/> <!--6-->

@@ -53,9 +53,10 @@ public class LuceneBackendFactory implements BackendFactory {
 					.as( Version.class, LuceneBackendFactory::parseLuceneVersion )
 					.build();
 
-	private static final OptionalConfigurationProperty<String> DIRECTORY_TYPE =
+	private static final ConfigurationProperty<String> DIRECTORY_TYPE =
 			ConfigurationProperty.forKey( LuceneBackendSettings.DIRECTORY_TYPE )
 					.asString()
+					.withDefault( LuceneBackendSettings.Defaults.DIRECTORY_TYPE )
 					.build();
 
 	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
@@ -116,9 +117,7 @@ public class LuceneBackendFactory implements BackendFactory {
 
 	private DirectoryProvider getDirectoryProvider(EventContext backendContext, ConfigurationPropertySource propertySource) {
 		// TODO HSEARCH-3440 be more clever about the type, also support providing a class => use a BeanReference?
-		String directoryType = DIRECTORY_TYPE.getOrThrow(
-				propertySource, propertyKey -> log.undefinedLuceneDirectoryProvider( propertyKey )
-		);
+		String directoryType = DIRECTORY_TYPE.get( propertySource );
 
 		DirectoryProviderInitializationContext initializationContext = new DirectoryProviderInitializationContextImpl(
 				backendContext,
