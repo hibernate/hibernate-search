@@ -68,20 +68,22 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_2 = MessageConstants.BACKEND_ES_ID_RANGE_MIN;
 
 	@Message(id = ID_OFFSET_2 + 7,
-			value = "Elasticsearch request failed.\nRequest: %1$s\nResponse: %2$s"
+			value = "Elasticsearch request failed: %3$s\nRequest: %1$s\nResponse: %2$s"
 	)
 	SearchException elasticsearchRequestFailed(
 			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
 			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response,
+			String causeMessage,
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 8,
 			// Note: no need to add a '\n' before "Response", since the formatter will always add one
-			value = "Elasticsearch bulked request failed.\nRequest metadata: %1$sResponse: %2$s"
+			value = "Elasticsearch bulked request failed: %3$s\nRequest metadata: %1$sResponse: %2$s"
 	)
 	SearchException elasticsearchBulkedRequestFailed(
 			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject requestMetadata,
 			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject response,
+			String causeMessage,
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 10,
