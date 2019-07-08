@@ -61,9 +61,13 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 	public final CompletableFuture<R> execute(ElasticsearchWorkExecutionContext executionContext) {
 		return Futures.create( () -> beforeExecute( executionContext, request ) )
 				.thenCompose( ignored -> executionContext.getClient().submit( request ) )
-				.exceptionally( Futures.handler(
-						throwable -> { throw log.elasticsearchRequestFailed( request, null, Throwables.expectException( throwable ) ); }
-				) )
+				.exceptionally( Futures.handler( throwable -> {
+					throw log.elasticsearchRequestFailed(
+							request, null,
+							throwable.getMessage(),
+							Throwables.expectException( throwable )
+					);
+				} ) )
 				.thenCompose( response -> handleResult( executionContext, response ) );
 	}
 
@@ -101,13 +105,17 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.elasticsearchRequestFailed( request, response, e );
+			throw log.elasticsearchRequestFailed( request, response, e.getMessage(), e );
 		}
 
 		return afterSuccess( executionContext )
-				.exceptionally( Futures.handler(
-						throwable -> { throw log.elasticsearchRequestFailed( request, response, Throwables.expectException( throwable ) ); }
-				) )
+				.exceptionally( Futures.handler( throwable -> {
+					throw log.elasticsearchRequestFailed(
+							request, response,
+							throwable.getMessage(),
+							Throwables.expectException( throwable )
+					);
+				} ) )
 				.thenApply( ignored -> result );
 	}
 

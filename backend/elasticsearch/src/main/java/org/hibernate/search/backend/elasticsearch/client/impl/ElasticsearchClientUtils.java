@@ -63,7 +63,7 @@ public class ElasticsearchClientUtils {
 						.orElseThrow( () -> new AssertionFailure( "Missing version number in JSON response" ) );
 			}
 			catch (RuntimeException e) {
-				throw log.elasticsearchRequestFailed( request, response, e );
+				throw log.elasticsearchRequestFailed( request, response, e.getMessage(), e );
 			}
 		}
 		catch (RuntimeException e) {
