@@ -67,7 +67,7 @@ public class ElasticsearchClientUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.failedToDetectElasticsearchVersion( e );
+			throw log.failedToDetectElasticsearchVersion( e.getMessage(), e );
 		}
 	}
 
