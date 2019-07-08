@@ -255,8 +255,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			TypeMetadataContributorProviderImpl contributorProvider = new TypeMetadataContributorProviderImpl();
 			mapper = mappingInitiator.createMapper( buildContext, contributorProvider );
 
-			Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>(
-					contributionByType.keySet() );
+			// We need to create a separate Set because calls to mapper.addIndexed() might add more contributions
+			Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>( contributionByType.keySet() );
 			for ( MappableTypeModel typeModel : potentiallyMappedToIndexTypes ) {
 				TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
 				String indexName = contribution.getIndexName();
