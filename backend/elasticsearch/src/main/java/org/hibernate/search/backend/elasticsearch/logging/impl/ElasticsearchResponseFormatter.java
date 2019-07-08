@@ -24,7 +24,7 @@ public class ElasticsearchResponseFormatter {
 
 	public static String formatResponse(ElasticsearchResponse response) {
 		if ( response == null ) {
-			return null;
+			return "(no response)";
 		}
 
 		JsonLogHelper helper = JsonLogHelper.get();
