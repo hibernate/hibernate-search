@@ -22,7 +22,6 @@ import org.junit.Test;
 
 public class ElasticsearchAnalysisConfigurerIT {
 
-	private static final String MAPPED_TYPE_NAME = "TypeName";
 	private static final String BACKEND_NAME = "BackendName";
 	private static final String INDEX_NAME = "IndexName";
 
@@ -39,8 +38,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -61,8 +58,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -94,8 +89,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -123,8 +116,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -152,8 +143,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -180,8 +169,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -207,8 +194,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -235,8 +220,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -262,8 +245,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -290,8 +271,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -317,8 +296,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -353,9 +330,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 				)
 				.withIndex(
 						INDEX_NAME,
-						c -> c.mappedType( MAPPED_TYPE_NAME ),
-						mappingContributor,
-						indexManager -> { }
+						mappingContributor
 				)
 				.setup();
 	}

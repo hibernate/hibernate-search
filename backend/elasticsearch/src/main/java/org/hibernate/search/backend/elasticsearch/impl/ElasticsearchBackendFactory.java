@@ -36,9 +36,7 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
@@ -81,8 +79,6 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 	@Override
 	public BackendImplementor<?> create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
-		EventContext backendContext = EventContexts.fromBackendName( name );
-
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
 		/*
 		 * The Elasticsearch client only converts JsonObjects to String and
@@ -124,7 +120,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					dialect.createIndexTypeFieldFactoryProvider( userFacingGson );
 
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
-					getAnalysisDefinitionRegistry( backendContext, buildContext, propertySource );
+					getAnalysisDefinitionRegistry( buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
 					link,
@@ -159,7 +155,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		}
 	}
 
-	private ElasticsearchAnalysisDefinitionRegistry getAnalysisDefinitionRegistry(EventContext backendContext,
+	private ElasticsearchAnalysisDefinitionRegistry getAnalysisDefinitionRegistry(
 			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		try {
 			// Apply the user-provided analysis configurer if necessary
@@ -177,7 +173,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.orElseGet( ElasticsearchAnalysisDefinitionRegistry::new );
 		}
 		catch (Exception e) {
-			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), backendContext, e );
+			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), e );
 		}
 	}
 }

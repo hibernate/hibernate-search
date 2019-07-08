@@ -85,10 +85,10 @@ public class LuceneBackendFactory implements BackendFactory {
 
 		DirectoryProvider directoryProvider = getDirectoryProvider( backendContext, propertySource );
 
-		MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( backendContext, propertySource );
+		MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource );
 
 		LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry = getAnalysisDefinitionRegistry(
-				backendContext, buildContext, propertySource, luceneVersion
+				buildContext, propertySource, luceneVersion
 		);
 
 		return new LuceneBackendImpl(
@@ -124,21 +124,21 @@ public class LuceneBackendFactory implements BackendFactory {
 	private DirectoryProvider getDirectoryProvider(EventContext backendContext, ConfigurationPropertySource propertySource) {
 		// TODO HSEARCH-3440 be more clever about the type, also support providing a class => use a BeanReference?
 		String directoryProviderString = DIRECTORY_PROVIDER.getOrThrow(
-				propertySource, propertyKey -> log.undefinedLuceneDirectoryProvider( propertyKey, backendContext )
+				propertySource, propertyKey -> log.undefinedLuceneDirectoryProvider( propertyKey )
 		);
 
 		if ( "local_directory".equals( directoryProviderString ) ) {
 			// TODO HSEARCH-3440 implement the checks properly
 			Path rootDirectory = ROOT_DIRECTORY.get( propertySource ).toAbsolutePath();
 
-			initializeRootDirectory( rootDirectory, backendContext );
+			initializeRootDirectory( rootDirectory );
 			return new MMapDirectoryProvider( backendContext, rootDirectory );
 		}
 
-		throw log.unrecognizedLuceneDirectoryProvider( directoryProviderString, backendContext );
+		throw log.unrecognizedLuceneDirectoryProvider( directoryProviderString );
 	}
 
-	private MultiTenancyStrategy getMultiTenancyStrategy(EventContext backendContext, ConfigurationPropertySource propertySource) {
+	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource) {
 		MultiTenancyStrategyName multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
 
 		switch ( multiTenancyStrategyName ) {
@@ -148,14 +148,13 @@ public class LuceneBackendFactory implements BackendFactory {
 				return new DiscriminatorMultiTenancyStrategy();
 			default:
 				throw new AssertionFailure( String.format(
-						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'. %2$s",
-						multiTenancyStrategyName,
-						backendContext.render()
+						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'.",
+						multiTenancyStrategyName
 				) );
 		}
 	}
 
-	private LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry(EventContext backendContext,
+	private LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry(
 			BackendBuildContext buildContext, ConfigurationPropertySource propertySource,
 			Version luceneVersion) {
 		try {
@@ -179,14 +178,14 @@ public class LuceneBackendFactory implements BackendFactory {
 					.orElseGet( LuceneAnalysisDefinitionRegistry::new );
 		}
 		catch (Exception e) {
-			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), backendContext, e );
+			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), e );
 		}
 	}
 
-	private void initializeRootDirectory(Path rootDirectory, EventContext eventContext) {
+	private void initializeRootDirectory(Path rootDirectory) {
 		if ( Files.exists( rootDirectory ) ) {
 			if ( !Files.isDirectory( rootDirectory ) || !Files.isWritable( rootDirectory ) ) {
-				throw log.localDirectoryBackendRootDirectoryNotWritableDirectory( rootDirectory, eventContext );
+				throw log.localDirectoryBackendRootDirectoryNotWritableDirectory( rootDirectory );
 			}
 		}
 		else {
@@ -194,7 +193,7 @@ public class LuceneBackendFactory implements BackendFactory {
 				Files.createDirectories( rootDirectory );
 			}
 			catch (Exception e) {
-				throw log.unableToCreateRootDirectoryForLocalDirectoryBackend( rootDirectory, eventContext, e );
+				throw log.unableToCreateRootDirectoryForLocalDirectoryBackend( rootDirectory, e );
 			}
 		}
 	}
