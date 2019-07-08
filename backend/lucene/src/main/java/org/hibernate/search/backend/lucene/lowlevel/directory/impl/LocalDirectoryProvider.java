@@ -32,6 +32,8 @@ public class LocalDirectoryProvider implements DirectoryProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public static final String NAME = "local-directory";
+
 	private static final ConfigurationProperty<Path> ROOT =
 			ConfigurationProperty.forKey( LuceneBackendSettings.DirectoryRadicals.ROOT )
 					.as( Path.class, Paths::get )

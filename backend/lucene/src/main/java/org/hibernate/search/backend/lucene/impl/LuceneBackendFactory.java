@@ -20,8 +20,6 @@ import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProviderInitializationContextImpl;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.directory.impl.LocalDirectoryProvider;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategy;
@@ -53,12 +51,6 @@ public class LuceneBackendFactory implements BackendFactory {
 					.as( Version.class, LuceneBackendFactory::parseLuceneVersion )
 					.build();
 
-	private static final ConfigurationProperty<String> DIRECTORY_TYPE =
-			ConfigurationProperty.forKey( LuceneBackendSettings.DIRECTORY_TYPE )
-					.asString()
-					.withDefault( LuceneBackendSettings.Defaults.DIRECTORY_TYPE )
-					.build();
-
 	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( LuceneBackendSettings.MULTI_TENANCY_STRATEGY )
 					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::of )
@@ -77,7 +69,8 @@ public class LuceneBackendFactory implements BackendFactory {
 
 		Version luceneVersion = getLuceneVersion( backendContext, propertySource );
 
-		DirectoryProvider directoryProvider = getDirectoryProvider( backendContext, propertySource );
+		BeanHolder<? extends DirectoryProvider> directoryProviderHolder =
+				getDirectoryProvider( backendContext, buildContext, propertySource );
 
 		MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource );
 
@@ -87,7 +80,7 @@ public class LuceneBackendFactory implements BackendFactory {
 
 		return new LuceneBackendImpl(
 				name,
-				directoryProvider,
+				directoryProviderHolder,
 				new LuceneWorkFactoryImpl( multiTenancyStrategy ),
 				analysisDefinitionRegistry,
 				multiTenancyStrategy
@@ -115,22 +108,14 @@ public class LuceneBackendFactory implements BackendFactory {
 		return luceneVersion;
 	}
 
-	private DirectoryProvider getDirectoryProvider(EventContext backendContext, ConfigurationPropertySource propertySource) {
-		// TODO HSEARCH-3440 be more clever about the type, also support providing a class => use a BeanReference?
-		String directoryType = DIRECTORY_TYPE.get( propertySource );
-
-		DirectoryProviderInitializationContext initializationContext = new DirectoryProviderInitializationContextImpl(
+	private BeanHolder<? extends DirectoryProvider> getDirectoryProvider(EventContext backendContext,
+			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
+		DirectoryProviderInitializationContextImpl initializationContext = new DirectoryProviderInitializationContextImpl(
 				backendContext,
+				buildContext.getBeanResolver(),
 				propertySource.withMask( "directory" )
 		);
-
-		if ( "local-directory".equals( directoryType ) ) {
-			DirectoryProvider directoryProvider = new LocalDirectoryProvider();
-			directoryProvider.initialize( initializationContext );
-			return directoryProvider;
-		}
-
-		throw log.unrecognizedLuceneDirectoryProvider( directoryType );
+		return initializationContext.createDirectoryProvider();
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource) {
