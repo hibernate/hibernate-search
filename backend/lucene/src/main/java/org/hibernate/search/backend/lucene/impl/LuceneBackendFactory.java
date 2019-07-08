@@ -125,7 +125,7 @@ public class LuceneBackendFactory implements BackendFactory {
 				propertySource.withMask( "directory" )
 		);
 
-		if ( "local_directory".equals( directoryType ) ) {
+		if ( "local-directory".equals( directoryType ) ) {
 			DirectoryProvider directoryProvider = new MMapDirectoryProvider();
 			directoryProvider.initialize( initializationContext );
 			return directoryProvider;
