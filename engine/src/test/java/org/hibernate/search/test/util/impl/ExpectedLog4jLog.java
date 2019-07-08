@@ -18,6 +18,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.apache.log4j.spi.ThrowableInformation;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -59,6 +60,20 @@ public class ExpectedLog4jLog implements TestRule {
 	}
 
 	/**
+	 * Verify that your code produces a log event matching the given level or higher,
+	 * with a throwable matching the given matcher, and a message containing the given strings.
+	 */
+	public void expectEvent(Level level,
+			Matcher<? super Throwable> throwableMatcher,
+			String containedString, String... otherContainedStrings) {
+		expectEvent( CoreMatchers.allOf(
+				eventLevelMatcher( level ),
+				eventThrowableMatcher( throwableMatcher ),
+				eventMessageMatcher( containsAllStrings( containedString, otherContainedStrings ) )
+		) );
+	}
+
+	/**
 	 * Verify that your code <strong>doesn't</strong> produce a log event matching the given matcher.
 	 */
 	public void expectEventMissing(Matcher<? extends LoggingEvent> matcher) {
@@ -69,16 +84,7 @@ public class ExpectedLog4jLog implements TestRule {
 	 * Verify that your code <strong>doesn't</strong> produce a log event matching the given level or higher.
 	 */
 	public void expectLevelMissing(Level level) {
-		expectEventMissing( new TypeSafeMatcher<LoggingEvent>() {
-			@Override
-			public void describeTo(Description description) {
-				description.appendText( "a LoggingEvent with " ).appendValue( level ).appendText( " level or higher" );
-			}
-			@Override
-			protected boolean matchesSafely(LoggingEvent item) {
-				return item.getLevel().isGreaterOrEqual( level );
-			}
-		} );
+		expectEventMissing( eventLevelMatcher( level ) );
 	}
 
 	/**
@@ -132,6 +138,33 @@ public class ExpectedLog4jLog implements TestRule {
 		return CoreMatchers.<String>allOf( matchers );
 	}
 
+	private Matcher<LoggingEvent> eventLevelMatcher(Level level) {
+		return new TypeSafeMatcher<LoggingEvent>() {
+			@Override
+			public void describeTo(Description description) {
+				description.appendText( "a LoggingEvent with " ).appendValue( level ).appendText( " level or higher" );
+			}
+			@Override
+			protected boolean matchesSafely(LoggingEvent item) {
+				return item.getLevel().isGreaterOrEqual( level );
+			}
+		};
+	}
+
+	private Matcher<LoggingEvent> eventThrowableMatcher(Matcher<? super Throwable> throwableMatcher) {
+		return new TypeSafeMatcher<LoggingEvent>() {
+			@Override
+			public void describeTo(Description description) {
+				description.appendText( "a LoggingEvent with throwable " ).appendValue( throwableMatcher );
+			}
+			@Override
+			protected boolean matchesSafely(LoggingEvent item) {
+				ThrowableInformation throwableInfo = item.getThrowableInformation();
+				return throwableMatcher.matches( throwableInfo == null ? null : throwableInfo.getThrowable() );
+			}
+		};
+	}
+
 	private Matcher<LoggingEvent> eventMessageMatcher(final Matcher<String> messageMatcher) {
 		return new TypeSafeMatcher<LoggingEvent>() {
 
@@ -154,6 +187,7 @@ public class ExpectedLog4jLog implements TestRule {
 
 		@Override
 		public void close() {
+			// Nothing to clean up
 		}
 
 		@Override
