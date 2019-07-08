@@ -51,7 +51,7 @@ public final class LuceneBackendSettings {
 	 * Expects a String, such as "local-directory".
 	 * See the reference documentation for a list of available values.
 	 * <p>
-	 * No default: this property must be set.
+	 * Defaults to {@link Defaults#DIRECTORY_TYPE}.
 	 */
 	public static final String DIRECTORY_TYPE = DIRECTORY_PREFIX + DirectoryRadicals.TYPE;
 
@@ -108,6 +108,8 @@ public final class LuceneBackendSettings {
 		}
 
 		public static final Version LUCENE_VERSION = Version.LATEST;
+
+		public static final String DIRECTORY_TYPE = "local-directory";
 
 		public static final String DIRECTORY_ROOT = ".";
 
