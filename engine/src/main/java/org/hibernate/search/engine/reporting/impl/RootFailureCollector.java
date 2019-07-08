@@ -159,7 +159,11 @@ public class RootFailureCollector implements FailureCollector {
 		final void appendChildrenFailuresTo(ToStringTreeBuilder builder) {
 			if ( children != null ) {
 				for ( ContextualFailureCollectorImpl child : children.values() ) {
-					child.appendFailuresTo( builder );
+					// Some contexts may have been mentioned without any failure being ever reported.
+					// Only display contexts that had at least one failure reported.
+					if ( child.hasFailure() ) {
+						child.appendFailuresTo( builder );
+					}
 				}
 			}
 		}
