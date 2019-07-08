@@ -189,8 +189,8 @@ public interface Log extends BasicLogger {
 	SearchException invalidElasticsearchTokenFilterDefinition(String name);
 
 	@Message(id = ID_OFFSET_2 + 80,
-			value = "Failed to detect the Elasticsearch version running on the cluster." )
-	SearchException failedToDetectElasticsearchVersion(@Cause Exception e);
+			value = "Failed to detect the Elasticsearch version running on the cluster: %s" )
+	SearchException failedToDetectElasticsearchVersion(String causeMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 81,
 			value = "An unsupported Elasticsearch version runs on the Elasticsearch cluster: '%s'."
