@@ -7,9 +7,6 @@
 package org.hibernate.search.backend.lucene.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.Optional;
@@ -20,9 +17,11 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.LuceneAnalysi
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyName;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProviderInitializationContextImpl;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.MMapDirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategy;
@@ -54,15 +53,9 @@ public class LuceneBackendFactory implements BackendFactory {
 					.as( Version.class, LuceneBackendFactory::parseLuceneVersion )
 					.build();
 
-	private static final OptionalConfigurationProperty<String> DIRECTORY_PROVIDER =
-			ConfigurationProperty.forKey( LuceneBackendSettings.DIRECTORY_PROVIDER )
+	private static final OptionalConfigurationProperty<String> DIRECTORY_TYPE =
+			ConfigurationProperty.forKey( LuceneBackendSettings.DIRECTORY_TYPE )
 					.asString()
-					.build();
-
-	private static final ConfigurationProperty<Path> ROOT_DIRECTORY =
-			ConfigurationProperty.forKey( LuceneBackendSettings.ROOT_DIRECTORY )
-					.as( Path.class, Paths::get )
-					.withDefault( () -> Paths.get( "." ) )
 					.build();
 
 	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
@@ -123,19 +116,22 @@ public class LuceneBackendFactory implements BackendFactory {
 
 	private DirectoryProvider getDirectoryProvider(EventContext backendContext, ConfigurationPropertySource propertySource) {
 		// TODO HSEARCH-3440 be more clever about the type, also support providing a class => use a BeanReference?
-		String directoryProviderString = DIRECTORY_PROVIDER.getOrThrow(
+		String directoryType = DIRECTORY_TYPE.getOrThrow(
 				propertySource, propertyKey -> log.undefinedLuceneDirectoryProvider( propertyKey )
 		);
 
-		if ( "local_directory".equals( directoryProviderString ) ) {
-			// TODO HSEARCH-3440 implement the checks properly
-			Path rootDirectory = ROOT_DIRECTORY.get( propertySource ).toAbsolutePath();
+		DirectoryProviderInitializationContext initializationContext = new DirectoryProviderInitializationContextImpl(
+				backendContext,
+				propertySource.withMask( "directory" )
+		);
 
-			initializeRootDirectory( rootDirectory );
-			return new MMapDirectoryProvider( backendContext, rootDirectory );
+		if ( "local_directory".equals( directoryType ) ) {
+			DirectoryProvider directoryProvider = new MMapDirectoryProvider();
+			directoryProvider.initialize( initializationContext );
+			return directoryProvider;
 		}
 
-		throw log.unrecognizedLuceneDirectoryProvider( directoryProviderString );
+		throw log.unrecognizedLuceneDirectoryProvider( directoryType );
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource) {
@@ -179,22 +175,6 @@ public class LuceneBackendFactory implements BackendFactory {
 		}
 		catch (Exception e) {
 			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), e );
-		}
-	}
-
-	private void initializeRootDirectory(Path rootDirectory) {
-		if ( Files.exists( rootDirectory ) ) {
-			if ( !Files.isDirectory( rootDirectory ) || !Files.isWritable( rootDirectory ) ) {
-				throw log.localDirectoryBackendRootDirectoryNotWritableDirectory( rootDirectory );
-			}
-		}
-		else {
-			try {
-				Files.createDirectories( rootDirectory );
-			}
-			catch (Exception e) {
-				throw log.unableToCreateRootDirectoryForLocalDirectoryBackend( rootDirectory, e );
-			}
 		}
 	}
 

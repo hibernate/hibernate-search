@@ -10,7 +10,10 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCreationContextImpl;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
@@ -37,7 +40,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.store.Directory;
 
 public class IndexingBackendContext {
 
@@ -72,13 +74,17 @@ public class IndexingBackendContext {
 	}
 
 	IndexAccessor createIndexAccessor(String indexName, Analyzer analyzer) {
-		Directory directory;
+		DirectoryHolder directory;
+		DirectoryCreationContext context = new DirectoryCreationContextImpl(
+				eventContext.append( EventContexts.fromIndexName( indexName ) ),
+				indexName
+		);
 		try {
-			directory = directoryProvider.createDirectory( indexName );
+			directory = directoryProvider.createDirectory( context );
 		}
 		catch (IOException | RuntimeException e) {
 			throw log.unableToCreateIndexDirectory(
-					eventContext.append( EventContexts.fromIndexName( indexName ) ),
+					eventContext.append( context.getEventContext() ),
 					e
 			);
 		}

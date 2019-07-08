@@ -59,7 +59,6 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 	public IndexWriterDelegatorImpl(String indexName, Directory directory, Analyzer analyzer, ErrorHandler errorHandler) {
 		this.indexName = indexName;
 		this.indexEventContext = EventContexts.fromIndexName( indexName );
-		// TODO HSEARCH-3440 use our own SPI instead of a directory directly
 		this.directory = directory;
 		this.analyzer = analyzer;
 		this.errorHandler = errorHandler;

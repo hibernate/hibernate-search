@@ -40,11 +40,31 @@ public final class LuceneBackendSettings {
 	 */
 	public static final String LUCENE_VERSION = "lucene_version";
 
-	// TODO HSEARCH-3440 document this property
-	public static final String DIRECTORY_PROVIDER = "directory_provider";
+	/**
+	 * The prefix for directory-related property keys.
+	 */
+	public static final String DIRECTORY_PREFIX = "directory.";
 
-	// TODO HSEARCH-3440 document this property
-	public static final String ROOT_DIRECTORY = "root_directory";
+	/**
+	 * The type of directory to use when reading from or writing to the index.
+	 * <p>
+	 * Expects a String, such as "local_directory".
+	 * See the reference documentation for a list of available values.
+	 * <p>
+	 * No default: this property must be set.
+	 */
+	public static final String DIRECTORY_TYPE = DIRECTORY_PREFIX + DirectoryRadicals.TYPE;
+
+	/**
+	 * The filesystem root for directories.
+	 * <p>
+	 * Expects a String representing a path to an existing directory accessible in read and write mode, such as "local_directory".
+	 * <p>
+	 * The actual index files will be created in {@code <root>/<index name>}.
+	 * <p>
+	 * Defaults to the JVM's working directory ({@link Defaults#DIRECTORY_ROOT}).
+	 */
+	public static final String DIRECTORY_ROOT = DIRECTORY_PREFIX + DirectoryRadicals.ROOT;
 
 	/**
 	 * The multi-tenancy strategy to use.
@@ -68,6 +88,18 @@ public final class LuceneBackendSettings {
 	public static final String ANALYSIS_CONFIGURER = "analysis_configurer";
 
 	/**
+	 * Configuration property keys for directories without the {@link #DIRECTORY_PREFIX prefix}.
+	 */
+	public static final class DirectoryRadicals {
+
+		private DirectoryRadicals() {
+		}
+
+		public static final String TYPE = "type";
+		public static final String ROOT = "root";
+	}
+
+	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {
@@ -76,6 +108,8 @@ public final class LuceneBackendSettings {
 		}
 
 		public static final Version LUCENE_VERSION = Version.LATEST;
+
+		public static final String DIRECTORY_ROOT = ".";
 
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 	}
