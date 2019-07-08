@@ -8,12 +8,10 @@ package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -26,27 +24,38 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SleepingLockWrapper;
 
 /**
- * Provides utility functions around Lucene directories.
+ * The implementation of {@link DirectoryCreationContext},
+ * providing utility functions around Lucene directories.
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-class DirectoryHelper {
+public class DirectoryCreationContextImpl implements DirectoryCreationContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private DirectoryHelper() {
+	private final EventContext eventContext;
+	private final String indexName;
+
+	public DirectoryCreationContextImpl(EventContext eventContext, String indexName) {
+		this.eventContext = eventContext;
+		this.indexName = indexName;
 	}
 
-	/**
-	 * Initialize the Lucene Directory if it isn't already.
-	 *
-	 * @param directory the Directory to initialize
-	 * @throws SearchException in case of lock acquisition timeouts, IOException, or if a corrupt index is found
-	 */
-	public static void initializeIndexIfNeeded(Directory directory, EventContext eventContext) throws IOException {
+	@Override
+	public EventContext getEventContext() {
+		return eventContext;
+	}
+
+	@Override
+	public String getIndexName() {
+		return indexName;
+	}
+
+	@Override
+	public void initializeIndexIfNeeded(Directory directory) throws IOException {
 		if ( DirectoryReader.indexExists( directory ) ) {
 			return;
 		}
@@ -62,22 +71,6 @@ class DirectoryHelper {
 		}
 		catch (LockObtainFailedException lofe) {
 			log.lockingFailureDuringInitialization( directory.toString(), eventContext );
-		}
-	}
-
-	public static void makeSanityCheckedFilesystemDirectory(Path indexDirectory, EventContext eventContext) {
-		if ( Files.exists( indexDirectory ) ) {
-			if ( !Files.isDirectory( indexDirectory ) || !Files.isWritable( indexDirectory ) ) {
-				throw log.localDirectoryIndexRootDirectoryNotWritableDirectory( indexDirectory, eventContext );
-			}
-		}
-		else {
-			try {
-				Files.createDirectories( indexDirectory );
-			}
-			catch (Exception e) {
-				throw log.unableToCreateIndexRootDirectoryForLocalDirectoryBackend( indexDirectory, eventContext, e );
-			}
 		}
 	}
 

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.index.impl;
 
 import java.io.IOException;
 
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegatorImpl;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
@@ -16,21 +17,19 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.store.Directory;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class IndexAccessor implements AutoCloseable {
-	private final Directory directory;
+	private final DirectoryHolder directoryHolder;
 
 	private final IndexWriterDelegatorImpl indexWriterDelegator;
 
-	public IndexAccessor(String indexName, Directory directory, Analyzer analyzer, ErrorHandler errorHandler) {
-		// TODO HSEARCH-3440 use our own SPI instead of a directory directly
-		this.directory = directory;
+	public IndexAccessor(String indexName, DirectoryHolder directoryHolder, Analyzer analyzer, ErrorHandler errorHandler) {
+		this.directoryHolder = directoryHolder;
 		this.indexWriterDelegator = new IndexWriterDelegatorImpl(
-				indexName, directory, analyzer, errorHandler
+				indexName, directoryHolder.get(), analyzer, errorHandler
 		);
 	}
 
@@ -38,7 +37,7 @@ public class IndexAccessor implements AutoCloseable {
 	public void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( IndexWriterDelegatorImpl::close, indexWriterDelegator );
-			closer.push( Directory::close, directory );
+			closer.push( DirectoryHolder::close, directoryHolder );
 		}
 	}
 
@@ -64,10 +63,10 @@ public class IndexAccessor implements AutoCloseable {
 	}
 
 	/**
-	 * Opens an IndexReader from the DirectoryProvider (not using the IndexWriter)
+	 * Opens an IndexReader from the Directory (not using the IndexWriter)
 	 */
 	public DirectoryReader openDirectoryIndexReader() throws IOException {
-		return DirectoryReader.open( directory );
+		return DirectoryReader.open( directoryHolder.get() );
 	}
 
 }

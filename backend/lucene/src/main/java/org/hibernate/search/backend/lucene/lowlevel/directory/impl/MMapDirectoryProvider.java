@@ -7,46 +7,92 @@
 package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.MMapDirectory;
 
 public class MMapDirectoryProvider implements DirectoryProvider {
-	private final EventContext backendContext;
 
-	private final Path rootDirectory;
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public MMapDirectoryProvider(EventContext backendContext, Path rootDirectory) {
-		this.backendContext = backendContext;
-		this.rootDirectory = rootDirectory;
-	}
+	private static final ConfigurationProperty<Path> ROOT =
+			ConfigurationProperty.forKey( LuceneBackendSettings.DirectoryRadicals.ROOT )
+					.as( Path.class, Paths::get )
+					.withDefault( () -> Paths.get( LuceneBackendSettings.Defaults.DIRECTORY_ROOT ) )
+					.build();
+
+	private Path root;
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() +
-				"[" +
-				"rootDirectory=" + rootDirectory +
-				"]";
+		return getClass().getSimpleName() + "[" + "root=" + root + "]";
 	}
 
 	@Override
-	public Directory createDirectory(String indexName) throws IOException {
-		EventContext indexContext = backendContext.append( EventContexts.fromIndexName( indexName ) );
-		Path directoryPath = rootDirectory.resolve( indexName );
-		DirectoryHelper.makeSanityCheckedFilesystemDirectory( directoryPath, indexContext );
+	public void initialize(DirectoryProviderInitializationContext context) {
+		this.root = ROOT.get( context.getConfigurationPropertySource() ).toAbsolutePath();
+		initializeRootDirectory( root );
+	}
+
+	@Override
+	public DirectoryHolder createDirectory(DirectoryCreationContext context) throws IOException {
+		Path directoryPath = root.resolve( context.getIndexName() );
+		makeSanityCheckedFilesystemDirectory( directoryPath, context.getEventContext() );
 		Directory directory = new MMapDirectory( directoryPath );
 		try {
-			DirectoryHelper.initializeIndexIfNeeded( directory, indexContext );
+			context.initializeIndexIfNeeded( directory );
+			return DirectoryHolder.of( directory );
 		}
 		catch (IOException | RuntimeException e) {
 			new SuppressingCloser( e ).push( directory );
 			throw e;
 		}
-		return directory;
+	}
+
+	private void initializeRootDirectory(Path rootDirectory) {
+		if ( Files.exists( rootDirectory ) ) {
+			if ( !Files.isDirectory( rootDirectory ) || !Files.isWritable( rootDirectory ) ) {
+				throw log.localDirectoryBackendRootDirectoryNotWritableDirectory( rootDirectory );
+			}
+		}
+		else {
+			try {
+				Files.createDirectories( rootDirectory );
+			}
+			catch (Exception e) {
+				throw log.unableToCreateRootDirectoryForLocalDirectoryBackend( rootDirectory, e );
+			}
+		}
+	}
+
+	private void makeSanityCheckedFilesystemDirectory(Path indexDirectory, EventContext eventContext) {
+		if ( Files.exists( indexDirectory ) ) {
+			if ( !Files.isDirectory( indexDirectory ) || !Files.isWritable( indexDirectory ) ) {
+				throw log.localDirectoryIndexRootDirectoryNotWritableDirectory( indexDirectory, eventContext );
+			}
+		}
+		else {
+			try {
+				Files.createDirectories( indexDirectory );
+			}
+			catch (Exception e) {
+				throw log.unableToCreateIndexRootDirectoryForLocalDirectoryBackend( indexDirectory, eventContext, e );
+			}
+		}
 	}
 }

@@ -17,7 +17,7 @@ spring.jpa:
           log.json_pretty_printing: true
         lucene1:
           # Hack to use a different directory for each test
-          root_directory: ${LUCENE_ROOT_PATH}/${random.uuid} # LUCENE_ROOT_PATH is an environment variable
+          directory.root: ${LUCENE_ROOT_PATH}/${random.uuid} # LUCENE_ROOT_PATH is an environment variable
 
 logging.level:
   org.hibernate.SQL: DEBUG
