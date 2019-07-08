@@ -20,7 +20,7 @@ import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProviderInitializationContextImpl;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.directory.impl.MMapDirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.directory.impl.LocalDirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -125,7 +125,7 @@ public class LuceneBackendFactory implements BackendFactory {
 		);
 
 		if ( "local-directory".equals( directoryType ) ) {
-			DirectoryProvider directoryProvider = new MMapDirectoryProvider();
+			DirectoryProvider directoryProvider = new LocalDirectoryProvider();
 			directoryProvider.initialize( initializationContext );
 			return directoryProvider;
 		}

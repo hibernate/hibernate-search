@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.cfg;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
+import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
 
 import org.apache.lucene.util.Version;
 
@@ -58,6 +59,8 @@ public final class LuceneBackendSettings {
 	/**
 	 * The filesystem root for directories.
 	 * <p>
+	 * Only available for the "local-directory" directory type.
+	 * <p>
 	 * Expects a String representing a path to an existing directory accessible in read and write mode, such as "local-directory".
 	 * <p>
 	 * The actual index files will be created in {@code <root>/<index name>}.
@@ -65,6 +68,18 @@ public final class LuceneBackendSettings {
 	 * Defaults to the JVM's working directory ({@link Defaults#DIRECTORY_ROOT}).
 	 */
 	public static final String DIRECTORY_ROOT = DIRECTORY_PREFIX + DirectoryRadicals.ROOT;
+
+	/**
+	 * The filesystem access strategy for directories.
+	 * <p>
+	 * Only available for the "local-directory" directory type.
+	 * <p>
+	 * Expects a {@link FileSystemAccessStrategyName} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#DIRECTORY_FILESYSTEM_ACCESS_STRATEGY}.
+	 */
+	public static final String DIRECTORY_FILESYSTEM_ACCESS_STRATEGY =
+			DIRECTORY_PREFIX + DirectoryRadicals.FILESYSTEM_ACCESS_STRATEGY;
 
 	/**
 	 * The multi-tenancy strategy to use.
@@ -97,6 +112,7 @@ public final class LuceneBackendSettings {
 
 		public static final String TYPE = "type";
 		public static final String ROOT = "root";
+		public static final String FILESYSTEM_ACCESS_STRATEGY = "filesystem_access.strategy";
 	}
 
 	/**
@@ -112,6 +128,9 @@ public final class LuceneBackendSettings {
 		public static final String DIRECTORY_TYPE = "local-directory";
 
 		public static final String DIRECTORY_ROOT = ".";
+
+		public static final FileSystemAccessStrategyName DIRECTORY_FILESYSTEM_ACCESS_STRATEGY =
+				FileSystemAccessStrategyName.AUTO;
 
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 	}
