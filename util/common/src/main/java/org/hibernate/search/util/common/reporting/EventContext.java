@@ -8,6 +8,7 @@ package org.hibernate.search.util.common.reporting;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 import org.hibernate.search.util.common.reporting.impl.CommonEventContextMessages;
@@ -48,6 +49,23 @@ public final class EventContext {
 	@Override
 	public String toString() {
 		return getClass() + "[" + render() + "]";
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj == null || !getClass().equals( obj.getClass() ) ) {
+			return false;
+		}
+
+		EventContext other = (EventContext) obj;
+
+		return Objects.equals( parent, other.parent )
+				&& element.equals( other.element );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( parent, element );
 	}
 
 	public List<EventContextElement> getElements() {

@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
@@ -32,6 +33,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.IndexedEntityBindingContextImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -66,11 +68,39 @@ class IndexManagerBuildingStateHolder {
 		this.rootBuildContext = rootBuildContext;
 	}
 
+	void createBackends(Set<String> backendNames) {
+		if ( backendNames.contains( "" ) || backendNames.contains( null ) ) {
+			backendNames.remove( "" );
+			backendNames.remove( null );
+			backendNames.add( getDefaultBackendName() );
+		}
+		for ( String backendName : backendNames ) {
+			BackendInitialBuildState<?> backendBuildState;
+			try {
+				backendBuildState = createBackend( backendName );
+			}
+			catch (RuntimeException e) {
+				rootBuildContext.getFailureCollector()
+						.withContext( EventContexts.fromBackendName( backendName ) )
+						.add( e );
+				continue;
+			}
+			backendBuildStateByName.put( backendName, backendBuildState );
+		}
+	}
+
 	BackendInitialBuildState<?> getBackend(String backendName) {
 		if ( StringHelper.isEmpty( backendName ) ) {
 			backendName = getDefaultBackendName();
 		}
-		return backendBuildStateByName.computeIfAbsent( backendName, this::createBackend );
+		BackendInitialBuildState<?> backendBuildState = backendBuildStateByName.get( backendName );
+		if ( backendBuildState == null ) {
+			throw new AssertionFailure(
+					"Mapper asking for a reference to backend '" + backendName + "', which was not declared in advance."
+					+ " There is a bug in Hibernate Search, please report it."
+			);
+		}
+		return backendBuildState;
 	}
 
 	private String getDefaultBackendName() {

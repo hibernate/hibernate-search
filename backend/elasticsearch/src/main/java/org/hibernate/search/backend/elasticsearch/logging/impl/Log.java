@@ -170,7 +170,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 75,
 			value = "Error while applying analysis configuration: %1$s")
-	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Param EventContext context, @Cause Exception e);
+	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 76,
 			value = "Invalid analyzer definition for name '%1$s'. Analyzer definitions must at least define the tokenizer.")

@@ -25,7 +25,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 public class LuceneAnalysisConfigurerIT {
 
-	private static final String MAPPED_TYPE_NAME = "TypeName";
 	private static final String BACKEND_NAME = "BackendName";
 	private static final String INDEX_NAME = "IndexName";
 
@@ -42,8 +41,6 @@ public class LuceneAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -64,8 +61,6 @@ public class LuceneAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -97,8 +92,6 @@ public class LuceneAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -126,8 +119,6 @@ public class LuceneAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -155,8 +146,6 @@ public class LuceneAnalysisConfigurerIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.indexContext( INDEX_NAME )
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -192,9 +181,7 @@ public class LuceneAnalysisConfigurerIT {
 				)
 				.withIndex(
 						INDEX_NAME,
-						c -> c.mappedType( MAPPED_TYPE_NAME ),
-						mappingContributor,
-						indexManager -> { }
+						mappingContributor
 				)
 				.setup();
 	}

@@ -18,9 +18,13 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.engine.testsupport.util.AbstractBeanResolverPartialMock;
 import org.hibernate.search.engine.testsupport.util.AbstractConfigurationPropertySourcePartialMock;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -67,6 +71,11 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				EasyMock.capture( backendPropertySourceCapture )
 		) )
 				.andReturn( (BackendImplementor) backendMock );
+		replayAll();
+		holder.createBackends( CollectionHelper.asSet( "myBackend" ) );
+		verifyAll();
+
+		resetAll();
 		replayAll();
 		IndexManagerBuildingStateHolder.BackendInitialBuildState<?> backend = holder.getBackend( "myBackend" );
 		verifyAll();
@@ -120,6 +129,9 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 
 	@Test
 	public void error_missingBackend_nullName() {
+		resetAll();
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.type" ) )
+				.andReturn( (Optional) Optional.of( "someBackendType" ) );
 		String keyPrefix = "somePrefix.";
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "default_backend" ) )
@@ -131,7 +143,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		thrown.expectMessage( "The name of the default backend is not set" );
 		thrown.expectMessage( "Set it through the configuration property 'somePrefix.default_backend'" );
 		thrown.expectMessage( "or set the backend name explicitly for each indexed type in your mapping" );
-		holder.getBackend( null );
+		holder.createBackends( CollectionHelper.asSet( (String) null ) );
 		verifyAll();
 	}
 
@@ -152,40 +164,66 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		thrown.expectMessage( "The name of the default backend is not set" );
 		thrown.expectMessage( "Set it through the configuration property 'somePrefix.default_backend'" );
 		thrown.expectMessage( "or set the backend name explicitly for each indexed type in your mapping" );
-		holder.getBackend( "" );
+		holder.createBackends( CollectionHelper.asSet( "" ) );
 		verifyAll();
 	}
 
 	@Test
 	public void error_missingBackendType_nullType() {
 		String keyPrefix = "somePrefix.";
+
+		FailureCollector rootFailureCollectorMock = createMock( FailureCollector.class );
+		ContextualFailureCollector backendFailureCollectorMock = createMock( ContextualFailureCollector.class );
+
+		Capture<Throwable> throwableCapture = Capture.newInstance();
+
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backends.backendName.type" ) )
 				.andReturn( Optional.empty() );
 		EasyMock.expect( configurationSourceMock.resolve( "backends.backendName.type" ) )
 				.andReturn( Optional.of( keyPrefix + "backends.backendName.type" ) );
+		EasyMock.expect( rootBuildContextMock.getFailureCollector() )
+				.andReturn( rootFailureCollectorMock );
+		EasyMock.expect( rootFailureCollectorMock.withContext( EventContexts.fromBackendName( "backendName" ) ) )
+				.andReturn( backendFailureCollectorMock );
+		backendFailureCollectorMock.add( EasyMock.capture( throwableCapture ) );
 		replayAll();
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Missing backend type for backend 'backendName'" );
-		thrown.expectMessage( "Set the property 'somePrefix.backends.backendName.type' to a supported value" );
-		holder.getBackend( "backendName" );
+		holder.createBackends( CollectionHelper.asSet( "backendName" ) );
 		verifyAll();
+
+		assertThat( throwableCapture.getValue() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Missing backend type for backend 'backendName'" )
+				.hasMessageContaining( "Set the property 'somePrefix.backends.backendName.type' to a supported value" );
 	}
 
 	@Test
 	public void error_missingBackendType_emptyType() {
 		String keyPrefix = "somePrefix.";
+
+		FailureCollector rootFailureCollectorMock = createMock( FailureCollector.class );
+		ContextualFailureCollector backendFailureCollectorMock = createMock( ContextualFailureCollector.class );
+
+		Capture<Throwable> throwableCapture = Capture.newInstance();
+
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backends.backendName.type" ) )
 				.andReturn( (Optional) Optional.of( "" ) );
 		EasyMock.expect( configurationSourceMock.resolve( "backends.backendName.type" ) )
 				.andReturn( Optional.of( keyPrefix + "backends.backendName.type" ) );
+		EasyMock.expect( rootBuildContextMock.getFailureCollector() )
+				.andReturn( rootFailureCollectorMock );
+		EasyMock.expect( rootFailureCollectorMock.withContext( EventContexts.fromBackendName( "backendName" ) ) )
+				.andReturn( backendFailureCollectorMock );
+		backendFailureCollectorMock.add( EasyMock.capture( throwableCapture ) );
 		replayAll();
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Missing backend type for backend 'backendName'" );
-		thrown.expectMessage( "Set the property 'somePrefix.backends.backendName.type' to a supported value" );
-		holder.getBackend( "backendName" );
+		holder.createBackends( CollectionHelper.asSet( "backendName" ) );
 		verifyAll();
+
+		assertThat( throwableCapture.getValue() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Missing backend type for backend 'backendName'" )
+				.hasMessageContaining( "Set the property 'somePrefix.backends.backendName.type' to a supported value" );
 	}
 
 }

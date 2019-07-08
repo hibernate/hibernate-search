@@ -162,7 +162,17 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			// Second step: create mappers and their backing index managers
+			// Second step: create backends that will be necessary for mappers
+			Set<String> backendNames = new LinkedHashSet<>();
+			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
+				mappingBuildingState.contributeBackendNames( backendNames );
+			}
+			indexManagerBuildingStateHolder.createBackends( backendNames );
+			checkingRootFailures = true;
+			failureCollector.checkNoFailure();
+			checkingRootFailures = false;
+
+			// Third step: create mappers and their backing index managers
 			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
 				mappingBuildingState.createMapper( indexManagerBuildingStateHolder );
 			}
@@ -170,7 +180,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			// Third step: create mappings
+			// Fourth step: create mappings
 			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
 				mappingBuildingState.partiallyBuildAndAddTo( partiallyBuiltMappings );
 			}
@@ -249,6 +259,15 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 		void collect() {
 			mappingInitiator.configure( buildContext, new MappingConfigurationCollectorImpl() );
+		}
+
+		void contributeBackendNames(Set<String> backendNames) {
+			for ( TypeMappingContribution<C> contribution : contributionByType.values() ) {
+				if ( contribution.getIndexName() != null ) { // If the type is mapped to an index
+					String backendName = contribution.getBackendName();
+					backendNames.add( backendName );
+				}
+			}
 		}
 
 		void createMapper(IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {

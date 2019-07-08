@@ -135,7 +135,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_1 + 329,
 			value = "Error while applying analysis configuration: %1$s")
-	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Param EventContext context, @Cause Exception e);
+	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_1 + 330,
 			value = "Multiple analyzer definitions with the same name: '%1$s'. The analyzer names must be unique." )
@@ -184,21 +184,19 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 1,
 			value = "Root directory '%1$s' exists but is not a writable directory.")
-	SearchException localDirectoryBackendRootDirectoryNotWritableDirectory(Path rootDirectory,
-			@Param EventContext context);
+	SearchException localDirectoryBackendRootDirectoryNotWritableDirectory(Path rootDirectory);
 
 	@Message(id = ID_OFFSET_2 + 2,
 			value = "Unable to create root directory '%1$s'.")
-	SearchException unableToCreateRootDirectoryForLocalDirectoryBackend(Path rootDirectory,
-			@Param EventContext context, @Cause Exception e);
+	SearchException unableToCreateRootDirectoryForLocalDirectoryBackend(Path rootDirectory, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 3,
 			value = "Undefined Lucene directory provider for property '%1$s'.")
-	SearchException undefinedLuceneDirectoryProvider(String propertyKey, @Param EventContext context);
+	SearchException undefinedLuceneDirectoryProvider(String propertyKey);
 
 	@Message(id = ID_OFFSET_2 + 4,
 			value = "Unrecognized Lucene directory provider '%1$s'.")
-	SearchException unrecognizedLuceneDirectoryProvider(String directoryProvider, @Param EventContext context);
+	SearchException unrecognizedLuceneDirectoryProvider(String directoryProvider);
 
 	@Message(id = ID_OFFSET_2 + 5,
 			value = "The Lucene extension can only be applied to objects"
