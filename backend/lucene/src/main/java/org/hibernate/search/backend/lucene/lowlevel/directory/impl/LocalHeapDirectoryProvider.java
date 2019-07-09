@@ -16,12 +16,14 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSLockFactory;
+import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
 
 public class LocalHeapDirectoryProvider implements DirectoryProvider {
 
 	public static final String NAME = "local-heap";
+
+	private LockFactory lockFactory;
 
 	@Override
 	public String toString() {
@@ -30,14 +32,12 @@ public class LocalHeapDirectoryProvider implements DirectoryProvider {
 
 	@Override
 	public void initialize(DirectoryProviderInitializationContext context) {
-		// Nothing to do
+		this.lockFactory = context.createConfiguredLockFactory().orElseGet( SingleInstanceLockFactory::new );
 	}
 
 	@Override
 	public DirectoryHolder createDirectory(DirectoryCreationContext context) throws IOException {
-		// TODO HSEARCH-3440 re-allow configuring the lock factory
-		//  see org.hibernate.search.store.impl.DefaultLockFactoryCreator.createLockFactory
-		Directory directory = new ByteBuffersDirectory( new SingleInstanceLockFactory() );
+		Directory directory = new ByteBuffersDirectory( lockFactory );
 		try {
 			context.initializeIndexIfNeeded( directory );
 			return DirectoryHolder.of( directory );
