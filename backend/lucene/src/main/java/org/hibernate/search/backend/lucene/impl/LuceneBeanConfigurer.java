@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.impl;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.LocalDirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.directory.impl.LocalHeapDirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -24,6 +25,10 @@ public class LuceneBeanConfigurer implements BeanConfigurer {
 		context.define(
 				DirectoryProvider.class, LocalDirectoryProvider.NAME,
 				factoryCreationContext -> BeanHolder.of( new LocalDirectoryProvider() )
+		);
+		context.define(
+				DirectoryProvider.class, LocalHeapDirectoryProvider.NAME,
+				factoryCreationContext -> BeanHolder.of( new LocalHeapDirectoryProvider() )
 		);
 	}
 }
