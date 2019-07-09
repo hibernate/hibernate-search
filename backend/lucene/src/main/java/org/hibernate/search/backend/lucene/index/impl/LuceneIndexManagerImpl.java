@@ -39,7 +39,7 @@ import org.apache.lucene.index.IndexReader;
 
 
 // TODO HSEARCH-3117 in the end the IndexManager won't implement ReaderProvider as it's far more complex than that
-class LuceneIndexManagerImpl
+public class LuceneIndexManagerImpl
 		implements IndexManagerImplementor<LuceneRootDocumentBuilder>, LuceneIndexManager, ReaderProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -178,6 +178,10 @@ class LuceneIndexManagerImpl
 		throw log.indexManagerUnwrappingWithUnknownType(
 				clazz, LuceneIndexManager.class, getBackendAndIndexEventContext()
 		);
+	}
+
+	public final IndexAccessor getIndexAccessorForTests() {
+		return indexAccessor;
 	}
 
 	private EventContext getBackendAndIndexEventContext() {
