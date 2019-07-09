@@ -16,6 +16,7 @@ import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -27,6 +28,7 @@ import org.junit.experimental.categories.Category;
 public class DirectoryLifecycleTest {
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testLifecycle() {
 		//test it once
 		testOnce();
