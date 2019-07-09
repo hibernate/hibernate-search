@@ -16,7 +16,7 @@ public enum LockingStrategyName {
 
 	SIMPLE_FILESYSTEM( "simple-filesystem" ),
 	NATIVE_FILESYSTEM( "native-filesystem" ),
-	SINGLE( "single" ),
+	SINGLE_INSTANCE( "single-instance" ),
 	NONE( "none" );
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
