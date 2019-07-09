@@ -28,7 +28,7 @@ import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.SimpleFSDirectory;
 
-public class LuceneLocalDirectoryIT extends AbstractBuiltInDirectoryIT {
+public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT {
 
 	/**
 	 * Test that the index is created in the configured root.
@@ -118,7 +118,7 @@ public class LuceneLocalDirectoryIT extends AbstractBuiltInDirectoryIT {
 
 	@Override
 	protected Object getDirectoryType() {
-		return "local-directory";
+		return "local-filesystem";
 	}
 
 	@Override
