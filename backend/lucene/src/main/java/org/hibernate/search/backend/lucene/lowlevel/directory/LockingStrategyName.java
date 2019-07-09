@@ -14,8 +14,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum LockingStrategyName {
 
-	SIMPLE( "simple" ),
-	NATIVE( "native" ),
+	SIMPLE_FILESYSTEM( "simple-filesystem" ),
+	NATIVE_FILESYSTEM( "native-filesystem" ),
 	SINGLE( "single" ),
 	NONE( "none" );
 

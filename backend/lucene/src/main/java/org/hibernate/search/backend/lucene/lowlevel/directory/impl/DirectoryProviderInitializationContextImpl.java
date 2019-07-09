@@ -95,9 +95,9 @@ public class DirectoryProviderInitializationContextImpl implements DirectoryProv
 
 	private static LockFactory createLockFactory(LockingStrategyName name) {
 		switch ( name ) {
-			case SIMPLE:
+			case SIMPLE_FILESYSTEM:
 				return SimpleFSLockFactory.INSTANCE;
-			case NATIVE:
+			case NATIVE_FILESYSTEM:
 				return NativeFSLockFactory.INSTANCE;
 			case SINGLE:
 				return new SingleInstanceLockFactory();
