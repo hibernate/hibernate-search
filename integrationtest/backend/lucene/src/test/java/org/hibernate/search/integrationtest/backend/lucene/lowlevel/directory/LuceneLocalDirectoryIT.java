@@ -28,7 +28,7 @@ import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.SimpleFSDirectory;
 
-public class LuceneLocalDirectoryIT extends AbstractDirectoryIT {
+public class LuceneLocalDirectoryIT extends AbstractBuiltInDirectoryIT {
 
 	/**
 	 * Test that the index is created in the configured root.
@@ -119,6 +119,11 @@ public class LuceneLocalDirectoryIT extends AbstractDirectoryIT {
 	@Override
 	protected Object getDirectoryType() {
 		return "local-directory";
+	}
+
+	@Override
+	protected String getDefaultLockClassName() {
+		return NATIVE_FS_LOCK_FQN;
 	}
 
 	private void testFileSystemAccessStrategy(String strategyName,
