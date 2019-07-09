@@ -23,6 +23,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -40,24 +41,28 @@ import java.util.Set;
 public class FSDirectorySelectionTest extends SearchTestBase {
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testMMapDirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "mmap" );
 		assertCorrectDirectoryType( factory, MMapDirectory.class.getName() );
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testNIODirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "nio" );
 		assertCorrectDirectoryType( factory, NIOFSDirectory.class.getName() );
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testSimpleDirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "simple" );
 		assertCorrectDirectoryType( factory, SimpleFSDirectory.class.getName() );
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testInvalidDirectoryType() {
 		try {
 			createSessionFactoryUsingDirectoryType( "foobar" );
