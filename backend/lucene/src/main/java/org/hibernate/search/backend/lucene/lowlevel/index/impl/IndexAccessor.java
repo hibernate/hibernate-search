@@ -17,6 +17,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.store.Directory;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
@@ -67,6 +68,10 @@ public class IndexAccessor implements AutoCloseable {
 	 */
 	public DirectoryReader openDirectoryIndexReader() throws IOException {
 		return DirectoryReader.open( directoryHolder.get() );
+	}
+
+	public Directory getDirectoryForTests() {
+		return directoryHolder.get();
 	}
 
 }

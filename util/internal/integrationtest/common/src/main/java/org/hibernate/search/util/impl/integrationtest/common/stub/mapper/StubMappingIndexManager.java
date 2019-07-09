@@ -31,6 +31,10 @@ public class StubMappingIndexManager {
 		this.indexManager = indexManager;
 	}
 
+	public <T> T unwrapForTests(Class<T> clazz) {
+		return clazz.cast( indexManager.toAPI() );
+	}
+
 	public IndexWorkPlan<? extends DocumentElement> createWorkPlan() {
 		return createWorkPlan( new StubSessionContext() );
 	}
