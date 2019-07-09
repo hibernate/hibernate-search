@@ -14,6 +14,7 @@ import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -50,6 +51,7 @@ public class CustomLockProviderTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testFailOnNonExistentLockingFactory() {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		try {
@@ -67,12 +69,14 @@ public class CustomLockProviderTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testUseOfNativeLockingFactory() throws IOException {
 		testUseOfSelectedLockingFactory( null, NATIVE_LOCK_FQN, false );
 		testUseOfSelectedLockingFactory( "native", NATIVE_LOCK_FQN, false );
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testUseOfSingleLockingFactory() throws IOException {
 		testUseOfSelectedLockingFactory( "single", SINGLE_INSTANCE_LOCK_FQN, false );
 		testUseOfSelectedLockingFactory( "single", SINGLE_INSTANCE_LOCK_FQN, true );
@@ -81,6 +85,7 @@ public class CustomLockProviderTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testUseOfSimpleLockingFactory() throws IOException {
 		testUseOfSelectedLockingFactory( "simple", SIMPLE_LOCK_FQN, false );
 	}
