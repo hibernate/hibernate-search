@@ -99,7 +99,7 @@ public class DirectoryProviderInitializationContextImpl implements DirectoryProv
 				return SimpleFSLockFactory.INSTANCE;
 			case NATIVE_FILESYSTEM:
 				return NativeFSLockFactory.INSTANCE;
-			case SINGLE:
+			case SINGLE_INSTANCE:
 				return new SingleInstanceLockFactory();
 			case NONE:
 				return NoLockFactory.INSTANCE;

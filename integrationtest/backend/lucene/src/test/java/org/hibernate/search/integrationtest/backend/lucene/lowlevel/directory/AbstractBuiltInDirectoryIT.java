@@ -78,7 +78,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 						.failure(
 								"Invalid locking strategy name",
 								"'some_invalid_name'",
-								"Valid names are: [simple-filesystem, native-filesystem, single, none]"
+								"Valid names are: [simple-filesystem, native-filesystem, single-instance, none]"
 						)
 						.build()
 				);
