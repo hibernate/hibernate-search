@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -24,6 +25,10 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -31,6 +36,12 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.assertj.core.api.Assertions;
+
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.MMapDirectory;
+import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.store.SimpleFSDirectory;
 
 public class LuceneLocalDirectoryIT {
 
@@ -78,6 +89,76 @@ public class LuceneLocalDirectoryIT {
 
 		Assertions.assertThat( contentSizeAfterIndexing )
 				.isGreaterThan( contentSizeBeforeIndexing );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3440")
+	public void filesystemAccessStrategy_default() {
+		// The actual class used here is OS-dependent
+		testFileSystemAccessStrategy( null, FSDirectory.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3440")
+	public void filesystemAccessStrategy_auto() {
+		// The actual class used here is OS-dependent
+		testFileSystemAccessStrategy( "auto", FSDirectory.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3440")
+	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testSimpleDirectoryType")
+	public void filesystemAccessStrategy_simple() {
+		testFileSystemAccessStrategy( "simple", SimpleFSDirectory.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3440")
+	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testNIODirectoryType")
+	public void filesystemAccessStrategy_nio() {
+		testFileSystemAccessStrategy( "nio", NIOFSDirectory.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3440")
+	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testMMapDirectoryType")
+	public void filesystemAccessStrategy_mmap() {
+		testFileSystemAccessStrategy( "mmap", MMapDirectory.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3440")
+	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testInvalidDirectoryType")
+	public void filesystemAccessStrategy_invalid() {
+		SubTest.expectException( () -> setup( c -> c.withBackendProperty(
+				BACKEND_NAME, LuceneBackendSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
+				"some_invalid_name"
+		) ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.backendContext( BACKEND_NAME )
+						.failure(
+								"Invalid filesystem access strategy name",
+								"'some_invalid_name'",
+								"Valid names are: [auto, simple, nio, mmap]"
+						)
+						.build()
+				);
+	}
+
+	private void testFileSystemAccessStrategy(String strategyName,
+			Class<? extends Directory> expectedDirectoryClass) {
+		setup( c -> c.withBackendProperty(
+				BACKEND_NAME, LuceneBackendSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
+				strategyName
+		) );
+
+		checkIndexingAndQuerying();
+
+		LuceneIndexManagerImpl luceneIndexManager = indexManager.unwrapForTests( LuceneIndexManagerImpl.class );
+		Assertions.assertThat( luceneIndexManager.getIndexAccessorForTests().getDirectoryForTests() )
+				.isInstanceOf( expectedDirectoryClass );
 	}
 
 	private void checkIndexingAndQuerying() {
