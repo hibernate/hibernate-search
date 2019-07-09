@@ -1,8 +1,6 @@
 [[backend-lucene]]
 = Lucene backend
 
-include::todo-placeholder.asciidoc[]
-
 [[backend-lucene-configuration]]
 == General configuration
 
@@ -14,14 +12,192 @@ but the defaults might not suit everyone.
 In particular, you might want to set the location of your indexes in the filesystem.
 See below for the details of every configuration property.
 
-[[backend-lucene-configuration-directory-provider]]
-=== Directory provider
+[[backend-lucene-configuration-directory]]
+=== Index storage (`Directory`)
 // Search 5 anchors backward compatibility
 [[search-configuration-directory]]
 
-include::todo-placeholder.asciidoc[]
+The component responsible for index storage in Lucene is the `org.apache.lucene.store.Directory`.
+The implementation of the directory determines where the index will be stored:
+on the filesystem, in the JVM's heap, ...
 
-// TODO HSEARCH-3440 document this
+By default, the Lucene backend stores the indexes on the filesystem,
+in the JVM's working directory.
+
+The type of directory is set a the backend level:
+
+// Search 5 anchors backward compatibility
+[[example-configuring-directory-providers]]
+[source]
+----
+hibernate.search.backends.<backend-name>.directory.type = local-filesystem
+----
+
+// Search 5 anchors backward compatibility
+[[directory-provider-table]]
+The following directory types are available:
+
+* `local-filesystem`: Store the index on the local filesystem.
+See <<backend-lucene-configuration-directory-local-filesystem>>
+for details and configuration options.
+* `local-heap`: Store the index in the local JVM heap.
+*Local heap directories and all contained indexes are lost when the JVM shuts down.*
+See <<backend-lucene-configuration-directory-local-heap>>
+for details and configuration options.
+
+[[backend-lucene-configuration-directory-local-filesystem]]
+==== Local filesystem storage
+
+The `local-filesystem` directory type will store each index in
+a subdirectory of a configured filesystem directory.
+
+[NOTE]
+====
+Local filesystem directories really are designed to be *local* to one server and one application.
+
+In particular, they should not be shared between multiple Hibernate Search instances.
+Even if network shares allow to share the raw content of indexes,
+using the same index files from multiple Hibernate Search
+would require more than that:
+non-exclusive locking, routing of write requests from one node to another, ...
+These additional features are simply not available on `local-filesystem` directories.
+
+If you need to share indexes between multiple Hibernate Search instances,
+the Elasticsearch backend will be a better choice.
+Refer to <<architecture>> for more information.
+====
+
+===== Index location
+
+Each index is assigned a subdirectory under a root directory.
+
+By default, the root directory is the JVM's working directory.
+It can be configured at the backend level:
+
+[source]
+----
+hibernate.search.backends.<backend-name>.directory.root = /path/to/my/root
+----
+
+For example, with the configuration above,
+an entity of type `com.mycompany.Order` will be indexed in directory
+`/path/to/my/root/com.mycompany.Order/`.
+If that entity is explicitly assigned the index name "orders"
+(see `@Indexed(index = ...)` in <<mapper-orm-entityindexmapping>>),
+it will instead be indexed in directory
+`/path/to/my/root/orders/`.
+
+===== Filesystem access strategy
+
+The default strategy for accessing the filesystem is determined automatically
+based on the operating system and architecture.
+It should work well in most situations.
+
+For situations where a different filesystem access strategy is needed,
+Hibernate Search exposes a configuration property at the backend level:
+
+[source]
+----
+hibernate.search.backends.<backend-name>.directory.filesystem_access.strategy = auto (default)
+----
+
+Allowed values are:
+
+* `auto` (default): lets Lucene select the most appropriate implementation
+based on the operating system and architecture.
+* `simple`: a straightforward strategy based on `Files.newByteChannel`.
+See `org.apache.lucene.store.SimpleFSDirectory`.
+* `mmap`: uses `mmap` for reading, and `FSDirectory.FSIndexOutput` for writing.
+See `org.apache.lucene.store.MMapDirectory`.
+* `nio`: uses ``java.nio.channels.FileChannel``'s positional read for concurrent reading,
+and `FSDirectory.FSIndexOutput` for writing.
+See `org.apache.lucene.store.NIOFSDirectory`.
+
+[NOTE]
+====
+Make sure to refer to Javadocs of these `Directory`
+implementations before changing this setting.
+Implementations offering better performance
+also bring issues of their own.
+====
+
+===== Other configuration options
+
+The `local-filesystem` directory also allows configuring a
+<<backend-lucene-configuration-directory-locking-strategy,locking strategy>>.
+
+[[backend-lucene-configuration-directory-local-heap]]
+==== Local heap storage
+
+The `local-heap` directory type will store indexes in the local JVM's heap.
+
+As a result, indexes contained in a `local-heap` directory are *lost when the JVM shuts down*.
+
+This directory type is only provided for use in *testing configurations*
+with *small indexes* and *low concurrency*,
+where it could slightly improve performance.
+In setups requiring larger indexes and/or high concurrency,
+a <<backend-lucene-configuration-directory-local-filesystem,filesystem-based directory>>
+will achieve better performance.
+
+The `local-heap` directory does not offer any specific option
+beyond the <<backend-lucene-configuration-directory-locking-strategy,locking strategy>>.
+
+[[backend-lucene-configuration-directory-locking-strategy]]
+==== Locking strategy
+// Search 5 anchors backward compatibility
+[[search-configuration-directory-lockfactories]]
+
+In order to write to an index, Lucene needs to acquire a lock to ensure no other application instance
+writes to the same index concurrently.
+Each directory type comes with a default locking strategy that should work well enough in most situations.
+
+For those (very) rare situations where a different locking strategy is needed,
+Hibernate Search exposes a configuration property at the backend level:
+
+[source]
+----
+hibernate.search.backends.<backend-name>.directory.locking.strategy = native-filesystem
+----
+
+The following strategies are available:
+
+* `simple-filesystem`:
+Locks the index by creating a marker file and checking it before write operations.
+This implementation is very simple and based Java's File API.
+If for some reason an application ends abruptly,
+the marker file will stay on the filesystem and will need to be removed manually.
++
+This strategy is only available for filesystem-based directories.
++
+See `org.apache.lucene.store.SimpleFSLockFactory`.
+* `native-filesystem`:
+Similarly to `simple-filesystem`, locks the index by creating a marker file,
+but using native OS file locks instead of Java's File API,
+so that locks will be cleaned up if the application ends abruptly.
++
+This is the default strategy for the `local-filesystem` directory type.
++
+This implementation has known problems with NFS: it should be avoided on network shares.
++
+This strategy is only available for filesystem-based directories.
++
+See `org.apache.lucene.store.NativeFSLockFactory`.
+* `single-instance`:
+Locks using a Java object held in the JVM's heap.
+Since the lock is only accessible by the same JVM,
+this strategy will only work properly when it is known
+that only a single application will ever try to accesses the indexes.
++
+This is the default strategy for the `local-heap` directory type.
++
+See `org.apache.lucene.store.SingleInstanceLockFactory`.
+* `none`:
+Does not use any lock.
+Concurrent writes from another application will result in index corruption.
+Test your application carefully and make sure you know what it means.
++
+See `org.apache.lucene.store.NoLockFactory`.
 
 === Index format compatibility
 
