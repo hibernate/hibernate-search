@@ -29,11 +29,11 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSLockFactory;
 import org.apache.lucene.store.LockFactory;
 
-public class LocalDirectoryProvider implements DirectoryProvider {
+public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static final String NAME = "local-directory";
+	public static final String NAME = "local-filesystem";
 
 	private static final ConfigurationProperty<Path> ROOT =
 			ConfigurationProperty.forKey( LuceneBackendSettings.DirectoryRadicals.ROOT )

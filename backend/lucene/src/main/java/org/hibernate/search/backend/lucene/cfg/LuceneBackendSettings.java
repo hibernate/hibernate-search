@@ -50,7 +50,7 @@ public final class LuceneBackendSettings {
 	/**
 	 * The type of directory to use when reading from or writing to the index.
 	 * <p>
-	 * Expects a String, such as "local-directory".
+	 * Expects a String, such as "local-filesystem".
 	 * See the reference documentation for a list of available values.
 	 * <p>
 	 * Defaults to {@link Defaults#DIRECTORY_TYPE}.
@@ -60,9 +60,9 @@ public final class LuceneBackendSettings {
 	/**
 	 * The filesystem root for directories.
 	 * <p>
-	 * Only available for the "local-directory" directory type.
+	 * Only available for the "local-filesystem" directory type.
 	 * <p>
-	 * Expects a String representing a path to an existing directory accessible in read and write mode, such as "local-directory".
+	 * Expects a String representing a path to an existing directory accessible in read and write mode, such as "local-filesystem".
 	 * <p>
 	 * The actual index files will be created in {@code <root>/<index name>}.
 	 * <p>
@@ -83,7 +83,7 @@ public final class LuceneBackendSettings {
 	/**
 	 * The filesystem access strategy for directories.
 	 * <p>
-	 * Only available for the "local-directory" directory type.
+	 * Only available for the "local-filesystem" directory type.
 	 * <p>
 	 * Expects a {@link FileSystemAccessStrategyName} value, or a String representation of such value.
 	 * <p>
@@ -137,7 +137,7 @@ public final class LuceneBackendSettings {
 
 		public static final Version LUCENE_VERSION = Version.LATEST;
 
-		public static final String DIRECTORY_TYPE = "local-directory";
+		public static final String DIRECTORY_TYPE = "local-filesystem";
 
 		public static final String DIRECTORY_ROOT = ".";
 
