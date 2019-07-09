@@ -223,7 +223,7 @@ This configuration property is set at the backend level:
 
 [source]
 ----
-hibernate.search.backends.<backend-name>.lucene_version = LUCENE_47
+hibernate.search.backends.<backend-name>.lucene_version = LUCENE_8_1_1
 ----
 
 Depending on the specific version of Lucene you're using,
