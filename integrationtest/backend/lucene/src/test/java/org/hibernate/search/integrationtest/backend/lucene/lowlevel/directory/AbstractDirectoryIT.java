@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -40,6 +41,7 @@ public abstract class AbstractDirectoryIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
+	protected SearchIntegration searchIntegration;
 	protected IndexMapping indexMapping;
 	protected StubMappingIndexManager indexManager;
 
@@ -70,7 +72,7 @@ public abstract class AbstractDirectoryIT {
 	}
 
 	protected final void setup(Function<SearchSetupHelper.SetupContext, SearchSetupHelper.SetupContext> additionalConfiguration) {
-		additionalConfiguration.apply(
+		searchIntegration = additionalConfiguration.apply(
 				setupHelper.start( BACKEND_NAME )
 						.withIndex(
 								INDEX_NAME,
