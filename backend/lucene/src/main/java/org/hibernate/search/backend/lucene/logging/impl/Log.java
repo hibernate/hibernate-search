@@ -504,4 +504,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 87,
 			value = "Invalid filesystem access strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidFileSystemAccessStrategyName(String invalidRepresentation, List<String> validRepresentations);
+
+	@Message(id = ID_OFFSET_2 + 88,
+			value = "Invalid locking strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidLockingStrategyName(String invalidRepresentation, List<String> validRepresentations);
 }

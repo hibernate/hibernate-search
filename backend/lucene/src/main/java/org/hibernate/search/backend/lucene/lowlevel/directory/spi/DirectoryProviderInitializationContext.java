@@ -6,9 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.directory.spi;
 
+import java.util.Optional;
+
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.reporting.EventContext;
+
+import org.apache.lucene.store.LockFactory;
 
 public interface DirectoryProviderInitializationContext {
 
@@ -30,4 +34,5 @@ public interface DirectoryProviderInitializationContext {
 	 */
 	ConfigurationPropertySource getConfigurationPropertySource();
 
+	Optional<LockFactory> createConfiguredLockFactory();
 }

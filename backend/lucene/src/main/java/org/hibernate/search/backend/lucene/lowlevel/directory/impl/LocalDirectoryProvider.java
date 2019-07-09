@@ -27,6 +27,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSLockFactory;
+import org.apache.lucene.store.LockFactory;
 
 public class LocalDirectoryProvider implements DirectoryProvider {
 
@@ -48,6 +49,7 @@ public class LocalDirectoryProvider implements DirectoryProvider {
 
 	private Path root;
 	private FileSystemAccessStrategy accessStrategy;
+	private LockFactory lockFactory;
 
 	@Override
 	public String toString() {
@@ -60,6 +62,8 @@ public class LocalDirectoryProvider implements DirectoryProvider {
 		this.root = ROOT.get( propertySource ).toAbsolutePath();
 		FileSystemAccessStrategyName accessStrategyName = FILESYSTEM_ACCESS_STRATEGY.get( propertySource );
 		this.accessStrategy = FileSystemAccessStrategy.get( accessStrategyName );
+		this.lockFactory = context.createConfiguredLockFactory().orElseGet( FSLockFactory::getDefault );
+
 		initializeRootDirectory( root );
 	}
 
@@ -67,9 +71,7 @@ public class LocalDirectoryProvider implements DirectoryProvider {
 	public DirectoryHolder createDirectory(DirectoryCreationContext context) throws IOException {
 		Path directoryPath = root.resolve( context.getIndexName() );
 		makeSanityCheckedFilesystemDirectory( directoryPath, context.getEventContext() );
-		// TODO HSEARCH-3440 re-allow configuring the lock factory
-		//  see org.hibernate.search.store.impl.DefaultLockFactoryCreator.createLockFactory
-		Directory directory = accessStrategy.createDirectory( directoryPath, FSLockFactory.getDefault() );
+		Directory directory = accessStrategy.createDirectory( directoryPath, lockFactory );
 		try {
 			context.initializeIndexIfNeeded( directory );
 			return DirectoryHolder.of( directory );

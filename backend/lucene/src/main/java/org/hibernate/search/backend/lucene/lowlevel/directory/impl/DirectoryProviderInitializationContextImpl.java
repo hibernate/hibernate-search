@@ -6,16 +6,27 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
+
+import org.apache.lucene.store.LockFactory;
+import org.apache.lucene.store.NativeFSLockFactory;
+import org.apache.lucene.store.NoLockFactory;
+import org.apache.lucene.store.SimpleFSLockFactory;
+import org.apache.lucene.store.SingleInstanceLockFactory;
 
 public class DirectoryProviderInitializationContextImpl implements DirectoryProviderInitializationContext {
 
@@ -23,6 +34,11 @@ public class DirectoryProviderInitializationContextImpl implements DirectoryProv
 			ConfigurationProperty.forKey( LuceneBackendSettings.DirectoryRadicals.TYPE )
 					.asBeanReference( DirectoryProvider.class )
 					.withDefault( BeanReference.of( DirectoryProvider.class, LuceneBackendSettings.Defaults.DIRECTORY_TYPE ) )
+					.build();
+
+	private static final OptionalConfigurationProperty<LockingStrategyName> LOCKING_STRATEGY =
+			ConfigurationProperty.forKey( LuceneBackendSettings.DirectoryRadicals.LOCKING_STRATEGY )
+					.as( LockingStrategyName.class, LockingStrategyName::of )
 					.build();
 
 	private final EventContext eventContext;
@@ -52,6 +68,13 @@ public class DirectoryProviderInitializationContextImpl implements DirectoryProv
 		return configurationPropertySource;
 	}
 
+	@Override
+	public Optional<LockFactory> createConfiguredLockFactory() {
+		// TODO HSEARCH-3635 Restore support for configuring a custom LockFactory
+		return LOCKING_STRATEGY.get( configurationPropertySource )
+				.map( DirectoryProviderInitializationContextImpl::createLockFactory );
+	}
+
 	public BeanHolder<? extends DirectoryProvider> createDirectoryProvider() {
 		BeanHolder<? extends DirectoryProvider> directoryProviderHolder =
 				TYPE.getAndTransform(
@@ -68,6 +91,20 @@ public class DirectoryProviderInitializationContextImpl implements DirectoryProv
 					.push( directoryProviderHolder );
 			throw e;
 		}
+	}
+
+	private static LockFactory createLockFactory(LockingStrategyName name) {
+		switch ( name ) {
+			case SIMPLE:
+				return SimpleFSLockFactory.INSTANCE;
+			case NATIVE:
+				return NativeFSLockFactory.INSTANCE;
+			case SINGLE:
+				return new SingleInstanceLockFactory();
+			case NONE:
+				return NoLockFactory.INSTANCE;
+		}
+		throw new AssertionFailure( "Unexpected name: " + name );
 	}
 
 }

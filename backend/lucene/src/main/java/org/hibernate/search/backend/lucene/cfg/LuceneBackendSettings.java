@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.cfg;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
+import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
 
 import org.apache.lucene.util.Version;
 
@@ -70,6 +71,16 @@ public final class LuceneBackendSettings {
 	public static final String DIRECTORY_ROOT = DIRECTORY_PREFIX + DirectoryRadicals.ROOT;
 
 	/**
+	 * The locking strategy for directories.
+	 * <p>
+	 * Expects a {@link LockingStrategyName} value, or a String representation of such value.
+	 * <p>
+	 * Defaults are specific to each directory type.
+	 */
+	public static final String DIRECTORY_LOCKING_STRATEGY =
+			DIRECTORY_PREFIX + DirectoryRadicals.LOCKING_STRATEGY;
+
+	/**
 	 * The filesystem access strategy for directories.
 	 * <p>
 	 * Only available for the "local-directory" directory type.
@@ -112,6 +123,7 @@ public final class LuceneBackendSettings {
 
 		public static final String TYPE = "type";
 		public static final String ROOT = "root";
+		public static final String LOCKING_STRATEGY = "locking.strategy";
 		public static final String FILESYSTEM_ACCESS_STRATEGY = "filesystem_access.strategy";
 	}
 
