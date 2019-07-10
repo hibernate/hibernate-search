@@ -25,8 +25,8 @@ public class LuceneAddEntryWork extends AbstractLuceneWriteWork<Long> {
 
 	private final LuceneIndexEntry indexEntry;
 
-	public LuceneAddEntryWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
-		super( "addEntry", indexName );
+	LuceneAddEntryWork(String tenantId, String id, LuceneIndexEntry indexEntry) {
+		super( "addEntry" );
 		this.tenantId = tenantId;
 		this.id = id;
 		this.indexEntry = indexEntry;
@@ -39,7 +39,7 @@ public class LuceneAddEntryWork extends AbstractLuceneWriteWork<Long> {
 			return indexWriterDelegator.addDocuments( indexEntry );
 		}
 		catch (IOException e) {
-			throw log.unableToIndexEntry( tenantId, id, getEventContext(), e );
+			throw log.unableToIndexEntry( tenantId, id, context.getEventContext(), e );
 		}
 	}
 

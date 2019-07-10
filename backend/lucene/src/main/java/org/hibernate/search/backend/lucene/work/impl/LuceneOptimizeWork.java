@@ -18,8 +18,8 @@ public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Void> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public LuceneOptimizeWork(String indexName) {
-		super( "optimizeIndex", indexName );
+	LuceneOptimizeWork() {
+		super( "optimizeIndex" );
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Void> {
 			return null;
 		}
 		catch (IOException e) {
-			throw log.unableToOptimizeIndex( getEventContext(), e );
+			throw log.unableToOptimizeIndex( context.getEventContext(), e );
 		}
 	}
 
@@ -39,7 +39,6 @@ public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Void> {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "type=" ).append( workType )
-				.append( ", indexName=" ).append( indexName )
 				.append( "]" );
 		return sb.toString();
 	}

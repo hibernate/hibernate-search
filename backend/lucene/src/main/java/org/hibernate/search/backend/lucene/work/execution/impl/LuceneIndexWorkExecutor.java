@@ -19,22 +19,20 @@ public class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 
 	private final LuceneWorkFactory factory;
 	private final LuceneWriteWorkOrchestrator orchestrator;
-	private final String indexName;
 	private final DetachedSessionContextImplementor sessionContext;
 
 	public LuceneIndexWorkExecutor(LuceneWorkFactory factory,
-			LuceneWriteWorkOrchestrator orchestrator, String indexName,
+			LuceneWriteWorkOrchestrator orchestrator,
 			DetachedSessionContextImplementor sessionContext) {
 		this.factory = factory;
 		this.orchestrator = orchestrator;
-		this.indexName = indexName;
 		this.sessionContext = sessionContext;
 	}
 
 	@Override
 	public CompletableFuture<?> optimize() {
 		return orchestrator.submit(
-				factory.optimize( indexName ),
+				factory.optimize(),
 				DocumentCommitStrategy.FORCE,
 				DocumentRefreshStrategy.NONE
 		);
@@ -43,7 +41,7 @@ public class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 	@Override
 	public CompletableFuture<?> purge() {
 		return orchestrator.submit(
-				factory.deleteAll( indexName, sessionContext.getTenantIdentifier() ),
+				factory.deleteAll( sessionContext.getTenantIdentifier() ),
 				DocumentCommitStrategy.FORCE,
 				DocumentRefreshStrategy.NONE
 		);
@@ -52,7 +50,7 @@ public class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 	@Override
 	public CompletableFuture<?> flush() {
 		return orchestrator.submit(
-				factory.flush( indexName ),
+				factory.flush(),
 				DocumentCommitStrategy.FORCE,
 				DocumentRefreshStrategy.NONE
 		);

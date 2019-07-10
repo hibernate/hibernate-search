@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
@@ -29,43 +27,45 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneWriteWork<?> add(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry) {
-		return new LuceneAddEntryWork( indexName, tenantId, id, indexEntry );
-	}
-
-	@Override
-	public LuceneWriteWork<?> update(String indexName, String tenantId, String id, String routingKey,
+	public LuceneWriteWork<?> add(String tenantId, String id,
 			LuceneIndexEntry indexEntry) {
-		return multiTenancyStrategy.createUpdateEntryLuceneWork( indexName, tenantId, id, indexEntry );
+		return new LuceneAddEntryWork( tenantId, id, indexEntry );
 	}
 
 	@Override
-	public LuceneWriteWork<?> delete(String indexName, String tenantId, String id, String routingKey) {
-		return multiTenancyStrategy.createDeleteEntryLuceneWork( indexName, tenantId, id );
+	public LuceneWriteWork<?> update(String tenantId, String id,
+			LuceneIndexEntry indexEntry) {
+		return multiTenancyStrategy.createUpdateEntryLuceneWork( tenantId, id, indexEntry );
 	}
 
 	@Override
-	public LuceneWriteWork<?> deleteAll(String indexName, String tenantId) {
-		return multiTenancyStrategy.createDeleteAllEntriesLuceneWork( indexName, tenantId );
+	public LuceneWriteWork<?> delete(String tenantId, String id) {
+		return multiTenancyStrategy.createDeleteEntryLuceneWork( tenantId, id );
 	}
 
 	@Override
-	public LuceneWriteWork<?> flush(String indexName) {
-		return new LuceneFlushWork( indexName );
+	public LuceneWriteWork<?> deleteAll(String tenantId) {
+		return multiTenancyStrategy.createDeleteAllEntriesLuceneWork( tenantId );
 	}
 
 	@Override
-	public LuceneWriteWork<?> optimize(String indexName) {
-		return new LuceneOptimizeWork( indexName );
+	public LuceneWriteWork<?> flush() {
+		return new LuceneFlushWork();
 	}
 
 	@Override
-	public <H> LuceneReadWork<LuceneLoadableSearchResult<H>> search(Set<String> indexNames, Query luceneQuery, Sort luceneSort,
+	public LuceneWriteWork<?> optimize() {
+		return new LuceneOptimizeWork();
+	}
+
+	@Override
+	public <H> LuceneReadWork<LuceneLoadableSearchResult<H>> search(
+			Query luceneQuery, Sort luceneSort,
 			Integer offset, Integer limit,
 			LuceneCollectorProvider luceneCollectorProvider,
 			LuceneSearchResultExtractor<H> searchResultExtractor) {
 		return new LuceneSearchWork<>(
-				indexNames, luceneQuery, luceneSort,
+				luceneQuery, luceneSort,
 				offset, limit,
 				luceneCollectorProvider,
 				searchResultExtractor
@@ -73,10 +73,10 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneReadWork<Explanation> explain(Set<String> indexNames, Query luceneQuery,
+	public LuceneReadWork<Explanation> explain(Query luceneQuery,
 			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentQuery) {
 		return new LuceneExplainWork(
-				indexNames, luceneQuery,
+				luceneQuery,
 				explainedDocumentIndexName, explainedDocumentId, explainedDocumentQuery
 		);
 	}

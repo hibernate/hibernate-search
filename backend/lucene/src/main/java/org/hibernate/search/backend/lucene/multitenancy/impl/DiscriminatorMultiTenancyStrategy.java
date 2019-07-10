@@ -43,18 +43,19 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public LuceneQueryBasedUpdateEntryWork createUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
-		return new LuceneQueryBasedUpdateEntryWork( indexName, tenantId, id, indexEntry );
+	public LuceneQueryBasedUpdateEntryWork createUpdateEntryLuceneWork(String tenantId, String id,
+			LuceneIndexEntry indexEntry) {
+		return new LuceneQueryBasedUpdateEntryWork( tenantId, id, indexEntry );
 	}
 
 	@Override
-	public LuceneQueryBasedDeleteEntryWork createDeleteEntryLuceneWork(String indexName, String tenantId, String id) {
-		return new LuceneQueryBasedDeleteEntryWork( indexName, tenantId, id );
+	public LuceneQueryBasedDeleteEntryWork createDeleteEntryLuceneWork(String tenantId, String id) {
+		return new LuceneQueryBasedDeleteEntryWork( tenantId, id );
 	}
 
 	@Override
-	public LuceneQueryBasedDeleteAllEntriesWork createDeleteAllEntriesLuceneWork(String indexName, String tenantId) {
-		return new LuceneQueryBasedDeleteAllEntriesWork( indexName, tenantId );
+	public LuceneQueryBasedDeleteAllEntriesWork createDeleteAllEntriesLuceneWork(String tenantId) {
+		return new LuceneQueryBasedDeleteAllEntriesWork( tenantId );
 	}
 
 	@Override

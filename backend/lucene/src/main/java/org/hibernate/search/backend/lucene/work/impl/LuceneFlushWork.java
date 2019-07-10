@@ -18,8 +18,8 @@ public class LuceneFlushWork extends AbstractLuceneWriteWork<Void> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public LuceneFlushWork(String indexName) {
-		super( "flushIndex", indexName );
+	LuceneFlushWork() {
+		super( "flushIndex" );
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class LuceneFlushWork extends AbstractLuceneWriteWork<Void> {
 			return null;
 		}
 		catch (IOException e) {
-			throw log.unableToFlushIndex( getEventContext(), e );
+			throw log.unableToFlushIndex( context.getEventContext(), e );
 		}
 	}
 
@@ -39,7 +39,6 @@ public class LuceneFlushWork extends AbstractLuceneWriteWork<Void> {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "type=" ).append( workType )
-				.append( ", indexName=" ).append( indexName )
 				.append( "]" );
 		return sb.toString();
 	}

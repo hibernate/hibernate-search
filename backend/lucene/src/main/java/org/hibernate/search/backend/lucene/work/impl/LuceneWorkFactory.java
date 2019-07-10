@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneLoadableSearchResult;
@@ -20,25 +18,24 @@ import org.apache.lucene.search.Explanation;
 
 public interface LuceneWorkFactory {
 
-	LuceneWriteWork<?> add(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry);
+	LuceneWriteWork<?> add(String tenantId, String id, LuceneIndexEntry indexEntry);
 
-	LuceneWriteWork<?> update(String indexName, String tenantId, String id, String routingKey,
-			LuceneIndexEntry indexEntry);
+	LuceneWriteWork<?> update(String tenantId, String id, LuceneIndexEntry indexEntry);
 
-	LuceneWriteWork<?> delete(String indexName, String tenantId, String id, String routingKey);
+	LuceneWriteWork<?> delete(String tenantId, String id);
 
-	LuceneWriteWork<?> deleteAll(String indexName, String tenantId);
+	LuceneWriteWork<?> deleteAll(String tenantId);
 
-	LuceneWriteWork<?> flush(String indexName);
+	LuceneWriteWork<?> flush();
 
-	LuceneWriteWork<?> optimize(String indexName);
+	LuceneWriteWork<?> optimize();
 
 	<H> LuceneReadWork<LuceneLoadableSearchResult<H>> search(
-			Set<String> indexNames, Query luceneQuery, Sort luceneSort,
+			Query luceneQuery, Sort luceneSort,
 			Integer offset, Integer limit,
 			LuceneCollectorProvider luceneCollectorProvider,
 			LuceneSearchResultExtractor<H> searchResultExtractor);
 
-	LuceneReadWork<Explanation> explain(Set<String> indexNames, Query luceneQuery,
+	LuceneReadWork<Explanation> explain(Query luceneQuery,
 			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentQuery);
 }

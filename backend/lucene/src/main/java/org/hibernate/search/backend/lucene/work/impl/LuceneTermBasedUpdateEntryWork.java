@@ -16,8 +16,8 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
 public class LuceneTermBasedUpdateEntryWork extends AbstractLuceneUpdateEntryWork {
 
-	public LuceneTermBasedUpdateEntryWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
-		super( indexName, tenantId, id, indexEntry );
+	public LuceneTermBasedUpdateEntryWork(String tenantId, String id, LuceneIndexEntry indexEntry) {
+		super( tenantId, id, indexEntry );
 	}
 
 	@Override

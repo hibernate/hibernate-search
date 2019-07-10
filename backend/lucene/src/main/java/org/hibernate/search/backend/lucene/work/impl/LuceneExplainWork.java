@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -22,17 +21,14 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Set<String> indexNames;
-
 	private final Query luceneQuery;
 
 	private final String indexName;
 	private final String documentId;
 	private final Query explainedDocumentQuery;
 
-	LuceneExplainWork(Set<String> indexNames, Query luceneQuery,
+	LuceneExplainWork(Query luceneQuery,
 			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentQuery) {
-		this.indexNames = indexNames;
 		this.luceneQuery = luceneQuery;
 		this.indexName = explainedDocumentIndexName;
 		this.documentId = explainedDocumentId;
@@ -70,8 +66,7 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexNames=" ).append( indexNames )
-				.append( ", luceneQuery=" ).append( luceneQuery )
+				.append( "luceneQuery=" ).append( luceneQuery )
 				.append( ", explainedDocumentQuery=" ).append( explainedDocumentQuery )
 				.append( "]" );
 		return sb.toString();

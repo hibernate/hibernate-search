@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
@@ -29,8 +28,6 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Set<String> indexNames;
-
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 
@@ -40,14 +37,12 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final LuceneSearchResultExtractor<H> searchResultExtractor;
 
-	LuceneSearchWork(Set<String> indexNames,
-			Query luceneQuery,
+	LuceneSearchWork(Query luceneQuery,
 			Sort luceneSort,
 			Integer offset,
 			Integer limit,
 			LuceneCollectorProvider luceneCollectorProvider,
 			LuceneSearchResultExtractor<H> searchResultExtractor) {
-		this.indexNames = indexNames;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
 		this.offset = offset == null ? 0 : offset;
@@ -102,8 +97,7 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexNames=" ).append( indexNames )
-				.append( ", luceneQuery=" ).append( luceneQuery )
+				.append( "luceneQuery=" ).append( luceneQuery )
 				.append( ", luceneSort=" ).append( luceneSort )
 				.append( ", offset=" ).append( offset )
 				.append( ", limit=" ).append( limit )

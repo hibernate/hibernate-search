@@ -136,6 +136,6 @@ public class IndexingBackendContext {
 			DetachedSessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new LuceneIndexWorkExecutor( workFactory, orchestrator, indexName, sessionContext );
+		return new LuceneIndexWorkExecutor( workFactory, orchestrator, sessionContext );
 	}
 }

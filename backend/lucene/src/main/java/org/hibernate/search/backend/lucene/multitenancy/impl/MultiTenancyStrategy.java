@@ -55,30 +55,28 @@ public interface MultiTenancyStrategy {
 	/**
 	 * Creates the according update {@link LuceneWriteWork}.
 	 *
-	 * @param indexName The index name.
 	 * @param tenantId The tenant id.
 	 * @param id The document id.
 	 * @param indexEntry The index entry.
 	 * @return The update {@link LuceneWriteWork}.
 	 */
-	AbstractLuceneUpdateEntryWork createUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry);
+	AbstractLuceneUpdateEntryWork createUpdateEntryLuceneWork(String tenantId, String id,
+			LuceneIndexEntry indexEntry);
 
 	/**
 	 * Creates the according delete {@link LuceneWriteWork}.
 	 *
-	 * @param indexName The index name.
 	 * @param tenantId The tenant id.
 	 * @param id The document id.
 	 * @return The delete {@link LuceneWriteWork}.
 	 */
-	AbstractLuceneDeleteEntryWork createDeleteEntryLuceneWork(String indexName, String tenantId, String id);
+	AbstractLuceneDeleteEntryWork createDeleteEntryLuceneWork(String tenantId, String id);
 
 	/**
 	 * Creates the according delete {@link LuceneWriteWork}, for deleting all documents.
 	 *
-	 * @param indexName The index name.
 	 * @param tenantId The tenant id.
 	 * @return The delete {@link LuceneWriteWork}.
 	 */
-	AbstractLuceneDeleteAllEntriesWork createDeleteAllEntriesLuceneWork(String indexName, String tenantId);
+	AbstractLuceneDeleteAllEntriesWork createDeleteAllEntriesLuceneWork(String tenantId);
 }

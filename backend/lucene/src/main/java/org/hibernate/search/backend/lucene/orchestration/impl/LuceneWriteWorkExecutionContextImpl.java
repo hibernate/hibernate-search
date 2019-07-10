@@ -10,13 +10,22 @@ import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWorkExecutionContext;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 class LuceneWriteWorkExecutionContextImpl implements LuceneWriteWorkExecutionContext {
 
+	private final EventContext eventContext;
+
 	private final IndexWriterDelegator indexWriterDelegator;
 
-	LuceneWriteWorkExecutionContextImpl(IndexWriterDelegator indexWriterDelegator) {
+	LuceneWriteWorkExecutionContextImpl(EventContext eventContext, IndexWriterDelegator indexWriterDelegator) {
+		this.eventContext = eventContext;
 		this.indexWriterDelegator = indexWriterDelegator;
+	}
+
+	@Override
+	public EventContext getEventContext() {
+		return eventContext;
 	}
 
 	@Override

@@ -44,6 +44,7 @@ public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecuto
 	@Override
 	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider, DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
 		String id = referenceProvider.getIdentifier();
+		// TODO HSEARCH-3314 use the routing key
 		String routingKey = referenceProvider.getRoutingKey();
 
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
@@ -51,7 +52,7 @@ public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecuto
 		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
 
 		return orchestrator.submit(
-				factory.add( indexName, tenantId, id, routingKey, indexEntry ),
+				factory.add( tenantId, id, indexEntry ),
 				commitStrategy,
 				DocumentRefreshStrategy.NONE
 		);

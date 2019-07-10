@@ -15,8 +15,8 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 
 public class LuceneQueryBasedUpdateEntryWork extends AbstractLuceneUpdateEntryWork {
 
-	public LuceneQueryBasedUpdateEntryWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
-		super( indexName, tenantId, id, indexEntry );
+	public LuceneQueryBasedUpdateEntryWork(String tenantId, String id, LuceneIndexEntry indexEntry) {
+		super( tenantId, id, indexEntry );
 	}
 
 	@Override

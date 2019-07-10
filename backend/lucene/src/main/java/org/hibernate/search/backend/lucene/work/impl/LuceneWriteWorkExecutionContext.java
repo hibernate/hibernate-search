@@ -9,9 +9,13 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 
 public interface LuceneWriteWorkExecutionContext {
 
+	EventContext getEventContext();
+
 	IndexWriterDelegator getIndexWriterDelegator() throws IOException;
+
 }

@@ -14,8 +14,8 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 
 public class LuceneQueryBasedDeleteAllEntriesWork extends AbstractLuceneDeleteAllEntriesWork {
 
-	public LuceneQueryBasedDeleteAllEntriesWork(String indexName, String tenantId) {
-		super( indexName, tenantId );
+	public LuceneQueryBasedDeleteAllEntriesWork(String tenantId) {
+		super( tenantId );
 	}
 
 	@Override

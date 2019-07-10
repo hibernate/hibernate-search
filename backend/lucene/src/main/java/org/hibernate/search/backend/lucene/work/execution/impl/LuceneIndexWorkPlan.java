@@ -54,34 +54,37 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 	public void add(DocumentReferenceProvider referenceProvider,
 			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
 		String id = referenceProvider.getIdentifier();
+		// TODO HSEARCH-3314 use the routing key
 		String routingKey = referenceProvider.getRoutingKey();
 
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
 		documentContributor.contribute( builder );
 		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
 
-		collect( factory.add( indexName, tenantId, id, routingKey, indexEntry ) );
+		collect( factory.add( tenantId, id, indexEntry ) );
 	}
 
 	@Override
 	public void update(DocumentReferenceProvider referenceProvider,
 			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
 		String id = referenceProvider.getIdentifier();
+		// TODO HSEARCH-3314 use the routing key
 		String routingKey = referenceProvider.getRoutingKey();
 
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
 		documentContributor.contribute( builder );
 		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
 
-		collect( factory.update( indexName, tenantId, id, routingKey, indexEntry ) );
+		collect( factory.update( tenantId, id, indexEntry ) );
 	}
 
 	@Override
 	public void delete(DocumentReferenceProvider referenceProvider) {
 		String id = referenceProvider.getIdentifier();
+		// TODO HSEARCH-3314 use the routing key
 		String routingKey = referenceProvider.getRoutingKey();
 
-		collect( factory.delete( indexName, tenantId, id, routingKey ) );
+		collect( factory.delete( tenantId, id ) );
 	}
 
 	@Override

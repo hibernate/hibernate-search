@@ -22,8 +22,8 @@ public abstract class AbstractLuceneDeleteEntryWork extends AbstractLuceneWriteW
 
 	private final String id;
 
-	public AbstractLuceneDeleteEntryWork(String indexName, String tenantId, String id) {
-		super( "deleteEntry", indexName );
+	AbstractLuceneDeleteEntryWork(String tenantId, String id) {
+		super( "deleteEntry" );
 		this.tenantId = tenantId;
 		this.id = id;
 	}
@@ -35,7 +35,7 @@ public abstract class AbstractLuceneDeleteEntryWork extends AbstractLuceneWriteW
 			return doDeleteDocuments( indexWriterDelegator, tenantId, id );
 		}
 		catch (IOException e) {
-			throw log.unableToDeleteEntryFromIndex( tenantId, id, getEventContext(), e );
+			throw log.unableToDeleteEntryFromIndex( tenantId, id, context.getEventContext(), e );
 		}
 	}
 
@@ -47,7 +47,6 @@ public abstract class AbstractLuceneDeleteEntryWork extends AbstractLuceneWriteW
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "type=" ).append( workType )
-				.append( ", indexName=" ).append( indexName )
 				.append( ", id=" ).append( id )
 				.append( "]" );
 		return sb.toString();

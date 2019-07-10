@@ -45,7 +45,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			ErrorHandler errorHandler) {
 		this.indexEventContext = indexEventContext;
 		this.indexWriterDelegator = indexWriterDelegator;
-		this.context = new LuceneWriteWorkExecutionContextImpl( indexWriterDelegator );
+		this.context = new LuceneWriteWorkExecutionContextImpl( indexEventContext, indexWriterDelegator );
 		this.errorHandler = errorHandler;
 	}
 

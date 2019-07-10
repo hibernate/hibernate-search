@@ -25,8 +25,8 @@ public abstract class AbstractLuceneUpdateEntryWork extends AbstractLuceneWriteW
 
 	private final LuceneIndexEntry indexEntry;
 
-	protected AbstractLuceneUpdateEntryWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
-		super( "updateEntry", indexName );
+	AbstractLuceneUpdateEntryWork(String tenantId, String id, LuceneIndexEntry indexEntry) {
+		super( "updateEntry" );
 		this.tenantId = tenantId;
 		this.id = id;
 		this.indexEntry = indexEntry;
@@ -39,7 +39,7 @@ public abstract class AbstractLuceneUpdateEntryWork extends AbstractLuceneWriteW
 			return doUpdateEntry( indexWriterDelegator, tenantId, id, indexEntry );
 		}
 		catch (IOException e) {
-			throw log.unableToIndexEntry( tenantId, id, getEventContext(), e );
+			throw log.unableToIndexEntry( tenantId, id, context.getEventContext(), e );
 		}
 	}
 

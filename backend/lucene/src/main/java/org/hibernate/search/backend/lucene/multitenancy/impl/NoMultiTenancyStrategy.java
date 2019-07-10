@@ -38,18 +38,19 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public LuceneTermBasedUpdateEntryWork createUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
-		return new LuceneTermBasedUpdateEntryWork( indexName, tenantId, id, indexEntry );
+	public LuceneTermBasedUpdateEntryWork createUpdateEntryLuceneWork(String tenantId, String id,
+			LuceneIndexEntry indexEntry) {
+		return new LuceneTermBasedUpdateEntryWork( tenantId, id, indexEntry );
 	}
 
 	@Override
-	public LuceneTermBasedDeleteEntryWork createDeleteEntryLuceneWork(String indexName, String tenantId, String id) {
-		return new LuceneTermBasedDeleteEntryWork( indexName, tenantId, id );
+	public LuceneTermBasedDeleteEntryWork createDeleteEntryLuceneWork(String tenantId, String id) {
+		return new LuceneTermBasedDeleteEntryWork( tenantId, id );
 	}
 
 	@Override
-	public LuceneDeleteAllEntriesWork createDeleteAllEntriesLuceneWork(String indexName, String tenantId) {
-		return new LuceneDeleteAllEntriesWork( indexName, tenantId );
+	public LuceneDeleteAllEntriesWork createDeleteAllEntriesLuceneWork(String tenantId) {
+		return new LuceneDeleteAllEntriesWork( tenantId );
 	}
 
 	@Override

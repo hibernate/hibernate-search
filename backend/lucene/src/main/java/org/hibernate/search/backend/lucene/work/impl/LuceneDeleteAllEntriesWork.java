@@ -12,8 +12,8 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 
 public class LuceneDeleteAllEntriesWork extends AbstractLuceneDeleteAllEntriesWork {
 
-	public LuceneDeleteAllEntriesWork(String indexName, String tenantId) {
-		super( indexName, tenantId );
+	public LuceneDeleteAllEntriesWork(String tenantId) {
+		super( tenantId );
 	}
 
 	@Override

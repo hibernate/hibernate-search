@@ -6,28 +6,17 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-
-
 public abstract class AbstractLuceneWriteWork<T> implements LuceneWriteWork<T> {
 
 	protected final String workType;
 
-	protected final String indexName;
-
-	public AbstractLuceneWriteWork(String workType, String indexName) {
+	AbstractLuceneWriteWork(String workType) {
 		this.workType = workType;
-		this.indexName = indexName;
 	}
 
 	@Override
 	public Object getInfo() {
 		// TODO extract immutable work relevant info. We need to think about it. See HSEARCH-3110.
 		return this;
-	}
-
-	protected final EventContext getEventContext() {
-		return EventContexts.fromIndexName( indexName );
 	}
 }
