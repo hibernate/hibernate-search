@@ -214,11 +214,15 @@ public class TestElasticsearchClient implements TestRule {
 		}
 
 		public TemplateClient create(String templateString, String settings) {
-			return create( templateString, toJsonElement( settings ).getAsJsonObject() );
+			return create( templateString, 0, settings );
 		}
 
-		public TemplateClient create(String templateString, JsonObject settings) {
-			TestElasticsearchClient.this.createTemplate( templateName, templateString, settings );
+		public TemplateClient create(String templateString, int templateOrder, String settings) {
+			return create( templateString, templateOrder, toJsonElement( settings ).getAsJsonObject() );
+		}
+
+		public TemplateClient create(String templateString, int templateOrder, JsonObject settings) {
+			TestElasticsearchClient.this.createTemplate( templateName, templateString, templateOrder, settings );
 			return this;
 		}
 
@@ -263,9 +267,10 @@ public class TestElasticsearchClient implements TestRule {
 		waitForRequiredIndexStatus( indexName );
 	}
 
-	private void createTemplate(String templateName, String templateString, JsonObject settings) {
+	private void createTemplate(String templateName, String templateString, int templateOrder, JsonObject settings) {
 		JsonObject source = new JsonObject();
 		dialect.setTemplatePattern( source, templateString );
+		source.addProperty( "order", templateOrder );
 		source.add( "settings", settings );
 
 		registerTemplateForCleanup( templateName );
