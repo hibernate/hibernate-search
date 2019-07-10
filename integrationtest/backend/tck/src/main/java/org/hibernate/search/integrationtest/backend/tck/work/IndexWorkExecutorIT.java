@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkE
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -35,8 +36,6 @@ import org.assertj.core.api.Assertions;
  */
 public class IndexWorkExecutorIT {
 
-	private static final String CONFIGURATION_ID = "multi-tenancy";
-
 	private static final String TENANT_1 = "tenant1";
 	private static final String TENANT_2 = "tenant2";
 
@@ -45,6 +44,9 @@ public class IndexWorkExecutorIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	@Rule
+	public SearchSetupHelper multiTenancySetupHelper = new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -85,7 +87,7 @@ public class IndexWorkExecutorIT {
 
 	@Test
 	public void runOptimizePurgeAndFlushWithMultiTenancy() {
-		setupHelper.withConfiguration( CONFIGURATION_ID )
+		multiTenancySetupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),

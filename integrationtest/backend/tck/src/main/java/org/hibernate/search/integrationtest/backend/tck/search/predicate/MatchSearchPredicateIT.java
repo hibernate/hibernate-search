@@ -33,6 +33,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -49,8 +50,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class MatchSearchPredicateIT {
-
-	public static final String CONFIGURATION_ID = "analysis-override";
 
 	private static final String INDEX_NAME = "IndexName";
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
@@ -71,7 +70,7 @@ public class MatchSearchPredicateIT {
 	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 = "incompatible_decimal_scale_1";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisOverrideBackendSetupStrategy );
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -94,7 +93,7 @@ public class MatchSearchPredicateIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withConfiguration( CONFIGURATION_ID )
+		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),

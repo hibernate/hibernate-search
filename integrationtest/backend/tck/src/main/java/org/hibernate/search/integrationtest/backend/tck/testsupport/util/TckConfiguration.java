@@ -8,21 +8,12 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
-import java.util.function.Function;
-
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 /**
- * Allows to run the tests with different backends depending on the content of the property file at
- * {@value DEFAULT_PROPERTIES_PATH} in the classpath.
+ * Allows running the tests with different backend technologies,
+ * relying on a {@link TckBackendHelper} to adapt to the particulars of each technology.
  */
 public final class TckConfiguration {
-
-	private static final String DEFAULT_PROPERTIES_PATH = "/backend-tck.properties";
-
-	private static final Function<String, String> SPECIFIC_PROPERTIES_PATH_FUNCTION =
-			configurationId -> "/backend-tck-" + configurationId + ".properties";
 
 	private static TckConfiguration instance;
 
@@ -33,31 +24,26 @@ public final class TckConfiguration {
 		return instance;
 	}
 
-	private final TckBackendFeatures backendFeatures;
+	private final TckBackendHelper helper;
 
 	private TckConfiguration() {
-		Iterator<TckBackendFeatures> featuresIterator = ServiceLoader.load( TckBackendFeatures.class ).iterator();
+		Iterator<TckBackendHelper> featuresIterator = ServiceLoader.load( TckBackendHelper.class ).iterator();
+		if ( !featuresIterator.hasNext() ) {
+			throw new IllegalStateException( "No implementation for TckBackendHelper service in classpath" );
+		}
+
+		this.helper = featuresIterator.next();
 		if ( featuresIterator.hasNext() ) {
-			this.backendFeatures = featuresIterator.next();
-			if ( featuresIterator.hasNext() ) {
-				throw new IllegalStateException( "Multiple backend features services found" );
-			}
+			throw new IllegalStateException( "Multiple implementations for TckBackendHelper service in classpath" );
 		}
-		else {
-			this.backendFeatures = new TckBackendFeatures();
-		}
+	}
+
+	public TckBackendHelper getBackendHelper() {
+		return helper;
 	}
 
 	public TckBackendFeatures getBackendFeatures() {
-		return backendFeatures;
+		return helper.getBackendFeatures();
 	}
 
-	public ConfigurationPropertySource getBackendProperties(TestConfigurationProvider configurationProvider, String configurationId) {
-		String propertiesPath =
-				configurationId == null
-						? DEFAULT_PROPERTIES_PATH
-						: SPECIFIC_PROPERTIES_PATH_FUNCTION.apply( configurationId );
-		return ConfigurationPropertySource.fromMap( configurationProvider.getPropertiesFromFile( propertiesPath ) )
-				.withMask( "backend" );
-	}
 }

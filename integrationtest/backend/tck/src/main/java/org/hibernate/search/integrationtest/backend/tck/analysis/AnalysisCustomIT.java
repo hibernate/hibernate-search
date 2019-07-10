@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
@@ -36,8 +37,6 @@ import org.junit.Test;
  * listed in {@link AnalysisDefinitions}.
  */
 public class AnalysisCustomIT {
-
-	public static final String CONFIGURATION_ID = "analysis-custom";
 
 	/**
 	 * The analysis definitions this test expects will be available when defining the schema.
@@ -87,7 +86,7 @@ public class AnalysisCustomIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisCustomBackendSetupStrategy );
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -259,7 +258,7 @@ public class AnalysisCustomIT {
 
 	private void setup(String fieldName,
 			Function<StringIndexFieldTypeOptionsStep<?>, IndexFieldTypeFinalStep<String>> typeContributor) {
-		setupHelper.withConfiguration( CONFIGURATION_ID )
+		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> {

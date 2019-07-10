@@ -32,7 +32,6 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
@@ -474,8 +473,9 @@ public class TestElasticsearchClient implements TestRule {
 	}
 
 	private void before() {
-		ConfigurationPropertySource backendProperties =
-				TckConfiguration.get().getBackendProperties( configurationProvider, null );
+		ConfigurationPropertySource backendProperties = ConfigurationPropertySource.fromMap(
+				configurationProvider.getPropertiesFromFile( ElasticsearchTckBackendHelper.DEFAULT_BACKEND_PROPERTIES_PATH )
+		);
 
 		BeanResolver beanResolver = configurationProvider.createBeanResolverForTest();
 		/*

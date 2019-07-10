@@ -9,9 +9,13 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.u
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 
-public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
+class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
-	private ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
+	private ElasticsearchTestDialect dialect;
+
+	ElasticsearchTckBackendFeatures(ElasticsearchTestDialect dialect) {
+		this.dialect = dialect;
+	}
 
 	@Override
 	public boolean geoPointIndexNullAs() {

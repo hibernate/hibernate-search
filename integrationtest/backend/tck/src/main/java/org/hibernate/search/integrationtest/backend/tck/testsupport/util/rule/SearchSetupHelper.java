@@ -10,13 +10,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -28,39 +32,48 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingPartialBuildState;
 
+import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public class SearchSetupHelper implements TestRule {
 
+	private final TestConfigurationProvider configurationProvider;
+	private final TckBackendSetupStrategy setupStrategy;
+	private final TestRule delegateRule;
+
 	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
 	private final List<SearchIntegration> integrations = new ArrayList<>();
 
-	private final TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
+	public SearchSetupHelper() {
+		this( TckBackendHelper::createDefaultBackendSetupStrategy );
+	}
+
+	public SearchSetupHelper(Function<TckBackendHelper, TckBackendSetupStrategy> setupStrategyFunction) {
+		this.configurationProvider = new TestConfigurationProvider();
+		this.setupStrategy = setupStrategyFunction.apply( TckConfiguration.get().getBackendHelper() );
+		Optional<TestRule> setupStrategyTestRule = setupStrategy.getTestRule();
+		this.delegateRule = setupStrategyTestRule
+				.<TestRule>map( rule -> RuleChain.outerRule( configurationProvider ).around( rule ) )
+				.orElse( configurationProvider );
+	}
 
 	public SetupContext withDefaultConfiguration() {
-		return withConfiguration( null );
+		return withDefaultConfiguration( "testedBackend" );
 	}
 
 	public SetupContext withDefaultConfiguration(String backendName) {
-		return withConfiguration( null, backendName );
-	}
-
-	public SetupContext withConfiguration(String configurationId) {
-		return withConfiguration( configurationId, "testedBackend" );
-	}
-
-	public SetupContext withConfiguration(String configurationId, String backendName) {
-		TckConfiguration tckConfiguration = TckConfiguration.get();
-		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( configurationProvider, configurationId )
+		ConfigurationPropertySource propertySource = setupStrategy.createBackendConfigurationPropertySource( configurationProvider )
 				.withPrefix( "backends." + backendName );
 
 		// Hack to have the resolve() method ignore the various masks and prefixes that we added for TCK purposes only
 		propertySource = ConfigurationPropertySource.empty().withOverride( propertySource );
 
-		return new SetupContext( propertySource )
+		SetupContext setupContext = new SetupContext( propertySource )
 				.withProperty( EngineSettings.DEFAULT_BACKEND, backendName );
+
+		return setupStrategy.startSetup( setupContext );
 	}
 
 	@Override
@@ -86,7 +99,7 @@ public class SearchSetupHelper implements TestRule {
 				}
 			}
 		};
-		return configurationProvider.apply( wrapped, description );
+		return delegateRule.apply( wrapped, description );
 	}
 
 	public class SetupContext {
