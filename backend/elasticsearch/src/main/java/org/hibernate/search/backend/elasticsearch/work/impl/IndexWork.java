@@ -82,7 +82,12 @@ public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 			if ( typeName != null ) { // ES6.x and below only
 				index.addProperty( "_type", typeName.original );
 			}
+
 			index.addProperty( "_id", id.original );
+
+			if ( routingKey != null ) {
+				index.addProperty( "routing", routingKey );
+			}
 
 			JsonObject result = new JsonObject();
 			result.add( "index", index );
