@@ -43,6 +43,27 @@ public class SearchHitsAssert<H> {
 		return this;
 	}
 
+	public ListAssert<DocumentReference> asNormalizedDocRefs() {
+		shouldHaveOnlyElementsOfTypeOrNull( asIs(), DocumentReference.class );
+		@SuppressWarnings( "unchecked" ) // We check that at runtime, that's what the assertion is for
+		List<DocumentReference> normalized = normalizeDocRefHits( ( (List<? extends DocumentReference>) actual ) );
+		return Assertions.assertThat( normalized ).as( description );
+	}
+
+	public ListAssert<List<?>> asNormalizedLists() {
+		shouldHaveOnlyElementsOfTypeOrNull( asIs(), List.class );
+		@SuppressWarnings( "unchecked" ) // We check that at runtime, that's what the assertion is for
+		List<List<?>> normalized = ( (List<? extends List<?>>) actual ).stream()
+				.map( NormalizationUtils::normalizeList )
+				.collect( Collectors.toList() );
+		return Assertions.assertThat( normalized ).as( description );
+	}
+
+	public ListAssert<H> asIs() {
+		return Assertions.<H>assertThat( actual )
+				.as( description );
+	}
+
 	public SearchHitsAssert<H> isEmpty() {
 		Assertions.<H>assertThat( actual )
 				.as( description )
@@ -52,17 +73,13 @@ public class SearchHitsAssert<H> {
 
 	@SafeVarargs
 	public final SearchHitsAssert<H> hasHitsExactOrder(H... hits) {
-		Assertions.<H>assertThat( actual )
-				.as( description )
-				.containsExactly( hits );
+		asIs().containsExactly( hits );
 		return this;
 	}
 
 	@SafeVarargs
 	public final SearchHitsAssert<H> hasHitsAnyOrder(H... hits) {
-		Assertions.<H>assertThat( actual )
-				.as( description )
-				.containsExactlyInAnyOrder( hits );
+		asIs().containsExactlyInAnyOrder( hits );
 		return this;
 	}
 
@@ -102,62 +119,24 @@ public class SearchHitsAssert<H> {
 		return new SearchHitsAssert( newActuals );
 	}
 
-	public SearchHitsAssert<H> hasDocRefHitsExactOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
-		DocumentReferenceHitsBuilder context = new DocumentReferenceHitsBuilder();
-		expectation.accept( context );
-		Assertions.assertThat( getNormalizedActualDocumentReferencesHits() )
-				.as( description )
-				.containsExactly( context.getExpectedHits() );
+	public SearchHitsAssert<H> hasDocRefHitsExactOrder(Consumer<NormalizedDocRefHit.Builder> expectation) {
+		asNormalizedDocRefs().containsExactly( NormalizedDocRefHit.of( expectation ) );
 		return this;
 	}
 
-	public SearchHitsAssert<H> hasDocRefHitsAnyOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
-		DocumentReferenceHitsBuilder context = new DocumentReferenceHitsBuilder();
-		expectation.accept( context );
-		Assertions.assertThat( getNormalizedActualDocumentReferencesHits() )
-				.as( description )
-				.containsExactlyInAnyOrder( context.getExpectedHits() );
+	public SearchHitsAssert<H> hasDocRefHitsAnyOrder(Consumer<NormalizedDocRefHit.Builder> expectation) {
+		asNormalizedDocRefs().containsExactlyInAnyOrder( NormalizedDocRefHit.of( expectation ) );
 		return this;
 	}
 
-	public SearchHitsAssert<H> hasListHitsExactOrder(Consumer<ListHitsBuilder> expectation) {
-		ListHitsBuilder context = new ListHitsBuilder();
-		expectation.accept( context );
-		Assertions.assertThat( getNormalizedActualListHits() )
-				.as( description )
-				.containsExactly( context.getExpectedHits() );
+	public SearchHitsAssert<H> hasListHitsExactOrder(Consumer<NormalizedListHit.Builder> expectation) {
+		asNormalizedLists().containsExactly( NormalizedListHit.of( expectation ) );
 		return this;
 	}
 
-	public SearchHitsAssert<H> hasListHitsAnyOrder(Consumer<ListHitsBuilder> expectation) {
-		ListHitsBuilder context = new ListHitsBuilder();
-		expectation.accept( context );
-		Assertions.assertThat( getNormalizedActualListHits() )
-				.as( description )
-				.containsExactlyInAnyOrder( context.getExpectedHits() );
+	public SearchHitsAssert<H> hasListHitsAnyOrder(Consumer<NormalizedListHit.Builder> expectation) {
+		asNormalizedLists().containsExactlyInAnyOrder( NormalizedListHit.of( expectation ) );
 		return this;
-	}
-
-	@SuppressWarnings( "unchecked" ) // We check that at runtime, that's what the assertion is for
-	private List<DocumentReference> getNormalizedActualDocumentReferencesHits() {
-		shouldHaveOnlyElementsOfTypeOrNull(
-				Assertions.assertThat( actual )
-						.as( description ),
-				DocumentReference.class
-		);
-		return normalizeDocRefHits( ( (List<? extends DocumentReference>) actual ) );
-	}
-
-	@SuppressWarnings( "unchecked" ) // We check that at runtime, that's what the assertion is for
-	private List<List<?>> getNormalizedActualListHits() {
-		shouldHaveOnlyElementsOfTypeOrNull(
-				Assertions.assertThat( actual )
-						.as( description ),
-				List.class
-		);
-		return ( (List<? extends List<?>>) actual ).stream()
-				.map( NormalizationUtils::normalizeList )
-				.collect( Collectors.toList() );
 	}
 
 	private static <T> void shouldHaveOnlyElementsOfTypeOrNull(ListAssert<? extends T> theAssert, Class<?> type) {
