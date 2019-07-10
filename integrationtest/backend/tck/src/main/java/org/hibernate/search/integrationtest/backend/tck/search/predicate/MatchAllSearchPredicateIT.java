@@ -45,7 +45,7 @@ public class MatchAllSearchPredicateIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),

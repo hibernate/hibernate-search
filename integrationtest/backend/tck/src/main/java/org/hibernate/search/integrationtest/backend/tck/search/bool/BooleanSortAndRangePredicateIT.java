@@ -64,7 +64,7 @@ public class BooleanSortAndRangePredicateIT {
 
 	@Before
 	public void before() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),

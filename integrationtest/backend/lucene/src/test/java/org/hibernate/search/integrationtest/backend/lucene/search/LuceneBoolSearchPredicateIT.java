@@ -30,7 +30,7 @@ public class LuceneBoolSearchPredicateIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> new IndexMapping( ctx.getSchemaElement() ),

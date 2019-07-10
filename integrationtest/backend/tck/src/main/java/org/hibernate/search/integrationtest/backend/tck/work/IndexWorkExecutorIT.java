@@ -60,7 +60,7 @@ public class IndexWorkExecutorIT {
 
 	@Test
 	public void runOptimizePurgeAndFlushInSequence() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
@@ -87,7 +87,7 @@ public class IndexWorkExecutorIT {
 
 	@Test
 	public void runOptimizePurgeAndFlushWithMultiTenancy() {
-		multiTenancySetupHelper.withDefaultConfiguration()
+		multiTenancySetupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),

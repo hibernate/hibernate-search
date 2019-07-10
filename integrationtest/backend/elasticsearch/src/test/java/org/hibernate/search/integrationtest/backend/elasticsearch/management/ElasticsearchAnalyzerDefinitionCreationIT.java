@@ -122,7 +122,7 @@ public class ElasticsearchAnalyzerDefinitionCreationIT {
 	}
 
 	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {
-		return setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		return setupHelper.start( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,

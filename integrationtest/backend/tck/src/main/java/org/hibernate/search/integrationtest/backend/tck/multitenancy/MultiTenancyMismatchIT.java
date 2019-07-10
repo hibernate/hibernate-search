@@ -50,7 +50,7 @@ public class MultiTenancyMismatchIT {
 		thrown.expectMessage( "requires multi-tenancy but the backend" );
 		thrown.expectMessage( "does not support it in its current configuration." );
 
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
@@ -62,7 +62,7 @@ public class MultiTenancyMismatchIT {
 
 	@Test
 	public void using_multi_tenancy_for_query_while_disabled_throws_exception() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						"IndexName-using_multi_tenancy_for_query_while_disabled_throws_exception",
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
@@ -82,7 +82,7 @@ public class MultiTenancyMismatchIT {
 
 	@Test
 	public void using_multi_tenancy_for_add_while_disabled_throws_exception() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						"IndexName-using_multi_tenancy_for_add_while_disabled_throws_exception",
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
@@ -101,7 +101,7 @@ public class MultiTenancyMismatchIT {
 
 	@Test
 	public void using_multi_tenancy_for_update_while_disabled_throws_exception() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						"IndexName-using_multi_tenancy_for_update_while_disabled_throws_exception",
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
@@ -120,7 +120,7 @@ public class MultiTenancyMismatchIT {
 
 	@Test
 	public void using_multi_tenancy_for_delete_while_disabled_throws_exception() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),

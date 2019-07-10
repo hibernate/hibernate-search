@@ -59,11 +59,11 @@ public class SearchSetupHelper implements TestRule {
 				.orElse( configurationProvider );
 	}
 
-	public SetupContext withDefaultConfiguration() {
-		return withDefaultConfiguration( "testedBackend" );
+	public SetupContext start() {
+		return start( "testedBackend" );
 	}
 
-	public SetupContext withDefaultConfiguration(String backendName) {
+	public SetupContext start(String backendName) {
 		ConfigurationPropertySource propertySource = setupStrategy.createBackendConfigurationPropertySource( configurationProvider )
 				.withPrefix( "backends." + backendName );
 

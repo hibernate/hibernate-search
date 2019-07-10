@@ -67,7 +67,7 @@ public class LuceneSearchMultiIndexIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration( BACKEND_1 )
+		setupHelper.start( BACKEND_1 )
 				.withIndex(
 						INDEX_NAME_1_1,
 						ctx -> this.indexMapping_1_1 = new IndexMapping_1_1( ctx.getSchemaElement() ),

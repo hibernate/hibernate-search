@@ -62,7 +62,7 @@ public class LuceneDocumentModelDslIT {
 	}
 
 	private void setup(Consumer<IndexBindingContext> mappingContributor) {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						b -> b.mappedType( TYPE_NAME ),

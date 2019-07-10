@@ -37,7 +37,7 @@ public class MatchIdSearchPredicateIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> { }, // Nothing to do, we don't need any field in the mapping

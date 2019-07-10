@@ -58,7 +58,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						(ctx) -> {

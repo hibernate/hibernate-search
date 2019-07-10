@@ -75,7 +75,7 @@ public class ElasticsearchSchemaCreateStrategyIT {
 	}
 
 	private void setup() {
-		setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		setupHelper.start( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,
 						ctx -> {

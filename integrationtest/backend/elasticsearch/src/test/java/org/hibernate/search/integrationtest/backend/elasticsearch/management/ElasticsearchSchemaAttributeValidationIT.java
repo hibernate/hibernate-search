@@ -1152,7 +1152,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	}
 
 	private SearchSetupHelper.SetupContext validateSchemaConfig() {
-		return setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		return setupHelper.start( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
@@ -1275,7 +1275,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	}
 
 	private SearchSetupHelper.SetupContext validateSchemaWithAnalyzerConfig() {
-		return setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		return setupHelper.start( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
