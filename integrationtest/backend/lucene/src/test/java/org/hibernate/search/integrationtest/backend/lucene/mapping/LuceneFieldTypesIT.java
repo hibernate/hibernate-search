@@ -45,7 +45,7 @@ public class LuceneFieldTypesIT {
 
 	@Before
 	public void setup() {
-		setupHelper.start( "myLuceneBackend" )
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
