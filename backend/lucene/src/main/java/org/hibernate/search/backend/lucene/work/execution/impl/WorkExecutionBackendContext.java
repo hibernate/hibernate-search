@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.work.execution.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -31,18 +30,18 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
  */
 public interface WorkExecutionBackendContext {
 	IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(
-			LuceneWriteWorkOrchestrator orchestrator,
-			String indexName, SessionContextImplementor sessionContext,
+			WorkExecutionIndexManagerContext indexManagerContext,
+			SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName,
 			IndexWriterDelegator indexWriterDelegator);
 
 	IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
-			LuceneWriteWorkOrchestrator orchestrator,
-			String indexName, SessionContextImplementor sessionContext,
+			WorkExecutionIndexManagerContext indexManagerContext,
+			SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
-	IndexWorkExecutor createWorkExecutor(LuceneWriteWorkOrchestrator orchestrator, String indexName,
+	IndexWorkExecutor createWorkExecutor(WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedSessionContextImplementor sessionContext);
 }

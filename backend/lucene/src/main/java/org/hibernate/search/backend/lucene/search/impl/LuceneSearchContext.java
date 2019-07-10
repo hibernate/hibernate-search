@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
@@ -60,7 +60,7 @@ public final class LuceneSearchContext {
 		return scopeModel.getIndexNames();
 	}
 
-	public Set<? extends ReaderProvider> getReaderProviders() {
+	public Set<? extends ReadIndexManagerContext> getIndexManagerContexts() {
 		return scopeModel.getIndexManagerContexts();
 	}
 

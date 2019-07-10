@@ -92,7 +92,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 				offset, limit,
 				luceneCollectorProvider, searchResultExtractor
 		);
-		return queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
+		return doSubmit( work )
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async processing, we will have to add a loadAsync method here,
@@ -112,8 +112,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 				( luceneCollectorBuilder -> { } ),
 				searchResultExtractor
 		);
-		return queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work )
-				.getHitCount();
+		return doSubmit( work ).getHitCount();
 	}
 
 	@Override
@@ -141,6 +140,14 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		return doExplain( indexName, id );
 	}
 
+	private <T> T doSubmit(LuceneReadWork<T> work) {
+		return queryOrchestrator.submit(
+				searchContext.getIndexNames(),
+				searchContext.getIndexManagerContexts(),
+				work
+		);
+	}
+
 	private Explanation doExplain(String indexName, String id) {
 		Query explainedDocumentQuery = new BooleanQuery.Builder()
 				.add( new TermQuery( new Term( LuceneFields.indexFieldName(), indexName ) ), BooleanClause.Occur.MUST )
@@ -153,6 +160,6 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		LuceneReadWork<Explanation> work = workFactory.explain(
 				luceneQuery, indexName, id, explainedDocumentQuery
 		);
-		return queryOrchestrator.submit( searchContext.getIndexNames(), searchContext.getReaderProviders(), work );
+		return doSubmit( work );
 	}
 }

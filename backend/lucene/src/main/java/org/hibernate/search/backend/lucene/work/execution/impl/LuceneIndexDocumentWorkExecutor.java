@@ -30,13 +30,13 @@ public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecuto
 	private final DocumentCommitStrategy commitStrategy;
 
 	public LuceneIndexDocumentWorkExecutor(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
-			LuceneWriteWorkOrchestrator orchestrator,
-			String indexName, SessionContextImplementor sessionContext,
+			WorkExecutionIndexManagerContext indexManagerContext,
+			SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.orchestrator = orchestrator;
-		this.indexName = indexName;
+		this.orchestrator = indexManagerContext.getWriteOrchestrator();
+		this.indexName = indexManagerContext.getIndexName();
 		this.tenantId = sessionContext.getTenantIdentifier();
 		this.commitStrategy = commitStrategy;
 	}

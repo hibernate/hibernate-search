@@ -22,10 +22,10 @@ public class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 	private final DetachedSessionContextImplementor sessionContext;
 
 	public LuceneIndexWorkExecutor(LuceneWorkFactory factory,
-			LuceneWriteWorkOrchestrator orchestrator,
+			WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedSessionContextImplementor sessionContext) {
 		this.factory = factory;
-		this.orchestrator = orchestrator;
+		this.orchestrator = indexManagerContext.getWriteOrchestrator();
 		this.sessionContext = sessionContext;
 	}
 

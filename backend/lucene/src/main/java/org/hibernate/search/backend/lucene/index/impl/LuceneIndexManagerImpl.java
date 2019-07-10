@@ -11,8 +11,11 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
+import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
+import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -23,7 +26,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkE
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -36,12 +38,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexReader;
 
-
 public class LuceneIndexManagerImpl
 		implements IndexManagerImplementor<LuceneRootDocumentBuilder>, LuceneIndexManager,
-		LuceneScopeIndexManagerContext,
-		// TODO HSEARCH-3117 in the end the IndexManager won't implement ReaderProvider as it's far more complex than that
-		ReaderProvider {
+		LuceneScopeIndexManagerContext, WorkExecutionIndexManagerContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -95,10 +94,20 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
+	public String getIndexName() {
+		return indexName;
+	}
+
+	@Override
+	public LuceneWriteWorkOrchestrator getWriteOrchestrator() {
+		return writeOrchestrator;
+	}
+
+	@Override
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return backendContext.createWorkPlan(
-				writeOrchestrator, indexName, sessionContext,
+				this, sessionContext,
 				commitStrategy, refreshStrategy
 		);
 	}
@@ -107,14 +116,14 @@ public class LuceneIndexManagerImpl
 	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
 			SessionContextImplementor sessionContext, DocumentCommitStrategy commitStrategy) {
 		return backendContext.createDocumentWorkExecutor(
-				writeOrchestrator, indexName, sessionContext,
+				this, sessionContext,
 				commitStrategy
 		);
 	}
 
 	@Override
 	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
-		return backendContext.createWorkExecutor( writeOrchestrator, indexName, sessionContext );
+		return backendContext.createWorkExecutor( this, sessionContext );
 	}
 
 	@Override
@@ -155,6 +164,7 @@ public class LuceneIndexManagerImpl
 			log.unableToCloseIndexReader( getBackendAndIndexEventContext(), e );
 		}
 	}
+
 
 	@Override
 	public IndexManager toAPI() {

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.scope.model.impl;
 
-import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 
-public interface LuceneScopeIndexManagerContext extends ReaderProvider {
+public interface LuceneScopeIndexManagerContext extends ReadIndexManagerContext {
 
 }

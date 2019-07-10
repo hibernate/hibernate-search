@@ -38,13 +38,13 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 	private final List<LuceneWriteWork<?>> works = new ArrayList<>();
 
 	public LuceneIndexWorkPlan(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
-			LuceneWriteWorkOrchestrator orchestrator,
-			String indexName, SessionContextImplementor sessionContext,
+			WorkExecutionIndexManagerContext indexManagerContext,
+			SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.orchestrator = orchestrator;
-		this.indexName = indexName;
+		this.orchestrator = indexManagerContext.getWriteOrchestrator();
+		this.indexName = indexManagerContext.getIndexName();
 		this.tenantId = sessionContext.getTenantIdentifier();
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
