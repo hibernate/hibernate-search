@@ -30,6 +30,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -44,8 +45,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class PhraseSearchPredicateIT {
-
-	private static final String CONFIGURATION_ID = "analysis-override";
 
 	private static final String INDEX_NAME = "IndexName";
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
@@ -78,7 +77,7 @@ public class PhraseSearchPredicateIT {
 	private static final String INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 = "incompatible_analyzer_1";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisOverrideBackendSetupStrategy );
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -96,7 +95,7 @@ public class PhraseSearchPredicateIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withConfiguration( CONFIGURATION_ID )
+		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),

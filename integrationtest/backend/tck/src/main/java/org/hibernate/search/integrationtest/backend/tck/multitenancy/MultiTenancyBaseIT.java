@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -34,8 +35,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class MultiTenancyBaseIT {
-
-	public static final String CONFIGURATION_ID = "multi-tenancy";
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -58,7 +57,7 @@ public class MultiTenancyBaseIT {
 	private static final Integer INTEGER_VALUE_5 = 5;
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -71,7 +70,7 @@ public class MultiTenancyBaseIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withConfiguration( CONFIGURATION_ID )
+		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),

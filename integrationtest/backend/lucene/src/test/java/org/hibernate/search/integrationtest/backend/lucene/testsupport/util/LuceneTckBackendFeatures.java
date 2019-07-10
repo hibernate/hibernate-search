@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 
-public class LuceneTckBackendFeatures extends TckBackendFeatures {
+class LuceneTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public boolean distanceSortDesc() {
