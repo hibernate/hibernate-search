@@ -49,7 +49,7 @@ public class ElasticsearchSchemaNoneStrategyIT {
 				ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 
-		setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		setupHelper.start( BACKEND_NAME )
 				.withBackendProperty(
 						BACKEND_NAME,
 						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,

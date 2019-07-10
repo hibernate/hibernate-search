@@ -85,7 +85,7 @@ public class IndexNullAsValueIT {
 
 	@Test
 	public void indexNullAsValue_fullText() {
-		SubTest.expectException( () -> setupHelper.withDefaultConfiguration()
+		SubTest.expectException( () -> setupHelper.start()
 				.withIndex( ANOTHER_INDEX_NAME, ctx -> ctx.getSchemaElement()
 								.field( "fullTextField", c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).indexNullAs( "bla bla bla" ) )
 								.toReference()
@@ -101,7 +101,7 @@ public class IndexNullAsValueIT {
 	}
 
 	private void setUp() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),

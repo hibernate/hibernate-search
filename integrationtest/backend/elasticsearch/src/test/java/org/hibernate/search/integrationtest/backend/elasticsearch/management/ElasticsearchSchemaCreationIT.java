@@ -197,7 +197,7 @@ public class ElasticsearchSchemaCreationIT {
 	}
 
 	private void setup(Consumer<IndexBindingContext> mappingContributor) {
-		setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		setupHelper.start( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,
 						mappingContributor

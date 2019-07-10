@@ -185,7 +185,7 @@ public class LuceneAnalysisConfigurerIT {
 	}
 
 	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> mappingContributor) {
-		setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		setupHelper.start( BACKEND_NAME )
 				.withProperty(
 						"backends." + BACKEND_NAME + "." + LuceneBackendSettings.ANALYSIS_CONFIGURER,
 						analysisConfigurer

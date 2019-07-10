@@ -96,7 +96,7 @@ public class LuceneExtensionIT {
 
 	@Before
 	public void setup() {
-		this.integration = setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		this.integration = setupHelper.start( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),

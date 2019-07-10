@@ -38,7 +38,7 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	public void explicitModelDialect() {
-		SearchSetupHelper.PartialSetup partialSetup = setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start( BACKEND_NAME )
 				.withBackendProperty(
 						BACKEND_NAME, ElasticsearchBackendSettings.VERSION, ElasticsearchTestDialect.getClusterVersion()
 				)

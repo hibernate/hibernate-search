@@ -51,7 +51,7 @@ public class LuceneFieldAttributesIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		setupHelper.start( BACKEND_NAME )
 				.withBackendProperty( BACKEND_NAME, LuceneBackendSettings.ANALYSIS_CONFIGURER,
 						(LuceneAnalysisConfigurer) ctx -> ctx
 								.analyzer( ANALYZER_NAME ).custom()

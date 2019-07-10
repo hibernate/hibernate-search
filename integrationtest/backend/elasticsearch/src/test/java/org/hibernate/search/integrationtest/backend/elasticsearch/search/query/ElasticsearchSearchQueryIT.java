@@ -49,7 +49,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		setupHelper.start( BACKEND_NAME )
 				.withBackendProperty(
 						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
 				)

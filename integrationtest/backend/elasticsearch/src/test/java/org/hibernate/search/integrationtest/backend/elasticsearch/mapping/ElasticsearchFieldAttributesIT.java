@@ -77,7 +77,7 @@ public class ElasticsearchFieldAttributesIT {
 		clientSpy.expectNext( ElasticsearchRequest.put().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).body( createIndex( properties ) ).build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE );
 
-		setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		setupHelper.start( BACKEND_NAME )
 				.withBackendProperty( BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory() )
 				.withIndex( INDEX_NAME, ctx -> mapping.accept( ctx.getSchemaElement() ) )
 				.setup();

@@ -258,7 +258,7 @@ public class AnalysisCustomIT {
 
 	private void setup(String fieldName,
 			Function<StringIndexFieldTypeOptionsStep<?>, IndexFieldTypeFinalStep<String>> typeContributor) {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> {

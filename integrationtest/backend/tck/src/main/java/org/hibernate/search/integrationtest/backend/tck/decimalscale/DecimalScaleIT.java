@@ -65,7 +65,7 @@ public class DecimalScaleIT {
 	@Test
 	public void noDecimalScale_bigDecimal() {
 		SubTest.expectException( () ->
-				setupHelper.withDefaultConfiguration()
+				setupHelper.start()
 						.withIndex( INDEX_NAME, ctx -> ctx.getSchemaElement().field( "noScaled", f -> f.asBigDecimal() ).toReference() )
 						.setup()
 		).assertThrown()
@@ -76,7 +76,7 @@ public class DecimalScaleIT {
 	@Test
 	public void noDecimalScale_bigInteger() {
 		SubTest.expectException( () ->
-				setupHelper.withDefaultConfiguration()
+				setupHelper.start()
 						.withIndex( INDEX_NAME, ctx -> ctx.getSchemaElement().field( "noScaled", f -> f.asBigInteger() ).toReference() )
 						.setup()
 		).assertThrown()
@@ -87,7 +87,7 @@ public class DecimalScaleIT {
 	@Test
 	public void positiveDecimalScale_bigInteger() {
 		SubTest.expectException( () ->
-				setupHelper.withDefaultConfiguration()
+				setupHelper.start()
 						.withIndex( INDEX_NAME, ctx -> ctx.getSchemaElement().field( "positiveScaled", f -> f.asBigInteger().decimalScale( 3 ) ).toReference() )
 						.setup()
 		).assertThrown()
@@ -97,7 +97,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_bigDecimal() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 3 ),
 						indexManager -> this.indexManager = indexManager )
@@ -115,7 +115,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_zeroScale_bigDecimal() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
@@ -133,7 +133,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_zeroScale_bigInteger() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
@@ -151,7 +151,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_negativeScale_bigDecimal() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), -3 ),
 						indexManager -> this.indexManager = indexManager )
@@ -169,7 +169,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_negativeScale_bigInteger() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -3 ),
 						indexManager -> this.indexManager = indexManager )
@@ -189,7 +189,7 @@ public class DecimalScaleIT {
 	public void decimalScale_largeScale_bigDecimal() {
 		final int schemaDecimalScale = 275;
 
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), schemaDecimalScale ),
 						indexManager -> this.indexManager = indexManager )
@@ -229,7 +229,7 @@ public class DecimalScaleIT {
 	public void decimalScale_negativeScale_largeScale_bigDecimal() {
 		final int schemaDecimalScale = -275;
 
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), schemaDecimalScale ),
 						indexManager -> this.indexManager = indexManager )
@@ -269,7 +269,7 @@ public class DecimalScaleIT {
 	public void decimalScale_negativeScale_largeScale_bigInteger() {
 		final int schemaDecimalScale = -275;
 
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), schemaDecimalScale ),
 						indexManager -> this.indexManager = indexManager )
@@ -307,7 +307,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_rounding_bigDecimal() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 2 ),
 						indexManager -> this.indexManager = indexManager )
@@ -331,7 +331,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_rounding_bigInteger() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -4 ),
 						indexManager -> this.indexManager = indexManager )
@@ -355,7 +355,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_largeDecimal_bigDecimal() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
@@ -376,7 +376,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_largeDecimal_bigInteger() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
@@ -397,7 +397,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scale0_bigDecimal() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
@@ -418,7 +418,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scale0_bigDecimal_queryPredicateBuildTime() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
@@ -444,7 +444,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scale0_bigDecimal_lowerBound() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
@@ -465,7 +465,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scale0_bigInteger() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
@@ -486,7 +486,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scale0_bigInteger_lowerBound() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
@@ -507,7 +507,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scale0_bigInteger_lowerBound_queryPredicateBuildTime() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), 0 ),
 						indexManager -> this.indexManager = indexManager )
@@ -533,7 +533,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scale2_bigDecimal() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 2 ),
 						indexManager -> this.indexManager = indexManager )
@@ -554,7 +554,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scale2_bigDecimal_lowerBound() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 2 ),
 						indexManager -> this.indexManager = indexManager )
@@ -575,7 +575,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scale2_bigDecimal_lowerBound_queryPredicateBuildTime() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 2 ),
 						indexManager -> this.indexManager = indexManager )
@@ -601,7 +601,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -2 ),
 						indexManager -> this.indexManager = indexManager )
@@ -622,7 +622,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger_queryPredicateBuildTime() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -2 ),
 						indexManager -> this.indexManager = indexManager )
@@ -648,7 +648,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger_lowerBound() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -2 ),
 						indexManager -> this.indexManager = indexManager )
@@ -669,7 +669,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void defaultDecimalScale_bigDecimal() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.defaultDecimalScaleIndexMapping = new DefaultDecimalScaleIndexMapping( ctx ),
 						indexManager -> this.indexManager = indexManager )
@@ -687,7 +687,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void defaultDecimalScale_bigInteger() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.defaultIntegerScaleIndexMapping = new DefaultIntegerScaleIndexMapping( ctx ),
 						indexManager -> this.indexManager = indexManager )
@@ -705,7 +705,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_andDefaultDecimalScale_bigDecimal() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.bothDecimalScaleIndexMapping = new BothDecimalScaleIndexMapping( ctx ),
 						indexManager -> this.indexManager = indexManager )
@@ -724,7 +724,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_andDefaultDecimalScale_bigInteger() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.bothIntegerScaleIndexMapping = new BothIntegerScaleIndexMapping( ctx ),
 						indexManager -> this.indexManager = indexManager )
@@ -743,7 +743,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_doesNotAffectProjections_bigDecimal() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.decimalScaleIndexMapping = new DecimalScaleIndexMapping( ctx.getSchemaElement(), 3 ),
 						indexManager -> this.indexManager = indexManager )
@@ -759,7 +759,7 @@ public class DecimalScaleIT {
 
 	@Test
 	public void decimalScale_doesNotAffectProjections_bigInteger() {
-		setupHelper.withDefaultConfiguration()
+		setupHelper.start()
 				.withIndex( INDEX_NAME,
 						ctx -> this.integerScaleIndexMapping = new IntegerScaleIndexMapping( ctx.getSchemaElement(), -7 ),
 						indexManager -> this.indexManager = indexManager )
