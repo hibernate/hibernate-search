@@ -31,8 +31,6 @@ import org.junit.Test;
  */
 public class LuceneSearchMultiIndexIT {
 
-	private static final String BACKEND_1 = "backend_1";
-
 	private static final String STRING_1 = "string_1";
 	private static final String STRING_2 = "string_2";
 
@@ -67,7 +65,7 @@ public class LuceneSearchMultiIndexIT {
 
 	@Before
 	public void setup() {
-		setupHelper.start( BACKEND_1 )
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME_1_1,
 						ctx -> this.indexMapping_1_1 = new IndexMapping_1_1( ctx.getSchemaElement() ),
