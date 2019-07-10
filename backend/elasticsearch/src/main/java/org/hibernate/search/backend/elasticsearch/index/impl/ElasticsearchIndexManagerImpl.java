@@ -94,6 +94,16 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
+	public String toString() {
+		return new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "name=" ).append( hibernateSearchIndexName )
+				.append( "elasticsearchName=" ).append( elasticsearchIndexName.original )
+				.append( "]" )
+				.toString();
+	}
+
+	@Override
 	public void start(IndexManagerStartContext context) {
 		try {
 			/*
@@ -175,16 +185,6 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 		ElasticsearchIndexScopeBuilder esBuilder = (ElasticsearchIndexScopeBuilder) builder;
 		esBuilder.add( backendContext, this );
-	}
-
-	@Override
-	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "name=" ).append( hibernateSearchIndexName )
-				.append( "elasticsearchName=" ).append( elasticsearchIndexName.original )
-				.append( "]" )
-				.toString();
 	}
 
 	@Override

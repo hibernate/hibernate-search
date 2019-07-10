@@ -67,13 +67,31 @@ public class LuceneIndexManagerImpl
 		this.indexAccessor = indexAccessor;
 	}
 
-	LuceneIndexModel getModel() {
-		return model;
+	@Override
+	public String toString() {
+		return new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "name=" ).append( indexName )
+				.append( "]" )
+				.toString();
 	}
 
 	@Override
 	public void start(IndexManagerStartContext context) {
 		writeOrchestrator.start();
+	}
+
+	@Override
+	public void close() {
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.push( LuceneWriteWorkOrchestratorImplementor::close, writeOrchestrator );
+			// Close the index writer after the orchestrators, when we're sure all works have been performed
+			closer.push( IndexAccessor::close, indexAccessor );
+			closer.push( LuceneIndexModel::close, model );
+		}
+		catch (IOException | RuntimeException e) {
+			throw log.failedToShutdownBackend( e, getBackendAndIndexEventContext() );
+		}
 	}
 
 	@Override
@@ -119,28 +137,6 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "name=" ).append( indexName )
-				.append( "]" )
-				.toString();
-	}
-
-	@Override
-	public void close() {
-		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( LuceneWriteWorkOrchestratorImplementor::close, writeOrchestrator );
-			// Close the index writer after the orchestrators, when we're sure all works have been performed
-			closer.push( IndexAccessor::close, indexAccessor );
-			closer.push( LuceneIndexModel::close, model );
-		}
-		catch (IOException | RuntimeException e) {
-			throw log.failedToShutdownBackend( e, getBackendAndIndexEventContext() );
-		}
-	}
-
-	@Override
 	public IndexReader openIndexReader() {
 		try {
 			return indexAccessor.openDirectoryIndexReader();
@@ -178,6 +174,10 @@ public class LuceneIndexManagerImpl
 
 	public final IndexAccessor getIndexAccessorForTests() {
 		return indexAccessor;
+	}
+
+	LuceneIndexModel getModel() {
+		return model;
 	}
 
 	private EventContext getBackendAndIndexEventContext() {

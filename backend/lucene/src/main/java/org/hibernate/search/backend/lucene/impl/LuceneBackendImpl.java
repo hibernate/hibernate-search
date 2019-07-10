@@ -76,8 +76,27 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	}
 
 	@Override
+	public String toString() {
+		return new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "name=" ).append( name ).append( ", " )
+				.append( "directoryProvider=" ).append( directoryProviderHolder.get() )
+				.append( "]" )
+				.toString();
+	}
+
+	@Override
 	public void start(BackendStartContext context) {
 		// TODO HSEARCH-3528 start thread(s) and allocate resources specific to this backend here
+	}
+
+	@Override
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( LuceneReadWorkOrchestratorImplementor::close, readOrchestrator );
+			closer.push( holder -> holder.get().close(), directoryProviderHolder );
+			closer.push( BeanHolder::close, directoryProviderHolder );
+		}
 	}
 
 	@Override
@@ -116,24 +135,5 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 				indexManagerBackendContext,
 				indexName, indexSchemaRootNodeBuilder
 		);
-	}
-
-	@Override
-	public void close() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( LuceneReadWorkOrchestratorImplementor::close, readOrchestrator );
-			closer.push( holder -> holder.get().close(), directoryProviderHolder );
-			closer.push( BeanHolder::close, directoryProviderHolder );
-		}
-	}
-
-	@Override
-	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "name=" ).append( name ).append( ", " )
-				.append( "directoryProvider=" ).append( directoryProviderHolder.get() )
-				.append( "]" )
-				.toString();
 	}
 }

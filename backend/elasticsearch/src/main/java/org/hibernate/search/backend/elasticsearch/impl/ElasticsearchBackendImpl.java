@@ -110,6 +110,13 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	}
 
 	@Override
+	public void start(BackendStartContext context) {
+		link.onStart( context.getConfigurationPropertySource() );
+		orchestratorProvider.start();
+		queryOrchestrator.start();
+	}
+
+	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchWorkOrchestratorImplementor::close, queryOrchestrator );
@@ -120,13 +127,6 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		catch (IOException | RuntimeException e) {
 			throw log.failedToShutdownBackend( e, eventContext );
 		}
-	}
-
-	@Override
-	public void start(BackendStartContext context) {
-		link.onStart( context.getConfigurationPropertySource() );
-		orchestratorProvider.start();
-		queryOrchestrator.start();
 	}
 
 	@Override
