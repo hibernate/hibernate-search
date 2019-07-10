@@ -18,4 +18,8 @@ public interface TckBackendHelper {
 
 	TckBackendSetupStrategy createAnalysisOverrideBackendSetupStrategy();
 
+	TckBackendSetupStrategy createNoShardingBackendSetupStrategy();
+
+	TckBackendSetupStrategy createHashBasedShardingBackendSetupStrategy(int shardCount);
+
 }

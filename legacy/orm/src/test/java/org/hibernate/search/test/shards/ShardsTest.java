@@ -26,6 +26,8 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.indexmanager.RamIndexManagerFactory;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -33,6 +35,7 @@ import org.junit.experimental.categories.Category;
 /**
  * @author Emmanuel Bernard
  */
+@Category(PortedToSearch6.class)
 public class ShardsTest extends SearchTestBase {
 
 	@Rule

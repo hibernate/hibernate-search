@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
 import java.util.Collections;
 
+import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.AnalysisOverrideITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
@@ -51,6 +52,23 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 		return TckBackendSetupStrategy.of(
 				DEFAULT_BACKEND_PROPERTIES_PATH,
 				Collections.singletonMap( "analysis_configurer", AnalysisOverrideITAnalysisConfigurer.class.getName() )
+		);
+	}
+
+	@Override
+	public TckBackendSetupStrategy createNoShardingBackendSetupStrategy() {
+		// Sharding is disabled by default
+		return createDefaultBackendSetupStrategy();
+	}
+
+	@Override
+	public TckBackendSetupStrategy createHashBasedShardingBackendSetupStrategy(int shardCount) {
+		return TckBackendSetupStrategy.of(
+				DEFAULT_BACKEND_PROPERTIES_PATH,
+				Collections.singletonMap(
+						BackendSettings.INDEX_DEFAULTS + ".sharding.number_of_shards",
+						String.valueOf( shardCount )
+				)
 		);
 	}
 }
