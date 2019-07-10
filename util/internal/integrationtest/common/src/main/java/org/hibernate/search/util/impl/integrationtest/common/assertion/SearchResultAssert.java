@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 
+import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.Assertions;
 
 public class SearchResultAssert<H> {
@@ -41,72 +42,75 @@ public class SearchResultAssert<H> {
 		return this;
 	}
 
+	public AbstractLongAssert<?> totalHitCount() {
+		return Assertions.assertThat( actual.getTotalHitCount() )
+				.as( "Total hit count of " + queryDescription );
+	}
+
+	public SearchHitsAssert<H> hits() {
+		return SearchHitsAssert.<H>assertThat( actual.getHits() ).as( "Hits of " + queryDescription );
+	}
+
 	public SearchResultAssert<H> hasNoHits() {
-		assertHits().isEmpty();
+		hits().isEmpty();
 		return this;
 	}
 
 	public SearchResultAssert<H> hasTotalHitCount(long expected) {
-		Assertions.assertThat( actual.getTotalHitCount() )
-				.as( "Total hit count of " + queryDescription )
-				.isEqualTo( expected );
+		totalHitCount().isEqualTo( expected );
 		return this;
 	}
 
 	@SafeVarargs
 	public final SearchResultAssert<H> hasHitsExactOrder(H... hits) {
-		assertHits().hasHitsExactOrder( hits );
+		hits().hasHitsExactOrder( hits );
 		return this;
 	}
 
 	@SafeVarargs
 	public final SearchResultAssert<H> hasHitsAnyOrder(H... hits) {
-		assertHits().hasHitsAnyOrder( hits );
+		hits().hasHitsAnyOrder( hits );
 		return this;
 	}
 
 	public final SearchResultAssert<H> hasHitsExactOrder(Collection<H> hits) {
-		assertHits().hasHitsExactOrder( hits );
+		hits().hasHitsExactOrder( hits );
 		return this;
 	}
 
 	public final SearchResultAssert<H> hasHitsAnyOrder(Collection<H> hits) {
-		assertHits().hasHitsAnyOrder( hits );
+		hits().hasHitsAnyOrder( hits );
 		return this;
 	}
 
 	public SearchResultAssert<H> hasDocRefHitsExactOrder(String indexName, String firstId, String... otherIds) {
-		assertHits().hasDocRefHitsExactOrder( indexName, firstId, otherIds );
+		hits().hasDocRefHitsExactOrder( indexName, firstId, otherIds );
 		return this;
 	}
 
 	public SearchResultAssert<H> hasDocRefHitsAnyOrder(String indexName, String firstId, String... otherIds) {
-		assertHits().hasDocRefHitsAnyOrder( indexName, firstId, otherIds );
+		hits().hasDocRefHitsAnyOrder( indexName, firstId, otherIds );
 		return this;
 	}
 
-	public SearchResultAssert<H> hasDocRefHitsExactOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
-		assertHits().hasDocRefHitsExactOrder( expectation );
+	public SearchResultAssert<H> hasDocRefHitsExactOrder(Consumer<NormalizedDocRefHit.Builder> expectation) {
+		hits().hasDocRefHitsExactOrder( expectation );
 		return this;
 	}
 
-	public SearchResultAssert<H> hasDocRefHitsAnyOrder(Consumer<DocumentReferenceHitsBuilder> expectation) {
-		assertHits().hasDocRefHitsAnyOrder( expectation );
+	public SearchResultAssert<H> hasDocRefHitsAnyOrder(Consumer<NormalizedDocRefHit.Builder> expectation) {
+		hits().hasDocRefHitsAnyOrder( expectation );
 		return this;
 	}
 
-	public SearchResultAssert<H> hasListHitsExactOrder(Consumer<ListHitsBuilder> expectation) {
-		assertHits().hasListHitsExactOrder( expectation );
+	public SearchResultAssert<H> hasListHitsExactOrder(Consumer<NormalizedListHit.Builder> expectation) {
+		hits().hasListHitsExactOrder( expectation );
 		return this;
 	}
 
-	public SearchResultAssert<H> hasListHitsAnyOrder(Consumer<ListHitsBuilder> expectation) {
-		assertHits().hasListHitsAnyOrder( expectation );
+	public SearchResultAssert<H> hasListHitsAnyOrder(Consumer<NormalizedListHit.Builder> expectation) {
+		hits().hasListHitsAnyOrder( expectation );
 		return this;
-	}
-
-	private SearchHitsAssert<H> assertHits() {
-		return SearchHitsAssert.<H>assertThat( actual.getHits() ).as( "Hits of " + queryDescription );
 	}
 
 }
