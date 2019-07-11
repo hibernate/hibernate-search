@@ -6,12 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.reader.impl;
 
-import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
+import java.io.IOException;
+
+import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
 
 /**
  * An interface with knowledge of the index manager internals,
  * able to retrieve components related to index reading.
  */
-public interface ReadIndexManagerContext extends ReaderProvider {
+public interface ReadIndexManagerContext {
+
+	IndexReaderHolder openIndexReader() throws IOException;
 
 }

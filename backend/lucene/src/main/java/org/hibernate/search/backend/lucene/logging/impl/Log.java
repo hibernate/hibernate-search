@@ -74,11 +74,6 @@ public interface Log extends BasicLogger {
 	// -----------------------------------
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
 
-	@LogMessage(level = Level.WARN)
-	@Message(id = ID_OFFSET_1 + 35,
-			value = "Could not close resource.")
-	void couldNotCloseResource(@Cause Exception e);
-
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 49,
 			value = "'%s' was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
@@ -120,8 +115,8 @@ public interface Log extends BasicLogger {
 	SearchException illegalLuceneVersionFormat(String property, String luceneErrorMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_1 + 284,
-			value = "An IOException happened while opening multiple indexes." )
-	SearchException ioExceptionOnMultiReaderRefresh(@Param EventContext context, @Cause IOException e);
+			value = "An exception occurred while opening multiple indexes." )
+	SearchException failureOnMultiReaderRefresh(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_1 + 320,
 			value = "Could not normalize value for field '%1$s'.")

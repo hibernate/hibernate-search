@@ -8,12 +8,12 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 
 
 public interface LuceneReadWorkOrchestrator {
 
-	<T> T submit(Set<String> indexNames, Set<? extends ReaderProvider> indexManagerContexts, LuceneReadWork<T> work);
+	<T> T submit(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts, LuceneReadWork<T> work);
 
 }

@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
-import org.hibernate.search.backend.lucene.lowlevel.reader.impl.MultiReaderFactory;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HolderMultiReader;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWorkExecutionContext;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
@@ -31,13 +34,16 @@ public class LuceneReadWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<LuceneReadWorkOrchestratorImpl.ReadTask<?>>
 		implements LuceneReadWorkOrchestratorImplementor {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	public LuceneReadWorkOrchestratorImpl(String name) {
 		super( name );
 	}
 
 	@Override
-	public <T> T submit(Set<String> indexNames, Set<? extends ReaderProvider> readerProviders, LuceneReadWork<T> work) {
-		ReadTask<T> task = new ReadTask<>( indexNames, readerProviders, work );
+	public <T> T submit(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
+			LuceneReadWork<T> work) {
+		ReadTask<T> task = new ReadTask<>( indexNames, indexManagerContexts, work );
 		Throwable throwable = null;
 		try {
 			submit( task );
@@ -73,14 +79,14 @@ public class LuceneReadWorkOrchestratorImpl
 
 	static class ReadTask<T> implements AutoCloseable, LuceneReadWorkExecutionContext {
 		private final Set<String> indexNames;
-		private final IndexReader indexReader;
+		private final HolderMultiReader indexReader;
 		private final LuceneReadWork<T> work;
 
 		private T result;
 
-		ReadTask(Set<String> indexNames, Set<? extends ReaderProvider> readerProviders, LuceneReadWork<T> work) {
+		ReadTask(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts, LuceneReadWork<T> work) {
 			this.indexNames = indexNames;
-			this.indexReader = MultiReaderFactory.openReader( indexNames, readerProviders );
+			this.indexReader = HolderMultiReader.open( indexNames, indexManagerContexts );
 			this.work = work;
 		}
 
@@ -104,7 +110,12 @@ public class LuceneReadWorkOrchestratorImpl
 
 		@Override
 		public void close() {
-			MultiReaderFactory.closeReader( indexReader );
+			try {
+				indexReader.close();
+			}
+			catch (IOException | RuntimeException e) {
+				log.unableToCloseIndexReader( getEventContext(), e );
+			}
 		}
 	}
 

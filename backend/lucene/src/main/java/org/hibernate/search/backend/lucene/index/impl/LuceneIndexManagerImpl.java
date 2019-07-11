@@ -36,8 +36,6 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.index.IndexReader;
-
 public class LuceneIndexManagerImpl
 		implements IndexManagerImplementor<LuceneRootDocumentBuilder>, LuceneIndexManager,
 		LuceneScopeIndexManagerContext, WorkExecutionIndexManagerContext {
@@ -146,25 +144,9 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexReader openIndexReader() {
-		try {
-			return indexAccessor.openDirectoryIndexReader();
-		}
-		catch (IOException e) {
-			throw log.unableToCreateIndexReader( getBackendAndIndexEventContext(), e );
-		}
+	public IndexReaderHolder openIndexReader() throws IOException {
+		return IndexReaderHolder.of( indexAccessor.openDirectoryIndexReader() );
 	}
-
-	@Override
-	public void closeIndexReader(IndexReader reader) {
-		try {
-			reader.close();
-		}
-		catch (IOException e) {
-			log.unableToCloseIndexReader( getBackendAndIndexEventContext(), e );
-		}
-	}
-
 
 	@Override
 	public IndexManager toAPI() {
