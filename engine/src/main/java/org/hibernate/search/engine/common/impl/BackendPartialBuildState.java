@@ -9,6 +9,7 @@ package org.hibernate.search.engine.common.impl;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -28,6 +29,7 @@ class BackendPartialBuildState {
 	}
 
 	BackendImplementor<?> finalizeBuild(RootFailureCollector rootFailureCollector,
+			BeanResolver beanResolver,
 			ConfigurationPropertySource rootPropertySource) {
 		ContextualFailureCollector backendFailureCollector =
 				rootFailureCollector.withContext( EventContexts.fromBackendName( backendName ) );
@@ -35,6 +37,7 @@ class BackendPartialBuildState {
 				EngineConfigurationUtils.getBackend( rootPropertySource, backendName );
 		BackendStartContextImpl startContext = new BackendStartContextImpl(
 				backendFailureCollector,
+				beanResolver,
 				backendPropertySource
 		);
 		try {

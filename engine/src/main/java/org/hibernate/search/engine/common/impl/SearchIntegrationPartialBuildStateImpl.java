@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
@@ -28,6 +29,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	private static final int FAILURE_LIMIT = 100;
 
 	private final BeanProvider beanProvider;
+	private final BeanResolver beanResolver;
 
 	private final Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings;
 	private final Map<MappingKey<?, ?>, MappingImplementor<?>> fullyBuiltMappings = new LinkedHashMap<>();
@@ -37,11 +39,12 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	private final Map<String, IndexManagerImplementor<?>> fullyBuiltIndexManagers = new LinkedHashMap<>();
 
 	SearchIntegrationPartialBuildStateImpl(
-			BeanProvider beanProvider,
+			BeanProvider beanProvider, BeanResolver beanResolver,
 			Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings,
 			Map<String, BackendPartialBuildState> partiallyBuiltBackends,
 			Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers) {
 		this.beanProvider = beanProvider;
+		this.beanResolver = beanResolver;
 		this.partiallyBuiltMappings = partiallyBuiltMappings;
 		this.partiallyBuiltBackends = partiallyBuiltBackends;
 		this.partiallyBuiltIndexManagers = partiallyBuiltIndexManagers;
@@ -96,7 +99,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			// TODO HSEARCH-3084 perform backend initialization in parallel for all backends?
 			fullyBuiltBackends.put(
 					entry.getKey(),
-					entry.getValue().finalizeBuild( failureCollector, configurationPropertySource )
+					entry.getValue().finalizeBuild( failureCollector, beanResolver, configurationPropertySource )
 			);
 		}
 		failureCollector.checkNoFailure();
@@ -106,7 +109,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
 			fullyBuiltIndexManagers.put(
 					entry.getKey(),
-					entry.getValue().finalizeBuild( failureCollector, configurationPropertySource )
+					entry.getValue().finalizeBuild( failureCollector, beanResolver, configurationPropertySource )
 			);
 		}
 		failureCollector.checkNoFailure();

@@ -9,6 +9,7 @@ package org.hibernate.search.engine.common.impl;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -31,6 +32,7 @@ class IndexManagerPartialBuildState {
 	}
 
 	IndexManagerImplementor<?> finalizeBuild(RootFailureCollector rootFailureCollector,
+			BeanResolver beanResolver,
 			ConfigurationPropertySource rootPropertySource) {
 		ContextualFailureCollector indexFailureCollector =
 				rootFailureCollector.withContext( EventContexts.fromIndexName( indexName ) );
@@ -43,7 +45,7 @@ class IndexManagerPartialBuildState {
 						indexName
 				);
 		IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl(
-				indexFailureCollector, indexPropertySource
+				indexFailureCollector, beanResolver, indexPropertySource
 		);
 		try {
 			partiallyBuiltIndexManager.start( startContext );

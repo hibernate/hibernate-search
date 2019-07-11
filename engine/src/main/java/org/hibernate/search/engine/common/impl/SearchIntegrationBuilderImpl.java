@@ -189,7 +189,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			checkingRootFailures = false;
 
 			return new SearchIntegrationPartialBuildStateImpl(
-					beanProvider,
+					beanProvider, beanResolver,
 					partiallyBuiltMappings,
 					indexManagerBuildingStateHolder.getBackendPartialBuildStates(),
 					indexManagerBuildingStateHolder.getIndexManagersByName()
