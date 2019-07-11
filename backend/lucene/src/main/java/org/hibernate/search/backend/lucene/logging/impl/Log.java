@@ -10,6 +10,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -504,4 +505,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 90,
 			value = "Missing value for property '%2$s'. The sharding strategy '%1$s' requires this property to be set.")
 	SearchException missingPropertyValueForShardingStrategy(String strategyName, String propertyKey);
+
+	@Message(id = ID_OFFSET_2 + 91,
+			value = "Invalid routing key: '%1$s'. Valid keys are: %2$s.")
+	SearchException invalidRoutingKeyForExplicitShardingStrategy(String invalidKey, Collection<String> validKeys);
 }

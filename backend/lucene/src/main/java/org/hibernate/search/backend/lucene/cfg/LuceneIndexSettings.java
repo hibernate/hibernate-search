@@ -47,6 +47,18 @@ public final class LuceneIndexSettings {
 	public static final String SHARDING_NUMBER_OF_SHARDS = SHARDING_PREFIX + ShardingRadicals.NUMBER_OF_SHARDS;
 
 	/**
+	 * The list of shard identifiers to accept for the index.
+	 * <p>
+	 * Only available for the "explicit" sharding strategy.
+	 * <p>
+	 * Expects either a String containing multiple shard identifiers separated by commas (','),
+	 * or a {@code Collection<String>} containing such shard identifiers.
+	 * <p>
+	 * No default: this property must be set when using the "explicit" sharding strategy.
+	 */
+	public static final String SHARDING_SHARD_IDENTIFIERS = SHARDING_PREFIX + ShardingRadicals.SHARD_IDENTIFIERS;
+
+	/**
 	 * Configuration property keys for sharding, without the {@link #SHARDING_PREFIX prefix}.
 	 */
 	public static final class ShardingRadicals {
@@ -56,6 +68,7 @@ public final class LuceneIndexSettings {
 
 		public static final String STRATEGY = "strategy";
 		public static final String NUMBER_OF_SHARDS = "number_of_shards";
+		public static final String SHARD_IDENTIFIERS = "shard_identifiers";
 	}
 
 	/**

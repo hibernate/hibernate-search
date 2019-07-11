@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.impl;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.index.impl.ExplicitShardingStrategy;
 import org.hibernate.search.backend.lucene.index.impl.HashShardingStrategy;
 import org.hibernate.search.backend.lucene.index.impl.NoShardingStrategy;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
@@ -40,6 +41,10 @@ public class LuceneBeanConfigurer implements BeanConfigurer {
 		context.define(
 				ShardingStrategy.class, HashShardingStrategy.NAME,
 				factoryCreationContext -> BeanHolder.of( new HashShardingStrategy() )
+		);
+		context.define(
+				ShardingStrategy.class, ExplicitShardingStrategy.NAME,
+				factoryCreationContext -> BeanHolder.of( new ExplicitShardingStrategy() )
 		);
 	}
 }
