@@ -494,4 +494,14 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 88,
 			value = "Invalid locking strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidLockingStrategyName(String invalidRepresentation, List<String> validRepresentations);
+
+	@Message(id = ID_OFFSET_2 + 89,
+			value = "The sharding strategy '%1$s' is not implemented properly:"
+					+ " it must call either context.setShardIdentifiers() or context.setShardingDisabled()"
+					+ " in its initialize() method, but it did not." )
+	SearchException missingShardIdentifiersAfterShardingStrategyInitialization(Object strategy);
+
+	@Message(id = ID_OFFSET_2 + 90,
+			value = "Missing value for property '%2$s'. The sharding strategy '%1$s' requires this property to be set.")
+	SearchException missingPropertyValueForShardingStrategy(String strategyName, String propertyKey);
 }

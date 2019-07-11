@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
@@ -63,12 +65,15 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 
 	@Override
 	public TckBackendSetupStrategy createHashBasedShardingBackendSetupStrategy(int shardCount) {
-		return TckBackendSetupStrategy.of(
-				DEFAULT_BACKEND_PROPERTIES_PATH,
-				Collections.singletonMap(
-						BackendSettings.INDEX_DEFAULTS + ".sharding.number_of_shards",
-						String.valueOf( shardCount )
-				)
+		Map<String, Object> overrides = new HashMap<>();
+		overrides.put(
+				BackendSettings.INDEX_DEFAULTS + ".sharding.strategy",
+				"hash"
 		);
+		overrides.put(
+				BackendSettings.INDEX_DEFAULTS + ".sharding.number_of_shards",
+				String.valueOf( shardCount )
+		);
+		return TckBackendSetupStrategy.of( DEFAULT_BACKEND_PROPERTIES_PATH, overrides );
 	}
 }

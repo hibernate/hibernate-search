@@ -9,35 +9,32 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.OptionalInt;
+import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
+import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIndexManagerContext {
 
-	private static final ConfigurationProperty<Integer> NUMBER_OF_SHARDS =
-			ConfigurationProperty.forKey( LuceneIndexSettings.ShardingRadicals.NUMBER_OF_SHARDS )
-					.asInteger()
-					.withDefault( LuceneIndexSettings.Defaults.SHARDING_NUMBER_OF_SHARDS )
-					.build();
-
 	private final IndexManagerBackendContext backendContext;
 	private final LuceneIndexModel model;
-	private final List<Shard> shards = new ArrayList<>();
+
+	private BeanHolder<? extends ShardingStrategy> shardingStrategyHolder;
+	private final Map<String, Shard> shards = new LinkedHashMap<>();
 	private final List<LuceneWriteWorkOrchestrator> writeOrchestrators = new ArrayList<>();
 
 	ShardHolder(IndexManagerBackendContext backendContext, LuceneIndexModel model) {
@@ -51,29 +48,30 @@ class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIn
 	}
 
 	void start(IndexManagerStartContext startContext) {
-		ConfigurationPropertySource propertySource = startContext.getConfigurationPropertySource()
-				.withMask( "sharding" );
-
-		int shardSize = NUMBER_OF_SHARDS.get( propertySource );
+		ConfigurationPropertySource propertySource = startContext.getConfigurationPropertySource();
 
 		try {
-			if ( shardSize == 1 ) {
-				Shard shard = Shard.create( backendContext, model, OptionalInt.empty() );
-				shards.add( shard );
+			ShardingStrategyInitializationContextImpl initializationContext =
+					new ShardingStrategyInitializationContextImpl(
+							backendContext,
+							model,
+							startContext,
+							propertySource.withMask( "sharding" )
+					);
+			this.shardingStrategyHolder = initializationContext.create( shards );
+
+			if ( startContext.getFailureCollector().hasFailure() ) {
+				// At least one shard failed; abort.
+				return;
 			}
-			else {
-				for ( int i = 0; i < shardSize; i++ ) {
-					Shard shard = Shard.create( backendContext, model, OptionalInt.of( i ) );
-					shards.add( shard );
-				}
-			}
-			for ( Shard shard : shards ) {
+
+			for ( Shard shard : shards.values() ) {
 				writeOrchestrators.add( shard.getWriteOrchestrator() );
 			}
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.pushAll( shards );
+					.pushAll( shards.values() );
 			shards.clear();
 			writeOrchestrators.clear();
 			throw e;
@@ -83,7 +81,7 @@ class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIn
 	@Override
 	public void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.pushAll( Shard::close, shards );
+			closer.pushAll( Shard::close, shards.values() );
 			shards.clear();
 			writeOrchestrators.clear();
 		}
@@ -97,31 +95,15 @@ class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIn
 	@Override
 	public void openIndexReaders(Set<String> routingKeys, Collection<IndexReaderHolder> readerCollector)
 			throws IOException {
-		BitSet enabledShards = new BitSet( shards.size() );
-		if ( routingKeys.isEmpty() ) {
-			// No routing key => target all shards
-			enabledShards.set( 0, shards.size() );
-		}
-		else {
-			for ( String routingKey : routingKeys ) {
-				int shardId = toShardId( routingKey );
-				enabledShards.set( shardId );
-			}
-		}
-
-		for ( int i = 0; i < shards.size(); i++ ) {
-			if ( enabledShards.get( i ) ) {
-				readerCollector.add( shards.get( i ).openReader() );
-			}
+		Collection<Shard> enabledShards = toShards( routingKeys );
+		for ( Shard shard : enabledShards ) {
+			readerCollector.add( shard.openReader() );
 		}
 	}
 
 	@Override
 	public LuceneWriteWorkOrchestrator getWriteOrchestrator(String documentId, String routingKey) {
-		if ( routingKey == null ) {
-			routingKey = documentId;
-		}
-		return shards.get( toShardId( routingKey ) ).getWriteOrchestrator();
+		return toShard( documentId, routingKey ).getWriteOrchestrator();
 	}
 
 	@Override
@@ -129,32 +111,32 @@ class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIn
 		return writeOrchestrators;
 	}
 
-	private int toShardId(String routingKey) {
-		int shardSize = shards.size();
-		if ( shardSize == 1 ) {
-			// Don't bother hashing: sharding is disabled.
-			return 0;
-		}
-
-		return Math.abs( hash( routingKey ) % shards.size() );
-	}
-
-	private static int hash(String routingKey) {
-		if ( routingKey == null ) {
-			return 0;
-		}
-
-		// reproduce the hashCode implementation of String as documented in the javadoc
-		// to be safe cross Java version (in case it changes some day)
-		int hash = 0;
-		int length = routingKey.length();
-		for ( int index = 0; index < length; index++ ) {
-			hash = 31 * hash + routingKey.charAt( index );
-		}
-		return hash;
-	}
-
 	public List<Shard> getShardsForTests() {
-		return new ArrayList<>( shards );
+		return new ArrayList<>( shards.values() );
+	}
+
+	private Collection<Shard> toShards(Set<String> routingKeys) {
+		if ( shardingStrategyHolder == null || routingKeys.isEmpty() ) {
+			// No sharding or no routing key => target all shards
+			return shards.values();
+		}
+
+		Set<String> shardIdentifiers = shardingStrategyHolder.get().toShardIdentifiers( routingKeys );
+
+		Collection<Shard> enabledShards = new HashSet<>();
+		for ( String shardId : shardIdentifiers ) {
+			enabledShards.add( shards.get( shardId ) );
+		}
+		return enabledShards;
+	}
+
+	private Shard toShard(String documentId, String routingKey) {
+		if ( shardingStrategyHolder == null ) {
+			// Sharding is disabled: there's only one shard
+			return shards.values().iterator().next();
+		}
+
+		String shardId = shardingStrategyHolder.get().toShardIdentifier( documentId, routingKey );
+		return shards.get( shardId );
 	}
 }

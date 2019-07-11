@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.lowlevel.directory.spi;
 
 import java.io.IOException;
-import java.util.OptionalInt;
+import java.util.Optional;
 
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -27,9 +27,9 @@ public interface DirectoryCreationContext {
 	String getIndexName();
 
 	/**
-	 * @return The identifier of the index shard (0-based), if relevant.
+	 * @return The identifier of the index shard, if relevant.
 	 */
-	OptionalInt getShardId();
+	Optional<String> getShardId();
 
 	/**
 	 * Initialize the Lucene Directory if it isn't already.

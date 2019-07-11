@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.OptionalInt;
+import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
@@ -20,7 +20,7 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public final class Shard implements Closeable {
 
-	static Shard create(IndexManagerBackendContext backendContext, LuceneIndexModel model, OptionalInt shardId) {
+	static Shard create(IndexManagerBackendContext backendContext, LuceneIndexModel model, Optional<String> shardId) {
 		LuceneWriteWorkOrchestratorImplementor writeOrchestrator = null;
 		IndexAccessor indexAccessor = null;
 

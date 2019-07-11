@@ -58,7 +58,7 @@ public interface EngineEventContextMessages {
 	String indexes(Set<String> names);
 
 	@Message(value = "shard '%1$s'")
-	String shard(int shardId);
+	String shard(String shardId);
 
 	@Message(value = "index schema root")
 	String indexSchemaRoot();

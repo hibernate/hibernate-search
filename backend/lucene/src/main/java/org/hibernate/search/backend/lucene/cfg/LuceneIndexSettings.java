@@ -17,20 +17,32 @@ public final class LuceneIndexSettings {
 	private LuceneIndexSettings() {
 	}
 
-
 	/**
 	 * The prefix for sharding-related property keys.
 	 */
 	public static final String SHARDING_PREFIX = "sharding.";
 
 	/**
+	 * The sharding strategy, deciding the number of shards, their identifiers,
+	 * and how to translate a routing key into a shard identifier.
+	 * <p>
+	 * Expects a String, such as "hash".
+	 * See the reference documentation for a list of available values.
+	 * <p>
+	 * Defaults to {@link LuceneIndexSettings.Defaults#SHARDING_STRATEGY} (no sharding).
+	 */
+	public static final String SHARDING_STRATEGY = SHARDING_PREFIX + ShardingRadicals.STRATEGY;
+
+	/**
 	 * The number of shards to create for the index,
 	 * i.e. the number of "physical" indexes, each holding a part of the index data.
+	 * <p>
+	 * Only available for the "hash" sharding strategy.
 	 * <p>
 	 * Expects a strictly positive Integer value, such as 4,
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#SHARDING_NUMBER_OF_SHARDS}.
+	 * No default: this property must be set when using the "hash" sharding strategy.
 	 */
 	public static final String SHARDING_NUMBER_OF_SHARDS = SHARDING_PREFIX + ShardingRadicals.NUMBER_OF_SHARDS;
 
@@ -42,6 +54,7 @@ public final class LuceneIndexSettings {
 		private ShardingRadicals() {
 		}
 
+		public static final String STRATEGY = "strategy";
 		public static final String NUMBER_OF_SHARDS = "number_of_shards";
 	}
 
@@ -53,6 +66,6 @@ public final class LuceneIndexSettings {
 		private Defaults() {
 		}
 
-		public static final int SHARDING_NUMBER_OF_SHARDS = 1;
+		public static final String SHARDING_STRATEGY = "none";
 	}
 }
