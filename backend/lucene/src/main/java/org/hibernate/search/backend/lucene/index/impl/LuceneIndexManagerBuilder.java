@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.index.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
@@ -43,20 +42,15 @@ public class LuceneIndexManagerBuilder implements IndexManagerBuilder<LuceneRoot
 	@Override
 	public LuceneIndexManagerImpl build() {
 		LuceneIndexModel model = null;
-		IndexAccessor indexAccessor = null;
 		try {
 			model = schemaRootNodeBuilder.build( indexName );
-			indexAccessor = backendContext.createIndexAccessor(
-					model.getIndexName(), model.getScopedAnalyzer()
-			);
 			return new LuceneIndexManagerImpl(
-					backendContext, indexName, model, indexAccessor
+					backendContext, indexName, model
 			);
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( model )
-					.push( indexAccessor );
+					.push( model );
 			throw e;
 		}
 	}

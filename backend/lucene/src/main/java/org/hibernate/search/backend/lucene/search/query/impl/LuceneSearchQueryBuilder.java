@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
@@ -28,6 +31,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 
 	private final LuceneSearchContext searchContext;
 	private final SessionContextImplementor sessionContext;
+	private final Set<String> routingKeys;
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
@@ -47,6 +51,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 
 		this.searchContext = searchContext;
 		this.sessionContext = sessionContext;
+		this.routingKeys = new HashSet<>();
 
 		this.elementCollector = new LuceneSearchQueryElementCollector();
 		this.storedFieldVisitor = storedFieldVisitor;
@@ -61,8 +66,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 
 	@Override
 	public void addRoutingKey(String routingKey) {
-		// TODO HSEARCH-3314 see what to do with the routing key
-		throw new UnsupportedOperationException( "Routing keys are not supported by the Lucene backend yet." );
+		this.routingKeys.add( routingKey );
 	}
 
 	@Override
@@ -82,6 +86,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 				searchContext,
 				sessionContext,
 				loadingContext,
+				routingKeys,
 				searchContext.decorateLuceneQuery( luceneQueryBuilder.build(), sessionContext.getTenantIdentifier() ),
 				elementCollector.toLuceneSort(),
 				rootProjection, searchResultExtractor

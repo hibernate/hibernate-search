@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.lowlevel.directory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
+import org.hibernate.search.backend.lucene.index.impl.Shard;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -20,7 +24,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
 
-import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.Lock;
 import org.assertj.core.api.Assertions;
 
@@ -122,14 +125,18 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 		checkIndexingAndQuerying();
 
 		LuceneIndexManagerImpl luceneIndexManager = indexManager.unwrapForTests( LuceneIndexManagerImpl.class );
-		Directory directory = luceneIndexManager.getIndexAccessorForTests().getDirectoryForTests();
-		try ( Lock lock = directory.obtainLock( "my-lock" ) ) {
-			Assertions.assertThat( lock.getClass().getName() )
-					.isEqualTo( expectedLockClassName );
-		}
-		catch (IOException e) {
-			throw new IllegalStateException( "Unexpected exception during test: " + e.getMessage(), e );
-		}
+		assertThat( luceneIndexManager.getShardsForTests() )
+				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( IndexAccessor::getDirectoryForTests )
+				.allSatisfy( directory -> {
+					try ( Lock lock = directory.obtainLock( "my-lock" ) ) {
+						Assertions.assertThat( lock.getClass().getName() )
+								.isEqualTo( expectedLockClassName );
+					}
+					catch (IOException e) {
+						throw new IllegalStateException( "Unexpected exception during test: " + e.getMessage(), e );
+					}
+				} );
 	}
 
 	private void testInvalidFSLockingStrategy(String strategyName) {
@@ -140,8 +147,6 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( MAPPED_TYPE_NAME )
-						.backendContext( BACKEND_NAME )
 						.indexContext( INDEX_NAME )
 						.failure(
 								"Unable to initialize index directory",

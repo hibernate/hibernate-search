@@ -36,7 +36,7 @@ public class HolderMultiReader extends MultiReader {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static HolderMultiReader open(Set<String> indexNames,
-			Set<? extends ReadIndexManagerContext> indexManagerContexts) {
+			Set<? extends ReadIndexManagerContext> indexManagerContexts, Set<String> routingKeys) {
 		if ( indexManagerContexts.isEmpty() ) {
 			return null;
 		}
@@ -44,7 +44,7 @@ public class HolderMultiReader extends MultiReader {
 			List<IndexReaderHolder> indexReaderHolders = new ArrayList<>();
 			try {
 				for ( ReadIndexManagerContext indexManagerContext : indexManagerContexts ) {
-					indexReaderHolders.add( indexManagerContext.openIndexReader() );
+					indexManagerContext.openIndexReaders( routingKeys, indexReaderHolders );
 				}
 				return new HolderMultiReader( indexReaderHolders );
 			}

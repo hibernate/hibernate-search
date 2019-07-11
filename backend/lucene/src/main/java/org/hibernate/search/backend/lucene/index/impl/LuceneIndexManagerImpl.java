@@ -8,14 +8,13 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
-import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
-import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -38,7 +37,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneIndexManagerImpl
 		implements IndexManagerImplementor<LuceneRootDocumentBuilder>, LuceneIndexManager,
-		LuceneScopeIndexManagerContext, WorkExecutionIndexManagerContext {
+		LuceneScopeIndexManagerContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -47,21 +46,16 @@ public class LuceneIndexManagerImpl
 	private final String indexName;
 	private final LuceneIndexModel model;
 
-	private final LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
-	private final IndexAccessor indexAccessor;
+	private final ShardHolder shardHolder;
 
 	LuceneIndexManagerImpl(IndexManagerBackendContext backendContext,
-			String indexName, LuceneIndexModel model,
-			IndexAccessor indexAccessor) {
+			String indexName, LuceneIndexModel model) {
 		this.backendContext = backendContext;
 
 		this.indexName = indexName;
 		this.model = model;
 
-		this.writeOrchestrator = backendContext.createOrchestrator(
-				indexName, indexAccessor.getIndexWriterDelegator()
-		);
-		this.indexAccessor = indexAccessor;
+		this.shardHolder = new ShardHolder( backendContext, model );
 	}
 
 	@Override
@@ -75,15 +69,13 @@ public class LuceneIndexManagerImpl
 
 	@Override
 	public void start(IndexManagerStartContext context) {
-		writeOrchestrator.start();
+		shardHolder.start( context );
 	}
 
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( LuceneWriteWorkOrchestratorImplementor::close, writeOrchestrator );
-			// Close the index writer after the orchestrators, when we're sure all works have been performed
-			closer.push( IndexAccessor::close, indexAccessor );
+			closer.push( ShardHolder::close, shardHolder );
 			closer.push( LuceneIndexModel::close, model );
 		}
 		catch (IOException | RuntimeException e) {
@@ -92,20 +84,10 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public String getIndexName() {
-		return indexName;
-	}
-
-	@Override
-	public LuceneWriteWorkOrchestrator getWriteOrchestrator() {
-		return writeOrchestrator;
-	}
-
-	@Override
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return backendContext.createWorkPlan(
-				this, sessionContext,
+				shardHolder, sessionContext,
 				commitStrategy, refreshStrategy
 		);
 	}
@@ -114,14 +96,14 @@ public class LuceneIndexManagerImpl
 	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
 			SessionContextImplementor sessionContext, DocumentCommitStrategy commitStrategy) {
 		return backendContext.createDocumentWorkExecutor(
-				this, sessionContext,
+				shardHolder, sessionContext,
 				commitStrategy
 		);
 	}
 
 	@Override
 	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
-		return backendContext.createWorkExecutor( this, sessionContext );
+		return backendContext.createWorkExecutor( shardHolder, sessionContext );
 	}
 
 	@Override
@@ -144,8 +126,9 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexReaderHolder openIndexReader() throws IOException {
-		return IndexReaderHolder.of( indexAccessor.openDirectoryIndexReader() );
+	public void openIndexReaders(Set<String> routingKeys, Collection<IndexReaderHolder> readerCollector)
+			throws IOException {
+		shardHolder.openIndexReaders( routingKeys, readerCollector );
 	}
 
 	@Override
@@ -164,8 +147,8 @@ public class LuceneIndexManagerImpl
 		);
 	}
 
-	public final IndexAccessor getIndexAccessorForTests() {
-		return indexAccessor;
+	public final List<Shard> getShardsForTests() {
+		return shardHolder.getShardsForTests();
 	}
 
 	LuceneIndexModel getModel() {

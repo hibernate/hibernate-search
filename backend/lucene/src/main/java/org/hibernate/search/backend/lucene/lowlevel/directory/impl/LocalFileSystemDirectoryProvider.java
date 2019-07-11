@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.OptionalInt;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -74,6 +75,10 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 	@Override
 	public DirectoryHolder createDirectory(DirectoryCreationContext context) throws IOException {
 		Path directoryPath = root.resolve( context.getIndexName() );
+		OptionalInt shardId = context.getShardId();
+		if ( shardId.isPresent() ) {
+			directoryPath = directoryPath.resolve( String.valueOf( shardId.getAsInt() ) );
+		}
 		try {
 			initializeWriteableDirectory( directoryPath );
 		}

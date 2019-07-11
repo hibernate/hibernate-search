@@ -42,8 +42,8 @@ public class LuceneReadWorkOrchestratorImpl
 
 	@Override
 	public <T> T submit(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
-			LuceneReadWork<T> work) {
-		ReadTask<T> task = new ReadTask<>( indexNames, indexManagerContexts, work );
+			Set<String> routingKeys, LuceneReadWork<T> work) {
+		ReadTask<T> task = new ReadTask<>( indexNames, indexManagerContexts, routingKeys, work );
 		Throwable throwable = null;
 		try {
 			submit( task );
@@ -84,9 +84,10 @@ public class LuceneReadWorkOrchestratorImpl
 
 		private T result;
 
-		ReadTask(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts, LuceneReadWork<T> work) {
+		ReadTask(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
+				Set<String> routingKeys, LuceneReadWork<T> work) {
 			this.indexNames = indexNames;
-			this.indexReader = HolderMultiReader.open( indexNames, indexManagerContexts );
+			this.indexReader = HolderMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 			this.work = work;
 		}
 

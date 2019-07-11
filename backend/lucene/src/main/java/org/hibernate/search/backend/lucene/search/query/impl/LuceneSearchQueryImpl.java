@@ -46,6 +46,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final LuceneSearchContext searchContext;
 	private final SessionContextImplementor sessionContext;
 	private final LoadingContext<?, ?> loadingContext;
+	private final Set<String> routingKeys;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneCollectorProvider luceneCollectorProvider;
@@ -55,6 +56,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
+			Set<String> routingKeys,
 			Query luceneQuery, Sort luceneSort,
 			LuceneCollectorProvider luceneCollectorProvider, LuceneSearchResultExtractor<H> searchResultExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
@@ -62,6 +64,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		this.searchContext = searchContext;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
+		this.routingKeys = routingKeys;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
 		this.luceneCollectorProvider = luceneCollectorProvider;
@@ -144,6 +147,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		return queryOrchestrator.submit(
 				searchContext.getIndexNames(),
 				searchContext.getIndexManagerContexts(),
+				routingKeys,
 				work
 		);
 	}

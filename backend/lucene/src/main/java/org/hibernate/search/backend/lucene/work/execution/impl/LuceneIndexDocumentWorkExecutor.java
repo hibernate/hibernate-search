@@ -24,7 +24,7 @@ public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecuto
 
 	private final LuceneWorkFactory factory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final LuceneWriteWorkOrchestrator orchestrator;
+	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String indexName;
 	private final String tenantId;
 	private final DocumentCommitStrategy commitStrategy;
@@ -35,7 +35,7 @@ public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecuto
 			DocumentCommitStrategy commitStrategy) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.orchestrator = indexManagerContext.getWriteOrchestrator();
+		this.indexManagerContext = indexManagerContext;
 		this.indexName = indexManagerContext.getIndexName();
 		this.tenantId = sessionContext.getTenantIdentifier();
 		this.commitStrategy = commitStrategy;
@@ -44,12 +44,14 @@ public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecuto
 	@Override
 	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider, DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
 		String id = referenceProvider.getIdentifier();
-		// TODO HSEARCH-3314 use the routing key
 		String routingKey = referenceProvider.getRoutingKey();
 
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
 		documentContributor.contribute( builder );
 		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
+
+		// Route the work to the appropriate shard
+		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( id, routingKey );
 
 		return orchestrator.submit(
 				factory.add( tenantId, id, indexEntry ),

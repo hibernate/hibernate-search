@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.work.execution.impl;
 
+import java.util.OptionalInt;
+
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
@@ -34,7 +36,7 @@ public interface WorkExecutionBackendContext {
 			SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName,
+	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, OptionalInt shardId,
 			IndexWriterDelegator indexWriterDelegator);
 
 	IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(

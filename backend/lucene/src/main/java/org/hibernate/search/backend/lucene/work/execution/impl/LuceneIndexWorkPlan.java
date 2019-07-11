@@ -7,7 +7,9 @@
 package org.hibernate.search.backend.lucene.work.execution.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -29,13 +31,13 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 
 	private final LuceneWorkFactory factory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final LuceneWriteWorkOrchestrator orchestrator;
+	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String indexName;
 	private final String tenantId;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final List<LuceneWriteWork<?>> works = new ArrayList<>();
+	private final Map<LuceneWriteWorkOrchestrator, List<LuceneWriteWork<?>>> worksByOrchestrator = new HashMap<>();
 
 	public LuceneIndexWorkPlan(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			WorkExecutionIndexManagerContext indexManagerContext,
@@ -43,7 +45,7 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.orchestrator = indexManagerContext.getWriteOrchestrator();
+		this.indexManagerContext = indexManagerContext;
 		this.indexName = indexManagerContext.getIndexName();
 		this.tenantId = sessionContext.getTenantIdentifier();
 		this.commitStrategy = commitStrategy;
@@ -54,37 +56,34 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 	public void add(DocumentReferenceProvider referenceProvider,
 			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
 		String id = referenceProvider.getIdentifier();
-		// TODO HSEARCH-3314 use the routing key
 		String routingKey = referenceProvider.getRoutingKey();
 
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
 		documentContributor.contribute( builder );
 		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
 
-		collect( factory.add( tenantId, id, indexEntry ) );
+		collect( id, routingKey, factory.add( tenantId, id, indexEntry ) );
 	}
 
 	@Override
 	public void update(DocumentReferenceProvider referenceProvider,
 			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
 		String id = referenceProvider.getIdentifier();
-		// TODO HSEARCH-3314 use the routing key
 		String routingKey = referenceProvider.getRoutingKey();
 
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
 		documentContributor.contribute( builder );
 		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
 
-		collect( factory.update( tenantId, id, indexEntry ) );
+		collect( id, routingKey, factory.update( tenantId, id, indexEntry ) );
 	}
 
 	@Override
 	public void delete(DocumentReferenceProvider referenceProvider) {
 		String id = referenceProvider.getIdentifier();
-		// TODO HSEARCH-3314 use the routing key
 		String routingKey = referenceProvider.getRoutingKey();
 
-		collect( factory.delete( tenantId, id ) );
+		collect( id, routingKey, factory.delete( tenantId, id ) );
 	}
 
 	@Override
@@ -95,14 +94,29 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 	@Override
 	public CompletableFuture<?> execute() {
 		try {
-			return orchestrator.submit( works, commitStrategy, refreshStrategy );
+			List<CompletableFuture<?>> futures = new ArrayList<>();
+			for ( Map.Entry<LuceneWriteWorkOrchestrator, List<LuceneWriteWork<?>>> entry : worksByOrchestrator.entrySet() ) {
+				LuceneWriteWorkOrchestrator orchestrator = entry.getKey();
+				List<LuceneWriteWork<?>> works = entry.getValue();
+				futures.add( orchestrator.submit( works, commitStrategy, refreshStrategy ) );
+			}
+			return CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) );
 		}
 		finally {
-			works.clear();
+			worksByOrchestrator.clear();
 		}
 	}
 
-	private void collect(LuceneWriteWork<?> work) {
+	private void collect(String documentId, String routingKey, LuceneWriteWork<?> work) {
+		// Route the work to the appropriate shard
+		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( documentId, routingKey );
+
+		List<LuceneWriteWork<?>> works = worksByOrchestrator.get( orchestrator );
+		if ( works == null ) {
+			works = new ArrayList<>();
+			worksByOrchestrator.put( orchestrator, works );
+		}
+
 		works.add( work );
 	}
 }

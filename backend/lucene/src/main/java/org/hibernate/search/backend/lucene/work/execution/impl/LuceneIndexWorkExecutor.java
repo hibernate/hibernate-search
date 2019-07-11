@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.work.execution.impl;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
@@ -18,41 +20,45 @@ import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionCon
 public class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 
 	private final LuceneWorkFactory factory;
-	private final LuceneWriteWorkOrchestrator orchestrator;
+	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final DetachedSessionContextImplementor sessionContext;
 
 	public LuceneIndexWorkExecutor(LuceneWorkFactory factory,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedSessionContextImplementor sessionContext) {
 		this.factory = factory;
-		this.orchestrator = indexManagerContext.getWriteOrchestrator();
+		this.indexManagerContext = indexManagerContext;
 		this.sessionContext = sessionContext;
 	}
 
 	@Override
 	public CompletableFuture<?> optimize() {
-		return orchestrator.submit(
-				factory.optimize(),
-				DocumentCommitStrategy.FORCE,
-				DocumentRefreshStrategy.NONE
-		);
+		return doSubmit( factory.optimize() );
 	}
 
 	@Override
 	public CompletableFuture<?> purge() {
-		return orchestrator.submit(
-				factory.deleteAll( sessionContext.getTenantIdentifier() ),
-				DocumentCommitStrategy.FORCE,
-				DocumentRefreshStrategy.NONE
-		);
+		return doSubmit( factory.deleteAll( sessionContext.getTenantIdentifier() ) );
 	}
 
 	@Override
 	public CompletableFuture<?> flush() {
-		return orchestrator.submit(
-				factory.flush(),
-				DocumentCommitStrategy.FORCE,
-				DocumentRefreshStrategy.NONE
-		);
+		return doSubmit( factory.flush() );
+	}
+
+	private CompletableFuture<?> doSubmit(LuceneWriteWork<?> work) {
+		Collection<LuceneWriteWorkOrchestrator> orchestrators = indexManagerContext.getAllWriteOrchestrators();
+		CompletableFuture<?>[] futures = new CompletableFuture[orchestrators.size()];
+		int i = 0;
+		for ( LuceneWriteWorkOrchestrator orchestrator : orchestrators ) {
+			futures[i] = orchestrator.submit(
+					work,
+					DocumentCommitStrategy.FORCE,
+					DocumentRefreshStrategy.NONE
+			);
+			++i;
+		}
+		return CompletableFuture.allOf( futures );
+
 	}
 }

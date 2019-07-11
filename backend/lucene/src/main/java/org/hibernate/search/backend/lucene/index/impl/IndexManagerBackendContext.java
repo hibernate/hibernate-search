@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.OptionalInt;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -102,12 +103,13 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName,
+	public LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, OptionalInt shardId,
 			IndexWriterDelegator indexWriterDelegator) {
 		return new LuceneBatchingWriteWorkOrchestrator(
-				"Lucene write work orchestrator for index " + indexName,
+				"Lucene write work orchestrator for index " + indexName
+						+ ( shardId.isPresent() ? " - shard " + shardId.getAsInt() : "" ),
 				new LuceneWriteWorkProcessor(
-						EventContexts.fromIndexName( indexName ),
+						EventContexts.fromIndexNameAndShardId( indexName, shardId ),
 						indexWriterDelegator,
 						errorHandler
 				),
@@ -172,11 +174,12 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return eventContext;
 	}
 
-	IndexAccessor createIndexAccessor(String indexName, Analyzer analyzer) {
+	IndexAccessor createIndexAccessor(String indexName, OptionalInt shardId, Analyzer analyzer) {
 		DirectoryHolder directory;
 		DirectoryCreationContext context = new DirectoryCreationContextImpl(
-				eventContext.append( EventContexts.fromIndexName( indexName ) ),
-				indexName
+				shardId.isPresent() ? EventContexts.fromShardId( shardId.get() ) : null,
+				indexName,
+				shardId
 		);
 		try {
 			directory = directoryProvider.createDirectory( context );

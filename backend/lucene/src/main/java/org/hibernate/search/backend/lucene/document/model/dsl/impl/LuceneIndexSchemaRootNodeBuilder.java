@@ -53,8 +53,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	@Override
 	public void explicitRouting() {
-		// TODO HSEARCH-3314 support explicit routing (for static sharding in particular)
-		throw new UnsupportedOperationException( "explicitRouting not supported right now" );
+		// Nothing to do
 	}
 
 	@Override

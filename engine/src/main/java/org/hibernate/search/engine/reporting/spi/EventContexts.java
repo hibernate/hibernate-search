@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.reporting.spi;
 
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Set;
 
 import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
@@ -84,6 +85,7 @@ public class EventContexts {
 			}
 		} );
 	}
+
 	public static EventContext fromIndexNames(String ... indexNames) {
 		return fromIndexNames( CollectionHelper.asLinkedHashSet( indexNames ) );
 	}
@@ -93,6 +95,28 @@ public class EventContexts {
 			@Override
 			public String render(Set<String> indexNames) {
 				return MESSAGES.indexes( indexNames );
+			}
+		} );
+	}
+
+	public static EventContext fromIndexNameAndShardId(String name, OptionalInt shardId) {
+		EventContext result = EventContext.create( new AbstractSimpleEventContextElement<String>( name ) {
+			@Override
+			public String render(String param) {
+				return MESSAGES.index( param );
+			}
+		} );
+		if ( shardId.isPresent() ) {
+			result = result.append( fromShardId( shardId.getAsInt() ) );
+		}
+		return result;
+	}
+
+	public static EventContext fromShardId(int shardId) {
+		return EventContext.create( new AbstractSimpleEventContextElement<Integer>( shardId ) {
+			@Override
+			public String render(Integer param) {
+				return MESSAGES.shard( param );
 			}
 		} );
 	}

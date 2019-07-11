@@ -14,6 +14,8 @@ import java.nio.file.Path;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
+import org.hibernate.search.backend.lucene.index.impl.Shard;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -141,8 +143,10 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 		checkIndexingAndQuerying();
 
 		LuceneIndexManagerImpl luceneIndexManager = indexManager.unwrapForTests( LuceneIndexManagerImpl.class );
-		assertThat( luceneIndexManager.getIndexAccessorForTests().getDirectoryForTests() )
-				.isInstanceOf( expectedDirectoryClass );
+		assertThat( luceneIndexManager.getShardsForTests() )
+				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( IndexAccessor::getDirectoryForTests )
+				.allSatisfy( directory -> assertThat( directory ).isInstanceOf( expectedDirectoryClass ) );
 	}
 
 	private static long directorySize(Path directory) throws IOException {

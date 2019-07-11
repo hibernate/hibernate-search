@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.OptionalInt;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
@@ -38,10 +39,12 @@ public class DirectoryCreationContextImpl implements DirectoryCreationContext {
 
 	private final EventContext eventContext;
 	private final String indexName;
+	private final OptionalInt shardId;
 
-	public DirectoryCreationContextImpl(EventContext eventContext, String indexName) {
+	public DirectoryCreationContextImpl(EventContext eventContext, String indexName, OptionalInt shardId) {
 		this.eventContext = eventContext;
 		this.indexName = indexName;
+		this.shardId = shardId;
 	}
 
 	@Override
@@ -52,6 +55,11 @@ public class DirectoryCreationContextImpl implements DirectoryCreationContext {
 	@Override
 	public String getIndexName() {
 		return indexName;
+	}
+
+	@Override
+	public OptionalInt getShardId() {
+		return shardId;
 	}
 
 	@Override
