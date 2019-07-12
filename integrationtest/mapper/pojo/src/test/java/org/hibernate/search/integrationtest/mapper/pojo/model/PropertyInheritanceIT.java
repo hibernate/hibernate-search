@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.model;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
@@ -30,7 +32,7 @@ public class PropertyInheritanceIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -49,7 +51,7 @@ public class PropertyInheritanceIT {
 				)
 		);
 
-		mapping = setupHelper.withBackendMock( backendMock )
+		mapping = setupHelper.start()
 				.setup( IndexedEntity.class );
 
 		backendMock.verifyExpectationsMet();

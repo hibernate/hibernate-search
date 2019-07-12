@@ -94,7 +94,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	protected SessionFactory sessionFactory;
 
@@ -147,7 +147,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 				)
 		);
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.setup( primitives.getIndexedClass(), primitives.getContainedClass() );
 		backendMock.verifyExpectationsMet();
 	}

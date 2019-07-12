@@ -56,7 +56,7 @@ public class SearchQueryBaseIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -64,7 +64,7 @@ public class SearchQueryBaseIT {
 	public void setup() {
 		backendMock.expectAnySchema( Book.INDEX );
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();

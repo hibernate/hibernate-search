@@ -47,7 +47,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -56,7 +56,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		backendMock.expectAnySchema( Containing.INDEX );
 		backendMock.expectAnySchema( Contained.INDEX );
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.setup(
 						Containing.class,
 						Contained.class

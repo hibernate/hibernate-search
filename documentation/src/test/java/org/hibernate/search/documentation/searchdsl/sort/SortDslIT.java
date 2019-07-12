@@ -15,7 +15,9 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.lucene.LuceneExtension;
-import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
+import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
@@ -23,6 +25,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchron
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
@@ -48,24 +51,25 @@ public class SortDslIT {
 	private static final int BOOK4_ID = 4;
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendSetups() {
-		return BackendSetupStrategy.simple().toArray();
+	public static Object[] backendConfigurations() {
+		return BackendConfigurations.simple().toArray();
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper = new OrmSetupHelper();
+	public OrmSetupHelper setupHelper;
 
-	private final BackendSetupStrategy backendSetupStrategy;
+	private BackendConfiguration backendConfiguration;
 
 	private EntityManagerFactory entityManagerFactory;
 
-	public SortDslIT(BackendSetupStrategy backendSetupStrategy) {
-		this.backendSetupStrategy = backendSetupStrategy;
+	public SortDslIT(BackendConfiguration backendConfiguration) {
+		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
+		this.backendConfiguration = backendConfiguration;
 	}
 
 	@Before
 	public void setup() {
-		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper )
+		entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE
@@ -272,7 +276,7 @@ public class SortDslIT {
 
 	@Test
 	public void lucene() {
-		Assume.assumeTrue( BackendSetupStrategy.LUCENE.equals( backendSetupStrategy ) );
+		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
 
 		withinSearchSession( searchSession -> {
 			// tag::lucene-fromLuceneSort[]
@@ -310,7 +314,7 @@ public class SortDslIT {
 
 	@Test
 	public void elasticsearch() {
-		Assume.assumeTrue( BackendSetupStrategy.ELASTICSEARCH.equals( backendSetupStrategy ) );
+		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
 
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-fromJson[]

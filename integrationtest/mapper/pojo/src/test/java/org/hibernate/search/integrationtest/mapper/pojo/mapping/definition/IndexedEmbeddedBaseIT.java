@@ -60,7 +60,7 @@ public class IndexedEmbeddedBaseIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -115,7 +115,7 @@ public class IndexedEmbeddedBaseIT {
 						)
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+		JavaBeanMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class, IndexedEmbeddedLevel2.class )
 				.setup();
@@ -200,7 +200,7 @@ public class IndexedEmbeddedBaseIT {
 						)
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+		JavaBeanMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
@@ -283,7 +283,7 @@ public class IndexedEmbeddedBaseIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "customPrefix_level1Property", String.class )
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+		JavaBeanMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
@@ -341,7 +341,7 @@ public class IndexedEmbeddedBaseIT {
 						.field( "includedProperty", String.class )
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+		JavaBeanMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
@@ -395,7 +395,7 @@ public class IndexedEmbeddedBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock )
+				() -> setupHelper.start()
 						.withAnnotatedEntityTypes( IndexedEntity.class )
 						.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 						.setup()
@@ -469,7 +469,7 @@ public class IndexedEmbeddedBaseIT {
 						.field( "level1Property", String.class )
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+		JavaBeanMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class, IndexedEmbeddedLevel2.class )
 				.setup();
@@ -522,7 +522,7 @@ public class IndexedEmbeddedBaseIT {
 						.field( "level1Property", String.class )
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+		JavaBeanMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
@@ -585,7 +585,7 @@ public class IndexedEmbeddedBaseIT {
 						.field( "level1IncludedField", String.class )
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+		JavaBeanMapping mapping = setupHelper.start()
 				.withConfiguration( b -> {
 					b.addEntityType( IndexedEntity.class );
 					b.programmaticMapping().type( IndexedEntity.class )

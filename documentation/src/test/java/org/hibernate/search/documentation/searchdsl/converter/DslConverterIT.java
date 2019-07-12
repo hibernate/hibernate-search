@@ -16,7 +16,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
-import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
@@ -39,24 +40,22 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class DslConverterIT {
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendSetups() {
-		return BackendSetupStrategy.simple().toArray();
+	public static Object[] backendConfigurations() {
+		return BackendConfigurations.simple().toArray();
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper = new OrmSetupHelper();
-
-	private final BackendSetupStrategy backendSetupStrategy;
+	public OrmSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
-	public DslConverterIT(BackendSetupStrategy backendSetupStrategy) {
-		this.backendSetupStrategy = backendSetupStrategy;
+	public DslConverterIT(BackendConfiguration backendConfiguration) {
+		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
 	}
 
 	@Before
 	public void setup() {
-		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper )
+		entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE

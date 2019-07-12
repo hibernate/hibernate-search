@@ -55,7 +55,7 @@ public class TypeBridgeBaseIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	/**
 	 * Basic test checking that a "normal" custom type bridge will work as expected
@@ -85,7 +85,7 @@ public class TypeBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 							private PojoElementAccessor<String> pojoPropertyAccessor;
@@ -165,7 +165,7 @@ public class TypeBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 							private IndexFieldReference<String> indexFieldReference;
@@ -232,7 +232,7 @@ public class TypeBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
@@ -294,7 +294,7 @@ public class TypeBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 							private IndexFieldReference<String> indexFieldReference;
@@ -379,7 +379,7 @@ public class TypeBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
@@ -435,7 +435,7 @@ public class TypeBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
@@ -491,7 +491,7 @@ public class TypeBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( NotEntity.class )
 								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
@@ -542,7 +542,7 @@ public class TypeBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
@@ -605,7 +605,7 @@ public class TypeBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
@@ -655,7 +655,7 @@ public class TypeBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
@@ -702,7 +702,7 @@ public class TypeBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 									@Override
@@ -757,7 +757,7 @@ public class TypeBridgeBaseIT {
 				)
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( CustomEnum.class )
 						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 							private IndexFieldReference<String> indexFieldReference;
@@ -862,7 +862,7 @@ public class TypeBridgeBaseIT {
 				)
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( Contained.class )
 						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 							@Override
@@ -902,7 +902,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -936,7 +936,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -992,7 +992,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -1030,7 +1030,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

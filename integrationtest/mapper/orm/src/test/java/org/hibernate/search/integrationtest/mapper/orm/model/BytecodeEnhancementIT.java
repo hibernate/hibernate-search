@@ -51,7 +51,7 @@ public class BytecodeEnhancementIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -80,7 +80,7 @@ public class BytecodeEnhancementIT {
 				.field( "transientText", String.class )
 		);
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				/*
 				 * This is necessary in order for the BytecodeEnhancerRunner to work correctly.
 				 * Otherwise classes can be successfully loaded from the application classloader

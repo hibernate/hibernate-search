@@ -43,7 +43,7 @@ public class SearchSessionWritePlanPersistBatchIndexingIT {
 	public BackendMock backendMock = new BackendMock( BACKEND_NAME );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	/**
 	 * Batch-index by simply processing entities before the session is cleared.
@@ -145,8 +145,7 @@ public class SearchSessionWritePlanPersistBatchIndexingIT {
 	private SessionFactory setup() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
 
-		SessionFactory sessionFactory = ormSetupHelper.startSetup()
-				.withBackendMock( backendMock )
+		SessionFactory sessionFactory = ormSetupHelper.start()
 				.setup( IndexedEntity.class );
 
 		backendMock.verifyExpectationsMet();

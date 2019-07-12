@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.lifecycle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -55,7 +56,7 @@ public class CleanupIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -332,7 +333,7 @@ public class CleanupIT {
 	}
 
 	private void startup(Consumer<ProgrammaticMappingConfigurationContext> additionalMappingContributor) {
-		this.mapping = setupHelper.withBackendMock( backendMock )
+		this.mapping = setupHelper.start()
 				/*
 				 * Make the StartubStubContainerExtractor available through a factory
 				 * that will return a BeanHolder that increments static counters

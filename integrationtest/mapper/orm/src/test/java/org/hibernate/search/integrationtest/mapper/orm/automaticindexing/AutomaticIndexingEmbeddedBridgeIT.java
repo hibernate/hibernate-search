@@ -52,7 +52,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -66,7 +66,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 				)
 		);
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.setup(
 						IndexedEntity.class,
 						ContainingEntity.class,

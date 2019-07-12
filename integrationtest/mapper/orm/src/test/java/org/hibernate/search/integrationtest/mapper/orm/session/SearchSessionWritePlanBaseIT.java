@@ -45,7 +45,7 @@ public class SearchSessionWritePlanBaseIT {
 	public BackendMock backend2Mock = new BackendMock( BACKEND2_NAME );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMocks( backend1Mock, backend2Mock );
 
 	@Test
 	public void simple() {
@@ -355,9 +355,7 @@ public class SearchSessionWritePlanBaseIT {
 		backend1Mock.expectAnySchema( IndexedEntity1.INDEX_NAME );
 		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
 
-		SessionFactory sessionFactory = ormSetupHelper.startSetup()
-				.withBackendMock( backend1Mock )
-				.withBackendMock( backend2Mock )
+		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
 						automaticIndexingStrategy

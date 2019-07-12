@@ -37,7 +37,7 @@ public class SearchSessionWritePlanNonEntityIdDocumentIdIT {
 	public BackendMock backendMock = new BackendMock( BACKEND_NAME );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
@@ -72,7 +72,7 @@ public class SearchSessionWritePlanNonEntityIdDocumentIdIT {
 	private SessionFactory setup() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
 
-		SessionFactory sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
 						HibernateOrmAutomaticIndexingStrategyName.NONE

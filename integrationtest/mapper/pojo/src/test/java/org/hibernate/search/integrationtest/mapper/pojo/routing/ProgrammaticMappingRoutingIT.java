@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.routing;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
@@ -33,7 +34,7 @@ public class ProgrammaticMappingRoutingIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private JavaBeanMapping mapping;
 
@@ -44,7 +45,7 @@ public class ProgrammaticMappingRoutingIT {
 				.field( "value", String.class )
 		);
 
-		mapping = setupHelper.withBackendMock( backendMock )
+		mapping = setupHelper.start()
 				.withConfiguration( builder -> {
 					builder.addEntityType( IndexedEntity.class );
 

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.nonregression.mapping.definition;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class IndexNullAsOnNumericContainerIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void test() {
@@ -43,7 +44,7 @@ public class IndexNullAsOnNumericContainerIT {
 				.field( "integerList", Integer.class, b2 -> b2.indexNullAs( 42 ).multiValued( true ) )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+		JavaBeanMapping mapping = setupHelper.start()
 				.setup( IndexedEntity.class );
 
 		backendMock.verifyExpectationsMet();

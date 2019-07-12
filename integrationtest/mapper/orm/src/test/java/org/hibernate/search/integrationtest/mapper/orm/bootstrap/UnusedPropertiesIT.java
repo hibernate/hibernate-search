@@ -31,7 +31,7 @@ public class UnusedPropertiesIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Rule
 	public ExpectedLog4jLog log = ExpectedLog4jLog.create();
@@ -91,7 +91,7 @@ public class UnusedPropertiesIT {
 				.field( "myTextField", String.class )
 		);
 
-		ormSetupHelper.withBackendMock( backendMock )
+		ormSetupHelper.start()
 				.withConfiguration( configurationContributor )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();

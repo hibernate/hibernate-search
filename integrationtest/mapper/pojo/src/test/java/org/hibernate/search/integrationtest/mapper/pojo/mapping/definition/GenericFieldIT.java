@@ -28,7 +28,7 @@ public class GenericFieldIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void searchable() {
@@ -73,7 +73,7 @@ public class GenericFieldIT {
 				.field( "useDefault", BigDecimal.class )
 				.field( "implicit", String.class )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 }

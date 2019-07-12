@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.smoke;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +48,7 @@ public class ProgrammaticMappingSmokeIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -127,7 +128,7 @@ public class ProgrammaticMappingSmokeIT {
 				.field( "myLocalDateField", LocalDate.class )
 		);
 
-		mapping = setupHelper.withBackendMock( backendMock )
+		mapping = setupHelper.start()
 				.withConfiguration( builder -> {
 					builder.addEntityTypes( CollectionHelper.asSet(
 							IndexedEntity.class,

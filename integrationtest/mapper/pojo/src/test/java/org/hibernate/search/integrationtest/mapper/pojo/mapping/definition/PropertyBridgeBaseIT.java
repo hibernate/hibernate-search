@@ -62,7 +62,7 @@ public class PropertyBridgeBaseIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 	/**
 	 * Basic test checking that a "normal" custom property bridge will work as expected
 	 * when relying on accessors.
@@ -91,7 +91,7 @@ public class PropertyBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							private PojoElementAccessor<String> pojoPropertyAccessor;
@@ -176,7 +176,7 @@ public class PropertyBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "contained" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							private IndexFieldReference<String> indexFieldReference;
@@ -251,7 +251,7 @@ public class PropertyBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
 								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -305,7 +305,7 @@ public class PropertyBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
 								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -357,7 +357,7 @@ public class PropertyBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 						.property( "child" )
 						.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -479,7 +479,7 @@ public class PropertyBridgeBaseIT {
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_use_invalidProperty() {
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
 								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -523,7 +523,7 @@ public class PropertyBridgeBaseIT {
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_fromOtherEntity_invalidProperty() {
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
 								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -565,7 +565,7 @@ public class PropertyBridgeBaseIT {
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_fromOtherEntity_invalidContainerExtractorPath() {
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
 								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -611,7 +611,7 @@ public class PropertyBridgeBaseIT {
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_fromOtherEntity_bridgedElementNotEntityType() {
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "notEntity" )
 								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -656,7 +656,7 @@ public class PropertyBridgeBaseIT {
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_fromOtherEntity_otherEntityTypeNotEntityType() {
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
 								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -701,7 +701,7 @@ public class PropertyBridgeBaseIT {
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_fromOtherEntity_inverseAssociationPathTargetsWrongType() {
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
 								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -764,7 +764,7 @@ public class PropertyBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
 								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -819,7 +819,7 @@ public class PropertyBridgeBaseIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).withConfiguration(
+				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
 								.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
@@ -875,7 +875,7 @@ public class PropertyBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							private IndexFieldReference<String> indexFieldReference;
@@ -958,7 +958,7 @@ public class PropertyBridgeBaseIT {
 				.field( "listFromBridge", String.class, b2 -> b2.multiValued( true ) )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
 						.bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							@Override
@@ -999,7 +999,7 @@ public class PropertyBridgeBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -1034,7 +1034,7 @@ public class PropertyBridgeBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -1091,7 +1091,7 @@ public class PropertyBridgeBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -1130,7 +1130,7 @@ public class PropertyBridgeBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

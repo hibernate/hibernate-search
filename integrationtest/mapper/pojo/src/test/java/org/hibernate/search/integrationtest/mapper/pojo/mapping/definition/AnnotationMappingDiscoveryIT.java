@@ -10,6 +10,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class AnnotationMappingDiscoveryIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -71,7 +72,7 @@ public class AnnotationMappingDiscoveryIT {
 				)
 		);
 
-		setupHelper.withBackendMock( backendMock )
+		setupHelper.start()
 				.withConfiguration( builder -> {
 					builder.addEntityType( IndexedEntity.class );
 
@@ -105,7 +106,7 @@ public class AnnotationMappingDiscoveryIT {
 				} )
 		);
 
-		setupHelper.withBackendMock( backendMock )
+		setupHelper.start()
 				.withConfiguration( builder -> {
 					builder.setAnnotatedTypeDiscoveryEnabled( false );
 					builder.addEntityType( IndexedEntity.class );

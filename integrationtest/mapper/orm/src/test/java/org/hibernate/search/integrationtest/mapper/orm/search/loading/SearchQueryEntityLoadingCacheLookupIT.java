@@ -66,7 +66,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	public void setup() {
 		backendMock.expectAnySchema( primitives.getIndexName() );
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.QUERY_LOADING_CACHE_LOOKUP_STRATEGY,
 						defaultCacheLookupStrategy

@@ -48,7 +48,7 @@ public class AutomaticIndexingEmbeddableIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -84,7 +84,7 @@ public class AutomaticIndexingEmbeddableIT {
 				)
 		);
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.withProperty( AvailableSettings.CREATE_EMPTY_COMPOSITES_ENABLED, true )
 				.setup(
 						IndexedEntity.class,

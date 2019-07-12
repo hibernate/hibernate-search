@@ -35,7 +35,7 @@ public class ProvidedIdIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void indexAndSearch() {
@@ -105,7 +105,7 @@ public class ProvidedIdIT {
 	}
 
 	private JavaBeanMappingSetupHelper.SetupContext withBaseConfiguration() {
-		return setupHelper.withBackendMock( backendMock )
+		return setupHelper.start()
 				.withConfiguration( b -> b.setImplicitProvidedId( true ) );
 	}
 

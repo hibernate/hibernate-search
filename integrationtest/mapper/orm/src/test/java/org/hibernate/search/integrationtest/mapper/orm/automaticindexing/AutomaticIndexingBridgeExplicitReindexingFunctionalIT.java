@@ -50,7 +50,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -62,7 +62,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 				)
 		);
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {

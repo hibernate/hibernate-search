@@ -167,7 +167,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 	public void setup(Integer searchLoadingFetchSize) {
 		backendMock.expectAnySchema( primitives.getIndexName() );
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.QUERY_LOADING_FETCH_SIZE,
 						searchLoadingFetchSize

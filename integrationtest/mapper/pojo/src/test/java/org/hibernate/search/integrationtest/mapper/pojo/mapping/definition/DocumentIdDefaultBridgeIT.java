@@ -57,7 +57,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private DefaultIdentifierBridgeExpectations<I> expectations;
 	private JavaBeanMapping mapping;
@@ -86,7 +86,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 				b -> { },
 				schemaCapture2
 		);
-		mapping = setupHelper.withBackendMock( backendMock )
+		mapping = setupHelper.start()
 				.setup( expectations.getTypeWithIdentifierBridge1(), expectations.getTypeWithIdentifierBridge2() );
 		backendMock.verifyExpectationsMet();
 		index1RootSchemaNode = schemaCapture1.getValue();

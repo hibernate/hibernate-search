@@ -41,7 +41,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -50,7 +50,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 		backendMock.expectAnySchema( Group.INDEX );
 		backendMock.expectAnySchema( Post.INDEX );
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.setup(
 						Group.class,
 						Post.class

@@ -42,7 +42,7 @@ public class FailureReportIT {
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	/**
 	 * Test mapping with failures in the same context
@@ -93,7 +93,7 @@ public class FailureReportIT {
 		);
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -160,7 +160,7 @@ public class FailureReportIT {
 		);
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -238,7 +238,7 @@ public class FailureReportIT {
 		);
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity1.class, IndexedEntity2.class )
+				() -> setupHelper.start().setup( IndexedEntity1.class, IndexedEntity2.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -309,7 +309,7 @@ public class FailureReportIT {
 		);
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

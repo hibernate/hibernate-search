@@ -12,12 +12,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
@@ -35,22 +36,20 @@ public class HibernateOrmAutomaticIndexingIT {
 	private static final String BOOK3_TITLE = "The Robots of Dawn";
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendSetups() {
-		return BackendSetupStrategy.simple().toArray();
+	public static Object[] backendConfigurations() {
+		return BackendConfigurations.simple().toArray();
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper = new OrmSetupHelper();
+	public OrmSetupHelper setupHelper;
 
-	private final BackendSetupStrategy backendSetupStrategy;
-
-	public HibernateOrmAutomaticIndexingIT(BackendSetupStrategy backendSetupStrategy) {
-		this.backendSetupStrategy = backendSetupStrategy;
+	public HibernateOrmAutomaticIndexingIT(BackendConfiguration backendConfiguration) {
+		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
 	}
 
 	@Test
 	public void synchronizationStrategyOverride() {
-		EntityManagerFactory entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper )
+		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						// To be overridden below

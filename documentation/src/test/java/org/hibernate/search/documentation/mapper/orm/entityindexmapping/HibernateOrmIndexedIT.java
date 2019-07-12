@@ -10,15 +10,18 @@ package org.hibernate.search.documentation.mapper.orm.entityindexmapping;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -31,25 +34,29 @@ public class HibernateOrmIndexedIT {
 	private static final String BACKEND_1 = "backend1";
 	private static final String BACKEND_2 = "backend2";
 
+	private static final Map<String, BackendConfiguration> BACKEND_CONFIGURATIONS;
+	static {
+		List<BackendConfiguration> backendConfigurations = BackendConfigurations.simple();
+		if ( backendConfigurations.size() != 2 ) {
+			throw new IllegalStateException(
+					"This test assumes there are only two types of backends."
+							+ " If this changed, please update this test to add/remove entity types mapped to each backend as necessary."
+			);
+		}
+		Map<String, BackendConfiguration> map = new HashMap<>();
+		map.put( BACKEND_1, backendConfigurations.get( 0 ) );
+		map.put( BACKEND_2, backendConfigurations.get( 1 ) );
+		BACKEND_CONFIGURATIONS = map;
+	}
+
 	@Rule
-	public OrmSetupHelper setupHelper = new OrmSetupHelper();
+	public OrmSetupHelper setupHelper = OrmSetupHelper.withMultipleBackends( BACKEND_1, BACKEND_CONFIGURATIONS );
 
 	private EntityManagerFactory entityManagerFactory;
 
 	@Before
 	public void setup() {
-		OrmSetupHelper.SetupContext setupContext = setupHelper.startSetup();
-
-		List<BackendSetupStrategy> backendSetupStrategies = BackendSetupStrategy.simple();
-		if ( backendSetupStrategies.size() != 2 ) {
-			throw new IllegalStateException(
-					"This test assumes there are only two types of backends."
-					+ " If this changed, please update this test to add/remove entity types mapped to each backend as necessary."
-			);
-		}
-		backendSetupStrategies.get( 0 ).withBackend( setupContext, BACKEND_1 );
-		backendSetupStrategies.get( 1 ).withBackend( setupContext, BACKEND_2 );
-		setupContext.withDefaultBackend( BACKEND_1 );
+		OrmSetupHelper.SetupContext setupContext = setupHelper.start();
 
 		setupContext.withProperty(
 				HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,

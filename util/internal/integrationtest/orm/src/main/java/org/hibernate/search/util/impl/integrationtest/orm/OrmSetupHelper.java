@@ -12,23 +12,46 @@ import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
 public final class OrmSetupHelper
 		extends MappingSetupHelper<OrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
 
-	public OrmSetupHelper() {
-		// Nothing to do
+	private static final String DEFAULT_BACKEND_NAME = "backendName";
+
+	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
+		return new OrmSetupHelper( BackendSetupStrategy.withBackendMocks( backendMock ) );
+	}
+
+	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock, BackendMock ... otherBackendMocks) {
+		return new OrmSetupHelper( BackendSetupStrategy.withBackendMocks( defaultBackendMock, otherBackendMocks ) );
+	}
+
+	public static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
+		return withSingleBackend( DEFAULT_BACKEND_NAME, backendConfiguration );
+	}
+
+	public static OrmSetupHelper withSingleBackend(String backendName, BackendConfiguration backendConfiguration) {
+		return new OrmSetupHelper( BackendSetupStrategy.withSingleBackend( backendName, backendConfiguration ) );
+	}
+
+	public static OrmSetupHelper withMultipleBackends(String defaultBackendName,
+			Map<String, BackendConfiguration> backendConfigurations) {
+		return new OrmSetupHelper( BackendSetupStrategy.withMultipleBackends(
+				defaultBackendName, backendConfigurations
+		) );
+	}
+
+	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy) {
+		super( backendSetupStrategy );
 	}
 
 	@Override
 	protected SetupContext createSetupContext() {
 		return new SetupContext();
-	}
-
-	@Override
-	protected String getPropertiesPath(String configurationId) {
-		return "/hibernate-test-" + configurationId + ".properties";
 	}
 
 	@Override

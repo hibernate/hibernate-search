@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.spatial;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -30,7 +32,7 @@ public class AnnotationMappingGeoPointBridgeIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private JavaBeanMapping mapping;
 
@@ -49,7 +51,7 @@ public class AnnotationMappingGeoPointBridgeIT {
 				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
 		);
 
-		mapping = setupHelper.withBackendMock( backendMock )
+		mapping = setupHelper.start()
 				.withAnnotatedEntityTypes(
 						GeoPointOnTypeEntity.class,
 						GeoPointOnCoordinatesPropertyEntity.class,
