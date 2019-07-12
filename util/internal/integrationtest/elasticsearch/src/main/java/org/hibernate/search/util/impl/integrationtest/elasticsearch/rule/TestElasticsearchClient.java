@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
+package org.hibernate.search.util.impl.integrationtest.elasticsearch.rule;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
@@ -474,7 +474,7 @@ public class TestElasticsearchClient implements TestRule {
 
 	private void before() {
 		ConfigurationPropertySource backendProperties = ConfigurationPropertySource.fromMap(
-				configurationProvider.getPropertiesFromFile( ElasticsearchTckBackendHelper.DEFAULT_BACKEND_PROPERTIES_PATH )
+				configurationProvider.getPropertiesFromFile( "/test-elasticsearch-client.properties" )
 		);
 
 		BeanResolver beanResolver = configurationProvider.createBeanResolverForTest();

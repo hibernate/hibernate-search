@@ -4,9 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect;
+package org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,31 +16,32 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class Elasticsearch7TestDialect implements ElasticsearchTestDialect {
+@SuppressWarnings("deprecation") // We use Paths.DOC on purpose
+public class Elasticsearch67TestDialect implements ElasticsearchTestDialect {
 
 	@Override
 	public boolean isEmptyMappingPossible() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public URLEncodedString getTypeKeywordForNonMappingApi() {
-		return Paths._DOC;
+		return Paths.DOC;
 	}
 
 	@Override
 	public Optional<URLEncodedString> getTypeNameForMappingApi() {
-		return Optional.empty();
+		return Optional.of( Paths.DOC );
 	}
 
 	@Override
 	public Boolean getIncludeTypeNameParameterForMappingApi() {
-		return null;
+		return true;
 	}
 
 	@Override
 	public List<String> getAllLocalDateDefaultMappingFormats() {
-		return Collections.singletonList( "uuuu-MM-dd" );
+		return Arrays.asList( "yyyy-MM-dd", "yyyyyyyyy-MM-dd" );
 	}
 
 	@Override

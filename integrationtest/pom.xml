@@ -35,6 +35,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-internal-integrationtest-elasticsearch</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-internal-integrationtest-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>

@@ -2350,7 +2350,7 @@
             <id>elasticsearch-5.6</id>
             <properties>
                 <test.elasticsearch.host.version>5.6.8</test.elasticsearch.host.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.Elasticsearch5TestDialect</test.elasticsearch.testdialect>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.Elasticsearch5TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>
@@ -2374,7 +2374,7 @@
             <id>elasticsearch-6.0</id>
             <properties>
                 <test.elasticsearch.host.version>6.6.2</test.elasticsearch.host.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.Elasticsearch60TestDialect</test.elasticsearch.testdialect>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.Elasticsearch60TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>
@@ -2398,7 +2398,7 @@
             <id>elasticsearch-6.7</id>
             <properties>
                 <test.elasticsearch.host.version>6.8.1</test.elasticsearch.host.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.Elasticsearch67TestDialect</test.elasticsearch.testdialect>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.Elasticsearch67TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>
@@ -2428,7 +2428,7 @@
             </activation>
             <properties>
                 <test.elasticsearch.host.version>${version.org.elasticsearch.main}</test.elasticsearch.host.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.Elasticsearch7TestDialect</test.elasticsearch.testdialect>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.Elasticsearch7TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>

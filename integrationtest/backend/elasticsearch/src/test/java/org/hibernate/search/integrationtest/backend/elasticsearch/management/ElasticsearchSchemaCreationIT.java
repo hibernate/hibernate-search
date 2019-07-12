@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycl
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
