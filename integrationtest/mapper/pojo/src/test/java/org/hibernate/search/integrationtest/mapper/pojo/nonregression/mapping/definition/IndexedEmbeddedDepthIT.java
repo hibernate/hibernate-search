@@ -27,7 +27,7 @@ public class IndexedEmbeddedDepthIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1467")
@@ -96,7 +96,7 @@ public class IndexedEmbeddedDepthIT {
 						)
 				)
 		);
-		setupHelper.withBackendMock( backendMock )
+		setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class, IndexedEmbeddedLevel2.class )
 				.setup();

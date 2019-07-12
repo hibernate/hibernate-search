@@ -37,7 +37,7 @@ public class ScaledNumberFieldIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void validDecimalScales_bigDecimals() {
@@ -75,7 +75,7 @@ public class ScaledNumberFieldIT {
 				.field( "unscaled", BigDecimal.class, f -> f.decimalScale( 0 ) )
 				.field( "defaultScaled", BigDecimal.class )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -115,7 +115,7 @@ public class ScaledNumberFieldIT {
 				.field( "unscaled", BigInteger.class, f -> f.decimalScale( 0 ) )
 				.field( "defaultScaled", BigInteger.class )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -139,7 +139,7 @@ public class ScaledNumberFieldIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -198,7 +198,7 @@ public class ScaledNumberFieldIT {
 				.field( "useDefault", BigDecimal.class )
 				.field( "implicit", BigInteger.class )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -224,7 +224,7 @@ public class ScaledNumberFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "wrap", BigDecimal.class, f -> f.decimalScale( 3 ) )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -250,7 +250,7 @@ public class ScaledNumberFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "wrap", BigDecimal.class, f -> f.decimalScale( 3 ) )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -274,7 +274,7 @@ public class ScaledNumberFieldIT {
 		}
 
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

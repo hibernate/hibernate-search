@@ -18,7 +18,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.mapper.orm.Search;
@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
@@ -39,24 +40,22 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class ProjectionConverterIT {
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendSetups() {
-		return BackendSetupStrategy.simple().toArray();
+	public static Object[] backendConfigurations() {
+		return BackendConfigurations.simple().toArray();
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper = new OrmSetupHelper();
-
-	private final BackendSetupStrategy backendSetupStrategy;
+	public OrmSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
-	public ProjectionConverterIT(BackendSetupStrategy backendSetupStrategy) {
-		this.backendSetupStrategy = backendSetupStrategy;
+	public ProjectionConverterIT(BackendConfiguration backendConfiguration) {
+		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
 	}
 
 	@Before
 	public void setup() {
-		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper )
+		entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE

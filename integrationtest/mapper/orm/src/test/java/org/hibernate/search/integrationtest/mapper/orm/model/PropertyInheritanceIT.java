@@ -33,7 +33,7 @@ public class PropertyInheritanceIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -52,7 +52,7 @@ public class PropertyInheritanceIT {
 				)
 		);
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.setup(
 						ParentIndexedEntity.class,
 						IndexedEntity.class

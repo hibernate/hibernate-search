@@ -46,7 +46,7 @@ public class ProgrammaticMappingAccessTypeIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -71,7 +71,7 @@ public class ProgrammaticMappingAccessTypeIT {
 		);
 		backendMock.expectSchema( IndexedEntityWithoutIdSetter.INDEX, b -> { } );
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, new MyMappingConfigurer() )
 				.setup(
 						IndexedEntity.class,

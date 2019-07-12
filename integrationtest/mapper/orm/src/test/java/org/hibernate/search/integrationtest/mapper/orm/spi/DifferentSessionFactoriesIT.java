@@ -37,7 +37,7 @@ public class DifferentSessionFactoriesIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -70,7 +70,7 @@ public class DifferentSessionFactoriesIT {
 	private SessionFactory initABasicSessionFactory() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
 
-		SessionFactory factory = ormSetupHelper.withBackendMock( backendMock )
+		SessionFactory factory = ormSetupHelper.start()
 				.setup( IndexedEntity.class );
 
 		backendMock.verifyExpectationsMet();

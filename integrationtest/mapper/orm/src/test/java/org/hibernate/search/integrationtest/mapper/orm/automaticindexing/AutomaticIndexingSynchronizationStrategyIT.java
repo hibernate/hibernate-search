@@ -48,7 +48,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
 	public void queued() throws InterruptedException, ExecutionException, TimeoutException {
@@ -248,7 +248,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	private SessionFactory setup(HibernateOrmAutomaticIndexingSynchronizationStrategyName strategyName) {
-		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.withBackendMock( backendMock );
+		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start();
 		if ( strategyName != null ) {
 			setupContext.withProperty(
 					HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,

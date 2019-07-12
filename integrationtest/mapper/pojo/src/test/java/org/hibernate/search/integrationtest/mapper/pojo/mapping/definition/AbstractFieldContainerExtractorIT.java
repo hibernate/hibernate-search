@@ -53,7 +53,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private final TestModelProvider testModelProvider;
 
@@ -297,7 +297,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 					}
 				} )
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( testModel.getEntityClass() );
+		JavaBeanMapping mapping = setupHelper.start().setup( testModel.getEntityClass() );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
@@ -332,7 +332,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 					}
 				} )
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( testModel.getEntityClass() );
+		JavaBeanMapping mapping = setupHelper.start().setup( testModel.getEntityClass() );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing

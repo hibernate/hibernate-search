@@ -46,7 +46,7 @@ public class FieldContainerExtractorBaseIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void custom() {
@@ -68,7 +68,7 @@ public class FieldContainerExtractorBaseIT {
 				.field( "text", String.class, f -> f.multiValued( true ) )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+		JavaBeanMapping mapping = setupHelper.start()
 				.withConfiguration( builder -> {
 					builder.containerExtractors().define( MyContainerExtractor.NAME, MyContainerExtractor.class );
 				} )
@@ -121,7 +121,7 @@ public class FieldContainerExtractorBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -150,7 +150,7 @@ public class FieldContainerExtractorBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock )
+				() -> setupHelper.start()
 						.withConfiguration( builder -> {
 							builder.containerExtractors().define( RawContainerExtractor.NAME, RawContainerExtractor.class );
 						} )
@@ -195,7 +195,7 @@ public class FieldContainerExtractorBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -230,7 +230,7 @@ public class FieldContainerExtractorBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

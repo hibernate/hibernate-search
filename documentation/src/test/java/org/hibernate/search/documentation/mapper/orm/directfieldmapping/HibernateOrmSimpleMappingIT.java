@@ -12,11 +12,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.documentation.testsupport.BackendSetupStrategy;
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
@@ -41,24 +42,22 @@ public class HibernateOrmSimpleMappingIT {
 	private static final Integer BOOK3_PAGECOUNT = 435;
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendSetups() {
-		return BackendSetupStrategy.simple().toArray();
+	public static Object[] backendConfigurations() {
+		return BackendConfigurations.simple().toArray();
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper = new OrmSetupHelper();
-
-	private final BackendSetupStrategy backendSetupStrategy;
+	public OrmSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
-	public HibernateOrmSimpleMappingIT(BackendSetupStrategy backendSetupStrategy) {
-		this.backendSetupStrategy = backendSetupStrategy;
+	public HibernateOrmSimpleMappingIT(BackendConfiguration backendConfiguration) {
+		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
 	}
 
 	@Before
 	public void setup() {
-		entityManagerFactory = backendSetupStrategy.withSingleBackend( setupHelper )
+		entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE

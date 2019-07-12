@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.model;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
@@ -26,7 +28,7 @@ public class ImplementedInterfaceIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private JavaBeanMapping mapping;
 
@@ -36,7 +38,7 @@ public class ImplementedInterfaceIT {
 				.field( "text", String.class )
 		);
 
-		mapping = setupHelper.withBackendMock( backendMock ).setup( IndexedPojo.class );
+		mapping = setupHelper.start().setup( IndexedPojo.class );
 		backendMock.verifyExpectationsMet();
 	}
 

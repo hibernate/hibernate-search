@@ -38,7 +38,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -49,7 +49,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 				.field( "indexedElementCollectionField", String.class, b2 -> b2.multiValued( true ) )
 		);
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}

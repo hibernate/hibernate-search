@@ -32,7 +32,7 @@ public class DependencyIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void associationInverseSide_error_missingInversePath() {
@@ -49,7 +49,7 @@ public class DependencyIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -83,7 +83,7 @@ public class DependencyIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -117,7 +117,7 @@ public class DependencyIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -185,7 +185,7 @@ public class DependencyIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock )
+				() -> setupHelper.start()
 						.withAnnotatedEntityTypes( DerivedFromCycle.A.class )
 						.withAnnotatedTypes( DerivedFromCycle.B.class, DerivedFromCycle.C.class )
 						.setup()
@@ -241,7 +241,7 @@ public class DependencyIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup(
+				() -> setupHelper.start().setup(
 						CannotInvertAssociation.A.class, CannotInvertAssociation.B.class
 				)
 		)
@@ -298,7 +298,7 @@ public class DependencyIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup(
+				() -> setupHelper.start().setup(
 						CannotApplyInvertAssociationPath.A.class, CannotApplyInvertAssociationPath.B.class
 				)
 		)
@@ -353,7 +353,7 @@ public class DependencyIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup(
+				() -> setupHelper.start().setup(
 						CannotApplyInvertAssociationPath.A.class, CannotApplyInvertAssociationPath.B.class
 				)
 		)

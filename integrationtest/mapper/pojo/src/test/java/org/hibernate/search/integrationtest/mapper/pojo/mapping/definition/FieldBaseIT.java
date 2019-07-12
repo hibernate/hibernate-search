@@ -42,7 +42,7 @@ public class FieldBaseIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void error_unableToResolveDefaultValueBridgeFromSourceType() {
@@ -60,7 +60,7 @@ public class FieldBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -92,7 +92,7 @@ public class FieldBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -122,7 +122,7 @@ public class FieldBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -152,7 +152,7 @@ public class FieldBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -184,7 +184,7 @@ public class FieldBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -215,7 +215,7 @@ public class FieldBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -261,7 +261,7 @@ public class FieldBaseIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -295,7 +295,7 @@ public class FieldBaseIT {
 				.field( "integer", Integer.class, f -> f.indexNullAs( 7 ) )
 		);
 
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		JavaBeanMapping mapping = setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
 		try ( SearchSession session = mapping.createSession() ) {
@@ -336,7 +336,7 @@ public class FieldBaseIT {
 			public Integer getInteger() { return integer; }
 		}
 
-		SubTest.expectException( () -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class ) )
+		SubTest.expectException( () -> setupHelper.start().setup( IndexedEntity.class ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "does not support parsing a value from a String" )

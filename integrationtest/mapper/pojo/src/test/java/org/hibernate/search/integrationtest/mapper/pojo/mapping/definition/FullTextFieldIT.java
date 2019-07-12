@@ -51,7 +51,7 @@ public class FullTextFieldIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void defaultBridge() {
@@ -124,7 +124,7 @@ public class FullTextFieldIT {
 				.field( "defaultNorms", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -171,7 +171,7 @@ public class FullTextFieldIT {
 				.field( "useDefault", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -225,7 +225,7 @@ public class FullTextFieldIT {
 				.field( "useDefault", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -303,7 +303,7 @@ public class FullTextFieldIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -335,7 +335,7 @@ public class FullTextFieldIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -359,7 +359,7 @@ public class FullTextFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "myProperty", indexedFieldType, b2 -> b2.analyzerName( ANALYZER_NAME ) )
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType );
+		JavaBeanMapping mapping = setupHelper.start().setup( entityType );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing

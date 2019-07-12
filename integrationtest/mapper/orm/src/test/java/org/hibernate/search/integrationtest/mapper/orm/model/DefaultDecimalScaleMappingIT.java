@@ -30,7 +30,7 @@ public class DefaultDecimalScaleMappingIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
 	public void mapping() {
@@ -46,7 +46,7 @@ public class DefaultDecimalScaleMappingIT {
 				.field( "bothInteger", BigInteger.class, f -> f.defaultDecimalScale( -3 ).decimalScale( -2 ) )
 		);
 
-		ormSetupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		ormSetupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 

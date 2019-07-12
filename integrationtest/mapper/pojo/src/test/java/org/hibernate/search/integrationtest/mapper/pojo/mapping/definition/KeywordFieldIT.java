@@ -50,7 +50,7 @@ public class KeywordFieldIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void noNormalizer() {
@@ -72,7 +72,7 @@ public class KeywordFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "myProperty", String.class )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -147,7 +147,7 @@ public class KeywordFieldIT {
 				.field( "defaultNorms", String.class )
 				.field( "implicit", String.class )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -194,7 +194,7 @@ public class KeywordFieldIT {
 				.field( "useDefault", String.class )
 				.field( "implicit", String.class )
 		);
-		setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class );
+		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -272,7 +272,7 @@ public class KeywordFieldIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -304,7 +304,7 @@ public class KeywordFieldIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -328,7 +328,7 @@ public class KeywordFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "myProperty", indexedFieldType, b2 -> b2.normalizerName( NORMALIZER_NAME ) )
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType );
+		JavaBeanMapping mapping = setupHelper.start().setup( entityType );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing

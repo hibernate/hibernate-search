@@ -9,32 +9,36 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 
+import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.AbstractSetupContext, B, R> implements TestRule {
 
+	private final TestConfigurationProvider configurationProvider;
+	private final BackendSetupStrategy backendSetupStrategy;
+	private final TestRule delegateRule;
+
 	private final List<R> toClose = new ArrayList<>();
 
-	private final TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
-
-	public C withBackendMock(BackendMock backendMock) {
-		String backendName = backendMock.getBackendName();
-		return createSetupContext()
-				.withBackendMock( backendMock )
-				.withPropertyRadical( EngineSettings.DEFAULT_BACKEND, backendName );
+	protected MappingSetupHelper(BackendSetupStrategy backendSetupStrategy) {
+		this.configurationProvider = new TestConfigurationProvider();
+		this.backendSetupStrategy = backendSetupStrategy;
+		Optional<TestRule> setupStrategyTestRule = backendSetupStrategy.getTestRule();
+		this.delegateRule = setupStrategyTestRule
+				.<TestRule>map( rule -> RuleChain.outerRule( configurationProvider ).around( rule ) )
+				.orElse( configurationProvider );
 	}
 
-	public C startSetup() {
-		return createSetupContext();
+	public C start() {
+		return backendSetupStrategy.start( createSetupContext(), configurationProvider );
 	}
 
 	@Override
@@ -43,8 +47,6 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 	}
 
 	protected abstract C createSetupContext();
-
-	protected abstract String getPropertiesPath(String configurationId);
 
 	protected abstract void close(R toClose) throws Exception;
 
@@ -63,7 +65,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 				}
 			}
 		};
-		return configurationProvider.apply( wrapped, description );
+		return delegateRule.apply( wrapped, description );
 	}
 
 	public abstract class AbstractSetupContext {
@@ -71,20 +73,6 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		private final List<Configuration<B, R>> configurations = new ArrayList<>();
 
 		protected AbstractSetupContext() {
-		}
-
-		public C withDefaultBackend(String backendName) {
-			return withPropertyRadical( EngineSettings.DEFAULT_BACKEND, backendName );
-		}
-
-		public C withBackend(String configurationId, String backendName) {
-			String propertiesPath = getPropertiesPath( configurationId );
-			return withBackendProperties( backendName, configurationProvider.getPropertiesFromFile( propertiesPath ) );
-		}
-
-		public C withBackendMock(BackendMock backendMock) {
-			String backendName = backendMock.getBackendName();
-			return withBackendProperty( backendName, "type", StubBackendFactory.class.getName() );
 		}
 
 		protected abstract C withPropertyRadical(String keyRadical, Object value);
@@ -95,7 +83,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 			return withPropertyRadical( "backends." + backendName + "." + keyRadical, value );
 		}
 
-		protected C withBackendProperties(String backendName, Map<String, Object> relativeProperties) {
+		public final C withBackendProperties(String backendName, Map<String, Object> relativeProperties) {
 			relativeProperties.forEach( (k, v) -> withBackendProperty( backendName, k, v ) );
 			return thisAsC();
 		}
@@ -142,6 +130,10 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		protected abstract R build(B builder);
 
 		protected abstract C thisAsC();
+
+		MappingSetupHelper<C, B, R> getHelper() {
+			return MappingSetupHelper.this;
+		}
 	}
 
 	private static class Configuration<B, R> {

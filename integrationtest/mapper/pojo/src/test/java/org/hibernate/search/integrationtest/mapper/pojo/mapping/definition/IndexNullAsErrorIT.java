@@ -41,7 +41,7 @@ public class IndexNullAsErrorIT<V, F> {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private DefaultValueBridgeExpectations<V, F> expectations;
 
@@ -52,7 +52,7 @@ public class IndexNullAsErrorIT<V, F> {
 	@Test
 	public void testParsingException() {
 		SubTest.expectException( () ->
-				setupHelper.withBackendMock( backendMock ).withConfiguration( c -> c
+				setupHelper.start().withConfiguration( c -> c
 						.addEntityType( expectations.getTypeWithValueBridge1() )
 						.programmaticMapping()
 						.type( expectations.getTypeWithValueBridge1() ).indexed()

@@ -42,7 +42,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
 	public void directPersistUpdateDelete() {
@@ -640,7 +640,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 				)
 		);
 
-		SessionFactory sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
@@ -667,7 +667,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 				)
 		);
 
-		SessionFactory sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
@@ -702,7 +702,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 				)
 		);
 
-		SessionFactory sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {

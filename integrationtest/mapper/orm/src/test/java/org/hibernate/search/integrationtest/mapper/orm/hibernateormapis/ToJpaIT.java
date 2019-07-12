@@ -47,14 +47,14 @@ public class ToJpaIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
 	@Before
 	public void setup() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.withProperty( AvailableSettings.JPA_QUERY_COMPLIANCE, true )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();

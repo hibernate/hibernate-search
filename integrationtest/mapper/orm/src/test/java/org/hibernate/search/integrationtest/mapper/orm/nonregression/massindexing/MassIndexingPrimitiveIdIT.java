@@ -37,7 +37,7 @@ public class MassIndexingPrimitiveIdIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -45,7 +45,7 @@ public class MassIndexingPrimitiveIdIT {
 	public void setup() {
 		backendMock.expectAnySchema( EntityWithPrimitiveId.INDEX );
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, HibernateOrmAutomaticIndexingStrategyName.NONE )
 				.setup( EntityWithPrimitiveId.class );
 

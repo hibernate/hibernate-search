@@ -55,7 +55,7 @@ public class ProgrammaticMappingSmokeIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -121,7 +121,7 @@ public class ProgrammaticMappingSmokeIT {
 				.field( "myLocalDateField", LocalDate.class )
 		);
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, new MyMappingConfigurer() )
 				.setup(
 						IndexedEntity.class,

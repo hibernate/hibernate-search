@@ -36,7 +36,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	protected abstract SessionFactory sessionFactory();
 

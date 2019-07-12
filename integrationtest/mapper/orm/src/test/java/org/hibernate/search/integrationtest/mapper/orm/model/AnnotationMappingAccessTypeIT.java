@@ -45,7 +45,7 @@ public class AnnotationMappingAccessTypeIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
@@ -70,7 +70,7 @@ public class AnnotationMappingAccessTypeIT {
 		);
 		backendMock.expectSchema( IndexedEntityWithoutIdSetter.INDEX, b -> { } );
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.setup(
 						IndexedEntity.class,
 						ParentIndexedEntity.class,

@@ -64,7 +64,7 @@ public class FieldDefaultBridgeIT<V, F> {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private PropertyTypeDescriptor<V> typeDescriptor;
 	private DefaultValueBridgeExpectations<V, F> expectations;
@@ -102,7 +102,7 @@ public class FieldDefaultBridgeIT<V, F> {
 					}
 				}, schemaCapture2
 		);
-		mapping = setupHelper.withBackendMock( backendMock )
+		mapping = setupHelper.start()
 				.setup( expectations.getTypeWithValueBridge1(), expectations.getTypeWithValueBridge2() );
 		backendMock.verifyExpectationsMet();
 		index1FieldSchemaNode = schemaCapture1.getValue().getChildren().get( FIELD_NAME ).get( 0 );

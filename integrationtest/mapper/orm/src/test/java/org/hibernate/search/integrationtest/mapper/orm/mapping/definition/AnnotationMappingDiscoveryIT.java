@@ -49,7 +49,7 @@ public class AnnotationMappingDiscoveryIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -77,7 +77,7 @@ public class AnnotationMappingDiscoveryIT {
 				)
 		);
 
-		ormSetupHelper.withBackendMock( backendMock )
+		ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
@@ -116,7 +116,7 @@ public class AnnotationMappingDiscoveryIT {
 				} )
 		);
 
-		ormSetupHelper.withBackendMock( backendMock )
+		ormSetupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.ENABLE_ANNOTATION_MAPPING, "false" )
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,

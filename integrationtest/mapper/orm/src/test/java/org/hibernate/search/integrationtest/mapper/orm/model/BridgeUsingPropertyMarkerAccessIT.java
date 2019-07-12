@@ -60,7 +60,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private ModelPrimitives<TIndexed> modelPrimitives;
 
@@ -76,7 +76,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 				.field( "location", GeoPoint.class,
 						b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
 		);
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.setup( modelPrimitives.getModelClass() );
 		backendMock.verifyExpectationsMet();
 	}

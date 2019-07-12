@@ -39,7 +39,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	public void setup() {
 		backendMock.expectAnySchema( primitives.getIndexName() );
 
-		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
+		sessionFactory = ormSetupHelper.start()
 				.setup( primitives.getIndexedClass() );
 
 		backendMock.verifyExpectationsMet();

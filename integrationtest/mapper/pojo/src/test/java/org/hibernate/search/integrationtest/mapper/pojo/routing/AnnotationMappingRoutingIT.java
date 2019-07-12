@@ -10,6 +10,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
@@ -40,7 +41,7 @@ public class AnnotationMappingRoutingIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper();
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private JavaBeanMapping mapping;
 
@@ -51,7 +52,7 @@ public class AnnotationMappingRoutingIT {
 				.field( "value", String.class )
 		);
 
-		mapping = setupHelper.withBackendMock( backendMock )
+		mapping = setupHelper.start()
 				.setup( IndexedEntity.class );
 
 		backendMock.verifyExpectationsMet();

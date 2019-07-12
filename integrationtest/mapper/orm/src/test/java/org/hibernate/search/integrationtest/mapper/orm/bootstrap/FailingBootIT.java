@@ -32,7 +32,7 @@ public class FailingBootIT {
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = new OrmSetupHelper();
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -43,7 +43,7 @@ public class FailingBootIT {
 		thrown.expectMessage( "Unable to find a default value bridge implementation" );
 		thrown.expectMessage( ContainedEntity.class.getName() );
 
-		ormSetupHelper.withBackendMock( backendMock )
+		ormSetupHelper.start()
 				.setup( FailingIndexedEntity.class, ContainedEntity.class );
 	}
 
