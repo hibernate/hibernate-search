@@ -71,6 +71,54 @@ include::todo-placeholder.asciidoc[]
 // TODO [[_performance_considerations]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_performance_considerations
 // TODO [[_result_size]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_result_size
 
+[[search-dsl-query-routing]]
+==== Routing
+
+include::components/sharding-intro-note.asciidoc[]
+
+This feature is useful when sharding is enabled,
+and when each entity is mapped in such a way that
+<<mapper-orm-bridge-routingkeybridge,it is assigned a routing key>>.
+
+If a search query already uses predicates to filter documents in such a way that
+all matching documents will have a routing key in a known subset of all possible routing keys,
+it is possible to specify these routing keys to Hibernate Search
+so that only the relevant shards are queried,
+potentially improving performance.
+
+[WARNING]
+====
+The main purpose of this feature is to *improve performance*.
+It should not be relied on for document filtering purposes.
+
+While setting a routing key will remove some irrelevant documents from the hits,
+it may not remove _all_ of them: the routing key will resolve into a single shard,
+but that shard may be contain documents with multiple different routing keys,
+depending on the sharding strategy.
+
+Thus, even when specifying a routing key that supposedly has the same value
+as a field in the document (e.g. a `genre` field),
+it is necessary to also add a predicate to explicitly filter out documents
+that may not have the same routing key.
+====
+
+Specifying routing keys is done by calling the `.routing(String)` or .`routing(Collection<String>)` methods
+when building the query:
+
+.Routing a query to a subset of all shards
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/routing/HibernateOrmRoutingIT.java[tags=routing-single]
+----
+<1> Start building the query.
+<2> Define that only documents matching the given `genre` should be returned.
+<3> In this case, the entity is mapped in such a way that the `genre` is also used as a routing key.
+We know all documents will have the given `genre` value,
+so we can specify the routing key to limit the query to relevant shards.
+<4> Build the query and fetch the results.
+====
+
 [[search-dsl-query-timeout]]
 === Timeout
 // Search 5 anchors backward compatibility

@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.cfg.BackendSettings;
+import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
@@ -86,6 +88,14 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		public final C withBackendProperties(String backendName, Map<String, Object> relativeProperties) {
 			relativeProperties.forEach( (k, v) -> withBackendProperty( backendName, k, v ) );
 			return thisAsC();
+		}
+
+		public C withIndexDefaultsProperty(String backendName, String keyRadical, Object value) {
+			return withPropertyRadical(
+					EngineSettings.BACKENDS + "." + backendName
+							+ "." + BackendSettings.INDEX_DEFAULTS + "." + keyRadical,
+					value
+			);
 		}
 
 		/**

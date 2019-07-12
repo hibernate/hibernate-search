@@ -37,3 +37,75 @@ see the documentation of each backend:
 
 * <<backend-lucene-analysis,Analysis for the Lucene backend>>
 * <<backend-elasticsearch-analysis,Analysis for the Elasticsearch backend>>
+
+[[concepts-sharding-routing]]
+== Sharding and routing
+
+Sharding consists in splitting index data into multiple "smaller indexes", called shards,
+in order to improve performance when dealing with large amounts of data.
+
+In Hibernate Search, similarly to Elasticsearch,
+another concept is closely related to sharding: routing.
+Routing consists in resolving a document identifier,
+or generally any string called a "routing key",
+into the corresponding shard.
+
+When indexing:
+
+* A document identifier and optionally a routing key
+are generated from the indexed entity.
+* The document, along with its identifier and optionally its routing key,
+is passed to the backend.
+* The backend "routes" the document to the correct shard.
+* The document is indexed in that shard.
+
+When searching:
+
+* The search query can optionally be passed one or more routing keys.
+* If no routing key was passed,
+the query will be executed on all shards.
+* If one or more routing keys were passed,
+the backend will resolve these routing key into a set of shards,
+and the query will only be executed on all shards,
+ignoring the other shards.
+
+Sharding, then, can be leveraged to boost performance in two ways:
+
+* When indexing: a sharded index can spread the "stress"
+onto multiple shards, which can be located on different disks (Lucene)
+or even different servers (Elasticsearch).
+* When searching: if one property, let's call it `category`,
+is often used to select a subset of documents,
+this property can be <<mapper-orm-bridge-routingkeybridge,defined as a routing key in the mapping>>,
+so that it's used to route documents instead of the document ID.
+As a result, documents with the same value for `category` will be indexed in the same shard.
+Then when searching, if a query already filters documents so that it is known that the hits
+will all have the same value for `category`,
+the query can be <<search-dsl-query-routing,routed to the shards containing documents with this value>>,
+*and the other shards can be ignored*.
+
+To enable sharding, some configuration is required:
+
+* The backends require explicit configuration:
+see <<backend-lucene-configuration-sharding,here for Lucene>>
+and <<backend-elasticsearch-configuration-sharding,here for Elasticsearch>>.
+* In most cases, document IDs are used to route documents to shards by default.
+This does not allow taking advantage of routing when searching,
+which requires multiple documents to share the same routing key.
+To define the routing key to assign to each document,
+assign <<mapper-orm-bridge-routingkeybridge,routing key bridges>> to your entities.
+
+[WARNING]
+====
+Sharding is static by nature:
+
+* Each entity, and its corresponding document,
+is expected to stay in the same shard from its creation to its deletion.
+Modifying an entity in such a way that its routing key,
+and thus its corresponding shard, changes,
+will lead to duplicate documents.
+Thus, properties used to generate routing keys must be immutable.
+* Each index is expected to have the same shards, with the same identifiers,
+from one boot to the other.
+Changing the number of shards or their identifiers will require full reindexing.
+====

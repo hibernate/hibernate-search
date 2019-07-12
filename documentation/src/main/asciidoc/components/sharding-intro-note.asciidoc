@@ -1,0 +1,6 @@
+[NOTE]
+====
+For a preliminary introduction to sharding,
+including how it works in Hibernate Search and what its limitations are,
+see <<concepts-sharding-routing>>.
+====

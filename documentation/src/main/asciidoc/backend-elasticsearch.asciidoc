@@ -249,6 +249,15 @@ You can find a full reference of available properties in the Hibernate Search ja
 
 include::todo-placeholder.asciidoc[]
 
+[[backend-elasticsearch-configuration-sharding]]
+==== Sharding
+
+include::components/sharding-intro-note.asciidoc[]
+
+Elasticsearch disables sharding by default.
+To enable it,
+link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[set the property `index.number_of_shards` in your cluster].
+
 [[backend-elasticsearch-index-lifecycle]]
 == Index lifecycle
 // Search 5 anchors backward compatibility
