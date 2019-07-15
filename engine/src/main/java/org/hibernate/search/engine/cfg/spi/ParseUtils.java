@@ -31,6 +31,7 @@ import java.time.format.DateTimeParseException;
 import java.time.format.SignStyle;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.TimeHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -57,6 +58,8 @@ public final class ParseUtils {
 			.appendLiteral( '-' )
 			.appendValue( DAY_OF_MONTH, 2 )
 			.toFormatter();
+
+	private static final String GEO_POINT_SEPARATOR = ",\\s*";
 
 	private ParseUtils() {
 		// Private constructor, do not use
@@ -197,6 +200,21 @@ public final class ParseUtils {
 		}
 		catch (DateTimeParseException e) {
 			throw log.invalidStringForType( value, Duration.class, e );
+		}
+	}
+
+	public static GeoPoint parseGeoPoint(String value) {
+		// using custom format, ex: '48.633308, 7.759294'
+		String[] split = value.split( GEO_POINT_SEPARATOR );
+		if ( split.length != 2 ) {
+			throw log.unableToParseGeoPoint( value );
+		}
+
+		try {
+			return GeoPoint.of( Double.parseDouble( split[0] ), Double.parseDouble( split[1] ) );
+		}
+		catch (NumberFormatException e) {
+			throw log.unableToParseGeoPoint( value );
 		}
 	}
 }
