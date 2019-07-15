@@ -52,11 +52,6 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 	}
 
 	@Override
-	public F cast(Object value) {
-		return fieldType.cast( value );
-	}
-
-	@Override
 	public F parse(String value) {
 		return parsingFunction.apply( value );
 	}

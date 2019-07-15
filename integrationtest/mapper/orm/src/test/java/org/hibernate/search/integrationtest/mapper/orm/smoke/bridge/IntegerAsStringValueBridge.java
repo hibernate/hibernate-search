@@ -18,11 +18,6 @@ public final class IntegerAsStringValueBridge implements ValueBridge<Integer, St
 	}
 
 	@Override
-	public Integer cast(Object value) {
-		return (Integer) value;
-	}
-
-	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
 	}

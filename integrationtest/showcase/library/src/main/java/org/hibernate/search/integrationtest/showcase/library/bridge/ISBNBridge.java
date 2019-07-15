@@ -32,11 +32,6 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 	}
 
 	@Override
-	public ISBN cast(Object value) {
-		return (ISBN) value;
-	}
-
-	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
 	}

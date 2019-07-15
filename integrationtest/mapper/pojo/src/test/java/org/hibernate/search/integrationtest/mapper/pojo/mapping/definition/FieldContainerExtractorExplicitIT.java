@@ -537,11 +537,6 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 				ValueBridgeToIndexedValueContext context) {
 			return value == null || value.isEmpty() ? null : value.iterator().next();
 		}
-		@Override
-		@SuppressWarnings("unchecked")
-		public Collection<String> cast(Object value) {
-			return (Collection<String>) value;
-		}
 	}
 
 }

@@ -12,11 +12,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 public final class IntegerAsStringValueBridge implements ValueBridge<Integer, String> {
 
 	@Override
-	public Integer cast(Object value) {
-		return (Integer) value;
-	}
-
-	@Override
 	public String toIndexedValue(Integer value,
 			ValueBridgeToIndexedValueContext context) {
 		return value == null ? null : value.toString();

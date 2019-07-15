@@ -175,10 +175,6 @@ public class DocumentIdBaseIT {
 	public static class MyStringBridge implements IdentifierBridge<String> {
 		private static String TOSTRING = "<MyStringBridge toString() result>";
 		@Override
-		public String cast(Object value) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-		@Override
 		public String fromDocumentIdentifier(String documentIdentifier,
 				IdentifierBridgeFromDocumentIdentifierContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );

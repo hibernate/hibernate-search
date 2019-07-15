@@ -166,11 +166,6 @@ public class DslConverterIT {
 		public String toIndexedValue(AuthenticationOutcome value, ValueBridgeToIndexedValueContext context) {
 			return value == null ? null : value.text;
 		}
-
-		@Override
-		public AuthenticationOutcome cast(Object value) {
-			return (AuthenticationOutcome) value;
-		}
 	}
 
 }

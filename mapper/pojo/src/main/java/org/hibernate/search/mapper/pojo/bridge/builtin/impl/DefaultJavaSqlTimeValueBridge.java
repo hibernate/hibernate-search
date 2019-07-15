@@ -32,11 +32,6 @@ public final class DefaultJavaSqlTimeValueBridge implements ValueBridge<Time, In
 	}
 
 	@Override
-	public Time cast(Object value) {
-		return (Time) value;
-	}
-
-	@Override
 	public Instant parse(String value) {
 		return ParseUtils.parseInstant( value );
 	}

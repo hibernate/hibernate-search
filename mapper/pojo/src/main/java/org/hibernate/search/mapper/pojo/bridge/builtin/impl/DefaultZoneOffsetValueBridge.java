@@ -31,11 +31,6 @@ public final class DefaultZoneOffsetValueBridge implements ValueBridge<ZoneOffse
 	}
 
 	@Override
-	public ZoneOffset cast(Object value) {
-		return (ZoneOffset) value;
-	}
-
-	@Override
 	public Integer parse(String value) {
 		return toIndexedValue( ParseUtils.parseZoneOffset( value ) );
 	}

@@ -25,11 +25,6 @@ public final class DefaultUUIDIdentifierBridge implements IdentifierBridge<UUID>
 	}
 
 	@Override
-	public UUID cast(Object value) {
-		return (UUID) value;
-	}
-
-	@Override
 	public boolean isCompatibleWith(IdentifierBridge<?> other) {
 		return getClass().equals( other.getClass() );
 	}

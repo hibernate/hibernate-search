@@ -51,11 +51,6 @@ public final class DefaultJavaUtilCalendarValueBridge implements ValueBridge<Cal
 	}
 
 	@Override
-	public Calendar cast(Object value) {
-		return (Calendar) value;
-	}
-
-	@Override
 	public ZonedDateTime parse(String value) {
 		return ParseUtils.parseZonedDateTime( value );
 	}

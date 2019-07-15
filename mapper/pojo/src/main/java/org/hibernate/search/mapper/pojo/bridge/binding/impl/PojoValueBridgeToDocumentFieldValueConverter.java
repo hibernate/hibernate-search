@@ -15,14 +15,16 @@ final class PojoValueBridgeToDocumentFieldValueConverter<U, V extends U, F> impl
 		ToDocumentFieldValueConverter<V, F> {
 
 	private final ValueBridge<U, F> bridge;
+	private final Class<U> expectedValueType;
 
-	PojoValueBridgeToDocumentFieldValueConverter(ValueBridge<U, F> bridge) {
+	PojoValueBridgeToDocumentFieldValueConverter(ValueBridge<U, F> bridge, Class<U> expectedValueType) {
 		this.bridge = bridge;
+		this.expectedValueType = expectedValueType;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + bridge + "]";
+		return getClass().getSimpleName() + "[bridge=" + bridge + ", expectedValueType=" + expectedValueType + "]";
 	}
 
 	@Override
@@ -32,7 +34,7 @@ final class PojoValueBridgeToDocumentFieldValueConverter<U, V extends U, F> impl
 
 	@Override
 	public F convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
-		return bridge.toIndexedValue( bridge.cast( value ), context.extension( PojoValueBridgeContextExtension.INSTANCE ) );
+		return bridge.toIndexedValue( expectedValueType.cast( value ), context.extension( PojoValueBridgeContextExtension.INSTANCE ) );
 	}
 
 	@Override
@@ -42,6 +44,7 @@ final class PojoValueBridgeToDocumentFieldValueConverter<U, V extends U, F> impl
 		}
 		PojoValueBridgeToDocumentFieldValueConverter<?, ?, ?> castedOther =
 				(PojoValueBridgeToDocumentFieldValueConverter<?, ?, ?>) other;
-		return bridge.isCompatibleWith( castedOther.bridge );
+		return expectedValueType.equals( castedOther.expectedValueType )
+				&& bridge.isCompatibleWith( castedOther.bridge );
 	}
 }

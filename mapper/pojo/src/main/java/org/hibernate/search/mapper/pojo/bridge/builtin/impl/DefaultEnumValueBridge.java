@@ -37,11 +37,6 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 	}
 
 	@Override
-	public V cast(Object value) {
-		return enumType.cast( value );
-	}
-
-	@Override
 	public String parse(String value) {
 		ValidateUtils.validateEnum( value, enumType );
 		return value;

@@ -103,11 +103,6 @@ public class StartupStubBridge<T>
 	}
 
 	@Override
-	public T cast(Object value) {
-		throw unexpectedRuntimeUse();
-	}
-
-	@Override
 	public String toIndexedValue(Object value,
 			ValueBridgeToIndexedValueContext context) {
 		throw unexpectedRuntimeUse();

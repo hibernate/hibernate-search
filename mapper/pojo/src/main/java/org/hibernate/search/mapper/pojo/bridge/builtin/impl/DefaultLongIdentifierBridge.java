@@ -24,11 +24,6 @@ public final class DefaultLongIdentifierBridge implements IdentifierBridge<Long>
 	}
 
 	@Override
-	public Long cast(Object value) {
-		return (Long) value;
-	}
-
-	@Override
 	public boolean isCompatibleWith(IdentifierBridge<?> other) {
 		return getClass().equals( other.getClass() );
 	}

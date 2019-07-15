@@ -234,10 +234,6 @@ public class FieldBaseIT {
 	public static class MyStringBridge implements ValueBridge<String, String> {
 		private static String TOSTRING = "<MyStringBridge toString() result>";
 		@Override
-		public String cast(Object value) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-		@Override
 		public String toIndexedValue(String value,
 				ValueBridgeToIndexedValueContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
@@ -353,11 +349,6 @@ public class FieldBaseIT {
 		@Override
 		public Integer toIndexedValue(Integer value, ValueBridgeToIndexedValueContext context) {
 			return value;
-		}
-
-		@Override
-		public Integer cast(Object value) {
-			return (Integer) value;
 		}
 	}
 }

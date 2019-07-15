@@ -418,11 +418,6 @@ public class FullTextFieldIT {
 			return value == null ? null : value.wrapped;
 		}
 
-		@Override
-		public WrappedValue cast(Object value) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-
 		public static class ExplictFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
@@ -434,11 +429,6 @@ public class FullTextFieldIT {
 	public static class InvalidTypeBridge implements ValueBridge<WrappedValue, Integer> {
 		@Override
 		public Integer toIndexedValue(WrappedValue value, ValueBridgeToIndexedValueContext context) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-
-		@Override
-		public WrappedValue cast(Object value) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 
