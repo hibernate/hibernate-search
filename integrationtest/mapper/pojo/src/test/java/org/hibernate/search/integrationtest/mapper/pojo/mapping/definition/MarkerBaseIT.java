@@ -12,6 +12,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.integrationtest.mapper.pojo.spatial.AnnotationMappingGeoPointBindingIT;
+import org.hibernate.search.integrationtest.mapper.pojo.spatial.ProgrammaticMappingGeoPointBindingIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
@@ -31,8 +33,8 @@ import org.junit.Test;
  * Test common use cases of markers and their mapping.
  * <p>
  * Does not test markers in depth for now;
- * {@link org.hibernate.search.integrationtest.mapper.pojo.spatial.AnnotationMappingGeoPointBridgeIT}
- * and {@link org.hibernate.search.integrationtest.mapper.pojo.spatial.ProgrammaticMappingGeoPointBridgeIT}
+ * {@link AnnotationMappingGeoPointBindingIT}
+ * and {@link ProgrammaticMappingGeoPointBindingIT}
  * should address that.
  */
 @SuppressWarnings("unused")
@@ -52,7 +54,7 @@ public class MarkerBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@MarkerAnnotationWithEmptyMarkerMapping
+			@BindingAnnotationWithEmptyMarkerBinderRef
 			public Integer getId() {
 				return id;
 			}
@@ -65,9 +67,9 @@ public class MarkerBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.annotationContextAnyParameters( MarkerAnnotationWithEmptyMarkerMapping.class )
+						.annotationContextAnyParameters( BindingAnnotationWithEmptyMarkerBinderRef.class )
 						.failure(
-								"Annotation type '" + MarkerAnnotationWithEmptyMarkerMapping.class.getName()
+								"Annotation type '" + BindingAnnotationWithEmptyMarkerBinderRef.class.getName()
 										+ "' is annotated with '" + MarkerBinding.class.getName() + "',"
 										+ " but the binder reference is empty"
 						)
@@ -78,7 +80,7 @@ public class MarkerBaseIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
 	@MarkerBinding(binder = @MarkerBinderRef)
-	private @interface MarkerAnnotationWithEmptyMarkerMapping {
+	private @interface BindingAnnotationWithEmptyMarkerBinderRef {
 	}
 
 	@Test
@@ -87,7 +89,7 @@ public class MarkerBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@MarkerAnnotationMappedToMarkerBinderWithDifferentAnnotationType
+			@BindingAnnotationWithBinderWithDifferentAnnotationType
 			public Integer getId() {
 				return id;
 			}
@@ -103,7 +105,7 @@ public class MarkerBaseIT {
 						.failure(
 								"Binder '" + MarkerBinderWithDifferentAnnotationType.TOSTRING
 										+ "' cannot be initialized with annotations of type '"
-										+ MarkerAnnotationMappedToMarkerBinderWithDifferentAnnotationType.class.getName() + "'"
+										+ BindingAnnotationWithBinderWithDifferentAnnotationType.class.getName() + "'"
 						)
 						.build()
 				);
@@ -112,7 +114,7 @@ public class MarkerBaseIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
 	@MarkerBinding(binder = @MarkerBinderRef(type = MarkerBinderWithDifferentAnnotationType.class))
-	private @interface MarkerAnnotationMappedToMarkerBinderWithDifferentAnnotationType {
+	private @interface BindingAnnotationWithBinderWithDifferentAnnotationType {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)

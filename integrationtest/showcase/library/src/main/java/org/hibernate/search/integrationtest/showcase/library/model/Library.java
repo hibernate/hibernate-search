@@ -18,7 +18,7 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
-import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
  */
 @Entity
 @Indexed(index = Library.INDEX)
-@GeoPointBridge(fieldName = "location", sortable = Sortable.YES)
+@GeoPointBinding(fieldName = "location", sortable = Sortable.YES)
 public class Library extends AbstractEntity<Integer> {
 
 	static final String INDEX = "Library";

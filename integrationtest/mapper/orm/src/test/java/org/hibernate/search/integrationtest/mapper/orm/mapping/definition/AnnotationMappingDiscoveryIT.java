@@ -203,7 +203,7 @@ public class AnnotationMappingDiscoveryIT {
 	@Embeddable
 	@Indexed(index = "SHOULD_NOT_BE_INDEXED")
 	public static class NonExplicitlyRegisteredType {
-		@CustomMarkerConsumingPropertyBridgeAnnotation
+		@CustomMarkerConsumingPropertyBinding
 		private NonExplicitlyRegisteredNonMappedType content;
 
 		public NonExplicitlyRegisteredNonMappedType getContent() {
@@ -222,7 +222,7 @@ public class AnnotationMappingDiscoveryIT {
 	 */
 	@Embeddable
 	public static class NonExplicitlyRegisteredNonMappedType {
-		@CustomMarkerAnnotation
+		@CustomMarkerBinding
 		private Integer annotatedProperty;
 
 		public Integer getAnnotatedProperty() {
@@ -258,22 +258,22 @@ public class AnnotationMappingDiscoveryIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.METHOD, ElementType.FIELD})
 	@MarkerBinding(binder = @MarkerBinderRef(type = CustomMarker.Binder.class))
-	private @interface CustomMarkerAnnotation {
+	private @interface CustomMarkerBinding {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.METHOD, ElementType.FIELD})
 	@PropertyBinding(binder = @PropertyBinderRef(type = CustomMarkerConsumingPropertyBridge.Binder.class))
-	private @interface CustomMarkerConsumingPropertyBridgeAnnotation {
+	private @interface CustomMarkerConsumingPropertyBinding {
 	}
 
 	private static final class CustomMarker {
 		private CustomMarker() {
 		}
 
-		public static class Binder implements MarkerBinder<CustomMarkerAnnotation> {
+		public static class Binder implements MarkerBinder<CustomMarkerBinding> {
 			@Override
-			public void initialize(CustomMarkerAnnotation annotation) {
+			public void initialize(CustomMarkerBinding annotation) {
 				// Nothing to do
 			}
 

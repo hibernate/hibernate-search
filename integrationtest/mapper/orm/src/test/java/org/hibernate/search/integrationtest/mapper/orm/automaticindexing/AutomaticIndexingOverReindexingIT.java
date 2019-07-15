@@ -179,7 +179,7 @@ public class AutomaticIndexingOverReindexingIT {
 
 	@Entity(name = "level1")
 	@Indexed(index = Level1Entity.INDEX)
-	@Level3Property1BridgeAnnotation
+	@Level3Property1Binding
 	public static class Level1Entity {
 
 		static final String INDEX = "level1";
@@ -303,7 +303,7 @@ public class AutomaticIndexingOverReindexingIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
 	@TypeBinding(binder = @TypeBinderRef(type = Level3Property1Bridge.Binder.class))
-	public @interface Level3Property1BridgeAnnotation {
+	public @interface Level3Property1Binding {
 
 	}
 
@@ -331,7 +331,7 @@ public class AutomaticIndexingOverReindexingIT {
 			);
 		}
 
-		public static class Binder implements TypeBinder<Level3Property1BridgeAnnotation> {
+		public static class Binder implements TypeBinder<Level3Property1Binding> {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new Level3Property1Bridge( context ) );

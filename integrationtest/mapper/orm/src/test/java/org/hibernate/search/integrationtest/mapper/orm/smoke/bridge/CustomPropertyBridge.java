@@ -63,12 +63,12 @@ public final class CustomPropertyBridge implements PropertyBridge {
 	}
 
 	public static final class Binder
-			implements PropertyBinder<CustomPropertyBridgeAnnotation> {
+			implements PropertyBinder<CustomPropertyBinding> {
 
 		private String objectName;
 
 		@Override
-		public void initialize(CustomPropertyBridgeAnnotation annotation) {
+		public void initialize(CustomPropertyBinding annotation) {
 			objectName( annotation.objectName() );
 		}
 

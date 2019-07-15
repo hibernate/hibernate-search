@@ -30,7 +30,7 @@ public @interface Longitude {
 
 	/**
 	 * @return The name of the marker set this marker belongs to.
-	 * Set it to the value of {@link GeoPointBridge#markerSet()}
+	 * Set it to the value of {@link GeoPointBinding#markerSet()}
 	 * so that the bridge detects this marker.
 	 */
 	String markerSet() default "";

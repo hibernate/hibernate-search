@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
@@ -77,7 +78,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 		@Override
 		public void initialize(
-				org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge annotation) {
+				GeoPointBinding annotation) {
 			fieldName( annotation.fieldName() );
 			markerSet( annotation.markerSet() );
 			projectable( annotation.projectable() );

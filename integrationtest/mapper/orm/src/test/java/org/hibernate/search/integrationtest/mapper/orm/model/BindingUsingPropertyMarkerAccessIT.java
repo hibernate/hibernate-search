@@ -13,7 +13,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -30,17 +30,18 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 /**
- * Test that a bridge using markers to retrieve and access properties
+ * Test that a binding using markers to retrieve and access properties
  * will behave as expected regarding access mode.
  * <p>
- * We use the GeoPointBridge to test this, but theoretically any other bridge relying on property markers would do.
+ * We use the GeoPointBinding to test this, but theoretically
+ * any other binding relying on property markers would do.
  *
  * @param <TIndexed> The entity class under test.
  */
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = { "HSEARCH-2759", "HSEARCH-2847" })
 @SuppressWarnings("unused")
-public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
+public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 
 	private static final String INDEX_NAME = "IndexedEntity";
 
@@ -66,7 +67,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 	private SessionFactory sessionFactory;
 
-	public BridgeUsingPropertyMarkerAccessIT(ModelPrimitives<TIndexed> modelPrimitives) {
+	public BindingUsingPropertyMarkerAccessIT(ModelPrimitives<TIndexed> modelPrimitives) {
 		this.modelPrimitives = modelPrimitives;
 	}
 
@@ -108,7 +109,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 	@Entity
 	@Indexed(index = INDEX_NAME)
-	@GeoPointBridge(fieldName = "location")
+	@GeoPointBinding(fieldName = "location")
 	public static final class PublicFieldAccessEntity {
 		static final ModelPrimitives<PublicFieldAccessEntity> PRIMITIVES = new ModelPrimitives<PublicFieldAccessEntity>() {
 			@Override
@@ -139,7 +140,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 	@Entity
 	@Indexed(index = INDEX_NAME)
-	@GeoPointBridge(fieldName = "location")
+	@GeoPointBinding(fieldName = "location")
 	public static final class ProtectedFieldAccessEntity {
 		static final ModelPrimitives<ProtectedFieldAccessEntity> PRIMITIVES = new ModelPrimitives<ProtectedFieldAccessEntity>() {
 			@Override
@@ -170,7 +171,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 	@Entity
 	@Indexed(index = INDEX_NAME)
-	@GeoPointBridge(fieldName = "location")
+	@GeoPointBinding(fieldName = "location")
 	public static final class PrivateFieldAccessEntity {
 		static final ModelPrimitives<PrivateFieldAccessEntity> PRIMITIVES = new ModelPrimitives<PrivateFieldAccessEntity>() {
 			@Override
@@ -201,7 +202,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 	@Entity
 	@Indexed(index = INDEX_NAME)
-	@GeoPointBridge(fieldName = "location")
+	@GeoPointBinding(fieldName = "location")
 	public static final class PublicMethodAccessEntity {
 		static final ModelPrimitives<PublicMethodAccessEntity> PRIMITIVES = new ModelPrimitives<PublicMethodAccessEntity>() {
 			@Override
@@ -262,7 +263,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 	@Entity
 	@Indexed(index = INDEX_NAME)
-	@GeoPointBridge(fieldName = "location")
+	@GeoPointBinding(fieldName = "location")
 	public static final class ProtectedMethodAccessEntity {
 		static final ModelPrimitives<ProtectedMethodAccessEntity> PRIMITIVES = new ModelPrimitives<ProtectedMethodAccessEntity>() {
 			@Override
@@ -323,7 +324,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 	@Entity
 	@Indexed(index = INDEX_NAME)
-	@GeoPointBridge(fieldName = "location")
+	@GeoPointBinding(fieldName = "location")
 	public static final class PrivateMethodAccessEntity {
 		static final ModelPrimitives<PrivateMethodAccessEntity> PRIMITIVES = new ModelPrimitives<PrivateMethodAccessEntity>() {
 			@Override

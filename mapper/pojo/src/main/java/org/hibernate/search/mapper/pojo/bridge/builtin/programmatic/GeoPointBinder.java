@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.programmatic;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
@@ -23,13 +23,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
  * These fields allow spatial predicates such as "within" (is the point within a circle, a bounding box, ...),
  * sorts by distance to another point, ...
  *
- * @see GeoPointBridge
+ * @see GeoPointBinding
  * @see #create()
  * @see #latitude()
  * @see #longitude()
  */
 public interface GeoPointBinder
-		extends TypeBinder<GeoPointBridge>, PropertyBinder<GeoPointBridge> {
+		extends TypeBinder<GeoPointBinding>, PropertyBinder<GeoPointBinding> {
 
 	/**
 	 * @param fieldName The name of the {@link GeoPoint} field.
@@ -65,7 +65,7 @@ public interface GeoPointBinder
 	GeoPointBinder markerSet(String markerSet);
 
 	@Override
-	default void initialize(GeoPointBridge annotation) {
+	default void initialize(GeoPointBinding annotation) {
 	}
 
 	/**

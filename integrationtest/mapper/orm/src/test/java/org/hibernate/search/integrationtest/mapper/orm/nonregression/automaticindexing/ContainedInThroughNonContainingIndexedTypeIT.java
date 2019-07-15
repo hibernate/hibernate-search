@@ -122,7 +122,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		@Id
 		private Integer id;
 
-		@BridgeGoingThroughEntityBoundariesAnnotation
+		@BindingGoingThroughEntityBoundaries
 		@OneToOne
 		private Contained contained;
 
@@ -203,7 +203,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@PropertyBinding(binder = @PropertyBinderRef(type = BridgeGoingThroughEntityBoundaries.Binder.class))
-	public @interface BridgeGoingThroughEntityBoundariesAnnotation {
+	public @interface BindingGoingThroughEntityBoundaries {
 	}
 
 	public static class BridgeGoingThroughEntityBoundaries implements PropertyBridge {
@@ -226,7 +226,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 			target.addValue( indexFieldReference, value );
 		}
 
-		public static class Binder implements PropertyBinder<BridgeGoingThroughEntityBoundariesAnnotation> {
+		public static class Binder implements PropertyBinder<BindingGoingThroughEntityBoundaries> {
 			@Override
 			public void bind(PropertyBindingContext context) {
 				context.setBridge( new BridgeGoingThroughEntityBoundaries( context ) );

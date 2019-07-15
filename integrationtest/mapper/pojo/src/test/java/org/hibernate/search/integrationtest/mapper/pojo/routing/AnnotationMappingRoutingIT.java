@@ -136,7 +136,7 @@ public class AnnotationMappingRoutingIT {
 	}
 
 	@Indexed(index = IndexedEntity.INDEX)
-	@MyRoutingKeyBridgeAnnotation
+	@MyRoutingKeyBinding
 	public static final class IndexedEntity {
 
 		public static final String INDEX = "IndexedEntity";
@@ -178,7 +178,7 @@ public class AnnotationMappingRoutingIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
 	@RoutingKeyBinding(binder = @RoutingKeyBinderRef(type = MyRoutingKeyBridge.Binder.class))
-	public @interface MyRoutingKeyBridgeAnnotation {
+	public @interface MyRoutingKeyBinding {
 	}
 
 	public static final class MyRoutingKeyBridge implements RoutingKeyBridge {
@@ -210,7 +210,7 @@ public class AnnotationMappingRoutingIT {
 			return keyBuilder.toString();
 		}
 
-		public static class Binder implements RoutingKeyBinder<MyRoutingKeyBridgeAnnotation> {
+		public static class Binder implements RoutingKeyBinder<MyRoutingKeyBinding> {
 			@Override
 			public void bind(RoutingKeyBindingContext context) {
 				PojoElementAccessor<EntityCategory> categoryAccessor =
