@@ -497,6 +497,7 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
 |java.sql.Timestamp|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
 |java.sql.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
 |java.sql.Time|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|org.hibernate.search.engine.spatial.GeoPoint|-| Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
 |===
 
 [[mapper-orm-bridge-typeandpropertybridge]]
