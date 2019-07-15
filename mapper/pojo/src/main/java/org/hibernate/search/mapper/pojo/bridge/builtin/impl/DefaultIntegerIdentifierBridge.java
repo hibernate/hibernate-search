@@ -24,11 +24,6 @@ public final class DefaultIntegerIdentifierBridge implements IdentifierBridge<In
 	}
 
 	@Override
-	public Integer cast(Object value) {
-		return (Integer) value;
-	}
-
-	@Override
 	public boolean isCompatibleWith(IdentifierBridge<?> other) {
 		return getClass().equals( other.getClass() );
 	}

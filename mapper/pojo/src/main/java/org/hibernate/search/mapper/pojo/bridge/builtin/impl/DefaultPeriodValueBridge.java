@@ -54,11 +54,6 @@ public final class DefaultPeriodValueBridge implements ValueBridge<Period, Strin
 	}
 
 	@Override
-	public Period cast(Object value) {
-		return (Period) value;
-	}
-
-	@Override
 	public String parse(String value) {
 		return toIndexedValue( ParseUtils.parsePeriod( value ) );
 	}

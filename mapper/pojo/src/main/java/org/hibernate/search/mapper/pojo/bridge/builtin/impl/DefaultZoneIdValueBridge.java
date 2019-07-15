@@ -31,11 +31,6 @@ public final class DefaultZoneIdValueBridge implements ValueBridge<ZoneId, Strin
 	}
 
 	@Override
-	public ZoneId cast(Object value) {
-		return (ZoneId) value;
-	}
-
-	@Override
 	public String parse(String value) {
 		ValidateUtils.validateZoneId( value );
 		return value;

@@ -48,17 +48,6 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	}
 
 	/**
-	 * Cast an input value to the expected type {@link V}.
-	 * <p>
-	 * Called for values passed to the predicate DSL in particular.
-	 *
-	 * @param value The value to convert.
-	 * @return The checked value.
-	 * @throws RuntimeException If the value does not match the expected type.
-	 */
-	V cast(Object value);
-
-	/**
 	 * Parse an input String to the raw index field value.
 	 *
 	 * @param value The value to parse.
@@ -72,9 +61,11 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	/**
 	 * @param other Another {@link ValueBridge}, never {@code null}.
 	 * @return {@code true} if the given object is also a {@link ValueBridge}
-	 * that behaves exactly the same as this object, i.e. its {@link #cast(Object)} and {@link #toIndexedValue(Object, ValueBridgeToIndexedValueContext)}
-	 * methods are guaranteed to always return the same value as this object's
-	 * when given the same input. {@code false} otherwise, or when in doubt.
+	 * that behaves exactly the same as this object, i.e. its {@link #toIndexedValue(Object, ValueBridgeToIndexedValueContext)}
+	 * method is guaranteed to accept the same values as this object's
+	 * and to always return the same value as this object's
+	 * when given the same input.
+	 * {@code false} otherwise, or when in doubt.
 	 */
 	default boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return equals( other );

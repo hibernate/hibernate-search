@@ -36,11 +36,6 @@ public final class DefaultDurationValueBridge implements ValueBridge<Duration, L
 	}
 
 	@Override
-	public Duration cast(Object value) {
-		return (Duration) value;
-	}
-
-	@Override
 	public Long parse(String value) {
 		return toIndexedValue( ParseUtils.parseDuration( value ) );
 	}

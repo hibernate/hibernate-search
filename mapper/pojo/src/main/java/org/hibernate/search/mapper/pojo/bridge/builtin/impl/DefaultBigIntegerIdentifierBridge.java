@@ -25,11 +25,6 @@ public final class DefaultBigIntegerIdentifierBridge implements IdentifierBridge
 	}
 
 	@Override
-	public BigInteger cast(Object value) {
-		return (BigInteger) value;
-	}
-
-	@Override
 	public boolean isCompatibleWith(IdentifierBridge<?> other) {
 		return getClass().equals( other.getClass() );
 	}

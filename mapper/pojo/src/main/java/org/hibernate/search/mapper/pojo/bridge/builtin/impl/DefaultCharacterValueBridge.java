@@ -30,11 +30,6 @@ public final class DefaultCharacterValueBridge implements ValueBridge<Character,
 	}
 
 	@Override
-	public Character cast(Object value) {
-		return (Character) value;
-	}
-
-	@Override
 	public String parse(String value) {
 		ValidateUtils.validateCharacter( value );
 		return value;

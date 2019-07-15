@@ -60,8 +60,10 @@ public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
 			@SuppressWarnings("unchecked") // We check that I2 equals I explicitly using reflection (see above)
 			BeanHolder<? extends IdentifierBridge<I>> castedBridgeHolder =
 					(BeanHolder<? extends IdentifierBridge<I>>) bridgeHolder;
+			@SuppressWarnings("unchecked") // We check that I2 equals I explicitly using reflection (see above)
+			Class<I> castedExpectedType = (Class<I>) expectedValueType;
 
-			this.partialBinding = new PartialBinding<>( castedBridgeHolder );
+			this.partialBinding = new PartialBinding<>( castedBridgeHolder, castedExpectedType );
 		}
 		catch (RuntimeException e) {
 			abortBridge( new SuppressingCloser( e ), bridgeHolder );
@@ -102,9 +104,12 @@ public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
 
 	private static class PartialBinding<I> {
 		private final BeanHolder<? extends IdentifierBridge<I>> bridgeHolder;
+		private final Class<I> expectedValueType;
 
-		private PartialBinding(BeanHolder<? extends IdentifierBridge<I>> bridgeHolder) {
+		private PartialBinding(BeanHolder<? extends IdentifierBridge<I>> bridgeHolder,
+				Class<I> expectedValueType) {
 			this.bridgeHolder = bridgeHolder;
+			this.expectedValueType = expectedValueType;
 		}
 
 		void abort(AbstractCloser<?, ?> closer) {
@@ -113,7 +118,9 @@ public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
 
 		BoundIdentifierBridge<I> complete(IndexedEntityBindingContext indexedEntityBindingContext) {
 			indexedEntityBindingContext.idDslConverter(
-					new PojoIdentifierBridgeToDocumentIdentifierValueConverter<>( bridgeHolder.get() )
+					new PojoIdentifierBridgeToDocumentIdentifierValueConverter<>(
+							bridgeHolder.get(), expectedValueType
+					)
 			);
 
 			return new BoundIdentifierBridge<>( bridgeHolder );

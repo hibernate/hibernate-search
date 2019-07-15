@@ -31,11 +31,6 @@ public final class DefaultUUIDValueBridge implements ValueBridge<UUID, String> {
 	}
 
 	@Override
-	public UUID cast(Object value) {
-		return (UUID) value;
-	}
-
-	@Override
 	public String parse(String value) {
 		ValidateUtils.validateUUID( value );
 		return value;

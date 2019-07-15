@@ -363,10 +363,6 @@ public abstract class AbstractFieldContainerExtractorIT {
 				ValueBridgeToIndexedValueContext context) {
 			return value == null ? null : PREFIX + value;
 		}
-		@Override
-		public String cast(Object value) {
-			return (String) value;
-		}
 	}
 
 	interface TestModelProvider {

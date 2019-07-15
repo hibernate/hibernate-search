@@ -32,11 +32,6 @@ public final class DefaultJavaSqlDateValueBridge implements ValueBridge<Date, In
 	}
 
 	@Override
-	public Date cast(Object value) {
-		return (Date) value;
-	}
-
-	@Override
 	public Instant parse(String value) {
 		return ParseUtils.parseInstant( value );
 	}

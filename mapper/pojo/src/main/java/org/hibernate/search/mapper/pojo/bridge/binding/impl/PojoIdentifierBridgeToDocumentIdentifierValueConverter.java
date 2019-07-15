@@ -19,25 +19,27 @@ import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingC
 final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> implements ToDocumentIdentifierValueConverter<I> {
 
 	private final IdentifierBridge<I> bridge;
+	private final Class<I> expectedValueType;
 
-	PojoIdentifierBridgeToDocumentIdentifierValueConverter(IdentifierBridge<I> bridge) {
+	PojoIdentifierBridgeToDocumentIdentifierValueConverter(IdentifierBridge<I> bridge, Class<I> expectedValueType) {
 		this.bridge = bridge;
+		this.expectedValueType = expectedValueType;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + bridge + "]";
+		return getClass().getSimpleName() + "[bridge=" + bridge + ",expectedValueType=" + expectedValueType + "]";
 	}
 
 	@Override
 	public String convert(I value, ToDocumentIdentifierValueConvertContext context) {
 		IdentifierBridgeToDocumentIdentifierContext extension = context.extension( PojoIdentifierBridgeContextExtension.INSTANCE );
-		return bridge.toDocumentIdentifier( bridge.cast( value ), extension );
+		return bridge.toDocumentIdentifier( value, extension );
 	}
 
 	@Override
 	public String convertUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
-		return convert( bridge.cast( value ), context );
+		return convert( expectedValueType.cast( value ), context );
 	}
 
 	@Override
@@ -47,7 +49,8 @@ final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> implements
 		}
 		PojoIdentifierBridgeToDocumentIdentifierValueConverter<?> castedOther =
 				(PojoIdentifierBridgeToDocumentIdentifierValueConverter<?>) other;
-		return bridge.isCompatibleWith( castedOther.bridge );
+		return expectedValueType.equals( castedOther.expectedValueType )
+				&& bridge.isCompatibleWith( castedOther.bridge );
 	}
 
 	private static class PojoIdentifierBridgeContextExtension

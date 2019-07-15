@@ -24,11 +24,6 @@ public final class DefaultShortIdentifierBridge implements IdentifierBridge<Shor
 	}
 
 	@Override
-	public Short cast(Object value) {
-		return (Short) value;
-	}
-
-	@Override
 	public boolean isCompatibleWith(IdentifierBridge<?> other) {
 		return getClass().equals( other.getClass() );
 	}

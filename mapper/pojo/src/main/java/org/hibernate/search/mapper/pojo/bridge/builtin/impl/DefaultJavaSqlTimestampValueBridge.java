@@ -32,11 +32,6 @@ public final class DefaultJavaSqlTimestampValueBridge implements ValueBridge<Tim
 	}
 
 	@Override
-	public Timestamp cast(Object value) {
-		return (Timestamp) value;
-	}
-
-	@Override
 	public Instant parse(String value) {
 		return ParseUtils.parseInstant( value );
 	}

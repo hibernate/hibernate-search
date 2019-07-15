@@ -36,11 +36,6 @@ public final class DefaultJavaNetURLValueBridge implements ValueBridge<URL, Stri
 	}
 
 	@Override
-	public URL cast(Object value) {
-		return (URL) value;
-	}
-
-	@Override
 	public String parse(String value) {
 		if ( value == null ) {
 			return null;

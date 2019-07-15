@@ -231,10 +231,5 @@ public class MassIndexingEmbeddedIdIT {
 		public BookId fromDocumentIdentifier(String documentIdentifier, IdentifierBridgeFromDocumentIdentifierContext context) {
 			return BookId.fromString( documentIdentifier );
 		}
-
-		@Override
-		public BookId cast(Object value) {
-			return (BookId) value;
-		}
 	}
 }
