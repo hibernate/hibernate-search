@@ -1,0 +1,217 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.util.common.data;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
+
+import org.hibernate.search.util.common.impl.Contracts;
+
+/**
+ * A representation of a range that can be used with any type.
+ * <p>
+ * Because there are no restrictions on type of values that can be used with this {@link Range} class,
+ * it is not able to "understand" values that are passed to its various factory methods.
+ * As a result, only minimal consistency checks are performed: null-checks, mostly.
+ * In particular, <strong>this class does not check that the lower bound is actually lower than the upper bound</strong>,
+ * because it has no idea what ordering to use.
+ * Checking the relative order of bounds is the responsibility of callers of the {@link #getLowerBoundValue()}
+ * and {@link #getUpperBoundValue()} methods.
+ *
+ * @param <T> The type of values in this range.
+ */
+public final class Range<T> {
+
+	/**
+	 * @param lowerBoundValue The lower bound of the range.
+	 * May be {@code null} to represent {@code -Infinity} (no lower bound),
+	 * @param upperBoundValue The upper bound of the range.
+	 * May be {@code null} to represent {@code +Infinity} (no upper bound).
+	 * @param <T> The type of range bounds.
+	 * @return The range {@code [lowerBoundValue, upperBoundValue)} (lower bound included, upper bound excluded),
+	 * or {@code (-Infinity, upperBoundValue)} (both bounds excluded) if the lower bound is {@code -Infinity}.
+	 */
+	public static <T> Range<T> of(T lowerBoundValue, T upperBoundValue) {
+		return new Range<>( lowerBoundValue, RangeBoundInclusion.INCLUDED, upperBoundValue, RangeBoundInclusion.EXCLUDED );
+	}
+
+	/**
+	 * @param lowerBoundValue The value of the lower bound of the range.
+	 * May be {@code null} to represent {@code -Infinity} (no lower bound).
+	 * @param lowerBoundInclusion Whether the lower bound is included in the range or excluded.
+	 * Ignored and replaced with {@link RangeBoundInclusion#EXCLUDED} if the lower bound is {@code null}.
+	 * @param upperBoundValue The value of the upper bound of the range.
+	 * May be {@code null} to represent {@code +Infinity} (no upper bound).
+	 * @param upperBoundInclusion Whether the upper bound is included in the range or excluded.
+	 * Ignored and replaced with {@link RangeBoundInclusion#EXCLUDED} if the upper bound is {@code null}.
+	 * @param <T> The type of range bounds.
+	 * @return A {@link Range}.
+	 */
+	public static <T> Range<T> of(T lowerBoundValue, RangeBoundInclusion lowerBoundInclusion,
+			T upperBoundValue, RangeBoundInclusion upperBoundInclusion) {
+		return new Range<>( lowerBoundValue, lowerBoundInclusion, upperBoundValue, upperBoundInclusion );
+	}
+
+	/**
+	 * @param <T> The type of range bounds.
+	 * @return The range {@code (-Infinity, +Infinity)} (both bounds excluded).
+	 */
+	public static <T> Range<T> all() {
+		return of( null, RangeBoundInclusion.EXCLUDED, null, RangeBoundInclusion.EXCLUDED );
+	}
+
+	/**
+	 * @param lowerBoundValue The value of the lower bound of the range. Must not be {@code null}.
+	 * @param <T> The type of range bounds.
+	 * @return The range {@code [lowerBoundValue, +Infinity)} (lower bound included).
+	 */
+	public static <T> Range<T> atLeast(T lowerBoundValue) {
+		Contracts.assertNotNull( lowerBoundValue, "lowerBoundValue" );
+		return of( lowerBoundValue, RangeBoundInclusion.INCLUDED, null, RangeBoundInclusion.EXCLUDED );
+	}
+
+	/**
+	 * @param lowerBoundValue The value of the lower bound of the range. Must not be {@code null}.
+	 * @param <T> The type of range bounds.
+	 * @return The range {@code (lowerBoundValue, +Infinity)} (lower bound excluded).
+	 */
+	public static <T> Range<T> greaterThan(T lowerBoundValue) {
+		Contracts.assertNotNull( lowerBoundValue, "lowerBoundValue" );
+		return of( lowerBoundValue, RangeBoundInclusion.EXCLUDED, null, RangeBoundInclusion.EXCLUDED );
+	}
+
+	/**
+	 * @param upperBoundValue The value of the upper bound of the range. Must not be {@code null}.
+	 * @param <T> The type of range bounds.
+	 * @return The range {@code (-Infinity, upperBoundValue]} (upper bound included).
+	 */
+	public static <T> Range<T> atMost(T upperBoundValue) {
+		Contracts.assertNotNull( upperBoundValue, "upperBoundValue" );
+		return of( null, RangeBoundInclusion.EXCLUDED, upperBoundValue, RangeBoundInclusion.INCLUDED );
+	}
+
+	/**
+	 * @param upperBoundValue The value of the upper bound of the range. Must not be {@code null}.
+	 * @param <T> The type of range bounds.
+	 * @return The range {@code (-Infinity, upperBoundValue)} (upper bound excluded).
+	 */
+	public static <T> Range<T> lessThan(T upperBoundValue) {
+		Contracts.assertNotNull( upperBoundValue, "upperBoundValue" );
+		return of( null, RangeBoundInclusion.EXCLUDED, upperBoundValue, RangeBoundInclusion.EXCLUDED );
+	}
+
+	private final Optional<T> lowerBoundValue;
+	private final RangeBoundInclusion lowerBoundInclusion;
+	private final Optional<T> upperBoundValue;
+	private final RangeBoundInclusion upperBoundInclusion;
+
+	private Range(T lowerBoundValue, RangeBoundInclusion lowerBoundInclusion,
+			T upperBoundValue, RangeBoundInclusion upperBoundInclusion) {
+		Contracts.assertNotNull( lowerBoundInclusion, "lowerBoundInclusion" );
+		Contracts.assertNotNull( upperBoundInclusion, "upperBoundInclusion" );
+		this.lowerBoundValue = Optional.ofNullable( lowerBoundValue );
+		this.lowerBoundInclusion = lowerBoundValue == null ? RangeBoundInclusion.EXCLUDED : lowerBoundInclusion;
+		this.upperBoundValue = Optional.ofNullable( upperBoundValue );
+		this.upperBoundInclusion = upperBoundValue == null ? RangeBoundInclusion.EXCLUDED : upperBoundInclusion;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		switch ( lowerBoundInclusion ) {
+			case INCLUDED:
+				builder.append( '[' );
+				break;
+			case EXCLUDED:
+				builder.append( '(' );
+				break;
+		}
+		if ( lowerBoundValue.isPresent() ) {
+			builder.append( lowerBoundValue.get() );
+		}
+		else {
+			builder.append( "-Infinity" );
+		}
+		builder.append( "," );
+		if ( upperBoundValue.isPresent() ) {
+			builder.append( upperBoundValue.get() );
+		}
+		else {
+			builder.append( "+Infinity" );
+		}
+		switch ( upperBoundInclusion ) {
+			case INCLUDED:
+				builder.append( ']' );
+				break;
+			case EXCLUDED:
+				builder.append( ')' );
+				break;
+		}
+		return builder.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null || getClass() != obj.getClass() ) {
+			return false;
+		}
+		Range<?> other = (Range<?>) obj;
+		return lowerBoundValue.equals( other.lowerBoundValue )
+				&& lowerBoundInclusion == other.lowerBoundInclusion
+				&& upperBoundValue.equals( other.upperBoundValue )
+				&& upperBoundInclusion == other.upperBoundInclusion;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( lowerBoundValue, lowerBoundInclusion, upperBoundValue, upperBoundInclusion );
+	}
+
+	/**
+	 * @return The value of the lower bound, or an empty optional to represent {-Infinity} (no lower bound).
+	 */
+	public Optional<T> getLowerBoundValue() {
+		return lowerBoundValue;
+	}
+
+	/**
+	 * @return Whether the lower bound is included in the range or excluded.
+	 * Always {@link RangeBoundInclusion#EXCLUDED} if there is no lower bound.
+	 */
+	public RangeBoundInclusion getLowerBoundInclusion() {
+		return lowerBoundInclusion;
+	}
+
+	/**
+	 * @return The value of the lower bound, or an empty optional to represent {+Infinity} (no upper bound).
+	 */
+	public Optional<T> getUpperBoundValue() {
+		return upperBoundValue;
+	}
+
+	/**
+	 * @return Whether the upper bound is included in the range or excluded.
+	 * Always {@link RangeBoundInclusion#EXCLUDED} if there is no upper bound.
+	 */
+	public RangeBoundInclusion getUpperBoundInclusion() {
+		return upperBoundInclusion;
+	}
+
+	public <R> Range<R> map(Function<? super T, ? extends R> function) {
+		return Range.of(
+				lowerBoundValue.map( function ).orElse( null ),
+				lowerBoundInclusion,
+				upperBoundValue.map( function ).orElse( null ),
+				upperBoundInclusion
+		);
+	}
+
+}
