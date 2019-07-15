@@ -22,8 +22,8 @@ import java.util.Set;
 
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
-import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPropertyBridgeAnnotation;
-import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBridgeAnnotation;
+import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPropertyBinding;
+import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBinding;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
@@ -510,7 +510,7 @@ public class AnnotationMappingSmokeIT {
 			this.localDate = localDate;
 		}
 
-		@CustomPropertyBridgeAnnotation(objectName = "customBridgeOnProperty")
+		@CustomPropertyBinding(objectName = "customBridgeOnProperty")
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
 						@PropertyValue( propertyName = "embeddingAsSingle")
@@ -526,7 +526,7 @@ public class AnnotationMappingSmokeIT {
 	}
 
 	@Indexed(index = IndexedEntity.INDEX)
-	@CustomTypeBridgeAnnotation(objectName = "customBridgeOnClass")
+	@CustomTypeBinding(objectName = "customBridgeOnClass")
 	public static final class IndexedEntity extends ParentIndexedEntity {
 
 		public static final String INDEX = "IndexedEntity";

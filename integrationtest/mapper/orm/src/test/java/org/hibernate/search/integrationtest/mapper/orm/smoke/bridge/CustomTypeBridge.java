@@ -63,12 +63,12 @@ public final class CustomTypeBridge implements TypeBridge {
 		// Nothing to do
 	}
 
-	public static final class Binder implements TypeBinder<CustomTypeBridgeAnnotation> {
+	public static final class Binder implements TypeBinder<CustomTypeBinding> {
 
 		private String objectName;
 
 		@Override
-		public void initialize(CustomTypeBridgeAnnotation annotation) {
+		public void initialize(CustomTypeBinding annotation) {
 			objectName( annotation.objectName() );
 		}
 

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.smoke.bridge;
+package org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @TypeBinding(binder = @TypeBinderRef(type = CustomTypeBridge.Binder.class))
-public @interface CustomTypeBridgeAnnotation {
+public @interface CustomTypeBinding {
 
 	String objectName();
 

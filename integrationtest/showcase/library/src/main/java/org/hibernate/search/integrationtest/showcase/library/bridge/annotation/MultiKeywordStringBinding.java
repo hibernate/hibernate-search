@@ -20,8 +20,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinder
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
-@Repeatable(MultiKeywordStringBridge.List.class)
-public @interface MultiKeywordStringBridge {
+@Repeatable(MultiKeywordStringBinding.List.class)
+public @interface MultiKeywordStringBinding {
 
 	String fieldName();
 
@@ -32,6 +32,6 @@ public @interface MultiKeywordStringBridge {
 	@Target({ ElementType.METHOD, ElementType.FIELD })
 	@Documented
 	@interface List {
-		MultiKeywordStringBridge[] value();
+		MultiKeywordStringBinding[] value();
 	}
 }

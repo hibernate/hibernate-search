@@ -814,7 +814,7 @@ public class TypeBridgeBaseIT {
 	@Test
 	public void mapping_error_missingBinderReference() {
 		@Indexed
-		@BridgeAnnotationWithEmptyTypeBridgeRef
+		@BindingAnnotationWithEmptyTypeBridgeRef
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
@@ -829,9 +829,9 @@ public class TypeBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.annotationContextAnyParameters( BridgeAnnotationWithEmptyTypeBridgeRef.class )
+						.annotationContextAnyParameters( BindingAnnotationWithEmptyTypeBridgeRef.class )
 						.failure(
-								"Annotation type '" + BridgeAnnotationWithEmptyTypeBridgeRef.class.getName()
+								"Annotation type '" + BindingAnnotationWithEmptyTypeBridgeRef.class.getName()
 										+ "' is annotated with '" + TypeBinding.class.getName() + "',"
 										+ " but the binder reference is empty."
 						)
@@ -842,13 +842,13 @@ public class TypeBridgeBaseIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	@TypeBinding(binder = @TypeBinderRef)
-	private @interface BridgeAnnotationWithEmptyTypeBridgeRef {
+	private @interface BindingAnnotationWithEmptyTypeBridgeRef {
 	}
 
 	@Test
 	public void mapping_error_invalidAnnotationType() {
 		@Indexed
-		@BridgeAnnotationMappedToBinderWithDifferentAnnotationType
+		@BindingAnnotationWithBinderWithDifferentAnnotationType
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
@@ -866,7 +866,7 @@ public class TypeBridgeBaseIT {
 						.failure(
 								"Binder '" + BinderWithDifferentAnnotationType.TOSTRING
 										+ "' cannot be initialized with annotations of type '"
-										+ BridgeAnnotationMappedToBinderWithDifferentAnnotationType.class.getName() + "'"
+										+ BindingAnnotationWithBinderWithDifferentAnnotationType.class.getName() + "'"
 						)
 						.build()
 				);
@@ -875,7 +875,7 @@ public class TypeBridgeBaseIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	@TypeBinding(binder = @TypeBinderRef(type = BinderWithDifferentAnnotationType.class))
-	private @interface BridgeAnnotationMappedToBinderWithDifferentAnnotationType {
+	private @interface BindingAnnotationWithBinderWithDifferentAnnotationType {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -906,7 +906,7 @@ public class TypeBridgeBaseIT {
 	@Test
 	public void mapping_error_incompatibleRequestedType() {
 		@Indexed
-		@IncompatibleTypeRequestingTypeBridgeAnnotation
+		@IncompatibleTypeRequestingBinding
 		class IndexedEntity {
 			Integer id;
 			String stringProperty;
@@ -936,11 +936,11 @@ public class TypeBridgeBaseIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	@TypeBinding(binder = @TypeBinderRef(type = IncompatibleTypeRequestingTypeBinder.class))
-	private @interface IncompatibleTypeRequestingTypeBridgeAnnotation {
+	private @interface IncompatibleTypeRequestingBinding {
 	}
 
 	public static class IncompatibleTypeRequestingTypeBinder
-			implements TypeBinder<IncompatibleTypeRequestingTypeBridgeAnnotation> {
+			implements TypeBinder<IncompatibleTypeRequestingBinding> {
 		@Override
 		public void bind(TypeBindingContext context) {
 			context.getBridgedElement().property( "stringProperty" ).createAccessor( Integer.class );

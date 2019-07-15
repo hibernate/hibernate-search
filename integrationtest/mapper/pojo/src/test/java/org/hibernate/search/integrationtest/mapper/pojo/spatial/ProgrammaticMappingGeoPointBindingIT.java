@@ -10,15 +10,13 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge;
-import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
-import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
+import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
 import org.junit.Before;
@@ -26,7 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 
-public class AnnotationMappingGeoPointBridgeIT {
+public class ProgrammaticMappingGeoPointBindingIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -52,14 +50,64 @@ public class AnnotationMappingGeoPointBridgeIT {
 		);
 
 		mapping = setupHelper.start()
-				.withAnnotatedEntityTypes(
-						GeoPointOnTypeEntity.class,
-						GeoPointOnCoordinatesPropertyEntity.class,
-						GeoPointOnCustomCoordinatesPropertyEntity.class
-				)
-				.withAnnotatedTypes(
-						CustomCoordinates.class
-				)
+				.withConfiguration( builder -> {
+					builder.addEntityTypes( CollectionHelper.asSet(
+							GeoPointOnTypeEntity.class,
+							GeoPointOnCoordinatesPropertyEntity.class,
+							GeoPointOnCustomCoordinatesPropertyEntity.class
+					) );
+
+					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
+					mappingDefinition.type( GeoPointOnTypeEntity.class )
+							.indexed( GeoPointOnTypeEntity.INDEX )
+							.binder( GeoPointBinder.create()
+									.fieldName( "homeLocation" )
+									.markerSet( "home" )
+									.projectable( Projectable.YES )
+									.sortable( Sortable.YES )
+							)
+							.binder( GeoPointBinder.create()
+									.fieldName( "workLocation" )
+									.markerSet( "work" )
+							)
+							.property( "id" )
+									.documentId()
+							.property( "homeLatitude" )
+									.marker( GeoPointBinder.latitude().markerSet( "home" ) )
+							.property( "homeLongitude" )
+									.marker( GeoPointBinder.longitude().markerSet( "home" ) )
+							.property( "workLatitude" )
+									.marker( GeoPointBinder.latitude().markerSet( "work" ) )
+							.property( "workLongitude" )
+									.marker( GeoPointBinder.longitude().markerSet( "work" ) );
+
+					mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class )
+							.indexed( GeoPointOnCoordinatesPropertyEntity.INDEX )
+							.property( "id" )
+									.documentId()
+							.property( "coord" )
+									.binder( GeoPointBinder.create() )
+									.binder( GeoPointBinder.create()
+											.fieldName( "location" )
+											.projectable( Projectable.NO )
+									);
+
+					mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class )
+							.indexed( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
+							.property( "id" )
+									.documentId()
+							.property( "coord" )
+									.binder( GeoPointBinder.create() )
+									.binder( GeoPointBinder.create()
+											.fieldName( "location" )
+									);
+
+					mappingDefinition.type( CustomCoordinates.class )
+							.property( "lat" )
+									.marker( GeoPointBinder.latitude() )
+							.property( "lon" )
+									.marker( GeoPointBinder.longitude() );
+				} )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
@@ -81,7 +129,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 				public double getLatitude() {
 					return 2.1d;
 				}
-
 				@Override
 				public double getLongitude() {
 					return 2.2d;
@@ -124,9 +171,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 		}
 	}
 
-	@Indexed(index = GeoPointOnTypeEntity.INDEX)
-	@GeoPointBridge(fieldName = "homeLocation", markerSet = "home", projectable = Projectable.YES, sortable = Sortable.YES)
-	@GeoPointBridge(fieldName = "workLocation", markerSet = "work")
 	public static final class GeoPointOnTypeEntity {
 
 		public static final String INDEX = "GeoPointOnTypeEntity";
@@ -141,7 +185,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 
 		private Double workLongitude;
 
-		@DocumentId
 		public Integer getId() {
 			return id;
 		}
@@ -150,7 +193,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 			this.id = id;
 		}
 
-		@Latitude(markerSet = "home")
 		public Double getHomeLatitude() {
 			return homeLatitude;
 		}
@@ -159,7 +201,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 			this.homeLatitude = homeLatitude;
 		}
 
-		@Longitude(markerSet = "home")
 		public Double getHomeLongitude() {
 			return homeLongitude;
 		}
@@ -168,7 +209,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 			this.homeLongitude = homeLongitude;
 		}
 
-		@Latitude(markerSet = "work")
 		public Double getWorkLatitude() {
 			return workLatitude;
 		}
@@ -177,7 +217,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 			this.workLatitude = workLatitude;
 		}
 
-		@Longitude(markerSet = "work")
 		public Double getWorkLongitude() {
 			return workLongitude;
 		}
@@ -188,7 +227,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 
 	}
 
-	@Indexed(index = GeoPointOnCoordinatesPropertyEntity.INDEX)
 	public static final class GeoPointOnCoordinatesPropertyEntity {
 
 		public static final String INDEX = "GeoPointOnCoordinatesPropertyEntity";
@@ -197,7 +235,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 
 		private GeoPoint coord;
 
-		@DocumentId
 		public Integer getId() {
 			return id;
 		}
@@ -206,8 +243,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 			this.id = id;
 		}
 
-		@GeoPointBridge
-		@GeoPointBridge(fieldName = "location", projectable = Projectable.NO)
 		public GeoPoint getCoord() {
 			return coord;
 		}
@@ -218,7 +253,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 
 	}
 
-	@Indexed(index = GeoPointOnCustomCoordinatesPropertyEntity.INDEX)
 	public static final class GeoPointOnCustomCoordinatesPropertyEntity {
 
 		public static final String INDEX = "GeoPointOnCustomCoordinatesPropertyEntity";
@@ -227,7 +261,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 
 		private CustomCoordinates coord;
 
-		@DocumentId
 		public Integer getId() {
 			return id;
 		}
@@ -236,8 +269,6 @@ public class AnnotationMappingGeoPointBridgeIT {
 			this.id = id;
 		}
 
-		@GeoPointBridge
-		@GeoPointBridge(fieldName = "location")
 		public CustomCoordinates getCoord() {
 			return coord;
 		}
@@ -260,13 +291,11 @@ public class AnnotationMappingGeoPointBridgeIT {
 		}
 
 		// Test primitive type
-		@Latitude
 		public double getLat() {
 			return lat;
 		}
 
 		// Test boxed type
-		@Longitude
 		public Double getLon() {
 			return lon;
 		}

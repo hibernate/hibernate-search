@@ -15,13 +15,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
-import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.AccountBorrowalSummaryBridge;
+import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.AccountBorrowalSummaryBinding;
 
 /**
  * A user account.
  */
 @Entity
-@AccountBorrowalSummaryBridge
+@AccountBorrowalSummaryBinding
 public class Account extends AbstractEntity<Integer> {
 
 	@Id

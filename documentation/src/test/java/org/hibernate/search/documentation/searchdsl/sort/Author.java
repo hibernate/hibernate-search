@@ -14,7 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -35,7 +35,7 @@ public class Author {
 	private String lastName;
 
 	@Embedded
-	@GeoPointBridge(sortable = Sortable.YES)
+	@GeoPointBinding(sortable = Sortable.YES)
 	private EmbeddableGeoPoint placeOfBirth;
 
 	@ManyToMany(mappedBy = "authors")

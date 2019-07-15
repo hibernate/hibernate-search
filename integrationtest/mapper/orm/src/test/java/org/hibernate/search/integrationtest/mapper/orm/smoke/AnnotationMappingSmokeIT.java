@@ -27,8 +27,8 @@ import javax.persistence.Table;
 
 import org.assertj.core.api.Assertions;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomPropertyBridgeAnnotation;
-import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBridgeAnnotation;
+import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomPropertyBinding;
+import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBinding;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -349,7 +349,7 @@ public class AnnotationMappingSmokeIT {
 		private LocalDate localDate;
 
 		@ManyToOne
-		@CustomPropertyBridgeAnnotation(objectName = "customBridgeOnProperty")
+		@CustomPropertyBinding(objectName = "customBridgeOnProperty")
 		private IndexedEntity embedded;
 
 		public LocalDate getLocalDate() {
@@ -372,7 +372,7 @@ public class AnnotationMappingSmokeIT {
 	@Entity
 	@Table(name = "indexed")
 	@Indexed(index = IndexedEntity.INDEX)
-	@CustomTypeBridgeAnnotation(objectName = "customBridgeOnClass")
+	@CustomTypeBinding(objectName = "customBridgeOnClass")
 	public static class IndexedEntity extends ParentIndexedEntity {
 
 		public static final String INDEX = "IndexedEntity";

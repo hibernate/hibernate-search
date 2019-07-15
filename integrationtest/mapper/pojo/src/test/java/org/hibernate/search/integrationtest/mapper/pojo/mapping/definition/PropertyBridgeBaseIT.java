@@ -897,7 +897,7 @@ public class PropertyBridgeBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@BridgeAnnotationWithEmptyPropertyBridgeMapping
+			@BindingAnnotationWithEmptyPropertyBridgeRef
 			public Integer getId() {
 				return id;
 			}
@@ -910,9 +910,9 @@ public class PropertyBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.annotationContextAnyParameters( BridgeAnnotationWithEmptyPropertyBridgeMapping.class )
+						.annotationContextAnyParameters( BindingAnnotationWithEmptyPropertyBridgeRef.class )
 						.failure(
-								"Annotation type '" + BridgeAnnotationWithEmptyPropertyBridgeMapping.class.getName()
+								"Annotation type '" + BindingAnnotationWithEmptyPropertyBridgeRef.class.getName()
 										+ "' is annotated with '" + PropertyBinding.class.getName() + "',"
 										+ " but the binder reference is empty."
 						)
@@ -923,7 +923,7 @@ public class PropertyBridgeBaseIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
 	@PropertyBinding(binder = @PropertyBinderRef())
-	private @interface BridgeAnnotationWithEmptyPropertyBridgeMapping {
+	private @interface BindingAnnotationWithEmptyPropertyBridgeRef {
 	}
 
 	@Test
@@ -932,7 +932,7 @@ public class PropertyBridgeBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@BridgeAnnotationMappedToBinderWithDifferentAnnotationType
+			@BindingAnnotationWithBinderWithDifferentAnnotationType
 			public Integer getId() {
 				return id;
 			}
@@ -948,7 +948,7 @@ public class PropertyBridgeBaseIT {
 						.failure(
 								"Binder '" + BinderWithDifferentAnnotationType.TOSTRING
 										+ "' cannot be initialized with annotations of type '"
-										+ BridgeAnnotationMappedToBinderWithDifferentAnnotationType.class.getName() + "'"
+										+ BindingAnnotationWithBinderWithDifferentAnnotationType.class.getName() + "'"
 						)
 						.build()
 				);
@@ -957,7 +957,7 @@ public class PropertyBridgeBaseIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
 	@PropertyBinding(binder = @PropertyBinderRef(type = BinderWithDifferentAnnotationType.class))
-	private @interface BridgeAnnotationMappedToBinderWithDifferentAnnotationType {
+	private @interface BindingAnnotationWithBinderWithDifferentAnnotationType {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -994,7 +994,7 @@ public class PropertyBridgeBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@IncompatibleTypeRequestingPropertyBridgeAnnotation
+			@IncompatibleTypeRequestingBinding
 			public String getStringProperty() {
 				return stringProperty;
 			}
@@ -1018,7 +1018,7 @@ public class PropertyBridgeBaseIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.METHOD, ElementType.FIELD})
 	@PropertyBinding(binder = @PropertyBinderRef(type = IncompatibleTypeRequestingPropertyBinder.class))
-	private @interface IncompatibleTypeRequestingPropertyBridgeAnnotation {
+	private @interface IncompatibleTypeRequestingBinding {
 	}
 
 	public static class IncompatibleTypeRequestingPropertyBinder implements PropertyBinder<Annotation> {

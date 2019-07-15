@@ -148,8 +148,8 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 	}
 
 	@Entity(name = "containing")
-	@FirstTypeBridgeAnnotation
-	@SecondTypeBridgeAnnotation
+	@FirstTypeBinding
+	@SecondTypeBinding
 	public static class ContainingEntity {
 
 		@Id
@@ -282,7 +282,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
 	@TypeBinding(binder = @TypeBinderRef(type = FirstTypeBridge.Binder.class))
-	public @interface FirstTypeBridgeAnnotation {
+	public @interface FirstTypeBinding {
 	}
 
 	public static class FirstTypeBridge implements TypeBridge {
@@ -318,7 +318,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
 	@TypeBinding(binder = @TypeBinderRef(type = SecondTypeBridge.Binder.class))
-	public @interface SecondTypeBridgeAnnotation {
+	public @interface SecondTypeBinding {
 	}
 
 	public static class SecondTypeBridge implements TypeBridge {

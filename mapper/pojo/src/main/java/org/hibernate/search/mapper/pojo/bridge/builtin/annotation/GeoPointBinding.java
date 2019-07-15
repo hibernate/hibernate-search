@@ -22,14 +22,14 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 
 /**
- * Defines a {@link GeoPoint} bridge, mapping a type or a property
- * to a {@link GeoPoint} field, representing a point on earth.
+ * Defines a {@link GeoPoint} binding from a type or a property
+ * to a {@link GeoPoint} field representing a point on earth.
  * <p>
  * If the longitude and latitude information is hosted on two different properties,
- * {@code @GeoPointBridge} must be used on the entity (class level).
+ * {@code @GeoPointBinding} must be used on the entity (class level).
  * The {@link Latitude} and {@link Longitude} annotations must mark the properties.
  * <pre><code>
- * &#064;GeoPointBridge(name="home")
+ * &#064;GeoPointBinding(name="home")
  * public class User {
  *     &#064;Latitude
  *     public Double getHomeLatitude() { ... }
@@ -38,9 +38,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
  * }
  * </code></pre>
  * <p>
- * Alternatively, {@code @GeoPointBridge} can be used on a type that implements {@link GeoPoint}:
+ * Alternatively, {@code @GeoPointBinding} can be used on a type that implements {@link GeoPoint}:
  * <pre><code>
- * &#064;GeoPointBridge(name="location")
+ * &#064;GeoPointBinding(name="location")
  * public class Home implements GeoPoint {
  *     &#064;Override
  *     public Double getLatitude() { ... }
@@ -52,7 +52,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
  * ... or on a property of type {@link GeoPoint}:
  * <pre><code>
  * public class User {
- *     &#064;GeoPointBridge
+ *     &#064;GeoPointBinding
  *     public GeoPoint getHome() { ... }
  * }
  * </code></pre>
@@ -68,8 +68,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
 @Documented
-@Repeatable(GeoPointBridge.List.class)
-public @interface GeoPointBridge {
+@Repeatable(GeoPointBinding.List.class)
+public @interface GeoPointBinding {
 
 	/**
 	 * The name of the index field holding spatial information.
@@ -104,7 +104,7 @@ public @interface GeoPointBridge {
 	@Documented
 	@interface List {
 
-		GeoPointBridge[] value();
+		GeoPointBinding[] value();
 
 	}
 }

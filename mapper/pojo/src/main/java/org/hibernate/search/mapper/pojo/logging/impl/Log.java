@@ -123,7 +123,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel);
 
 	@Message(id = ID_OFFSET_2 + 11,
-			value = "Missing field name for GeoPointBridge on type %1$s."
+			value = "Missing field name for GeoPointBinding on type %1$s."
 					+ " The field name is mandatory when the bridge is applied on an type, optional when applied on a property.")
 	SearchException missingFieldNameForGeoPointBridgeOnType(String typeName);
 

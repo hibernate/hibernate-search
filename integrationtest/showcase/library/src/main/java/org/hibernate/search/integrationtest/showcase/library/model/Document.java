@@ -22,7 +22,7 @@ import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAna
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge;
+import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 /**
@@ -57,7 +57,7 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	 * Comma-separated tags.
 	 */
 	@Basic
-	@MultiKeywordStringBridge(fieldName = "tags")
+	@MultiKeywordStringBinding(fieldName = "tags")
 	private String tags;
 
 	@OneToMany(mappedBy = "document", targetEntity = DocumentCopy.class)
