@@ -283,4 +283,7 @@ public interface Log extends BasicLogger {
 			value = "A workset was submitted after shutdown was requested to '%1$s'."
 					+ " The workset has been discarded." )
 	SearchException orchestratorShutDownBeforeSubmittingWorkset(String orchestratorName);
+
+	@Message(id = ID_OFFSET_2 + 64, value = "Unable to parse the provided geo-point value: '%1$s'. The expected format is latitude, longitude.")
+	SearchException unableToParseGeoPoint(String value);
 }

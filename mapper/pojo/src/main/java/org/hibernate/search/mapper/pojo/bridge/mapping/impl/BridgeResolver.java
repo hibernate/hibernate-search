@@ -38,6 +38,7 @@ import java.util.UUID;
 
 import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIdentifierBridge;
@@ -127,6 +128,7 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( java.sql.Date.class, new DefaultJavaSqlDateValueBridge() );
 		addValueBridgeForExactRawType( Timestamp.class, new DefaultJavaSqlTimestampValueBridge() );
 		addValueBridgeForExactRawType( Time.class, new DefaultJavaSqlTimeValueBridge() );
+		addValueBinderForExactRawType( GeoPoint.class, new PassThroughValueBridge.Binder<>( GeoPoint.class, ParseUtils::parseGeoPoint ) );
 	}
 
 	public IdentifierBinder resolveIdentifierBinderForType(PojoGenericTypeModel<?> sourceType) {
