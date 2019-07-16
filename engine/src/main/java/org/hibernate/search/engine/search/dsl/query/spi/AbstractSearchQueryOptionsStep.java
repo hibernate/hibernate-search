@@ -13,6 +13,8 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.dsl.aggregation.AggregationFinalStep;
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactory;
@@ -23,6 +25,8 @@ import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -30,13 +34,14 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 public abstract class AbstractSearchQueryOptionsStep<
-				S extends SearchQueryOptionsStep<S, H, SF>,
+				S extends SearchQueryOptionsStep<S, H, SF, AF>,
 				H,
 				PDF extends SearchPredicateFactory,
 				SF extends SearchSortFactory,
+				AF extends SearchAggregationFactory,
 				C
 		>
-		implements SearchQueryPredicateStep<S, H, PDF>, SearchQueryOptionsStep<S, H, SF> {
+		implements SearchQueryPredicateStep<S, H, PDF>, SearchQueryOptionsStep<S, H, SF, AF> {
 
 	private final IndexScope<C> indexScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;
@@ -91,6 +96,16 @@ public abstract class AbstractSearchQueryOptionsStep<
 		SearchSort sort = sortContributor.apply( extendSortFactory( factory ) ).toSort();
 		contribute( builderFactory, sort );
 		return thisAsS();
+	}
+
+	@Override
+	public <T> S aggregation(AggregationKey<T> key, SearchAggregation<T> aggregation) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public <T> S aggregation(AggregationKey<T> key, Function<? super AF, ? extends AggregationFinalStep<T>> aggregationContributor) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
@@ -151,4 +166,6 @@ public abstract class AbstractSearchQueryOptionsStep<
 	protected abstract PDF extendPredicateFactory(SearchPredicateFactory predicateFactory);
 
 	protected abstract SF extendSortFactory(SearchSortFactory sortFactory);
+
+	protected abstract AF extendAggregationFactory(SearchAggregationFactory aggregationFactory);
 }

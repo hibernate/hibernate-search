@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.query.spi;
 
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
@@ -15,14 +16,15 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 public abstract class AbstractExtendedSearchQueryOptionsStep<
-				S extends SearchQueryOptionsStep<S, H, SF>,
+				S extends SearchQueryOptionsStep<S, H, SF, AF>,
 				H,
 				R extends SearchResult<H>,
 				PDF extends SearchPredicateFactory,
 				SF extends SearchSortFactory,
+				AF extends SearchAggregationFactory,
 				C
 		>
-		extends AbstractSearchQueryOptionsStep<S, H, PDF, SF, C> {
+		extends AbstractSearchQueryOptionsStep<S, H, PDF, SF, AF, C> {
 
 	public AbstractExtendedSearchQueryOptionsStep(IndexScope<C> indexScope,
 			SearchQueryBuilder<H, C> searchQueryBuilder) {

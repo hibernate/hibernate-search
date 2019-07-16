@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 public final class DefaultSearchQueryHitTypeStep<R, E, C>
 		extends AbstractSearchQueryHitTypeStep<
-						SearchQueryOptionsStep<?, E, ?>,
+						SearchQueryOptionsStep<?, E, ?, ?>,
 						R,
 						E,
 						SearchProjectionFactory<R, E>,
@@ -82,13 +82,13 @@ public final class DefaultSearchQueryHitTypeStep<R, E, C>
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, ?> predicate(
+	public SearchQueryOptionsStep<?, E, ?, ?> predicate(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return asEntity().predicate( predicateContributor );
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, ?> predicate(SearchPredicate predicate) {
+	public SearchQueryOptionsStep<?, E, ?, ?> predicate(SearchPredicate predicate) {
 		return asEntity().predicate( predicate );
 	}
 

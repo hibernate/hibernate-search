@@ -261,27 +261,27 @@ public class SearchQueryFetchIT {
 				.hasNoHits();
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?> matchAllQuery() {
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchAllQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.byField( "integer" ).asc() );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?> matchFirstHalfQuery() {
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchFirstHalfQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.range().onField( "integer" ).below( DOCUMENT_COUNT / 2 ).excludeLimit() )
 				.sort( f -> f.byField( "integer" ).asc() );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?> matchOneQuery(int id) {
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchOneQuery(int id) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.match().onField( "integer" ).matching( id ) );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?> matchNoneQuery() {
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchNoneQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.match().onField( "integer" ).matching( DOCUMENT_COUNT + 2 ) );

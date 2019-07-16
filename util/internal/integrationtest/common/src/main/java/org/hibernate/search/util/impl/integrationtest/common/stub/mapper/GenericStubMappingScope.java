@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
@@ -47,5 +48,9 @@ public class GenericStubMappingScope<R, E> {
 
 	public SearchProjectionFactory<R, E> projection() {
 		return delegate.projection();
+	}
+
+	public SearchAggregationFactory aggregation() {
+		return delegate.aggregation();
 	}
 }

@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 public abstract class AbstractSearchQueryHitTypeStep<
-				N extends SearchQueryOptionsStep<?, E, ?>,
+				N extends SearchQueryOptionsStep<?, E, ?, ?>,
 				R,
 				E,
 				PJF extends SearchProjectionFactory<R, E>,

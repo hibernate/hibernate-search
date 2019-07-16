@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.query.impl;
 
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
@@ -20,10 +21,11 @@ final class DefaultSearchQueryOptionsStep<H, C>
 						H,
 						SearchPredicateFactory,
 						SearchSortFactory,
+						SearchAggregationFactory,
 						C
 				>
 		implements SearchQueryPredicateStep<DefaultSearchQueryOptionsStep<H, C>, H, SearchPredicateFactory>,
-		SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, C>, H, SearchSortFactory> {
+		SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, C>, H, SearchSortFactory, SearchAggregationFactory> {
 
 	DefaultSearchQueryOptionsStep(IndexScope<C> indexScope, SearchQueryBuilder<H, C> searchQueryBuilder) {
 		super( indexScope, searchQueryBuilder );
@@ -40,6 +42,12 @@ final class DefaultSearchQueryOptionsStep<H, C>
 	protected SearchSortFactory extendSortFactory(SearchSortFactory sortFactory) {
 		// We don't extend anything.
 		return sortFactory;
+	}
+
+	@Override
+	protected SearchAggregationFactory extendAggregationFactory(SearchAggregationFactory aggregationFactory) {
+		// We don't extend anything.
+		return aggregationFactory;
 	}
 
 	@Override

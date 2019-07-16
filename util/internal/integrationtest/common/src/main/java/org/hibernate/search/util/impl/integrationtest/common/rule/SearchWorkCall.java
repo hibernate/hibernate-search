@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -73,7 +74,8 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 						actualCall.loadingContext.getProjectionHitMapper(),
 						actualCall.rootProjection,
 						behavior.getRawHits()
-				)
+				),
+				Collections.emptyMap()
 		);
 	}
 

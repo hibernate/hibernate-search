@@ -8,6 +8,9 @@ package org.hibernate.search.mapper.orm.scope;
 
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
@@ -84,6 +87,21 @@ public interface SearchScope<E> {
 	 * @see SearchProjectionFactory
 	 */
 	SearchProjectionFactory<EntityReference, E> projection();
+
+	/**
+	 * Initiate the building of a search aggregation that will be valid for the indexes in this scope.
+	 * <p>
+	 * The aggregation will only be usable in {@link #search() search queries} created using this scope.
+	 * <p>
+	 * Note this method is only necessary if you do not want to use lambda expressions,
+	 * since you can {@link SearchQueryOptionsStep#aggregation(AggregationKey, SearchAggregation)} define aggregations with lambdas}
+	 * within the search query DSL,
+	 * removing the need to create separate objects to represent the aggregation.
+	 *
+	 * @return An aggregation factory.
+	 * @see SearchAggregationFactory
+	 */
+	SearchAggregationFactory aggregation();
 
 	/**
 	 * Create a {@link SearchWriter} for the indexes mapped to types in this scope, or to any of their sub-types.

@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 
 public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E>
 		implements SearchQueryHitTypeStep<
-						SearchQueryOptionsStep<?, E, ?>,
+						SearchQueryOptionsStep<?, E, ?, ?>,
 						R,
 						E,
 						SearchProjectionFactory<R, E>,
@@ -63,13 +63,13 @@ public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E>
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, ?> predicate(
+	public SearchQueryOptionsStep<?, E, ?, ?> predicate(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return delegate.predicate( predicateContributor );
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, ?> predicate(SearchPredicate predicate) {
+	public SearchQueryOptionsStep<?, E, ?, ?> predicate(SearchPredicate predicate) {
 		return delegate.predicate( predicate );
 	}
 

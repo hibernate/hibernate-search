@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.query.impl;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.search.dsl.aggregation.ElasticsearchSearchAggregationFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryPredicateStep;
@@ -16,17 +17,19 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 
 class ElasticsearchSearchQueryOptionsStepImpl<H>
 		extends AbstractExtendedSearchQueryOptionsStep<
-		ElasticsearchSearchQueryOptionsStep<H>,
+						ElasticsearchSearchQueryOptionsStep<H>,
 						H,
 						ElasticsearchSearchResult<H>,
 						ElasticsearchSearchPredicateFactory,
-				ElasticsearchSearchSortFactory,
+						ElasticsearchSearchSortFactory,
+						ElasticsearchSearchAggregationFactory,
 						ElasticsearchSearchQueryElementCollector
 				>
 		implements ElasticsearchSearchQueryPredicateStep<H>, ElasticsearchSearchQueryOptionsStep<H> {
@@ -59,5 +62,11 @@ class ElasticsearchSearchQueryOptionsStepImpl<H>
 	protected ElasticsearchSearchSortFactory extendSortFactory(
 			SearchSortFactory sortFactory) {
 		return sortFactory.extension( ElasticsearchExtension.get() );
+	}
+
+	@Override
+	protected ElasticsearchSearchAggregationFactory extendAggregationFactory(SearchAggregationFactory aggregationFactory) {
+		// FIXME HSEARCH-3271 implement this
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 }

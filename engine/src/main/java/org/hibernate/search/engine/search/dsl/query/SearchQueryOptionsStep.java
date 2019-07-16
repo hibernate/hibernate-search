@@ -10,10 +10,15 @@ package org.hibernate.search.engine.search.dsl.query;
 import java.util.Collection;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.dsl.aggregation.AggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchFetchable;
+import org.hibernate.search.engine.search.query.SearchResult;
 
 /**
  * The final step in a query definition, where optional parameters such as {@link #sort(Function) sorts} can be set,
@@ -23,11 +28,13 @@ import org.hibernate.search.engine.search.query.SearchFetchable;
  * May be a subtype of SearchQueryOptionsStep with more exposed methods.
  * @param <H> The type of hits for the created query.
  * @param <SF> The type of factory used to create sorts in {@link #sort(Function)}.
+ * @param <AF> The type of factory used to create aggregations in {@link #aggregation(AggregationKey, Function)}.
  */
 public interface SearchQueryOptionsStep<
-				S extends SearchQueryOptionsStep<? extends S, H, SF>,
+				S extends SearchQueryOptionsStep<? extends S, H, SF, AF>,
 				H,
-				SF extends SearchSortFactory
+				SF extends SearchSortFactory,
+				AF extends SearchAggregationFactory
 		>
 		extends SearchQueryFinalStep<H>, SearchFetchable<H> {
 
@@ -71,5 +78,27 @@ public interface SearchQueryOptionsStep<
 	 * @return {@code this}, for method chaining.
 	 */
 	S sort(Function<? super SF, ? extends SortFinalStep> sortContributor);
+
+	/**
+	 * Add an aggregation to this query.
+	 * @param key The key that will be used to {@link SearchResult#getAggregation(AggregationKey) retrieve the aggregation}
+	 * from the {@link SearchResult}.
+	 * @param aggregation A {@link SearchAggregation} object obtained from the search scope.
+	 * @param <T> The type of aggregation values.
+	 * @return {@code this}, for method chaining.
+	 */
+	<T> S aggregation(AggregationKey<T> key, SearchAggregation<T> aggregation);
+
+	/**
+	 * Add an aggregation to this query.
+	 * @param key The key that will be used to {@link SearchResult#getAggregation(AggregationKey) retrieve the aggregation}
+	 * from the {@link SearchResult}.
+	 * @param aggregationContributor A function that will use the factory passed in parameter to create an aggregation,
+	 * returning the final step in the sort DSL.
+	 * Should generally be a lambda expression.
+	 * @param <T> The type of aggregation values.
+	 * @return {@code this}, for method chaining.
+	 */
+	<T> S aggregation(AggregationKey<T> key, Function<? super AF, ? extends AggregationFinalStep<T>> aggregationContributor);
 
 }

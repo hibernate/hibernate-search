@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.scope.spi;
 
 import java.util.Set;
 
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
@@ -37,6 +38,8 @@ public interface PojoScopeDelegate<R, E, C> {
 	SearchSortFactory sort();
 
 	SearchProjectionFactory<R, E> projection();
+
+	SearchAggregationFactory aggregation();
 
 	PojoScopeWorkExecutor executor();
 
