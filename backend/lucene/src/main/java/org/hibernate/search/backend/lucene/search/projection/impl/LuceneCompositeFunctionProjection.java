@@ -9,60 +9,20 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
-import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-
-public class LuceneCompositeFunctionProjection<E, P1, P> implements LuceneCompositeProjection<E, P> {
-
-	private final Set<String> indexNames;
+class LuceneCompositeFunctionProjection<P1, P>
+		extends AbstractLuceneCompositeProjection<P> {
 
 	private final Function<P1, P> transformer;
 
-	private final LuceneSearchProjection<E, P1> projection;
-
-	public LuceneCompositeFunctionProjection(Set<String> indexNames, Function<P1, P> transformer,
-			LuceneSearchProjection<E, P1> projection) {
-		this.indexNames = indexNames;
+	LuceneCompositeFunctionProjection(Set<String> indexNames, Function<P1, P> transformer,
+			LuceneSearchProjection<?, P1> projection) {
+		super( indexNames, projection );
 		this.transformer = transformer;
-		this.projection = projection;
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		projection.contributeCollectors( luceneCollectorBuilder );
-	}
-
-	@Override
-	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		projection.contributeFields( builder );
-	}
-
-	@Override
-	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
-			SearchProjectionExtractContext context) {
-		return projection.extract( projectionHitMapper, luceneResult, context );
-	}
-
-	@Override
-	public P transform(LoadingResult<?> loadingResult, E extractedData,
-			SearchProjectionTransformContext context) {
-		return transformer.apply( projection.transform( loadingResult, extractedData, context ) );
-	}
-
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "projection=" ).append( projection )
-				.append( "]" );
-		return sb.toString();
+	@SuppressWarnings("unchecked")
+	P doTransform(Object[] childResults) {
+		return transformer.apply( (P1) childResults[0] );
 	}
 }

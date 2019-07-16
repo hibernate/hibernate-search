@@ -12,9 +12,9 @@ import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuil
 
 class LuceneCompositeProjectionBuilder<P> implements CompositeProjectionBuilder<P> {
 
-	private final LuceneCompositeProjection<?, P> projection;
+	private final AbstractLuceneCompositeProjection<P> projection;
 
-	LuceneCompositeProjectionBuilder(LuceneCompositeProjection<?, P> projection) {
+	LuceneCompositeProjectionBuilder(AbstractLuceneCompositeProjection<P> projection) {
 		this.projection = projection;
 	}
 
