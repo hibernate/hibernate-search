@@ -17,6 +17,7 @@ import org.hibernate.search.engine.logging.spi.MappingKeyFormatter;
 import org.hibernate.search.engine.logging.spi.SimpleNameClassFormatter;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
@@ -286,4 +287,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 64, value = "Unable to parse the provided geo-point value: '%1$s'. The expected format is latitude, longitude.")
 	SearchException unableToParseGeoPoint(String value);
+
+	@Message(id = ID_OFFSET_2 + 65,
+			value = "Unknown aggregation key '%1$s'. This key was not used when building the search query." )
+	SearchException unknownAggregationKey(AggregationKey<?> key);
 }

@@ -6,13 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.query;
 
+import org.hibernate.search.backend.elasticsearch.search.dsl.aggregation.ElasticsearchSearchAggregationFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchFetchable;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 
 public interface ElasticsearchSearchQueryOptionsStep<H>
-		extends SearchQueryOptionsStep<ElasticsearchSearchQueryOptionsStep<H>, H, ElasticsearchSearchSortFactory>,
+		extends SearchQueryOptionsStep<
+						ElasticsearchSearchQueryOptionsStep<H>,
+						H,
+						ElasticsearchSearchSortFactory,
+						ElasticsearchSearchAggregationFactory
+				>,
 				ElasticsearchSearchFetchable<H> {
 
 	@Override

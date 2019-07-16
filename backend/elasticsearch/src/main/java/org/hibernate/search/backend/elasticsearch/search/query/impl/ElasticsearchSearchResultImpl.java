@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
@@ -14,6 +15,6 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 class ElasticsearchSearchResultImpl<H> extends SimpleSearchResult<H>
 		implements ElasticsearchSearchResult<H> {
 	ElasticsearchSearchResultImpl(long hitCount, List<H> hits) {
-		super( hitCount, hits );
+		super( hitCount, hits, Collections.emptyMap() );
 	}
 }

@@ -8,6 +8,7 @@ package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
@@ -59,5 +60,10 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 	@Override
 	public SearchProjectionFactory<R, E> projection() {
 		return new DefaultSearchProjectionFactory<>( delegate.getSearchProjectionFactory() );
+	}
+
+	@Override
+	public SearchAggregationFactory aggregation() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 }

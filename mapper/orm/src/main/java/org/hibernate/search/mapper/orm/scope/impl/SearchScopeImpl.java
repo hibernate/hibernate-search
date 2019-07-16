@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
@@ -58,6 +59,11 @@ public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.
 	@Override
 	public SearchProjectionFactory<EntityReference, E> projection() {
 		return delegate.projection();
+	}
+
+	@Override
+	public SearchAggregationFactory aggregation() {
+		return delegate.aggregation();
 	}
 
 	@Override

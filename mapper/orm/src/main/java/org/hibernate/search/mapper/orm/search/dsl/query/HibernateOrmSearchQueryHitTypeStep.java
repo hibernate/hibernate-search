@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
  */
 public interface HibernateOrmSearchQueryHitTypeStep<E>
 		extends SearchQueryHitTypeStep<
-				SearchQueryOptionsStep<?, E, ?>,
+				SearchQueryOptionsStep<?, E, ?, ?>,
 				EntityReference,
 				E,
 				SearchProjectionFactory<EntityReference, E>,
