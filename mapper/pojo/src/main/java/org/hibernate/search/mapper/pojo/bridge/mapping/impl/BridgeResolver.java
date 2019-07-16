@@ -87,6 +87,8 @@ public final class BridgeResolver {
 		TypePatternMatcher concreteEnumPattern = typePatternMatcherFactory.createRawSuperTypeMatcher( Enum.class )
 				.and( typePatternMatcherFactory.createExactRawTypeMatcher( Enum.class ).negate() );
 
+		TypePatternMatcher concreteGeoPointPattern = typePatternMatcherFactory.createRawSuperTypeMatcher( GeoPoint.class );
+
 		addIdentifierBridgeForExactRawType( Integer.class, new DefaultIntegerIdentifierBridge() );
 		addIdentifierBridgeForExactRawType( Long.class, new DefaultLongIdentifierBridge() );
 		addIdentifierBinderForTypePattern( concreteEnumPattern, new DefaultEnumIdentifierBridge.Binder() );
@@ -128,7 +130,7 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( java.sql.Date.class, new DefaultJavaSqlDateValueBridge() );
 		addValueBridgeForExactRawType( Timestamp.class, new DefaultJavaSqlTimestampValueBridge() );
 		addValueBridgeForExactRawType( Time.class, new DefaultJavaSqlTimeValueBridge() );
-		addValueBinderForExactRawType( GeoPoint.class, new PassThroughValueBridge.Binder<>( GeoPoint.class, ParseUtils::parseGeoPoint ) );
+		addValueBinderForTypePattern( concreteGeoPointPattern, new PassThroughValueBridge.Binder<>( GeoPoint.class, ParseUtils::parseGeoPoint ) );
 	}
 
 	public IdentifierBinder resolveIdentifierBinderForType(PojoGenericTypeModel<?> sourceType) {
