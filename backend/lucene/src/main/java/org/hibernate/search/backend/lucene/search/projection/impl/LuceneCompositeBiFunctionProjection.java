@@ -6,76 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
-
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
-import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-
-public class LuceneCompositeBiFunctionProjection<P1, P2, P> implements LuceneCompositeProjection<Object[], P> {
-
-	private final Set<String> indexNames;
+class LuceneCompositeBiFunctionProjection<P1, P2, P>
+		extends AbstractLuceneCompositeProjection<P> {
 
 	private final BiFunction<P1, P2, P> transformer;
 
-	private final LuceneSearchProjection<?, P1> projection1;
-	private final LuceneSearchProjection<?, P2> projection2;
-
-	public LuceneCompositeBiFunctionProjection(Set<String> indexNames, BiFunction<P1, P2, P> transformer,
+	LuceneCompositeBiFunctionProjection(Set<String> indexNames, BiFunction<P1, P2, P> transformer,
 			LuceneSearchProjection<?, P1> projection1, LuceneSearchProjection<?, P2> projection2) {
-		this.indexNames = indexNames;
+		super( indexNames, projection1, projection2 );
 		this.transformer = transformer;
-		this.projection1 = projection1;
-		this.projection2 = projection2;
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		projection1.contributeCollectors( luceneCollectorBuilder );
-		projection2.contributeCollectors( luceneCollectorBuilder );
-	}
-
-	@Override
-	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		projection1.contributeFields( builder );
-		projection2.contributeFields( builder );
-	}
-
-	@Override
-	public Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
-			SearchProjectionExtractContext context) {
-		return new Object[] {
-				projection1.extract( projectionHitMapper, luceneResult, context ),
-				projection2.extract( projectionHitMapper, luceneResult, context )
-		};
-	}
-
-	@Override
-	public P transform(LoadingResult<?> loadingResult, Object[] extractedData,
-			SearchProjectionTransformContext context) {
-		return transformer.apply(
-				transformUnsafe( projection1, loadingResult, extractedData[0], context ),
-				transformUnsafe( projection2, loadingResult, extractedData[1], context )
-		);
-	}
-
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "projection1=" ).append( projection1 )
-				.append( ", projection2=" ).append( projection2 )
-				.append( "]" );
-		return sb.toString();
+	@SuppressWarnings("unchecked")
+	P doTransform(Object[] childResults) {
+		return transformer.apply( (P1) childResults[0], (P2) childResults[1] );
 	}
 }

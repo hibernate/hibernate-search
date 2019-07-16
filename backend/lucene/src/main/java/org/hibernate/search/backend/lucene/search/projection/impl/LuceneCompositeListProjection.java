@@ -6,81 +6,24 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
-
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
-import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-
-public class LuceneCompositeListProjection<P> implements LuceneCompositeProjection<List<Object>, P> {
-
-	private final Set<String> indexNames;
+public class LuceneCompositeListProjection<P>
+		extends AbstractLuceneCompositeProjection<P> {
 
 	private final Function<List<?>, P> transformer;
 
-	private final List<LuceneSearchProjection<?, ?>> children;
-
 	public LuceneCompositeListProjection(Set<String> indexNames, Function<List<?>, P> transformer,
 			List<LuceneSearchProjection<?, ?>> children) {
-		this.indexNames = indexNames;
+		super( indexNames, children.toArray( new LuceneSearchProjection<?, ?>[0] ) );
 		this.transformer = transformer;
-		this.children = children;
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		for ( LuceneSearchProjection<?, ?> child : children ) {
-			child.contributeCollectors( luceneCollectorBuilder );
-		}
-	}
-
-	@Override
-	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		for ( LuceneSearchProjection<?, ?> child : children ) {
-			child.contributeFields( builder );
-		}
-	}
-
-	@Override
-	public List<Object> extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
-		List<Object> extractedData = new ArrayList<>( children.size() );
-
-		for ( LuceneSearchProjection<?, ?> child : children ) {
-			extractedData.add( child.extract( mapper, documentResult, context ) );
-		}
-
-		return extractedData;
-	}
-
-	@Override
-	public P transform(LoadingResult<?> loadingResult, List<Object> extractedData,
-			SearchProjectionTransformContext context) {
-		for ( int i = 0; i < extractedData.size(); i++ ) {
-			extractedData.set( i, transformUnsafe( children.get( i ), loadingResult, extractedData.get( i ), context ) );
-		}
-
-		return transformer.apply( extractedData );
-	}
-
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "children=" ).append( children )
-				.append( "]" );
-		return sb.toString();
+	P doTransform(Object[] childResults) {
+		return transformer.apply( Arrays.asList( childResults ) );
 	}
 }
