@@ -183,12 +183,12 @@ public interface Log extends BasicLogger {
 	SearchException unknownFieldForSearch(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 1,
-			value = "Root directory '%1$s' exists but is not a writable directory.")
-	SearchException localDirectoryBackendRootDirectoryNotWritableDirectory(Path rootDirectory);
+			value = "Path '%1$s' exists but does not point to a writable directory.")
+	SearchException pathIsNotWriteableDirectory(Path rootDirectory);
 
 	@Message(id = ID_OFFSET_2 + 2,
-			value = "Unable to create root directory '%1$s'.")
-	SearchException unableToCreateRootDirectoryForLocalDirectoryBackend(Path rootDirectory, @Cause Exception e);
+			value = "Unable to initialize root directory '%1$s': %2$s")
+	SearchException unableToInitializeRootDirectory(Path rootDirectory, String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 5,
 			value = "The Lucene extension can only be applied to objects"
@@ -214,8 +214,9 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixLuceneSearchSortWithOtherSorts(SearchSort sort);
 
 	@Message(id = ID_OFFSET_2 + 15,
-			value = "Unable to create the index directory.")
-	SearchException unableToCreateIndexDirectory(@Param EventContext context, @Cause Exception e);
+			value = "Unable to initialize index directory: %1$s")
+	SearchException unableToInitializeIndexDirectory(String causeMessage,
+			@Param EventContext context, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 16, value = "Unable to index entry '%2$s' with tenant identifier '%1$s'.")
 	SearchException unableToIndexEntry(String tenantId, String id,
@@ -233,16 +234,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 19,
 			value = "Unable to commit.")
 	SearchException unableToCommitIndex(@Param EventContext context, @Cause Exception e);
-
-	@Message(id = ID_OFFSET_2 + 20,
-			value = "Index directory '%1$s' exists but is not a writable directory.")
-	SearchException localDirectoryIndexRootDirectoryNotWritableDirectory(Path indexDirectory,
-			@Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 21,
-			value = "Unable to create index root directory '%1$s'.")
-	SearchException unableToCreateIndexRootDirectoryForLocalDirectoryBackend(Path indexDirectory,
-			@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 22,
 			value = "Could not open an index reader.")

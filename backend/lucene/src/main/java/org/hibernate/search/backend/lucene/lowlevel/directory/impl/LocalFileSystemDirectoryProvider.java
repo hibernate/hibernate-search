@@ -23,7 +23,6 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSLockFactory;
@@ -64,13 +63,23 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 		this.accessStrategy = FileSystemAccessStrategy.get( accessStrategyName );
 		this.lockFactory = context.createConfiguredLockFactory().orElseGet( FSLockFactory::getDefault );
 
-		initializeRootDirectory( root );
+		try {
+			initializeWriteableDirectory( root );
+		}
+		catch (Exception e) {
+			throw log.unableToInitializeRootDirectory( root, e.getMessage(), e );
+		}
 	}
 
 	@Override
 	public DirectoryHolder createDirectory(DirectoryCreationContext context) throws IOException {
 		Path directoryPath = root.resolve( context.getIndexName() );
-		makeSanityCheckedFilesystemDirectory( directoryPath, context.getEventContext() );
+		try {
+			initializeWriteableDirectory( directoryPath );
+		}
+		catch (Exception e) {
+			throw log.unableToInitializeIndexDirectory( e.getMessage(), context.getEventContext(), e );
+		}
 		Directory directory = accessStrategy.createDirectory( directoryPath, lockFactory );
 		try {
 			context.initializeIndexIfNeeded( directory );
@@ -82,35 +91,15 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 		}
 	}
 
-	private void initializeRootDirectory(Path rootDirectory) {
+	private void initializeWriteableDirectory(Path rootDirectory) throws IOException {
 		if ( Files.exists( rootDirectory ) ) {
 			if ( !Files.isDirectory( rootDirectory ) || !Files.isWritable( rootDirectory ) ) {
-				throw log.localDirectoryBackendRootDirectoryNotWritableDirectory( rootDirectory );
+				throw log.pathIsNotWriteableDirectory( rootDirectory );
 			}
 		}
 		else {
-			try {
-				Files.createDirectories( rootDirectory );
-			}
-			catch (Exception e) {
-				throw log.unableToCreateRootDirectoryForLocalDirectoryBackend( rootDirectory, e );
-			}
+			Files.createDirectories( rootDirectory );
 		}
 	}
 
-	private void makeSanityCheckedFilesystemDirectory(Path indexDirectory, EventContext eventContext) {
-		if ( Files.exists( indexDirectory ) ) {
-			if ( !Files.isDirectory( indexDirectory ) || !Files.isWritable( indexDirectory ) ) {
-				throw log.localDirectoryIndexRootDirectoryNotWritableDirectory( indexDirectory, eventContext );
-			}
-		}
-		else {
-			try {
-				Files.createDirectories( indexDirectory );
-			}
-			catch (Exception e) {
-				throw log.unableToCreateIndexRootDirectoryForLocalDirectoryBackend( indexDirectory, eventContext, e );
-			}
-		}
-	}
 }

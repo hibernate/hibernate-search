@@ -83,8 +83,9 @@ public class IndexingBackendContext {
 			directory = directoryProvider.createDirectory( context );
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToCreateIndexDirectory(
-					eventContext.append( context.getEventContext() ),
+			throw log.unableToInitializeIndexDirectory(
+					e.getMessage(),
+					context.getEventContext(),
 					e
 			);
 		}
