@@ -45,8 +45,6 @@ public abstract class AbstractDirectoryIT {
 	protected IndexMapping indexMapping;
 	protected StubMappingIndexManager indexManager;
 
-	protected abstract Object getDirectoryType();
-
 	protected final void checkIndexingAndQuerying() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
@@ -71,7 +69,8 @@ public abstract class AbstractDirectoryIT {
 		);
 	}
 
-	protected final void setup(Function<SearchSetupHelper.SetupContext, SearchSetupHelper.SetupContext> additionalConfiguration) {
+	protected final void setup(Object directoryType,
+			Function<SearchSetupHelper.SetupContext, SearchSetupHelper.SetupContext> additionalConfiguration) {
 		searchIntegration = additionalConfiguration.apply(
 				setupHelper.start( BACKEND_NAME )
 						.withIndex(
@@ -80,7 +79,7 @@ public abstract class AbstractDirectoryIT {
 								indexManager -> this.indexManager = indexManager
 						)
 						.withBackendProperty(
-								BACKEND_NAME, LuceneBackendSettings.DIRECTORY_TYPE, getDirectoryType()
+								BACKEND_NAME, LuceneBackendSettings.DIRECTORY_TYPE, directoryType
 						)
 		)
 				.setup();

@@ -15,6 +15,9 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreat
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
@@ -33,8 +36,8 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.DirectoryLifecycleTest.testLifecycle")
-	public void test() {
-		setup( c -> c.withBackendProperty(
+	public void valid() {
+		setup( CustomDirectoryProvider.class, c -> c.withBackendProperty(
 				BACKEND_NAME,
 				"directory." + CustomDirectoryProvider.CONFIGURATION_PROPERTY_KEY_RADICAL,
 				CustomDirectoryProvider.CONFIGURATION_PROPERTY_EXPECTED_VALUE
@@ -58,9 +61,25 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		assertThat( staticCounters.get( CustomDirectoryProvider.CLOSE_COUNTER_KEY ) ).isEqualTo( 1 );
 	}
 
-	@Override
-	protected Object getDirectoryType() {
-		return CustomDirectoryProvider.class;
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3440")
+	public void invalid() {
+		String invalidDirectoryType = "someInvalidDirectoryType";
+		SubTest.expectException( () ->
+				setup( "someInvalidDirectoryType", c -> c )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.backendContext( BACKEND_NAME )
+						.failure(
+								"Unable to convert configuration property 'backends." + BACKEND_NAME + ".directory.type'"
+										+ " with value '" + invalidDirectoryType + "'",
+								"Unable to find " + DirectoryProvider.class.getName() + " implementation class: "
+										+ invalidDirectoryType
+						)
+						.build()
+				);
 	}
 
 	public static class CustomDirectoryProvider implements DirectoryProvider {

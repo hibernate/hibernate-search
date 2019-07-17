@@ -7,9 +7,11 @@
 package org.hibernate.search.integrationtest.backend.lucene.lowlevel.directory;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -85,7 +87,14 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 		testLockingStrategy( "none", NO_LOCK_FQN );
 	}
 
+	protected abstract Object getDirectoryType();
+
 	protected abstract String getDefaultLockClassName();
+
+	protected final void setup(
+			Function<SearchSetupHelper.SetupContext, SearchSetupHelper.SetupContext> additionalConfiguration) {
+		setup( getDirectoryType(), additionalConfiguration );
+	}
 
 	private void testLockingStrategy(String strategyName, String expectedLockClassName) throws IOException {
 		setup( c -> {
