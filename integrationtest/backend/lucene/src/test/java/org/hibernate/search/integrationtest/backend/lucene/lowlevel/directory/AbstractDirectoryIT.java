@@ -28,6 +28,7 @@ import org.junit.rules.TemporaryFolder;
 
 public abstract class AbstractDirectoryIT {
 
+	protected static final String MAPPED_TYPE_NAME = "MappedTypeName";
 	protected static final String BACKEND_NAME = "BackendName";
 	protected static final String INDEX_NAME = "IndexName";
 
@@ -75,6 +76,7 @@ public abstract class AbstractDirectoryIT {
 				setupHelper.start( BACKEND_NAME )
 						.withIndex(
 								INDEX_NAME,
+								c -> c.mappedType( MAPPED_TYPE_NAME ),
 								ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 								indexManager -> this.indexManager = indexManager
 						)
