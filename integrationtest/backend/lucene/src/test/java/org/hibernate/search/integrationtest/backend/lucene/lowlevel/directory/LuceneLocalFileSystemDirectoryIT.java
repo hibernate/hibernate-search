@@ -122,6 +122,11 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	}
 
 	@Override
+	protected boolean isFSDirectory() {
+		return true;
+	}
+
+	@Override
 	protected String getDefaultLockClassName() {
 		return NATIVE_FS_LOCK_FQN;
 	}

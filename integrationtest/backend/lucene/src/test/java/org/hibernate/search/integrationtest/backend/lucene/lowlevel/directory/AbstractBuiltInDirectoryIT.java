@@ -34,41 +34,51 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfNativeLockingFactory")
-	public void lockingStrategy_default() throws IOException {
-		testLockingStrategy( null, getDefaultLockClassName() );
+	public void lockingStrategy_default() {
+		testValidLockingStrategy( null, getDefaultLockClassName() );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfSimpleLockingFactory")
-	public void lockingStrategy_simpleFilesystem() throws IOException {
-		testLockingStrategy( "simple-filesystem", SIMPLE_FS_LOCK_FQN );
+	public void lockingStrategy_simpleFilesystem() {
+		if ( isFSDirectory() ) {
+			testValidLockingStrategy( "simple-filesystem", SIMPLE_FS_LOCK_FQN );
+		}
+		else {
+			testInvalidFSLockingStrategy( "simple-filesystem" );
+		}
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfNativeLockingFactory")
-	public void lockingStrategy_nativeFilesystem() throws IOException {
-		testLockingStrategy( "native-filesystem", NATIVE_FS_LOCK_FQN );
+	public void lockingStrategy_nativeFilesystem() {
+		if ( isFSDirectory() ) {
+			testValidLockingStrategy( "native-filesystem", NATIVE_FS_LOCK_FQN );
+		}
+		else {
+			testInvalidFSLockingStrategy( "simple-filesystem" );
+		}
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfSingleLockingFactory")
-	public void lockingStrategy_singleInstance() throws IOException {
-		testLockingStrategy( "single-instance", SINGLE_INSTANCE_LOCK_FQN );
+	public void lockingStrategy_singleInstance() {
+		testValidLockingStrategy( "single-instance", SINGLE_INSTANCE_LOCK_FQN );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	public void lockingStrategy_none() throws IOException {
-		testLockingStrategy( "none", NO_LOCK_FQN );
+	public void lockingStrategy_none() {
+		testValidLockingStrategy( "none", NO_LOCK_FQN );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testFailOnNonExistentLockingFactory")
-	public void lockingStrategy_invalid() throws IOException {
+	public void lockingStrategy_invalid() {
 		SubTest.expectException( () -> setup( c -> c.withBackendProperty(
 				BACKEND_NAME, LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
 				"some_invalid_name"
@@ -84,10 +94,12 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 						)
 						.build()
 				);
-		testLockingStrategy( "none", NO_LOCK_FQN );
+		testValidLockingStrategy( "none", NO_LOCK_FQN );
 	}
 
 	protected abstract Object getDirectoryType();
+
+	protected abstract boolean isFSDirectory();
 
 	protected abstract String getDefaultLockClassName();
 
@@ -96,7 +108,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 		setup( getDirectoryType(), additionalConfiguration );
 	}
 
-	private void testLockingStrategy(String strategyName, String expectedLockClassName) throws IOException {
+	private void testValidLockingStrategy(String strategyName, String expectedLockClassName) {
 		setup( c -> {
 			if ( strategyName != null ) {
 				c.withBackendProperty(
@@ -115,5 +127,28 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 			Assertions.assertThat( lock.getClass().getName() )
 					.isEqualTo( expectedLockClassName );
 		}
+		catch (IOException e) {
+			throw new IllegalStateException( "Unexpected exception during test: " + e.getMessage(), e );
+		}
 	}
+
+	private void testInvalidFSLockingStrategy(String strategyName) {
+		SubTest.expectException( () -> setup( c -> c.withBackendProperty(
+				BACKEND_NAME, LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
+				strategyName
+		) ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( MAPPED_TYPE_NAME )
+						.backendContext( BACKEND_NAME )
+						.indexContext( INDEX_NAME )
+						.failure(
+								"Unable to initialize index directory",
+								"can only be used with FSDirectory subclasses"
+						)
+						.build()
+				);
+	}
+
 }

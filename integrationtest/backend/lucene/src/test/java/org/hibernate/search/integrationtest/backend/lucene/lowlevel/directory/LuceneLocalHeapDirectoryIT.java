@@ -8,13 +8,10 @@ package org.hibernate.search.integrationtest.backend.lucene.lowlevel.directory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -40,22 +37,13 @@ public class LuceneLocalHeapDirectoryIT extends AbstractBuiltInDirectoryIT {
 	}
 
 	@Override
-	@Test
-	@Ignore // Cannot use this locking strategy with a non-FS directory
-	public void lockingStrategy_nativeFilesystem() throws IOException {
-		super.lockingStrategy_nativeFilesystem();
-	}
-
-	@Override
-	@Test
-	@Ignore // Cannot use this locking strategy with a non-FS directory
-	public void lockingStrategy_simpleFilesystem() throws IOException {
-		super.lockingStrategy_simpleFilesystem();
-	}
-
-	@Override
 	protected Object getDirectoryType() {
 		return "local-heap";
+	}
+
+	@Override
+	protected boolean isFSDirectory() {
+		return false;
 	}
 
 	@Override
