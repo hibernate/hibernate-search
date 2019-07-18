@@ -16,7 +16,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
@@ -317,6 +320,60 @@ public class SearchProjectionIT extends EasyMockSupport {
 		} );
 	}
 
+	/**
+	 * Test mixing multiple projection types (field projections, special projections, ...),
+	 * and also multiple field projections, using nested fields too.
+	 */
+	@Test
+	public void mixed_withNestedFields() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<List<?>> query;
+
+		query = scope.query()
+				.asProjection( f ->
+						f.composite(
+								f.field( indexMapping.string1Field.relativeFieldName, String.class ),
+								f.documentReference(),
+								f.field( "nested." + indexMapping.nestedField.relativeFieldName, String.class ),
+								f.field( "nested.nested." + indexMapping.nestedNestedField.relativeFieldName, String.class ),
+								f.field( "nested.flattened." + indexMapping.flattenedField.relativeFieldName, String.class )
+						)
+				)
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+		assertThat( query ).hasListHitsAnyOrder( b -> {
+			b.list(
+					indexMapping.string1Field.document1Value.indexedValue,
+					reference( INDEX_NAME, DOCUMENT_1 ),
+					indexMapping.nestedField.document1Value.indexedValue,
+					indexMapping.nestedNestedField.document1Value.indexedValue,
+					indexMapping.flattenedField.document1Value.indexedValue
+			);
+			b.list(
+					indexMapping.string1Field.document2Value.indexedValue,
+					reference( INDEX_NAME, DOCUMENT_2 ),
+					indexMapping.nestedField.document2Value.indexedValue,
+					indexMapping.nestedNestedField.document2Value.indexedValue,
+					indexMapping.flattenedField.document2Value.indexedValue
+			);
+			b.list(
+					indexMapping.string1Field.document3Value.indexedValue,
+					reference( INDEX_NAME, DOCUMENT_3 ),
+					indexMapping.nestedField.document3Value.indexedValue,
+					indexMapping.nestedNestedField.document3Value.indexedValue,
+					indexMapping.flattenedField.document3Value.indexedValue
+			);
+			b.list(
+					null,
+					reference( INDEX_NAME, EMPTY ),
+					null,
+					null,
+					null
+			);
+		} );
+	}
+
 	@Test
 	public void reuseProjectionInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = indexManager.createScope();
@@ -485,18 +542,45 @@ public class SearchProjectionIT extends EasyMockSupport {
 			indexMapping.string2Field.document1Value.write( document );
 
 			indexMapping.scoreField.document1Value.write( document );
+
+			DocumentElement nestedDocument = document.addObject( indexMapping.nestedObject );
+			indexMapping.nestedField.document1Value.write( nestedDocument );
+
+			DocumentElement nestedNestedDocument = nestedDocument.addObject( indexMapping.nestedNestedObject );
+			indexMapping.nestedNestedField.document1Value.write( nestedNestedDocument );
+
+			DocumentElement flattedDocument = nestedDocument.addObject( indexMapping.flattenedObject );
+			indexMapping.flattenedField.document1Value.write( flattedDocument );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.string1Field.document2Value.write( document );
 			indexMapping.string2Field.document2Value.write( document );
 
 			indexMapping.scoreField.document2Value.write( document );
+
+			DocumentElement nestedDocument = document.addObject( indexMapping.nestedObject );
+			indexMapping.nestedField.document2Value.write( nestedDocument );
+
+			DocumentElement nestedNestedDocument = nestedDocument.addObject( indexMapping.nestedNestedObject );
+			indexMapping.nestedNestedField.document2Value.write( nestedNestedDocument );
+
+			DocumentElement flattedDocument = nestedDocument.addObject( indexMapping.flattenedObject );
+			indexMapping.flattenedField.document2Value.write( flattedDocument );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.string1Field.document3Value.write( document );
 			indexMapping.string2Field.document3Value.write( document );
 
 			indexMapping.scoreField.document3Value.write( document );
+
+			DocumentElement nestedDocument = document.addObject( indexMapping.nestedObject );
+			indexMapping.nestedField.document3Value.write( nestedDocument );
+
+			DocumentElement nestedNestedDocument = nestedDocument.addObject( indexMapping.nestedNestedObject );
+			indexMapping.nestedNestedField.document3Value.write( nestedNestedDocument );
+
+			DocumentElement flattedDocument = nestedDocument.addObject( indexMapping.flattenedObject );
+			indexMapping.flattenedField.document3Value.write( flattedDocument );
 		} );
 		workPlan.add( referenceProvider( EMPTY ), document -> { } );
 
@@ -522,6 +606,15 @@ public class SearchProjectionIT extends EasyMockSupport {
 		final FieldModel<String> string2Field;
 		final FieldModel<String> scoreField;
 
+		final IndexObjectFieldReference nestedObject;
+		final FieldModel<String> nestedField;
+
+		final IndexObjectFieldReference nestedNestedObject;
+		final FieldModel<String> nestedNestedField;
+
+		final IndexObjectFieldReference flattenedObject;
+		final FieldModel<String> flattenedField;
+
 		IndexMapping(IndexSchemaElement root) {
 			string1Field = FieldModel.mapper( String.class, "ccc", "mmm", "xxx" )
 					.map( root, "string1" );
@@ -532,6 +625,24 @@ public class SearchProjectionIT extends EasyMockSupport {
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ),
 					"scorepattern scorepattern", "scorepattern", "xxx" )
 					.map( root, "score" );
+
+			IndexSchemaObjectField nested = root.objectField( "nested", ObjectFieldStorage.NESTED );
+			nestedObject = nested.toReference();
+
+			nestedField = FieldModel.mapper( String.class, "eee", "ooo", "zzz" )
+					.map( nested, "inner" );
+
+			IndexSchemaObjectField nestedNested = nested.objectField( "nested", ObjectFieldStorage.NESTED );
+			nestedNestedObject = nestedNested.toReference();
+
+			nestedNestedField = FieldModel.mapper( String.class, "fff", "ppp", "aaa" )
+					.map( nestedNested, "inner" );
+
+			IndexSchemaObjectField flattened = nested.objectField( "flattened", ObjectFieldStorage.FLATTENED );
+			flattenedObject = flattened.toReference();
+
+			flattenedField = FieldModel.mapper( String.class, "ggg", "ooo", "bbb" )
+					.map( flattened, "inner" );
 		}
 	}
 
