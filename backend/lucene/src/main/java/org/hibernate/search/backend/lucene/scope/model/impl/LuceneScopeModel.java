@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -147,5 +148,21 @@ public class LuceneScopeModel {
 			}
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
+	}
+
+	public Set<String> getNestedDocumentPaths(String absoluteFieldPath) {
+		HashSet<String> nestedDocumentPaths = new HashSet<>();
+		for ( LuceneIndexModel indexModel : indexModels ) {
+			LuceneIndexSchemaFieldNode<?> fieldNode = indexModel.getFieldNode( absoluteFieldPath );
+			if ( fieldNode == null ) {
+				continue;
+			}
+
+			String nestedFieldPath = fieldNode.getNestedDocumentPath();
+			if ( nestedFieldPath != null ) {
+				nestedDocumentPaths.add( nestedFieldPath );
+			}
+		}
+		return nestedDocumentPaths;
 	}
 }

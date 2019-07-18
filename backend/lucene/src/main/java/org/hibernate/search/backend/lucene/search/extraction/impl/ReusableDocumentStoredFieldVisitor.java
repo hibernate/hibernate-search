@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
@@ -35,6 +36,7 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 
 	private final FieldAcceptor rootAcceptor;
 	private final int totalFields;
+	private final Set<String> nestedDocumentPaths;
 
 	//The Lucene Document which will be returned. Lazily initialized.
 	private Document doc = null;
@@ -50,12 +52,13 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 		this.rootAcceptor = null;
 		this.totalFields = 0; // Shouldn't be used
 		this.missingFields = totalFields;
+		this.nestedDocumentPaths = new HashSet<>();
 	}
 
 	/**
 	 * Create a visitor that collects only some specified fields.
 	 */
-	public ReusableDocumentStoredFieldVisitor(Set<String> fieldsToLoad) {
+	public ReusableDocumentStoredFieldVisitor(Set<String> fieldsToLoad, Set<String> nestedDocumentPaths) {
 		FieldAcceptor previous = NOT_ACCEPT;
 		for ( String fieldName : fieldsToLoad ) {
 			previous = new ChainedFieldAcceptor( previous, fieldName );
@@ -63,6 +66,7 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 		this.rootAcceptor = previous;
 		this.totalFields = fieldsToLoad.size();
 		this.missingFields = totalFields;
+		this.nestedDocumentPaths = nestedDocumentPaths;
 	}
 
 	@Override
@@ -117,22 +121,6 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 	}
 
 	/**
-	 * Useful for tests
-	 * @return the amount of accepted fields
-	 */
-	public int countAcceptedFields() {
-		FieldAcceptor acceptor = rootAcceptor;
-		int count = 0;
-		while ( acceptor != NOT_ACCEPT ) {
-			//If it's not negative it has to be positive:
-			ChainedFieldAcceptor positiveAcceptor = (ChainedFieldAcceptor) acceptor;
-			acceptor = positiveAcceptor.next;
-			count++;
-		}
-		return count;
-	}
-
-	/**
 	 * Retrieve the visited document, and resets the instance to be reused by creating a new Document
 	 * internally.
 	 *
@@ -157,6 +145,10 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 			this.doc = localDoc;
 		}
 		return localDoc;
+	}
+
+	public Set<String> getNestedDocumentPaths() {
+		return nestedDocumentPaths;
 	}
 
 	/* The structure below shapes a chain of accepted field names:

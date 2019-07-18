@@ -8,7 +8,12 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import static org.hibernate.search.backend.lucene.util.impl.LuceneFields.internalFieldName;
 
+import java.util.Set;
 import java.util.function.Consumer;
+
+import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.LatLonDocValuesField;
@@ -19,10 +24,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocValuesFieldExistsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.engine.spatial.GeoPoint;
 
 public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 
@@ -88,6 +89,11 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	public void contributeStoredFields(String absoluteFieldPath, Consumer<String> collector) {
 		collector.accept( getLatitudeAbsoluteFieldPath( absoluteFieldPath ) );
 		collector.accept( getLongitudeAbsoluteFieldPath( absoluteFieldPath ) );
+	}
+
+	@Override
+	public void contributeNestedDocumentPaths(Set<String> nestedDocumentPaths, Consumer<Set<String>> collector) {
+		collector.accept( nestedDocumentPaths );
 	}
 
 	@Override

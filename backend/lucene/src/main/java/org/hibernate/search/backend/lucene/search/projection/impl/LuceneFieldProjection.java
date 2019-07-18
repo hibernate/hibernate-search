@@ -21,15 +21,17 @@ class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
+	private final Set<String> nestedDocumentPaths;
 
 	private final LuceneFieldCodec<F> codec;
 
 	private final FromDocumentFieldValueConverter<? super F, V> converter;
 
-	LuceneFieldProjection(Set<String> indexNames, String absoluteFieldPath, LuceneFieldCodec<F> codec,
-			FromDocumentFieldValueConverter<? super F, V> converter) {
+	LuceneFieldProjection(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedDocumentPaths,
+			LuceneFieldCodec<F> codec, FromDocumentFieldValueConverter<? super F, V> converter) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.nestedDocumentPaths = nestedDocumentPaths;
 		this.codec = codec;
 		this.converter = converter;
 	}
@@ -42,6 +44,7 @@ class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 	@Override
 	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
 		codec.contributeStoredFields( absoluteFieldPath, builder::add );
+		codec.contributeNestedDocumentPaths( nestedDocumentPaths, builder::addNestedDocumentPaths );
 	}
 
 	@Override

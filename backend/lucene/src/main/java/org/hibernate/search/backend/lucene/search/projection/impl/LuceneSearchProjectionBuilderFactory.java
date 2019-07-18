@@ -68,8 +68,10 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 				fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
 				break;
 		}
+
 		return fieldComponent.getComponent()
-				.createFieldValueProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, expectedType, convert );
+				.createFieldValueProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, scopeModel.getNestedDocumentPaths( absoluteFieldPath ),
+						expectedType, convert );
 	}
 
 	@Override

@@ -65,8 +65,9 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 
+		String nestedDocumentPath = ( ObjectFieldStorage.NESTED.equals( storage ) ) ? absoluteFieldPath : parentNode.getNestedDocumentPath();
 		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode(
-				parentNode, absoluteFieldPath, storage, multiValued
+				parentNode, absoluteFieldPath, nestedDocumentPath, storage, multiValued
 		);
 		collector.collectObjectNode( absoluteFieldPath, node );
 

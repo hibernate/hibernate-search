@@ -28,6 +28,8 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final String absoluteFieldPath;
 
+	private final String nestedDocumentPath;
+
 	private final boolean multiValued;
 
 	private final LuceneFieldCodec<F> codec;
@@ -47,6 +49,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = parent.getAbsolutePath( relativeFieldName );
+		this.nestedDocumentPath = parent.getNestedDocumentPath();
 		this.multiValued = multiValued;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
@@ -60,6 +63,10 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	public String getAbsoluteFieldPath() {
 		return absoluteFieldPath;
+	}
+
+	public String getNestedDocumentPath() {
+		return nestedDocumentPath;
 	}
 
 	/**

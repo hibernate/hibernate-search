@@ -509,4 +509,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 91,
 			value = "Invalid routing key: '%1$s'. Valid keys are: %2$s.")
 	SearchException invalidRoutingKeyForExplicitShardingStrategy(String invalidKey, Collection<String> validKeys);
+
+	@Message(id = ID_OFFSET_2 + 92, value = "Error fetching nested documents. Native Lucene query: '%1$s'.")
+	SearchException errorFetchingNestedDocuments(Query luceneQuery, @Cause Exception e);
 }
