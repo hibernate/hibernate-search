@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
 import java.lang.annotation.Annotation;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
@@ -32,6 +33,11 @@ abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation>
 			fieldContext.sortable( sortable );
 		}
 
+		Aggregable aggregable = getAggregable( annotation );
+		if ( !Aggregable.DEFAULT.equals( aggregable ) ) {
+			fieldContext.aggregable( aggregable );
+		}
+
 		String indexNullAs = getIndexNullAs( annotation );
 		if ( indexNullAs != null && !AnnotationDefaultValues.DO_NOT_INDEX_NULL.equals( indexNullAs ) ) {
 			fieldContext.indexNullAs( indexNullAs );
@@ -44,6 +50,8 @@ abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation>
 			PojoPropertyModel<?> propertyModel, A annotation, String fieldName);
 
 	abstract Sortable getSortable(A annotation);
+
+	abstract Aggregable getAggregable(A annotation);
 
 	abstract String getIndexNullAs(A annotation);
 }

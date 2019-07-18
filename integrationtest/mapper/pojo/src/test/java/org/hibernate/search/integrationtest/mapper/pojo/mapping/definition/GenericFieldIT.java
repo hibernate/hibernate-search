@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -72,6 +73,52 @@ public class GenericFieldIT {
 				.field( "unsearchable", LocalDate.class, f -> f.searchable( Searchable.NO ) )
 				.field( "useDefault", BigDecimal.class )
 				.field( "implicit", String.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void aggregable() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String enabled;
+			String disabled;
+			String explicitDefault;
+			String implicitDefault;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@GenericField(aggregable = Aggregable.YES)
+			public String getEnabled() {
+				return enabled;
+			}
+
+			@GenericField(aggregable = Aggregable.NO)
+			public String getDisabled() {
+				return disabled;
+			}
+
+			@GenericField(aggregable = Aggregable.DEFAULT)
+			public String getExplicitDefault() {
+				return explicitDefault;
+			}
+
+			@GenericField
+			public String getImplicitDefault() {
+				return implicitDefault;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "enabled", String.class, f -> f.aggregable( Aggregable.YES ) )
+				.field( "disabled", String.class, f -> f.aggregable( Aggregable.NO ) )
+				.field( "explicitDefault", String.class )
+				.field( "implicitDefault", String.class )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();

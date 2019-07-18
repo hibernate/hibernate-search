@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -284,6 +285,11 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
+		Aggregable getAggregable(GenericField annotation) {
+			return annotation.aggregable();
+		}
+
+		@Override
 		String getIndexNullAs(GenericField annotation) {
 			return annotation.indexNullAs();
 		}
@@ -403,6 +409,11 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
+		Aggregable getAggregable(KeywordField annotation) {
+			return annotation.aggregable();
+		}
+
+		@Override
 		String getIndexNullAs(KeywordField annotation) {
 			return annotation.indexNullAs();
 		}
@@ -457,6 +468,11 @@ class AnnotationProcessorProvider {
 		@Override
 		Sortable getSortable(ScaledNumberField annotation) {
 			return annotation.sortable();
+		}
+
+		@Override
+		Aggregable getAggregable(ScaledNumberField annotation) {
+			return annotation.aggregable();
 		}
 
 		@Override

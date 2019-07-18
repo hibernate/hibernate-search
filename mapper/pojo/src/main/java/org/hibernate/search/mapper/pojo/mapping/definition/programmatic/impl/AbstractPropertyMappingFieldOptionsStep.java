@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -67,6 +68,12 @@ abstract class AbstractPropertyMappingFieldOptionsStep<
 	@Override
 	public S searchable(Searchable searchable) {
 		fieldModelContributor.add( (c, b) -> c.searchable( searchable ) );
+		return thisAsS();
+	}
+
+	@Override
+	public S aggregable(Aggregable aggregable) {
+		fieldModelContributor.add( (c, b) -> c.aggregable( aggregable ) );
 		return thisAsS();
 	}
 

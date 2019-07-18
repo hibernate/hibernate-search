@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -197,6 +198,52 @@ public class ScaledNumberFieldIT {
 				.field( "unsearchable", BigInteger.class, f -> f.searchable( Searchable.NO ) )
 				.field( "useDefault", BigDecimal.class )
 				.field( "implicit", BigInteger.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void aggregable() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			BigDecimal enabled;
+			BigDecimal disabled;
+			BigDecimal explicitDefault;
+			BigDecimal implicitDefault;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@ScaledNumberField(aggregable = Aggregable.YES)
+			public BigDecimal getEnabled() {
+				return enabled;
+			}
+
+			@ScaledNumberField(aggregable = Aggregable.NO)
+			public BigDecimal getDisabled() {
+				return disabled;
+			}
+
+			@ScaledNumberField(aggregable = Aggregable.DEFAULT)
+			public BigDecimal getExplicitDefault() {
+				return explicitDefault;
+			}
+
+			@ScaledNumberField
+			public BigDecimal getImplicitDefault() {
+				return implicitDefault;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "enabled", BigDecimal.class, f -> f.aggregable( Aggregable.YES ) )
+				.field( "disabled", BigDecimal.class, f -> f.aggregable( Aggregable.NO ) )
+				.field( "explicitDefault", BigDecimal.class )
+				.field( "implicitDefault", BigDecimal.class )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
