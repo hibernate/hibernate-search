@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldFinalStep;
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
@@ -413,6 +414,34 @@ public class DocumentModelDslIT {
 						.indexContext( INDEX_NAME )
 						.failure(
 								"Cannot apply an analyzer on a sortable field",
+								"Use a normalizer instead",
+								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
+						)
+						.build() );
+	}
+
+	@Test
+	public void analyzerOnAggregableField() {
+		SubTest.expectException(
+				"Setting an analyzer on aggregable field",
+				() -> setup( ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					root.field(
+							"myField",
+							f -> f.asString()
+									.aggregable( Aggregable.YES )
+									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+					)
+							.toReference();
+				} )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
+						.failure(
+								"Cannot apply an analyzer on an aggregable field",
 								"Use a normalizer instead",
 								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
 						)
