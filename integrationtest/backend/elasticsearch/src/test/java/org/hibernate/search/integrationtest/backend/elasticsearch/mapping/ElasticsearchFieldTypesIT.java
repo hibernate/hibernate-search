@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -41,7 +42,7 @@ public class ElasticsearchFieldTypesIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
-	public void addUpdateDelete_routing() {
+	public void test() {
 		clientSpy.expectNext(
 				ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.STRICT
 		);
@@ -100,6 +101,7 @@ public class ElasticsearchFieldTypesIT {
 		properties.add( "short", type( "short" ) );
 		properties.add( "float", type( "float" ) );
 		properties.add( "double", type( "double" ) );
+		properties.add( "unsupportedType", type( "half_float" ) );
 
 		return payload;
 	}
@@ -125,6 +127,12 @@ public class ElasticsearchFieldTypesIT {
 			root.field( "short", f -> f.asShort() ).toReference();
 			root.field( "float", f -> f.asFloat() ).toReference();
 			root.field( "double", f -> f.asDouble() ).toReference();
+			root.field(
+					"unsupportedType",
+					f -> f.extension( ElasticsearchExtension.get() )
+							.asNative( "{\"type\": \"half_float\"}" )
+			)
+					.toReference();
 		}
 	}
 }

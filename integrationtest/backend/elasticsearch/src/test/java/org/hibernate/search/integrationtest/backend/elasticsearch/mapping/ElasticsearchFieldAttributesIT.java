@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -66,6 +67,25 @@ public class ElasticsearchFieldAttributesIT {
 			root.field( "yes", f -> f.asString().analyzer( "standard" ).termVector( TermVector.YES ) ).toReference();
 			root.field( "implicit", f -> f.asString().analyzer( "standard" ) ).toReference();
 			root.field( "moreOptions", f -> f.asString().analyzer( "standard" ).termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS ) ).toReference();
+		}, properties );
+	}
+
+	@Test
+	public void verifyNative() {
+		JsonObject nativeField = new JsonObject();
+		nativeField.addProperty( "type", "half_float" );
+		nativeField.addProperty( "ignore_malformed", true );
+
+		JsonObject properties = new JsonObject();
+		properties.add( "native", nativeField );
+
+		matchMapping( root -> {
+			root.field(
+					"native",
+					f -> f.extension( ElasticsearchExtension.get() )
+							.asNative( "{\"type\": \"half_float\",\"ignore_malformed\": true}" )
+			)
+					.toReference();
 		}, properties );
 	}
 

@@ -464,6 +464,7 @@ public class ElasticsearchExtensionIT {
 						+ "'integer': 1,"
 						+ "'geoPoint': {'lat': 45.12, 'lon': -75.34},"
 						+ "'dateWithColons': '2018:01:25',"
+						+ "'unsupportedType': 'foobar',"
 						+ "'sort5': 'z'"
 						+ "}",
 				result.get( 0 ),
@@ -499,6 +500,7 @@ public class ElasticsearchExtensionIT {
 						+ "'integer': 1,"
 						+ "'geoPoint': {'lat': 45.12, 'lon': -75.34},"
 						+ "'dateWithColons': '2018:01:25',"
+						+ "'unsupportedType': 'foobar',"
 						+ "'sort5': 'z'"
 						+ "}",
 				result.get( 0 ),
@@ -587,6 +589,7 @@ public class ElasticsearchExtensionIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
 			document.addValue( indexMapping.integer, "2" );
+			document.addValue( indexMapping.unsupportedType, "42" );
 
 			document.addValue( indexMapping.sort1, "z" );
 			document.addValue( indexMapping.sort2, "a" );
@@ -627,6 +630,7 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.integer, "1" );
 			document.addValue( indexMapping.geoPoint, "{'lat': 45.12, 'lon': -75.34}" );
 			document.addValue( indexMapping.dateWithColons, "'2018:01:25'" );
+			document.addValue( indexMapping.unsupportedType, "'foobar'" ); // ignore_malformed is enabled, this should be ignored
 
 			document.addValue( indexMapping.sort5, "z" );
 		} );
@@ -650,6 +654,7 @@ public class ElasticsearchExtensionIT {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> geoPoint;
 		final IndexFieldReference<String> dateWithColons;
+		final IndexFieldReference<String> unsupportedType;
 
 		final IndexFieldReference<String> sort1;
 		final IndexFieldReference<String> sort2;
@@ -680,6 +685,12 @@ public class ElasticsearchExtensionIT {
 					"dateWithColons",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'date', 'format': 'yyyy:MM:dd'}" )
+			)
+					.toReference();
+			unsupportedType = root.field(
+					"unsupportedType",
+					f -> f.extension( ElasticsearchExtension.get() )
+							.asNative( "{'type': 'half_float', 'ignore_malformed': true}" )
 			)
 					.toReference();
 
