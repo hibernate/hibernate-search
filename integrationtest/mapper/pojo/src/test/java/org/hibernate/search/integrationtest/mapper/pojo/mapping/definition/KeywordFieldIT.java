@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
@@ -194,6 +195,52 @@ public class KeywordFieldIT {
 				.field( "unsearchable", String.class, f -> f.searchable( Searchable.NO ) )
 				.field( "useDefault", String.class )
 				.field( "implicit", String.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void aggregable() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String enabled;
+			String disabled;
+			String explicitDefault;
+			String implicitDefault;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@KeywordField(aggregable = Aggregable.YES)
+			public String getEnabled() {
+				return enabled;
+			}
+
+			@KeywordField(aggregable = Aggregable.NO)
+			public String getDisabled() {
+				return disabled;
+			}
+
+			@KeywordField(aggregable = Aggregable.DEFAULT)
+			public String getExplicitDefault() {
+				return explicitDefault;
+			}
+
+			@KeywordField
+			public String getImplicitDefault() {
+				return implicitDefault;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "enabled", String.class, f -> f.aggregable( Aggregable.YES ) )
+				.field( "disabled", String.class, f -> f.aggregable( Aggregable.NO ) )
+				.field( "explicitDefault", String.class )
+				.field( "implicitDefault", String.class )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();

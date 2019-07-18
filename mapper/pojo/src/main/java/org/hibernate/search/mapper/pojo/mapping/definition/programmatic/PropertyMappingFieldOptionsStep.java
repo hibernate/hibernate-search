@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -36,6 +37,14 @@ public interface PropertyMappingFieldOptionsStep<S extends PropertyMappingFieldO
 	 * @see Searchable
 	 */
 	S searchable(Searchable searchable);
+
+	/**
+	 * @param aggregable Whether aggregations are enabled for this field.
+	 * @return {@code this}, for method chaining.
+	 * @see GenericField#aggregable()
+	 * @see Aggregable
+	 */
+	S aggregable(Aggregable aggregable);
 
 	/**
 	 * @param bridgeClass The class of the bridge to use.

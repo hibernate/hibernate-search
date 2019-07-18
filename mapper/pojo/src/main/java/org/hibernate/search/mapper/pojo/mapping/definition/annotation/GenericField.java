@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -58,6 +59,12 @@ public @interface GenericField {
 	 * @see Searchable
 	 */
 	Searchable searchable() default Searchable.DEFAULT;
+
+	/**
+	 * @return Whether aggregations are enabled for this field.
+	 * @see Aggregable
+	 */
+	Aggregable aggregable() default Aggregable.DEFAULT;
 
 	/**
 	 * @return A value used instead of null values when indexing.
