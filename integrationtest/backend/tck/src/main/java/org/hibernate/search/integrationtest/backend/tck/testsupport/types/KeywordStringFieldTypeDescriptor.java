@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
@@ -20,6 +22,20 @@ public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String
 
 	KeywordStringFieldTypeDescriptor() {
 		super( String.class, "keywordString" );
+	}
+
+	@Override
+	public List<String> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				"Auster",
+				"Irving",
+				"Zach",
+				"amaretto y croutons",
+				"irving and company",
+				"none the wiser",
+				"per the captain's log",
+				"platypus"
+		);
 	}
 
 	@Override

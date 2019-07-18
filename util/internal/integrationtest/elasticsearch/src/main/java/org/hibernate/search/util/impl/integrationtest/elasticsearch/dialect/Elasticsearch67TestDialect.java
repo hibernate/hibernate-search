@@ -50,4 +50,9 @@ public class Elasticsearch67TestDialect implements ElasticsearchTestDialect {
 		array.add( pattern );
 		object.add( "index_patterns", array );
 	}
+
+	@Override
+	public boolean zonedDateTimeDocValueHasUTCZoneId() {
+		return true;
+	}
 }

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
@@ -20,6 +22,20 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 
 	LongFieldTypeDescriptor() {
 		super( Long.class );
+	}
+
+	@Override
+	public List<Long> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				Long.MIN_VALUE,
+				-251_484_254L,
+				0L,
+				42L,
+				55L,
+				2500L,
+				151_484_254L,
+				Long.MAX_VALUE
+		);
 	}
 
 	@Override

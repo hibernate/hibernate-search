@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
@@ -29,6 +32,25 @@ public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<Str
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, String> configure(IndexFieldTypeFactory fieldContext) {
 		return fieldContext.asString().normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name );
+	}
+
+	@Override
+	public String toExpectedDocValue(String indexed) {
+		return indexed == null ? null : indexed.toLowerCase( Locale.ROOT );
+	}
+
+	@Override
+	public List<String> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				"amaretto y croutons",
+				"Auster",
+				"Irving",
+				"irving and company",
+				"none the wiser",
+				"per the captain's log",
+				"platypus",
+				"Zach"
+		);
 	}
 
 	@Override

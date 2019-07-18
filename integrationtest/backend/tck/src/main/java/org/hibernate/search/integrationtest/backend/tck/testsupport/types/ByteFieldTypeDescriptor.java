@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
@@ -20,6 +22,20 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 
 	ByteFieldTypeDescriptor() {
 		super( Byte.class );
+	}
+
+	@Override
+	public List<Byte> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				Byte.MIN_VALUE,
+				(byte) -58,
+				(byte) 0,
+				(byte) 42,
+				(byte) 55,
+				(byte) 70,
+				(byte) 101,
+				Byte.MAX_VALUE
+		);
 	}
 
 	@Override

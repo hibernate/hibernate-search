@@ -20,8 +20,10 @@ import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Hardy Ferentschik
  */
+@Category(PortedToSearch6.class)
 public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 	private final String facetName = "ccs";
 

@@ -10,11 +10,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ObjectAssert;
 
 public class SearchResultAssert<H> {
 
@@ -49,6 +51,15 @@ public class SearchResultAssert<H> {
 
 	public SearchHitsAssert<H> hits() {
 		return SearchHitsAssert.<H>assertThat( actual.getHits() ).as( "Hits of " + queryDescription );
+	}
+
+	public <A> ObjectAssert<A> aggregation(AggregationKey<A> key) {
+		return Assertions.assertThat( actual.getAggregation( key ) );
+	}
+
+	public <A> SearchResultAssert<H> aggregation(AggregationKey<A> key, Consumer<A> assertion) {
+		assertion.accept( actual.getAggregation( key ) );
+		return this;
 	}
 
 	public SearchResultAssert<H> hasNoHits() {

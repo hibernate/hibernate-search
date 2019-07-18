@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
@@ -20,6 +22,20 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 
 	ShortFieldTypeDescriptor() {
 		super( Short.class );
+	}
+
+	@Override
+	public List<Short> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				Short.MIN_VALUE,
+				(short) -25435,
+				(short) 0,
+				(short) 42,
+				(short) 55,
+				(short) 2500,
+				(short) 18353,
+				Short.MAX_VALUE
+		);
 	}
 
 	@Override

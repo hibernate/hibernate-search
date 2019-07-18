@@ -17,8 +17,12 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.junit.Test;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+@Category(PortedToSearch6.class)
 public class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 
 	@Test

@@ -10,6 +10,7 @@ import java.time.LocalTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,26 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 
 	OffsetTimeFieldTypeDescriptor() {
 		super( OffsetTime.class );
+	}
+
+	@Override
+	public OffsetTime toExpectedDocValue(OffsetTime indexed) {
+		return indexed == null ? null : indexed.withOffsetSameInstant( ZoneOffset.UTC );
+	}
+
+	@Override
+	public List<OffsetTime> getAscendingUniqueTermValues() {
+		// Remember: we only get millisecond precision for predicates/sorts/aggregations/etc.
+		return Arrays.asList(
+				LocalTime.of( 3, 4, 0, 0 ).atOffset( ZoneOffset.ofHours( 10 ) ),
+				LocalTime.of( 2, 0, 0, 0 ).atOffset( ZoneOffset.ofHours( 2 ) ),
+				LocalTime.of( 10, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( -2 ) ),
+				LocalTime.of( 13, 0, 23, 0 ).atOffset( ZoneOffset.ofHours( 0 ) ),
+				LocalTime.of( 10, 0, 0, 0 ).atOffset( ZoneOffset.ofHours( -4 ) ),
+				LocalTime.of( 19, 59, 0, 0 ).atOffset( ZoneOffset.ofHours( 2 ) ),
+				LocalTime.of( 23, 59, 59, 999_000_000 ).atOffset( ZoneOffset.ofHours( 0 ) ),
+				LocalTime.of( 21, 0, 0, 0 ).atOffset( ZoneOffset.ofHours( -4 ) )
+		);
 	}
 
 	@Override

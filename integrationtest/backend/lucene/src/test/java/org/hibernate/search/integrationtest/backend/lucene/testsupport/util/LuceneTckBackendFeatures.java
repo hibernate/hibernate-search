@@ -16,4 +16,12 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 		// see LuceneSearchSortIT
 		return false;
 	}
+
+	@Override
+	public boolean aggregationsOnMultiValuedFields(Class<?> fieldType) {
+		// TODO HSEARCH-1929 + HSEARCH-1927 Aggregations on multi-valued numeric fields are not supported at the moment
+		//  See in particular https://hibernate.atlassian.net/browse/HSEARCH-1927?focusedCommentId=88210&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-88210
+		return String.class.equals( fieldType );
+	}
+
 }

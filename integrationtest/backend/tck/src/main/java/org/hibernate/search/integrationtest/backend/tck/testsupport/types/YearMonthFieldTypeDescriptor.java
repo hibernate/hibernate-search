@@ -28,6 +28,20 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 	}
 
 	@Override
+	public List<YearMonth> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				YearMonth.of( -25435, Month.MAY ),
+				YearMonth.of( 0, Month.JUNE ),
+				YearMonth.of( 0, Month.OCTOBER ),
+				YearMonth.of( 1989, Month.MARCH ),
+				YearMonth.of( 1989, Month.JULY ),
+				YearMonth.of( 2019, Month.JANUARY ),
+				YearMonth.of( 2019, Month.NOVEMBER ),
+				YearMonth.of( 2019, Month.DECEMBER )
+		);
+	}
+
+	@Override
 	public Optional<IndexingExpectations<YearMonth>> getIndexingExpectations() {
 		List<YearMonth> values = new ArrayList<>();
 		YearFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( year -> {

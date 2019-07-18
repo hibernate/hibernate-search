@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,21 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 
 	InstantFieldTypeDescriptor() {
 		super( Instant.class );
+	}
+
+	@Override
+	public List<Instant> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				Instant.parse( "2018-01-01T10:58:30.00Z" ),
+				Instant.parse( "2018-02-01T10:15:30.00Z" ),
+				Instant.parse( "2018-02-01T12:15:30.00Z" ),
+				Instant.parse( "2018-02-15T10:15:30.00Z" ),
+				Instant.parse( "2018-03-01T08:15:30.00Z" ),
+				Instant.parse( "2018-03-01T08:15:32.00Z" ),
+				Instant.parse( "2018-03-15T09:15:30.00Z" ),
+				Instant.parse( "2018-03-15T10:15:30.00Z" ),
+				Instant.parse( "2018-04-01T10:15:30.00Z" )
+		);
 	}
 
 	@Override

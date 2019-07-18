@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
@@ -30,6 +32,21 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, BigInteger> configure(IndexFieldTypeFactory fieldContext) {
 		return fieldContext.asBigInteger().decimalScale( DECIMAL_SCALE );
+	}
+
+	@Override
+	public List<BigInteger> getAscendingUniqueTermValues() {
+		// Remember: scale is -2, so the last two digits are dropped for predicates/sorts/aggregations/etc.
+		return Arrays.asList(
+				new BigInteger( "-4200" ),
+				new BigInteger( "-200" ),
+				BigInteger.ZERO,
+				BigInteger.valueOf( 4200 ),
+				BigInteger.valueOf( 7800 ),
+				BigInteger.valueOf( 154800 ),
+				BigInteger.valueOf( 151_484_200L ),
+				BigInteger.valueOf( 151_484_254_000L )
+		);
 	}
 
 	@Override

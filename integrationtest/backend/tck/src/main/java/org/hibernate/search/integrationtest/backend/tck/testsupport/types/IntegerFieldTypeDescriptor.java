@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
@@ -20,6 +22,20 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 
 	IntegerFieldTypeDescriptor() {
 		super( Integer.class );
+	}
+
+	@Override
+	public List<Integer> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				Integer.MIN_VALUE,
+				-251_484_254,
+				0,
+				42,
+				55,
+				2500,
+				151_484_254,
+				Integer.MAX_VALUE
+		);
 	}
 
 	@Override

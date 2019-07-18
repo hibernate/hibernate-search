@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
@@ -65,6 +66,10 @@ public final class ValueWrapper<T> implements Normalizable<ValueWrapper<T>> {
 				return other != null && getClass().equals( other.getClass() );
 			}
 		};
+	}
+
+	public static <T> Function<T, ValueWrapper<T>> canonicalizer(Function<T, T> canonicalizer) {
+		return canonicalizer.andThen( ValueWrapper::new );
 	}
 
 	private final T value;

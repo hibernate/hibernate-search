@@ -27,4 +27,12 @@ public class TckBackendFeatures {
 	public boolean supportsManyRoutingKeys() {
 		return true;
 	}
+
+	public boolean zonedDateTimeDocValueHasUTCZoneId() {
+		return false;
+	}
+
+	public boolean aggregationsOnMultiValuedFields(Class<?> fieldType) {
+		return true;
+	}
 }

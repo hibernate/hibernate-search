@@ -23,6 +23,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedDateTime> {
 
@@ -42,6 +43,47 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 
 	ZonedDateTimeFieldTypeDescriptor() {
 		super( ZonedDateTime.class );
+	}
+
+	@Override
+	public ZonedDateTime toExpectedDocValue(ZonedDateTime indexed) {
+		if ( indexed == null ) {
+			return null;
+		}
+
+		ZonedDateTime indexedAtUTC = indexed.withZoneSameInstant( ZoneOffset.UTC );
+
+		/*
+		 * When formatting a ZonedDateTime's docvalues,
+		 * ES 7 and above will return something like "2018-02-01T10:15:30.000000000Z[Z]".
+		 * while ES 6 and below will return something like "2018-02-01T10:15:30.000+00:00[UTC]".
+		 * Strangely, these strings are not equivalent: when parsing them with format "uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ'['VV']'",
+		 * the first one will result in a ZonedDateTime whose offset is "+00:00" and zone is that same offset,
+		 * while the second one will result in a ZonedDateTime whose offset is "+00:00" and zone is "UTC".
+		 * This does not matter much in practice, but we need to know where we stand when testing,
+		 * because those two ZonedDateTimes are not equal.
+		 */
+		if ( TckConfiguration.get().getBackendFeatures().zonedDateTimeDocValueHasUTCZoneId() ) {
+			return ZonedDateTime.ofLocal( indexedAtUTC.toLocalDateTime(), ZoneId.of( "UTC" ), ZoneOffset.UTC );
+		}
+
+		return indexedAtUTC;
+	}
+
+	@Override
+	public List<ZonedDateTime> getAscendingUniqueTermValues() {
+		// Remember: we only get millisecond precision for predicates/sorts/aggregations/etc.
+		return Arrays.asList(
+				LocalDateTime.of( 2018, 1, 1, 12, 58, 30, 0 ).atZone( ZoneId.of( "Africa/Cairo" /* UTC+2 */ ) ),
+				LocalDateTime.of( 2018, 2, 1, 8, 15, 30, 0 ).atZone( ZoneOffset.ofHours( -2 ) ),
+				LocalDateTime.of( 2018, 2, 1, 2, 15, 30, 0 ).atZone( ZoneId.of( "Pacific/Honolulu" /* UTC-10 */ ) ),
+				LocalDateTime.of( 2018, 2, 15, 20, 15, 30, 0 ).atZone( ZoneId.of( "Asia/Vladivostok" /* UTC+10 */ ) ),
+				LocalDateTime.of( 2018, 3, 1, 8, 15, 30, 0 ).atZone( ZoneId.of( "UTC" ) ),
+				LocalDateTime.of( 2018, 3, 1, 12, 15, 32, 0 ).atZone( ZoneOffset.ofHours( 4 ) ),
+				LocalDateTime.of( 2018, 3, 15, 9, 15, 30, 0 ).atZone( ZoneId.of( "UTC" ) ),
+				LocalDateTime.of( 2018, 3, 15, 11, 15, 30, 0 ).atZone( ZoneId.of( "Europe/Paris" /* UTC+1 */ ) ),
+				LocalDateTime.of( 2018, 4, 1, 10, 15, 30, 0 ).atZone( ZoneId.of( "UTC" ) )
+		);
 	}
 
 	@Override

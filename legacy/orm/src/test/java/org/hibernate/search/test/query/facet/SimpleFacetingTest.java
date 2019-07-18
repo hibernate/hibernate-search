@@ -24,7 +24,10 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
+
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Hardy Ferentschik
@@ -33,6 +36,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	private final String facetName = "ccs";
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testSimpleDiscretFaceting() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -152,6 +156,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testNullFieldNameThrowsException() {
 		try {
 			queryBuilder( Car.class ).facet()
@@ -215,6 +220,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testMultipleFacets() {
 		final String descendingOrderedFacet = "desc";
 		FacetingRequest requestDesc = queryBuilder( Car.class ).facet()

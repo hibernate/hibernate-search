@@ -42,6 +42,27 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 	}
 
 	@Override
+	public OffsetDateTime toExpectedDocValue(OffsetDateTime indexed) {
+		return indexed == null ? null : indexed.withOffsetSameInstant( ZoneOffset.UTC );
+	}
+
+	@Override
+	public List<OffsetDateTime> getAscendingUniqueTermValues() {
+		// Remember: we only get millisecond precision for predicates/sorts/aggregations/etc.
+		return Arrays.asList(
+				LocalDateTime.of( 2018, 1, 1, 12, 58, 30, 0 ).atOffset( ZoneOffset.ofHours( 2 ) ),
+				LocalDateTime.of( 2018, 2, 1, 8, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( -2 ) ),
+				LocalDateTime.of( 2018, 2, 1, 2, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( -10 ) ),
+				LocalDateTime.of( 2018, 2, 15, 20, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 10 ) ),
+				LocalDateTime.of( 2018, 3, 1, 8, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 0 ) ),
+				LocalDateTime.of( 2018, 3, 1, 12, 15, 32, 0 ).atOffset( ZoneOffset.ofHours( 4 ) ),
+				LocalDateTime.of( 2018, 3, 15, 9, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 0 ) ),
+				LocalDateTime.of( 2018, 3, 15, 11, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
+				LocalDateTime.of( 2018, 4, 1, 10, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 0 ) )
+		);
+	}
+
+	@Override
 	public Optional<IndexingExpectations<OffsetDateTime>> getIndexingExpectations() {
 		List<OffsetDateTime> values = new ArrayList<>();
 		LocalDateTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localDateTime -> {

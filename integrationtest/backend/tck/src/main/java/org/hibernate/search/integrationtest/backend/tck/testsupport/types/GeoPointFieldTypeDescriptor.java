@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -21,6 +22,11 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 
 	GeoPointFieldTypeDescriptor() {
 		super( GeoPoint.class );
+	}
+
+	@Override
+	public List<GeoPoint> getAscendingUniqueTermValues() {
+		throw new UnsupportedOperationException( "Value lookup isn't supported for GeoPoint." );
 	}
 
 	@Override
