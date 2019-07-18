@@ -12,7 +12,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBigIntegerFieldCodec;
@@ -37,7 +37,7 @@ class ElasticsearchBigIntegerIndexFieldTypeOptionsStep
 	private Integer decimalScale = null;
 
 	ElasticsearchBigIntegerIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext, IndexFieldTypeDefaultsProvider defaultsProvider) {
-		super( buildContext, BigInteger.class, DataType.SCALED_FLOAT );
+		super( buildContext, BigInteger.class, DataTypes.SCALED_FLOAT );
 		this.defaultsProvider = defaultsProvider;
 	}
 

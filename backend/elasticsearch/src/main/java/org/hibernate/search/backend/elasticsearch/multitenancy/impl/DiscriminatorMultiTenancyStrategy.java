@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.regex.Pattern;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -49,13 +49,13 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 		PropertyMapping idPropertyMapping = new PropertyMapping();
 		idPropertyMapping.setIndex( true );
 		idPropertyMapping.setStore( Boolean.TRUE );
-		idPropertyMapping.setType( DataType.KEYWORD );
+		idPropertyMapping.setType( DataTypes.KEYWORD );
 		rootTypeMapping.addProperty( ElasticsearchFields.idFieldName(), idPropertyMapping );
 
 		PropertyMapping tenantIdPropertyMapping = new PropertyMapping();
 		tenantIdPropertyMapping.setIndex( true );
 		tenantIdPropertyMapping.setStore( Boolean.TRUE );
-		tenantIdPropertyMapping.setType( DataType.KEYWORD );
+		tenantIdPropertyMapping.setType( DataTypes.KEYWORD );
 		rootTypeMapping.addProperty( ElasticsearchFields.tenantIdFieldName(), tenantIdPropertyMapping );
 	}
 

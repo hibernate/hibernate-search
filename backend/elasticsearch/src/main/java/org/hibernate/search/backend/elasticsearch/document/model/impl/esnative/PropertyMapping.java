@@ -26,7 +26,7 @@ import com.google.gson.annotations.SerializedName;
 @JsonAdapter(PropertyMappingJsonAdapterFactory.class)
 public class PropertyMapping extends AbstractTypeMapping {
 
-	private DataType type;
+	private String type;
 
 	/*
 	 * Attributes common to multiple datatypes
@@ -87,11 +87,11 @@ public class PropertyMapping extends AbstractTypeMapping {
 	@SerializedName("term_vector")
 	private String termVector;
 
-	public DataType getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(DataType type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 

@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
@@ -22,7 +21,7 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
 public class ElasticsearchTextFieldPredicateBuilderFactory
 		extends ElasticsearchStandardFieldPredicateBuilderFactory<String> {
 
-	private final DataType type;
+	private final String type;
 	private final String analyzer;
 	private final String normalizer;
 

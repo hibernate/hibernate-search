@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchShortFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -20,7 +20,7 @@ class ElasticsearchShortIndexFieldTypeOptionsStep
 		extends AbstractElasticsearchScalarFieldTypeOptionsStep<ElasticsearchShortIndexFieldTypeOptionsStep, Short> {
 
 	ElasticsearchShortIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Short.class, DataType.SHORT );
+		super( buildContext, Short.class, DataTypes.SHORT );
 	}
 
 	@Override

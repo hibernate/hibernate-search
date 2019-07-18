@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DynamicType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -84,15 +84,15 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 		reference.enable( fieldNode );
 
 		PropertyMapping mapping = new PropertyMapping();
-		DataType dataType = DataType.OBJECT;
+		String dataType = DataTypes.OBJECT;
 		switch ( storage ) {
 			case DEFAULT:
 				break;
 			case FLATTENED:
-				dataType = DataType.OBJECT;
+				dataType = DataTypes.OBJECT;
 				break;
 			case NESTED:
-				dataType = DataType.NESTED;
+				dataType = DataTypes.NESTED;
 				break;
 		}
 		mapping.setType( dataType );

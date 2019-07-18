@@ -321,7 +321,7 @@ public class ElasticsearchSchemaValidationIT {
 						)
 						.indexFieldContext( "myField" )
 						.failure(
-								"Invalid value for attribute 'type'. Expected 'KEYWORD', actual is 'INTEGER'"
+								"Invalid value for attribute 'type'. Expected 'keyword', actual is 'integer'"
 						)
 						.build()
 		);
@@ -384,7 +384,7 @@ public class ElasticsearchSchemaValidationIT {
 						)
 						.indexFieldContext( "myField" )
 						.failure(
-								"Invalid value for attribute 'type'. Expected 'KEYWORD', actual is 'INTEGER'"
+								"Invalid value for attribute 'type'. Expected 'keyword', actual is 'integer'"
 						)
 						.build()
 		);

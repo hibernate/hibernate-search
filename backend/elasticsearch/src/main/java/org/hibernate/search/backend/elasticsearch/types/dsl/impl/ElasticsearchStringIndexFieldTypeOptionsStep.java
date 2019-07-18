@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;
@@ -110,7 +110,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 		mapping.setIndex( resolvedSearchable );
 
 		if ( analyzerName != null ) {
-			mapping.setType( DataType.TEXT );
+			mapping.setType( DataTypes.TEXT );
 			mapping.setAnalyzer( analyzerName );
 			mapping.setTermVector( resolveTermVector() );
 
@@ -127,7 +127,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			}
 		}
 		else {
-			mapping.setType( DataType.KEYWORD );
+			mapping.setType( DataTypes.KEYWORD );
 			mapping.setNormalizer( normalizerName );
 			mapping.setDocValues( resolvedSortable );
 		}
