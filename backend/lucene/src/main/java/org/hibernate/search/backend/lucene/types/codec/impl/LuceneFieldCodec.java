@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import java.util.Set;
 import java.util.function.Consumer;
+
+import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
-
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 /**
  * Defines how a given value will be encoded in the Lucene document and how it will be decoded.
@@ -41,6 +42,10 @@ public interface LuceneFieldCodec<F> {
 	 */
 	default void contributeStoredFields(String absoluteFieldPath, Consumer<String> collector) {
 		collector.accept( absoluteFieldPath );
+	}
+
+	default void contributeNestedDocumentPaths(Set<String> nestedDocumentPaths, Consumer<Set<String>> collector) {
+		collector.accept( nestedDocumentPaths );
 	}
 
 	/**

@@ -46,7 +46,7 @@ public class LuceneStandardFieldProjectionBuilderFactory<F> implements LuceneFie
 
 	@Override
 	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
-	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
+	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedDocumentPaths,
 			Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( absoluteFieldPath, projectable );
 
@@ -56,7 +56,7 @@ public class LuceneStandardFieldProjectionBuilderFactory<F> implements LuceneFie
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
-		return (FieldProjectionBuilder<T>) new LuceneFieldProjectionBuilder<>( indexNames, absoluteFieldPath, requestConverter, codec );
+		return (FieldProjectionBuilder<T>) new LuceneFieldProjectionBuilder<>( indexNames, absoluteFieldPath, nestedDocumentPaths, requestConverter, codec );
 	}
 
 	@Override

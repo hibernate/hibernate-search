@@ -12,7 +12,9 @@ import java.util.Set;
 public class LuceneDocumentStoredFieldVisitorBuilder {
 
 	private boolean entireDocumentRequired = false;
+
 	private final Set<String> explicitlyRequired = new HashSet<>();
+	private final Set<String> nestedDocumentPaths = new HashSet<>();
 
 	public void addEntireDocument() {
 		entireDocumentRequired = true;
@@ -25,12 +27,21 @@ public class LuceneDocumentStoredFieldVisitorBuilder {
 		}
 	}
 
+	public void addNestedDocumentPaths(Set<String> nestedDocumentPaths) {
+		this.nestedDocumentPaths.addAll( nestedDocumentPaths );
+	}
+
+	public void add(String absoluteFieldPath, Set<String> nestedDocumentPaths) {
+		add( absoluteFieldPath );
+		addNestedDocumentPaths( nestedDocumentPaths );
+	}
+
 	public ReusableDocumentStoredFieldVisitor build() {
 		if ( entireDocumentRequired ) {
 			return new ReusableDocumentStoredFieldVisitor();
 		}
 		else {
-			return new ReusableDocumentStoredFieldVisitor( explicitlyRequired );
+			return new ReusableDocumentStoredFieldVisitor( explicitlyRequired, nestedDocumentPaths );
 		}
 	}
 

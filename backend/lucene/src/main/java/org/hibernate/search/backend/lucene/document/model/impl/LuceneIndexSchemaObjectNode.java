@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 public class LuceneIndexSchemaObjectNode {
 
 	private static final LuceneIndexSchemaObjectNode ROOT =
-			new LuceneIndexSchemaObjectNode( null, null, null, false );
+			new LuceneIndexSchemaObjectNode( null, null, null, null, false );
 
 	public static LuceneIndexSchemaObjectNode root() {
 		return ROOT;
@@ -23,14 +23,17 @@ public class LuceneIndexSchemaObjectNode {
 
 	private final String absolutePath;
 
+	private final String nestedDocumentPath;
+
 	private final ObjectFieldStorage storage;
 
 	private final boolean multiValued;
 
-	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String absolutePath,
+	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String absolutePath, String nestedDocumentPath,
 			ObjectFieldStorage storage, boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
+		this.nestedDocumentPath = nestedDocumentPath;
 		this.storage = storage;
 		this.multiValued = multiValued;
 	}
@@ -45,6 +48,10 @@ public class LuceneIndexSchemaObjectNode {
 
 	public String getAbsolutePath(String relativeFieldName) {
 		return LuceneFields.compose( absolutePath, relativeFieldName );
+	}
+
+	public String getNestedDocumentPath() {
+		return nestedDocumentPath;
 	}
 
 	public ObjectFieldStorage getStorage() {
