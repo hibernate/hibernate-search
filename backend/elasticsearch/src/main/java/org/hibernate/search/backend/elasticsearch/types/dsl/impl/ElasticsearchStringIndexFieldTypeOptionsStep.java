@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexF
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -44,6 +45,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 	private Searchable searchable = Searchable.DEFAULT;
 	private Norms norms = Norms.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
+	private Aggregable aggregable = Aggregable.DEFAULT;
 	private String indexNullAs;
 	private TermVector termVector = TermVector.DEFAULT;
 
@@ -100,12 +102,19 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 	}
 
 	@Override
+	public ElasticsearchStringIndexFieldTypeOptionsStep aggregable(Aggregable aggregable) {
+		this.aggregable = aggregable;
+		return this;
+	}
+
+	@Override
 	public IndexFieldType<String> toIndexFieldType() {
 		PropertyMapping mapping = new PropertyMapping();
 
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedSearchable = resolveDefault( searchable );
+		boolean resolvedAggregable = resolveDefault( aggregable );
 
 		mapping.setIndex( resolvedSearchable );
 
@@ -125,11 +134,15 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			if ( indexNullAs != null ) {
 				throw log.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAs, getBuildContext().getEventContext() );
 			}
+
+			if ( resolvedAggregable ) {
+				throw log.cannotUseAnalyzerOnAggregableField( analyzerName, getBuildContext().getEventContext() );
+			}
 		}
 		else {
 			mapping.setType( DataTypes.KEYWORD );
 			mapping.setNormalizer( normalizerName );
-			mapping.setDocValues( resolvedSortable );
+			mapping.setDocValues( resolvedSortable || resolvedAggregable );
 		}
 
 		mapping.setStore( resolvedProjectable );
