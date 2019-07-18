@@ -57,4 +57,9 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 	public boolean worksFineWithStrictGraterThanRangedQueriesOnScaledFloatField() {
 		return false;
 	}
+
+	@Override
+	public boolean zonedDateTimeDocValueHasUTCZoneId() {
+		return true;
+	}
 }

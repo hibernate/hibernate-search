@@ -15,7 +15,10 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
+
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,6 +26,7 @@ import static org.junit.Assert.assertEquals;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
+@Category(PortedToSearch6.class)
 public class EdgeCaseFacetTest extends AbstractFacetTest {
 	private final String facetName = "ccs";
 

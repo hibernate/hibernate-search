@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
@@ -20,6 +22,20 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 
 	FloatFieldTypeDescriptor() {
 		super( Float.class );
+	}
+
+	@Override
+	public List<Float> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				-251_484_254.849f,
+				-42.42f,
+				0.0f,
+				Float.MIN_VALUE,
+				55f,
+				2500.5100000045f,
+				1584514514.000000184f,
+				Float.MAX_VALUE
+		);
 	}
 
 	@Override

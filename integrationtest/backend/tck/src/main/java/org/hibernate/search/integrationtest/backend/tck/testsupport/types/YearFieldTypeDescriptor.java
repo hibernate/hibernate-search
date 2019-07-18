@@ -46,6 +46,20 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 	}
 
 	@Override
+	public List<Year> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				Year.of( -25435 ),
+				Year.of( 0 ),
+				Year.of( 42 ),
+				Year.of( 1989 ),
+				Year.of( 1999 ),
+				Year.of( 2000 ),
+				Year.of( 2019 ),
+				Year.of( 2050 )
+		);
+	}
+
+	@Override
 	public Optional<IndexingExpectations<Year>> getIndexingExpectations() {
 		return Optional.of( new IndexingExpectations<>( getValuesForIndexingExpectations() ) );
 	}

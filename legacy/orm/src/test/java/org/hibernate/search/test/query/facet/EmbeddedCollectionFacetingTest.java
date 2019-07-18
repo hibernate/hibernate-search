@@ -23,8 +23,11 @@ import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,6 +35,7 @@ import static org.junit.Assert.assertEquals;
  * @author Elmer van Chastelet
  */
 @TestForIssue(jiraKey = "HSEARCH-726")
+@Category(PortedToSearch6.class)
 public class EmbeddedCollectionFacetingTest extends SearchTestBase {
 	Author voltaire;
 	Author hugo;

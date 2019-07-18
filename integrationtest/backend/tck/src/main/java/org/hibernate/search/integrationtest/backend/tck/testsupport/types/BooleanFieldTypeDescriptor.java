@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
@@ -20,6 +22,11 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 
 	BooleanFieldTypeDescriptor() {
 		super( Boolean.class );
+	}
+
+	@Override
+	public List<Boolean> getAscendingUniqueTermValues() {
+		return Arrays.asList( false, true );
 	}
 
 	@Override

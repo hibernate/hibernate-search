@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
@@ -21,6 +23,20 @@ public class LocalDateFieldTypeDescriptor extends FieldTypeDescriptor<LocalDate>
 
 	LocalDateFieldTypeDescriptor() {
 		super( LocalDate.class );
+	}
+
+	@Override
+	public List<LocalDate> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				LocalDate.of( -52, 10, 11 ),
+				LocalDate.of( 1600, 2, 28 ),
+				LocalDate.of( 1900, 1, 1 ),
+				LocalDate.of( 1970, 1, 1 ),
+				LocalDate.of( 1980, 1, 1 ),
+				LocalDate.of( 1980, 12, 31 ),
+				LocalDate.of( 2004, 2, 29 ),
+				LocalDate.of( 2017, 7, 7 )
+		);
 	}
 
 	@Override

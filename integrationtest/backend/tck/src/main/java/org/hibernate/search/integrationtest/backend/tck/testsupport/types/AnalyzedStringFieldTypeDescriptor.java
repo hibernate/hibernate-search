@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
@@ -28,6 +30,20 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, String> configure(IndexFieldTypeFactory fieldContext) {
 		return fieldContext.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name );
+	}
+
+	@Override
+	public List<String> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				"amaretto",
+				"Auster",
+				"captain",
+				"irving",
+				"none",
+				"platypus",
+				"wifi",
+				"Zach"
+		);
 	}
 
 	@Override

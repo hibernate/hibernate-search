@@ -56,6 +56,15 @@ public abstract class FieldTypeDescriptor<F> {
 		return all;
 	}
 
+	public static FieldTypeDescriptor<?> getIncompatible(FieldTypeDescriptor<?> typeDescriptor) {
+		if ( Integer.class.equals( typeDescriptor.getJavaType() ) ) {
+			return new LongFieldTypeDescriptor();
+		}
+		else {
+			return new IntegerFieldTypeDescriptor();
+		}
+	}
+
 	private final Class<F> javaType;
 	private final String uniqueName;
 
@@ -84,6 +93,24 @@ public abstract class FieldTypeDescriptor<F> {
 	public StandardIndexFieldTypeOptionsStep<?, F> configure(IndexFieldTypeFactory fieldContext) {
 		return fieldContext.as( javaType );
 	}
+
+	/**
+	 * @param indexed The value that was indexed.
+	 * @return The value that will returned by the backend,
+	 * which could be different due to normalization.
+	 * In particular, date/time types with an offset/zone will be normalized to UTC and lose the offset/zone information.
+	 */
+	public F toExpectedDocValue(F indexed) {
+		return indexed;
+	}
+
+	/**
+	 * @return A list of "term" (single-token) values, in strictly ascending order,
+	 * that are guaranteed to have a unique indexed value (after analysis/normalization).
+	 * @throws UnsupportedOperationException If value lookup is not supported for this field type
+	 * (hence this method should never be called).
+	 */
+	public abstract List<F> getAscendingUniqueTermValues();
 
 	public abstract Optional<IndexingExpectations<F>> getIndexingExpectations();
 

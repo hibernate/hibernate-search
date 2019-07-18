@@ -35,6 +35,21 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 	}
 
 	@Override
+	public List<LocalTime> getAscendingUniqueTermValues() {
+		// Remember: we only get millisecond precision for predicates/sorts/aggregations/etc.
+		return Arrays.asList(
+				LocalTime.of( 0, 0, 0, 0 ),
+				LocalTime.of( 1, 0, 0, 0 ),
+				LocalTime.of( 10, 15, 30, 0 ),
+				LocalTime.of( 11, 15, 30, 555_000_000 ),
+				LocalTime.of( 12, 0, 0, 0 ),
+				LocalTime.of( 13, 0, 23, 0 ),
+				LocalTime.of( 17, 59, 0, 0 ),
+				LocalTime.of( 23, 59, 59, 999_000_000 )
+		);
+	}
+
+	@Override
 	public Optional<IndexingExpectations<LocalTime>> getIndexingExpectations() {
 		return Optional.of( new IndexingExpectations<>( getValuesForIndexingExpectations() ) );
 	}

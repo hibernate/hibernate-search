@@ -40,4 +40,8 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// TODO HSEARCH-3655 AWS signing fails when using multiple routing keys
 		return ! ElasticsearchTestHostConnectionConfiguration.get().isAwsSigningEnabled();
 	}
+
+	public boolean zonedDateTimeDocValueHasUTCZoneId() {
+		return dialect.zonedDateTimeDocValueHasUTCZoneId();
+	}
 }

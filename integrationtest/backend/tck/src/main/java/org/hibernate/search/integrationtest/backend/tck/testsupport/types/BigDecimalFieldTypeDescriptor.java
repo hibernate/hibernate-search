@@ -8,6 +8,8 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
@@ -31,6 +33,21 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 	@Override
 	public StandardIndexFieldTypeOptionsStep<?, BigDecimal> configure(IndexFieldTypeFactory fieldContext) {
 		return fieldContext.asBigDecimal().decimalScale( DECIMAL_SCALE );
+	}
+
+	@Override
+	public List<BigDecimal> getAscendingUniqueTermValues() {
+		// Remember: scale is 2, so only two decimal digits are kept for predicates/sorts/aggregations/etc.
+		return Arrays.asList(
+				new BigDecimal( "-42" ),
+				new BigDecimal( "-2.12" ),
+				BigDecimal.ZERO,
+				BigDecimal.ONE,
+				BigDecimal.TEN,
+				BigDecimal.valueOf( 42.42 ),
+				BigDecimal.valueOf( 1548.00 ),
+				BigDecimal.valueOf( 1584514514.18 )
+		);
 	}
 
 	@Override

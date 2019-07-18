@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
@@ -20,6 +22,20 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 
 	DoubleFieldTypeDescriptor() {
 		super( Double.class );
+	}
+
+	@Override
+	public List<Double> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				-251_484_254.849,
+				-42.42,
+				0.0,
+				Double.MIN_VALUE,
+				55.0,
+				2500.5100000045,
+				1584514514.000000184,
+				Double.MAX_VALUE
+		);
 	}
 
 	@Override

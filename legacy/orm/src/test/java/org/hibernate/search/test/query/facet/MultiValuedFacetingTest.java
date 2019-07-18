@@ -28,13 +28,16 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 @TestForIssue(jiraKey = "HSEARCH-2535")
+@Category(PortedToSearch6.class)
 public class MultiValuedFacetingTest {
 	@Rule
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder(

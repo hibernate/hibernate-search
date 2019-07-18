@@ -49,6 +49,21 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 	}
 
 	@Override
+	public List<LocalDateTime> getAscendingUniqueTermValues() {
+		// Remember: we only get millisecond precision for predicates/sorts/aggregations/etc.
+		return Arrays.asList(
+				LocalDateTime.of( -52, 10, 11, 10, 15, 30, 0 ),
+				LocalDateTime.of( 1600, 2, 28, 13, 0, 23, 0 ),
+				LocalDateTime.of( 1900, 1, 1, 0, 0, 0, 0 ),
+				LocalDateTime.of( 1970, 1, 1, 0, 0, 0, 0 ),
+				LocalDateTime.of( 1980, 1, 1, 0, 0, 0, 0 ),
+				LocalDateTime.of( 1980, 12, 31, 12, 0, 0, 0 ),
+				LocalDateTime.of( 2004, 2, 29, 1, 0, 0, 0 ),
+				LocalDateTime.of( 2017, 7, 7, 11, 15, 30, 555_000_000 )
+		);
+	}
+
+	@Override
 	public Optional<IndexingExpectations<LocalDateTime>> getIndexingExpectations() {
 		return Optional.of( new IndexingExpectations<>( getValuesForIndexingExpectations() ) );
 	}

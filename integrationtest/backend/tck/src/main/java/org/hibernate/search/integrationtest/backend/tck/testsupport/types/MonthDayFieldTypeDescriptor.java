@@ -29,6 +29,20 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 	}
 
 	@Override
+	public List<MonthDay> getAscendingUniqueTermValues() {
+		return Arrays.asList(
+				MonthDay.of( Month.JANUARY, 1 ),
+				MonthDay.of( Month.FEBRUARY, 29 ),
+				MonthDay.of( Month.MARCH, 7 ),
+				MonthDay.of( Month.JUNE, 6 ),
+				MonthDay.of( Month.JULY, 14 ),
+				MonthDay.of( Month.SEPTEMBER, 18 ),
+				MonthDay.of( Month.NOVEMBER, 6 ),
+				MonthDay.of( Month.DECEMBER, 31 )
+		);
+	}
+
+	@Override
 	public Optional<IndexingExpectations<MonthDay>> getIndexingExpectations() {
 		List<MonthDay> values = new ArrayList<>();
 		Arrays.stream( Month.values() ).forEach( month -> {
