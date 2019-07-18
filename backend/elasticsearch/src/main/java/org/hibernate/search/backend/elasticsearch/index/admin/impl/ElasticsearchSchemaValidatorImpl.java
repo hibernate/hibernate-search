@@ -21,7 +21,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.N
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.TokenFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.TokenizerDefinition;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DynamicType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
@@ -321,21 +321,21 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	}
 
 	private void validateJsonPrimitive(ValidationErrorCollector errorCollector,
-			DataType type, String attributeName, JsonElement expectedValue, JsonElement actualValue) {
-		DataType defaultedType = type == null ? DataType.OBJECT : type;
+			String type, String attributeName, JsonElement expectedValue, JsonElement actualValue) {
+		String defaultedType = type == null ? DataTypes.OBJECT : type;
 		doValidateJsonPrimitive( errorCollector, defaultedType, attributeName, expectedValue, actualValue );
 	}
 
 	private void doValidateJsonPrimitive(ValidationErrorCollector errorCollector,
-			DataType type, String attributeName, JsonElement expectedValue, JsonElement actualValue) {
+			String type, String attributeName, JsonElement expectedValue, JsonElement actualValue) {
 		// We can't just use equal, mainly because of floating-point numbers
 
 		switch ( type ) {
-			case TEXT:
-			case KEYWORD:
+			case DataTypes.TEXT:
+			case DataTypes.KEYWORD:
 				validateEqualWithoutDefault( errorCollector, attributeName, expectedValue, actualValue );
 				break;
-			case DOUBLE:
+			case DataTypes.DOUBLE:
 				if ( areNumbers( expectedValue, actualValue ) ) {
 					validateEqualWithDefault( errorCollector, attributeName, expectedValue.getAsDouble(), actualValue.getAsDouble(),
 							DEFAULT_DOUBLE_DELTA, null );
@@ -346,7 +346,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 					) );
 				}
 				break;
-			case FLOAT:
+			case DataTypes.FLOAT:
 				if ( areNumbers( expectedValue, actualValue ) ) {
 					validateEqualWithDefault( errorCollector, attributeName, expectedValue.getAsFloat(), actualValue.getAsFloat(),
 							DEFAULT_FLOAT_DELTA, null );
@@ -357,12 +357,12 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 					) );
 				}
 				break;
-			case INTEGER:
-			case LONG:
-			case DATE:
-			case BOOLEAN:
-			case OBJECT:
-			case GEO_POINT:
+			case DataTypes.INTEGER:
+			case DataTypes.LONG:
+			case DataTypes.DATE:
+			case DataTypes.BOOLEAN:
+			case DataTypes.OBJECT:
+			case DataTypes.GEO_POINT:
 			default:
 				validateEqualWithoutDefault( errorCollector, attributeName, expectedValue, actualValue );
 				break;
@@ -536,9 +536,9 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 
 		@Override
 		public void validate(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
-			validateEqualWithDefault( errorCollector, "type", expectedMapping.getType(), actualMapping.getType(), DataType.OBJECT );
+			validateEqualWithDefault( errorCollector, "type", expectedMapping.getType(), actualMapping.getType(), DataTypes.OBJECT );
 
-			List<String> formatDefault = DataType.DATE.equals( expectedMapping.getType() )
+			List<String> formatDefault = DataTypes.DATE.equals( expectedMapping.getType() )
 					? DEFAULT_DATE_FORMAT : Collections.emptyList();
 			validateFormatWithDefault( errorCollector, "format", expectedMapping.getFormat(), actualMapping.getFormat(), formatDefault );
 
@@ -577,7 +577,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 		Boolean expectedNorms = expectedMapping.getNorms();
 		if ( Boolean.TRUE.equals( expectedNorms ) ) { // If we don't need norms, we don't care
 			// From ES 5.0 on, norms are enabled by default on text fields only
-			Boolean normsDefault = DataType.TEXT.equals( expectedMapping.getType() ) ? Boolean.TRUE : Boolean.FALSE;
+			Boolean normsDefault = DataTypes.TEXT.equals( expectedMapping.getType() ) ? Boolean.TRUE : Boolean.FALSE;
 			validateEqualWithDefault( errorCollector, "norms", expectedNorms, actualMapping.getNorms(), normsDefault );
 		}
 

@@ -20,7 +20,7 @@ public class PropertyMappingJsonAdapterFactory extends AbstractTypeMappingJsonAd
 	@Override
 	protected <T> void addFields(Builder<T> builder) {
 		super.addFields( builder );
-		builder.add( "type", DataType.class );
+		builder.add( "type", String.class );
 		builder.add( "index", Boolean.class );
 		builder.add( "norms", Boolean.class );
 		builder.add( "docValues", Boolean.class );

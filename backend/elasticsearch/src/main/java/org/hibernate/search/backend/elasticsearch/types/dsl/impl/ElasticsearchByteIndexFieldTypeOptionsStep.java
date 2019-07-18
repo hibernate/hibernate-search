@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchByteFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -20,7 +20,7 @@ class ElasticsearchByteIndexFieldTypeOptionsStep
 		extends AbstractElasticsearchScalarFieldTypeOptionsStep<ElasticsearchByteIndexFieldTypeOptionsStep, Byte> {
 
 	ElasticsearchByteIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Byte.class, DataType.BYTE );
+		super( buildContext, Byte.class, DataTypes.BYTE );
 	}
 
 	@Override

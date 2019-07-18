@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -18,7 +17,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends AbstractElasticsearchScalarFieldTypeOptionsStep<? extends S, F>, F>
 		extends AbstractElasticsearchStandardIndexFieldTypeOptionsStep<S, F> {
 
-	private final DataType dataType;
+	private final String dataType;
 
 	private Sortable sortable = Sortable.DEFAULT;
 	protected boolean resolvedSortable;
@@ -32,7 +31,7 @@ abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends Abstrac
 	protected F indexNullAs;
 
 	AbstractElasticsearchScalarFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			Class<F> fieldType, DataType dataType) {
+			Class<F> fieldType, String dataType) {
 		super( buildContext, fieldType );
 		this.dataType = dataType;
 	}

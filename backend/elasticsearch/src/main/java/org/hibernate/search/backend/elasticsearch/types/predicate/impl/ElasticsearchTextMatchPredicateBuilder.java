@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
@@ -30,7 +30,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	private static final JsonAccessor<Integer> PREFIX_LENGTH_ACCESSOR = JsonAccessor.root().property( "prefix_length" ).asInteger();
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
 
-	private final DataType type;
+	private final String type;
 	private final ElasticsearchCompatibilityChecker analyzerChecker;
 
 	private Integer fuzziness;
@@ -42,7 +42,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends String> converter, ToDocumentFieldValueConverter<String, ? extends String> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<String> codec,
-			DataType type, ElasticsearchCompatibilityChecker analyzerChecker) {
+			String type, ElasticsearchCompatibilityChecker analyzerChecker) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 		this.type = type;
 		this.analyzerChecker = analyzerChecker;
@@ -61,7 +61,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 
 	@Override
 	public void skipAnalysis() {
-		if ( DataType.KEYWORD.equals( type ) ) {
+		if ( DataTypes.KEYWORD.equals( type ) ) {
 			throw log.skipAnalysisOnKeywordField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 

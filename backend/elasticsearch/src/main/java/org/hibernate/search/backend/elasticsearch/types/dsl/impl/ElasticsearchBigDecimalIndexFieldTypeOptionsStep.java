@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBigDecimalFieldCodec;
@@ -36,7 +36,7 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 	private Integer decimalScale = null;
 
 	ElasticsearchBigDecimalIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext, IndexFieldTypeDefaultsProvider defaultsProvider) {
-		super( buildContext, BigDecimal.class, DataType.SCALED_FLOAT );
+		super( buildContext, BigDecimal.class, DataTypes.SCALED_FLOAT );
 		this.defaultsProvider = defaultsProvider;
 	}
 
