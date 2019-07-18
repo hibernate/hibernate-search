@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
@@ -83,6 +84,12 @@ abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractS
 	@Override
 	public S searchable(Searchable searchable) {
 		modifiers.add( b -> b.searchable( searchable ) );
+		return thisAsS();
+	}
+
+	@Override
+	public S aggregable(Aggregable aggregable) {
+		modifiers.add( b -> b.aggregable( aggregable ) );
 		return thisAsS();
 	}
 

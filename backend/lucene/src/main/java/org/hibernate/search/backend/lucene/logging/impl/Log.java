@@ -515,4 +515,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 93, value = "Multiple conflicting nested document paths to build a projection for field '%1$s'. '%2$s' vs. '%3$s'.")
 	SearchException conflictingNestedDocumentPathsForProjection(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 94,
+			value = "Cannot apply an analyzer on an aggregable field. Use a normalizer instead. Analyzer: '%1$s'."
+					+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
+					+ " one with an analyzer that is not aggregable, and one with a normalizer that is aggregable.")
+	SearchException cannotUseAnalyzerOnAggregableField(String analyzerName, @Param EventContext context);
+
 }

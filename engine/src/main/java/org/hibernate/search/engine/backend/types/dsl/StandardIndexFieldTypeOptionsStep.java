@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.types.dsl;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -48,5 +49,12 @@ public interface StandardIndexFieldTypeOptionsStep<S extends StandardIndexFieldT
 	 * @see Searchable
 	 */
 	S searchable(Searchable searchable);
+
+	/**
+	 * @param aggregable Whether aggregations are enabled for this field.
+	 * @return {@code this}, for method chaining.
+	 * @see Aggregable
+	 */
+	S aggregable(Aggregable aggregable);
 
 }

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.types.dsl.LuceneStandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
@@ -32,6 +33,7 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 	private FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
 	protected Projectable projectable = Projectable.DEFAULT;
 	protected Searchable searchable = Searchable.DEFAULT;
+	protected Aggregable aggregable = Aggregable.DEFAULT;
 	protected F indexNullAsValue = null;
 
 	AbstractLuceneStandardIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType) {
@@ -68,6 +70,12 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 	@Override
 	public S searchable(Searchable searchable) {
 		this.searchable = searchable;
+		return thisAsS();
+	}
+
+	@Override
+	public S aggregable(Aggregable aggregable) {
+		this.aggregable = aggregable;
 		return thisAsS();
 	}
 
@@ -129,6 +137,18 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 				return true;
 			default:
 				throw new AssertionFailure( "Unexpected value for Sortable: " + sortable );
+		}
+	}
+
+	protected static boolean resolveDefault(Aggregable aggregable) {
+		switch ( aggregable ) {
+			case DEFAULT:
+			case NO:
+				return false;
+			case YES:
+				return true;
+			default:
+				throw new AssertionFailure( "Unexpected value for Aggregable: " + aggregable );
 		}
 	}
 }

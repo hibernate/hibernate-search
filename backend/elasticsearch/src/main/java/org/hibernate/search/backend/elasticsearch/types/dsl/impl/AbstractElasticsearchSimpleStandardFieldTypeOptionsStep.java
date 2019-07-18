@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -58,6 +59,11 @@ abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends
 	public S searchable(Searchable searchable) {
 		this.searchable = searchable;
 		return thisAsS();
+	}
+
+	@Override
+	public S aggregable(Aggregable aggregable) {
+		throw new UnsupportedOperationException( "Not supported yet" );
 	}
 
 	@Override

@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -174,6 +175,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder searchable(Searchable searchable) {
 			attribute( "searchable", searchable );
+			return this;
+		}
+
+		public Builder aggregable(Aggregable aggregable) {
+			attribute( "aggregable", aggregable );
 			return this;
 		}
 

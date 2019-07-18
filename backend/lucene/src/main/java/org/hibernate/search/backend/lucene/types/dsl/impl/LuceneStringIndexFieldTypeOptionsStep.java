@@ -91,6 +91,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedSearchable = resolveDefault( searchable );
+		boolean resolvedAggregable = resolveDefault( aggregable );
 		boolean resolvedNorms = resolveNorms();
 		ResolvedTermVector resolvedTermVector = resolveTermVector();
 
@@ -105,6 +106,10 @@ class LuceneStringIndexFieldTypeOptionsStep
 
 			if ( indexNullAsValue != null ) {
 				throw log.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAsValue, getBuildContext().getEventContext() );
+			}
+
+			if ( resolvedAggregable ) {
+				throw log.cannotUseAnalyzerOnAggregableField( analyzerName, getBuildContext().getEventContext() );
 			}
 		}
 
