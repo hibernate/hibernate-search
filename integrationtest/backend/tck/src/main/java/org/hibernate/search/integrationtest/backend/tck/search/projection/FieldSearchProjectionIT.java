@@ -416,9 +416,6 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void inNestedObject() {
-		Assume.assumeTrue( "Projections on fields within nested object fields are not supported yet", false );
-		// TODO HSEARCH-3062 support projections on fields within nested object fields
-
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
