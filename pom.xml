@@ -384,7 +384,7 @@
         <!--
              Pass these properties as system properties to be able to switch to
              a different database without re-compiling the hibernate.properties file
-             (which is located in a different file)
+             (which is located in a dependency of the integration tests modules)
          -->
         <failsafe.jvm.args.hibernate-orm>
             -Dhibernate.dialect=${db.dialect}
@@ -432,6 +432,14 @@
 
         <test.elasticsearch.java_home>${java.home}</test.elasticsearch.java_home>
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
+        <!--
+             These properties are transparently passed as system properties to integration tests,
+             and retrieved by a test utility:
+             org.hibernate.search.util.impl.integrationtest.elasticsearch.ElasticsearchTestHostConnectionConfiguration
+             This is better than configuration files filtered by Maven,
+             because we will be able to change the configuration without re-compiling the configuration file
+             (which is located in a dependency of the integration tests modules).
+         -->
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
         <test.elasticsearch.host.aws.signing.enabled>false</test.elasticsearch.host.aws.signing.enabled>

@@ -6,10 +6,14 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
-import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisOverrideITAnalysisConfigurer;
+import org.hibernate.search.util.impl.integrationtest.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
@@ -28,14 +32,14 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 
 	@Override
 	public TckBackendSetupStrategy createDefaultBackendSetupStrategy() {
-		return TckBackendSetupStrategy.of( DEFAULT_BACKEND_PROPERTIES_PATH );
+		return TckBackendSetupStrategy.of( DEFAULT_BACKEND_PROPERTIES_PATH, createProperties() );
 	}
 
 	@Override
 	public TckBackendSetupStrategy createMultiTenancyBackendSetupStrategy() {
 		return TckBackendSetupStrategy.of(
 				DEFAULT_BACKEND_PROPERTIES_PATH,
-				Collections.singletonMap( "multi_tenancy_strategy", "discriminator" )
+				createProperties( c -> c.accept( "multi_tenancy_strategy", "discriminator" ) )
 		);
 	}
 
@@ -43,7 +47,9 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	public TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy() {
 		return TckBackendSetupStrategy.of(
 				DEFAULT_BACKEND_PROPERTIES_PATH,
-				Collections.singletonMap( "analysis_configurer", AnalysisCustomITAnalysisConfigurer.class.getName() )
+				createProperties( c ->
+						c.accept( "analysis_configurer", AnalysisCustomITAnalysisConfigurer.class.getName() )
+				)
 		);
 	}
 
@@ -51,7 +57,22 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	public TckBackendSetupStrategy createAnalysisOverrideBackendSetupStrategy() {
 		return TckBackendSetupStrategy.of(
 				DEFAULT_BACKEND_PROPERTIES_PATH,
-				Collections.singletonMap( "analysis_configurer", AnalysisOverrideITAnalysisConfigurer.class.getName() )
+				createProperties( c ->
+						c.accept( "analysis_configurer", AnalysisOverrideITAnalysisConfigurer.class.getName() )
+				)
 		);
+	}
+
+	private Map<String, Object> createProperties() {
+		Map<String, Object> map = new LinkedHashMap<>();
+		// Always add configuration options that allow to connect to Elasticsearch
+		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( map );
+		return map;
+	}
+
+	private Map<String, Object> createProperties(Consumer<BiConsumer<String, Object>> overrides) {
+		Map<String, Object> map = createProperties();
+		overrides.accept( map::put );
+		return map;
 	}
 }

@@ -10,8 +10,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -31,6 +33,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.util.impl.integrationtest.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
@@ -473,9 +476,9 @@ public class TestElasticsearchClient implements TestRule {
 	}
 
 	private void before() {
-		ConfigurationPropertySource backendProperties = ConfigurationPropertySource.fromMap(
-				configurationProvider.getPropertiesFromFile( "/test-elasticsearch-client.properties" )
-		);
+		Map<String, Object> map = new LinkedHashMap<>();
+		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( map );
+		ConfigurationPropertySource backendProperties = ConfigurationPropertySource.fromMap( map );
 
 		BeanResolver beanResolver = configurationProvider.createBeanResolverForTest();
 		/*
