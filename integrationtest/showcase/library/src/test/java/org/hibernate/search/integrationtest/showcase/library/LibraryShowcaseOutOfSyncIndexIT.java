@@ -54,7 +54,7 @@ public class LibraryShowcaseOutOfSyncIndexIT {
 		assertThat( indexedEntityCount ).isEqualTo( entityCount );
 
 		// Simulate an external delete that Hibernate Search will not be able to detect
-		testDataService.executeSql(
+		testDataService.executeHql(
 				"DELETE FROM Book WHERE MOD(id, 2) = 0"
 		);
 

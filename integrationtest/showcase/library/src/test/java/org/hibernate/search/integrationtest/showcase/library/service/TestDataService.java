@@ -269,8 +269,8 @@ public class TestDataService {
 		}
 	}
 
-	public void executeSql(String sql, Object... parameters) {
-		Query query = entityManager.createNativeQuery( sql );
+	public void executeHql(String hql, Object... parameters) {
+		Query query = entityManager.createQuery( hql );
 		for ( int i = 0; i < parameters.length; i++ ) {
 			query.setParameter( i, parameters[i] );
 		}
