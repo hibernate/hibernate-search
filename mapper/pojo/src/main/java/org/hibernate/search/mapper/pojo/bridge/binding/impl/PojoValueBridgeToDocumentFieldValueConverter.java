@@ -11,13 +11,13 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
-final class PojoValueBridgeToDocumentFieldValueConverter<U, V extends U, F> implements
-		ToDocumentFieldValueConverter<V, F> {
+final class PojoValueBridgeToDocumentFieldValueConverter<V, F>
+		implements ToDocumentFieldValueConverter<V, F> {
 
-	private final ValueBridge<U, F> bridge;
-	private final Class<U> expectedValueType;
+	private final ValueBridge<V, F> bridge;
+	private final Class<V> expectedValueType;
 
-	PojoValueBridgeToDocumentFieldValueConverter(ValueBridge<U, F> bridge, Class<U> expectedValueType) {
+	PojoValueBridgeToDocumentFieldValueConverter(ValueBridge<V, F> bridge, Class<V> expectedValueType) {
 		this.bridge = bridge;
 		this.expectedValueType = expectedValueType;
 	}
@@ -25,6 +25,11 @@ final class PojoValueBridgeToDocumentFieldValueConverter<U, V extends U, F> impl
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[bridge=" + bridge + ", expectedValueType=" + expectedValueType + "]";
+	}
+
+	@Override
+	public boolean isValidInputType(Class<?> inputTypeCandidate) {
+		return expectedValueType.isAssignableFrom( inputTypeCandidate );
 	}
 
 	@Override
@@ -42,8 +47,8 @@ final class PojoValueBridgeToDocumentFieldValueConverter<U, V extends U, F> impl
 		if ( other == null || !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		PojoValueBridgeToDocumentFieldValueConverter<?, ?, ?> castedOther =
-				(PojoValueBridgeToDocumentFieldValueConverter<?, ?, ?>) other;
+		PojoValueBridgeToDocumentFieldValueConverter<?, ?> castedOther =
+				(PojoValueBridgeToDocumentFieldValueConverter<?, ?>) other;
 		return expectedValueType.equals( castedOther.expectedValueType )
 				&& bridge.isCompatibleWith( castedOther.bridge );
 	}

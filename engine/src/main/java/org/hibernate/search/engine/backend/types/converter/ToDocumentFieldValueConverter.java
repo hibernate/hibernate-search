@@ -18,6 +18,20 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFie
 public interface ToDocumentFieldValueConverter<V, F> {
 
 	/**
+	 * Check whether the given type is a valid type for values passed
+	 * to {@link #convert(Object, ToDocumentFieldValueConvertContext)},
+	 * which generally means the given type is a subtype of {@link V}.
+	 * <p>
+	 * This method is generally implemented like this:
+	 * {@code return TheInputType.class.isAssignableFrom( inputTypeCandidate )}.
+	 * @param inputTypeCandidate A candidate type for the input of {@link #convertUnknown(Object, ToDocumentFieldValueConvertContext)}.
+	 * @return {@code true} if values of type {@code inputTypeCandidate}
+	 * may be accepted by {@link #convertUnknown(Object, ToDocumentFieldValueConvertContext)},
+	 * {@code false} otherwise.
+	 */
+	boolean isValidInputType(Class<?> inputTypeCandidate);
+
+	/**
 	 * @param value The source value to convert.
 	 * @param context A context that can be
 	 * {@link ToDocumentFieldValueConvertContext#extension(ToDocumentFieldValueConvertContextExtension) extended}
