@@ -22,6 +22,10 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep
 public final class ValueWrapper<T> {
 	public static <T> ToDocumentFieldValueConverter<ValueWrapper<T>, T> toIndexFieldConverter() {
 		return new ToDocumentFieldValueConverter<ValueWrapper<T>, T>() {
+			@Override
+			public boolean isValidInputType(Class<?> inputTypeCandidate) {
+				return ValueWrapper.class.isAssignableFrom( inputTypeCandidate );
+			}
 
 			@Override
 			public T convert(ValueWrapper<T> value, ToDocumentFieldValueConvertContext context) {

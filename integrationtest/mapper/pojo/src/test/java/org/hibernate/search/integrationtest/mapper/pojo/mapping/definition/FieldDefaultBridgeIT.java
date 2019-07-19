@@ -283,6 +283,11 @@ public class FieldDefaultBridgeIT<V, F> {
 	private static class IncompatibleToDocumentFieldValueConverter
 			implements ToDocumentFieldValueConverter<Object, Object> {
 		@Override
+		public boolean isValidInputType(Class<?> inputTypeCandidate) {
+			return Object.class.isAssignableFrom( inputTypeCandidate );
+		}
+
+		@Override
 		public Object convert(Object value, ToDocumentFieldValueConvertContext context) {
 			throw new UnsupportedOperationException();
 		}

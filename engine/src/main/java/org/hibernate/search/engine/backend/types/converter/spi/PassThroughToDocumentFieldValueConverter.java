@@ -24,6 +24,11 @@ public final class PassThroughToDocumentFieldValueConverter<F> implements ToDocu
 	}
 
 	@Override
+	public boolean isValidInputType(Class<?> inputTypeCandidate) {
+		return valueType.isAssignableFrom( inputTypeCandidate );
+	}
+
+	@Override
 	public F convert(F value, ToDocumentFieldValueConvertContext context) {
 		return value;
 	}
