@@ -28,7 +28,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
@@ -213,7 +213,7 @@ public class FieldSearchProjectionIT {
 			Class<?> wrongType = ( rightType.equals( Integer.class ) ) ? Long.class : Integer.class;
 
 			SubTest.expectException(
-					() -> scope.projection().field( fieldPath, wrongType, ProjectionConverter.ENABLED ).toProjection()
+					() -> scope.projection().field( fieldPath, wrongType, ValueConvert.YES ).toProjection()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -308,7 +308,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.field( fieldPath, model.type, ProjectionConverter.DISABLED ) )
+								.asProjection( f -> f.field( fieldPath, model.type, ValueConvert.NO ) )
 								.predicate( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
@@ -331,7 +331,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.field( fieldPath, ProjectionConverter.DISABLED ) )
+								.asProjection( f -> f.field( fieldPath, ValueConvert.NO ) )
 								.predicate( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
@@ -525,7 +525,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.field( fieldPath, model.type, ProjectionConverter.DISABLED ) )
+								.asProjection( f -> f.field( fieldPath, model.type, ValueConvert.NO ) )
 								.predicate( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
@@ -566,7 +566,7 @@ public class FieldSearchProjectionIT {
 
 			SubTest.expectException(
 					"projection on multiple indexes with incompatible types for field " + fieldPath,
-					() -> scope.projection().field( fieldPath, ProjectionConverter.DISABLED )
+					() -> scope.projection().field( fieldPath, ValueConvert.NO )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )

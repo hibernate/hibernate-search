@@ -25,7 +25,7 @@ public interface MatchPredicateMatchingStep {
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 *
-	 * @see #matching(Object, DslConverter)
+	 * @see #matching(Object, ValueConvert)
 	 */
 	default MatchPredicateOptionsStep matching(Object value) {
 		return matching( value, ValueConvert.YES );
@@ -42,7 +42,7 @@ public interface MatchPredicateMatchingStep {
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 *
-	 * @see DslConverter
+	 * @see ValueConvert
 	 */
 	MatchPredicateOptionsStep matching(Object value, ValueConvert convert);
 

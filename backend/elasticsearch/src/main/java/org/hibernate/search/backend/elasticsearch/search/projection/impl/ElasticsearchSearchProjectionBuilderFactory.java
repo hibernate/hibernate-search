@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.scope.model.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
@@ -58,14 +58,21 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ProjectionConverter projectionConverter) {
+	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldProjectionBuilderFactory> fieldComponent =
 				scopeModel.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		if ( projectionConverter.isEnabled() ) {
-			fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
+		switch ( convert ) {
+			case NO:
+				break;
+			case YES:
+			default:
+				fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
+				break;
 		}
 		return fieldComponent.getComponent()
-				.createFieldValueProjectionBuilder( scopeModel.getHibernateSearchIndexNames(), absoluteFieldPath, expectedType, projectionConverter );
+				.createFieldValueProjectionBuilder(
+						scopeModel.getHibernateSearchIndexNames(), absoluteFieldPath, expectedType, convert
+				);
 	}
 
 	@Override
