@@ -15,12 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBigDecimalFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -47,23 +42,11 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<BigDecimal> toIndexFieldType(PropertyMapping mapping) {
+	protected ElasticsearchFieldCodec<BigDecimal> complete(PropertyMapping mapping) {
 		BigDecimal scalingFactor = BigDecimal.TEN.pow( resolveDecimalScale(), new MathContext( 10, RoundingMode.HALF_UP ) );
 		mapping.setScalingFactor( scalingFactor.doubleValue() );
 
-		ToDocumentFieldValueConverter<?, ? extends BigDecimal> dslToIndexConverter =
-				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super BigDecimal, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		ElasticsearchBigDecimalFieldCodec codec = new ElasticsearchBigDecimalFieldCodec( scalingFactor );
-
-		return new ElasticsearchIndexFieldType<>(
-				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( resolvedSearchable, dslToIndexConverter , createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
-				mapping
-		);
+		return new ElasticsearchBigDecimalFieldCodec( scalingFactor );
 	}
 
 	@Override

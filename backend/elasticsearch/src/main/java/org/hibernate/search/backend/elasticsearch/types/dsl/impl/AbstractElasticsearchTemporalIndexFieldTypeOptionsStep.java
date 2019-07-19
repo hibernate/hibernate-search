@@ -8,13 +8,14 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 
 abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
-		S extends AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<? extends S, F>, F extends TemporalAccessor
+				S extends AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<? extends S, F>, F extends TemporalAccessor
 		>
 		extends AbstractElasticsearchScalarFieldTypeOptionsStep<S, F> {
 
@@ -24,7 +25,7 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 	}
 
 	@Override
-	protected final ElasticsearchIndexFieldType<F> toIndexFieldType(PropertyMapping mapping) {
+	protected ElasticsearchFieldCodec<F> complete(PropertyMapping mapping) {
 		ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider =
 				getBuildContext().getDefaultFieldFormatProvider();
 
@@ -33,9 +34,9 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 
 		DateTimeFormatter formatter = defaultFieldFormatProvider.getDefaultDateTimeFormatter( getFieldType() );
 
-		return toIndexFieldType( mapping, formatter );
+		return createCodec( formatter );
 	}
 
-	protected abstract ElasticsearchIndexFieldType<F> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter);
+	protected abstract ElasticsearchFieldCodec<F> createCodec(DateTimeFormatter formatter);
 
 }

@@ -9,12 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBooleanFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 
 class ElasticsearchBooleanIndexFieldTypeOptionsStep
 		extends
@@ -25,20 +20,8 @@ class ElasticsearchBooleanIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<Boolean> toIndexFieldType(PropertyMapping mapping) {
-		ToDocumentFieldValueConverter<?, ? extends Boolean> dslToIndexConverter =
-				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super Boolean, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		ElasticsearchBooleanFieldCodec codec = ElasticsearchBooleanFieldCodec.INSTANCE;
-
-		return new ElasticsearchIndexFieldType<>(
-				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( resolvedSearchable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
-				mapping
-		);
+	protected ElasticsearchFieldCodec<Boolean> complete(PropertyMapping mapping) {
+		return ElasticsearchBooleanFieldCodec.INSTANCE;
 	}
 
 	@Override
