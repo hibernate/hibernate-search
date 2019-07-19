@@ -9,12 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchByteFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 
 class ElasticsearchByteIndexFieldTypeOptionsStep
 		extends AbstractElasticsearchScalarFieldTypeOptionsStep<ElasticsearchByteIndexFieldTypeOptionsStep, Byte> {
@@ -24,20 +19,8 @@ class ElasticsearchByteIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<Byte> toIndexFieldType(PropertyMapping mapping) {
-		ToDocumentFieldValueConverter<?, ? extends Byte> dslToIndexConverter =
-				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super Byte, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		ElasticsearchByteFieldCodec codec = ElasticsearchByteFieldCodec.INSTANCE;
-
-		return new ElasticsearchIndexFieldType<>(
-				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( resolvedSearchable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
-				mapping
-		);
+	protected ElasticsearchFieldCodec<Byte> complete(PropertyMapping mapping) {
+		return ElasticsearchByteFieldCodec.INSTANCE;
 	}
 
 	@Override

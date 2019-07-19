@@ -9,14 +9,8 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchZonedDateTimeFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep
 		extends
@@ -27,21 +21,8 @@ class ElasticsearchZonedDateTimeIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<ZonedDateTime> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
-		ElasticsearchZonedDateTimeFieldCodec codec = new ElasticsearchZonedDateTimeFieldCodec( formatter );
-
-		ToDocumentFieldValueConverter<?, ? extends ZonedDateTime> dslToIndexConverter =
-				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super ZonedDateTime, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-
-		return new ElasticsearchIndexFieldType<>(
-				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( resolvedSearchable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
-				mapping
-		);
+	protected ElasticsearchFieldCodec<ZonedDateTime> createCodec(DateTimeFormatter formatter) {
+		return new ElasticsearchZonedDateTimeFieldCodec( formatter );
 	}
 
 	@Override

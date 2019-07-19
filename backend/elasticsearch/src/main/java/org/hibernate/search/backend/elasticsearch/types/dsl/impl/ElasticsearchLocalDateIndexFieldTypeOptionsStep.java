@@ -9,14 +9,8 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLocalDateFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 
 class ElasticsearchLocalDateIndexFieldTypeOptionsStep
@@ -28,21 +22,8 @@ class ElasticsearchLocalDateIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<LocalDate> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
-		ElasticsearchLocalDateFieldCodec codec = new ElasticsearchLocalDateFieldCodec( formatter );
-
-		ToDocumentFieldValueConverter<?, ? extends LocalDate> dslToIndexConverter =
-				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super LocalDate, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-
-		return new ElasticsearchIndexFieldType<>(
-				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( resolvedSearchable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
-				mapping
-		);
+	protected ElasticsearchFieldCodec<LocalDate> createCodec(DateTimeFormatter formatter) {
+		return new ElasticsearchLocalDateFieldCodec( formatter );
 	}
 
 	@Override

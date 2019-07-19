@@ -9,14 +9,8 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchOffsetDateTimeFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class ElasticsearchOffsetDateTimeIndexFieldTypeOptionsStep
 		extends
@@ -27,21 +21,8 @@ class ElasticsearchOffsetDateTimeIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<OffsetDateTime> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
-		ElasticsearchOffsetDateTimeFieldCodec codec = new ElasticsearchOffsetDateTimeFieldCodec( formatter );
-
-		ToDocumentFieldValueConverter<?, ? extends OffsetDateTime> dslToIndexConverter =
-				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super OffsetDateTime, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-
-		return new ElasticsearchIndexFieldType<>(
-				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( resolvedSearchable, dslToIndexConverter, createToDocumentRawConverter(),codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
-				mapping
-		);
+	protected ElasticsearchFieldCodec<OffsetDateTime> createCodec(DateTimeFormatter formatter) {
+		return new ElasticsearchOffsetDateTimeFieldCodec( formatter );
 	}
 
 	@Override
