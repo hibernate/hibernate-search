@@ -17,7 +17,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -90,7 +90,7 @@ public class DslConverterIT {
 			// tag::dsl-converter-disabled[]
 			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
 					.predicate( f -> f.match().onField( "outcome" )
-							.matching( "Invalid password", DslConverter.DISABLED ) )
+							.matching( "Invalid password", ValueConvert.NO ) )
 					.fetchHits();
 			// end::dsl-converter-disabled[]
 

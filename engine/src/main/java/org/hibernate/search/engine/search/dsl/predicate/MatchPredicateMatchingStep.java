@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 
 /**
  * The step in a "match" predicate definition where the value to match can be set.
@@ -17,18 +17,18 @@ public interface MatchPredicateMatchingStep {
 	 * Require at least one of the targeted fields to match the given value.
 	 * <p>
 	 * This method will apply DSL converters to {@code value} before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter#ENABLED}.
+	 * See {@link ValueConvert#YES}.
 	 *
 	 * @param value The value to match.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link DslConverter#ENABLED} for more information.
+	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 *
 	 * @see #matching(Object, DslConverter)
 	 */
 	default MatchPredicateOptionsStep matching(Object value) {
-		return matching( value, DslConverter.ENABLED );
+		return matching( value, ValueConvert.YES );
 	}
 
 	/**
@@ -37,13 +37,13 @@ public interface MatchPredicateMatchingStep {
 	 * @param value The value to match.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
-	 * See {@link DslConverter} for more information.
-	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter} for more information.
+	 * See {@link ValueConvert} for more information.
+	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 *
 	 * @see DslConverter
 	 */
-	MatchPredicateOptionsStep matching(Object value, DslConverter dslConverter);
+	MatchPredicateOptionsStep matching(Object value, ValueConvert convert);
 
 }

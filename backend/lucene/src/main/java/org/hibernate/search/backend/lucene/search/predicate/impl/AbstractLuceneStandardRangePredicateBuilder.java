@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -60,8 +60,8 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 	}
 
 	@Override
-	public void lowerLimit(Object value, DslConverter dslConverter) {
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( dslConverter );
+	public void lowerLimit(Object value, ValueConvert convert) {
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			lowerLimit = codec.encode( converted );
@@ -79,8 +79,8 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 	}
 
 	@Override
-	public void upperLimit(Object value, DslConverter dslConverter) {
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( dslConverter );
+	public void upperLimit(Object value, ValueConvert convert) {
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			upperLimit = codec.encode( converted );
@@ -97,11 +97,14 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 		excludeUpperLimit = true;
 	}
 
-	public ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(DslConverter dslConverter) {
-		if ( dslConverter.isEnabled() ) {
-			converterChecker.failIfNotCompatible();
+	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
+		switch ( convert ) {
+			case NO:
+				return rawConverter;
+			case YES:
+			default:
+				converterChecker.failIfNotCompatible();
+				return converter;
 		}
-
-		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
 	}
 }

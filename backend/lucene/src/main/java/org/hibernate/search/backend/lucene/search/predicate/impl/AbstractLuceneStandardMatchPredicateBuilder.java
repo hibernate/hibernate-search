@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -69,12 +69,8 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 	}
 
 	@Override
-	public void value(Object value, DslConverter dslConverter) {
-		if ( dslConverter.isEnabled() ) {
-			converterChecker.failIfNotCompatible();
-		}
-
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = ( dslConverter.isEnabled() ) ? converter : rawConverter;
+	public void value(Object value, ValueConvert convert) {
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			this.value = codec.encode( converted );
@@ -83,6 +79,17 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 			throw log.cannotConvertDslParameter(
 					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
+		}
+	}
+
+	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
+		switch ( convert ) {
+			case NO:
+				return rawConverter;
+			case YES:
+			default:
+				converterChecker.failIfNotCompatible();
+				return converter;
 		}
 	}
 }

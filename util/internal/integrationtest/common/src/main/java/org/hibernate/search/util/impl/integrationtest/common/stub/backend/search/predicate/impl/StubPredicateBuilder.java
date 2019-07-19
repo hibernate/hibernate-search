@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
@@ -86,7 +86,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public void value(Object value, DslConverter dslConverter) {
+	public void value(Object value, ValueConvert convert) {
 		// No-op
 	}
 
@@ -101,7 +101,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public void lowerLimit(Object value, DslConverter dslConverter) {
+	public void lowerLimit(Object value, ValueConvert convert) {
 		// No-op
 	}
 
@@ -111,7 +111,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public void upperLimit(Object value, DslConverter dslConverter) {
+	public void upperLimit(Object value, ValueConvert convert) {
 		// No-op
 	}
 

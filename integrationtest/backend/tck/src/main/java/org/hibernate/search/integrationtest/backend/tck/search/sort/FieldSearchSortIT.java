@@ -27,7 +27,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -296,19 +296,19 @@ public class FieldSearchSortIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-					.use( fieldModel.before1Value, DslConverter.DISABLED ) );
+					.use( fieldModel.before1Value, ValueConvert.NO ) );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-					.use( fieldModel.between1And2Value, DslConverter.DISABLED ) );
+					.use( fieldModel.between1And2Value, ValueConvert.NO ) );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-					.use( fieldModel.between2And3Value, DslConverter.DISABLED ) );
+					.use( fieldModel.between2And3Value, ValueConvert.NO ) );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-					.use( fieldModel.after3Value, DslConverter.DISABLED ) );
+					.use( fieldModel.after3Value, ValueConvert.NO ) );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 		}
@@ -495,7 +495,7 @@ public class FieldSearchSortIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-					.use( fieldModel.before1Value, DslConverter.DISABLED ), scope );
+					.use( fieldModel.before1Value, ValueConvert.NO ), scope );
 
 			/*
 			 * Not testing the ordering of results here because some documents have the same value.

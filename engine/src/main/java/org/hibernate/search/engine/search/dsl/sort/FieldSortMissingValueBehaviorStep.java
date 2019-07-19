@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.sort;
 
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -42,25 +42,25 @@ public interface FieldSortMissingValueBehaviorStep<N> {
 	 * When documents are missing a value on the sort field, use the given value instead.
 	 * <p>
 	 * This method will apply DSL converters to {@code value} before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter#ENABLED}.
+	 * See {@link ValueConvert#YES}.
 	 *
 	 * @param value The value to use as a default when a document is missing a value on the sort field.
 	 * @return The next step.
 	 * @throws SearchException If the field is not numeric.
 	 */
 	default N use(Object value) {
-		return use( value, DslConverter.ENABLED );
+		return use( value, ValueConvert.YES );
 	}
 
 	/**
 	 * When documents are missing a value on the sort field, use the given value instead.
 	 *
 	 * @param value The value to use as a default when a document is missing a value on the sort field.
-	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter}.
+	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert}.
 	 * @return The next step.
 	 * @throws SearchException If the field is not numeric.
 	 */
-	N use(Object value, DslConverter dslConverter);
+	N use(Object value, ValueConvert convert);
 
 }
