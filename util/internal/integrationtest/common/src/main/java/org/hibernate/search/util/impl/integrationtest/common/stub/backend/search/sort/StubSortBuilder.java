@@ -7,7 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort;
 
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
@@ -31,7 +31,7 @@ public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
 	}
 
 	@Override
-	public void missingAs(Object value, DslConverter dslConverter) {
+	public void missingAs(Object value, ValueConvert convert) {
 		// No-op
 	}
 

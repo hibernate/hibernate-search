@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldC
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -75,12 +75,8 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	}
 
 	@Override
-	public void missingAs(Object value, DslConverter dslConverter) {
-		if ( dslConverter.isEnabled() ) {
-			converterChecker.failIfNotCompatible();
-		}
-
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = ( dslConverter.isEnabled() ) ? converter : rawConverter;
+	public void missingAs(Object value, ValueConvert convert) {
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			missingValue = encodeMissingAs( converted );
@@ -113,5 +109,16 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 		}
 
 		sortField.setMissingValue( effectiveMissingValue );
+	}
+
+	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
+		switch ( convert ) {
+			case NO:
+				return rawConverter;
+			case YES:
+			default:
+				converterChecker.failIfNotCompatible();
+				return converter;
+		}
 	}
 }

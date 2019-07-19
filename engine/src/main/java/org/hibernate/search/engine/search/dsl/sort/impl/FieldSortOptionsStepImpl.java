@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.dsl.sort.FieldSortMissingValueBehavior
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.dsl.sort.spi.AbstractSortThenStep;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 class FieldSortOptionsStepImpl<B>
@@ -50,8 +50,8 @@ class FieldSortOptionsStepImpl<B>
 	}
 
 	@Override
-	public FieldSortOptionsStep use(Object value, DslConverter dslConverter) {
-		builder.missingAs( value, dslConverter );
+	public FieldSortOptionsStep use(Object value, ValueConvert convert) {
+		builder.missingAs( value, convert );
 		return this;
 	}
 

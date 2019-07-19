@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -178,7 +178,7 @@ public class RangeSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).above( fieldModel.predicateLowerBound, DslConverter.DISABLED ) )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).above( fieldModel.predicateLowerBound, ValueConvert.NO ) )
 					.toQuery();
 
 			assertThat( query )
@@ -260,7 +260,7 @@ public class RangeSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).below( fieldModel.predicateUpperBound, DslConverter.DISABLED ) )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).below( fieldModel.predicateUpperBound, ValueConvert.NO ) )
 					.toQuery();
 
 			assertThat( query )
@@ -341,8 +341,8 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = scope.query()
 					.predicate( f -> f.range().onField( absoluteFieldPath )
-							.from( fieldModel.predicateLowerBound, DslConverter.DISABLED )
-							.to( fieldModel.predicateUpperBound, DslConverter.DISABLED ) )
+							.from( fieldModel.predicateLowerBound, ValueConvert.NO )
+							.to( fieldModel.predicateUpperBound, ValueConvert.NO ) )
 					.toQuery();
 
 			assertThat( query )
@@ -681,7 +681,7 @@ public class RangeSearchPredicateIT {
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
 				.predicate( f -> f.range().onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
 						.orField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
-						.below( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue, DslConverter.DISABLED )
+						.below( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue, ValueConvert.NO )
 				)
 				.toQuery();
 
@@ -889,7 +889,7 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch, DslConverter.DISABLED ) )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch, ValueConvert.NO ) )
 					.toQuery();
 
 			assertThat( query ).hasDocRefHitsAnyOrder( b -> {

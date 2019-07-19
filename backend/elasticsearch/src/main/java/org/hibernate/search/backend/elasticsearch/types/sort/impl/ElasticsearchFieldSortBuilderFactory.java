@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -20,7 +20,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * allowing fine-grained control over the type of sort created for each field.
  * <p>
  * For example, a sort on an {@link Integer} field
- * will not have its {@link FieldSortBuilder#missingAs(Object, DslConverter)} method
+ * will not have its {@link FieldSortBuilder#missingAs(Object, ValueConvert)} method
  * accept the same arguments as a sort on a {@link java.time.LocalDate} field;
  * having a separate {@link ElasticsearchFieldSortBuilderFactory} for those two fields
  * allows to implement the different behavior.

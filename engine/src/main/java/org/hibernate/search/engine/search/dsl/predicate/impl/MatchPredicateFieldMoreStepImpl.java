@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateOptionsStep;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldMoreStep;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -55,8 +55,8 @@ class MatchPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public MatchPredicateOptionsStep matching(Object value, DslConverter dslConverter) {
-		return commonState.matching( value, dslConverter );
+	public MatchPredicateOptionsStep matching(Object value, ValueConvert convert) {
+		return commonState.matching( value, convert );
 	}
 
 	@Override
@@ -81,14 +81,14 @@ class MatchPredicateFieldMoreStepImpl<B>
 			super( builderFactory );
 		}
 
-		MatchPredicateOptionsStep matching(Object value, DslConverter dslConverter) {
+		MatchPredicateOptionsStep matching(Object value, ValueConvert convert) {
 			if ( value == null ) {
 				throw log.matchPredicateCannotMatchNullValue( getEventContext() );
 			}
 
 			for ( MatchPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
 				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
-					predicateBuilder.value( value, dslConverter );
+					predicateBuilder.value( value, convert );
 				}
 			}
 			return this;

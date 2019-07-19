@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.dsl.predicate.RangePredicateLastLimitE
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateOptionsStep;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromToStep;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -58,18 +58,18 @@ class RangePredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public RangePredicateFromToStep from(Object value, DslConverter dslConverter) {
-		return commonState.from( value, dslConverter );
+	public RangePredicateFromToStep from(Object value, ValueConvert convert) {
+		return commonState.from( value, convert );
 	}
 
 	@Override
-	public RangePredicateLastLimitExcludeStep above(Object value, DslConverter dslConverter) {
-		return commonState.above( value, dslConverter );
+	public RangePredicateLastLimitExcludeStep above(Object value, ValueConvert convert) {
+		return commonState.above( value, convert );
 	}
 
 	@Override
-	public RangePredicateLastLimitExcludeStep below(Object value, DslConverter dslConverter) {
-		return commonState.below( value, dslConverter );
+	public RangePredicateLastLimitExcludeStep below(Object value, ValueConvert convert) {
+		return commonState.below( value, convert );
 	}
 
 	@Override
@@ -113,36 +113,36 @@ class RangePredicateFieldMoreStepImpl<B>
 			return super.toImplementation();
 		}
 
-		RangePredicateFromToStep from(Object value, DslConverter dslConverter) {
-			doAbove( value, dslConverter );
+		RangePredicateFromToStep from(Object value, ValueConvert convert) {
+			doAbove( value, convert );
 			return new RangePredicateFromToStepImpl<>( this );
 		}
 
-		RangePredicateLastLimitExcludeStep above(Object value, DslConverter dslConverter) {
-			doAbove( value, dslConverter );
+		RangePredicateLastLimitExcludeStep above(Object value, ValueConvert convert) {
+			doAbove( value, convert );
 			checkHasNonNullBound();
 			return this;
 		}
 
-		RangePredicateLastLimitExcludeStep below(Object value, DslConverter dslConverter) {
-			doBelow( value, dslConverter );
+		RangePredicateLastLimitExcludeStep below(Object value, ValueConvert convert) {
+			doBelow( value, convert );
 			checkHasNonNullBound();
 			return this;
 		}
 
-		private void doAbove(Object value, DslConverter dslConverter) {
+		private void doAbove(Object value, ValueConvert convert) {
 			excludeUpperLimit = false;
 			if ( value != null ) {
 				hasNonNullBound = true;
-				getQueryBuilders().forEach( q -> q.lowerLimit( value, dslConverter ) );
+				getQueryBuilders().forEach( q -> q.lowerLimit( value, convert ) );
 			}
 		}
 
-		private void doBelow(Object value, DslConverter dslConverter) {
+		private void doBelow(Object value, ValueConvert convert) {
 			excludeUpperLimit = true;
 			if ( value != null ) {
 				hasNonNullBound = true;
-				getQueryBuilders().forEach( q -> q.upperLimit( value, dslConverter ) );
+				getQueryBuilders().forEach( q -> q.upperLimit( value, convert ) );
 			}
 		}
 
@@ -171,8 +171,8 @@ class RangePredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public RangePredicateLastLimitExcludeStep to(Object value, DslConverter dslConverter) {
-			delegate.doBelow( value, dslConverter );
+		public RangePredicateLastLimitExcludeStep to(Object value, ValueConvert convert) {
+			delegate.doBelow( value, convert );
 			delegate.checkHasNonNullBound();
 			return delegate;
 		}

@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
@@ -193,7 +193,7 @@ public class MatchSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( fieldModel.predicateParameterValue, DslConverter.DISABLED ) )
+					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( fieldModel.predicateParameterValue, ValueConvert.NO ) )
 					.toQuery();
 
 			assertThat( query )
@@ -1060,7 +1060,7 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.match()
 						.onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
 						.orField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
-						.matching( indexMapping.string1FieldWithDslConverter.document3Value.indexedValue, DslConverter.DISABLED )
+						.matching( indexMapping.string1FieldWithDslConverter.document3Value.indexedValue, ValueConvert.NO )
 				)
 				.toQuery();
 
@@ -1187,7 +1187,7 @@ public class MatchSearchPredicateIT {
 				Object valueToMatch = model.predicateParameterValue;
 
 				SearchQuery<DocumentReference> query = scope.query()
-						.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch, DslConverter.DISABLED ) )
+						.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch, ValueConvert.NO ) )
 						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {

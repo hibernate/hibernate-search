@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -21,7 +21,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * allowing fine-grained control over the type of sort created for each field.
  * <p>
  * For example, a sort on an {@link Integer} field
- * will not have its {@link FieldSortBuilder#missingAs(Object, DslConverter)} method
+ * will not have its {@link FieldSortBuilder#missingAs(Object, ValueConvert)} method
  * accept the same arguments as a sort on a {@link java.time.LocalDate} field;
  * having a separate {@link LuceneFieldSortBuilderFactory} for those two fields
  * allows to implement the different behavior.

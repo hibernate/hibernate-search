@@ -1284,8 +1284,8 @@ instead of the default `Enum#name()`.
 
 Then, we will need to tell Hibernate Search that the value passed to the DSL should not be passed to the DSL converter,
 but should be assumed to match the type of the index field directly (in this case, `String`).
-To that end, one can simply use the variant of the `matching` method that accepts a `DslConverter` parameter,
-and pass `DslConverter.DISABLED`:
+To that end, one can simply use the variant of the `matching` method that accepts a `ValueConvert` parameter,
+and pass `ValueConvert.NO`:
 
 .Disabling the DSL converter
 ====
@@ -1295,7 +1295,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/converter/DslC
 ----
 ====
 
-All methods that apply DSL converters offer a variant that accepts a `DslConverter` parameter:
+All methods that apply DSL converters offer a variant that accepts a `ValueConvert` parameter:
 `matching`, `from`, `to`, `above`, `below`, ...
 
 [NOTE]

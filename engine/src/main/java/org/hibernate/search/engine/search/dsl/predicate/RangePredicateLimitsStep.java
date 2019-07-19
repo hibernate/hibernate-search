@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 
 /**
  * The step in a "range" predicate definition where the limits of the range to match can be set.
@@ -23,13 +23,13 @@ public interface RangePredicateLimitsStep {
 	 * and the upper bound (passed to {@link RangePredicateFromToStep#to(Object)}) must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link DslConverter#ENABLED} for more information.
+	 * See {@link ValueConvert#YES} for more information.
 	 * The lower bound is included in the range by default,
 	 * but can be excluded by calling {@link RangePredicateLimitExcludeStep#excludeLimit()} on the next step.
 	 * @return The next step.
 	 */
 	default RangePredicateFromToStep from(Object value) {
-		return from( value, DslConverter.ENABLED );
+		return from( value, ValueConvert.YES );
 	}
 
 	/**
@@ -42,14 +42,14 @@ public interface RangePredicateLimitsStep {
 	 * and the upper bound (passed to {@link RangePredicateFromToStep#to(Object)}) must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
-	 * See {@link DslConverter} for more information.
+	 * See {@link ValueConvert} for more information.
 	 * The lower bound is included in the range by default,
 	 * but can be excluded by calling {@link RangePredicateLimitExcludeStep#excludeLimit()} on the next step.
-	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter} for more information.
+	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	RangePredicateFromToStep from(Object value, DslConverter dslConverter);
+	RangePredicateFromToStep from(Object value, ValueConvert convert);
 
 	/**
 	 * Require at least one of the targeted fields to be "higher than" the given value,
@@ -58,13 +58,13 @@ public interface RangePredicateLimitsStep {
 	 * @param value The lower bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link DslConverter#ENABLED} for more information.
+	 * See {@link ValueConvert#YES} for more information.
 	 * The lower bound is included in the range by default,
 	 * but can be excluded by calling {@link RangePredicateLimitExcludeStep#excludeLimit()} on the next step.
 	 * @return The next step.
 	 */
 	default RangePredicateLastLimitExcludeStep above(Object value) {
-		return above( value, DslConverter.ENABLED );
+		return above( value, ValueConvert.YES );
 	}
 
 	/**
@@ -74,14 +74,14 @@ public interface RangePredicateLimitsStep {
 	 * @param value The lower bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
-	 * See {@link DslConverter} for more information.
+	 * See {@link ValueConvert} for more information.
 	 * The lower bound is included in the range by default,
 	 * but can be excluded by calling {@link RangePredicateLimitExcludeStep#excludeLimit()} on the next step.
-	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter} for more information.
+	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	RangePredicateLastLimitExcludeStep above(Object value, DslConverter dslConverter);
+	RangePredicateLastLimitExcludeStep above(Object value, ValueConvert convert);
 
 	/**
 	 * Require at least one of the targeted fields to be "lower than" the given value,
@@ -90,13 +90,13 @@ public interface RangePredicateLimitsStep {
 	 * @param value The upper bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See {@link DslConverter#ENABLED} for more information.
+	 * See {@link ValueConvert#YES} for more information.
 	 * The upper bound is included in the range by default,
 	 * but can be excluded by calling {@link RangePredicateLimitExcludeStep#excludeLimit()} on the next step.
 	 * @return The next step.
 	 */
 	default RangePredicateLastLimitExcludeStep below(Object value) {
-		return below( value, DslConverter.ENABLED );
+		return below( value, ValueConvert.YES );
 	}
 
 	/**
@@ -106,13 +106,13 @@ public interface RangePredicateLimitsStep {
 	 * @param value The upper bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
-	 * See {@link DslConverter} for more information.
+	 * See {@link ValueConvert} for more information.
 	 * The upper bound is included in the range by default,
 	 * but can be excluded by calling {@link RangePredicateLimitExcludeStep#excludeLimit()} on the next step.
-	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
-	 * See {@link DslConverter} for more information.
+	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	RangePredicateLastLimitExcludeStep below(Object value, DslConverter dslConverter);
+	RangePredicateLastLimitExcludeStep below(Object value, ValueConvert convert);
 
 }

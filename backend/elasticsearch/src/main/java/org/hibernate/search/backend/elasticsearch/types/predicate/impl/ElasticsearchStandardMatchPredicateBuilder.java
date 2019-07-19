@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -76,12 +76,8 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 	}
 
 	@Override
-	public void value(Object value, DslConverter dslConverter) {
-		if ( dslConverter.isEnabled() ) {
-			converterChecker.failIfNotCompatible();
-		}
-
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = ( dslConverter.isEnabled() ) ? converter : rawConverter;
+	public void value(Object value, ValueConvert convert) {
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			this.value = codec.encode( converted );
@@ -103,5 +99,16 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 		MATCH_ACCESSOR.set( outerObject, middleObject );
 		return outerObject;
+	}
+
+	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
+		switch ( convert ) {
+			case NO:
+				return rawConverter;
+			case YES:
+			default:
+				converterChecker.failIfNotCompatible();
+				return converter;
+		}
 	}
 }
