@@ -1,6 +1,28 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Alpha8 (19-07-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3641 Some attributes for native Elasticsearch fields are restricted to values known by Hibernate Search
+
+** Improvement
+    * HSEARCH-3637 Upgrade to Lucene 8.1.1
+    * HSEARCH-3627 Upgrade to Elasticsearch 6.8.1
+    * HSEARCH-3625 Upgrade to Elasticsearch 7.2.0
+    * HSEARCH-3607 Allow using @GenericField on GeoPoint properties instead of @GeoPointBinding (previously @Spatial)
+    * HSEARCH-3602 Use the "Step" suffix instead of the "Context" suffix in DSLs
+
+** Task
+    * HSEARCH-3638 Improve test utils (SearchSetupHelper, OrmSetupHelper, ...) to allow sharding tests
+    * HSEARCH-3626 Fix order requirements in various backend integration tests
+    * HSEARCH-3624 Move ConfigurationPropertySource to SPI
+    * HSEARCH-3621 Clarify the error message when the Elasticsearch cluster cannot be reached upon startup
+    * HSEARCH-3609 Search 6 groundwork - Replace bridge builders with *binders*
+    * HSEARCH-3440 Search 6 groundwork - Finalize the lucene DirectoryProvider SPI
+    * HSEARCH-3349 Search 6 groundwork - Restore ORM object loading with the same feature coverage as Search 5
+
 6.0.0.Alpha7 (21-06-2019)
 -------------------------
 
