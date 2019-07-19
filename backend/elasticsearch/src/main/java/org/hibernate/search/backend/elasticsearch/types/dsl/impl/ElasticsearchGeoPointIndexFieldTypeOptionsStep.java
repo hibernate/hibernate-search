@@ -18,8 +18,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 
 class ElasticsearchGeoPointIndexFieldTypeOptionsStep
-		extends
-		AbstractElasticsearchScalarFieldTypeOptionsStep<ElasticsearchGeoPointIndexFieldTypeOptionsStep, GeoPoint> {
+		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<ElasticsearchGeoPointIndexFieldTypeOptionsStep, GeoPoint> {
 
 	ElasticsearchGeoPointIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, GeoPoint.class, DataTypes.GEO_POINT );
