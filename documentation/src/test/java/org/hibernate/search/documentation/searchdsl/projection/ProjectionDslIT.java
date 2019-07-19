@@ -21,7 +21,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -221,7 +221,7 @@ public class ProjectionDslIT {
 			// tag::field-noProjectionConverter[]
 			List<String> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.field(
-							"genre", String.class, ProjectionConverter.DISABLED
+							"genre", String.class, ValueConvert.NO
 					) )
 					.predicate( f -> f.matchAll() )
 					.fetchHits();

@@ -20,7 +20,7 @@ import javax.persistence.Table;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -88,7 +88,7 @@ public class ProjectionConverterIT {
 
 			// tag::projection-converter-disabled[]
 			List<String> result = searchSession.search( Order.class )
-					.asProjection( f -> f.field( "status", String.class, ProjectionConverter.DISABLED ) )
+					.asProjection( f -> f.field( "status", String.class, ValueConvert.NO ) )
 					.predicate( f -> f.matchAll() )
 					.fetchHits();
 			// end::projection-converter-disabled[]

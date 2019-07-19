@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFie
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
@@ -57,14 +57,19 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	}
 
 	@Override
-	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ProjectionConverter projectionConverter) {
+	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
 		LuceneScopedIndexFieldComponent<LuceneFieldProjectionBuilderFactory> fieldComponent =
 				scopeModel.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		if ( projectionConverter.isEnabled() ) {
-			fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
+		switch ( convert ) {
+			case NO:
+				break;
+			case YES:
+			default:
+				fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
+				break;
 		}
 		return fieldComponent.getComponent()
-				.createFieldValueProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, expectedType, projectionConverter );
+				.createFieldValueProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, expectedType, convert );
 	}
 
 	@Override

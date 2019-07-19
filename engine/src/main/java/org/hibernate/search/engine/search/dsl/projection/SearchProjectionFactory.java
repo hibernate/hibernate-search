@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.function.TriFunction;
@@ -59,7 +59,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * Project to the value of a field in the indexed document.
 	 * <p>
 	 * This method will apply projection converters on data fetched from the backend.
-	 * See {@link ProjectionConverter#ENABLED}.
+	 * See {@link ValueConvert#YES}.
 	 *
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param type The resulting type of the projection.
@@ -67,7 +67,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
 	default <T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> type) {
-		return field( absoluteFieldPath, type, ProjectionConverter.ENABLED );
+		return field( absoluteFieldPath, type, ValueConvert.YES );
 	}
 
 	/**
@@ -76,34 +76,34 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param type The resulting type of the projection.
 	 * @param <T> The resulting type of the projection.
-	 * @param projectionConverter Controls how the data fetched from the backend should be converted.
-	 * See {@link ProjectionConverter}.
+	 * @param convert Controls how the data fetched from the backend should be converted.
+	 * See {@link ValueConvert}.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	<T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> type, ProjectionConverter projectionConverter);
+	<T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert);
 
 	/**
 	 * Project to the value of a field in the indexed document, without specifying a type.
 	 * <p>
 	 * This method will apply projection converters on data fetched from the backend.
-	 * See {@link ProjectionConverter#ENABLED}.
+	 * See {@link ValueConvert#YES}.
 	 *
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
 	default FieldProjectionOptionsStep<Object> field(String absoluteFieldPath) {
-		return field( absoluteFieldPath, ProjectionConverter.ENABLED );
+		return field( absoluteFieldPath, ValueConvert.YES );
 	}
 
 	/**
 	 * Project to the value of a field in the indexed document, without specifying a type.
 	 *
 	 * @param absoluteFieldPath The absolute path of the field.
-	 * @param projectionConverter Controls how the data fetched from the backend should be converted.
-	 * See {@link ProjectionConverter}.
+	 * @param convert Controls how the data fetched from the backend should be converted.
+	 * See {@link ValueConvert}.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ProjectionConverter projectionConverter);
+	FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ValueConvert convert);
 
 	/**
 	 * Project on the score of the hit.

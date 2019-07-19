@@ -21,7 +21,7 @@ import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionOptionsS
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionIfSupportedStep;
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
 
@@ -49,13 +49,13 @@ public class DelegatingSearchProjectionFactory<R, E> implements SearchProjection
 	}
 
 	@Override
-	public <T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> type, ProjectionConverter projectionConverter) {
-		return delegate.field( absoluteFieldPath, type, projectionConverter );
+	public <T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert) {
+		return delegate.field( absoluteFieldPath, type, convert );
 	}
 
 	@Override
-	public FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ProjectionConverter projectionConverter) {
-		return delegate.field( absoluteFieldPath, projectionConverter );
+	public FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ValueConvert convert) {
+		return delegate.field( absoluteFieldPath, convert );
 	}
 
 	@Override

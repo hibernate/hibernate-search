@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionOptionsS
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionIfSupportedStep;
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
@@ -43,15 +43,15 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 	}
 
 	@Override
-	public <T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> clazz, ProjectionConverter projectionConverter) {
+	public <T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> clazz, ValueConvert convert) {
 		Contracts.assertNotNull( clazz, "clazz" );
 
-		return new FieldProjectionOptionsStepImpl<>( factory, absoluteFieldPath, clazz, projectionConverter );
+		return new FieldProjectionOptionsStepImpl<>( factory, absoluteFieldPath, clazz, convert );
 	}
 
 	@Override
-	public FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ProjectionConverter projectionConverter) {
-		return field( absoluteFieldPath, Object.class, projectionConverter );
+	public FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ValueConvert convert) {
+		return field( absoluteFieldPath, Object.class, convert );
 	}
 
 	@Override

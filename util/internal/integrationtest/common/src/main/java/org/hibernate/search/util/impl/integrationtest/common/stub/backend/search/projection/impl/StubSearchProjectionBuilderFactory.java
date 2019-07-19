@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
@@ -49,7 +49,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz, ProjectionConverter projectionConverter) {
+	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz, ValueConvert convert) {
 		StubFieldConverter<?> converter = scopeModel.getFieldConverter( absoluteFieldPath );
 		return new FieldProjectionBuilder<T>() {
 			@Override

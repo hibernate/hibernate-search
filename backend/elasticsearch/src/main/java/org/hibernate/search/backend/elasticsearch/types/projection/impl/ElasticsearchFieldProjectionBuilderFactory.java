@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -26,7 +26,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 public interface ElasticsearchFieldProjectionBuilderFactory {
 
 	<T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			Class<T> expectedType, ProjectionConverter projectionConverter);
+			Class<T> expectedType, ValueConvert convert);
 
 	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
 			GeoPoint center);

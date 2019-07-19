@@ -1349,8 +1349,8 @@ But in some cases, you may want to disable this conversion and return the index 
 (i.e. the value of `Enum.name()`).
 
 In that case, we will need to tell Hibernate Search that the value returned by the backend should not be passed to the projection converter.
-To that end, one can simply use the variant of the `field` method that accepts a `ProjectionConverter` parameter,
-and pass `ProjectionConverter.DISABLED`:
+To that end, one can simply use the variant of the `field` method that accepts a `ValueConvert` parameter,
+and pass `ValueConvert.NO`:
 
 .Disabling the projection converter
 ====

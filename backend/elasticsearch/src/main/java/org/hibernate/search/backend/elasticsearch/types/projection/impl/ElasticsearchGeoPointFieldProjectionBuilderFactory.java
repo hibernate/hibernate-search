@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.projection.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -43,10 +43,10 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory implements Elast
 	@Override
 	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
 	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			Class<T> expectedType, ProjectionConverter projectionConverter) {
+			Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( absoluteFieldPath, projectable );
 
-		FromDocumentFieldValueConverter<? super GeoPoint, ?> requestConverter = getConverter( projectionConverter );
+		FromDocumentFieldValueConverter<? super GeoPoint, ?> requestConverter = getConverter( convert );
 		if ( !requestConverter.isConvertedTypeAssignableTo( expectedType ) ) {
 			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
@@ -90,7 +90,13 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory implements Elast
 		}
 	}
 
-	private FromDocumentFieldValueConverter<? super GeoPoint, ?> getConverter(ProjectionConverter projectionConverter) {
-		return ( projectionConverter.isEnabled() ) ? converter : rawConverter;
+	private FromDocumentFieldValueConverter<? super GeoPoint, ?> getConverter(ValueConvert convert) {
+		switch ( convert ) {
+			case NO:
+				return rawConverter;
+			case YES:
+			default:
+				return converter;
+		}
 	}
 }
