@@ -53,7 +53,7 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker,
 			ElasticsearchCompatibilityChecker analyzerChecker) {
-		throw log.matchPredicatesNotSupportedByGeoPoint(
+		throw log.directValueLookupNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
 	}
@@ -61,7 +61,7 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker) {
-		throw log.rangePredicatesNotSupportedByGeoPoint(
+		throw log.rangesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
 	}

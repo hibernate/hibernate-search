@@ -420,7 +420,8 @@ public class RangeSearchPredicateIT {
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Range predicates are not supported by" )
+					.hasMessageContaining( "range predicates" )
+					.hasMessageContaining( "are not supported by this field's type" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );

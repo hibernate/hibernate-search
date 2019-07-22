@@ -43,7 +43,7 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
-		throw log.matchPredicatesNotSupportedByGeoPoint(
+		throw log.directValueLookupNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
 	}
@@ -51,7 +51,7 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker) {
-		throw log.rangePredicatesNotSupportedByGeoPoint(
+		throw log.rangesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
 	}

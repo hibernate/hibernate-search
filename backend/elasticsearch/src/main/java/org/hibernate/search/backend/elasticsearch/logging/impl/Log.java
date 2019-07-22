@@ -315,12 +315,12 @@ public interface Log extends BasicLogger {
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 23,
-			value = "Range predicates are not supported by the GeoPoint field type, use spatial predicates instead.")
-	SearchException rangePredicatesNotSupportedByGeoPoint(@Param EventContext context);
+			value = "Range lookups (range predicates) are not supported by this field's type (GeoPoint). Use spatial features instead.")
+	SearchException rangesNotSupportedByGeoPoint(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 24,
-			value = "Match predicates are not supported by the GeoPoint field type, use spatial predicates instead.")
-	SearchException matchPredicatesNotSupportedByGeoPoint(@Param EventContext context);
+			value = "Direct value lookups (match predicates) are not supported by this field's type (GeoPoint). Use spatial features instead.")
+	SearchException directValueLookupNotSupportedByGeoPoint(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 25,
 			value = "Invalid field reference for this document element: this document element has path '%1$s', but the referenced field has a parent with path '%2$s'.")

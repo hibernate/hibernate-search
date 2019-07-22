@@ -244,7 +244,8 @@ public class MatchSearchPredicateIT {
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Match predicates are not supported by" )
+					.hasMessageContaining( "match predicates" )
+					.hasMessageContaining( "are not supported by this field's type" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
