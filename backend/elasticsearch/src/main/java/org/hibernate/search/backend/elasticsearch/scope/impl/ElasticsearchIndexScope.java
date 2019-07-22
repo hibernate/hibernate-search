@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBacken
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactoryImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
+import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 
 public class ElasticsearchIndexScope
 		implements IndexScope<ElasticsearchSearchQueryElementCollector> {
@@ -73,5 +74,10 @@ public class ElasticsearchIndexScope
 	@Override
 	public ElasticsearchSearchProjectionBuilderFactory getSearchProjectionFactory() {
 		return searchProjectionFactory;
+	}
+
+	@Override
+	public SearchAggregationBuilderFactory<? super ElasticsearchSearchQueryElementCollector> getSearchAggregationFactory() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 }

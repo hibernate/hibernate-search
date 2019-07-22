@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContex
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactoryImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
+import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 
 
 public class LuceneIndexScope
@@ -65,5 +66,10 @@ public class LuceneIndexScope
 	@Override
 	public LuceneSearchProjectionBuilderFactory getSearchProjectionFactory() {
 		return searchProjectionFactory;
+	}
+
+	@Override
+	public SearchAggregationBuilderFactory<? super LuceneSearchQueryElementCollector> getSearchAggregationFactory() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 }
