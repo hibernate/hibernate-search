@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuild
  *
  * @param <F> The type of aggregation factory.
  */
-public interface SearchAggregationDslContext<F extends SearchAggregationBuilderFactory> {
+public interface SearchAggregationDslContext<F extends SearchAggregationBuilderFactory<?>> {
 
 	/**
 	 * @return The aggregation builder factory. Will always return the exact same instance.

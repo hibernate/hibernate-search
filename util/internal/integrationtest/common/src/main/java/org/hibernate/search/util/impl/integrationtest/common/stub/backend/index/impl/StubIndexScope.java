@@ -13,6 +13,7 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
+import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
@@ -56,6 +57,11 @@ class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 	@Override
 	public SearchProjectionBuilderFactory getSearchProjectionFactory() {
 		return projectionFactory;
+	}
+
+	@Override
+	public SearchAggregationBuilderFactory<? super StubQueryElementCollector> getSearchAggregationFactory() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	static class Builder implements IndexScopeBuilder {

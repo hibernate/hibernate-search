@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.scope.spi;
 
+import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
@@ -25,5 +26,7 @@ public interface IndexScope<C> {
 	SearchQueryBuilderFactory<C> getSearchQueryBuilderFactory();
 
 	SearchProjectionBuilderFactory getSearchProjectionFactory();
+
+	SearchAggregationBuilderFactory<? super C> getSearchAggregationFactory();
 
 }

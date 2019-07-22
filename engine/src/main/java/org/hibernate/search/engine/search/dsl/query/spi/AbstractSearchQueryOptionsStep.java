@@ -13,8 +13,11 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.dsl.aggregation.AggregationFinalStep;
 import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
+import org.hibernate.search.engine.search.dsl.aggregation.impl.DefaultSearchAggregationFactory;
+import org.hibernate.search.engine.search.dsl.aggregation.impl.SearchAggregationDslContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactory;
@@ -99,13 +102,21 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public <T> S aggregation(AggregationKey<T> key, SearchAggregation<T> aggregation) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+	public <A> S aggregation(AggregationKey<A> key, SearchAggregation<A> aggregation) {
+		SearchAggregationBuilderFactory<? super C> builderFactory = indexScope.getSearchAggregationFactory();
+		contribute( builderFactory, key, aggregation );
+		return thisAsS();
 	}
 
 	@Override
-	public <T> S aggregation(AggregationKey<T> key, Function<? super AF, ? extends AggregationFinalStep<T>> aggregationContributor) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+	public <A> S aggregation(AggregationKey<A> key, Function<? super AF, ? extends AggregationFinalStep<A>> aggregationContributor) {
+		SearchAggregationBuilderFactory<? super C> builderFactory = indexScope.getSearchAggregationFactory();
+		AF factory = extendAggregationFactory( new DefaultSearchAggregationFactory(
+				SearchAggregationDslContextImpl.root( builderFactory )
+		) );
+		SearchAggregation<A> aggregation = aggregationContributor.apply( factory ).toAggregation();
+		contribute( builderFactory, key, aggregation );
+		return thisAsS();
 	}
 
 	@Override
@@ -159,6 +170,11 @@ public abstract class AbstractSearchQueryOptionsStep<
 
 	private <B> void contribute(SearchSortBuilderFactory<? super C, B> factory, SearchSort sort) {
 		factory.contribute( searchQueryBuilder.getQueryElementCollector(), factory.toImplementation( sort ) );
+	}
+
+	private <A> void contribute(SearchAggregationBuilderFactory<? super C> factory,
+			AggregationKey<A> aggregationKey, SearchAggregation<A> aggregation) {
+		factory.contribute( searchQueryBuilder.getQueryElementCollector(), aggregationKey, aggregation );
 	}
 
 	protected abstract S thisAsS();
