@@ -49,8 +49,10 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoIm
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // As long as T is not a proxy-specific interface, it will also be implemented by the unproxified object
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
+		dirty = (T) runtimeIntrospector.unproxy( dirty );
 		for ( PojoImplicitReindexingResolverNode<? super T, S> node : nestedNodes ) {
 			node.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
 		}
