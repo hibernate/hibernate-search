@@ -62,10 +62,12 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // As long as T is not a proxy-specific interface, it will also be implemented by the unproxified object
 	public final void process(DocumentElement target, T source, AbstractPojoSessionContextImplementor sessionContext) {
 		if ( source == null ) {
 			return;
 		}
+		source = (T) sessionContext.getRuntimeIntrospector().unproxy( source );
 		DocumentElement parentObject = target;
 		for ( IndexObjectFieldReference objectFieldReference : parentIndexObjectReferences ) {
 			parentObject = parentObject.addObject( objectFieldReference );
