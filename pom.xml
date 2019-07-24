@@ -1585,8 +1585,6 @@
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <runOrder>alphabetical</runOrder>
                         <systemPropertyVariables>
-                            <!-- See HSEARCH-1444 -->
-                            <hibernate.service.allow_crawling>false</hibernate.service.allow_crawling>
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
@@ -1609,8 +1607,6 @@
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <runOrder>alphabetical</runOrder>
                         <systemPropertyVariables>
-                            <!-- See HSEARCH-1444 -->
-                            <hibernate.service.allow_crawling>false</hibernate.service.allow_crawling>
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
