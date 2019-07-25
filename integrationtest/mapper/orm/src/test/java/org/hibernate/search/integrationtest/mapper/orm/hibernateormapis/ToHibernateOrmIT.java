@@ -247,7 +247,7 @@ public class ToHibernateOrmIT {
 	}
 
 	@Test
-	public void lazyCrateSearchSessionAfterOrmSessionIsClosed() {
+	public void lazyCreateSearchSessionAfterOrmSessionIsClosed() {
 		Session session = sessionFactory.openSession();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( session );
@@ -258,7 +258,7 @@ public class ToHibernateOrmIT {
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
+				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
 
 	@Test

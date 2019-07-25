@@ -129,7 +129,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void lazyCrateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
+	public void lazyCreateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
 		Session session = sessionFactory.openSession();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( session );
@@ -140,7 +140,7 @@ public class MassIndexingBaseIT {
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
+				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
 
 	private void initData() {

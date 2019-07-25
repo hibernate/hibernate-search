@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.transaction.Synchronization;
 
+import org.hibernate.BaseSessionEventListener;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
@@ -27,6 +28,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
@@ -52,6 +54,35 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, HibernateOrmScopeSessionContext, ReferenceHitMapper<EntityReference> {
+
+	/**
+	 * @param sessionImplementor A Hibernate session
+	 *
+	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
+	 */
+	@SuppressWarnings("unchecked")
+	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
+			SessionImplementor sessionImplementor) {
+		checkOrmSessionIsOpen( sessionImplementor );
+		TransientReference<HibernateOrmSearchSession> reference =
+				(TransientReference<HibernateOrmSearchSession>) sessionImplementor.getProperties()
+						.get( SEARCH_SESSION_KEY );
+		@SuppressWarnings("resource") // The listener below handles closing
+				HibernateOrmSearchSession searchSession = reference == null ? null : reference.get();
+		if ( searchSession == null ) {
+			searchSession = context.createSessionBuilder( sessionImplementor ).build();
+			reference = new TransientReference<>( searchSession );
+			sessionImplementor.setProperty( SEARCH_SESSION_KEY, reference );
+
+			// Make sure we will ultimately close the query manager
+			sessionImplementor.getEventListenerManager()
+					.addListener( new SearchSessionClosingListener( sessionImplementor ) );
+		}
+		return searchSession;
+	}
+
+	private static final String SEARCH_SESSION_KEY =
+			HibernateOrmMapping.class.getName() + "#SEARCH_SESSION_KEY";
 
 	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
 			HibernateOrmSearchSession.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
@@ -274,8 +305,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	void checkOrmSessionIsOpen() {
+		checkOrmSessionIsOpen( sessionContext.getSession() );
+	}
+
+	static void checkOrmSessionIsOpen(SessionImplementor session) {
 		try {
-			sessionContext.getSession().checkOpen();
+			session.checkOpen();
 		}
 		catch (IllegalStateException e) {
 			throw log.hibernateSessionIsClosed( e );
@@ -310,6 +345,26 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		@Override
 		public HibernateOrmSearchSession build() {
 			return new HibernateOrmSearchSession( this );
+		}
+	}
+
+	private static class SearchSessionClosingListener extends BaseSessionEventListener {
+		private final SessionImplementor sessionImplementor;
+
+		private SearchSessionClosingListener(SessionImplementor sessionImplementor) {
+			this.sessionImplementor = sessionImplementor;
+		}
+
+		@Override
+		public void end() {
+			@SuppressWarnings("unchecked") // This key "belongs" to us, we know what we put in there.
+					TransientReference<HibernateOrmSearchSession> reference =
+					(TransientReference<HibernateOrmSearchSession>) sessionImplementor.getProperties()
+							.get( SEARCH_SESSION_KEY );
+			HibernateOrmSearchSession searchSession = reference == null ? null : reference.get();
+			if ( searchSession != null ) {
+				searchSession.close();
+			}
 		}
 	}
 }

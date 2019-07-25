@@ -13,8 +13,9 @@ import javax.persistence.TypedQuery;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.Query;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.impl.LazyInitSearchSession;
@@ -133,7 +134,10 @@ public final class Search {
 	}
 
 	private static SearchSession createSearchSession(SessionImplementor sessionImplementor) {
-		return new LazyInitSearchSession( sessionImplementor );
+		HibernateSearchContextProviderService mappingContextProvider =
+				sessionImplementor.getSessionFactory().getServiceRegistry()
+						.getService( HibernateSearchContextProviderService.class );
+		return new LazyInitSearchSession( mappingContextProvider, sessionImplementor );
 	}
 
 }
