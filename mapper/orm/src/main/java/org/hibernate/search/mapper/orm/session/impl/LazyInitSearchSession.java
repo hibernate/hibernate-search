@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import javax.persistence.EntityManager;
 
@@ -25,10 +26,13 @@ import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
  */
 public class LazyInitSearchSession implements SearchSession {
 
+	private final Supplier<? extends HibernateOrmSearchSessionMappingContext> mappingContextProvider;
 	private final SessionImplementor sessionImplementor;
 	private HibernateOrmSearchSession delegate;
 
-	public LazyInitSearchSession(SessionImplementor sessionImplementor) {
+	public LazyInitSearchSession(Supplier<? extends HibernateOrmSearchSessionMappingContext> mappingContextProvider,
+			SessionImplementor sessionImplementor) {
+		this.mappingContextProvider = mappingContextProvider;
 		this.sessionImplementor = sessionImplementor;
 	}
 
@@ -60,10 +64,7 @@ public class LazyInitSearchSession implements SearchSession {
 
 	private HibernateOrmSearchSession getDelegate() {
 		if ( delegate == null ) {
-			HibernateOrmSearchSessionContextProvider contextProvider =
-					sessionImplementor.getSessionFactory().getServiceRegistry()
-							.getService( HibernateOrmSearchSessionContextProvider.class );
-			delegate = contextProvider.getSearchSession( sessionImplementor );
+			delegate = HibernateOrmSearchSession.get( mappingContextProvider.get(), sessionImplementor );
 		}
 		return delegate;
 	}

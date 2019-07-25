@@ -7,10 +7,9 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.service.Service;
 
-public interface HibernateOrmSearchSessionContextProvider extends Service {
+public interface HibernateOrmSearchSessionMappingContext {
 
-	HibernateOrmSearchSession getSearchSession(SessionImplementor sessionImplementor);
-
+	HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder createSessionBuilder(
+			SessionImplementor sessionImplementor);
 }

@@ -33,7 +33,7 @@ import org.hibernate.search.mapper.orm.cfg.impl.ConsumedPropertyKeysReport;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
@@ -96,7 +96,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		propertyCollector.accept( HibernateOrmMapperSpiSettings.INTEGRATION_PARTIAL_BUILD_STATE, partialBuildState );
 	}
 
-	CompletableFuture<HibernateSearchContextService> orchestrateBootAndShutdown(
+	CompletableFuture<HibernateSearchContextProviderService> orchestrateBootAndShutdown(
 			CompletionStage<SessionFactoryImplementor> sessionFactoryReadyStage,
 			CompletionStage<?> sessionFactoryDestroyingStage) {
 		CompletableFuture<Void> environmentSynchronizerReadyStage = new CompletableFuture<>();
@@ -134,7 +134,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		/*
 		 * As soon as boot is required, we need to, well... boot.
 		 */
-		CompletableFuture<HibernateSearchContextService> contextBootedFuture =
+		CompletableFuture<HibernateSearchContextProviderService> contextBootedFuture =
 				bootRequiredStage.thenApply( this::bootNow );
 
 		/*
@@ -148,7 +148,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		return contextBootedFuture;
 	}
 
-	private HibernateSearchContextService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {
+	private HibernateSearchContextProviderService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {
 		Optional<HibernateOrmIntegrationPartialBuildState> partialBuildStateOptional =
 				INTEGRATION_PARTIAL_BUILD_STATE.get( propertySource );
 
@@ -231,7 +231,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		}
 	}
 
-	private HibernateSearchContextService doBootSecondPhase(
+	private HibernateSearchContextProviderService doBootSecondPhase(
 			HibernateOrmIntegrationPartialBuildState partialBuildState,
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmMapping mapping = partialBuildState.integrationBuildState.finalizeMapping(
@@ -244,8 +244,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		 * Make the booted integration available to the user (through Search.getFullTextEntityManager(em))
 		 * and to the index event listener.
 		 */
-		HibernateSearchContextService contextService =
-				sessionFactoryImplementor.getServiceRegistry().getService( HibernateSearchContextService.class );
+		HibernateSearchContextProviderService contextService =
+				sessionFactoryImplementor.getServiceRegistry().getService( HibernateSearchContextProviderService.class );
 		contextService.initialize( integration, mapping );
 
 		// TODO HSEARCH-3057 JMX

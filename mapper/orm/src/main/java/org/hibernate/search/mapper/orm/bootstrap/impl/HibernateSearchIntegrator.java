@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
@@ -24,7 +25,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingStrategy
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextService;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
@@ -77,7 +78,7 @@ public class HibernateSearchIntegrator implements Integrator {
 		// Orchestrate bootstrap and shutdown
 		CompletableFuture<SessionFactoryImplementor> sessionFactoryCreatedFuture = new CompletableFuture<>();
 		CompletableFuture<?> sessionFactoryClosingFuture = new CompletableFuture<>();
-		CompletableFuture<HibernateSearchContextService> contextFuture =
+		CompletableFuture<HibernateSearchContextProviderService> contextFuture =
 				booter.orchestrateBootAndShutdown( sessionFactoryCreatedFuture, sessionFactoryClosingFuture );
 
 		// Listen to the session factory lifecycle to boot/shutdown Hibernate Search at the right time
@@ -94,7 +95,7 @@ public class HibernateSearchIntegrator implements Integrator {
 		if ( HibernateOrmAutomaticIndexingStrategyName.SESSION.equals( automaticIndexingStrategyName ) ) {
 			log.debug( "Hibernate Search event listeners activated" );
 			HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
-					contextFuture,
+					contextFuture.thenApply( Supplier::get ),
 					DIRTY_CHECK_ENABLED.get( propertySource )
 			);
 			registerHibernateSearchEventListener( hibernateSearchEventListener, serviceRegistry );
