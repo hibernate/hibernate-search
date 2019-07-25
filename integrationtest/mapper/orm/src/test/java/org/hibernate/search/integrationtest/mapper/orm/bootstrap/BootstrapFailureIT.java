@@ -24,7 +24,7 @@ import org.junit.rules.ExpectedException;
  * Check that a failing boot correctly propagates exceptions,
  * despite the complex asynchronous code used during boot.
  */
-public class FailingBootIT {
+public class BootstrapFailureIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
