@@ -330,7 +330,7 @@ public class ExpectedLog4jLog implements TestRule {
 		private int count = 0;
 		private List<LoggingEvent> extraEvents;
 
-		public LogChecker(LogExpectation expectation) {
+		private LogChecker(LogExpectation expectation) {
 			this.expectation = expectation;
 		}
 
@@ -341,12 +341,12 @@ public class ExpectedLog4jLog implements TestRule {
 			}
 			if ( expectation.getMatcher().matches( event ) ) {
 				++count;
-			}
-			if ( expectation.getMaxExpectedCount() != null && count > expectation.getMaxExpectedCount() ) {
-				if ( extraEvents == null ) {
-					extraEvents = new ArrayList<>();
+				if ( expectation.getMaxExpectedCount() != null && count > expectation.getMaxExpectedCount() ) {
+					if ( extraEvents == null ) {
+						extraEvents = new ArrayList<>();
+					}
+					extraEvents.add( event );
 				}
-				extraEvents.add( event );
 			}
 		}
 
