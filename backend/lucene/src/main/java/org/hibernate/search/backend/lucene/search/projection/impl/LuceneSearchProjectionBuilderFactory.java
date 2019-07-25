@@ -93,7 +93,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, center );
+				.getComponent().createDistanceProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, scopeModel.getNestedDocumentPaths( absoluteFieldPath ), center );
 	}
 
 	@Override

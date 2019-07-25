@@ -21,14 +21,16 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
+	private final Set<String> nestedDocumentPaths;
 
 	private final GeoPoint center;
 
 	private final DistanceUnit unit;
 
-	LuceneDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
+	LuceneDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedDocumentPaths, GeoPoint center, DistanceUnit unit) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.nestedDocumentPaths = nestedDocumentPaths;
 		this.center = center;
 		this.unit = unit;
 	}
@@ -41,6 +43,7 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 	@Override
 	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
 		builder.add( absoluteFieldPath );
+		builder.addNestedDocumentPaths( nestedDocumentPaths );
 	}
 
 	@Override
