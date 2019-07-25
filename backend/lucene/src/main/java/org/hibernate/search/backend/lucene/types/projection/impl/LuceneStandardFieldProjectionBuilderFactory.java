@@ -61,7 +61,7 @@ public class LuceneStandardFieldProjectionBuilderFactory<F> implements LuceneFie
 
 	@Override
 	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			GeoPoint center) {
+			Set<String> nestedDocumentPaths, GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

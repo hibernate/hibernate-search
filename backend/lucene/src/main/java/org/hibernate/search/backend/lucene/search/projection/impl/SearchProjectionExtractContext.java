@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
@@ -47,6 +48,10 @@ public class SearchProjectionExtractContext {
 	public DistanceCollector getDistanceCollector(String absoluteFieldPath, GeoPoint location) {
 		DistanceCollectorKey collectorKey = new DistanceCollectorKey( absoluteFieldPath, location );
 		return distanceCollectors.get( collectorKey );
+	}
+
+	public Collection<DistanceCollector> getDistanceCollectors() {
+		return distanceCollectors.values();
 	}
 
 	public static class DistanceCollectorKey {

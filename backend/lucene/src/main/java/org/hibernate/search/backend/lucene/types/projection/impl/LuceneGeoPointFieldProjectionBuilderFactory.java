@@ -56,11 +56,11 @@ public class LuceneGeoPointFieldProjectionBuilderFactory implements LuceneFieldP
 	}
 
 	@Override
-	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
+	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedDocumentPaths,
 			GeoPoint center) {
 		checkProjectable( absoluteFieldPath, projectable );
 
-		return new LuceneDistanceToFieldProjectionBuilder( indexNames, absoluteFieldPath, center );
+		return new LuceneDistanceToFieldProjectionBuilder( indexNames, absoluteFieldPath, nestedDocumentPaths, center );
 	}
 
 	@Override

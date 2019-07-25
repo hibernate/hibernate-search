@@ -9,6 +9,8 @@ package org.hibernate.search.backend.lucene.search.extraction.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 import org.apache.lucene.geo.GeoEncodingUtils;
 import org.apache.lucene.index.DocValues;
@@ -39,6 +41,8 @@ public class DistanceCollector implements Collector {
 	private final GeoPoint center;
 	private final SpatialResultsCollector distances;
 
+	private HashMap<Integer, Set<Integer>> nestedDocs;
+
 	public DistanceCollector(String absoluteFieldPath, GeoPoint center, int hitsCount) {
 		this.center = center;
 		this.absoluteFieldPath = absoluteFieldPath;
@@ -46,7 +50,23 @@ public class DistanceCollector implements Collector {
 	}
 
 	public Double getDistance(final int index) {
-		return distances.get( index, center );
+		Double result = distances.get( index, center );
+		if ( result != null ) {
+			return result;
+		}
+
+		// try to find the field on nested docs
+		if ( nestedDocs == null || !nestedDocs.containsKey( index ) ) {
+			return null;
+		}
+		for ( Integer nestedDocIndex : nestedDocs.get( index ) ) {
+			result = distances.get( nestedDocIndex, center );
+			if ( result != null ) {
+				return result;
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -57,6 +77,10 @@ public class DistanceCollector implements Collector {
 	@Override
 	public ScoreMode scoreMode() {
 		return ScoreMode.COMPLETE_NO_SCORES;
+	}
+
+	public void setNestedDocs(HashMap<Integer, Set<Integer>> nestedDocs) {
+		this.nestedDocs = nestedDocs;
 	}
 
 	/**

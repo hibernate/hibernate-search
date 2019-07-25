@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
@@ -29,7 +31,9 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
@@ -76,7 +80,7 @@ class LuceneSearchResultExtractorImpl<H> implements LuceneSearchResultExtractor<
 		}
 
 		List<Object> extractedData = new ArrayList<>( topDocs.scoreDocs.length );
-		Map<Integer, Set<Integer>> nestedDocs = fetchNestedDocs( indexSearcher, topDocs.scoreDocs );
+		Map<Integer, Set<Integer>> nestedDocs = fetchNestedDocs( indexSearcher, topDocs.scoreDocs, projectionExecutionContext.getDistanceCollectors() );
 
 		for ( ScoreDoc hit : topDocs.scoreDocs ) {
 			// add root object contribution
@@ -96,7 +100,8 @@ class LuceneSearchResultExtractorImpl<H> implements LuceneSearchResultExtractor<
 		return extractedData;
 	}
 
-	private Map<Integer, Set<Integer>> fetchNestedDocs(IndexSearcher indexSearcher, ScoreDoc[] scoreDocs) throws IOException {
+	private Map<Integer, Set<Integer>> fetchNestedDocs(IndexSearcher indexSearcher, ScoreDoc[] scoreDocs,
+			Collection<DistanceCollector> distanceCollectors) throws IOException {
 		// if the projection does not need any nested object skip their fetching
 		if ( storedFieldVisitor.getNestedDocumentPaths().isEmpty() ) {
 			return new HashMap<>();
@@ -112,15 +117,19 @@ class LuceneSearchResultExtractorImpl<H> implements LuceneSearchResultExtractor<
 			parentIds.put( parentId, hit.doc );
 		}
 
-		Map<String, Set<Integer>> stringSetMap = fetchChildren( indexSearcher, parentIds.keySet(), storedFieldVisitor.getNestedDocumentPaths() );
+		Map<String, Set<Integer>> stringSetMap = fetchChildren( indexSearcher, parentIds.keySet(), storedFieldVisitor.getNestedDocumentPaths(), distanceCollectors );
 		HashMap<Integer, Set<Integer>> result = new HashMap<>();
 		for ( Map.Entry<String, Set<Integer>> entry : stringSetMap.entrySet() ) {
 			result.put( parentIds.get( entry.getKey() ), entry.getValue() );
 		}
+		for ( DistanceCollector distanceCollector : distanceCollectors ) {
+			distanceCollector.setNestedDocs( result );
+		}
 		return result;
 	}
 
-	private Map<String, Set<Integer>> fetchChildren(IndexSearcher indexSearcher, Set<String> parentIds, Set<String> nestedDocumentPaths) {
+	private Map<String, Set<Integer>> fetchChildren(IndexSearcher indexSearcher, Set<String> parentIds, Set<String> nestedDocumentPaths,
+			Collection<DistanceCollector> distanceCollectors) {
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 		for ( String parentId : parentIds ) {
 			TermQuery query = new TermQuery( new Term( LuceneFields.rootIdFieldName(), parentId ) );
@@ -131,8 +140,12 @@ class LuceneSearchResultExtractorImpl<H> implements LuceneSearchResultExtractor<
 		BooleanQuery booleanQuery = builder.build();
 
 		try {
+			ArrayList<Collector> luceneCollectors = new ArrayList<>();
 			LuceneChildrenCollector childrenCollector = new LuceneChildrenCollector();
-			indexSearcher.search( booleanQuery, childrenCollector );
+			luceneCollectors.add( childrenCollector );
+			luceneCollectors.addAll( distanceCollectors );
+
+			indexSearcher.search( booleanQuery, MultiCollector.wrap( luceneCollectors ) );
 			return childrenCollector.getChildren();
 		}
 		catch (IOException e) {
