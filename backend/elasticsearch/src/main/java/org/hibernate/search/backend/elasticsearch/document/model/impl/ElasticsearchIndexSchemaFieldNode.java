@@ -18,6 +18,8 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final String absolutePath;
 
+	private final String nestedPath;
+
 	private final boolean multiValued;
 
 	private final ElasticsearchFieldCodec<F> codec;
@@ -36,6 +38,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 			ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory) {
 		this.parent = parent;
 		this.absolutePath = parent.getAbsolutePath( relativeFieldName );
+		this.nestedPath = parent.getNestedPath();
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
@@ -49,6 +52,10 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	public String getAbsolutePath() {
 		return absolutePath;
+	}
+
+	public String getNestedPath() {
+		return nestedPath;
 	}
 
 	/**

@@ -28,7 +28,7 @@ public interface ElasticsearchFieldProjectionBuilderFactory {
 	<T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
 			Class<T> expectedType, ValueConvert convert);
 
-	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
+	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedPaths,
 			GeoPoint center);
 
 	boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory other);

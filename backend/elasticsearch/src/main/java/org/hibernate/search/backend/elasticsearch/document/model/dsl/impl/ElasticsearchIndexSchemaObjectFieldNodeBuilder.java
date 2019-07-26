@@ -77,8 +77,8 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 
-		ElasticsearchIndexSchemaObjectNode fieldNode =
-				new ElasticsearchIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage, multiValued );
+		String nestedPath = ( ObjectFieldStorage.NESTED.equals( storage ) ) ? absoluteFieldPath : parentNode.getNestedPath();
+		ElasticsearchIndexSchemaObjectNode fieldNode = new ElasticsearchIndexSchemaObjectNode( parentNode, absoluteFieldPath, nestedPath, storage, multiValued );
 		collector.collect( absoluteFieldPath, fieldNode );
 
 		reference.enable( fieldNode );

@@ -13,11 +13,13 @@ import java.util.regex.Pattern;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -29,8 +31,25 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 
 	private static final Pattern NON_DIGITS_PATTERN = Pattern.compile( "\\D" );
 
+	private static final String DISTANCE_PROJECTION_SCRIPT =
+		// Use ".size() != 0" to check whether this field has a value. ".value != null" won't work on ES7+
+		" Object result;" +
+		" if (doc[params.fieldPath].size() != 0) {" +
+			" result = doc[params.fieldPath].arcDistance(params.lat, params.lon);" +
+		" } else {" +
+			" for (int i=0; i<params.nestedPaths.length; i++) {" +
+				" String nestedPath = params.nestedPaths[i];" +
+				" String relativeFieldPath = params.relativeFieldPaths[i];" +
+				" if (params['_source'][nestedPath] == null) continue;" +
+				" if (params['_source'][nestedPath][relativeFieldPath] == null) continue;" +
+				" return params['_source'][nestedPath][relativeFieldPath]" +
+			" }" +
+		" }" +
+		" return result;";
+
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
+	private final Set<String> nestedPaths;
 
 	private final GeoPoint center;
 
@@ -38,9 +57,10 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 
 	private final String scriptFieldName;
 
-	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
+	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedPaths, GeoPoint center, DistanceUnit unit) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.nestedPaths = nestedPaths;
 		this.center = center;
 		this.unit = unit;
 		this.scriptFieldName = createScriptFieldName( absoluteFieldPath, center, unit );
@@ -53,7 +73,7 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 			SCRIPT_FIELDS_ACCESSOR
 					.property( scriptFieldName ).asObject()
 					.property( "script" ).asObject()
-					.set( requestBody, createScript( absoluteFieldPath, center ) );
+					.set( requestBody, createScript( absoluteFieldPath, nestedPaths, center ) );
 		}
 	}
 
@@ -61,14 +81,11 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	public Double extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		Optional<Double> distance;
-
 		Integer distanceSortIndex = context.getDistanceSortIndex( absoluteFieldPath, center );
 
 		if ( distanceSortIndex == null ) {
 			// we extract the value from the fields computed by the script_fields
-			distance = FIELDS_ACCESSOR.property( scriptFieldName ).asArray()
-					.element( 0 )
-					.asDouble().get( hit );
+			distance = extractDistance( hit );
 		}
 		else {
 			// we extract the value from the score element
@@ -89,6 +106,23 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 
 		return distance.isPresent() && Double.isFinite( distance.get() ) ?
 				unit.fromMeters( distance.get() ) : null;
+	}
+
+	public Optional<Double> extractDistance(JsonObject hit) {
+		Optional<JsonElement> projectedFieldElement = FIELDS_ACCESSOR.property( scriptFieldName ).asArray().element( 0 ).get( hit );
+		if ( !projectedFieldElement.isPresent() || projectedFieldElement.get().isJsonNull() ) {
+			return Optional.empty();
+		}
+
+		if ( projectedFieldElement.get().isJsonPrimitive() ) {
+			return Optional.of( projectedFieldElement.get().getAsDouble() );
+		}
+
+		JsonObject geoPoint = projectedFieldElement.get().getAsJsonObject();
+		double distanceInMeters = SloppyMath.haversinMeters(
+				center.getLatitude(), center.getLongitude(), geoPoint.get( "lat" ).getAsDouble(), geoPoint.get( "lon" ).getAsDouble() );
+
+		return Optional.of( unit.fromMeters( distanceInMeters ) );
 	}
 
 	@Override
@@ -126,21 +160,29 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 		return sb.toString();
 	}
 
-	private static JsonObject createScript(String absoluteFieldPath, GeoPoint center) {
-		JsonObject jsonCenter = new JsonObject();
-		jsonCenter.addProperty( "lat", center.getLatitude() );
-		jsonCenter.addProperty( "lon", center.getLongitude() );
+	private static JsonObject createScript(String absoluteFieldPath, Set<String> nestedPaths, GeoPoint center) {
+		JsonArray nestedPathsProperty = new JsonArray();
+		JsonArray relativeFieldPaths = new JsonArray();
+
+		for ( String nestedPath : nestedPaths ) {
+			if ( !absoluteFieldPath.startsWith( nestedPath ) ) {
+				continue;
+			}
+			nestedPathsProperty.add( nestedPath );
+			relativeFieldPaths.add( absoluteFieldPath.substring( nestedPath.length() + 1 ) );
+		}
+
+		JsonObject params = new JsonObject();
+		params.addProperty( "lat", center.getLatitude() );
+		params.addProperty( "lon", center.getLongitude() );
+		params.addProperty( "fieldPath", absoluteFieldPath );
+		params.add( "nestedPaths", nestedPathsProperty );
+		params.add( "relativeFieldPaths", relativeFieldPaths );
 
 		JsonObject scriptContent = new JsonObject();
 		scriptContent.addProperty( "lang", "painless" );
-		scriptContent.add( "params", jsonCenter );
-		scriptContent.addProperty(
-				"source",
-				// Use ".size() != 0" to check whether this field has a value. ".value != null" won't work on ES7+
-				"doc['" + absoluteFieldPath + "'].size() != 0"
-						+ " ? doc['" + absoluteFieldPath + "'].arcDistance(params.lat, params.lon)"
-						+ " : null"
-		);
+		scriptContent.add( "params", params );
+		scriptContent.addProperty( "source", DISTANCE_PROJECTION_SCRIPT );
 
 		return scriptContent;
 	}
