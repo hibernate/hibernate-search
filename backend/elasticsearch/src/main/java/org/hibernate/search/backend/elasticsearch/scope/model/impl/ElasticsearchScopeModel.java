@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -151,5 +152,16 @@ public class ElasticsearchScopeModel {
 			}
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
+	}
+
+	public Set<String> getNestedDocumentPaths(String absoluteFieldPath) {
+		HashSet<String> nestedDocumentPaths = new HashSet<>();
+		for ( ElasticsearchIndexModel indexModel : indexModels ) {
+			String nestedFieldPath = indexModel.getNestedDocumentPath( absoluteFieldPath );
+			if ( nestedFieldPath != null ) {
+				nestedDocumentPaths.add( nestedFieldPath );
+			}
+		}
+		return nestedDocumentPaths;
 	}
 }

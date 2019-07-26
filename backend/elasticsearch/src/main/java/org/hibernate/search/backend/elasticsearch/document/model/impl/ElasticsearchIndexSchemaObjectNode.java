@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 public class ElasticsearchIndexSchemaObjectNode {
 
 	private static final ElasticsearchIndexSchemaObjectNode ROOT =
-			new ElasticsearchIndexSchemaObjectNode( null, null, null, false );
+			new ElasticsearchIndexSchemaObjectNode( null, null, null, null, false );
 
 	public static ElasticsearchIndexSchemaObjectNode root() {
 		return ROOT;
@@ -22,15 +22,18 @@ public class ElasticsearchIndexSchemaObjectNode {
 
 	private final String absolutePath;
 
+	private final String nestedPath;
+
 	private final ObjectFieldStorage storage;
 
 	private final boolean multiValued;
 
-	public ElasticsearchIndexSchemaObjectNode(ElasticsearchIndexSchemaObjectNode parent, String absolutePath,
+	public ElasticsearchIndexSchemaObjectNode(ElasticsearchIndexSchemaObjectNode parent, String absolutePath, String nestedPath,
 			ObjectFieldStorage storage,
 			boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
+		this.nestedPath = nestedPath;
 		this.storage = ObjectFieldStorage.DEFAULT.equals( storage ) ? ObjectFieldStorage.FLATTENED : storage;
 		this.multiValued = multiValued;
 	}
@@ -50,6 +53,10 @@ public class ElasticsearchIndexSchemaObjectNode {
 
 	public String getAbsolutePath(String relativeFieldName) {
 		return absolutePath == null ? relativeFieldName : absolutePath + "." + relativeFieldName;
+	}
+
+	public String getNestedPath() {
+		return nestedPath;
 	}
 
 	public ObjectFieldStorage getStorage() {
