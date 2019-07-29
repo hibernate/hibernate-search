@@ -106,7 +106,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				 * This method may not be easy to implement for blocking mappers,
 				 * so we may choose to throw exceptions for those.
 				 */
-				.loadBlocking( sessionContext );
+				.loadBlocking();
 	}
 
 	@Override
