@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
 
-public interface ScrollWorkBuilder<H> extends ElasticsearchWorkBuilder<ElasticsearchWork<ElasticsearchLoadableSearchResult<H>>> {
+public interface ScrollWorkBuilder<R> extends ElasticsearchWorkBuilder<ElasticsearchWork<R>> {
 
 }

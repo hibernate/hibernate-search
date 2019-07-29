@@ -13,9 +13,9 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 
 public interface ElasticsearchSearchResultExtractorFactory {
 
-	<T> ElasticsearchSearchResultExtractor<T> createResultExtractor(
+	<H> ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> createResultExtractor(
 			LoadingContext<?, ?> loadingContext,
-			ElasticsearchSearchProjection<?, T> rootProjection,
+			ElasticsearchSearchProjection<?, H> rootProjection,
 			SearchProjectionExtractContext searchProjectionExecutionContext);
 
 }

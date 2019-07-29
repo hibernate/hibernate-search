@@ -52,7 +52,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final LoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
-	private final ElasticsearchSearchResultExtractor<H> searchResultExtractor;
+	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
@@ -60,7 +60,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
-			JsonObject payload, ElasticsearchSearchResultExtractor<H> searchResultExtractor) {
+			JsonObject payload,
+			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchContext = searchContext;

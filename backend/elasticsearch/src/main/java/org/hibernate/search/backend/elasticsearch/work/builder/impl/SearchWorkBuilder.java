@@ -9,19 +9,18 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 import java.util.Collection;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
 
-public interface SearchWorkBuilder<T> extends ElasticsearchWorkBuilder<ElasticsearchWork<ElasticsearchLoadableSearchResult<T>>> {
+public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<ElasticsearchWork<R>> {
 
-	SearchWorkBuilder<T> indexes(Collection<URLEncodedString> indexNames);
+	SearchWorkBuilder<R> indexes(Collection<URLEncodedString> indexNames);
 
-	SearchWorkBuilder<T> paging(Integer limit, Integer offset);
+	SearchWorkBuilder<R> paging(Integer limit, Integer offset);
 
-	SearchWorkBuilder<T> scrolling(int scrollSize, String scrollTimeout);
+	SearchWorkBuilder<R> scrolling(int scrollSize, String scrollTimeout);
 
-	SearchWorkBuilder<T> routingKeys(Set<String> routingKeys);
+	SearchWorkBuilder<R> routingKeys(Set<String> routingKeys);
 
 }
