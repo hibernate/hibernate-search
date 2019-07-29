@@ -9,35 +9,34 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBuilder;
 
 import com.google.gson.JsonObject;
 
 
-public class ScrollWork<H> extends AbstractSimpleElasticsearchWork<ElasticsearchLoadableSearchResult<H>> {
+public class ScrollWork<R> extends AbstractSimpleElasticsearchWork<R> {
 
-	private final ElasticsearchSearchResultExtractor<H> resultExtractor;
+	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 
-	protected ScrollWork(Builder<H> builder) {
+	protected ScrollWork(Builder<R> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
 	}
 
 	@Override
-	protected ElasticsearchLoadableSearchResult<H> generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.getBody();
 		return resultExtractor.extract( body );
 	}
 
-	public static class Builder<H>
-			extends AbstractBuilder<Builder<H>>
-			implements ScrollWorkBuilder<H> {
+	public static class Builder<R>
+			extends AbstractBuilder<Builder<R>>
+			implements ScrollWorkBuilder<R> {
 		private final String scrollId;
 		private final String scrollTimeout;
-		private final ElasticsearchSearchResultExtractor<H> resultExtractor;
+		private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 
-		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<H> resultExtractor) {
+		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<R> resultExtractor) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.scrollId = scrollId;
 			this.scrollTimeout = scrollTimeout;
@@ -60,7 +59,7 @@ public class ScrollWork<H> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		@Override
-		public ScrollWork<H> build() {
+		public ScrollWork<R> build() {
 			return new ScrollWork<>( this );
 		}
 	}

@@ -137,7 +137,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
-		ElasticsearchSearchResultExtractor<H> searchResultExtractor =
+		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(
 						loadingContext,
 						rootProjection, searchProjectionExecutionContext

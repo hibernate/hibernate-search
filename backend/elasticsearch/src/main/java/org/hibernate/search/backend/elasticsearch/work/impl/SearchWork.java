@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
@@ -24,13 +23,13 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-public class SearchWork<H> extends AbstractSimpleElasticsearchWork<ElasticsearchLoadableSearchResult<H>> {
+public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 
 	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
-	private final ElasticsearchSearchResultExtractor<H> resultExtractor;
+	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 
-	protected SearchWork(Builder<H> builder) {
+	protected SearchWork(Builder<R> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
 	}
@@ -46,14 +45,14 @@ public class SearchWork<H> extends AbstractSimpleElasticsearchWork<Elasticsearch
 	}
 
 	@Override
-	protected ElasticsearchLoadableSearchResult<H> generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.getBody();
 		return resultExtractor.extract( body );
 	}
 
-	public static class Builder<H>
-			extends AbstractBuilder<Builder<H>>
-			implements SearchWorkBuilder<H> {
+	public static class Builder<R>
+			extends AbstractBuilder<Builder<R>>
+			implements SearchWorkBuilder<R> {
 
 		public static <T> Builder<T> forElasticsearch6AndBelow(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
 			// No "track_total_hits": this parameter does not exist in ES6 and below, and total hits are always tracked
@@ -66,7 +65,7 @@ public class SearchWork<H> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		private final JsonObject payload;
-		private final ElasticsearchSearchResultExtractor<H> resultExtractor;
+		private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 		private final Boolean trackTotalHits;
 		private final Set<URLEncodedString> indexes = new HashSet<>();
 
@@ -76,7 +75,7 @@ public class SearchWork<H> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		private String scrollTimeout;
 		private Set<String> routingKeys;
 
-		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<H> resultExtractor, Boolean trackTotalHits) {
+		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.payload = payload;
 			this.resultExtractor = resultExtractor;
@@ -84,27 +83,27 @@ public class SearchWork<H> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		@Override
-		public Builder<H> indexes(Collection<URLEncodedString> indexNames) {
+		public Builder<R> indexes(Collection<URLEncodedString> indexNames) {
 			indexes.addAll( indexNames );
 			return this;
 		}
 
 		@Override
-		public Builder<H> paging(Integer limit, Integer offset) {
+		public Builder<R> paging(Integer limit, Integer offset) {
 			this.from = offset;
 			this.size = limit;
 			return this;
 		}
 
 		@Override
-		public Builder<H> scrolling(int scrollSize, String scrollTimeout) {
+		public Builder<R> scrolling(int scrollSize, String scrollTimeout) {
 			this.scrollSize = scrollSize;
 			this.scrollTimeout = scrollTimeout;
 			return this;
 		}
 
 		@Override
-		public SearchWorkBuilder<H> routingKeys(Set<String> routingKeys) {
+		public SearchWorkBuilder<R> routingKeys(Set<String> routingKeys) {
 			this.routingKeys = routingKeys;
 			return this;
 		}
@@ -142,7 +141,7 @@ public class SearchWork<H> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		@Override
-		public SearchWork<H> build() {
+		public SearchWork<R> build() {
 			return new SearchWork<>( this );
 		}
 	}

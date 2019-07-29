@@ -13,7 +13,8 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 
 public class Elasticsearch7SearchResultExtractorFactory implements ElasticsearchSearchResultExtractorFactory {
 	@Override
-	public <H> ElasticsearchSearchResultExtractor<H> createResultExtractor(LoadingContext<?, ?> loadingContext,
+	public <H> ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> createResultExtractor(
+			LoadingContext<?, ?> loadingContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
 			SearchProjectionExtractContext searchProjectionExecutionContext) {
 		return new Elasticsearch7SearchResultExtractor<>( loadingContext, rootProjection,

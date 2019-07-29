@@ -22,7 +22,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResultExtractor<H> {
+class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> {
 
 	protected static final JsonObjectAccessor HITS_ACCESSOR =
 			JsonAccessor.root().property( "hits" ).asObject();
