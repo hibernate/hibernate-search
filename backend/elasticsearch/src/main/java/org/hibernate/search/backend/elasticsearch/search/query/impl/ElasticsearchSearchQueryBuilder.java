@@ -6,12 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
@@ -21,11 +26,13 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -34,6 +41,8 @@ import com.google.gson.JsonObject;
 public class ElasticsearchSearchQueryBuilder<H>
 		implements SearchQueryBuilder<H, ElasticsearchSearchQueryElementCollector>,
 				ElasticsearchSearchQueryElementCollector {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
@@ -51,6 +60,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private JsonObject jsonPredicate;
 	private JsonArray jsonSort;
 	private Map<DistanceSortKey, Integer> distanceSorts;
+	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
 
 	public ElasticsearchSearchQueryBuilder(
 			ElasticsearchWorkBuilderFactory workFactory,
@@ -116,6 +126,17 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
+	public <A> void collectAggregation(AggregationKey<A> key, ElasticsearchSearchAggregation<A> aggregation) {
+		if ( aggregations == null ) {
+			aggregations = new LinkedHashMap<>();
+		}
+		Object previous = aggregations.put( key, aggregation );
+		if ( previous != null ) {
+			throw log.duplicateAggregationKey( key );
+		}
+	}
+
+	@Override
 	public ElasticsearchSearchQuery<H> build() {
 		JsonObject payload = new JsonObject();
 
@@ -138,10 +159,21 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 		rootProjection.request( payload, requestContext );
 
+		if ( aggregations != null ) {
+			JsonObject jsonAggregations = new JsonObject();
+
+			for ( Map.Entry<AggregationKey<?>, ElasticsearchSearchAggregation<?>> entry : aggregations.entrySet() ) {
+				jsonAggregations.add( entry.getKey().getName(), entry.getValue().request( requestContext ) );
+			}
+
+			payload.add( "aggregations", jsonAggregations );
+		}
+
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(
 						requestContext,
-						rootProjection
+						rootProjection,
+						aggregations == null ? Collections.emptyMap() : aggregations
 				);
 
 		return new ElasticsearchSearchQueryImpl<>(

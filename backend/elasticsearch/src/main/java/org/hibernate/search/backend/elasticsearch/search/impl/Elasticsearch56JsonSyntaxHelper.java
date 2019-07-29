@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
-public class Elasticsearch7JsonSyntaxHelper implements ElasticsearchJsonSyntaxHelper {
+public class Elasticsearch56JsonSyntaxHelper extends Elasticsearch7JsonSyntaxHelper {
 	@Override
 	public String getTermAggregationOrderByTermToken() {
-		return "_key";
+		return "_term"; // _key in ES6.0+
 	}
 }

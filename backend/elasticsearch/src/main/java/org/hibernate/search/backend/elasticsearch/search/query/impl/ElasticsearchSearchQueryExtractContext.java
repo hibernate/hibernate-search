@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -19,7 +20,7 @@ import com.google.gson.JsonObject;
  * The context holding all the useful information pertaining to the extraction of data from
  * the response to the Elasticsearch search query.
  */
-class ElasticsearchSearchQueryExtractContext {
+class ElasticsearchSearchQueryExtractContext implements AggregationExtractContext {
 
 	private final ElasticsearchSearchQueryRequestContext requestContext;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
@@ -35,6 +36,11 @@ class ElasticsearchSearchQueryExtractContext {
 		this.projectionHitMapper = projectionHitMapper;
 		this.convertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
 		this.responseBody = responseBody;
+	}
+
+	@Override
+	public FromDocumentFieldValueConvertContext getConvertContext() {
+		return convertContext;
 	}
 
 	JsonObject getResponseBody() {

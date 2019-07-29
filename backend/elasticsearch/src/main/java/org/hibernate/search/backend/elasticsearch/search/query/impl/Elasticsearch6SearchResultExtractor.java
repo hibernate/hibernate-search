@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.util.Map;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 
 import com.google.gson.JsonObject;
 
@@ -26,8 +30,9 @@ class Elasticsearch6SearchResultExtractor<H> extends Elasticsearch7SearchResultE
 
 	Elasticsearch6SearchResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
-			ElasticsearchSearchProjection<?, H> rootProjection) {
-		super( requestContext, rootProjection );
+			ElasticsearchSearchProjection<?, H> rootProjection,
+			Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations) {
+		super( requestContext, rootProjection, aggregations );
 	}
 
 	@Override

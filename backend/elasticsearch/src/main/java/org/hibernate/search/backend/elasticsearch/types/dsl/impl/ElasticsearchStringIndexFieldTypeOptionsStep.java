@@ -12,6 +12,7 @@ import java.util.Locale;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchTextFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextFieldPredicateBuilderFactory;
@@ -154,15 +155,32 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
 				createDslToIndexConverter();
+		ToDocumentFieldValueConverter<String, ? extends String> rawDslToIndexConverter =
+				createToDocumentRawConverter();
 		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
+		FromDocumentFieldValueConverter<? super String, String> rawIndexToProjectionConverter =
+				createFromDocumentRawConverter();
 		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,
-				new ElasticsearchTextFieldPredicateBuilderFactory( resolvedSearchable, dslToIndexConverter, createToDocumentRawConverter(), codec, mapping ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
+				new ElasticsearchTextFieldPredicateBuilderFactory(
+						resolvedSearchable, dslToIndexConverter, rawDslToIndexConverter, codec, mapping
+				),
+				new ElasticsearchStandardFieldSortBuilderFactory<>(
+						resolvedSortable, dslToIndexConverter, rawDslToIndexConverter, codec
+				),
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>(
+						resolvedProjectable, indexToProjectionConverter, rawIndexToProjectionConverter, codec
+				),
+				new ElasticsearchTextFieldAggregationBuilderFactory(
+						resolvedAggregable,
+						dslToIndexConverter, rawDslToIndexConverter,
+						indexToProjectionConverter, rawIndexToProjectionConverter,
+						codec,
+						analyzerName != null
+				),
 				mapping
 		);
 	}

@@ -66,7 +66,6 @@ class ElasticsearchSearchQueryOptionsStepImpl<H>
 
 	@Override
 	protected ElasticsearchSearchAggregationFactory extendAggregationFactory(SearchAggregationFactory aggregationFactory) {
-		// FIXME HSEARCH-3271 implement this
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return aggregationFactory.extension( ElasticsearchExtension.get() );
 	}
 }

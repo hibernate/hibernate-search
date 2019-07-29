@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
@@ -30,12 +31,15 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory;
 
+	private final ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory;
+
 	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
 			boolean multiValued,
 			ElasticsearchFieldCodec<F> codec,
 			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory,
 			ElasticsearchFieldSortBuilderFactory sortBuilderFactory,
-			ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory) {
+			ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory,
+			ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory) {
 		this.parent = parent;
 		this.absolutePath = parent.getAbsolutePath( relativeFieldName );
 		this.nestedPath = parent.getNestedPath();
@@ -43,6 +47,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
+		this.aggregationBuilderFactory = aggregationBuilderFactory;
 		this.multiValued = multiValued;
 	}
 
@@ -79,6 +84,10 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	public ElasticsearchFieldProjectionBuilderFactory getProjectionBuilderFactory() {
 		return projectionBuilderFactory;
+	}
+
+	public ElasticsearchFieldAggregationBuilderFactory getAggregationBuilderFactory() {
+		return aggregationBuilderFactory;
 	}
 
 	@Override

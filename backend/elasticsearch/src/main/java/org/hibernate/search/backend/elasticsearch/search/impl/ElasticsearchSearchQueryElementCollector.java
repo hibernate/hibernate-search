@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 
 public interface ElasticsearchSearchQueryElementCollector
-		extends ElasticsearchSearchPredicateCollector, ElasticsearchSearchSortCollector {
+		extends ElasticsearchSearchPredicateCollector, ElasticsearchSearchSortCollector,
+				ElasticsearchSearchAggregationCollector {
 }

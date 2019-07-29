@@ -8,6 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 
 public interface ElasticsearchJsonSyntaxHelper {
 
-	// TODO HSEARCH-3649 add relevant helper methods here
+	String getTermAggregationOrderByTermToken();
 
 }

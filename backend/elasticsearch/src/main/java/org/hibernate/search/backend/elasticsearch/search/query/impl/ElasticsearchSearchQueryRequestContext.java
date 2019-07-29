@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import java.util.Collections;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -28,7 +29,7 @@ import com.google.gson.JsonObject;
  *     ({@link #createExtractContext(JsonObject)}</li>
  * </ul>
  */
-class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestContext {
+class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestContext, AggregationRequestContext {
 
 	private final SessionContextImplementor sessionContext;
 	private final LoadingContext<?, ?> loadingContext;

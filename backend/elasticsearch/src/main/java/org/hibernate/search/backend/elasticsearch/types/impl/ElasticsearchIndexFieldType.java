@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
@@ -22,17 +23,20 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 	private final ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory;
 	private final ElasticsearchFieldSortBuilderFactory sortBuilderFactory;
 	private final ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory;
+	private final ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory;
 	private final PropertyMapping mapping;
 
 	public ElasticsearchIndexFieldType(ElasticsearchFieldCodec<F> codec,
 			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory,
 			ElasticsearchFieldSortBuilderFactory sortBuilderFactory,
 			ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory,
+			ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory,
 			PropertyMapping mapping) {
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
+		this.aggregationBuilderFactory = aggregationBuilderFactory;
 		this.mapping = mapping;
 	}
 
@@ -46,7 +50,8 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 				codec,
 				predicateBuilderFactory,
 				sortBuilderFactory,
-				projectionBuilderFactory
+				projectionBuilderFactory,
+				aggregationBuilderFactory
 		);
 
 		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
