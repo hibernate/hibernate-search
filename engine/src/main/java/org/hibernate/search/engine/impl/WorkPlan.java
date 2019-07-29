@@ -384,14 +384,14 @@ public class WorkPlan {
 								throw new AssertionFailure( "Unknown action type: " + operation );
 						}
 						// recursion starts
-						documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this, context );
+						documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this, context, tenantId );
 					}
 					// else nothing to do as it's being processed already
 				}
 				else {
 					// this branch for @ContainedIn recursive work of non-indexed entities
 					// as they don't have an indexingId
-					documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this, context );
+					documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this, context, tenantId );
 				}
 			}
 		}

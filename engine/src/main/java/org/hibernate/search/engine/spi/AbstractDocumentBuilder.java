@@ -152,13 +152,14 @@ public abstract class AbstractDocumentBuilder {
 	}
 
 	/**
-	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities.
-	 *
 	 * @see #appendContainedInWorkForInstance(Object, WorkPlan, ContainedInRecursionContext, String)
 	 * @param instance the instance to be indexed
 	 * @param workPlan the current work plan
 	 * @param currentRecursionContext the current {@link org.hibernate.search.engine.spi.ContainedInRecursionContext} object used to check the graph traversal
+	 * @deprecated Use {@link #appendContainedInWorkForInstance(Object, WorkPlan, ContainedInRecursionContext, String)}
+	 * instead, and pass the appropriate tenant ID.
 	 */
+	@Deprecated
 	public void appendContainedInWorkForInstance(Object instance, WorkPlan workPlan, ContainedInRecursionContext currentRecursionContext) {
 		appendContainedInWorkForInstance( instance, workPlan, currentRecursionContext, null );
 	}
@@ -170,7 +171,6 @@ public abstract class AbstractDocumentBuilder {
 	 * @param workPlan the current work plan
 	 * @param currentRecursionContext the current {@link org.hibernate.search.engine.spi.ContainedInRecursionContext} object used to check the graph traversal
 	 * @param tenantIdentifier the identifier of the tenant or null, if there isn't one
-	 * @see #appendContainedInWorkForInstance(Object, WorkPlan, ContainedInRecursionContext)
 	 */
 	public void appendContainedInWorkForInstance(Object instance, WorkPlan workPlan, ContainedInRecursionContext currentRecursionContext, String tenantIdentifier) {
 		for ( ContainedInMetadata containedInMetadata : typeMetadata.getContainedInMetadata() ) {
