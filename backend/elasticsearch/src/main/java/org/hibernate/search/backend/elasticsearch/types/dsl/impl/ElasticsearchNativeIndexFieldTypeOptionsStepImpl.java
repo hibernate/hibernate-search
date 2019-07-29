@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchStandardFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchJsonStringFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeOptionsStep;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -44,15 +45,27 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
 				createDslToIndexConverter();
+		ToDocumentFieldValueConverter<String, ? extends String> rawDslToIndexConverter =
+				createToDocumentRawConverter();
 		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
+		FromDocumentFieldValueConverter<? super String, String> rawIndexToProjectionConverter =
+				createFromDocumentRawConverter();
 		ElasticsearchJsonStringFieldCodec codec = new ElasticsearchJsonStringFieldCodec( gson );
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,
 				new ElasticsearchStandardFieldPredicateBuilderFactory<>( true, dslToIndexConverter, createToDocumentRawConverter(), codec ),
 				new ElasticsearchStandardFieldSortBuilderFactory<>( true, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( true, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>(
+						true, indexToProjectionConverter, createFromDocumentRawConverter(), codec
+				),
+				new ElasticsearchStandardFieldAggregationBuilderFactory<>(
+						true,
+						dslToIndexConverter, rawDslToIndexConverter,
+						indexToProjectionConverter, rawIndexToProjectionConverter,
+						codec
+				),
 				mapping
 		);
 	}

@@ -10,10 +10,12 @@ import static org.hibernate.search.backend.elasticsearch.search.projection.impl.
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 
 /**
@@ -33,15 +35,18 @@ public class ElasticsearchLoadableSearchResult<H> {
 
 	private final long hitCount;
 	private List<Object> extractedHits;
+	private final Map<AggregationKey<?>, ?> extractedAggregations;
 
 	ElasticsearchLoadableSearchResult(ElasticsearchSearchQueryExtractContext extractContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
 			long hitCount,
-			List<Object> extractedHits) {
+			List<Object> extractedHits,
+			Map<AggregationKey<?>, ?> extractedAggregations) {
 		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
 		this.extractedHits = extractedHits;
+		this.extractedAggregations = extractedAggregations;
 	}
 
 	ElasticsearchSearchResult<H> loadBlocking() {
@@ -78,6 +83,6 @@ public class ElasticsearchLoadableSearchResult<H> {
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
 		extractedHits = null;
 
-		return new ElasticsearchSearchResultImpl<>( hitCount, loadedHits );
+		return new ElasticsearchSearchResultImpl<>( hitCount, loadedHits, extractedAggregations );
 	}
 }

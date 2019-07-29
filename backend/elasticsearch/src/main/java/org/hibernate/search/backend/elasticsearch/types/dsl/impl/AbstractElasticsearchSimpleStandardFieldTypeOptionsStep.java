@@ -29,6 +29,9 @@ abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends
 	private Searchable searchable = Searchable.DEFAULT;
 	protected boolean resolvedSearchable;
 
+	private Aggregable aggregable = Aggregable.DEFAULT;
+	protected boolean resolvedAggregable;
+
 	private F indexNullAs;
 
 	AbstractElasticsearchSimpleStandardFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
@@ -63,7 +66,8 @@ abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends
 
 	@Override
 	public S aggregable(Aggregable aggregable) {
-		throw new UnsupportedOperationException( "Not supported yet" );
+		this.aggregable = aggregable;
+		return thisAsS();
 	}
 
 	@Override
@@ -75,10 +79,11 @@ abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends
 		resolvedSortable = resolveDefault( sortable );
 		resolvedProjectable = resolveDefault( projectable );
 		resolvedSearchable = resolveDefault( searchable );
+		resolvedAggregable = resolveDefault( aggregable );
 
 		mapping.setIndex( resolvedSearchable );
 		mapping.setStore( resolvedProjectable );
-		mapping.setDocValues( resolvedSortable );
+		mapping.setDocValues( resolvedSortable || resolvedAggregable );
 
 		ElasticsearchIndexFieldType<F> indexFieldType = toIndexFieldType( mapping );
 		if ( indexNullAs != null ) {

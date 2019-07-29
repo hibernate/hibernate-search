@@ -9,6 +9,9 @@ package org.hibernate.search.backend.elasticsearch;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.dsl.aggregation.ElasticsearchSearchAggregationFactory;
+import org.hibernate.search.backend.elasticsearch.search.dsl.aggregation.impl.ElasticsearchSearchAggregationFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.ElasticsearchSearchProjectionFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryHitTypeStep;
@@ -28,6 +31,9 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactoryExtension;
+import org.hibernate.search.engine.search.dsl.aggregation.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
@@ -71,6 +77,7 @@ public final class ElasticsearchExtension<H, R, E>
 		SearchPredicateFactoryExtension<ElasticsearchSearchPredicateFactory>,
 		SearchSortFactoryExtension<ElasticsearchSearchSortFactory>,
 		SearchProjectionFactoryExtension<ElasticsearchSearchProjectionFactory<R, E>, R, E>,
+		SearchAggregationFactoryExtension<ElasticsearchSearchAggregationFactory>,
 		IndexFieldTypeFactoryExtension<ElasticsearchIndexFieldTypeFactory> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -176,6 +183,24 @@ public final class ElasticsearchExtension<H, R, E>
 		if ( factory instanceof ElasticsearchSearchProjectionBuilderFactory ) {
 			return Optional.of( new ElasticsearchSearchProjectionFactoryImpl<>(
 					original, (ElasticsearchSearchProjectionBuilderFactory) factory
+			) );
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@SuppressWarnings("unchecked") // If the factory is an instance of ElasticsearchSearchAggregationBuilderFactory, the cast is safe
+	public Optional<ElasticsearchSearchAggregationFactory> extendOptional(
+			SearchAggregationFactory original, SearchAggregationDslContext<?> dslContext) {
+		if ( dslContext.getBuilderFactory() instanceof ElasticsearchSearchAggregationBuilderFactory ) {
+			return Optional.of( new ElasticsearchSearchAggregationFactoryImpl(
+					original,
+					(SearchAggregationDslContext<ElasticsearchSearchAggregationBuilderFactory>) dslContext
 			) );
 		}
 		else {

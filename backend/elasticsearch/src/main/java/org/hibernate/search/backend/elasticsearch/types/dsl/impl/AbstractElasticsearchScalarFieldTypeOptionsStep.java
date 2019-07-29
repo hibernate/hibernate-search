@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchStandardFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
@@ -47,7 +49,30 @@ abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends Abstrac
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>(
 						resolvedProjectable, indexToProjectionConverter, rawIndexToProjectionConverter, codec
 				),
+				createAggregationBuilderFactory(
+						resolvedAggregable,
+						dslToIndexConverter, rawDslToIndexConverter,
+						indexToProjectionConverter, rawIndexToProjectionConverter,
+						codec
+				),
 				mapping
+		);
+	}
+
+	protected ElasticsearchFieldAggregationBuilderFactory createAggregationBuilderFactory(
+			boolean resolvedAggregable,
+			ToDocumentFieldValueConverter<?,? extends F> dslToIndexConverter,
+			ToDocumentFieldValueConverter<F,? extends F> rawDslToIndexConverter,
+			FromDocumentFieldValueConverter<? super F,?> indexToProjectionConverter,
+			FromDocumentFieldValueConverter<? super F,F> rawIndexToProjectionConverter,
+			ElasticsearchFieldCodec<F> codec) {
+		return new ElasticsearchStandardFieldAggregationBuilderFactory<>(
+				resolvedAggregable,
+				dslToIndexConverter,
+				rawDslToIndexConverter,
+				indexToProjectionConverter,
+				rawIndexToProjectionConverter,
+				codec
 		);
 	}
 

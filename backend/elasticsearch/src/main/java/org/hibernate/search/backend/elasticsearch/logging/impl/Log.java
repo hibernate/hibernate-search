@@ -17,16 +17,21 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
@@ -315,11 +320,11 @@ public interface Log extends BasicLogger {
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 23,
-			value = "Range lookups (range predicates) are not supported by this field's type (GeoPoint). Use spatial features instead.")
+			value = "Range lookups (range predicates, range aggregations) are not supported by this field's type (GeoPoint). Use spatial features instead.")
 	SearchException rangesNotSupportedByGeoPoint(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 24,
-			value = "Direct value lookups (match predicates) are not supported by this field's type (GeoPoint). Use spatial features instead.")
+			value = "Direct value lookups (match predicates, terms aggregations) are not supported by this field's type (GeoPoint). Use spatial features instead.")
 	SearchException directValueLookupNotSupportedByGeoPoint(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 25,
@@ -538,4 +543,48 @@ public interface Log extends BasicLogger {
 					+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
 					+ " one with an analyzer that is not aggregable, and one with a normalizer that is aggregable.")
 	SearchException cannotUseAnalyzerOnAggregableField(String analyzerName, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 77,
+			value = "Aggregations are not enabled for field '%1$s'. Make sure the field is marked as aggregable.")
+	SearchException nonAggregableField(String absoluteFieldPath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 78, value = "Invalid type '%2$s' for aggregation on field '%1$s'.")
+	SearchException invalidAggregationInvalidType(String absoluteFieldPath,
+			@FormatWith(ClassFormatter.class) Class<?> type,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 79,
+			value = "Multiple conflicting types to build an aggregation for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldTypesForAggregation(String absoluteFieldPath,
+			ElasticsearchFieldAggregationBuilderFactory component1,
+			ElasticsearchFieldAggregationBuilderFactory component2,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 80,
+			value = "Elasticsearch range aggregations only accept ranges in the canonical form:"
+					+ " (-Infinity, <value>) or [<value1>, <value2>) or [<value>, +Infinity)."
+					+ " The given range is not in canonical form: '%1$s'.")
+	SearchException elasticsearchRangeAggregationRequiresCanonicalFormForRanges(Range<?> range);
+
+	@Message(id = ID_OFFSET_3 + 81,
+			value = "An Elasticsearch query cannot include search aggregations built using a non-Elasticsearch search scope."
+					+ " Given aggregation was: '%1$s'")
+	SearchException cannotMixElasticsearchSearchQueryWithOtherAggregations(SearchAggregation<?> aggregation);
+
+	@Message(id = ID_OFFSET_3 + 82, value = "The aggregation '%1$s' is defined on a scope targeting different indexes."
+			+ " Aggregation is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	SearchException aggregationDefinedOnDifferentIndexes(SearchAggregation<?> aggregation,
+			Set<String> aggregationIndexes, Set<String> scopeIndexes);
+
+	@Message(id = ID_OFFSET_3 + 83,
+			value = "Terms aggregations are not supported by this field's type (string field with analyzed). Use a normalized field instead.")
+	SearchException termsAggregationsNotSupportedByAnalyzedTextFieldType(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 84,
+			value = "Range aggregations are not supported by this field's type.")
+	SearchException rangeAggregationsNotSupportedByFieldType(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 85,
+			value = "Multiple aggregations with the same key: '%1$s'")
+	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey key);
 }
