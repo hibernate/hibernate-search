@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.lucene.search.spatial;
+package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
@@ -36,11 +36,9 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Offset;
 
 /**
- * Tests distance projetions on nested document.
- * <p>
- * It can be promoted to TCK, or merged with others, as soon as we support the same feature for all backends.
+ * Tests distance projections on flattened and nested documents.
  */
-public class LuceneNestedDocumentDistanceProjectionIT {
+public class NestedDocumentDistanceProjectionIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -75,6 +73,21 @@ public class LuceneNestedDocumentDistanceProjectionIT {
 	}
 
 	@Test
+	public void distance_flattenedDocument() {
+		StubMappingScope scope = indexManager.createScope();
+		List<Double> hits = scope.query()
+				.asProjection( f -> f.distance( "flattened.geoPoint", METRO_GARIBALDI ) )
+				.predicate( f -> f.matchAll() )
+				.sort( f -> f.byField( "ordinal" ).desc() )
+				.fetchHits();
+
+		assertEquals( hits.size(), 3 );
+		checkResult( hits.get( 0 ), 164d, Offset.offset( 10d ) );
+		checkResult( hits.get( 1 ), 1037d, Offset.offset( 10d ) );
+		checkResult( hits.get( 2 ), 2457d, Offset.offset( 10d ) );
+	}
+
+	@Test
 	public void distance_nestedDocument() {
 		StubMappingScope scope = indexManager.createScope();
 		List<Double> hits = scope.query()
@@ -93,18 +106,30 @@ public class LuceneNestedDocumentDistanceProjectionIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			document.addValue( indexMapping.ordinalField, 1 );
+
 			DocumentElement nestedDocument = document.addObject( indexMapping.nestedDocument );
 			nestedDocument.addValue( indexMapping.nestedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
+
+			DocumentElement flattenedDocument = document.addObject( indexMapping.flattenedDocument );
+			flattenedDocument.addValue( indexMapping.flattenedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
 			document.addValue( indexMapping.ordinalField, 2 );
+
 			DocumentElement nestedDocument = document.addObject( indexMapping.nestedDocument );
 			nestedDocument.addValue( indexMapping.nestedGeoPoint, IMOUTO_GEO_POINT );
+
+			DocumentElement flattenedDocument = document.addObject( indexMapping.flattenedDocument );
+			flattenedDocument.addValue( indexMapping.flattenedGeoPoint, IMOUTO_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
 			document.addValue( indexMapping.ordinalField, 3 );
+
 			DocumentElement nestedDocument = document.addObject( indexMapping.nestedDocument );
 			nestedDocument.addValue( indexMapping.nestedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
+
+			DocumentElement flattenedDocument = document.addObject( indexMapping.flattenedDocument );
+			flattenedDocument.addValue( indexMapping.flattenedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 		} );
 		workPlan.execute().join();
 
@@ -127,8 +152,12 @@ public class LuceneNestedDocumentDistanceProjectionIT {
 
 	protected static class IndexMapping {
 		final IndexFieldReference<Integer> ordinalField;
+
 		final IndexObjectFieldReference nestedDocument;
 		final IndexFieldReference<GeoPoint> nestedGeoPoint;
+
+		final IndexObjectFieldReference flattenedDocument;
+		final IndexFieldReference<GeoPoint> flattenedGeoPoint;
 
 		IndexMapping(IndexSchemaElement root) {
 			ordinalField = root.field( "ordinal", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
@@ -136,6 +165,10 @@ public class LuceneNestedDocumentDistanceProjectionIT {
 			IndexSchemaObjectField nested = root.objectField( "nested", ObjectFieldStorage.NESTED );
 			nestedDocument = nested.toReference();
 			nestedGeoPoint = nested.field( "geoPoint", f -> f.asGeoPoint().projectable( Projectable.YES ) ).toReference();
+
+			IndexSchemaObjectField flattened = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
+			flattenedDocument = flattened.toReference();
+			flattenedGeoPoint = flattened.field( "geoPoint", f -> f.asGeoPoint().projectable( Projectable.YES ) ).toReference();
 		}
 	}
 }
