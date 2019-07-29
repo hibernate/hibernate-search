@@ -34,3 +34,7 @@ org.jboss.logging.processor.util.Objects
 # Methods from Hibernate ORM :
 # This one is only safe to use with specific configurations:
 org.hibernate.SharedSessionContract#getTransaction()
+
+################################################################################################################
+# Methods from Hibernate Search:
+org.hibernate.search.engine.spi.AbstractDocumentBuilder#appendContainedInWorkForInstance(java.lang.Object, org.hibernate.search.engine.impl.WorkPlan, org.hibernate.search.engine.spi.ContainedInRecursionContext)
