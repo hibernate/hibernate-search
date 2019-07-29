@@ -14,9 +14,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 /**
  * A search result from the backend that offers a method to load data from the mapper.
@@ -30,32 +28,33 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
  * @param <H> The type of hits in the search result.
  */
 public class ElasticsearchLoadableSearchResult<H> {
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final ElasticsearchSearchQueryExtractContext extractContext;
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
 
 	private final long hitCount;
-	private List<Object> extractedData;
+	private List<Object> extractedHits;
 
-	ElasticsearchLoadableSearchResult(ProjectionHitMapper<?, ?> projectionHitMapper,
+	ElasticsearchLoadableSearchResult(ElasticsearchSearchQueryExtractContext extractContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
-			long hitCount, List<Object> extractedData) {
-		this.projectionHitMapper = projectionHitMapper;
+			long hitCount,
+			List<Object> extractedHits) {
+		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
-		this.extractedData = extractedData;
+		this.extractedHits = extractedHits;
 	}
 
-	ElasticsearchSearchResult<H> loadBlocking(SessionContextImplementor sessionContext) {
-		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( sessionContext );
+	ElasticsearchSearchResult<H> loadBlocking() {
+		SearchProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
 
-		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking();
+		LoadingResult<?> loadingResult = extractContext.getProjectionHitMapper().loadBlocking();
 
 		int readIndex = 0;
 		int writeIndex = 0;
-		for ( ; readIndex < extractedData.size(); ++readIndex ) {
+		for ( ; readIndex < extractedHits.size(); ++readIndex ) {
 			transformContext.reset();
 			H transformed = transformUnsafe(
-					rootProjection, loadingResult, extractedData.get( readIndex ), transformContext
+					rootProjection, loadingResult, extractedHits.get( readIndex ), transformContext
 			);
 
 			if ( transformContext.hasFailedLoad() ) {
@@ -63,21 +62,21 @@ public class ElasticsearchLoadableSearchResult<H> {
 				continue;
 			}
 
-			extractedData.set( writeIndex, transformed );
+			extractedHits.set( writeIndex, transformed );
 			++writeIndex;
 		}
 
 		if ( writeIndex < readIndex ) {
 			// Some hits were skipped; adjust the list size.
-			extractedData.subList( writeIndex, readIndex ).clear();
+			extractedHits.subList( writeIndex, readIndex ).clear();
 		}
 
 		// The cast is safe, since all elements extend H and we make the list unmodifiable
 		@SuppressWarnings("unchecked")
-		List<H> loadedHits = Collections.unmodifiableList( (List<? extends H>) extractedData );
+		List<H> loadedHits = Collections.unmodifiableList( (List<? extends H>) extractedHits );
 
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
-		extractedData = null;
+		extractedHits = null;
 
 		return new ElasticsearchSearchResultImpl<>( hitCount, loadedHits );
 	}

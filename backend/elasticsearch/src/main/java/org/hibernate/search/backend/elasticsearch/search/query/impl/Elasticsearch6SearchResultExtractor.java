@@ -8,8 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 
 import com.google.gson.JsonObject;
 
@@ -27,10 +25,9 @@ class Elasticsearch6SearchResultExtractor<H> extends Elasticsearch7SearchResultE
 			HITS_ACCESSOR.property( "total" ).asLong();
 
 	Elasticsearch6SearchResultExtractor(
-			LoadingContext<?, ?> loadingContext,
-			ElasticsearchSearchProjection<?, H> rootProjection,
-			SearchProjectionExtractContext searchProjectionExecutionContext) {
-		super( loadingContext, rootProjection, searchProjectionExecutionContext );
+			ElasticsearchSearchQueryRequestContext requestContext,
+			ElasticsearchSearchProjection<?, H> rootProjection) {
+		super( requestContext, rootProjection );
 	}
 
 	@Override

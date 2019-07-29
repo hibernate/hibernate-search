@@ -137,10 +137,14 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
+		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
+				sessionContext, loadingContext, distanceSorts
+		);
+
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(
-						loadingContext,
-						rootProjection, searchProjectionExecutionContext
+						requestContext,
+						rootProjection
 				);
 
 		return new ElasticsearchSearchQueryImpl<>(

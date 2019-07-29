@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonArray;
@@ -33,45 +32,58 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 	private static final JsonAccessor<Long> HITS_TOTAL_ACCESSOR =
 			HITS_ACCESSOR.property( "total" ).property( "value" ).asLong();
 
-	private final LoadingContext<?, ?> loadingContext;
+	private static final JsonObjectAccessor AGGREGATIONS_ACCESSOR =
+			JsonAccessor.root().property( "aggregations" ).asObject();
+
+	private final ElasticsearchSearchQueryRequestContext requestContext;
+
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
 
-	private final SearchProjectionExtractContext searchProjectionExecutionContext;
-
 	Elasticsearch7SearchResultExtractor(
-			LoadingContext<?, ?> loadingContext,
-			ElasticsearchSearchProjection<?, H> rootProjection,
-			SearchProjectionExtractContext searchProjectionExecutionContext) {
-		this.loadingContext = loadingContext;
+			ElasticsearchSearchQueryRequestContext requestContext,
+			ElasticsearchSearchProjection<?, H> rootProjection) {
+		this.requestContext = requestContext;
 		this.rootProjection = rootProjection;
-		this.searchProjectionExecutionContext = searchProjectionExecutionContext;
 	}
 
 	@Override
 	public ElasticsearchLoadableSearchResult<H> extract(JsonObject responseBody) {
-		ProjectionHitMapper<?, ?> hitMapper = loadingContext.getProjectionHitMapper();
+		ElasticsearchSearchQueryExtractContext extractContext = requestContext.createExtractContext(
+				responseBody
+		);
 
 		long hitCount = extractHitCount( responseBody );
 
-		final List<Object> extractedData = hitCount > 0 ? extractHits( hitMapper, responseBody ) : Collections.emptyList();
+		final List<Object> extractedHits = hitCount > 0 ?
+				extractHits( extractContext ) : Collections.emptyList();
 
-		return new ElasticsearchLoadableSearchResult<>( hitMapper, rootProjection, hitCount, extractedData );
+		return new ElasticsearchLoadableSearchResult<>(
+				extractContext,
+				rootProjection,
+				hitCount,
+				extractedHits
+		);
 	}
 
 	protected long extractHitCount(JsonObject responseBody) {
 		return HITS_TOTAL_ACCESSOR.get( responseBody ).orElse( 0L );
 	}
 
-	private List<Object> extractHits(ProjectionHitMapper<?, ?> hitMapper, JsonObject responseBody) {
+	private List<Object> extractHits(ElasticsearchSearchQueryExtractContext extractContext) {
+		JsonObject responseBody = extractContext.getResponseBody();
+		ProjectionHitMapper<?, ?> hitMapper = extractContext.getProjectionHitMapper();
 		JsonArray jsonHits = HITS_HITS_ACCESSOR.get( responseBody ).orElseGet( JsonArray::new );
 
+		SearchProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext();
 		List<Object> extractedData = new ArrayList<>( jsonHits.size() );
 
 		for ( JsonElement hit : jsonHits ) {
 			JsonObject hitObject = hit.getAsJsonObject();
 
-			extractedData.add( rootProjection.extract( hitMapper, responseBody, hitObject,
-					searchProjectionExecutionContext ) );
+			extractedData.add( rootProjection.extract(
+					hitMapper, responseBody, hitObject,
+					projectionExtractContext
+			) );
 		}
 
 		return extractedData;
