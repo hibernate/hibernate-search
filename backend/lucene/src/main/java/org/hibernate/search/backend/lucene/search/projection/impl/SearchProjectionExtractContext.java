@@ -54,6 +54,10 @@ public class SearchProjectionExtractContext {
 		return distanceCollectors.values();
 	}
 
+	public Query getLuceneQuery() {
+		return luceneQuery;
+	}
+
 	public static class DistanceCollectorKey {
 		private final String absoluteFieldPath;
 		private final GeoPoint location;
