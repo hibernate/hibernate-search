@@ -27,8 +27,12 @@ org.jboss.logging.processor.util.Objects @ Bad import, use java.util.Objects
 
 ################################################################################################################
 # Methods from Hibernate ORM :
-# This one is only safe to use with specific configurations:
 org.hibernate.SharedSessionContract#getTransaction() @ Using this method is often unsafe
+org.hibernate.SharedSessionContract#createCriteria(java.lang.Class) @ Native Criteria are deprecated
+org.hibernate.SharedSessionContract#createCriteria(java.lang.Class, java.lang.String) @ Native Criteria are deprecated
+org.hibernate.SharedSessionContract#createCriteria(java.lang.String) @ Native Criteria are deprecated
+org.hibernate.SharedSessionContract#createCriteria(java.lang.String, java.lang.String) @ Native Criteria are deprecated
+org.hibernate.criterion.** @ Native Criteria are deprecated
 
 ################################################################################################################
 # Use our Contracts class instead
