@@ -395,7 +395,9 @@
             // Exclude types that have only private constructors
             OPTIONAL MATCH (type)-[:DECLARES]->(nonPrivateConstructor:Constructor)
             WHERE
-                nonPrivateConstructor.visibility <> 'private'
+                // Ignore synthetic constructors
+                NOT nonPrivateConstructor.synthetic
+                AND nonPrivateConstructor.visibility <> 'private'
             WITH type, count(nonPrivateConstructor) = 0 AS hasOnlyPrivateConstructors
             WHERE
                 NOT hasOnlyPrivateConstructors
