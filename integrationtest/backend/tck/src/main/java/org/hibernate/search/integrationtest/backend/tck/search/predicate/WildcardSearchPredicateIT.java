@@ -36,6 +36,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Assume;
 import org.junit.Before;
@@ -64,6 +65,13 @@ public class WildcardSearchPredicateIT {
 	private static final String TEXT_MATCHING_PATTERN_2 = "Internationalization allows to adapt the application to multiple locales.";
 	private static final String TEXT_MATCHING_PATTERN_3 = "A had to call the landlord.";
 	private static final String TEXT_MATCHING_PATTERN_2_AND_3 = "I had some interaction with that lad.";
+
+	private static final String TERM_PATTERN_1 = "lOCAl*N";
+	private static final String TERM_PATTERN_2 = "IN*oN";
+	private static final String TERM_PATTERN_3 = "INteR*oN";
+	private static final String TERM_MATCHING_PATTERN_1 = "Localization";
+	private static final String TERM_MATCHING_PATTERN_2 = "iNTroSPEctiOn";
+	private static final String TERM_MATCHING_PATTERN_2_AND_3 = "Internationalization";
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
@@ -136,6 +144,25 @@ public class WildcardSearchPredicateIT {
 
 		assertThat( createQuery.apply( PATTERN_3 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3612")
+	public void wildcard_normalizeMatchingExpression() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.normalizedField.relativeFieldName;
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
+				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( queryString ) )
+				.toQuery();
+
+		assertThat( createQuery.apply( TERM_PATTERN_1 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		assertThat( createQuery.apply( TERM_PATTERN_2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+
+		assertThat( createQuery.apply( TERM_PATTERN_3 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
 	@Test
@@ -480,12 +507,15 @@ public class WildcardSearchPredicateIT {
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, TEXT_MATCHING_PATTERN_1 );
+			document.addValue( indexMapping.normalizedField.reference, TERM_MATCHING_PATTERN_1 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2 );
+			document.addValue( indexMapping.normalizedField.reference, TERM_MATCHING_PATTERN_2 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_3 );
+			document.addValue( indexMapping.normalizedField.reference, TERM_MATCHING_PATTERN_2_AND_3 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2_AND_3 );
@@ -549,6 +579,7 @@ public class WildcardSearchPredicateIT {
 		final MainFieldModel analyzedStringField2;
 		final MainFieldModel analyzedStringField3;
 		final MainFieldModel analyzedStringFieldWithDslConverter;
+		final MainFieldModel normalizedField;
 
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
@@ -576,6 +607,10 @@ public class WildcardSearchPredicateIT {
 							.dslConverter( ValueWrapper.toIndexFieldConverter() )
 			)
 					.map( root, "analyzedStringWithDslConverter" );
+			normalizedField = MainFieldModel.mapper(
+					c -> c.asString().normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )
+			)
+					.map( root, "normalized" );
 		}
 	}
 
