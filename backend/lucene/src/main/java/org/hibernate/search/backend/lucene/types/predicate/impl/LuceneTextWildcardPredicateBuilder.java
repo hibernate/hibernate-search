@@ -9,21 +9,27 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.types.predicate.parse.impl.LuceneWildcardExpressionHelper;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.util.BytesRef;
 
 class LuceneTextWildcardPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		implements WildcardPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	protected final String absoluteFieldPath;
 
+	private final Analyzer analyzer;
+
 	private String pattern;
 
-	LuceneTextWildcardPredicateBuilder(String absoluteFieldPath) {
+	LuceneTextWildcardPredicateBuilder(String absoluteFieldPath, Analyzer analyzer) {
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.analyzer = analyzer;
 	}
 
 	@Override
@@ -33,6 +39,7 @@ class LuceneTextWildcardPredicateBuilder extends AbstractLuceneSearchPredicateBu
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		return new WildcardQuery( new Term( absoluteFieldPath, pattern ) );
+		BytesRef analyzedWildcard = LuceneWildcardExpressionHelper.analyzeWildcard( analyzer, absoluteFieldPath, pattern );
+		return new WildcardQuery( new Term( absoluteFieldPath, analyzedWildcard ) );
 	}
 }

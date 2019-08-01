@@ -61,7 +61,7 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
 			String absoluteFieldPath) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneTextWildcardPredicateBuilder( absoluteFieldPath );
+		return new LuceneTextWildcardPredicateBuilder( absoluteFieldPath, analyzerOrNormalizer );
 	}
 
 	@Override
