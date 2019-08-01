@@ -510,30 +510,27 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/Pred
 ----
 ====
 
-// TODO HSEARCH-3612 When the ticket is fixed, rephrase this warning to state that only ES 6.7 and below is affected by the normalization problem.
-
 [IMPORTANT]
 ====
-Patterns used in wildcard predicates are not analyzed or normalized,
-and they are expected to match a *single* indexed token, not a sequence of tokens.
+If a normalizer has been defined on the field, the patterns used in wildcard predicates
+will be normalized.
 
-For example, a pattern such as `Cat*` will not match anything
-when targeting a field that applies a lowercase filter when indexing.
-`cat*` may match, since it's already lowercased.
+If an analyzer has been defined on the field:
 
-Similarly, a pattern such as `john gr*` will not match anything
+* when using the Elasticsearch backend, the patterns won't be analyzed nor normalized,
+and will be expected to match a *single* indexed token, not a sequence of tokens.
+* when using the Lucene backend the patterns will be normalized, but not tokenized:
+the pattern will still be expected to match a *single* indexed token, not a sequence of tokens.
+
+For example, a pattern such as `Cat*` could match `cat`
+when targeting a field having a normalizer that applies a lowercase filter when indexing.
+
+A pattern such as `john gr*` will not match anything
 when targeting a field that tokenizes on spaces.
 `gr*` may match, since it doesn't include any space.
 
-These limitations generally make the wildcard predicate unadvisable for high-level,
-user-exposed features,
-though it can still be useful in very specific cases.
-
 When the goal is to match user-provided query strings,
 the <<search-dsl-predicate-simple-query-string,simple query string predicate>> should be preferred.
-At the very least it fixes the second issue by automatically splitting the query string around spaces,
-even though it may also suffer from the case-sensitivity issue in some cases
-(see https://hibernate.atlassian.net/browse/HSEARCH-3612[HSEARCH-3612]).
 ====
 
 [[search-dsl-predicate-boolean]]
