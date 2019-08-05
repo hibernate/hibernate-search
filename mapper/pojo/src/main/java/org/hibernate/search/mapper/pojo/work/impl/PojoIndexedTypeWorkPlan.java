@@ -103,6 +103,10 @@ public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends Ab
 		return delegate.execute();
 	}
 
+	void discard() {
+		delegate.discard();
+	}
+
 	private IndexedEntityWorkPlan getWork(I identifier) {
 		IndexedEntityWorkPlan work = workPlansPerId.get( identifier );
 		if ( work == null ) {

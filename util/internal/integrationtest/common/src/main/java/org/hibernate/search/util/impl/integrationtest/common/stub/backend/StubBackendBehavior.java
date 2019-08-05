@@ -43,6 +43,12 @@ public abstract class StubBackendBehavior {
 		}
 
 		@Override
+		public void discardDocumentWorks(String indexName, List<StubDocumentWork> works) {
+			throw new IllegalStateException( "The stub backend behavior was not set when works were discarded from index '"
+					+ indexName + "': " + works );
+		}
+
+		@Override
 		public CompletableFuture<?> executeDocumentWorks(String indexName, List<StubDocumentWork> works) {
 			throw new IllegalStateException( "The stub backend behavior was not set when works were executed for index '"
 					+ indexName + "': " + works );
@@ -97,6 +103,8 @@ public abstract class StubBackendBehavior {
 	public abstract void pushSchema(String indexName, StubIndexSchemaNode rootSchemaNode);
 
 	public abstract void prepareDocumentWorks(String indexName, List<StubDocumentWork> works);
+
+	public abstract void discardDocumentWorks(String indexName, List<StubDocumentWork> works);
 
 	public abstract CompletableFuture<?> executeDocumentWorks(String indexName, List<StubDocumentWork> works);
 

@@ -15,6 +15,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -108,6 +111,51 @@ public class AutomaticIndexingBasicIT {
 					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void rollback_discardPreparedWorks() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			Transaction trx = session.beginTransaction();
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+			entity1.getIndexedElementCollectionField().add( "firstValue" );
+
+			session.persist( entity1 );
+			session.flush();
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", entity1.getIndexedField() )
+							.field( "noReindexOnUpdateField", null )
+							.field(
+									"indexedElementCollectionField",
+									entity1.getIndexedElementCollectionField().get( 0 )
+							)
+					)
+					.prepared();
+
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
+			writePlan.process();
+
+			backendMock.verifyExpectationsMet();
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", entity1.getIndexedField() )
+							.field( "noReindexOnUpdateField", null )
+							.field(
+									"indexedElementCollectionField",
+									entity1.getIndexedElementCollectionField().get( 0 )
+							)
+					)
+					.discarded();
+
+			trx.rollback();
+
+			backendMock.verifyExpectationsMet();
+		} );
 	}
 
 	@Test

@@ -95,6 +95,11 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 		}
 	}
 
+	@Override
+	public void discard() {
+		works.clear();
+	}
+
 	private void index(DocumentReferenceProvider referenceProvider,
 			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
 		String id = referenceProvider.getIdentifier();

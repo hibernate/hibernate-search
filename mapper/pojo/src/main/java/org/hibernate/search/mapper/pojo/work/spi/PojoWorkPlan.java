@@ -144,4 +144,8 @@ public interface PojoWorkPlan {
 	 */
 	CompletableFuture<?> execute();
 
+	/**
+	 * Discard all works that are prepared but not yet executed.
+	 */
+	void discard();
 }

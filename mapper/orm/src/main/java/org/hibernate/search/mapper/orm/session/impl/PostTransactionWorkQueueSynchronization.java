@@ -60,7 +60,7 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 						this,
 						i
 				);
-				// TODO HSEARCH-3075 send some signal to the workPlan to release resources if necessary?
+				workPlan.discard();
 			}
 		}
 		finally {
