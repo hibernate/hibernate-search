@@ -178,16 +178,14 @@ public class SearchSessionWritePlanBaseIT {
 
 			session.persist( entity1 );
 			session.persist( entity2 );
-			session.flush();
 
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
-
+			// flush triggers the prepare of the current PojoWorkPlan
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
 					.prepared();
 
-			writePlan.process();
+			session.flush();
 
 			// Works should be prepared immediately
 			backend1Mock.verifyExpectationsMet();
@@ -222,14 +220,21 @@ public class SearchSessionWritePlanBaseIT {
 
 			session.persist( entity1 );
 			session.persist( entity2 );
+
+			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.add( "1", b -> b.field( "text", "number1" ) )
+					.add( "2", b -> b.field( "text", "number2" ) )
+					.prepared();
+
 			session.flush();
+			backend1Mock.verifyExpectationsMet();
 
 			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
-					.preparedThenExecuted();
+					.executed();
 
 			writePlan.execute();
 

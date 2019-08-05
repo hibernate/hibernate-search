@@ -131,6 +131,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	 */
 	@Override
 	public void onFlush(FlushEvent event) {
+		getCurrentWorkPlan( state.getContextProvider(), event.getSession() ).prepare();
+
 		// TODO HSEARCH-3068 handle the "simulated" transaction when a Flush listener is registered
 //		Session session = event.getSession();
 //		Synchronization synchronization = flushSynch.get( session );
