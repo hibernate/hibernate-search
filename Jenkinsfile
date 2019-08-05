@@ -138,7 +138,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  * (see "Configuration file" above) to send Sonar analysis input to sonarcloud.io.
  */
 
-@Field final String MAVEN_TOOL = 'Apache Maven 3.6.0'
+@Field final String MAVEN_TOOL = 'Apache Maven 3.6'
 
 // Default node pattern, to be used for resource-intensive stages.
 // Should not include the master node.
