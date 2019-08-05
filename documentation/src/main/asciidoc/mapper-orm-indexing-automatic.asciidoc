@@ -37,7 +37,8 @@ This is because queries are executed on the database side,
 One workaround is to <<mapper-orm-indexing-explicit,explicitly reindex>> after you run such queries.
 Indexing happens after transactions are committed::
 Indexes are not updated immediately, but only after transactions are successfully committed.
-That way, if a transaction is rolled back, the indexes will be left in a state consistent with the database.
+That way, if a transaction is rolled back, the indexes will be left in a state consistent with the database,
+discarding all the index changes that were planned during the transaction.
 +
 This means in particular that Hibernate Search will retrieve the state of entities after the transaction is committed.
 As a result, clearing the session during the transaction may cause trouble:
