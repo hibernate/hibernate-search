@@ -6,7 +6,6 @@
  */
 
 import groovy.transform.Field
-import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 
 /*
  * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
@@ -65,12 +64,21 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  * In the first case, the name of a Maven settings file must be provided in the job configuration file
  * (see below).
  *
+ * #### AWS
+ *
+ * This job will trigger integration tests against an Elasticsearch service hosted on AWS.
+ *
+ * You need to set some environment variables to select the endpoint (see below).
+ *
+ * Then you will also need to add AWS credentials in Jenkins
+ * and reference them from the configuration file (see below).
+ *
  * #### Coveralls (optional)
  *
  * You need to enable your repository in Coveralls first: see https://coveralls.io/repos/new.
  *
  * Then you will also need to add the Coveralls repository token as credentials in Jenkins
- * (see "Credentials" section below).
+ * and reference it from the configuration file (see below).
  *
  * #### Gitter (optional)
  *
@@ -109,20 +117,22 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  *
  * Below is the additional structure specific to this Jenkinsfile:
  *
+ *     aws:
+ *       # String containing the ID of aws credentials. Mandatory in order to test against an Elasticsearch service hosted on AWS.
+ *       # Expects username/password credentials where the username is the AWS access key
+ *       # and the password is the AWS secret key.
+ *       credentials: ...
+ *     coveralls:
+ *       # String containing the ID of coveralls credentials. Optional.
+ *       # Expects secret text credentials containing the repository token.
+ *       # Note these credentials should be registered at the job level, not system-wide.
+ *       credentials: ...
  *     deployment:
  *       maven:
  *         # String containing the ID of a Maven settings file registered using the config-file-provider Jenkins plugin.
  *         # The settings must provide credentials to the servers with ID
  *         # 'jboss-releases-repository' and 'jboss-snapshots-repository'.
  *         settingsId: ...
- *
- * #### Credentials
- *
- * The following credentials are necessary for some features:
- *
- * - 'aws-elasticsearch' AWS credentials, to test Elasticsearch as a service on AWS
- * - 'coveralls-repository-token' secret text credentials containing the repository token,
- * to send coverage reports to coveralls.io. Note these credentials should be registered at the job level, not system-wide.
  */
 
 @Field final String MAVEN_TOOL = 'Apache Maven 3.6'
@@ -355,8 +365,9 @@ stage('Default build') {
 
 			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing
 			if (enableDefaultBuildIT) {
-				try {
-					withCredentials([string(credentialsId: 'coveralls-repository-token', variable: 'COVERALLS_TOKEN')]) {
+				if (helper.configuration.file?.coveralls?.credentials) {
+					def coverallsCredentialsId = helper.configuration.file.coveralls.credentials
+					withCredentials([string(credentialsId: coverallsCredentialsId, variable: 'COVERALLS_TOKEN')]) {
 						sh """ \
 								mvn coveralls:report \
 								-DrepoToken=${COVERALLS_TOKEN} \
@@ -368,8 +379,8 @@ stage('Default build') {
 						"""
 					}
 				}
-				catch (CredentialNotFoundException e) {
-					echo "No Coveralls token configured - skipping Coveralls report. Error was: ${e}"
+				else {
+					echo "No Coveralls token configured - skipping Coveralls report."
 				}
 			}
 
@@ -449,12 +460,16 @@ stage('Non-default environments') {
 		if (!buildEnv.awsRegion) {
 			throw new IllegalStateException("Unexpected empty AWS region")
 		}
+		def awsCredentialsId = helper.configuration.file?.aws?.credentials
+		if (!awsCredentialsId) {
+			throw new IllegalStateException("Missing AWS credentials")
+		}
 		executions.put(buildEnv.tag, {
 			lock(label: buildEnv.lockedResourcesLabel) {
 				node(NODE_PATTERN_BASE + '&&AWS') {
 					helper.withMavenWorkspace {
 						withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-										 credentialsId   : 'aws-elasticsearch',
+										 credentialsId   : awsCredentialsId,
 										 usernameVariable: 'AWS_ACCESS_KEY_ID',
 										 passwordVariable: 'AWS_SECRET_ACCESS_KEY'
 						]]) {
