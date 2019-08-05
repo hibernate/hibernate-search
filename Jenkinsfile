@@ -115,7 +115,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  * - 'aws-elasticsearch' AWS credentials, to test Elasticsearch as a service on AWS
  */
 
-@Field final String MAVEN_TOOL = 'Apache Maven 3.5.4'
+@Field final String MAVEN_TOOL = 'Apache Maven 3.5'
 
 // Default node pattern, to be used for resource-intensive stages.
 // Should not include the master node.
