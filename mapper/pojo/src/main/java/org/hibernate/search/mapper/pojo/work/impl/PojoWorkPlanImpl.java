@@ -134,6 +134,18 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 		}
 	}
 
+	@Override
+	public void discard() {
+		try {
+			for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+				delegate.discard();
+			}
+		}
+		finally {
+			indexedTypeDelegates.clear();
+		}
+	}
+
 	private PojoRuntimeIntrospector getIntrospector() {
 		return introspector;
 	}

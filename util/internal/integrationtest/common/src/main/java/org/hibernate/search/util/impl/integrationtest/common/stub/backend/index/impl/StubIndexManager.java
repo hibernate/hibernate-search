@@ -122,4 +122,8 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	CompletableFuture<?> prepareAndExecuteWork(StubDocumentWork work) {
 		return backend.getBehavior().prepareAndExecuteDocumentWork( name, work );
 	}
+
+	public void discard(List<StubDocumentWork> works) {
+		backend.getBehavior().discardDocumentWorks( name, works );
+	}
 }

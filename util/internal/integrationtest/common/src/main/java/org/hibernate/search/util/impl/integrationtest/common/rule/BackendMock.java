@@ -299,6 +299,14 @@ public class BackendMock implements TestRule {
 					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}
+
+		public BackendMock discarded() {
+			log.debugf( "Expecting %d works to be discarded", works.size() );
+			works.stream()
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ) )
+					.forEach( expectationConsumer );
+			return BackendMock.this;
+		}
 	}
 
 	public class IndexScopeWorkCallListContext {

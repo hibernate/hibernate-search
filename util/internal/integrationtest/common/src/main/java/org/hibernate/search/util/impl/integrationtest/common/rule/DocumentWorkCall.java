@@ -17,8 +17,20 @@ import org.junit.Assert;
 class DocumentWorkCall extends Call<DocumentWorkCall> {
 
 	enum WorkPhase {
+		/**
+		 * The initial state for a work.
+		 */
 		PREPARE,
-		EXECUTE
+
+		/**
+		 * Works that are prepared and never discarded, may be executed.
+		 */
+		EXECUTE,
+
+		/**
+		 * Works that are prepared and not yet executed, may be discarded from executions.
+		 */
+		DISCARD
 	}
 
 	private final String indexName;

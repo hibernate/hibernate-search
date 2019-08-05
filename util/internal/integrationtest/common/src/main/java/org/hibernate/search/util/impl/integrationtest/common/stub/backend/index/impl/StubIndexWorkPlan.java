@@ -90,6 +90,12 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 		return future;
 	}
 
+	@Override
+	public void discard() {
+		indexManager.discard( works );
+		works.clear();
+	}
+
 	private void populate(StubDocumentWork.Builder builder, DocumentReferenceProvider documentReferenceProvider) {
 		builder.tenantIdentifier( sessionContext.getTenantIdentifier() );
 		builder.identifier( documentReferenceProvider.getIdentifier() );

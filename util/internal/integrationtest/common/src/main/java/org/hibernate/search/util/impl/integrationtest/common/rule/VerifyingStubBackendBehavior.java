@@ -117,6 +117,18 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
+	public void discardDocumentWorks(String indexName, List<StubDocumentWork> works) {
+		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
+		works.stream()
+				.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ) )
+				.forEach( call -> callQueue.verify(
+						call,
+						DocumentWorkCall::verify,
+						noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
+				) );
+	}
+
+	@Override
 	public CompletableFuture<?> executeDocumentWorks(String indexName, List<StubDocumentWork> works) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		return works.stream()

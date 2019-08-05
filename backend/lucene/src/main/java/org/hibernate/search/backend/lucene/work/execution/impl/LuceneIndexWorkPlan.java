@@ -107,6 +107,11 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 		}
 	}
 
+	@Override
+	public void discard() {
+		worksByOrchestrator.clear();
+	}
+
 	private void collect(String documentId, String routingKey, LuceneWriteWork<?> work) {
 		// Route the work to the appropriate shard
 		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( documentId, routingKey );
@@ -116,7 +121,6 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 			works = new ArrayList<>();
 			worksByOrchestrator.put( orchestrator, works );
 		}
-
 		works.add( work );
 	}
 }

@@ -60,4 +60,8 @@ public interface IndexWorkPlan<D> {
 	 */
 	CompletableFuture<?> execute();
 
+	/**
+	 * Discard all works that are present in this plan.
+	 */
+	void discard();
 }
