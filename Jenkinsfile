@@ -144,8 +144,8 @@ helper.runWithNotification {
 stage('Configure') {
 	this.environments = AlternativeMultiMap.create([
 			jdk: [
-					new JdkITEnvironment(version: '8', tool: 'Oracle JDK 8', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
-					new JdkITEnvironment(version: '9', tool: 'OpenJDK 9', status: ITEnvironmentStatus.SUPPORTED)
+					new JdkITEnvironment(version: '8', tool: 'OpenJDK 8 Latest', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
+					new JdkITEnvironment(version: '9', tool: 'OpenJDK 9 Latest', status: ITEnvironmentStatus.SUPPORTED)
 			],
 			database: [
 					new DatabaseITEnvironment(dbName: 'h2', mavenProfile: 'h2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
