@@ -62,13 +62,11 @@ public class SearchSessionWritePlanPersistBatchIndexingIT {
 
 			for ( int i = 0; i < ENTITY_COUNT; i++ ) {
 				if ( i > 0 && i % BATCH_SIZE == 0 ) {
-					session.flush();
-
 					// For test only: register expectations regarding processing
 					expectAddWorks( firstIdOfThisBatch, i ).prepared();
 					firstIdOfThisBatch = i;
 
-					writePlan.process();
+					session.flush();
 
 					// For test only: check processing happens before the clear()
 					backendMock.verifyExpectationsMet();
@@ -107,10 +105,12 @@ public class SearchSessionWritePlanPersistBatchIndexingIT {
 
 			for ( int i = 0; i < ENTITY_COUNT; i++ ) {
 				if ( i > 0 && i % BATCH_SIZE == 0 ) {
+					expectAddWorks( firstIdOfThisBatch, i ).prepared();
 					session.flush();
+					backendMock.verifyExpectationsMet();
 
 					// For test only: register expectations regarding execution
-					expectAddWorks( firstIdOfThisBatch, i ).preparedThenExecuted();
+					expectAddWorks( firstIdOfThisBatch, i ).executed();
 					firstIdOfThisBatch = i;
 
 					writePlan.execute();

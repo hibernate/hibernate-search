@@ -16,8 +16,6 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -123,7 +121,6 @@ public class AutomaticIndexingBasicIT {
 			entity1.getIndexedElementCollectionField().add( "firstValue" );
 
 			session.persist( entity1 );
-			session.flush();
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
@@ -136,9 +133,7 @@ public class AutomaticIndexingBasicIT {
 					)
 					.prepared();
 
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
-			writePlan.process();
-
+			session.flush();
 			backendMock.verifyExpectationsMet();
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -153,7 +148,6 @@ public class AutomaticIndexingBasicIT {
 					.discarded();
 
 			trx.rollback();
-
 			backendMock.verifyExpectationsMet();
 		} );
 	}
