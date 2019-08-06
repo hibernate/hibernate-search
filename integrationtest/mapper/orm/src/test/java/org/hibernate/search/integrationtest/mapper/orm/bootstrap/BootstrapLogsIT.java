@@ -78,7 +78,7 @@ public class BootstrapLogsIT {
 	@Indexed(index = IndexedEntity.NAME)
 	private static class IndexedEntity {
 
-		private static final String NAME = "IndexedEntity";
+		static final String NAME = "IndexedEntity";
 
 		@Id
 		private Integer id;
@@ -94,7 +94,7 @@ public class BootstrapLogsIT {
 	@Entity(name = ContainedEntity.NAME)
 	private static class ContainedEntity {
 
-		private static final String NAME = "ContainedEntity";
+		static final String NAME = "ContainedEntity";
 
 		@Id
 		private Integer id;
