@@ -13,6 +13,9 @@ import org.hibernate.Hibernate;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.AbstractCollectionEvent;
+import org.hibernate.event.spi.ClearEvent;
+import org.hibernate.event.spi.ClearEventListener;
+import org.hibernate.event.spi.EventSource;
 import org.hibernate.event.spi.FlushEvent;
 import org.hibernate.event.spi.FlushEventListener;
 import org.hibernate.event.spi.PostCollectionRecreateEvent;
@@ -45,7 +48,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public final class HibernateSearchEventListener implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
-		PostCollectionUpdateEventListener, FlushEventListener {
+		PostCollectionUpdateEventListener, FlushEventListener, ClearEventListener {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -143,6 +146,15 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 //			synchronization.beforeCompletion();
 //			synchronization.afterCompletion( Status.STATUS_COMMITTED );
 //		}
+	}
+
+	@Override
+	public void onClear(ClearEvent event) {
+		EventSource session = event.getSession();
+		// skip the clearNotPrepared operation in case of rollback
+		if ( session.isTransactionInProgress() ) {
+			getCurrentWorkPlan( state.getContextProvider(), session ).clearNotPrepared();
+		}
 	}
 
 	private HibernateOrmListenerContextProvider doInitialize(
@@ -249,5 +261,4 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		// advantage of this new hook?
 		return false;
 	}
-
 }

@@ -146,6 +146,13 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 		}
 	}
 
+	@Override
+	public void clearNotPrepared() {
+		for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+			delegate.clearNotPrepared();
+		}
+	}
+
 	private PojoRuntimeIntrospector getIntrospector() {
 		return introspector;
 	}
