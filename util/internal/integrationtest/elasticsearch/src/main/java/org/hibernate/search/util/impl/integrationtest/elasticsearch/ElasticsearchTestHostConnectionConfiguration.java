@@ -26,7 +26,7 @@ public class ElasticsearchTestHostConnectionConfiguration {
 	private final String url;
 	private final String username;
 	private final String password;
-	private final String awsSigningEnabled;
+	private final boolean awsSigningEnabled;
 	private final String awsSigningAccessKey;
 	private final String awsSigningSecretKey;
 	private final String awsSigningRegion;
@@ -35,22 +35,26 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		this.url = System.getProperty( "test.elasticsearch.host.url" );
 		this.username = System.getProperty( "test.elasticsearch.host.username" );
 		this.password = System.getProperty( "test.elasticsearch.host.password" );
-		this.awsSigningEnabled = System.getProperty( "test.elasticsearch.host.aws.signing.enabled" );
+		this.awsSigningEnabled = Boolean.getBoolean( "test.elasticsearch.host.aws.signing.enabled" );
 		this.awsSigningAccessKey = System.getProperty( "test.elasticsearch.host.aws.signing.access_key" );
 		this.awsSigningSecretKey = System.getProperty( "test.elasticsearch.host.aws.signing.secret_key" );
 		this.awsSigningRegion = System.getProperty( "test.elasticsearch.host.aws.signing.region" );
 
 		log.infof(
 				"Integration tests will connect to '%s' (AWS signing enabled: '%s')",
-				url, Boolean.parseBoolean( awsSigningEnabled )
+				url, awsSigningEnabled
 		);
+	}
+
+	public boolean isAwsSigningEnabled() {
+		return awsSigningEnabled;
 	}
 
 	public void addToBackendProperties(Map<String, Object> properties) {
 		properties.put( "hosts", url );
 		properties.put( "username", username );
 		properties.put( "password", password );
-		properties.put( "aws.signing.enabled", awsSigningEnabled );
+		properties.put( "aws.signing.enabled", String.valueOf( awsSigningEnabled ) );
 		properties.put( "aws.signing.access_key", awsSigningAccessKey );
 		properties.put( "aws.signing.secret_key", awsSigningSecretKey );
 		properties.put( "aws.signing.region", awsSigningRegion );

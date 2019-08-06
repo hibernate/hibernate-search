@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -84,6 +85,10 @@ public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 				.hits().asNormalizedDocRefs()
 				.hasSize( totalDocumentCount )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
+
+		if ( !TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys() ) {
+			return;
+		}
 
 		// Same goes with all routing keys
 		SearchResultAssert.assertThat( indexManager.createScope().query()

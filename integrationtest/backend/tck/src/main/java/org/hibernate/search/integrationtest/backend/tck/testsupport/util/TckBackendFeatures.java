@@ -23,4 +23,8 @@ public class TckBackendFeatures {
 	public boolean normalizeStringMissingValues() {
 		return true;
 	}
+
+	public boolean supportsManyRoutingKeys() {
+		return true;
+	}
 }

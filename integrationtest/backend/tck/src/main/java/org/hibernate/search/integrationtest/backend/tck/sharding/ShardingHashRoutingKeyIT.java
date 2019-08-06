@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -82,16 +83,6 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 				.hasSize( totalDocumentCount )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 
-		// All routing keys => all documents should be returned
-		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
-				.routing( docIdByRoutingKey.keySet() )
-				.toQuery()
-		)
-				.hits().asNormalizedDocRefs()
-				.hasSize( totalDocumentCount )
-				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
-
 		// Now test with a specific routing key
 		String someRoutingKey = docIdByRoutingKey.keySet().iterator().next();
 
@@ -125,6 +116,20 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 		)
 				.hits().asNormalizedDocRefs()
 				.containsExactlyInAnyOrder( docRefsForRoutingKey( someRoutingKey, docIdByRoutingKey ) );
+
+		if ( !TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys() ) {
+			return;
+		}
+
+		// All routing keys => all documents should be returned
+		SearchResultAssert.assertThat( indexManager.createScope().query()
+				.predicate( f -> f.matchAll() )
+				.routing( docIdByRoutingKey.keySet() )
+				.toQuery()
+		)
+				.hits().asNormalizedDocRefs()
+				.hasSize( totalDocumentCount )
+				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 	}
 
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
+import org.hibernate.search.util.impl.integrationtest.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 
@@ -32,5 +33,11 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// TODO HSEARCH-3387 Elasticsearch does not apply the normalizer defined on the field
 		//   to the String provided as replacement for missing values on sorting
 		return false;
+	}
+
+	@Override
+	public boolean supportsManyRoutingKeys() {
+		// TODO HSEARCH-3655 AWS signing fails when using multiple routing keys
+		return ! ElasticsearchTestHostConnectionConfiguration.get().isAwsSigningEnabled();
 	}
 }
