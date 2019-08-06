@@ -107,6 +107,10 @@ public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends Ab
 		delegate.discard();
 	}
 
+	void clearNotPrepared() {
+		this.workPlansPerId.clear();
+	}
+
 	private IndexedEntityWorkPlan getWork(I identifier) {
 		IndexedEntityWorkPlan work = workPlansPerId.get( identifier );
 		if ( work == null ) {

@@ -148,4 +148,10 @@ public interface PojoWorkPlan {
 	 * Discard all works that are prepared but not yet executed.
 	 */
 	void discard();
+
+	/**
+	 * Discard all works that are not prepared yet.
+	 */
+	void clearNotPrepared();
+
 }

@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import static org.hibernate.search.util.impl.integrationtest.orm.OrmUtils.withinTransaction;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import javax.persistence.Basic;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -16,11 +19,14 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -519,6 +525,97 @@ public class AutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	public void sessionClear() {
+		withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );
+			IndexedEntity entity2 = new IndexedEntity( 2, "number2" );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+
+			// flush triggers the prepare of the current PojoWorkPlan
+			Consumer<StubDocumentNode.Builder> documentFieldConsumer = b -> b.field( "indexedField", "number1" ).field( "noReindexOnUpdateField", null );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", expectedValue( "number1" ) )
+					.add( "2", expectedValue( "number2" ) )
+					.prepared();
+
+			session.flush();
+
+			// Works should be prepared immediately
+			backendMock.verifyExpectationsMet();
+
+			IndexedEntity entity3 = new IndexedEntity( 3, "number3" );
+			IndexedEntity entity4 = new IndexedEntity( 4, "number4" );
+
+			session.persist( entity3 );
+			session.persist( entity4 );
+
+			// without clear the session
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "3", expectedValue( "number3" ) )
+					.add( "4", expectedValue( "number4" ) )
+					.prepared();
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", expectedValue( "number1" ) )
+					.add( "2", expectedValue( "number2" ) )
+					.add( "3", expectedValue( "number3" ) )
+					.add( "4", expectedValue( "number4" ) )
+					.executed();
+		} );
+		// Works should be executed on transaction commit
+		backendMock.verifyExpectationsMet();
+
+		withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity5 = new IndexedEntity( 5, "number5" );
+			IndexedEntity entity6 = new IndexedEntity( 6, "number6" );
+
+			session.persist( entity5 );
+			session.persist( entity6 );
+
+			// flush triggers the prepare of the current PojoWorkPlan
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "5", expectedValue( "number5" ) )
+					.add( "6", expectedValue( "number6" ) )
+					.prepared();
+
+			session.flush();
+
+			// Works should be prepared immediately
+			backendMock.verifyExpectationsMet();
+
+			IndexedEntity entity7 = new IndexedEntity( 7, "number7" );
+			IndexedEntity entity8 = new IndexedEntity( 8, "number8" );
+			IndexedEntity entity9 = new IndexedEntity( 9, "number9" );
+			IndexedEntity entity10 = new IndexedEntity( 10, "number10" );
+
+			session.persist( entity7 );
+			session.persist( entity8 );
+
+			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
+			writePlan.addOrUpdate( entity9 );
+			writePlan.addOrUpdate( entity10 );
+
+			// the clear will revert the changes that haven't been flushed yet,
+			// including the ones that have been inserted directly in the write plan (bypassing the ORM session)
+			session.clear();
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "5", expectedValue( "number5" ) )
+					.add( "6", expectedValue( "number6" ) )
+					.executed();
+		} );
+		// Works should be executed on transaction commit
+		backendMock.verifyExpectationsMet();
+	}
+
+	public Consumer<StubDocumentNode.Builder> expectedValue(String indexedFieldExpectedValue) {
+		return b -> b.field( "indexedField", indexedFieldExpectedValue ).field( "noReindexOnUpdateField", null );
+	}
+
 	@Entity(name = "indexed")
 	@Indexed(index = IndexedEntity.INDEX)
 	public static class IndexedEntity {
@@ -551,6 +648,14 @@ public class AutomaticIndexingBasicIT {
 		@GenericField
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private List<String> noReindexOnUpdateElementCollectionField = new ArrayList<>();
+
+		public IndexedEntity() {
+		}
+
+		public IndexedEntity(Integer id, String indexedField) {
+			this.id = id;
+			this.indexedField = indexedField;
+		}
 
 		public Integer getId() {
 			return id;

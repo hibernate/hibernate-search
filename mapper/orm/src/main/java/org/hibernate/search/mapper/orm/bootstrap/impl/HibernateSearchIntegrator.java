@@ -121,6 +121,7 @@ public class HibernateSearchIntegrator implements Integrator {
 		listenerRegistry.appendListeners( EventType.POST_COLLECTION_REMOVE, eventListener );
 		listenerRegistry.appendListeners( EventType.POST_COLLECTION_UPDATE, eventListener );
 		listenerRegistry.appendListeners( EventType.FLUSH, eventListener );
+		listenerRegistry.appendListeners( EventType.CLEAR, eventListener );
 	}
 
 	public static class KeepIfSameClassDuplicationStrategy implements DuplicationStrategy {
