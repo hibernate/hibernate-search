@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.bootstrap;
 
+import java.util.regex.Pattern;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
@@ -34,6 +35,17 @@ import org.hamcrest.TypeSafeMatcher;
  */
 @TestForIssue(jiraKey = "HSEARCH-3644")
 public class BootstrapLogsIT {
+
+	private static final Pattern CONNECTION_POOL_WARNING_PATTERN = Pattern.compile(
+			"CachingRegionFactory should be only used for testing"
+					+ "||Using Hibernate built-in connection pool"
+	);
+
+	private static final Pattern HBM2DDL_WARNING_PATTERN = Pattern.compile(
+			"^SQL Warning code"
+					+ "||^(relation|table) .* does not exist, skipping"
+					+ "||^GenerationTarget encountered exception accepting command:.*"
+	);
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -67,9 +79,9 @@ public class BootstrapLogsIT {
 				return item.getLevel().isGreaterOrEqual( level )
 						// Ignore these, they are warning but are expected (just related to the testing infrastructure)
 						&& !(
-						item.getRenderedMessage().contains( "CachingRegionFactory should be only used for testing" )
-								|| item.getRenderedMessage().contains( "Using Hibernate built-in connection pool" )
-				);
+								CONNECTION_POOL_WARNING_PATTERN.matcher( item.getRenderedMessage() ).find()
+								|| HBM2DDL_WARNING_PATTERN.matcher( item.getRenderedMessage() ).find()
+						);
 			}
 		};
 	}
