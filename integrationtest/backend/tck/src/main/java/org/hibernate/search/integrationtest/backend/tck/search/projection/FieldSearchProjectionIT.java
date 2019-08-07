@@ -572,6 +572,26 @@ public class FieldSearchProjectionIT {
 		}
 	}
 
+	@Test
+	public void multiIndex_withIncompatibleIndexManager_inNestedObject() {
+		StubMappingScope scope = incompatibleIndexManager.createScope( indexManager );
+
+		for ( FieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
+			SubTest.expectSuccess( fieldModel, model -> {
+				String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + model.relativeFieldName;
+
+				SubTest.expectException(
+						"projection on multiple indexes with incompatible types for field " + fieldPath,
+						() -> scope.projection().field( fieldPath, ValueConvert.NO )
+				)
+						.assertThrown()
+						.isInstanceOf( SearchException.class )
+						.hasMessageContaining( "Multiple conflicting nested document paths to build a projection" )
+						.hasMessageContaining( "'" + fieldPath + "'" );
+			} );
+		}
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
@@ -748,6 +768,8 @@ public class FieldSearchProjectionIT {
 	}
 
 	private static class IncompatibleIndexMapping {
+		final ObjectMapping flattenedObject;
+
 		IncompatibleIndexMapping(IndexSchemaElement root) {
 			/*
 			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
@@ -763,6 +785,14 @@ public class FieldSearchProjectionIT {
 				}
 				mapper.map( root, "byType_" + typeDescriptor.getUniqueName() );
 			} );
+
+			/*
+			 * Add object with the same name of nestedObject of IndexMapping,
+			 * but we're using here a ObjectFieldStorage.FLATTENED for it.
+			 * If we try to project a field within this object,
+			 * this will have to lead to an inconsistency exception.
+			 */
+			flattenedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.FLATTENED );
 		}
 	}
 

@@ -7,9 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -155,13 +157,20 @@ public class ElasticsearchScopeModel {
 	}
 
 	public Set<String> getNestedDocumentPaths(String absoluteFieldPath) {
-		HashSet<String> nestedDocumentPaths = new HashSet<>();
-		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			String nestedFieldPath = indexModel.getNestedDocumentPath( absoluteFieldPath );
-			if ( nestedFieldPath != null ) {
-				nestedDocumentPaths.add( nestedFieldPath );
-			}
-		}
-		return nestedDocumentPaths;
+		Optional<String> nestedDocumentPath = indexModels.stream()
+				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
+				.filter( Objects::nonNull )
+				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedPath() ) )
+				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
+					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
+						return nestedDocumentPath1;
+					}
+
+					throw log.conflictingNestedDocumentPathsForProjection(
+							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+				} )
+				.orElse( Optional.empty() );
+
+		return ( nestedDocumentPath.isPresent() ) ? Collections.singleton( nestedDocumentPath.get() ) : Collections.emptySet();
 	}
 }

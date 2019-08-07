@@ -75,15 +75,6 @@ public class ElasticsearchIndexModel {
 		return fieldNodes.get( absoluteFieldPath );
 	}
 
-	public String getNestedDocumentPath(String absoluteFieldPath) {
-		ElasticsearchIndexSchemaFieldNode<?> fieldNode = fieldNodes.get( absoluteFieldPath );
-		if ( fieldNode == null ) {
-			return null;
-		}
-
-		return fieldNode.getNestedPath();
-	}
-
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )

@@ -512,4 +512,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 92, value = "Error fetching nested documents. Native Lucene query: '%1$s'.")
 	SearchException errorFetchingNestedDocuments(Query luceneQuery, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_2 + 93, value = "Multiple conflicting nested document paths to build a projection for field '%1$s'. '%2$s' vs. '%3$s'.")
+	SearchException conflictingNestedDocumentPathsForProjection(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
 }
