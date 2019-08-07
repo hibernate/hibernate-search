@@ -56,7 +56,7 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 	}
 
 	@Override
-	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedPaths,
+	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedPath,
 			GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )

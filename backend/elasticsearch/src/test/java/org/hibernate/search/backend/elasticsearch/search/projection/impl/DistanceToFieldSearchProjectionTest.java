@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
@@ -33,7 +32,7 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 		SessionContextImplementor sessionContext = createMock( SessionContextImplementor.class );
 		ElasticsearchSearchQueryElementCollector elementCollector = new ElasticsearchSearchQueryElementCollector( sessionContext );
 
-		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD, new HashSet<>(),
+		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD, null,
 				LOCATION, DistanceUnit.METERS );
 
 		JsonObject requestBody = new JsonObject();
@@ -56,7 +55,7 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 		elementCollector.collectSort( new JsonObject() );
 		elementCollector.collectDistanceSort( new JsonObject(), FIELD, LOCATION );
 
-		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD, new HashSet<>(),
+		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD, null,
 				LOCATION, DistanceUnit.METERS );
 
 		JsonObject requestBody = new JsonObject();

@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -156,7 +155,7 @@ public class ElasticsearchScopeModel {
 		}
 	}
 
-	public Set<String> getNestedDocumentPaths(String absoluteFieldPath) {
+	public String getNestedDocumentPath(String absoluteFieldPath) {
 		Optional<String> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
 				.filter( Objects::nonNull )
@@ -171,6 +170,6 @@ public class ElasticsearchScopeModel {
 				} )
 				.orElse( Optional.empty() );
 
-		return ( nestedDocumentPath.isPresent() ) ? Collections.singleton( nestedDocumentPath.get() ) : Collections.emptySet();
+		return nestedDocumentPath.orElse( null );
 	}
 }
