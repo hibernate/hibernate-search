@@ -7,8 +7,10 @@
 package org.hibernate.search.backend.lucene.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -151,18 +153,20 @@ public class LuceneScopeModel {
 	}
 
 	public Set<String> getNestedDocumentPaths(String absoluteFieldPath) {
-		HashSet<String> nestedDocumentPaths = new HashSet<>();
-		for ( LuceneIndexModel indexModel : indexModels ) {
-			LuceneIndexSchemaFieldNode<?> fieldNode = indexModel.getFieldNode( absoluteFieldPath );
-			if ( fieldNode == null ) {
-				continue;
-			}
+		Optional<String> nestedDocumentPath = indexModels.stream()
+				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
+				.filter( Objects::nonNull )
+				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedDocumentPath() ) )
+				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
+					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
+						return nestedDocumentPath1;
+					}
 
-			String nestedFieldPath = fieldNode.getNestedDocumentPath();
-			if ( nestedFieldPath != null ) {
-				nestedDocumentPaths.add( nestedFieldPath );
-			}
-		}
-		return nestedDocumentPaths;
+					throw log.conflictingNestedDocumentPathsForProjection(
+							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+				} )
+				.orElse( Optional.empty() );
+
+		return ( nestedDocumentPath.isPresent() ) ? Collections.singleton( nestedDocumentPath.get() ) : Collections.emptySet();
 	}
 }

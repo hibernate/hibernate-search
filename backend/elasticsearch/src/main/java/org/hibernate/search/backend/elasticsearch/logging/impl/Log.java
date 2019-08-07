@@ -529,4 +529,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 74, value = "The projection '%1$s' is defined on a scope targeting different indexes."
 			+ " Projection is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
 	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
+
+	@Message(id = ID_OFFSET_3 + 75, value = "Multiple conflicting nested document paths to build a projection for field '%1$s'. '%2$s' vs. '%3$s'.")
+	SearchException conflictingNestedDocumentPathsForProjection(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
 }
