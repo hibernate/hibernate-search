@@ -56,11 +56,11 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory implements Elast
 	}
 
 	@Override
-	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedPaths,
+	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedPath,
 			GeoPoint center) {
 		checkProjectable( absoluteFieldPath, projectable );
 
-		return new ElasticsearchDistanceToFieldProjectionBuilder( indexNames, absoluteFieldPath, nestedPaths, center );
+		return new ElasticsearchDistanceToFieldProjectionBuilder( indexNames, absoluteFieldPath, nestedPath, center );
 	}
 
 	@Override

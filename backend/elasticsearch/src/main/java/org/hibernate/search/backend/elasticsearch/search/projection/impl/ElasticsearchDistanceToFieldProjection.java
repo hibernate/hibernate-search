@@ -19,7 +19,6 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -37,19 +36,17 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 		" if (doc[params.fieldPath].size() != 0) {" +
 			" result = doc[params.fieldPath].arcDistance(params.lat, params.lon);" +
 		" } else {" +
-			" for (int i=0; i<params.nestedPaths.length; i++) {" +
-				" String nestedPath = params.nestedPaths[i];" +
-				" String relativeFieldPath = params.relativeFieldPaths[i];" +
-				" if (params['_source'][nestedPath] == null) continue;" +
-				" if (params['_source'][nestedPath][relativeFieldPath] == null) continue;" +
-				" return params['_source'][nestedPath][relativeFieldPath]" +
-			" }" +
+			" String nestedPath = params.nestedPath;" +
+			" String relativeFieldPath = params.relativeFieldPath;" +
+			" if (params['_source'][nestedPath] == null) return result;" +
+			" if (params['_source'][nestedPath][relativeFieldPath] == null) return result;" +
+			" return params['_source'][nestedPath][relativeFieldPath]" +
 		" }" +
 		" return result;";
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
-	private final Set<String> nestedPaths;
+	private final String nestedPath;
 
 	private final GeoPoint center;
 
@@ -57,10 +54,10 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 
 	private final String scriptFieldName;
 
-	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedPaths, GeoPoint center, DistanceUnit unit) {
+	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedPath, GeoPoint center, DistanceUnit unit) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedPaths = nestedPaths;
+		this.nestedPath = nestedPath;
 		this.center = center;
 		this.unit = unit;
 		this.scriptFieldName = createScriptFieldName( absoluteFieldPath, center, unit );
@@ -73,7 +70,7 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 			SCRIPT_FIELDS_ACCESSOR
 					.property( scriptFieldName ).asObject()
 					.property( "script" ).asObject()
-					.set( requestBody, createScript( absoluteFieldPath, nestedPaths, center ) );
+					.set( requestBody, createScript( absoluteFieldPath, nestedPath, center ) );
 		}
 	}
 
@@ -160,24 +157,16 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 		return sb.toString();
 	}
 
-	private static JsonObject createScript(String absoluteFieldPath, Set<String> nestedPaths, GeoPoint center) {
-		JsonArray nestedPathsProperty = new JsonArray();
-		JsonArray relativeFieldPaths = new JsonArray();
-
-		for ( String nestedPath : nestedPaths ) {
-			if ( !absoluteFieldPath.startsWith( nestedPath ) ) {
-				continue;
-			}
-			nestedPathsProperty.add( nestedPath );
-			relativeFieldPaths.add( absoluteFieldPath.substring( nestedPath.length() + 1 ) );
-		}
+	private static JsonObject createScript(String absoluteFieldPath, String nestedPath, GeoPoint center) {
+		String relativeFieldPath = ( nestedPath != null && absoluteFieldPath.startsWith( nestedPath ) ) ?
+			absoluteFieldPath.substring( nestedPath.length() + 1 ) : null;
 
 		JsonObject params = new JsonObject();
 		params.addProperty( "lat", center.getLatitude() );
 		params.addProperty( "lon", center.getLongitude() );
 		params.addProperty( "fieldPath", absoluteFieldPath );
-		params.add( "nestedPaths", nestedPathsProperty );
-		params.add( "relativeFieldPaths", relativeFieldPaths );
+		params.addProperty( "nestedPath", nestedPath );
+		params.addProperty( "relativeFieldPath", relativeFieldPath );
 
 		JsonObject scriptContent = new JsonObject();
 		scriptContent.addProperty( "lang", "painless" );
