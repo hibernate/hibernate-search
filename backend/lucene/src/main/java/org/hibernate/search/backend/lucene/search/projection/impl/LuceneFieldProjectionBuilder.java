@@ -17,23 +17,23 @@ public class LuceneFieldProjectionBuilder<F, V> implements FieldProjectionBuilde
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
-	private final Set<String> nestedDocumentPaths;
+	private final String nestedDocumentPath;
 
 	private final FromDocumentFieldValueConverter<? super F, V> converter;
 	private final LuceneFieldCodec<F> codec;
 
-	public LuceneFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedDocumentPaths,
+	public LuceneFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
 			FromDocumentFieldValueConverter<? super F, V> converter,
 			LuceneFieldCodec<F> codec) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedDocumentPaths = nestedDocumentPaths;
+		this.nestedDocumentPath = nestedDocumentPath;
 		this.converter = converter;
 		this.codec = codec;
 	}
 
 	@Override
 	public SearchProjection<V> build() {
-		return new LuceneFieldProjection<>( indexNames, absoluteFieldPath, nestedDocumentPaths, codec, converter );
+		return new LuceneFieldProjection<>( indexNames, absoluteFieldPath, nestedDocumentPath, codec, converter );
 	}
 }

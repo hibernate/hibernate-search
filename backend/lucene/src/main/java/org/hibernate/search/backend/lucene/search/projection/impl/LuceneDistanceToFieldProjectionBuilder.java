@@ -17,16 +17,16 @@ public class LuceneDistanceToFieldProjectionBuilder implements DistanceToFieldPr
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
-	private final Set<String> nestedDocumentPaths;
+	private final String nestedDocumentPath;
 
 	private final GeoPoint center;
 
 	private DistanceUnit unit = DistanceUnit.METERS;
 
-	public LuceneDistanceToFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, Set<String> nestedDocumentPaths, GeoPoint center) {
+	public LuceneDistanceToFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath, GeoPoint center) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedDocumentPaths = nestedDocumentPaths;
+		this.nestedDocumentPath = nestedDocumentPath;
 		this.center = center;
 	}
 
@@ -38,6 +38,6 @@ public class LuceneDistanceToFieldProjectionBuilder implements DistanceToFieldPr
 
 	@Override
 	public SearchProjection<Double> build() {
-		return new LuceneDistanceToFieldProjection( indexNames, absoluteFieldPath, nestedDocumentPaths, center, unit );
+		return new LuceneDistanceToFieldProjection( indexNames, absoluteFieldPath, nestedDocumentPath, center, unit );
 	}
 }

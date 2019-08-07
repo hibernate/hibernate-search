@@ -70,7 +70,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		}
 
 		return fieldComponent.getComponent()
-				.createFieldValueProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, scopeModel.getNestedDocumentPaths( absoluteFieldPath ),
+				.createFieldValueProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, scopeModel.getNestedDocumentPath( absoluteFieldPath ),
 						expectedType, convert );
 	}
 
@@ -93,7 +93,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, scopeModel.getNestedDocumentPaths( absoluteFieldPath ), center );
+				.getComponent().createDistanceProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, scopeModel.getNestedDocumentPath( absoluteFieldPath ), center );
 	}
 
 	@Override

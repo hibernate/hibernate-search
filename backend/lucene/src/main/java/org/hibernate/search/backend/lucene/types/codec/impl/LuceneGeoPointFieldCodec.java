@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import static org.hibernate.search.backend.lucene.util.impl.LuceneFields.internalFieldName;
 
-import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
@@ -92,8 +91,8 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	}
 
 	@Override
-	public void contributeNestedDocumentPaths(Set<String> nestedDocumentPaths, Consumer<Set<String>> collector) {
-		collector.accept( nestedDocumentPaths );
+	public void contributeNestedDocumentPath(String nestedDocumentPath, Consumer<String> collector) {
+		collector.accept( nestedDocumentPath );
 	}
 
 	@Override
