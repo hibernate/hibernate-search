@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,6 +14,8 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
+import org.apache.lucene.index.BinaryDocValues;
+import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.Collector;
@@ -25,7 +26,6 @@ import org.apache.lucene.search.ScoreMode;
 public class LuceneChildrenCollector implements Collector {
 
 	private final Map<String, Set<Integer>> children = new HashMap<>();
-	private static final Set<String> ROOT_ID_FIELD_SET = Collections.singleton( LuceneFields.rootIdFieldName() );
 
 	@Override
 	public LeafCollector getLeafCollector(LeafReaderContext context) throws IOException {
@@ -44,9 +44,11 @@ public class LuceneChildrenCollector implements Collector {
 	private class FieldLeafCollector implements LeafCollector {
 
 		private final LeafReader reader;
+		private final BinaryDocValues docValues;
 
 		public FieldLeafCollector(LeafReaderContext context) throws IOException {
 			reader = context.reader();
+			docValues = DocValues.getBinary( reader, LuceneFields.rootIdFieldName() );
 		}
 
 		@Override
@@ -56,8 +58,11 @@ public class LuceneChildrenCollector implements Collector {
 
 		@Override
 		public void collect(int doc) throws IOException {
-			// FIXME tried to use BinaryDocValues without success. The field isn't nether binary nor numeric.
-			String parentId = reader.document( doc, ROOT_ID_FIELD_SET ).getField( LuceneFields.rootIdFieldName() ).stringValue();
+			if ( !docValues.advanceExact( doc ) ) {
+				return;
+			}
+
+			String parentId = docValues.binaryValue().utf8ToString();
 			if ( !children.containsKey( parentId ) ) {
 				children.put( parentId, new HashSet<>() );
 			}

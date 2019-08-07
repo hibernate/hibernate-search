@@ -8,15 +8,39 @@ package org.hibernate.search.backend.lucene.document.impl;
 
 import java.util.List;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.StringField;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.DocValuesType;
+import org.apache.lucene.index.IndexOptions;
+import org.apache.lucene.util.BytesRef;
 
 
 class LuceneNestedObjectDocumentBuilder extends AbstractLuceneNonFlattenedDocumentBuilder {
+
+	/**
+	 * Indexed, not tokenized, omits norms, indexes
+	 * DOCS_ONLY, stored
+	 */
+	private static final FieldType TYPE_STORED_BINARY = new FieldType();
+
+	static {
+		TYPE_STORED_BINARY.setOmitNorms( true );
+		TYPE_STORED_BINARY.setIndexOptions( IndexOptions.DOCS );
+		TYPE_STORED_BINARY.setStored( true );
+		TYPE_STORED_BINARY.setTokenized( false );
+
+		// Using a binary type to allow doc values extraction. See LuceneChildrenCollector.FieldLeafCollector.
+		TYPE_STORED_BINARY.setDocValuesType( DocValuesType.BINARY );
+
+		TYPE_STORED_BINARY.freeze();
+	}
 
 	LuceneNestedObjectDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode) {
 		super( schemaNode );
@@ -27,7 +51,7 @@ class LuceneNestedObjectDocumentBuilder extends AbstractLuceneNonFlattenedDocume
 			List<Document> nestedDocuments) {
 		document.add( new StringField( LuceneFields.typeFieldName(), LuceneFields.TYPE_CHILD_DOCUMENT, Store.YES ) );
 		document.add( new StringField( LuceneFields.rootIndexFieldName(), rootIndexName, Store.YES ) );
-		document.add( new StringField( LuceneFields.rootIdFieldName(), rootId, Store.YES ) );
+		document.add( new Field( LuceneFields.rootIdFieldName(), new BytesRef( rootId ), TYPE_STORED_BINARY ) );
 		document.add( new StringField( LuceneFields.nestedDocumentPathFieldName(), schemaNode.getAbsolutePath(), Store.YES ) );
 
 		// all the ancestors of a subdocument must be added after it
