@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
@@ -44,8 +43,8 @@ public interface LuceneFieldCodec<F> {
 		collector.accept( absoluteFieldPath );
 	}
 
-	default void contributeNestedDocumentPaths(Set<String> nestedDocumentPaths, Consumer<Set<String>> collector) {
-		collector.accept( nestedDocumentPaths );
+	default void contributeNestedDocumentPath(String nestedDocumentPath, Consumer<String> collector) {
+		collector.accept( nestedDocumentPath );
 	}
 
 	/**

@@ -27,13 +27,10 @@ public class LuceneDocumentStoredFieldVisitorBuilder {
 		}
 	}
 
-	public void addNestedDocumentPaths(Set<String> nestedDocumentPaths) {
-		this.nestedDocumentPaths.addAll( nestedDocumentPaths );
-	}
-
-	public void add(String absoluteFieldPath, Set<String> nestedDocumentPaths) {
-		add( absoluteFieldPath );
-		addNestedDocumentPaths( nestedDocumentPaths );
+	public void addNestedDocumentPath(String nestedDocumentPath) {
+		if ( nestedDocumentPath != null ) {
+			this.nestedDocumentPaths.add( nestedDocumentPath );
+		}
 	}
 
 	public ReusableDocumentStoredFieldVisitor build() {
