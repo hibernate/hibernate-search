@@ -24,4 +24,10 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 		return String.class.equals( fieldType );
 	}
 
+	@Override
+	public boolean nonDefaultOrderInTermsAggregations() {
+		// TODO HSEARCH-3666 Lucene terms aggregations (discrete facets) may return wrong results for any sort other than the default one
+		return false;
+	}
+
 }
