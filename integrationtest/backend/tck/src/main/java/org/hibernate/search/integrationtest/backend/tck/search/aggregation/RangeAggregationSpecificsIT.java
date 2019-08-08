@@ -43,9 +43,10 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchRes
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
+import org.hibernate.search.util.impl.test.singleinstance.BeforeAll;
+import org.hibernate.search.util.impl.test.singleinstance.InstanceRule;
+import org.hibernate.search.util.impl.test.singleinstance.SingleInstanceRunnerWithParameters;
 
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -56,6 +57,7 @@ import org.junit.runners.Parameterized;
  * Behavior common to all single-field aggregations is tested in {@link SingleFieldAggregationBaseIT}.
  */
 @RunWith(Parameterized.class)
+@Parameterized.UseParametersRunnerFactory(SingleInstanceRunnerWithParameters.Factory.class)
 public class RangeAggregationSpecificsIT<F> {
 
 	private static final String INDEX_NAME = "IndexName";
@@ -76,7 +78,7 @@ public class RangeAggregationSpecificsIT<F> {
 		return combinations.toArray( new Object[0][] );
 	}
 
-	@Rule
+	@InstanceRule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private final FieldTypeDescriptor<F> typeDescriptor;
@@ -90,7 +92,7 @@ public class RangeAggregationSpecificsIT<F> {
 		this.ascendingValues = typeDescriptor.getAscendingUniqueTermValues();
 	}
 
-	@Before
+	@BeforeAll
 	public void setup() {
 		setupHelper.start()
 				.withIndex(

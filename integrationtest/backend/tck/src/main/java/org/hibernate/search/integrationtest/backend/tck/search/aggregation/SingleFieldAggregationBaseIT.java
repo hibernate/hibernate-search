@@ -53,9 +53,10 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.singleinstance.BeforeAll;
+import org.hibernate.search.util.impl.test.singleinstance.InstanceRule;
+import org.hibernate.search.util.impl.test.singleinstance.SingleInstanceRunnerWithParameters;
 
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -65,6 +66,7 @@ import org.junit.runners.Parameterized;
  * on supported types.
  */
 @RunWith(Parameterized.class)
+@Parameterized.UseParametersRunnerFactory(SingleInstanceRunnerWithParameters.Factory.class)
 public class SingleFieldAggregationBaseIT<F> {
 
 	private static final String INDEX_NAME = "IndexName";
@@ -96,7 +98,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		return combinations.toArray( new Object[0][] );
 	}
 
-	@Rule
+	@InstanceRule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private final FieldTypeDescriptor<F> typeDescriptor;
@@ -128,7 +130,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		this.expectations = expectations;
 	}
 
-	@Before
+	@BeforeAll
 	public void setup() {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start()
 				.withIndex(
