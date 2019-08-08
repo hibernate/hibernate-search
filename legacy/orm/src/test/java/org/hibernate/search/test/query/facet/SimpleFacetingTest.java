@@ -50,6 +50,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testDefaultSortOrderIsCount() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -63,6 +64,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testCountSortOrderAsc() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -77,6 +79,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testCountSortOrderDesc() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -91,6 +94,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testAlphabeticalSortOrder() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -109,6 +113,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testZeroCountsExcluded() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -124,6 +129,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testZeroCountsIncluded() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -140,6 +146,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-776")
+	@Category(PortedToSearch6.class)
 	public void testMaxFacetCounts() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )

@@ -39,4 +39,8 @@ public class TckBackendFeatures {
 	public boolean nonCanonicalRangeInAggregations() {
 		return true;
 	}
+
+	public boolean nonDefaultOrderInTermsAggregations() {
+		return true;
+	}
 }
