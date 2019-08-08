@@ -165,16 +165,16 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	private <B> void contribute(SearchPredicateBuilderFactory<? super C, B> factory, SearchPredicate predicate) {
-		factory.contribute( searchQueryBuilder.getQueryElementCollector(), factory.toImplementation( predicate ) );
+		factory.contribute( searchQueryBuilder.toQueryElementCollector(), factory.toImplementation( predicate ) );
 	}
 
 	private <B> void contribute(SearchSortBuilderFactory<? super C, B> factory, SearchSort sort) {
-		factory.contribute( searchQueryBuilder.getQueryElementCollector(), factory.toImplementation( sort ) );
+		factory.contribute( searchQueryBuilder.toQueryElementCollector(), factory.toImplementation( sort ) );
 	}
 
 	private <A> void contribute(SearchAggregationBuilderFactory<? super C> factory,
 			AggregationKey<A> aggregationKey, SearchAggregation<A> aggregation) {
-		factory.contribute( searchQueryBuilder.getQueryElementCollector(), aggregationKey, aggregation );
+		factory.contribute( searchQueryBuilder.toQueryElementCollector(), aggregationKey, aggregation );
 	}
 
 	protected abstract S thisAsS();

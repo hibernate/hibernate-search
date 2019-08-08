@@ -6,11 +6,18 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
@@ -24,7 +31,8 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, LuceneSearchQueryElementCollector> {
+public class LuceneSearchQueryBuilder<H>
+		implements SearchQueryBuilder<H, LuceneSearchQueryElementCollector>, LuceneSearchQueryElementCollector {
 
 	private final LuceneWorkFactory workFactory;
 	private final LuceneReadWorkOrchestrator queryOrchestrator;
@@ -36,7 +44,9 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<?, H> rootProjection;
-	private final LuceneSearchQueryElementCollector elementCollector;
+
+	private Query luceneQuery;
+	private List<SortField> sortFields;
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -53,20 +63,44 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
-		this.elementCollector = new LuceneSearchQueryElementCollector();
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 	}
 
 	@Override
-	public LuceneSearchQueryElementCollector getQueryElementCollector() {
-		return elementCollector;
+	public LuceneSearchQueryElementCollector toQueryElementCollector() {
+		return this;
 	}
 
 	@Override
 	public void addRoutingKey(String routingKey) {
 		this.routingKeys.add( routingKey );
+	}
+
+	@Override
+	public void collectPredicate(Query luceneQuery) {
+		this.luceneQuery = luceneQuery;
+	}
+
+	@Override
+	public void collectSortField(SortField sortField) {
+		if ( sortFields == null ) {
+			sortFields = new ArrayList<>( 5 );
+		}
+		sortFields.add( sortField );
+	}
+
+	@Override
+	public void collectSortFields(SortField[] sortFields) {
+		if ( sortFields == null || sortFields.length == 0 ) {
+			return;
+		}
+
+		if ( this.sortFields == null ) {
+			this.sortFields = new ArrayList<>( sortFields.length );
+		}
+		Collections.addAll( this.sortFields, sortFields );
 	}
 
 	@Override
@@ -78,8 +112,13 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 		);
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
-		luceneQueryBuilder.add( elementCollector.toLuceneQueryPredicate(), Occur.MUST );
+		luceneQueryBuilder.add( luceneQuery, Occur.MUST );
 		luceneQueryBuilder.add( LuceneQueries.mainDocumentQuery(), Occur.FILTER );
+
+		Sort luceneSort = null;
+		if ( sortFields != null && !sortFields.isEmpty() ) {
+			luceneSort = new Sort( sortFields.toArray( new SortField[0] ) );
+		}
 
 		return new LuceneSearchQueryImpl<>(
 				queryOrchestrator, workFactory,
@@ -88,7 +127,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H, Lucene
 				loadingContext,
 				routingKeys,
 				searchContext.decorateLuceneQuery( luceneQueryBuilder.build(), sessionContext.getTenantIdentifier() ),
-				elementCollector.toLuceneSort(),
+				luceneSort,
 				rootProjection, searchResultExtractor
 		);
 	}
