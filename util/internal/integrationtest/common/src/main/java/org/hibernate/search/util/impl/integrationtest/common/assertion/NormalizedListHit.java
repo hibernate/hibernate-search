@@ -32,7 +32,7 @@ public class NormalizedListHit {
 
 		public Builder list(Object firstProjectionItem, Object ... otherProjectionItems) {
 			List<?> projectionItems = CollectionHelper.asList( firstProjectionItem, otherProjectionItems );
-			expectedHits.add( NormalizationUtils.normalizeList( projectionItems ) );
+			expectedHits.add( NormalizationUtils.normalize( projectionItems ) );
 			return this;
 		}
 

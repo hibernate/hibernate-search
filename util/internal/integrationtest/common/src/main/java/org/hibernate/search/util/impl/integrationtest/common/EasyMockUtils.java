@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common;
 
-import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalizeList;
-import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalizeReference;
+import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,12 +27,12 @@ public final class EasyMockUtils {
 	}
 
 	public static DocumentReference referenceMatcher(DocumentReference expected) {
-		DocumentReference normalizedExpected = normalizeReference( expected );
+		DocumentReference normalizedExpected = normalize( expected );
 		EasyMock.reportMatcher( new IArgumentMatcher() {
 			@Override
 			public boolean matches(Object argument) {
 				return argument instanceof DocumentReference
-						&& Objects.equals( normalizedExpected, normalizeReference( (DocumentReference) argument ) );
+						&& Objects.equals( normalizedExpected, normalize( (DocumentReference) argument ) );
 			}
 
 			@Override
@@ -49,12 +48,12 @@ public final class EasyMockUtils {
 	}
 
 	public static List<?> projectionMatcher(List<?> expected) {
-		List<?> normalizedExpected = normalizeList( expected );
+		List<?> normalizedExpected = normalize( expected );
 		EasyMock.reportMatcher( new IArgumentMatcher() {
 			@Override
 			public boolean matches(Object argument) {
 				return argument instanceof List
-						&& Objects.equals( normalizedExpected, normalizeList( (List<?>) argument ) );
+						&& Objects.equals( normalizedExpected, normalize( (List<?>) argument ) );
 			}
 
 			@Override

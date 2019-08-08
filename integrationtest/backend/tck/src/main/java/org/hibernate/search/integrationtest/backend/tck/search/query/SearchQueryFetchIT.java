@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
-import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalizeReference;
+import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
@@ -204,8 +204,8 @@ public class SearchQueryFetchIT {
 	public void fetchSingleHit() {
 		Optional<DocumentReference> result = matchOneQuery( 4 ).fetchSingleHit();
 		Assertions.assertThat( result ).isNotEmpty();
-		Assertions.assertThat( normalizeReference( result.get() ) )
-				.isEqualTo( normalizeReference( reference( INDEX_NAME, docId( 4 ) ) ) );
+		Assertions.assertThat( normalize( result.get() ) )
+				.isEqualTo( normalize( reference( INDEX_NAME, docId( 4 ) ) ) );
 
 		result = matchNoneQuery().fetchSingleHit();
 		Assertions.assertThat( result ).isEmpty();

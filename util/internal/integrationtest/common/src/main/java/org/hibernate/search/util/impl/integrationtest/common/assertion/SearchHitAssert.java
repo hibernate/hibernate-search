@@ -35,7 +35,7 @@ public class SearchHitAssert<H> {
 			references.add( NormalizationUtils.reference( indexName, orId ) );
 		}
 
-		DocumentReference actualReference = NormalizationUtils.normalizeReference( (DocumentReference) actual );
+		DocumentReference actualReference = NormalizationUtils.normalize( (DocumentReference) actual );
 
 		Assertions.assertThat( references )
 				.as( description )
