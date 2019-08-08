@@ -37,7 +37,7 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQuer
 	}
 
 	@Override
-	public StubQueryElementCollector getQueryElementCollector() {
+	public StubQueryElementCollector toQueryElementCollector() {
 		return StubQueryElementCollector.get();
 	}
 

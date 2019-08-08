@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
  */
 public interface SearchQueryBuilder<H, C> {
 
-	C getQueryElementCollector();
+	C toQueryElementCollector();
 
 	void addRoutingKey(String routingKey);
 

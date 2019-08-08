@@ -9,12 +9,14 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext.DistanceSortKey;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
+
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
@@ -29,45 +31,43 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 
 	@Test
 	public void projection_script() {
-		SessionContextImplementor sessionContext = createMock( SessionContextImplementor.class );
-		ElasticsearchSearchQueryElementCollector elementCollector = new ElasticsearchSearchQueryElementCollector( sessionContext );
-
 		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD, null,
 				LOCATION, DistanceUnit.METERS );
 
-		JsonObject requestBody = new JsonObject();
+		Map<DistanceSortKey, Integer> distanceSorts = Collections.emptyMap();
+		SearchProjectionExtractContext extractContext = createExtractContext( distanceSorts );
+		assertThat( extractContext.getDistanceSortIndex( FIELD, LOCATION ) ).isNull();
 
+		JsonObject requestBody = new JsonObject();
 		resetAll();
 		replayAll();
-		SearchProjectionExtractContext searchProjectionExecutionContext =
-				elementCollector.toSearchProjectionExecutionContext();
-		projection.contributeRequest( requestBody, searchProjectionExecutionContext );
+		projection.contributeRequest( requestBody, extractContext );
 		verifyAll();
 
-		assertThat( searchProjectionExecutionContext.getDistanceSortIndex( FIELD, LOCATION ) ).isNull();
 		assertThat( requestBody.get( "script_fields" ) ).as( "script_fields" ).isNotNull();
 	}
 
 	@Test
 	public void projection_sort() {
-		SessionContextImplementor sessionContext = createMock( SessionContextImplementor.class );
-		ElasticsearchSearchQueryElementCollector elementCollector = new ElasticsearchSearchQueryElementCollector( sessionContext );
-		elementCollector.collectSort( new JsonObject() );
-		elementCollector.collectDistanceSort( new JsonObject(), FIELD, LOCATION );
-
 		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD, null,
 				LOCATION, DistanceUnit.METERS );
+
+		Map<DistanceSortKey, Integer> distanceSorts = new HashMap<>();
+		distanceSorts.put( new DistanceSortKey( FIELD, LOCATION ), 1 );
+		SearchProjectionExtractContext extractContext = createExtractContext( distanceSorts );
+		assertThat( extractContext.getDistanceSortIndex( FIELD, LOCATION ) ).isEqualTo( 1 );
 
 		JsonObject requestBody = new JsonObject();
 
 		resetAll();
 		replayAll();
-		SearchProjectionExtractContext searchProjectionExecutionContext =
-				elementCollector.toSearchProjectionExecutionContext();
-		projection.contributeRequest( requestBody, searchProjectionExecutionContext );
+		projection.contributeRequest( requestBody, extractContext );
 		verifyAll();
 
-		assertThat( searchProjectionExecutionContext.getDistanceSortIndex( FIELD, LOCATION ) ).isEqualTo( 1 );
 		assertThat( requestBody.get( "script_fields" ) ).as( "script_fields" ).isNull();
+	}
+
+	private SearchProjectionExtractContext createExtractContext(Map<DistanceSortKey, Integer> distanceSorts) {
+		return new SearchProjectionExtractContext( distanceSorts );
 	}
 }

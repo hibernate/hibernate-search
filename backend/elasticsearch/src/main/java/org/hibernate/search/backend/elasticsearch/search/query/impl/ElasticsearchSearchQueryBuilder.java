@@ -7,12 +7,14 @@
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
@@ -22,12 +24,16 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchQueryBuilder<H>
-		implements SearchQueryBuilder<H, ElasticsearchSearchQueryElementCollector> {
+		implements SearchQueryBuilder<H, ElasticsearchSearchQueryElementCollector>,
+				ElasticsearchSearchQueryElementCollector {
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
@@ -36,11 +42,15 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	private final ElasticsearchSearchContext searchContext;
 	private final SessionContextImplementor sessionContext;
-	private final Set<String> routingKeys;
 
-	private final ElasticsearchSearchQueryElementCollector elementCollector;
+	private final ElasticsearchSearchPredicateContext rootPredicateContext;
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
+
+	private final Set<String> routingKeys;
+	private JsonObject jsonPredicate;
+	private JsonArray jsonSort;
+	private Map<SearchProjectionExtractContext.DistanceSortKey, Integer> distanceSorts;
 
 	public ElasticsearchSearchQueryBuilder(
 			ElasticsearchWorkBuilderFactory workFactory,
@@ -60,14 +70,14 @@ public class ElasticsearchSearchQueryBuilder<H>
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
-		this.elementCollector = new ElasticsearchSearchQueryElementCollector( sessionContext );
+		this.rootPredicateContext = new ElasticsearchSearchPredicateContext( sessionContext );
 		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 	}
 
 	@Override
-	public ElasticsearchSearchQueryElementCollector getQueryElementCollector() {
-		return elementCollector;
+	public ElasticsearchSearchQueryElementCollector toQueryElementCollector() {
+		return this;
 	}
 
 	@Override
@@ -76,21 +86,52 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
+	public ElasticsearchSearchPredicateContext getRootPredicateContext() {
+		return rootPredicateContext;
+	}
+
+	@Override
+	public void collectPredicate(JsonObject jsonQuery) {
+		this.jsonPredicate = jsonQuery;
+	}
+
+	@Override
+	public void collectSort(JsonElement sort) {
+		if ( jsonSort == null ) {
+			jsonSort = new JsonArray();
+		}
+		this.jsonSort.add( sort );
+	}
+
+	@Override
+	public void collectDistanceSort(JsonElement sort, String absoluteFieldPath, GeoPoint center) {
+		collectSort( sort );
+
+		int index = jsonSort.size() - 1;
+		if ( distanceSorts == null ) {
+			distanceSorts = CollectionHelper.newHashMap( 3 );
+		}
+
+		distanceSorts.put( new SearchProjectionExtractContext.DistanceSortKey( absoluteFieldPath, center ), index );
+	}
+
+	@Override
 	public ElasticsearchSearchQuery<H> build() {
 		JsonObject payload = new JsonObject();
 
-		JsonObject jsonQuery = getJsonQuery();
+		JsonObject jsonQuery = multiTenancyStrategy.decorateJsonQuery(
+				jsonPredicate, sessionContext.getTenantIdentifier()
+		);
 		if ( jsonQuery != null ) {
 			payload.add( "query", jsonQuery );
 		}
 
-		JsonArray jsonSort = elementCollector.toJsonSort();
 		if ( jsonSort != null ) {
 			payload.add( "sort", jsonSort );
 		}
 
-		SearchProjectionExtractContext searchProjectionExecutionContext = elementCollector
-				.toSearchProjectionExecutionContext();
+		SearchProjectionExtractContext searchProjectionExecutionContext =
+				new SearchProjectionExtractContext( distanceSorts );
 
 		rootProjection.contributeRequest( payload, searchProjectionExecutionContext );
 
@@ -110,7 +151,4 @@ public class ElasticsearchSearchQueryBuilder<H>
 		);
 	}
 
-	private JsonObject getJsonQuery() {
-		return multiTenancyStrategy.decorateJsonQuery( elementCollector.toJsonPredicate(), sessionContext.getTenantIdentifier() );
-	}
 }
