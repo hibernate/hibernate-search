@@ -55,6 +55,11 @@ public abstract class AbstractElasticsearchJavaTimeFieldCodec<T extends Temporal
 	}
 
 	@Override
+	public T decodeAggregationKey(JsonElement key, JsonElement keyAsString) {
+		return decode( keyAsString );
+	}
+
+	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> obj) {
 		if ( obj == this ) {
 			return true;

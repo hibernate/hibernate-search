@@ -65,7 +65,12 @@ public class ElasticsearchTermsAggregation<F, K>
 		FromDocumentFieldValueConvertContext convertContext = context.getConvertContext();
 		for ( JsonElement bucketElement : bucketArray ) {
 			JsonObject bucket = bucketElement.getAsJsonObject();
-			K key = fromFieldValueConverter.convert( codec.decode( bucket.get( "key" ) ), convertContext );
+			JsonElement keyJson = bucket.get( "key" );
+			JsonElement keyAsStringJson = bucket.get( "key_as_string" );
+			K key = fromFieldValueConverter.convert(
+					codec.decodeAggregationKey( keyJson, keyAsStringJson ),
+					convertContext
+			);
 			long documentCount = bucket.get( "doc_count" ).getAsLong();
 			result.put( key, documentCount );
 		}
