@@ -36,6 +36,9 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 		" if (doc[params.fieldPath].size() != 0) {" +
 			" result = doc[params.fieldPath].arcDistance(params.lat, params.lon);" +
 		" } else {" +
+			// At the moment it seems that there is no way to apply #arcDistance on a nested object field.
+			// To workaround this limit we extract the geo point JSON source
+			// and we will compute the distance on client side.
 			" String nestedPath = params.nestedPath;" +
 			" String relativeFieldPath = params.relativeFieldPath;" +
 			" if (params['_source'][nestedPath] == null) return result;" +
