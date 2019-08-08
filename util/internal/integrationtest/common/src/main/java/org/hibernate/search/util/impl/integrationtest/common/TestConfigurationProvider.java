@@ -41,7 +41,7 @@ public final class TestConfigurationProvider implements TestRule {
 		return new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				testId = description.getTestClass().getSimpleName() + "-" + description.getMethodName();
+				testId = description.getDisplayName().replaceAll( "[^A-Za-z0-9_+().\\[\\]=]+", "_" );
 				try {
 					base.evaluate();
 				}
