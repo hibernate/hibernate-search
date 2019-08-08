@@ -13,13 +13,15 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
+import org.hibernate.search.util.impl.integrationtest.common.Normalizable;
+import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
 /**
  * A value wrapper used when testing
  * {@link IndexFieldTypeConverterStep#dslConverter(ToDocumentFieldValueConverter) DSL converters}
  * and {@link IndexFieldTypeConverterStep#projectionConverter(FromDocumentFieldValueConverter) projection converters}.
  */
-public final class ValueWrapper<T> {
+public final class ValueWrapper<T> implements Normalizable<ValueWrapper<T>> {
 	public static <T> ToDocumentFieldValueConverter<ValueWrapper<T>, T> toIndexFieldConverter() {
 		return new ToDocumentFieldValueConverter<ValueWrapper<T>, T>() {
 			@Override
@@ -88,6 +90,11 @@ public final class ValueWrapper<T> {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode( value );
+	}
+
+	@Override
+	public ValueWrapper<T> normalize() {
+		return new ValueWrapper<>( NormalizationUtils.normalize( value ) );
 	}
 
 	public T getValue() {
