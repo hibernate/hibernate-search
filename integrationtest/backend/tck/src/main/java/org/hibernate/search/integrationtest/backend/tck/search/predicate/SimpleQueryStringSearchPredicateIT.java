@@ -73,12 +73,28 @@ public class SimpleQueryStringSearchPredicateIT {
 	private static final String TEXT_TERM_4_IN_PHRASE_SLOP_2 = "An elephant ran past John.";
 	private static final String TEXT_TERM_1_EDIT_DISTANCE_1 = "I came to the world in a dumpster.";
 
-	private static final String PREFIX_SEPARATOR = " ";
 	// Taken from William Blake's Only Sonnet
-	private static final String PREFIX_1 = "Smile on our loves, and while thou drawest the";
-	private static final String PREFIX_2 = PREFIX_1 + PREFIX_SEPARATOR + "Blue curtains of the sky, scatter thy silver dew";
-	private static final String PREFIX_3 = PREFIX_2 + PREFIX_SEPARATOR + "On every flower that shuts its sweet eyes";
-	private static final String PREFIX_4 = PREFIX_3 + PREFIX_SEPARATOR + "In timely sleep.";
+	private static final String ROW_1 = "Smile on our loves, and while thou drawest the";
+	private static final String ROW_2 = "Blue curtains of the sky, scatter thy silver dew";
+	private static final String ROW_3 = "On every flower that shuts its sweet eyes";
+	private static final String ROW_4 = "In timely sleep.";
+
+	private static final String PREFIX_SEPARATOR = " ";
+
+	private static final String PREFIX_1 = ROW_1;
+	private static final String PREFIX_2 = PREFIX_1 + PREFIX_SEPARATOR + ROW_2;
+	private static final String PREFIX_3 = PREFIX_2 + PREFIX_SEPARATOR + ROW_3;
+	private static final String PREFIX_4 = PREFIX_3 + PREFIX_SEPARATOR + ROW_4;
+
+	private static final String ROW_1_DIFFERENT_CASE = "SmILE on oUr LOves, and while thou dRAWest thE";
+	private static final String ROW_2_DIFFERENT_CASE = "bLUE cURTaiNs of tHE skY, scATTer thY SILver dEw";
+	private static final String ROW_3_DIFFERENT_CASE = "ON eVErY flowEr thAt sHUts ITs sWEeT EyEs";
+	private static final String ROW_4_DIFFERENT_CASE = "in tiMeLy sLEEp.";
+
+	private static final String PREFIX_1_DIFFERENT_CASE = ROW_1_DIFFERENT_CASE;
+	private static final String PREFIX_2_DIFFERENT_CASE = PREFIX_1_DIFFERENT_CASE + PREFIX_SEPARATOR + ROW_2_DIFFERENT_CASE;
+	private static final String PREFIX_3_DIFFERENT_CASE = PREFIX_2_DIFFERENT_CASE + PREFIX_SEPARATOR + ROW_3_DIFFERENT_CASE;
+	private static final String PREFIX_4_DIFFERENT_CASE = PREFIX_3_DIFFERENT_CASE + PREFIX_SEPARATOR + ROW_4_DIFFERENT_CASE;
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
@@ -564,7 +580,24 @@ public class SimpleQueryStringSearchPredicateIT {
 	@Test
 	@TestForIssue( jiraKey = "HSEARCH-3612" )
 	public void prefix_normalizePrefixTerm() {
-		// TODO HSEARCH-3612
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField4.relativeFieldName;
+
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
+				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( queryString ) )
+				.toQuery();
+
+		assertThat( createQuery.apply( "\"" + PREFIX_1_DIFFERENT_CASE + "\"*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+
+		assertThat( createQuery.apply( "\"" + PREFIX_2_DIFFERENT_CASE + "\"*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+
+		assertThat( createQuery.apply( "\"" + PREFIX_3_DIFFERENT_CASE + "\"*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
+
+		assertThat( createQuery.apply( "\"" + PREFIX_4_DIFFERENT_CASE + "\"*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_4 );
 	}
 
 	@Test
