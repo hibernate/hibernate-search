@@ -73,6 +73,13 @@ public class SimpleQueryStringSearchPredicateIT {
 	private static final String TEXT_TERM_4_IN_PHRASE_SLOP_2 = "An elephant ran past John.";
 	private static final String TEXT_TERM_1_EDIT_DISTANCE_1 = "I came to the world in a dumpster.";
 
+	private static final String PREFIX_SEPARATOR = " ";
+	// Taken from William Blake's Only Sonnet
+	private static final String PREFIX_1 = "Smile on our loves, and while thou drawest the";
+	private static final String PREFIX_2 = PREFIX_1 + PREFIX_SEPARATOR + "Blue curtains of the sky, scatter thy silver dew";
+	private static final String PREFIX_3 = PREFIX_2 + PREFIX_SEPARATOR + "On every flower that shuts its sweet eyes";
+	private static final String PREFIX_4 = PREFIX_3 + PREFIX_SEPARATOR + "In timely sleep.";
+
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 	private static final String INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 = "incompatible_analyzer_1";
@@ -533,6 +540,34 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	@Test
+	public void prefix() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField4.relativeFieldName;
+
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
+				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).matching( queryString ) )
+				.toQuery();
+
+		assertThat( createQuery.apply( "\"" + PREFIX_1 + "\"*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+
+		assertThat( createQuery.apply( "\"" + PREFIX_2 + "\"*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+
+		assertThat( createQuery.apply( "\"" + PREFIX_3 + "\"*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
+
+		assertThat( createQuery.apply( "\"" + PREFIX_4 + "\"*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_4 );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HSEARCH-3612" )
+	public void prefix_normalizePrefixTerm() {
+		// TODO HSEARCH-3612
+	}
+
+	@Test
 	public void multiFields() {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
@@ -757,22 +792,26 @@ public class SimpleQueryStringSearchPredicateIT {
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringField2.reference, TEXT_TERM_1_AND_TERM_3 );
 			document.addValue( indexMapping.analyzedStringField3.reference, TERM_4 );
+			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_1 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_3 );
+			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_2 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_2_IN_PHRASE );
+			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_3 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_4_IN_PHRASE_SLOP_2 );
 			document.addValue( indexMapping.analyzedStringField2.reference, TEXT_TERM_2_IN_PHRASE );
+			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_4 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_5 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_EDIT_DISTANCE_1 );
@@ -842,6 +881,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		final MainFieldModel analyzedStringField1;
 		final MainFieldModel analyzedStringField2;
 		final MainFieldModel analyzedStringField3;
+		final MainFieldModel analyzedStringField4;
 		final MainFieldModel analyzedStringFieldWithDslConverter;
 		final MainFieldModel whitespaceAnalyzedField;
 		final MainFieldModel whitespaceLowercaseAnalyzedField;
@@ -867,6 +907,10 @@ public class SimpleQueryStringSearchPredicateIT {
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
 					.mapMultiValued( root, "analyzedString3" );
+			analyzedStringField4 = MainFieldModel.mapper(
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+			)
+					.map( root, "analyzedString4" );
 			analyzedStringFieldWithDslConverter = MainFieldModel.mapper(
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 							.dslConverter( ValueWrapper.toIndexFieldConverter() )
