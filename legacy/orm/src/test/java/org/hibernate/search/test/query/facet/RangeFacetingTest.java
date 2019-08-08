@@ -61,6 +61,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testRangeBelow() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
@@ -77,6 +78,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testRangeBelowExcludeLimit() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
@@ -93,6 +95,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testRangeAbove() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
@@ -109,6 +112,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testRangeAboveExcludeLimit() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
@@ -125,6 +129,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testRangeAboveBelow() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
@@ -142,6 +147,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testRangeBelowMiddleAbove() {
 		final String facetingName = "cdPriceFaceting";
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
@@ -160,6 +166,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testRangeWithExcludeLimitsAtEachLevel() {
 		final String facetingName = "cdPriceFaceting";
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
@@ -221,6 +228,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testRangeQueryForDoubleWithZeroCount() {
 		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )
@@ -338,6 +346,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testRangeQueryWithNullToAndFrom() {
 		try {
 			queryBuilder( Cd.class ).facet()
@@ -354,6 +363,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testUnsupportedRangeParameterTypeThrowsException() {
 		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )

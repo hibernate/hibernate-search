@@ -44,4 +44,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean zonedDateTimeDocValueHasUTCZoneId() {
 		return dialect.zonedDateTimeDocValueHasUTCZoneId();
 	}
+
+	@Override
+	public boolean nonCanonicalRangeInAggregations() {
+		// Elasticsearch only supports [a, b), (-Infinity, b), [a, +Infinity), but not [a, b] for example.
+		return false;
+	}
 }
