@@ -52,6 +52,16 @@ public class ElasticsearchBigIntegerFieldCodec implements ElasticsearchFieldCode
 	}
 
 	@Override
+	public BigInteger decodeAggregationKey(JsonElement key, JsonElement keyAsString) {
+		if ( key == null || key.isJsonNull() ) {
+			return null;
+		}
+
+		// scaled_float aggregations format keys in double format, e.g. 1.514843E8
+		return JsonElementTypes.BIG_DECIMAL.fromElement( key ).toBigInteger();
+	}
+
+	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> obj) {
 		if ( this == obj ) {
 			return true;

@@ -26,6 +26,18 @@ public interface ElasticsearchFieldCodec<F> {
 	F decode(JsonElement element);
 
 	/**
+	 * Decode the key returned by an aggregation.
+	 * @param key The "key" property  returned by the aggregation.
+	 * May be a number, a string, ... depending on the field type.
+	 * @param keyAsString The "key_as_string" property returned by the term aggregation.
+	 * Either null or a {@link com.google.gson.JsonPrimitive} containing a string.
+	 * @return The decoded term.
+	 */
+	default F decodeAggregationKey(JsonElement key, JsonElement keyAsString) {
+		return decode( key );
+	}
+
+	/**
 	 * Determine whether another codec is compatible with this one, i.e. whether it will encode/decode the information
 	 * to/from the document in a compatible way.
 	 *

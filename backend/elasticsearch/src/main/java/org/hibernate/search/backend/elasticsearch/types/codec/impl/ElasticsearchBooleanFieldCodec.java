@@ -35,6 +35,15 @@ public class ElasticsearchBooleanFieldCodec implements ElasticsearchFieldCodec<B
 	}
 
 	@Override
+	public Boolean decodeAggregationKey(JsonElement key, JsonElement keyAsString) {
+		if ( key == null || key.isJsonNull() ) {
+			return null;
+		}
+		int intValue = JsonElementTypes.INTEGER.fromElement( key );
+		return intValue != 0;
+	}
+
+	@Override
 	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
 		return INSTANCE == other;
 	}
