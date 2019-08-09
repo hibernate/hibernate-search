@@ -79,7 +79,7 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 
 	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Double>> getIndexNullAsMatchPredicateExpectations() {
-		return Optional.of( new IndexNullAsMatchPredicateExpectactions(
+		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				0.0, 42.1
 		) );
 	}
