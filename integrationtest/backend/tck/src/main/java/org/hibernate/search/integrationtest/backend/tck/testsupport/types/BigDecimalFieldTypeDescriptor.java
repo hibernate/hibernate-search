@@ -89,7 +89,7 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 
 	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<BigDecimal>> getIndexNullAsMatchPredicateExpectations() {
-		return Optional.of( new IndexNullAsMatchPredicateExpectactions(
+		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				BigDecimal.ZERO, BigDecimal.valueOf( 42.1 )
 		) );
 	}

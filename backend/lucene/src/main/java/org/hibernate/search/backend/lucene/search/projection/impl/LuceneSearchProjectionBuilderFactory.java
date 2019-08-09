@@ -76,12 +76,12 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return new LuceneEntityProjectionBuilder( scopeModel.getIndexNames() );
+		return new LuceneEntityProjectionBuilder<>( scopeModel.getIndexNames() );
 	}
 
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
-		return new LuceneEntityReferenceProjectionBuilder( scopeModel.getIndexNames() );
+		return new LuceneEntityReferenceProjectionBuilder<>( scopeModel.getIndexNames() );
 	}
 
 	@Override
