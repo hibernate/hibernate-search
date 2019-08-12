@@ -39,6 +39,8 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	private final Map<Class<?>, PojoIndexedTypeWorkPlan<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
 	private final Map<Class<?>, PojoContainedTypeWorkPlan<?>> containedTypeDelegates = new HashMap<>();
 
+	private boolean isPreparing = false;
+
 	public PojoWorkPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
 			AbstractPojoSessionContextImplementor sessionContext,
@@ -108,14 +110,24 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	@Override
 	public void prepare() {
-		for ( PojoContainedTypeWorkPlan<?> delegate : containedTypeDelegates.values() ) {
-			delegate.resolveDirty( this::updateBecauseOfContained );
+		if ( isPreparing ) {
+			return;
 		}
-		for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
-			delegate.resolveDirty( this::updateBecauseOfContained );
+
+		isPreparing = true;
+		try {
+			for ( PojoContainedTypeWorkPlan<?> delegate : containedTypeDelegates.values() ) {
+				delegate.resolveDirty( this::updateBecauseOfContained );
+			}
+			for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+				delegate.resolveDirty( this::updateBecauseOfContained );
+			}
+			for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+				delegate.prepare();
+			}
 		}
-		for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
-			delegate.prepare();
+		finally {
+			isPreparing = false;
 		}
 	}
 

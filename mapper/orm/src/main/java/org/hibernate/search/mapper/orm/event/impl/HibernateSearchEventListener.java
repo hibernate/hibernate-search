@@ -10,9 +10,12 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.AbstractCollectionEvent;
+import org.hibernate.event.spi.AutoFlushEvent;
+import org.hibernate.event.spi.AutoFlushEventListener;
 import org.hibernate.event.spi.ClearEvent;
 import org.hibernate.event.spi.ClearEventListener;
 import org.hibernate.event.spi.EventSource;
@@ -47,8 +50,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public final class HibernateSearchEventListener implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
-		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
-		PostCollectionUpdateEventListener, FlushEventListener, ClearEventListener {
+		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener, PostCollectionUpdateEventListener,
+		FlushEventListener, AutoFlushEventListener, ClearEventListener {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -146,6 +149,11 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 //			synchronization.beforeCompletion();
 //			synchronization.afterCompletion( Status.STATUS_COMMITTED );
 //		}
+	}
+
+	@Override
+	public void onAutoFlush(AutoFlushEvent event) throws HibernateException {
+		getCurrentWorkPlan( state.getContextProvider(), event.getSession() ).prepare();
 	}
 
 	@Override
