@@ -632,6 +632,96 @@ public class IndexedEmbeddedBaseIT {
 		assertEquals( 0, counters.get( getLongitudeKey ) );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-899")
+	public void invalid_wrongType() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String text;
+			String invalid;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@GenericField
+			public String getText() {
+				return text;
+			}
+
+			@IndexedEmbedded
+			public String getInvalid() {
+				return invalid;
+			}
+		}
+
+		SubTest.expectException( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.setup() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".invalid<no value extractors>" )
+						.failure( "Type '" + String.class.getName() +
+								"' cannot be indexed-embedded, because no index mapping (@GenericField, @FullTextField, ...) is defined for that type." )
+						.build()
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-899")
+	public void invalid_emptyNested() {
+		class ValidNested {
+			String text;
+
+			@GenericField
+			public String getText() {
+				return text;
+			}
+		}
+
+		class EmptyNested {
+		}
+
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			ValidNested valid;
+			EmptyNested invalid;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@IndexedEmbedded
+			public ValidNested getValid() {
+				return valid;
+			}
+
+			@IndexedEmbedded
+			public EmptyNested getInvalid() {
+				return invalid;
+			}
+		}
+
+		SubTest.expectException( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.setup() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".invalid<no value extractors>" )
+						.failure( "Type '" + EmptyNested.class.getName() +
+								"' cannot be indexed-embedded, because no index mapping (@GenericField, @FullTextField, ...) is defined for that type." )
+						.build()
+				);
+	}
+
 	private <E> void doTestEmbeddedRuntime(JavaBeanMapping mapping,
 			Function<Integer, E> newEntityFunction,
 			Consumer<StubDocumentNode.Builder> expectedDocumentContributor) {
