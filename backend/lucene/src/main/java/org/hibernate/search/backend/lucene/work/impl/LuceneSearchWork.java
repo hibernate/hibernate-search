@@ -89,7 +89,7 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 			return 0;
 		}
 		else {
-			return Math.min( (int) ( offset + limit ), reader.maxDoc() );
+			return Math.min(( offset + limit ), reader.maxDoc() );
 		}
 	}
 

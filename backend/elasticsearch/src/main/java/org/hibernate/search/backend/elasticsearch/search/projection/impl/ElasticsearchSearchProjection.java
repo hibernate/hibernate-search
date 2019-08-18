@@ -63,7 +63,7 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <Z> Z transformUnsafe(ElasticsearchSearchProjection<?, Z> projection, LoadingResult<?> loadingResult,
 			Object extractedData, SearchProjectionTransformContext context) {
-		return (Z) ( (ElasticsearchSearchProjection) projection ).transform( loadingResult, extractedData, context );
+		return (Z) projection.transform( loadingResult, extractedData, context );
 	}
 
 	Set<String> getIndexNames();

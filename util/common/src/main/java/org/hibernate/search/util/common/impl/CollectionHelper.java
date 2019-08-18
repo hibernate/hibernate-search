@@ -141,6 +141,6 @@ public final class CollectionHelper {
 		if ( expectedSize < 3 ) {
 			return expectedSize + 1;
 		}
-		return (int) ( (float) expectedSize / 0.75f + 1.0f );
+		return (int) ( expectedSize / 0.75f + 1.0f );
 	}
 }

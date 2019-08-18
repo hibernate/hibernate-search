@@ -16,6 +16,7 @@ import org.hibernate.MappingException;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.mapping.Any;
 import org.hibernate.mapping.Component;
+import org.hibernate.mapping.IndexedCollection;
 import org.hibernate.mapping.OneToMany;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -305,7 +306,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 				 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
 				 * but the value of the foreign key to the targeted entity...
 				 */
-				return ( (org.hibernate.mapping.Map) collectionValue ).getIndex();
+				return ( (IndexedCollection) collectionValue ).getIndex();
 			}
 			else if ( extractorName == null || BuiltinContainerExtractors.MAP_VALUE.equals( extractorName ) ) {
 				return collectionValue.getElement();

@@ -59,7 +59,7 @@ public class OptionalStringUserType implements UserType {
 			delegateType.nullSafeSet( st, null, index, session );
 		}
 		else {
-			delegateType.nullSafeSet( st, (String) optional.get(), index, session );
+			delegateType.nullSafeSet(st, optional.get(), index, session );
 		}
 	}
 

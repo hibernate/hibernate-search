@@ -310,7 +310,7 @@ public final class ConvertUtils {
 					.collect( Collectors.toList() );
 		}
 		else if ( value instanceof String ) {
-			return separatorPattern.splitAsStream( (String) value )
+			return separatorPattern.splitAsStream( (CharSequence) value )
 					.map( ConvertUtils::trimIfString )
 					.filter( Objects::nonNull )
 					.map( elementConverter )
