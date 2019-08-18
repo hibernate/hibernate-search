@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRepository {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static final Class<Document<?>> DOCUMENT_CLASS = (Class<Document<?>>) (Class) Document.class;
+	private static final Class<Document<?>> DOCUMENT_CLASS = (Class) Document.class;
 
 	@Autowired
 	private EntityManager entityManager;

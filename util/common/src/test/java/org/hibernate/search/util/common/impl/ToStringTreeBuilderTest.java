@@ -143,7 +143,7 @@ public class ToStringTreeBuilderTest {
 						.endObject()
 					.attribute( "appendable", new Appendable() )
 					.attribute( "appendableAsObject", (Object) new Appendable() )
-					.attribute( "nullAppendable", (Appendable) null )
+					.attribute( "nullAppendable" , null )
 					.startList( "list" )
 						.startObject()
 							.attribute( "name", "foo" )
