@@ -179,7 +179,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = { "HSEARCH-809", "HSEARCH-2376" })
+	@TestForIssue(jiraKey = { "HSEARCH-809", "HSEARCH-2376", "HSEARCH-2472" })
 	@PortedFromSearch5(original = {
 			"org.hibernate.search.test.query.facet.NumberFacetingTest",
 			"org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryForInteger",
