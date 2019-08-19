@@ -378,7 +378,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	 * Test behavior when aggregating on an multi-valued field.
 	 */
 	@Test
-	@TestForIssue(jiraKey = {"HSEARCH-726", "HSEARCH-900", "HSEARCH-2535"})
+	@TestForIssue(jiraKey = {"HSEARCH-726", "HSEARCH-900", "HSEARCH-2535", "HSEARCH-1927"})
 	@PortedFromSearch5(original = {
 			"org.hibernate.search.test.query.facet.EmbeddedCollectionFacetingTest",
 			"org.hibernate.search.test.query.facet.ManyToOneFacetingTest",
