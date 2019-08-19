@@ -25,6 +25,7 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.singleinstance.BeforeAll;
 import org.hibernate.search.util.impl.test.singleinstance.InstanceRule;
 import org.hibernate.search.util.impl.test.singleinstance.SingleInstanceRunnerWithParameters;
@@ -91,6 +92,7 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1748")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryWithUnsupportedType")
 	public void simple() {
 		FieldModel<F> model = indexMapping.fieldModel;
