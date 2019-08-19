@@ -21,6 +21,6 @@ public @interface PortedFromSearch5 {
 	/**
 	 * @return A reference (FQCN + method if applicable) to the original test in Search 5.
 	 */
-	String original();
+	String[] original();
 
 }
