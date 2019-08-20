@@ -8,36 +8,35 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
-import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorExtractContext;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorKey;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TopDocs;
 
-public class SearchProjectionExtractContext {
+public class SearchProjectionExtractContext implements LuceneCollectorExtractContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexSearcher indexSearcher;
 	private final Query luceneQuery;
-	private final TopDocs topDocs;
-	private final Map<DistanceCollectorKey, DistanceCollector> distanceCollectors;
+	private final Map<Integer, Set<Integer>> nestedDocs;
+	private final Map<LuceneCollectorKey<?>, Collector> collectors;
 
 	public SearchProjectionExtractContext(IndexSearcher indexSearcher, Query luceneQuery,
-			TopDocs topDocs,
-			Map<DistanceCollectorKey, DistanceCollector> distanceCollectors) {
+			Map<Integer, Set<Integer>> nestedDocs,
+			Map<LuceneCollectorKey<?>, Collector> collectors) {
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
-		this.topDocs = topDocs;
-		this.distanceCollectors = distanceCollectors;
+		this.nestedDocs = nestedDocs;
+		this.collectors = collectors;
 	}
 
 	public Explanation explain(int docId) {
@@ -49,49 +48,14 @@ public class SearchProjectionExtractContext {
 		}
 	}
 
-	public TopDocs getTopDocs() {
-		return topDocs;
+	@Override
+	public Set<Integer> getNestedDocs(int docId) {
+		return nestedDocs.get( docId );
 	}
 
-	public DistanceCollector getDistanceCollector(String absoluteFieldPath, GeoPoint location) {
-		DistanceCollectorKey collectorKey = new DistanceCollectorKey( absoluteFieldPath, location );
-		return distanceCollectors.get( collectorKey );
+	@SuppressWarnings("unchecked")
+	public <C extends Collector> C getCollector(LuceneCollectorKey<C> key) {
+		return (C) collectors.get( key );
 	}
 
-	public Collection<DistanceCollector> getDistanceCollectors() {
-		return distanceCollectors.values();
-	}
-
-	public Query getLuceneQuery() {
-		return luceneQuery;
-	}
-
-	public static class DistanceCollectorKey {
-		private final String absoluteFieldPath;
-		private final GeoPoint location;
-
-		public DistanceCollectorKey(String absoluteFieldPath, GeoPoint location) {
-			this.absoluteFieldPath = absoluteFieldPath;
-			this.location = location;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if ( obj == this ) {
-				return true;
-			}
-			if ( !( obj instanceof DistanceCollectorKey ) ) {
-				return false;
-			}
-
-			DistanceCollectorKey other = (DistanceCollectorKey) obj;
-
-			return Objects.equals( this.absoluteFieldPath, other.absoluteFieldPath )
-					&& Objects.equals( this.location, other.location );
-		}
-		@Override
-		public int hashCode() {
-			return Objects.hash( absoluteFieldPath, location );
-		}
-	}
 }

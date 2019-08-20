@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
@@ -14,8 +18,10 @@ import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocum
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
+import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TopDocs;
 
 /**
  * The context holding all the useful information pertaining to the extraction of data from
@@ -48,15 +54,23 @@ class LuceneSearchQueryExtractContext {
 		return projectionHitMapper;
 	}
 
-	SearchProjectionExtractContext createProjectionExtractContext() {
+	TopDocs getTopDocs() {
+		return luceneCollectors.getTopDocs();
+	}
+
+	Collection<Collector> getCollectorsForNestedDocuments() {
+		return luceneCollectors.getCollectorsForNestedDocuments();
+	}
+
+	SearchProjectionExtractContext createProjectionExtractContext(Map<Integer, Set<Integer>> nestedDocs) {
 		return new SearchProjectionExtractContext(
 				indexSearcher, luceneQuery,
-				luceneCollectors.getTopDocs(), luceneCollectors.getDistanceCollectors()
+				nestedDocs,
+				luceneCollectors.getCollectors()
 		);
 	}
 
 	SearchProjectionTransformContext createProjectionTransformContext() {
 		return new SearchProjectionTransformContext( convertContext );
 	}
-
 }

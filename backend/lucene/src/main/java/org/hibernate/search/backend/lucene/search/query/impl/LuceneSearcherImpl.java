@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
@@ -136,14 +136,15 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		ProjectionHitMapper<?, ?> projectionHitMapper = extractContext.getProjectionHitMapper();
 		IndexSearcher indexSearcher = extractContext.getIndexSearcher();
 
-		SearchProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext();
-		TopDocs topDocs = projectionExtractContext.getTopDocs();
+		TopDocs topDocs = extractContext.getTopDocs();
 		if ( topDocs == null ) {
 			return Collections.emptyList();
 		}
 
 		List<Object> extractedData = new ArrayList<>( topDocs.scoreDocs.length );
-		Map<Integer, Set<Integer>> nestedDocs = fetchNestedDocs( indexSearcher, topDocs.scoreDocs, projectionExtractContext );
+		Map<Integer, Set<Integer>> nestedDocs = fetchNestedDocs( indexSearcher, topDocs.scoreDocs, extractContext );
+
+		SearchProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext( nestedDocs );
 
 		for ( ScoreDoc hit : topDocs.scoreDocs ) {
 			// add root object contribution
@@ -164,7 +165,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	private Map<Integer, Set<Integer>> fetchNestedDocs(IndexSearcher indexSearcher, ScoreDoc[] scoreDocs,
-			SearchProjectionExtractContext projectionExecutionContext)
+			LuceneSearchQueryExtractContext extractContext)
 			throws IOException {
 		// if the projection does not need any nested object skip their fetching
 		if ( storedFieldVisitor.getNestedDocumentPaths().isEmpty() ) {
@@ -182,26 +183,26 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			parentIds.put( parentId, hit.doc );
 		}
 
-		Map<String, Set<Integer>> stringSetMap = fetchChildren( indexSearcher, storedFieldVisitor.getNestedDocumentPaths(), projectionExecutionContext );
+		Map<String, Set<Integer>> stringSetMap = fetchChildren(
+				indexSearcher, storedFieldVisitor.getNestedDocumentPaths(),
+				extractContext.getCollectorsForNestedDocuments()
+		);
 		HashMap<Integer, Set<Integer>> result = new HashMap<>();
 		for ( Map.Entry<String, Set<Integer>> entry : stringSetMap.entrySet() ) {
 			result.put( parentIds.get( entry.getKey() ), entry.getValue() );
-		}
-		for ( DistanceCollector distanceCollector : projectionExecutionContext.getDistanceCollectors() ) {
-			distanceCollector.setNestedDocs( result );
 		}
 		return result;
 	}
 
 	private Map<String, Set<Integer>> fetchChildren(IndexSearcher indexSearcher, Set<String> nestedDocumentPaths,
-			SearchProjectionExtractContext projectionExecutionContext) {
-		BooleanQuery booleanQuery = getChildQuery( nestedDocumentPaths, projectionExecutionContext );
+			Collection<Collector> collectorsForChildren) {
+		BooleanQuery booleanQuery = getChildQuery( nestedDocumentPaths );
 
 		try {
 			ArrayList<Collector> luceneCollectors = new ArrayList<>();
 			LuceneChildrenCollector childrenCollector = new LuceneChildrenCollector();
 			luceneCollectors.add( childrenCollector );
-			luceneCollectors.addAll( projectionExecutionContext.getDistanceCollectors() );
+			luceneCollectors.addAll( collectorsForChildren );
 
 			indexSearcher.search( booleanQuery, MultiCollector.wrap( luceneCollectors ) );
 			return childrenCollector.getChildren();
@@ -211,9 +212,9 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		}
 	}
 
-	private BooleanQuery getChildQuery(Set<String> nestedDocumentPaths, SearchProjectionExtractContext projectionExecutionContext) {
+	private BooleanQuery getChildQuery(Set<String> nestedDocumentPaths) {
 		QueryBitSetProducer parentsFilter = new QueryBitSetProducer( LuceneQueries.mainDocumentQuery() );
-		ToChildBlockJoinQuery parentQuery = new ToChildBlockJoinQuery( projectionExecutionContext.getLuceneQuery(), parentsFilter );
+		ToChildBlockJoinQuery parentQuery = new ToChildBlockJoinQuery( requestContext.getLuceneQuery(), parentsFilter );
 
 		return new BooleanQuery.Builder()
 				.add( parentQuery, BooleanClause.Occur.MUST )
