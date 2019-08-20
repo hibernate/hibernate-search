@@ -107,7 +107,7 @@ public class LuceneSearchQueryBuilder<H>
 	public LuceneSearchQuery<H> build() {
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
-		LuceneSearchResultExtractor<H> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
+		LuceneSearchResultExtractorImpl<H> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
 				storedFieldVisitor, rootProjection, loadingContext
 		);
 

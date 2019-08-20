@@ -14,8 +14,6 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneLoadableSearchResult;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchResultExtractor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexReader;
@@ -24,7 +22,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 
 
-public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchResult<H>> {
+public class LuceneSearchWork<R> implements LuceneReadWork<R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -35,14 +33,14 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 	private final Integer limit;
 
 	private final LuceneCollectorProvider luceneCollectorProvider;
-	private final LuceneSearchResultExtractor<H> searchResultExtractor;
+	private final LuceneSearchResultExtractor<R> searchResultExtractor;
 
 	LuceneSearchWork(Query luceneQuery,
 			Sort luceneSort,
 			Integer offset,
 			Integer limit,
 			LuceneCollectorProvider luceneCollectorProvider,
-			LuceneSearchResultExtractor<H> searchResultExtractor) {
+			LuceneSearchResultExtractor<R> searchResultExtractor) {
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
 		this.offset = offset == null ? 0 : offset;
@@ -52,7 +50,7 @@ public class LuceneSearchWork<H> implements LuceneReadWork<LuceneLoadableSearchR
 	}
 
 	@Override
-	public LuceneLoadableSearchResult<H> execute(LuceneReadWorkExecutionContext context) {
+	public R execute(LuceneReadWorkExecutionContext context) {
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 

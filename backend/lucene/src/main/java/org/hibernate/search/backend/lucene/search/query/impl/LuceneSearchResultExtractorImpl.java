@@ -23,6 +23,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.work.impl.LuceneSearchResultExtractor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -38,7 +39,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.search.join.ToChildBlockJoinQuery;
 
-class LuceneSearchResultExtractorImpl<H> implements LuceneSearchResultExtractor<H> {
+class LuceneSearchResultExtractorImpl<H> implements LuceneSearchResultExtractor<LuceneLoadableSearchResult<H>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

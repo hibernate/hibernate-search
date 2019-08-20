@@ -8,8 +8,6 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneLoadableSearchResult;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchResultExtractor;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -30,11 +28,10 @@ public interface LuceneWorkFactory {
 
 	LuceneWriteWork<?> optimize();
 
-	<H> LuceneReadWork<LuceneLoadableSearchResult<H>> search(
-			Query luceneQuery, Sort luceneSort,
+	<R> LuceneReadWork<R> search(Query luceneQuery, Sort luceneSort,
 			Integer offset, Integer limit,
 			LuceneCollectorProvider luceneCollectorProvider,
-			LuceneSearchResultExtractor<H> searchResultExtractor);
+			LuceneSearchResultExtractor<R> searchResultExtractor);
 
 	LuceneReadWork<Explanation> explain(Query luceneQuery,
 			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentQuery);
