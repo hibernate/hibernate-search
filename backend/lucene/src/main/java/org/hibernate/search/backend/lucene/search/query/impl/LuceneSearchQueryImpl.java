@@ -17,6 +17,7 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneSearchResultExtractor;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -50,7 +51,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneCollectorProvider luceneCollectorProvider;
-	private final LuceneSearchResultExtractor<H> searchResultExtractor;
+	private final LuceneSearchResultExtractor<LuceneLoadableSearchResult<H>> searchResultExtractor;
 
 	LuceneSearchQueryImpl(LuceneReadWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
@@ -58,7 +59,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
 			Query luceneQuery, Sort luceneSort,
-			LuceneCollectorProvider luceneCollectorProvider, LuceneSearchResultExtractor<H> searchResultExtractor) {
+			LuceneCollectorProvider luceneCollectorProvider,
+			LuceneSearchResultExtractor<LuceneLoadableSearchResult<H>> searchResultExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.searchContext = searchContext;
