@@ -7,9 +7,8 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
-
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext.DistanceCollectorKey;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
@@ -28,8 +27,9 @@ public class LuceneCollectors {
 	private final TotalHitCountCollector totalHitCountCollector;
 
 	private final Collector compositeCollector;
+	private final Collection<Collector> collectorsForNestedDocuments;
 
-	private final Map<DistanceCollectorKey, DistanceCollector> distanceCollectors;
+	private final Map<LuceneCollectorKey<?>, Collector> collectors;
 
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
@@ -37,12 +37,14 @@ public class LuceneCollectors {
 	private TopDocs topDocs = null;
 
 	LuceneCollectors(TopDocsCollector<?> topDocsCollector, TotalHitCountCollector totalHitCountCollector,
-			Collector compositeCollector, Map<DistanceCollectorKey, DistanceCollector> distanceCollectors,
+			Collector compositeCollector, Collection<Collector> collectorsForNestedDocuments,
+			Map<LuceneCollectorKey<?>, Collector> collectors,
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring) {
 		this.topDocsCollector = topDocsCollector;
 		this.totalHitCountCollector = totalHitCountCollector;
 		this.compositeCollector = compositeCollector;
-		this.distanceCollectors = distanceCollectors;
+		this.collectorsForNestedDocuments = collectorsForNestedDocuments;
+		this.collectors = collectors;
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
 	}
@@ -78,8 +80,12 @@ public class LuceneCollectors {
 		}
 	}
 
-	public Map<DistanceCollectorKey, DistanceCollector> getDistanceCollectors() {
-		return distanceCollectors;
+	public Collection<Collector> getCollectorsForNestedDocuments() {
+		return collectorsForNestedDocuments;
+	}
+
+	public Map<LuceneCollectorKey<?>, Collector> getCollectors() {
+		return collectors;
 	}
 
 	public long getTotalHits() {

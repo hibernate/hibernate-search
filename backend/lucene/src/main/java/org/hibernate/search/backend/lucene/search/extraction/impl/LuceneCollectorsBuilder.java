@@ -7,12 +7,9 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext.DistanceCollectorKey;
-import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.MultiCollector;
@@ -34,15 +31,15 @@ public class LuceneCollectorsBuilder {
 	private boolean requireTopDocs;
 	private boolean requireScore;
 
-	private final List<Collector> luceneCollectors = new ArrayList<>();
-	private final Map<DistanceCollectorKey, DistanceCollector> distanceCollectors = new HashMap<>();
+	private final Map<LuceneCollectorKey<?>, Collector> luceneCollectors = new LinkedHashMap<>();
+	private final List<Collector> luceneCollectorsForNestedDocuments = new ArrayList<>();
 
 	public LuceneCollectorsBuilder(Sort sort, int maxDocs) {
 		this.sort = sort;
 		this.maxDocs = maxDocs;
 
 		this.totalHitCountCollector = new TotalHitCountCollector();
-		this.luceneCollectors.add( this.totalHitCountCollector );
+		this.luceneCollectors.put( LuceneCollectorKey.TOTAL_HIT_COUNT, this.totalHitCountCollector );
 	}
 
 	public void requireScore() {
@@ -54,12 +51,17 @@ public class LuceneCollectorsBuilder {
 		this.requireTopDocs = true;
 	}
 
-	public DistanceCollector addDistanceCollector(String absoluteFieldPath, GeoPoint center) {
-		this.requireTopDocs = true; // We can't collect distances if we don't know from which documents it should be collected
-		DistanceCollector distanceCollector = new DistanceCollector( absoluteFieldPath, center, maxDocs );
-		luceneCollectors.add( distanceCollector );
-		distanceCollectors.put( new DistanceCollectorKey( absoluteFieldPath, center ), distanceCollector );
-		return distanceCollector;
+	public <C extends Collector> void addCollector(LuceneCollectorFactory<C> collectorFactory) {
+		this.requireTopDocs = true; // We can't collect anything if we don't know from which documents it should be collected
+		if ( luceneCollectors.containsKey( collectorFactory ) ) {
+			return;
+		}
+
+		Collector collector = collectorFactory.createCollector( maxDocs );
+		luceneCollectors.put( collectorFactory, collector );
+		if ( collectorFactory.applyToNestedDocuments() ) {
+			luceneCollectorsForNestedDocuments.add( collector );
+		}
 	}
 
 	public LuceneCollectors build() {
@@ -103,19 +105,15 @@ public class LuceneCollectorsBuilder {
 						Integer.MAX_VALUE
 				);
 			}
-			luceneCollectors.add( topDocsCollector );
+			luceneCollectors.put( LuceneCollectorKey.TOP_DOCS, topDocsCollector );
 		}
 
-		Collector compositeCollector;
-		if ( luceneCollectors.size() == 1 ) {
-			compositeCollector = luceneCollectors.get( 0 );
-		}
-		else {
-			compositeCollector = MultiCollector.wrap( luceneCollectors );
-		}
+		Collector compositeCollector = MultiCollector.wrap( luceneCollectors.values() );
 
 		return new LuceneCollectors(
-				topDocsCollector, totalHitCountCollector, compositeCollector, distanceCollectors,
+				topDocsCollector, totalHitCountCollector,
+				compositeCollector, luceneCollectorsForNestedDocuments,
+				luceneCollectors,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring
 		);
 	}

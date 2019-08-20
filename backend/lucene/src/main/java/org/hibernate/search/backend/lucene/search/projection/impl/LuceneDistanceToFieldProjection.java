@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Objects;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorFactory;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
@@ -17,7 +19,8 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, Double> {
+class LuceneDistanceToFieldProjection
+		implements LuceneSearchProjection<Double, Double>, LuceneCollectorFactory<DistanceCollector> {
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
@@ -35,9 +38,30 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 		this.unit = unit;
 	}
 
+	/**
+	 * Necessary in order to share a single collector if there are multiple similar projections.
+	 * See {@link #createCollector(int)}, {@link #contributeCollectors(LuceneCollectorsBuilder)}.
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
+			return false;
+		}
+		LuceneDistanceToFieldProjection other = (LuceneDistanceToFieldProjection) obj;
+		return absoluteFieldPath.equals( other.absoluteFieldPath ) && center.equals( other.center );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( absoluteFieldPath, center );
+	}
+
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		luceneCollectorBuilder.addDistanceCollector( absoluteFieldPath, center );
+		luceneCollectorBuilder.addCollector( this );
 	}
 
 	@Override
@@ -49,9 +73,10 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 	@Override
 	public Double extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-
-		DistanceCollector distanceCollector = context.getDistanceCollector( absoluteFieldPath, center );
-		return unit.fromMeters( distanceCollector.getDistance( documentResult.getDocId() ) );
+		DistanceCollector distanceCollector = context.getCollector( this );
+		return unit.fromMeters( distanceCollector.getDistance(
+				documentResult.getDocId(), context
+		) );
 	}
 
 	@Override
@@ -73,5 +98,15 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 				.append( ", center=" ).append( center )
 				.append( "]" );
 		return sb.toString();
+	}
+
+	@Override
+	public DistanceCollector createCollector(int maxDocs) {
+		return new DistanceCollector( absoluteFieldPath, center, maxDocs );
+	}
+
+	@Override
+	public boolean applyToNestedDocuments() {
+		return true;
 	}
 }
