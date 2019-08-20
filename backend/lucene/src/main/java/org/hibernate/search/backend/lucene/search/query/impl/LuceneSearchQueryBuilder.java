@@ -120,8 +120,12 @@ public class LuceneSearchQueryBuilder<H>
 				luceneQueryBuilder.build(), sessionContext.getTenantIdentifier()
 		);
 
+		LuceneSearchQueryRequestContext requestContext = new LuceneSearchQueryRequestContext(
+				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
+		);
+
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
-				definitiveLuceneQuery, luceneSort, storedFieldVisitor, rootProjection, loadingContext
+				requestContext, storedFieldVisitor, rootProjection
 		);
 
 		return new LuceneSearchQueryImpl<>(
@@ -132,6 +136,7 @@ public class LuceneSearchQueryBuilder<H>
 				routingKeys,
 				definitiveLuceneQuery,
 				luceneSort,
+
 				searcher
 		);
 	}
