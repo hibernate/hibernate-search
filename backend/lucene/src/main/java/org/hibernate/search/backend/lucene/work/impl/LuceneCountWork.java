@@ -15,31 +15,22 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.search.IndexSearcher;
 
 
-public class LuceneSearchWork<R> implements LuceneReadWork<R> {
+public class LuceneCountWork implements LuceneReadWork<Integer> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearcher<R> searcher;
+	private final LuceneSearcher<?> searcher;
 
-	private final int offset;
-	private final Integer limit;
-
-	LuceneSearchWork(LuceneSearcher<R> searcher,
-			Integer offset,
-			Integer limit) {
-		this.offset = offset == null ? 0 : offset;
-		this.limit = limit;
+	LuceneCountWork(LuceneSearcher<?> searcher) {
 		this.searcher = searcher;
 	}
 
 	@Override
-	public R execute(LuceneReadWorkExecutionContext context) {
+	public Integer execute(LuceneReadWorkExecutionContext context) {
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 
-			return searcher.search(
-					indexSearcher, offset, limit
-			);
+			return searcher.count( indexSearcher );
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), context.getEventContext(), e );
@@ -51,8 +42,6 @@ public class LuceneSearchWork<R> implements LuceneReadWork<R> {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "searcher=" ).append( searcher )
-				.append( ", offset=" ).append( offset )
-				.append( ", limit=" ).append( limit )
 				.append( "]" );
 		return sb.toString();
 	}

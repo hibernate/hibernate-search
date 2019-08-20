@@ -21,15 +21,15 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Query luceneQuery;
+	private final LuceneSearcher<?> searcher;
 
 	private final String indexName;
 	private final String documentId;
 	private final Query explainedDocumentQuery;
 
-	LuceneExplainWork(Query luceneQuery,
+	LuceneExplainWork(LuceneSearcher<?> searcher,
 			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentQuery) {
-		this.luceneQuery = luceneQuery;
+		this.searcher = searcher;
 		this.indexName = explainedDocumentIndexName;
 		this.documentId = explainedDocumentId;
 		this.explainedDocumentQuery = explainedDocumentQuery;
@@ -42,10 +42,10 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 
 			int luceneDocId = getLuceneDocId( indexSearcher );
 
-			return indexSearcher.explain( luceneQuery, luceneDocId );
+			return searcher.explain( indexSearcher, luceneDocId );
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnQueryExecution( luceneQuery, context.getEventContext(), e );
+			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), context.getEventContext(), e );
 		}
 	}
 
@@ -66,7 +66,7 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "luceneQuery=" ).append( luceneQuery )
+				.append( "searcher=" ).append( searcher )
 				.append( ", explainedDocumentQuery=" ).append( explainedDocumentQuery )
 				.append( "]" );
 		return sb.toString();

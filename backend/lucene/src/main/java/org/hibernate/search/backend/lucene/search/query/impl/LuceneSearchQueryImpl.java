@@ -11,13 +11,12 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
-import org.hibernate.search.backend.lucene.work.impl.LuceneSearchResultExtractor;
+import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -50,8 +49,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final Set<String> routingKeys;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
-	private final LuceneCollectorProvider luceneCollectorProvider;
-	private final LuceneSearchResultExtractor<LuceneLoadableSearchResult<H>> searchResultExtractor;
+	private final LuceneSearcher<LuceneLoadableSearchResult<H>> searcher;
 
 	LuceneSearchQueryImpl(LuceneReadWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
@@ -59,8 +57,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
 			Query luceneQuery, Sort luceneSort,
-			LuceneCollectorProvider luceneCollectorProvider,
-			LuceneSearchResultExtractor<LuceneLoadableSearchResult<H>> searchResultExtractor) {
+			LuceneSearcher<LuceneLoadableSearchResult<H>> searcher) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.searchContext = searchContext;
@@ -69,8 +66,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		this.routingKeys = routingKeys;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
-		this.luceneCollectorProvider = luceneCollectorProvider;
-		this.searchResultExtractor = searchResultExtractor;
+		this.searcher = searcher;
 	}
 
 	@Override
@@ -92,11 +88,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public LuceneSearchResult<H> fetch(Integer limit, Integer offset) {
-		LuceneReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
-				luceneQuery, luceneSort,
-				offset, limit,
-				luceneCollectorProvider, searchResultExtractor
-		);
+		LuceneReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit );
 		return doSubmit( work )
 				/*
 				 * WARNING: the following call must run in the user thread.
@@ -110,14 +102,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public long fetchTotalHitCount() {
-		LuceneReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search(
-				luceneQuery, luceneSort,
-				0, 0,
-				// do not add any TopDocs collector
-				( luceneCollectorBuilder -> { } ),
-				searchResultExtractor
-		);
-		return doSubmit( work ).getHitCount();
+		LuceneReadWork<Integer> work = workFactory.count( searcher );
+		return doSubmit( work );
 	}
 
 	@Override
@@ -164,7 +150,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		);
 
 		LuceneReadWork<Explanation> work = workFactory.explain(
-				luceneQuery, indexName, id, explainedDocumentQuery
+				searcher, indexName, id, explainedDocumentQuery
 		);
 		return doSubmit( work );
 	}

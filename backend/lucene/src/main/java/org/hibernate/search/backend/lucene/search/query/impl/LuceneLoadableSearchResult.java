@@ -45,10 +45,6 @@ public class LuceneLoadableSearchResult<H> {
 		this.extractedData = extractedData;
 	}
 
-	long getHitCount() {
-		return hitCount;
-	}
-
 	LuceneSearchResult<H> loadBlocking(SessionContextImplementor sessionContext) {
 		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( sessionContext );
 

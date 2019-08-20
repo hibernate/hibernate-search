@@ -107,10 +107,6 @@ public class LuceneSearchQueryBuilder<H>
 	public LuceneSearchQuery<H> build() {
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
-		LuceneSearchResultExtractorImpl<H> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
-				storedFieldVisitor, rootProjection, loadingContext
-		);
-
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( luceneQuery, Occur.MUST );
 		luceneQueryBuilder.add( LuceneQueries.mainDocumentQuery(), Occur.FILTER );
@@ -120,15 +116,23 @@ public class LuceneSearchQueryBuilder<H>
 			luceneSort = new Sort( sortFields.toArray( new SortField[0] ) );
 		}
 
+		Query definitiveLuceneQuery = searchContext.decorateLuceneQuery(
+				luceneQueryBuilder.build(), sessionContext.getTenantIdentifier()
+		);
+
+		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
+				definitiveLuceneQuery, luceneSort, storedFieldVisitor, rootProjection, loadingContext
+		);
+
 		return new LuceneSearchQueryImpl<>(
 				queryOrchestrator, workFactory,
 				searchContext,
 				sessionContext,
 				loadingContext,
 				routingKeys,
-				searchContext.decorateLuceneQuery( luceneQueryBuilder.build(), sessionContext.getTenantIdentifier() ),
+				definitiveLuceneQuery,
 				luceneSort,
-				rootProjection, searchResultExtractor
+				searcher
 		);
 	}
 }
