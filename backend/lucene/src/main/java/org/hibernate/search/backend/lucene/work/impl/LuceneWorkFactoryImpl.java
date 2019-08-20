@@ -8,13 +8,9 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.Explanation;
-
-
 
 public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 
@@ -57,23 +53,20 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public <R> LuceneReadWork<R> search(Query luceneQuery, Sort luceneSort,
-			Integer offset, Integer limit,
-			LuceneCollectorProvider luceneCollectorProvider,
-			LuceneSearchResultExtractor<R> searchResultExtractor) {
-		return new LuceneSearchWork<>(
-				luceneQuery, luceneSort,
-				offset, limit,
-				luceneCollectorProvider,
-				searchResultExtractor
-		);
+	public <R> LuceneReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit) {
+		return new LuceneSearchWork<>( searcher, offset, limit );
 	}
 
 	@Override
-	public LuceneReadWork<Explanation> explain(Query luceneQuery,
+	public LuceneReadWork<Integer> count(LuceneSearcher<?> searcher) {
+		return new LuceneCountWork( searcher );
+	}
+
+	@Override
+	public LuceneReadWork<Explanation> explain(LuceneSearcher<?> searcher,
 			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentQuery) {
 		return new LuceneExplainWork(
-				luceneQuery,
+				searcher,
 				explainedDocumentIndexName, explainedDocumentId, explainedDocumentQuery
 		);
 	}
