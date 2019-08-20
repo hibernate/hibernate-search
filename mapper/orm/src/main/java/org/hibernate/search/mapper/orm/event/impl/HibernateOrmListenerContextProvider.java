@@ -16,6 +16,6 @@ public interface HibernateOrmListenerContextProvider {
 
 	AutomaticIndexingSynchronizationStrategy getSynchronizationStrategy();
 
-	PojoWorkPlan getCurrentWorkPlan(SessionImplementor session);
+	PojoWorkPlan getCurrentWorkPlan(SessionImplementor session, boolean createIfDoesNotExist);
 
 }

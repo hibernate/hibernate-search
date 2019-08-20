@@ -137,8 +137,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor session) {
-		return HibernateOrmSearchSession.get( this, session ).getCurrentWorkPlan();
+	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor session, boolean createIfDoesNotExist) {
+		return HibernateOrmSearchSession.get( this, session ).getCurrentWorkPlan( createIfDoesNotExist );
 	}
 
 	@Override

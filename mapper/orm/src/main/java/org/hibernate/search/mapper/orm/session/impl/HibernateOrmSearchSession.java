@@ -189,7 +189,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@SuppressWarnings("unchecked")
-	public PojoWorkPlan getCurrentWorkPlan() {
+	public PojoWorkPlan getCurrentWorkPlan(boolean createIfDoesNotExist) {
 		SessionImplementor sessionImplementor = sessionContext.getSession();
 		Transaction transactionIdentifier = null;
 
@@ -210,6 +210,10 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		PojoWorkPlan workPlan = workPlanPerTransaction.get( transactionIdentifier );
 		if ( workPlan != null ) {
 			return workPlan;
+		}
+
+		if ( !createIfDoesNotExist ) {
+			return null;
 		}
 
 		AutomaticIndexingSynchronizationStrategy workPlanSynchronizationStrategy = synchronizationStrategy;

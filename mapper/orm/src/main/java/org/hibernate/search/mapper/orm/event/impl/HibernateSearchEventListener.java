@@ -165,9 +165,11 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	@Override
 	public void onClear(ClearEvent event) {
 		EventSource session = event.getSession();
-		// skip the clearNotPrepared operation in case of rollback
-		if ( session.isTransactionInProgress() ) {
-			getCurrentWorkPlan( state.getContextProvider(), session ).clearNotPrepared();
+		PojoWorkPlan workPlan = getCurrentWorkPlanIfExisting( state.getContextProvider(), session );
+
+		// skip the clearNotPrepared operation in case there has been no one to clear
+		if ( workPlan != null ) {
+			workPlan.clearNotPrepared();
 		}
 	}
 
@@ -181,7 +183,12 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	private PojoWorkPlan getCurrentWorkPlan(HibernateOrmListenerContextProvider contextProvider,
 			SessionImplementor sessionImplementor) {
-		return contextProvider.getCurrentWorkPlan( sessionImplementor );
+		return contextProvider.getCurrentWorkPlan( sessionImplementor, true );
+	}
+
+	private PojoWorkPlan getCurrentWorkPlanIfExisting(HibernateOrmListenerContextProvider contextProvider,
+			SessionImplementor sessionImplementor) {
+		return contextProvider.getCurrentWorkPlan( sessionImplementor, false );
 	}
 
 	private HibernateOrmListenerTypeContext getTypeContext(HibernateOrmListenerContextProvider contextProvider,
