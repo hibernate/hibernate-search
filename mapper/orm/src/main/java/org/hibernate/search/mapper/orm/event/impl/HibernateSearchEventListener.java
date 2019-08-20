@@ -153,6 +153,15 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	@Override
 	public void onAutoFlush(AutoFlushEvent event) throws HibernateException {
+		if ( !event.isFlushRequired() ) {
+			/*
+			 * Auto-flush was disabled or there wasn't any entity/collection to flush.
+			 * Note this is not an optimization: we really need to avoid triggering entity processing in this case.
+			 * There may be dirty entities, but ORM chose not to flush them,
+			 * so we shouldn't flush the index changes either.
+			 */
+			return;
+		}
 		getCurrentWorkPlan( state.getContextProvider(), event.getSession() ).prepare();
 	}
 
