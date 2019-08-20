@@ -20,6 +20,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TopDocs;
 
 public class SearchProjectionExtractContext {
 
@@ -27,12 +28,15 @@ public class SearchProjectionExtractContext {
 
 	private final IndexSearcher indexSearcher;
 	private final Query luceneQuery;
+	private final TopDocs topDocs;
 	private final Map<DistanceCollectorKey, DistanceCollector> distanceCollectors;
 
 	public SearchProjectionExtractContext(IndexSearcher indexSearcher, Query luceneQuery,
+			TopDocs topDocs,
 			Map<DistanceCollectorKey, DistanceCollector> distanceCollectors) {
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
+		this.topDocs = topDocs;
 		this.distanceCollectors = distanceCollectors;
 	}
 
@@ -43,6 +47,10 @@ public class SearchProjectionExtractContext {
 		catch (IOException e) {
 			throw log.ioExceptionOnExplain( e );
 		}
+	}
+
+	public TopDocs getTopDocs() {
+		return topDocs;
 	}
 
 	public DistanceCollector getDistanceCollector(String absoluteFieldPath, GeoPoint location) {

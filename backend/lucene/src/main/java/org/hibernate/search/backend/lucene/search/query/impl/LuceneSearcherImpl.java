@@ -26,7 +26,6 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -40,7 +39,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.search.join.ToChildBlockJoinQuery;
@@ -51,30 +49,25 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	private static final Set<String> ID_FIELD_SET = Collections.singleton( LuceneFields.idFieldName() );
 
-	private final Query luceneQuery;
-	private final Sort luceneSort;
+	private final LuceneSearchQueryRequestContext requestContext;
+
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LuceneSearchProjection<?, H> rootProjection;
-	private final LoadingContext<?, ?> loadingContext;
 
-	LuceneSearcherImpl(Query luceneQuery,
-			Sort luceneSort,
+	LuceneSearcherImpl(LuceneSearchQueryRequestContext requestContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
-			LuceneSearchProjection<?, H> rootProjection,
-			LoadingContext<?, ?> loadingContext) {
-		this.luceneQuery = luceneQuery;
-		this.luceneSort = luceneSort;
+			LuceneSearchProjection<?, H> rootProjection) {
+		this.requestContext = requestContext;
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.rootProjection = rootProjection;
-		this.loadingContext = loadingContext;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "luceneQuery=" ).append( luceneQuery )
-				.append( ", luceneSort=" ).append( luceneSort )
+				.append( "luceneQuery=" ).append( requestContext.getLuceneQuery() )
+				.append( ", luceneSort=" ).append( requestContext.getLuceneSort() )
 				.append( "]" );
 		return sb.toString();
 	}
@@ -84,22 +77,16 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			throws IOException {
 		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, offset, limit );
 
-		luceneCollectors.collect( indexSearcher, luceneQuery, offset, limit );
+		luceneCollectors.collect( indexSearcher, requestContext.getLuceneQuery(), offset, limit );
 
-		SearchProjectionExtractContext projectionExtractContext = new SearchProjectionExtractContext(
-				indexSearcher, luceneQuery, luceneCollectors.getDistanceCollectors()
+		LuceneSearchQueryExtractContext extractContext = requestContext.createExtractContext(
+				indexSearcher, luceneCollectors
 		);
 
-		ProjectionHitMapper<?, ?> projectionHitMapper = loadingContext.getProjectionHitMapper();
-
-		List<Object> extractedData = extractHits(
-				projectionHitMapper, indexSearcher,
-				luceneCollectors.getTopDocs(),
-				projectionExtractContext
-		);
+		List<Object> extractedData = extractHits( extractContext );
 
 		return new LuceneLoadableSearchResult<>(
-				projectionHitMapper, rootProjection,
+				extractContext, rootProjection,
 				luceneCollectors.getTotalHits(), extractedData
 		);
 	}
@@ -108,17 +95,17 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	public int count(IndexSearcher indexSearcher) throws IOException {
 		// TODO HSEARCH-3352 implement timeout handling... somehow?
 		//  We may have to use search() instead of count() with a TotalHitCountCollector wrapped with the timeout limiting one
-		return indexSearcher.count( luceneQuery );
+		return indexSearcher.count( requestContext.getLuceneQuery() );
 	}
 
 	@Override
 	public Explanation explain(IndexSearcher indexSearcher, int luceneDocId) throws IOException {
-		return indexSearcher.explain( luceneQuery, luceneDocId );
+		return indexSearcher.explain( requestContext.getLuceneQuery(), luceneDocId );
 	}
 
 	@Override
 	public Query getLuceneQueryForExceptions() {
-		return luceneQuery;
+		return requestContext.getLuceneQuery();
 	}
 
 	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, int offset, Integer limit) {
@@ -128,7 +115,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
 		// TODO HSEARCH-3352 implement timeout handling by wrapping the collector with the timeout limiting one
-		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( luceneSort, maxDocs );
+		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( requestContext.getLuceneSort(), maxDocs );
 		rootProjection.contributeCollectors( luceneCollectorsBuilder );
 		return luceneCollectorsBuilder.build();
 	}
@@ -145,15 +132,18 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		}
 	}
 
-	private List<Object> extractHits(ProjectionHitMapper<?, ?> projectionHitMapper,
-			IndexSearcher indexSearcher, TopDocs topDocs,
-			SearchProjectionExtractContext projectionExecutionContext) throws IOException {
+	private List<Object> extractHits(LuceneSearchQueryExtractContext extractContext) throws IOException {
+		ProjectionHitMapper<?, ?> projectionHitMapper = extractContext.getProjectionHitMapper();
+		IndexSearcher indexSearcher = extractContext.getIndexSearcher();
+
+		SearchProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext();
+		TopDocs topDocs = projectionExtractContext.getTopDocs();
 		if ( topDocs == null ) {
 			return Collections.emptyList();
 		}
 
 		List<Object> extractedData = new ArrayList<>( topDocs.scoreDocs.length );
-		Map<Integer, Set<Integer>> nestedDocs = fetchNestedDocs( indexSearcher, topDocs.scoreDocs, projectionExecutionContext );
+		Map<Integer, Set<Integer>> nestedDocs = fetchNestedDocs( indexSearcher, topDocs.scoreDocs, projectionExtractContext );
 
 		for ( ScoreDoc hit : topDocs.scoreDocs ) {
 			// add root object contribution
@@ -167,13 +157,14 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			Document document = storedFieldVisitor.getDocumentAndReset();
 			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
-			extractedData.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExecutionContext ) );
+			extractedData.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExtractContext ) );
 		}
 
 		return extractedData;
 	}
 
-	private Map<Integer, Set<Integer>> fetchNestedDocs(IndexSearcher indexSearcher, ScoreDoc[] scoreDocs, SearchProjectionExtractContext projectionExecutionContext)
+	private Map<Integer, Set<Integer>> fetchNestedDocs(IndexSearcher indexSearcher, ScoreDoc[] scoreDocs,
+			SearchProjectionExtractContext projectionExecutionContext)
 			throws IOException {
 		// if the projection does not need any nested object skip their fetching
 		if ( storedFieldVisitor.getNestedDocumentPaths().isEmpty() ) {

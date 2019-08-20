@@ -97,7 +97,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 				 * This method may not be easy to implement for blocking mappers,
 				 * so we may choose to throw exceptions for those.
 				 */
-				.loadBlocking( sessionContext );
+				.loadBlocking();
 	}
 
 	@Override

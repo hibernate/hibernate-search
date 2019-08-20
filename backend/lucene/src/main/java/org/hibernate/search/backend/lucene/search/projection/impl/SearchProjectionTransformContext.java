@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 public class SearchProjectionTransformContext {
 
@@ -16,8 +14,8 @@ public class SearchProjectionTransformContext {
 
 	private boolean hasFailedLoad = false;
 
-	public SearchProjectionTransformContext(SessionContextImplementor sessionContext) {
-		this.fromDocumentFieldValueConvertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
+	public SearchProjectionTransformContext(FromDocumentFieldValueConvertContext convertContext) {
+		this.fromDocumentFieldValueConvertContext = convertContext;
 	}
 
 	FromDocumentFieldValueConvertContext getFromDocumentFieldValueConvertContext() {

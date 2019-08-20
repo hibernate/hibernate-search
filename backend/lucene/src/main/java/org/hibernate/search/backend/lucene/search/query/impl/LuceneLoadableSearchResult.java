@@ -14,9 +14,7 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 /**
  * A search result from the backend that offers a method to load data from the mapper.
@@ -30,25 +28,25 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
  * @param <H> The type of hits in the search result.
  */
 public class LuceneLoadableSearchResult<H> {
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final LuceneSearchQueryExtractContext extractContext;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
 	private final long hitCount;
 	private List<Object> extractedData;
 
-	LuceneLoadableSearchResult(ProjectionHitMapper<?, ?> projectionHitMapper,
+	LuceneLoadableSearchResult(LuceneSearchQueryExtractContext extractContext,
 			LuceneSearchProjection<?, H> rootProjection,
 			long hitCount, List<Object> extractedData) {
-		this.projectionHitMapper = projectionHitMapper;
+		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
 		this.extractedData = extractedData;
 	}
 
-	LuceneSearchResult<H> loadBlocking(SessionContextImplementor sessionContext) {
-		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( sessionContext );
+	LuceneSearchResult<H> loadBlocking() {
+		SearchProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
 
-		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking();
+		LoadingResult<?> loadingResult = extractContext.getProjectionHitMapper().loadBlocking();
 
 		int readIndex = 0;
 		int writeIndex = 0;
