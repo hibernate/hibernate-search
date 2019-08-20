@@ -122,6 +122,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
+	public AutomaticIndexingSynchronizationStrategy getSynchronizationStrategy() {
+		return synchronizationStrategy;
+	}
+
+	@Override
 	public EntityLoadingCacheLookupStrategy getCacheLookupStrategy() {
 		return cacheLookupStrategy;
 	}

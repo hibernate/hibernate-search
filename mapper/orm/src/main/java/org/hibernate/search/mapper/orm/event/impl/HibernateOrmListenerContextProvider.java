@@ -7,11 +7,14 @@
 package org.hibernate.search.mapper.orm.event.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 public interface HibernateOrmListenerContextProvider {
 
 	<E> HibernateOrmListenerTypeContext getTypeContext(Class<E> type);
+
+	AutomaticIndexingSynchronizationStrategy getSynchronizationStrategy();
 
 	PojoWorkPlan getCurrentWorkPlan(SessionImplementor session);
 
