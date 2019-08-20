@@ -46,6 +46,6 @@ final class SearchSessionWritePlanImpl implements SearchSessionWritePlan {
 
 	private PojoWorkPlan getCurrentWorkPlan() {
 		searchSession.checkOrmSessionIsOpen();
-		return searchSession.getCurrentWorkPlan();
+		return searchSession.getCurrentWorkPlan( true );
 	}
 }
