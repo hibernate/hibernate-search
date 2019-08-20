@@ -35,6 +35,7 @@ import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -67,11 +68,6 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		this.state = new InitializingHibernateSearchState( contextProviderFuture.thenApply( this::doInitialize ) );
 		this.dirtyCheckingEnabled = dirtyCheckingEnabled;
 	}
-
-	// TODO HSEARCH-3068 handle the "simulated" transaction when a Flush listener is registered
-	//only used by the HibernateSearchEventListener instance playing in the FlushEventListener role.
-	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
-//	private final Map<Session, Synchronization> flushSynch = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
 
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
@@ -137,18 +133,18 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	 */
 	@Override
 	public void onFlush(FlushEvent event) {
-		getCurrentWorkPlan( state.getContextProvider(), event.getSession() ).prepare();
+		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
+		EventSource session = event.getSession();
+		PojoWorkPlan currentWorkPlan = getCurrentWorkPlan( contextProvider, session );
+		currentWorkPlan.prepare();
 
-		// TODO HSEARCH-3068 handle the "simulated" transaction when a Flush listener is registered
-//		Session session = event.getSession();
-//		Synchronization synchronization = flushSynch.get( session );
-//		if ( synchronization != null ) {
-//			//first cleanup
-//			flushSynch.remove( session );
-//			log.debug( "flush event causing index update out of transaction" );
-//			synchronization.beforeCompletion();
-//			synchronization.afterCompletion( Status.STATUS_COMMITTED );
-//		}
+		// flush within a transaction should trigger only the prepare phase,
+		// since the execute phase is supposed to be triggered by the transaction commit
+		if ( !session.isTransactionInProgress() ) {
+			// out of transaction it will trigger both of them
+			AutomaticIndexingSynchronizationStrategy synchronizationStrategy = contextProvider.getSynchronizationStrategy();
+			synchronizationStrategy.handleFuture( currentWorkPlan.execute() );
+		}
 	}
 
 	@Override
@@ -192,22 +188,6 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			Object entity) {
 		return contextProvider.getTypeContext( Hibernate.getClass( entity ) );
 	}
-
-	// TODO HSEARCH-3068 handle the "simulated" transaction when a Flush listener is registered
-//	/**
-//	 * Adds a synchronization to be performed in the onFlush method;
-//	 * should only be used as workaround for the case a flush is happening
-//	 * out of transaction.
-//	 * Warning: if the synchronization contains a hard reference
-//	 * to the Session proper cleanup is not guaranteed and memory leaks
-//	 * will happen.
-//	 *
-//	 * @param eventSource should be the Session doing the flush
-//	 * @param synchronization the synchronisation instance
-//	 */
-//	public void addSynchronization(EventSource eventSource, Synchronization synchronization) {
-//		this.flushSynch.put( eventSource, synchronization );
-//	}
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();

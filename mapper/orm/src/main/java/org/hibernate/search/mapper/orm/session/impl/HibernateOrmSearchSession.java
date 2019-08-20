@@ -191,54 +191,41 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@SuppressWarnings("unchecked")
 	public PojoWorkPlan getCurrentWorkPlan() {
 		SessionImplementor sessionImplementor = sessionContext.getSession();
+		Transaction transactionIdentifier = null;
+
+		TransientReference<Map<Transaction, PojoWorkPlan>> reference = (TransientReference<Map<Transaction, PojoWorkPlan>>) sessionImplementor.getProperties()
+				.get( WORK_PLAN_PER_TRANSACTION_MAP_KEY );
+		Map<Transaction, PojoWorkPlan> workPlanPerTransaction = reference == null ? null : reference.get();
+		if ( workPlanPerTransaction == null ) {
+			workPlanPerTransaction = new HashMap<>();
+			reference = new TransientReference<>( workPlanPerTransaction );
+			sessionImplementor.setProperty( WORK_PLAN_PER_TRANSACTION_MAP_KEY, reference );
+		}
+
 		if ( sessionImplementor.isTransactionInProgress() ) {
-			final Transaction transactionIdentifier = sessionImplementor.accessTransaction();
-			TransientReference<Map<Transaction, PojoWorkPlan>> reference =
-					(TransientReference<Map<Transaction, PojoWorkPlan>>) sessionImplementor.getProperties()
-							.get( WORK_PLAN_PER_TRANSACTION_MAP_KEY );
-			Map<Transaction, PojoWorkPlan> workPlanPerTransaction = reference == null ? null : reference.get();
-			if ( workPlanPerTransaction == null ) {
-				workPlanPerTransaction = new HashMap<>();
-				reference = new TransientReference<>( workPlanPerTransaction );
-				sessionImplementor.setProperty( WORK_PLAN_PER_TRANSACTION_MAP_KEY, reference );
-			}
-			PojoWorkPlan workPlan = workPlanPerTransaction.get( transactionIdentifier );
-			if ( workPlan == null ) {
-				AutomaticIndexingSynchronizationStrategy workPlanSynchronizationStrategy =
-						synchronizationStrategy;
-				workPlan = createWorkPlan(
-						workPlanSynchronizationStrategy.getDocumentCommitStrategy(),
-						workPlanSynchronizationStrategy.getDocumentRefreshStrategy()
-				);
-				workPlanPerTransaction.put( transactionIdentifier, workPlan );
-				Synchronization txSync = createTransactionWorkQueueSynchronization(
-						workPlan, workPlanPerTransaction, transactionIdentifier, workPlanSynchronizationStrategy
-				);
-				registerSynchronization( sessionImplementor, txSync );
-			}
+			transactionIdentifier = sessionImplementor.accessTransaction();
+		}
+		// For out of transaction case we will use null as transaction identifier
+
+		PojoWorkPlan workPlan = workPlanPerTransaction.get( transactionIdentifier );
+		if ( workPlan != null ) {
 			return workPlan;
 		}
-		/*
-		 * TODO HSEARCH-3068 handle the "simulated" transaction when "a Flush listener is registered".
-		 * See:
-		 *  - HibernateSearchEventListener (in Search 5 and here)
-		 *  - the else block in org.hibernate.search.event.impl.EventSourceTransactionContext#registerSynchronization in Search 5
-		else if ( some condition ) {
-			throw new UnsupportedOperationException( "Not implemented yet" );
+
+		AutomaticIndexingSynchronizationStrategy workPlanSynchronizationStrategy = synchronizationStrategy;
+		workPlan = createWorkPlan(
+				workPlanSynchronizationStrategy.getDocumentCommitStrategy(),
+				workPlanSynchronizationStrategy.getDocumentRefreshStrategy()
+		);
+		workPlanPerTransaction.put( transactionIdentifier, workPlan );
+
+		if ( sessionImplementor.isTransactionInProgress() ) {
+			Synchronization txSync = createTransactionWorkQueueSynchronization(
+					workPlan, workPlanPerTransaction, transactionIdentifier, workPlanSynchronizationStrategy
+			);
+			registerSynchronization( sessionImplementor, txSync );
 		}
-		 */
-		else {
-			// TODO HSEARCH-3069 add a warning when configuration expects transactions, but none was found
-//			if ( transactionExpected ) {
-//				// this is a workaround: isTransactionInProgress should return "true"
-//				// for correct configurations.
-//				log.pushedChangesOutOfTransaction();
-//			}
-			// TODO HSEARCH-3069 Create a work plan (to handle automatic reindexing of containing types),
-			//  but ensure changes will be applied without waiting for a call to workPlan.execute()
-			// TODO HSEARCH-3069 also ensure synchronicity if necessary (make some Session event, such as flush(), wait for the works to be executed)
-			throw new UnsupportedOperationException( "Not implemented yet" );
-		}
+		return workPlan;
 	}
 
 	AutomaticIndexingSynchronizationStrategy getAutomaticIndexingSynchronizationStrategy() {
@@ -250,7 +237,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	private Synchronization createTransactionWorkQueueSynchronization(PojoWorkPlan workPlan,
-			Map<Transaction, PojoWorkPlan> workPlanPerTransaction, Object transactionIdentifier,
+			Map<Transaction, PojoWorkPlan> workPlanPerTransaction, Transaction transactionIdentifier,
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		if ( enlistInTransaction ) {
 			return new InTransactionWorkQueueSynchronization(
