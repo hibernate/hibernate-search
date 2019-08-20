@@ -403,4 +403,11 @@ public interface Log extends BasicLogger {
 			value = "The bind() method of binder '%1$s' is not implemented correctly:"
 					+ " it did not call context.setMarker(...).")
 	SearchException missingMarkerForBinder(Object binder);
+
+	@Message(id = ID_OFFSET_2 + 60,
+			value = "Entity processing was triggered while already processing entities, which is not supported."
+					+ " Make sure you do not change entities within an entity getter or a custom bridge used for indexing,"
+					+ " and avoid any event that could trigger entity processing."
+					+ " Hibernate ORM flushes, in particular, must be avoided in entity getters and bridges.")
+	SearchException recursiveWorkPlanPrepare();
 }

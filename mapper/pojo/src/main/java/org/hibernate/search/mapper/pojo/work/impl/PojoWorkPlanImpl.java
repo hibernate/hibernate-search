@@ -111,7 +111,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	@Override
 	public void prepare() {
 		if ( isPreparing ) {
-			return;
+			throw log.recursiveWorkPlanPrepare();
 		}
 
 		isPreparing = true;
