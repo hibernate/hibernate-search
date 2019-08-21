@@ -18,6 +18,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneLongDomain;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
 public final class LuceneLocalDateFieldCodec extends AbstractLuceneNumericFieldCodec<LocalDate, Long> {
 
@@ -62,6 +64,6 @@ public final class LuceneLocalDateFieldCodec extends AbstractLuceneNumericFieldC
 
 	@Override
 	public LuceneNumericDomain<Long> getDomain() {
-		return LuceneNumericDomain.LONG;
+		return LuceneLongDomain.get();
 	}
 }

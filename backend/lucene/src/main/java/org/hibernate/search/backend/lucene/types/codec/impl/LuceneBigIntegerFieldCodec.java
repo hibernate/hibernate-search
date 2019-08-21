@@ -13,6 +13,8 @@ import java.math.RoundingMode;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneLongDomain;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -64,7 +66,7 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 
 	@Override
 	public LuceneNumericDomain<Long> getDomain() {
-		return LuceneNumericDomain.LONG;
+		return LuceneLongDomain.get();
 	}
 
 	@Override

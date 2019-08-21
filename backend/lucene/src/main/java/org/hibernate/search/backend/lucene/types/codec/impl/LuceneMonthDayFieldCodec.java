@@ -16,6 +16,8 @@ import java.time.format.ResolverStyle;
 import java.util.Locale;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneIntegerDomain;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
@@ -69,6 +71,6 @@ public final class LuceneMonthDayFieldCodec extends AbstractLuceneNumericFieldCo
 
 	@Override
 	public LuceneNumericDomain<Integer> getDomain() {
-		return LuceneNumericDomain.INTEGER;
+		return LuceneIntegerDomain.get();
 	}
 }

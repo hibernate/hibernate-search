@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityC
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericDomain;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
