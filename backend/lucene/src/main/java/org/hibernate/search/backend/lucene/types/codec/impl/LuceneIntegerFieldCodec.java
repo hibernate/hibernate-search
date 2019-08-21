@@ -10,6 +10,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneIntegerDomain;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
 public final class LuceneIntegerFieldCodec extends AbstractLuceneNumericFieldCodec<Integer, Integer> {
 
@@ -41,6 +43,6 @@ public final class LuceneIntegerFieldCodec extends AbstractLuceneNumericFieldCod
 
 	@Override
 	public LuceneNumericDomain<Integer> getDomain() {
-		return LuceneNumericDomain.INTEGER;
+		return LuceneIntegerDomain.get();
 	}
 }

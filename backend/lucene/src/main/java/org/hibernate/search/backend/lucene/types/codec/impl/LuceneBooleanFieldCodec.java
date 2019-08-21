@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneIntegerDomain;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
@@ -43,7 +45,7 @@ public final class LuceneBooleanFieldCodec extends AbstractLuceneNumericFieldCod
 
 	@Override
 	public LuceneNumericDomain<Integer> getDomain() {
-		return LuceneNumericDomain.INTEGER;
+		return LuceneIntegerDomain.get();
 	}
 
 }

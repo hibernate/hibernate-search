@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
 import org.apache.lucene.index.Term;
