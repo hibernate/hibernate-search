@@ -8,52 +8,26 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.time.YearMonth;
 
+import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneYearMonthFieldCodec;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNumericFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class LuceneYearMonthIndexFieldTypeOptionsStep
-		extends AbstractLuceneStandardIndexFieldTypeOptionsStep<LuceneYearMonthIndexFieldTypeOptionsStep, YearMonth> {
-
-	private Sortable sortable = Sortable.DEFAULT;
+		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneYearMonthIndexFieldTypeOptionsStep, YearMonth> {
 
 	LuceneYearMonthIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, YearMonth.class );
 	}
 
 	@Override
-	public LuceneYearMonthIndexFieldTypeOptionsStep sortable(Sortable sortable) {
-		this.sortable = sortable;
-		return this;
-	}
-
-	@Override
-	public LuceneIndexFieldType<YearMonth> toIndexFieldType() {
-		boolean resolvedSortable = resolveDefault( sortable );
-		boolean resolvedProjectable = resolveDefault( projectable );
-		boolean resolvedSearchable = resolveDefault( searchable );
-
-		ToDocumentFieldValueConverter<?, ? extends YearMonth> dslToIndexConverter =
-				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super YearMonth, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		LuceneYearMonthFieldCodec codec = new LuceneYearMonthFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
-
-		return new LuceneIndexFieldType<>(
-				codec,
-				new LuceneNumericFieldPredicateBuilderFactory<>( resolvedSearchable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec )
-		);
-	}
-
-	@Override
 	protected LuceneYearMonthIndexFieldTypeOptionsStep thisAsS() {
 		return this;
+	}
+
+	@Override
+	protected AbstractLuceneNumericFieldCodec<YearMonth, ?> createCodec(boolean resolvedProjectable,
+			boolean resolvedSearchable, boolean resolvedSortable, YearMonth indexNullAsValue) {
+		return new LuceneYearMonthFieldCodec(
+				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
+		);
 	}
 }
