@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +22,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
@@ -33,7 +31,6 @@ import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorPro
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorTypeNode;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A builder of {@link PojoIndexingProcessorTypeNode}.
@@ -42,8 +39,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcessorNodeBuilder
 		implements PojoMappingCollectorTypeNode {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BoundPojoModelPathTypeNode<T> modelPath;
 
@@ -140,16 +135,13 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 					.map( Optional::get )
 					.forEach( immutablePropertyNodes::add );
 
-			if ( immutableBridgeHolders.isEmpty() && immutablePropertyNodes.isEmpty() ) {
-				if ( parentIndexObjectReferences.isEmpty() ) {
-					/*
-					 * If this node doesn't create any object in the document, and it doesn't have any bridge,
-					 * nor any property node, then it is useless and we don't need to build it.
-					 */
-					return Optional.empty();
-				}
-
-				throw log.invalidIndexedEmbedded( modelPath.getTypeModel() );
+			if ( parentIndexObjectReferences.isEmpty() && immutableBridgeHolders.isEmpty() && immutablePropertyNodes
+					.isEmpty() ) {
+				/*
+				 * If this node doesn't create any object in the document, and it doesn't have any bridge,
+				 * nor any property node, then it is useless and we don't need to build it.
+				 */
+				return Optional.empty();
 			}
 			else {
 				return Optional.of( new PojoIndexingProcessorTypeNode<>(
