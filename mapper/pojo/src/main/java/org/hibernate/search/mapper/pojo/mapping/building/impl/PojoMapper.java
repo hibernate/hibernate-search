@@ -124,10 +124,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		indexedTypeManagerBuilders.put( entityTypeModel, builder );
 
 		PojoMappingCollectorTypeNode collector = builder.asCollector();
-		contributorProvider.forEach(
-				entityTypeModel,
-				c -> c.contributeMapping( collector )
-		);
+
+		contributorProvider.get( entityTypeModel )
+				.forEach( c -> c.contributeMapping( collector ) );
 	}
 
 	@Override

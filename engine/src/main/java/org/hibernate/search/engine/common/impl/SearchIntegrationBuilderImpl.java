@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -418,13 +418,18 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		}
 
 		private class TypeMetadataContributorProviderImpl implements TypeMetadataContributorProvider<C> {
+
 			@Override
-			public void forEach(MappableTypeModel typeModel, Consumer<C> contributorConsumer) {
-				typeModel.getDescendingSuperTypes()
+			public Set<C> get(MappableTypeModel typeModel) {
+				return typeModel.getDescendingSuperTypes()
 						.map( MappingBuildingState.this::getContributionIncludingAutomaticallyDiscovered )
 						.filter( Objects::nonNull )
 						.flatMap( TypeMappingContribution::getContributors )
-						.forEach( contributorConsumer );
+
+						// Using a LinkedHashSet because it seems the order matters.
+						// Otherwise, AutomaticIndexingPolymorphicOriginalSideAssociationIT could fail
+						// because of PojoTypeAdditionalMetadataProvider#createTypeAdditionalMetadata
+						.collect( Collectors.toCollection( LinkedHashSet::new ) );
 			}
 
 			@Override
