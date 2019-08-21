@@ -24,6 +24,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -101,8 +102,11 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 			);
 			typeNodeBuilders.add( nestedProcessorBuilder );
 
-			mappingHelper.getContributorProvider().get( embeddedTypeModelPath.getTypeModel().getRawType() )
-					.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
+			Set<PojoTypeMetadataContributor> contributors = mappingHelper.getContributorProvider().get( embeddedTypeModelPath.getTypeModel().getRawType() );
+			if ( contributors.isEmpty() ) {
+				throw log.invalidIndexedEmbedded( modelPath.getTypeModel() );
+			}
+			contributors.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
 
 			Set<String> uselessIncludePaths = nestedBindingContext.getUselessIncludePaths();
 			if ( !uselessIncludePaths.isEmpty() ) {

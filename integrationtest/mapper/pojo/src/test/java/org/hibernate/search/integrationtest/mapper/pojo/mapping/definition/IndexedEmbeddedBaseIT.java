@@ -664,7 +664,7 @@ public class IndexedEmbeddedBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".invalid<no value extractors>" )
+						.pathContext( ".invalid" )
 						.failure( "Type '" + String.class.getName() +
 								"' cannot be indexed-embedded, because no index mapping (@GenericField, @FullTextField, ...) is defined for that type." )
 						.build()
@@ -715,7 +715,7 @@ public class IndexedEmbeddedBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".invalid<no value extractors>" )
+						.pathContext( ".invalid" )
 						.failure( "Type '" + EmptyNested.class.getName() +
 								"' cannot be indexed-embedded, because no index mapping (@GenericField, @FullTextField, ...) is defined for that type." )
 						.build()
