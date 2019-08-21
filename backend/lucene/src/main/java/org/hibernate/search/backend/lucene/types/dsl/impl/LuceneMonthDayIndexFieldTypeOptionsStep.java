@@ -8,52 +8,26 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.time.MonthDay;
 
+import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneMonthDayFieldCodec;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNumericFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class LuceneMonthDayIndexFieldTypeOptionsStep
-		extends AbstractLuceneStandardIndexFieldTypeOptionsStep<LuceneMonthDayIndexFieldTypeOptionsStep, MonthDay> {
-
-	private Sortable sortable = Sortable.DEFAULT;
+		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneMonthDayIndexFieldTypeOptionsStep, MonthDay> {
 
 	LuceneMonthDayIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, MonthDay.class );
 	}
 
 	@Override
-	public LuceneMonthDayIndexFieldTypeOptionsStep sortable(Sortable sortable) {
-		this.sortable = sortable;
-		return this;
-	}
-
-	@Override
-	public LuceneIndexFieldType<MonthDay> toIndexFieldType() {
-		boolean resolvedSortable = resolveDefault( sortable );
-		boolean resolvedProjectable = resolveDefault( projectable );
-		boolean resolvedSearchable = resolveDefault( searchable );
-
-		ToDocumentFieldValueConverter<?, ? extends MonthDay> dslToIndexConverter =
-				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super MonthDay, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		LuceneMonthDayFieldCodec codec = new LuceneMonthDayFieldCodec( resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue );
-
-		return new LuceneIndexFieldType<>(
-				codec,
-				new LuceneNumericFieldPredicateBuilderFactory<>( resolvedSearchable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec )
-		);
-	}
-
-	@Override
 	protected LuceneMonthDayIndexFieldTypeOptionsStep thisAsS() {
 		return this;
+	}
+
+	@Override
+	protected AbstractLuceneNumericFieldCodec<MonthDay, ?> createCodec(boolean resolvedProjectable,
+			boolean resolvedSearchable, boolean resolvedSortable, MonthDay indexNullAsValue) {
+		return new LuceneMonthDayFieldCodec(
+				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
+		);
 	}
 }
