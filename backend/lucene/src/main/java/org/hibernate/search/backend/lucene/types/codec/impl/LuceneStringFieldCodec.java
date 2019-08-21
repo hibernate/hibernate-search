@@ -8,24 +8,27 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import java.util.Objects;
 
+import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.SortedDocValuesField;
+import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocValuesFieldExistsQuery;
 import org.apache.lucene.search.NormsFieldExistsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.BytesRef;
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
 public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String> {
 
 	private final boolean sortable;
 	private final boolean searchable;
+	private final boolean aggregable;
 
 	private final FieldType fieldType;
 
@@ -33,9 +36,11 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 
 	private final Analyzer analyzerOrNormalizer;
 
-	public LuceneStringFieldCodec(boolean searchable, boolean sortable, FieldType fieldType, String indexNullAsValue, Analyzer analyzerOrNormalizer) {
+	public LuceneStringFieldCodec(boolean searchable, boolean sortable, boolean aggregable,
+			FieldType fieldType, String indexNullAsValue, Analyzer analyzerOrNormalizer) {
 		this.sortable = sortable;
 		this.searchable = searchable;
+		this.aggregable = aggregable;
 		this.fieldType = fieldType;
 		this.indexNullAsValue = indexNullAsValue;
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
@@ -56,9 +61,14 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 			documentBuilder.addField( new Field( absoluteFieldPath, value, fieldType ) );
 		}
 
-		if ( sortable ) {
-			// sortable
-			documentBuilder.addField( new SortedDocValuesField( absoluteFieldPath, normalize( absoluteFieldPath, value ) ) );
+		if ( sortable || aggregable ) {
+			BytesRef normalized = normalize( absoluteFieldPath, value );
+			if ( sortable ) {
+				documentBuilder.addField( new SortedDocValuesField( absoluteFieldPath, normalized ) );
+			}
+			if ( aggregable ) {
+				documentBuilder.addField( new SortedSetDocValuesFacetField( absoluteFieldPath, normalized.utf8ToString() ) );
+			}
 		}
 
 		if ( !sortable && fieldType.omitNorms() ) {

@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.work.impl;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.Query;
 
 public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 

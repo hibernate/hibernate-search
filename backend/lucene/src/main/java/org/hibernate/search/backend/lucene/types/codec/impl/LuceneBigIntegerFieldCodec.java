@@ -30,8 +30,9 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	private final BigDecimal minScaledValue;
 	private final BigDecimal maxScaledValue;
 
-	public LuceneBigIntegerFieldCodec(boolean projectable, boolean searchable, boolean sortable, BigInteger indexNullAsValue, int decimalScale) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	public LuceneBigIntegerFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, BigInteger indexNullAsValue, int decimalScale) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 		this.decimalScale = decimalScale;
 		this.minScaledValue = new BigDecimal( NumberScaleConstants.MIN_LONG_AS_BIGINTEGER, decimalScale );
 		this.maxScaledValue = new BigDecimal( NumberScaleConstants.MAX_LONG_AS_BIGINTEGER, decimalScale );
@@ -65,6 +66,11 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
+	public BigInteger decode(Long encoded) {
+		return scale( encoded ).toBigInteger();
+	}
+
+	@Override
 	public LuceneNumericDomain<Long> getDomain() {
 		return LuceneLongDomain.get();
 	}
@@ -85,6 +91,10 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	private Long unscale(BigDecimal decimal) {
 		// See tck.DecimalScaleIT#roundingMode
 		return decimal.setScale( decimalScale, RoundingMode.HALF_UP ).unscaledValue().longValue();
+	}
+
+	private BigDecimal scale(Long value) {
+		return new BigDecimal( BigInteger.valueOf( value ), decimalScale );
 	}
 
 	private boolean isTooLarge(BigDecimal decimal) {

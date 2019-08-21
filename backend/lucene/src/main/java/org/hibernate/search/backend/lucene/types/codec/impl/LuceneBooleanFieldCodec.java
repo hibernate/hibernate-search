@@ -16,8 +16,9 @@ import org.apache.lucene.index.IndexableField;
 
 public final class LuceneBooleanFieldCodec extends AbstractLuceneNumericFieldCodec<Boolean, Integer> {
 
-	public LuceneBooleanFieldCodec(boolean projectable, boolean searchable, boolean sortable, Boolean indexNullAsValue) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	public LuceneBooleanFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, Boolean indexNullAsValue) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 	}
 
 	@Override
@@ -41,6 +42,11 @@ public final class LuceneBooleanFieldCodec extends AbstractLuceneNumericFieldCod
 	@Override
 	public Integer encode(Boolean value) {
 		return value ? 1 : 0;
+	}
+
+	@Override
+	public Boolean decode(Integer encoded) {
+		return encoded > 0;
 	}
 
 	@Override

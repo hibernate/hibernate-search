@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 
 class LuceneSearchQueryOptionsStepImpl<H>
 		extends AbstractExtendedSearchQueryOptionsStep<
-		LuceneSearchQueryOptionsStep<H>,
+						LuceneSearchQueryOptionsStep<H>,
 						H,
 						LuceneSearchResult<H>,
 						LuceneSearchPredicateFactory,
@@ -66,7 +66,6 @@ class LuceneSearchQueryOptionsStepImpl<H>
 
 	@Override
 	protected LuceneSearchAggregationFactory extendAggregationFactory(SearchAggregationFactory aggregationFactory) {
-		// FIXME HSEARCH-3271 implement this
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return aggregationFactory.extension( LuceneExtension.get() );
 	}
 }

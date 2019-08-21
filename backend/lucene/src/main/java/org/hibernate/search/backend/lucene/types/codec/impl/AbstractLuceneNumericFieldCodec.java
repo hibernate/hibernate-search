@@ -20,13 +20,16 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 	private final boolean projectable;
 	private final boolean searchable;
 	private final boolean sortable;
+	private final boolean aggregable;
 
 	private final F indexNullAsValue;
 
-	public AbstractLuceneNumericFieldCodec(boolean projectable, boolean searchable, boolean sortable, F indexNullAsValue) {
+	public AbstractLuceneNumericFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, F indexNullAsValue) {
 		this.projectable = projectable;
 		this.searchable = searchable;
 		this.sortable = sortable;
+		this.aggregable = aggregable;
 		this.indexNullAsValue = indexNullAsValue;
 	}
 
@@ -48,7 +51,7 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 
 		LuceneNumericDomain<E> domain = getDomain();
 
-		if ( sortable ) {
+		if ( sortable || aggregable ) {
 			documentBuilder.addField( domain.createDocValuesField( absoluteFieldPath, encodedValue ) );
 		}
 		else {
@@ -63,7 +66,7 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 
 	@Override
 	public Query createExistsQuery(String absoluteFieldPath) {
-		if ( sortable ) {
+		if ( sortable || aggregable ) {
 			return new DocValuesFieldExistsQuery( absoluteFieldPath );
 		}
 		else {
@@ -83,8 +86,10 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 		AbstractLuceneNumericFieldCodec<?, ?> other = (AbstractLuceneNumericFieldCodec<?, ?>) obj;
 
 		return ( projectable == other.projectable ) && ( searchable == other.searchable )
-				&& ( sortable == other.sortable );
+				&& ( sortable == other.sortable ) && ( aggregable == other.aggregable );
 	}
+
+	public abstract F decode(E encoded);
 
 	public abstract LuceneNumericDomain<E> getDomain();
 

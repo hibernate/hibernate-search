@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -18,7 +21,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
@@ -27,12 +32,16 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneSearchQueryBuilder<H>
 		implements SearchQueryBuilder<H, LuceneSearchQueryElementCollector>, LuceneSearchQueryElementCollector {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneWorkFactory workFactory;
 	private final LuceneReadWorkOrchestrator queryOrchestrator;
@@ -47,6 +56,7 @@ public class LuceneSearchQueryBuilder<H>
 
 	private Query luceneQuery;
 	private List<SortField> sortFields;
+	private Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -104,6 +114,17 @@ public class LuceneSearchQueryBuilder<H>
 	}
 
 	@Override
+	public <A> void collectAggregation(AggregationKey<A> key, LuceneSearchAggregation<A> aggregation) {
+		if ( aggregations == null ) {
+			aggregations = new LinkedHashMap<>();
+		}
+		Object previous = aggregations.put( key, aggregation );
+		if ( previous != null ) {
+			throw log.duplicateAggregationKey( key );
+		}
+	}
+
+	@Override
 	public LuceneSearchQuery<H> build() {
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
@@ -125,7 +146,10 @@ public class LuceneSearchQueryBuilder<H>
 		);
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
-				requestContext, storedFieldVisitor, rootProjection
+				requestContext,
+				storedFieldVisitor,
+				rootProjection,
+				aggregations == null ? Collections.emptyMap() : aggregations
 		);
 
 		return new LuceneSearchQueryImpl<>(

@@ -10,10 +10,12 @@ import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneS
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 
 /**
@@ -33,14 +35,17 @@ public class LuceneLoadableSearchResult<H> {
 
 	private final long hitCount;
 	private List<Object> extractedData;
+	private final Map<AggregationKey<?>, ?> extractedAggregations;
 
 	LuceneLoadableSearchResult(LuceneSearchQueryExtractContext extractContext,
 			LuceneSearchProjection<?, H> rootProjection,
-			long hitCount, List<Object> extractedData) {
+			long hitCount, List<Object> extractedData,
+			Map<AggregationKey<?>, ?> extractedAggregations) {
 		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
 		this.extractedData = extractedData;
+		this.extractedAggregations = extractedAggregations;
 	}
 
 	LuceneSearchResult<H> loadBlocking() {
@@ -77,6 +82,6 @@ public class LuceneLoadableSearchResult<H> {
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
 		extractedData = null;
 
-		return new LuceneSearchResultImpl<>( hitCount, loadedHits );
+		return new LuceneSearchResultImpl<>( hitCount, loadedHits, extractedAggregations );
 	}
 }

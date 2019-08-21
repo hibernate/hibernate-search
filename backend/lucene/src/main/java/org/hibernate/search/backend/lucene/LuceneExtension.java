@@ -9,6 +9,9 @@ package org.hibernate.search.backend.lucene;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
+import org.hibernate.search.backend.lucene.search.dsl.aggregation.LuceneSearchAggregationFactory;
+import org.hibernate.search.backend.lucene.search.dsl.aggregation.impl.LuceneSearchAggregationFactoryImpl;
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearchPredicateFactoryImpl;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
@@ -28,6 +31,9 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
+import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactoryExtension;
+import org.hibernate.search.engine.search.dsl.aggregation.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
@@ -71,6 +77,7 @@ public final class LuceneExtension<H, R, E>
 		SearchPredicateFactoryExtension<LuceneSearchPredicateFactory>,
 		SearchSortFactoryExtension<LuceneSearchSortFactory>,
 		SearchProjectionFactoryExtension<LuceneSearchProjectionFactory<R, E>, R, E>,
+		SearchAggregationFactoryExtension<LuceneSearchAggregationFactory>,
 		IndexFieldTypeFactoryExtension<LuceneIndexFieldTypeFactory> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -176,6 +183,24 @@ public final class LuceneExtension<H, R, E>
 		if ( factory instanceof LuceneSearchProjectionBuilderFactory ) {
 			return Optional.of( new LuceneSearchProjectionFactoryImpl<>(
 					original, (LuceneSearchProjectionBuilderFactory) factory
+			) );
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@SuppressWarnings("unchecked") // If the factory is an instance of LuceneSearchAggregationBuilderFactory, the cast is safe
+	public Optional<LuceneSearchAggregationFactory> extendOptional(
+			SearchAggregationFactory original, SearchAggregationDslContext<?> dslContext) {
+		if ( dslContext.getBuilderFactory() instanceof LuceneSearchAggregationBuilderFactory ) {
+			return Optional.of( new LuceneSearchAggregationFactoryImpl(
+					original,
+					(SearchAggregationDslContext<LuceneSearchAggregationBuilderFactory>) dslContext
 			) );
 		}
 		else {

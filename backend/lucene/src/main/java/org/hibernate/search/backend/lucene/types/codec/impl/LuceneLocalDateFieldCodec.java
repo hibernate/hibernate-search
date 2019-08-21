@@ -30,8 +30,9 @@ public final class LuceneLocalDateFieldCodec extends AbstractLuceneNumericFieldC
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneLocalDateFieldCodec(boolean projectable, boolean searchable, boolean sortable, LocalDate indexNullAsValue) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	public LuceneLocalDateFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, LocalDate indexNullAsValue) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 	}
 
 	@Override
@@ -60,6 +61,11 @@ public final class LuceneLocalDateFieldCodec extends AbstractLuceneNumericFieldC
 	@Override
 	public Long encode(LocalDate value) {
 		return value == null ? null : value.toEpochDay();
+	}
+
+	@Override
+	public LocalDate decode(Long encoded) {
+		return LocalDate.ofEpochDay( encoded );
 	}
 
 	@Override

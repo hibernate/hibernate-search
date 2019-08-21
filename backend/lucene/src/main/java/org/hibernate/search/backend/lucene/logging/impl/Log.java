@@ -17,14 +17,18 @@ import java.util.Set;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
@@ -54,6 +58,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 118, max = 118),
 		@ValidIdRange(min = 225, max = 225),
 		@ValidIdRange(min = 228, max = 228),
+		@ValidIdRange(min = 265, max = 265),
 		@ValidIdRange(min = 284, max = 284),
 		@ValidIdRange(min = 320, max = 320),
 		@ValidIdRange(min = 321, max = 321),
@@ -114,6 +119,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 228,
 			value = "Value '%1$ss' is not in a valid format to express a Lucene version: %2$s" )
 	SearchException illegalLuceneVersionFormat(String property, String luceneErrorMessage, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_1 + 265,
+			value = "Unable to build Lucene Document due to facet indexing error")
+	SearchException errorDuringFacetingIndexing(@Cause Exception e );
 
 	@Message(id = ID_OFFSET_1 + 284,
 			value = "An exception occurred while opening multiple indexes." )
@@ -284,11 +293,11 @@ public interface Log extends BasicLogger {
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 37,
-			value = "Range lookups (range predicates) are not supported by this field's type (GeoPoint). Use spatial features instead.")
+			value = "Range lookups (range predicates, range aggregations) are not supported by this field's type (GeoPoint). Use spatial features instead.")
 	SearchException rangesNotSupportedByGeoPoint(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 38,
-			value = "Direct value lookups (match predicates) are not supported by this field's type (GeoPoint). Use spatial features instead.")
+			value = "Direct value lookups (match predicates, terms aggregations) are not supported by this field's type (GeoPoint). Use spatial features instead.")
 	SearchException directValueLookupNotSupportedByGeoPoint(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 39,
@@ -522,4 +531,44 @@ public interface Log extends BasicLogger {
 					+ " one with an analyzer that is not aggregable, and one with a normalizer that is aggregable.")
 	SearchException cannotUseAnalyzerOnAggregableField(String analyzerName, @Param EventContext context);
 
+	@Message(id = ID_OFFSET_2 + 95,
+			value = "Aggregations are not enabled for field '%1$s'. Make sure the field is marked as aggregable.")
+	SearchException nonAggregableField(String absoluteFieldPath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 96, value = "Invalid type '%2$s' for aggregation on field '%1$s'.")
+	SearchException invalidAggregationInvalidType(String absoluteFieldPath,
+			@FormatWith(ClassFormatter.class) Class<?> type,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 97,
+			value = "Multiple conflicting types to build an aggregation for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldTypesForAggregation(String absoluteFieldPath,
+			LuceneFieldAggregationBuilderFactory component1,
+			LuceneFieldAggregationBuilderFactory component2,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 98,
+			value = "An Lucene query cannot include search aggregations built using a non-Lucene search scope."
+					+ " Given aggregation was: '%1$s'")
+	SearchException cannotMixLuceneSearchQueryWithOtherAggregations(SearchAggregation<?> aggregation);
+
+	@Message(id = ID_OFFSET_2 + 99, value = "The aggregation '%1$s' is defined on a scope targeting different indexes."
+			+ " Aggregation is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	SearchException aggregationDefinedOnDifferentIndexes(SearchAggregation<?> aggregation,
+			Set<String> aggregationIndexes, Set<String> scopeIndexes);
+
+	@Message(id = ID_OFFSET_2 + 100,
+			value = "Terms aggregations are not supported by this field's type (string field with analyzed). Use a normalized field instead.")
+	SearchException termsAggregationsNotSupportedByAnalyzedTextFieldType(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 101,
+			value = "Range aggregations are not supported by this field's type.")
+	SearchException rangeAggregationsNotSupportedByFieldType(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 102,
+			value = "Multiple aggregations with the same key: '%1$s'")
+	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey key);
+
+	@Message(id = ID_OFFSET_2 + 103, value = "This field does not support aggregations.")
+	SearchException unsupportedDSLAggregations(@Param EventContext context);
 }

@@ -6,9 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
+import java.io.IOException;
+import java.util.Collection;
+
+import org.hibernate.search.util.common.data.Range;
+
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.facet.Facets;
+import org.apache.lucene.facet.FacetsCollector;
+import org.apache.lucene.facet.LongValueFacetCounts;
+import org.apache.lucene.facet.range.LongRangeFacetCounts;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 
@@ -54,6 +64,28 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	@Override
 	public SortField.Type getSortFieldType() {
 		return SortField.Type.INT;
+	}
+
+	@Override
+	public Integer fromDocValue(Long longValue) {
+		return longValue.intValue();
+	}
+
+	@Override
+	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector) throws IOException {
+		return new LongValueFacetCounts(
+				absoluteFieldPath, LongValuesSource.fromIntField( absoluteFieldPath ),
+				facetsCollector
+		);
+	}
+
+	@Override
+	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
+			Collection<? extends Range<? extends Integer>> ranges) throws IOException {
+		return new LongRangeFacetCounts(
+				absoluteFieldPath, LongValuesSource.fromIntField( absoluteFieldPath ),
+				facetsCollector, FacetCountsUtils.createLongRanges( ranges )
+		);
 	}
 
 	@Override

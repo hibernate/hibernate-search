@@ -12,11 +12,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
@@ -26,6 +29,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -53,13 +57,16 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LuceneSearchProjection<?, H> rootProjection;
+	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 
 	LuceneSearcherImpl(LuceneSearchQueryRequestContext requestContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
-			LuceneSearchProjection<?, H> rootProjection) {
+			LuceneSearchProjection<?, H> rootProjection,
+			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations) {
 		this.requestContext = requestContext;
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.rootProjection = rootProjection;
+		this.aggregations = aggregations;
 	}
 
 	@Override
@@ -85,9 +92,14 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 		List<Object> extractedData = extractHits( extractContext );
 
+		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
+				Collections.emptyMap() : extractAggregations( extractContext );
+
 		return new LuceneLoadableSearchResult<>(
 				extractContext, rootProjection,
-				luceneCollectors.getTotalHits(), extractedData
+				luceneCollectors.getTotalHits(),
+				extractedData,
+				extractedAggregations
 		);
 	}
 
@@ -117,6 +129,9 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		// TODO HSEARCH-3352 implement timeout handling by wrapping the collector with the timeout limiting one
 		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( requestContext.getLuceneSort(), maxDocs );
 		rootProjection.contributeCollectors( luceneCollectorsBuilder );
+		for ( LuceneSearchAggregation<?> aggregation : aggregations.values() ) {
+			aggregation.contributeCollectors( luceneCollectorsBuilder );
+		}
 		return luceneCollectorsBuilder.build();
 	}
 
@@ -162,6 +177,24 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		}
 
 		return extractedData;
+	}
+
+	private Map<AggregationKey<?>, ?> extractAggregations(LuceneSearchQueryExtractContext extractContext)
+			throws IOException {
+		AggregationExtractContext aggregationExtractContext =
+				extractContext.createAggregationExtractContext();
+
+		Map<AggregationKey<?>, Object> extractedMap = new LinkedHashMap<>();
+
+		for ( Map.Entry<AggregationKey<?>, LuceneSearchAggregation<?>> entry : aggregations.entrySet() ) {
+			AggregationKey<?> key = entry.getKey();
+			LuceneSearchAggregation<?> aggregation = entry.getValue();
+
+			Object extracted = aggregation.extract( aggregationExtractContext );
+			extractedMap.put( key, extracted );
+		}
+
+		return extractedMap;
 	}
 
 	private Map<Integer, Set<Integer>> fetchNestedDocs(IndexSearcher indexSearcher, ScoreDoc[] scoreDocs,

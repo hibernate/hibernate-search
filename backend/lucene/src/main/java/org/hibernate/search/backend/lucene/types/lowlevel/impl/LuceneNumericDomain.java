@@ -6,6 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
+import java.io.IOException;
+import java.util.Collection;
+
+import org.hibernate.search.util.common.data.Range;
+
+import org.apache.lucene.facet.Facets;
+import org.apache.lucene.facet.FacetsCollector;
+import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
@@ -26,8 +34,14 @@ public interface LuceneNumericDomain<E> {
 
 	SortField.Type getSortFieldType();
 
+	E fromDocValue(Long longValue);
+
+	LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector) throws IOException;
+
+	Facets createRangeFacetCounts(String absoluteFieldPath,
+			FacetsCollector facetsCollector, Collection<? extends Range<? extends E>> ranges) throws IOException;
+
 	IndexableField createIndexField(String absoluteFieldPath, E numericValue);
 
 	IndexableField createDocValuesField(String absoluteFieldPath, E numericValue);
-
 }

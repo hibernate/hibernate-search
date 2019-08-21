@@ -13,6 +13,7 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexOptions;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextFieldPredicateBuilderFactory;
@@ -117,19 +118,38 @@ class LuceneStringIndexFieldTypeOptionsStep
 
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
 				createDslToIndexConverter();
+		ToDocumentFieldValueConverter<String, ? extends String> rawDslToIndexConverter =
+				createToDocumentRawConverter();
 		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
+		FromDocumentFieldValueConverter<? super String, String> rawIndexToProjectionConverter =
+				createFromDocumentRawConverter();
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
-				resolvedSearchable, resolvedSortable,
+				resolvedSearchable, resolvedSortable, resolvedAggregable,
 				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector ), indexNullAsValue,
 				analyzerOrNormalizer
 		);
 
 		return new LuceneIndexFieldType<>(
 				codec,
-				new LuceneTextFieldPredicateBuilderFactory<>( resolvedSearchable, dslToIndexConverter, createToDocumentRawConverter(), codec, analyzerOrNormalizer, analyzer, normalizer ),
-				new LuceneTextFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
+				new LuceneTextFieldPredicateBuilderFactory<>(
+						resolvedSearchable, dslToIndexConverter, rawDslToIndexConverter, codec,
+						analyzerOrNormalizer, analyzer, normalizer
+				),
+				new LuceneTextFieldSortBuilderFactory<>(
+						resolvedSortable, dslToIndexConverter, rawDslToIndexConverter, codec
+				),
+				new LuceneStandardFieldProjectionBuilderFactory<>(
+						resolvedProjectable, indexToProjectionConverter, rawIndexToProjectionConverter, codec
+				),
+				new LuceneTextFieldAggregationBuilderFactory(
+						resolvedAggregable,
+						dslToIndexConverter, rawDslToIndexConverter,
+						indexToProjectionConverter, rawIndexToProjectionConverter,
+						codec,
+						analyzer != null
+				),
+				resolvedAggregable,
 				analyzerOrNormalizer
 		);
 	}

@@ -45,7 +45,9 @@ public class LuceneIndexManagerBuilder implements IndexManagerBuilder<LuceneRoot
 		LuceneIndexModel model = null;
 		try {
 			model = schemaRootNodeBuilder.build( indexName );
-			LuceneIndexEntryFactory indexEntryFactory = backendContext.createLuceneIndexEntryFactory( indexName );
+			LuceneIndexEntryFactory indexEntryFactory = backendContext.createLuceneIndexEntryFactory(
+					indexName, model.getFacetsConfig()
+			);
 			return new LuceneIndexManagerImpl(
 					backendContext, indexName, model, indexEntryFactory
 			);

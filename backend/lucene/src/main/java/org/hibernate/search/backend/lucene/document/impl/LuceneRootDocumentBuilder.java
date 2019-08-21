@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.document.impl;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
+import org.apache.lucene.facet.FacetsConfig;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
@@ -27,11 +29,14 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumen
 
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final String indexName;
+	private final FacetsConfig facetsConfig;
 
-	LuceneRootDocumentBuilder(MultiTenancyStrategy multiTenancyStrategy, String indexName) {
+	LuceneRootDocumentBuilder(MultiTenancyStrategy multiTenancyStrategy, String indexName,
+			FacetsConfig facetsConfig) {
 		super( LuceneIndexSchemaObjectNode.root() );
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.indexName = indexName;
+		this.facetsConfig = facetsConfig;
 	}
 
 	public LuceneIndexEntry build(String tenantId, String id) {
@@ -48,6 +53,19 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumen
 		contribute( indexName, multiTenancyStrategy, tenantId, id, documents );
 
 		documents.add( document );
+
+		if ( facetsConfig != null ) {
+			for ( int i = 0; i < documents.size(); i++ ) {
+				Document document = documents.get( i );
+				try {
+					Document facetedDocument = facetsConfig.build( document );
+					documents.set( i, facetedDocument );
+				}
+				catch (IOException | RuntimeException e) {
+					throw log.errorDuringFacetingIndexing( e );
+				}
+			}
+		}
 
 		return documents;
 	}

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneGeoPointFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointFieldPredicateBuilderFactory;
@@ -37,20 +38,31 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedSearchable = resolveDefault( searchable );
+		boolean resolvedAggregable = resolveDefault( aggregable );
 
 		ToDocumentFieldValueConverter<?, ? extends GeoPoint> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super GeoPoint, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
+		FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawIndexToProjectionConverter =
+				createFromDocumentRawConverter();
 		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
 				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
 		);
 
 		return new LuceneIndexFieldType<>(
 				codec,
-				new LuceneGeoPointFieldPredicateBuilderFactory( resolvedSearchable, dslToIndexConverter, codec ),
+				new LuceneGeoPointFieldPredicateBuilderFactory(
+						resolvedSearchable, dslToIndexConverter, codec
+				),
 				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable ),
-				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec, indexToProjectionConverter, createFromDocumentRawConverter() )
+				new LuceneGeoPointFieldProjectionBuilderFactory(
+						resolvedProjectable, codec, indexToProjectionConverter, rawIndexToProjectionConverter
+				),
+				new LuceneGeoPointFieldAggregationBuilderFactory(
+						resolvedAggregable, dslToIndexConverter, indexToProjectionConverter, codec
+				),
+				resolvedAggregable
 		);
 	}
 

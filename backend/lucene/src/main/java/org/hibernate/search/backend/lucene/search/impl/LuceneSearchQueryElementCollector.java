@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
+import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationCollector;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateCollector;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 
 
 public interface LuceneSearchQueryElementCollector
-		extends LuceneSearchPredicateCollector, LuceneSearchSortCollector {
+		extends LuceneSearchPredicateCollector, LuceneSearchSortCollector, LuceneSearchAggregationCollector {
 
 }

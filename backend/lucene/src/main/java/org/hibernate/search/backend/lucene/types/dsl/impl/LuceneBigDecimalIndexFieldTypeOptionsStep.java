@@ -43,11 +43,12 @@ class LuceneBigDecimalIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected AbstractLuceneNumericFieldCodec<BigDecimal, ?> createCodec(boolean resolvedProjectable, boolean resolvedSearchable,
-			boolean resolvedSortable, BigDecimal indexNullAsValue) {
+	protected AbstractLuceneNumericFieldCodec<BigDecimal, ?> createCodec(boolean resolvedProjectable,
+			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
+			BigDecimal indexNullAsValue) {
 		int resolvedDecimalScale = resolveDecimalScale();
 		return new LuceneBigDecimalFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue,
+				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue,
 				resolvedDecimalScale
 		);
 	}

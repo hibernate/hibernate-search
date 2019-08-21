@@ -39,7 +39,11 @@ class LuceneNativeIndexFieldTypeFinalStep<F>
 				codec,
 				null,
 				null,
-				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, indexToProjectionConverter, indexToProjectionConverter, codec )
+				new LuceneStandardFieldProjectionBuilderFactory<>(
+						fieldValueExtractor != null, indexToProjectionConverter, indexToProjectionConverter, codec
+				),
+				null,
+				false
 		);
 	}
 }

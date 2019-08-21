@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -30,8 +31,9 @@ public final class LuceneLocalDateTimeFieldCodec extends AbstractLuceneNumericFi
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneLocalDateTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable, LocalDateTime indexNullAsValue) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	public LuceneLocalDateTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, LocalDateTime indexNullAsValue) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 	}
 
 	@Override
@@ -60,6 +62,11 @@ public final class LuceneLocalDateTimeFieldCodec extends AbstractLuceneNumericFi
 	@Override
 	public Long encode(LocalDateTime value) {
 		return value == null ? null : value.toInstant( ZoneOffset.UTC ).toEpochMilli();
+	}
+
+	@Override
+	public LocalDateTime decode(Long encoded) {
+		return Instant.ofEpochMilli( encoded ).atOffset( ZoneOffset.UTC ).toLocalDateTime();
 	}
 
 	@Override

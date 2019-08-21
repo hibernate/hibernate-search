@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
@@ -40,12 +41,15 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
 
+	private final LuceneFieldAggregationBuilderFactory aggregationBuilderFactory;
+
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName,
 			boolean multiValued,
 			LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
-			LuceneFieldProjectionBuilderFactory projectionBuilderFactory) {
+			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
+			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = parent.getAbsolutePath( relativeFieldName );
@@ -55,6 +59,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
+		this.aggregationBuilderFactory = aggregationBuilderFactory;
 	}
 
 	public LuceneIndexSchemaObjectNode getParent() {
@@ -95,6 +100,13 @@ public class LuceneIndexSchemaFieldNode<F> {
 			throw log.unsupportedDSLProjections( getEventContext() );
 		}
 		return projectionBuilderFactory;
+	}
+
+	public LuceneFieldAggregationBuilderFactory getAggregationBuilderFactory() {
+		if ( aggregationBuilderFactory == null ) {
+			throw log.unsupportedDSLAggregations( getEventContext() );
+		}
+		return aggregationBuilderFactory;
 	}
 
 	@Override

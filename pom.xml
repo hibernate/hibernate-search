@@ -796,6 +796,11 @@
                 <artifactId>lucene-join</artifactId>
                 <version>${version.org.apache.lucene}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-facet</artifactId>
+                <version>${version.org.apache.lucene}</version>
+            </dependency>
 
             <!-- JavaEE/JakartaEE dependencies -->
             <dependency>
