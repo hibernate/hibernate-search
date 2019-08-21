@@ -32,7 +32,7 @@ public class DocumentReferenceExtractorHelper {
 		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
-	public void contributeRequest(JsonObject requestBody) {
+	public void requestDocumentReference(JsonObject requestBody) {
 		multiTenancyStrategy.contributeToSearchRequest( requestBody );
 	}
 

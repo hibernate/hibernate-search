@@ -30,7 +30,7 @@ class ElasticsearchExplanationProjection implements ElasticsearchSearchProjectio
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
+	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
 		REQUEST_EXPLAIN_ACCESSOR.set( requestBody, true );
 	}
 

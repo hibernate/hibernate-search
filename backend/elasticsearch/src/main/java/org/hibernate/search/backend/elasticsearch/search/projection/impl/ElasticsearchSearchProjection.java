@@ -19,10 +19,10 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	/**
 	 * Contribute to the request, making sure that the requirements for this projection are met.
 	 * @param requestBody The request body.
-	 * @param context An execution context that will also be passed to
+	 * @param context An execution context that will share state with the context passed to
 	 * {@link #extract(ProjectionHitMapper, JsonObject, JsonObject, SearchProjectionExtractContext)}.
 	 */
-	void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context);
+	void request(JsonObject requestBody, SearchProjectionRequestContext context);
 
 	/**
 	 * Perform hit extraction.

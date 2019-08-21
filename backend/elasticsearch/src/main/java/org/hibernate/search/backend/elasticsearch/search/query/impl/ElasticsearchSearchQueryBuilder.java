@@ -15,8 +15,8 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
@@ -50,7 +50,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final Set<String> routingKeys;
 	private JsonObject jsonPredicate;
 	private JsonArray jsonSort;
-	private Map<SearchProjectionExtractContext.DistanceSortKey, Integer> distanceSorts;
+	private Map<DistanceSortKey, Integer> distanceSorts;
 
 	public ElasticsearchSearchQueryBuilder(
 			ElasticsearchWorkBuilderFactory workFactory,
@@ -112,7 +112,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			distanceSorts = CollectionHelper.newHashMap( 3 );
 		}
 
-		distanceSorts.put( new SearchProjectionExtractContext.DistanceSortKey( absoluteFieldPath, center ), index );
+		distanceSorts.put( new DistanceSortKey( absoluteFieldPath, center ), index );
 	}
 
 	@Override
@@ -130,16 +130,13 @@ public class ElasticsearchSearchQueryBuilder<H>
 			payload.add( "sort", jsonSort );
 		}
 
-		SearchProjectionExtractContext searchProjectionExecutionContext =
-				new SearchProjectionExtractContext( distanceSorts );
-
-		rootProjection.contributeRequest( payload, searchProjectionExecutionContext );
-
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
 		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
 				sessionContext, loadingContext, distanceSorts
 		);
+
+		rootProjection.request( payload, requestContext );
 
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(
