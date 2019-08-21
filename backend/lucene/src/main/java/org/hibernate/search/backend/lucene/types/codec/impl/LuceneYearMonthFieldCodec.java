@@ -34,8 +34,14 @@ public final class LuceneYearMonthFieldCodec extends AbstractLuceneNumericFieldC
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneYearMonthFieldCodec(boolean projectable, boolean searchable, boolean sortable, YearMonth indexNullAsValue) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	/**
+	 * Some YearMonth whose value does not matter, to be able to generate a YearMonth from a proleptic month.
+	 */
+	private static final YearMonth SOME_YEAR_MONTH = YearMonth.of( 0, 1 );
+
+	public LuceneYearMonthFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, YearMonth indexNullAsValue) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 	}
 
 	@Override
@@ -64,6 +70,11 @@ public final class LuceneYearMonthFieldCodec extends AbstractLuceneNumericFieldC
 	@Override
 	public Long encode(YearMonth value) {
 		return value == null ? null : value.getLong( ChronoField.PROLEPTIC_MONTH );
+	}
+
+	@Override
+	public YearMonth decode(Long encoded) {
+		return SOME_YEAR_MONTH.with( ChronoField.PROLEPTIC_MONTH, encoded );
 	}
 
 	@Override

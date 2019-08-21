@@ -6,15 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 
 class LuceneSearchResultImpl<H> extends SimpleSearchResult<H>
 		implements LuceneSearchResult<H> {
-	LuceneSearchResultImpl(long hitCount, List<H> hits) {
-		super( hitCount, hits, Collections.emptyMap() );
+	LuceneSearchResultImpl(long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults) {
+		super( hitCount, hits, aggregationResults );
 	}
 }

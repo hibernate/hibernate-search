@@ -33,8 +33,9 @@ public final class LuceneMonthDayFieldCodec extends AbstractLuceneNumericFieldCo
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneMonthDayFieldCodec(boolean projectable, boolean searchable, boolean sortable, MonthDay indexNullAsValue) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	public LuceneMonthDayFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, MonthDay indexNullAsValue) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 	}
 
 	@Override
@@ -67,6 +68,11 @@ public final class LuceneMonthDayFieldCodec extends AbstractLuceneNumericFieldCo
 		}
 
 		return 100 * value.getMonthValue() + value.getDayOfMonth();
+	}
+
+	@Override
+	public MonthDay decode(Integer encoded) {
+		return MonthDay.of( encoded / 100, encoded % 100 );
 	}
 
 	@Override

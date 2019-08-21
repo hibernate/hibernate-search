@@ -39,8 +39,9 @@ public final class LuceneLocalTimeFieldCodec extends AbstractLuceneNumericFieldC
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneLocalTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable, LocalTime indexNullAsValue) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	public LuceneLocalTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, LocalTime indexNullAsValue) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 	}
 
 	@Override
@@ -69,6 +70,11 @@ public final class LuceneLocalTimeFieldCodec extends AbstractLuceneNumericFieldC
 	@Override
 	public Long encode(LocalTime value) {
 		return value == null ? null : value.toNanoOfDay();
+	}
+
+	@Override
+	public LocalTime decode(Long encoded) {
+		return LocalTime.ofNanoOfDay( encoded );
 	}
 
 	@Override

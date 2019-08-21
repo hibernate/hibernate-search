@@ -9,19 +9,26 @@ package org.hibernate.search.backend.lucene.document.impl;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 
+import org.apache.lucene.facet.FacetsConfig;
+
 public class LuceneIndexEntryFactory {
 
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final String indexName;
+	private final FacetsConfig facetsConfig;
 
-	public LuceneIndexEntryFactory(MultiTenancyStrategy multiTenancyStrategy, String indexName) {
+	public LuceneIndexEntryFactory(MultiTenancyStrategy multiTenancyStrategy, String indexName,
+			FacetsConfig facetsConfig) {
 		this.indexName = indexName;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.facetsConfig = facetsConfig;
 	}
 
 	public LuceneIndexEntry create(String tenantId, String id,
 			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
-		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder( multiTenancyStrategy, indexName );
+		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder(
+				multiTenancyStrategy, indexName, facetsConfig
+		);
 		documentContributor.contribute( builder );
 		return builder.build( tenantId, id );
 	}

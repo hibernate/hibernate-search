@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFieldPredicateBuilderFactory;
@@ -35,6 +36,7 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedSearchable = resolveDefault( searchable );
+		boolean resolvedAggregable = resolveDefault( aggregable );
 
 		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter =
 				createDslToIndexConverter();
@@ -48,6 +50,7 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 				resolvedProjectable,
 				resolvedSearchable,
 				resolvedSortable,
+				resolvedAggregable,
 				indexNullAsValue
 		);
 
@@ -61,12 +64,33 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 				),
 				new LuceneStandardFieldProjectionBuilderFactory<>(
 						resolvedProjectable, indexToProjectionConverter, rawIndexToProjectionConverter, codec
-				)
+				),
+				createAggregationBuilderFactory(
+						resolvedAggregable,
+						dslToIndexConverter, rawDslToIndexConverter,
+						indexToProjectionConverter, rawIndexToProjectionConverter,
+						codec
+				),
+				resolvedAggregable
 		);
 	}
 
 	protected abstract AbstractLuceneNumericFieldCodec<F, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable,
+			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
 			F indexNullAsValue);
 
+	protected LuceneNumericFieldAggregationBuilderFactory<F> createAggregationBuilderFactory(
+			boolean resolvedAggregable,
+			ToDocumentFieldValueConverter<?,? extends F> dslToIndexConverter,
+			ToDocumentFieldValueConverter<F,? extends F> rawDslToIndexConverter,
+			FromDocumentFieldValueConverter<? super F,?> indexToProjectionConverter,
+			FromDocumentFieldValueConverter<? super F,F> rawIndexToProjectionConverter,
+			AbstractLuceneNumericFieldCodec<F, ?> codec) {
+		return new LuceneNumericFieldAggregationBuilderFactory<>(
+				resolvedAggregable,
+				dslToIndexConverter, rawDslToIndexConverter,
+				indexToProjectionConverter, rawIndexToProjectionConverter,
+				codec
+		);
+	}
 }

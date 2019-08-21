@@ -6,9 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
+import java.io.IOException;
+import java.util.Collection;
+
+import org.hibernate.search.util.common.data.Range;
+
 import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.document.DoublePoint;
+import org.apache.lucene.facet.Facets;
+import org.apache.lucene.facet.FacetsCollector;
+import org.apache.lucene.facet.LongValueFacetCounts;
+import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 
@@ -54,6 +64,33 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	@Override
 	public SortField.Type getSortFieldType() {
 		return SortField.Type.DOUBLE;
+	}
+
+	@Override
+	public Double fromDocValue(Long longValue) {
+		// See createTermsFacetCounts: it's the reason we need this method
+		// Using the reverse operation from Double.doubleToRawLongBits, which is used in DoubleDocValues.
+		return Double.longBitsToDouble( longValue );
+	}
+
+	@Override
+	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector) throws IOException {
+		return new LongValueFacetCounts(
+				absoluteFieldPath,
+				// We can't use DoubleValueSource here because it drops the decimals...
+				// So we use this to get raw bits, and then apply fromDocValue to get back the original value.
+				LongValuesSource.fromLongField( absoluteFieldPath ),
+				facetsCollector
+		);
+	}
+
+	@Override
+	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
+			Collection<? extends Range<? extends Double>> ranges) throws IOException {
+		return new DoubleRangeFacetCounts(
+				absoluteFieldPath,
+				facetsCollector, FacetCountsUtils.createDoubleRanges( ranges )
+		);
 	}
 
 	@Override

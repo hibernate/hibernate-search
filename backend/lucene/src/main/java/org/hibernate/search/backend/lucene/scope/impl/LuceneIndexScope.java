@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.scope.impl;
 
+import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
@@ -27,6 +28,7 @@ public class LuceneIndexScope
 	private final LuceneSearchSortBuilderFactoryImpl searchSortFactory;
 	private final LuceneSearchQueryBuilderFactory searchQueryFactory;
 	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
+	private final LuceneSearchAggregationBuilderFactory searchAggregationFactory;
 
 	public LuceneIndexScope(SearchBackendContext backendContext,
 			MappingContextImplementor mappingContext,
@@ -36,6 +38,7 @@ public class LuceneIndexScope
 		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchContext, model );
 		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( searchContext, model );
 		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( model );
+		this.searchAggregationFactory = new LuceneSearchAggregationBuilderFactory( searchContext, model );
 		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( backendContext, searchContext, this.searchProjectionFactory );
 	}
 
@@ -70,6 +73,6 @@ public class LuceneIndexScope
 
 	@Override
 	public SearchAggregationBuilderFactory<? super LuceneSearchQueryElementCollector> getSearchAggregationFactory() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return searchAggregationFactory;
 	}
 }

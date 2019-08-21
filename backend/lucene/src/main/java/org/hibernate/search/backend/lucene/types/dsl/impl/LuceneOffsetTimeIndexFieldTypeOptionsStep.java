@@ -25,9 +25,10 @@ class LuceneOffsetTimeIndexFieldTypeOptionsStep
 
 	@Override
 	protected AbstractLuceneNumericFieldCodec<OffsetTime, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, OffsetTime indexNullAsValue) {
+			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
+			OffsetTime indexNullAsValue) {
 		return new LuceneOffsetTimeFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
+				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
 		);
 	}
 }

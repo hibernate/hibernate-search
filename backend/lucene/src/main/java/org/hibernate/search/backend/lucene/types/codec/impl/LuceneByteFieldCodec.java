@@ -16,8 +16,9 @@ import org.apache.lucene.index.IndexableField;
 
 public final class LuceneByteFieldCodec extends AbstractLuceneNumericFieldCodec<Byte, Integer> {
 
-	public LuceneByteFieldCodec(boolean projectable, boolean searchable, boolean sortable, Byte indexNullAsValue) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	public LuceneByteFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, Byte indexNullAsValue) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 	}
 
 	@Override
@@ -41,6 +42,11 @@ public final class LuceneByteFieldCodec extends AbstractLuceneNumericFieldCodec<
 	@Override
 	public Integer encode(Byte value) {
 		return (int) value;
+	}
+
+	@Override
+	public Byte decode(Integer encoded) {
+		return encoded.byteValue();
 	}
 
 	@Override

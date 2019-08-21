@@ -23,9 +23,10 @@ class LuceneDoubleIndexFieldTypeOptionsStep
 
 	@Override
 	protected AbstractLuceneNumericFieldCodec<Double, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, Double indexNullAsValue) {
+			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
+			Double indexNullAsValue) {
 		return new LuceneDoubleFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
+				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
 		);
 	}
 }

@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.impl;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
@@ -22,25 +23,34 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 	private final LuceneFieldPredicateBuilderFactory predicateBuilderFactory;
 	private final LuceneFieldSortBuilderFactory sortBuilderFactory;
 	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
+	private final LuceneFieldAggregationBuilderFactory aggregationBuilderFactory;
+	private final boolean aggregable;
 	private final Analyzer analyzerOrNormalizer;
 
 	public LuceneIndexFieldType(
 			LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
-			LuceneFieldProjectionBuilderFactory projectionBuilderFactory) {
-		this( codec, predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory, null );
+			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
+			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory,
+			boolean aggregable) {
+		this( codec, predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
+				aggregationBuilderFactory, aggregable, null );
 	}
 
 	public LuceneIndexFieldType(LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
 			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
+			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory,
+			boolean aggregable,
 			Analyzer analyzerOrNormalizer) {
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
+		this.aggregationBuilderFactory = aggregationBuilderFactory;
+		this.aggregable = aggregable;
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
@@ -53,10 +63,15 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 				codec,
 				predicateBuilderFactory,
 				sortBuilderFactory,
-				projectionBuilderFactory
+				projectionBuilderFactory,
+				aggregationBuilderFactory
 		);
 
 		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
+
+		if ( aggregable ) {
+			collector.collectFacetConfig( schemaNode.getAbsoluteFieldPath(), multiValued );
+		}
 
 		if ( analyzerOrNormalizer != null ) {
 			collector.collectAnalyzer( schemaNode.getAbsoluteFieldPath(), analyzerOrNormalizer );

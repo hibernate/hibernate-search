@@ -25,9 +25,10 @@ class LuceneZonedDateTimeIndexFieldTypeOptionsStep
 
 	@Override
 	protected AbstractLuceneNumericFieldCodec<ZonedDateTime, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, ZonedDateTime indexNullAsValue) {
+			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
+			ZonedDateTime indexNullAsValue) {
 		return new LuceneZonedDateTimeFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
+				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
 		);
 	}
 }

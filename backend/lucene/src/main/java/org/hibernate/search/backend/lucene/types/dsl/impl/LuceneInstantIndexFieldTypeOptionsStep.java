@@ -20,9 +20,10 @@ class LuceneInstantIndexFieldTypeOptionsStep
 
 	@Override
 	protected AbstractLuceneNumericFieldCodec<Instant, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, Instant indexNullAsValue) {
+			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
+			Instant indexNullAsValue) {
 		return new LuceneInstantFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
+				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
 		);
 	}
 

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
@@ -72,5 +73,13 @@ class LuceneSearchQueryExtractContext {
 
 	SearchProjectionTransformContext createProjectionTransformContext() {
 		return new SearchProjectionTransformContext( convertContext );
+	}
+
+	AggregationExtractContext createAggregationExtractContext() {
+		return new AggregationExtractContext(
+				indexSearcher.getIndexReader(),
+				convertContext,
+				luceneCollectors.getCollectors()
+		);
 	}
 }

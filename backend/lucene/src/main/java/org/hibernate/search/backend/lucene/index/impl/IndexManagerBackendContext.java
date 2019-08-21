@@ -206,8 +206,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		}
 	}
 
-	LuceneIndexEntryFactory createLuceneIndexEntryFactory(String indexName) {
-		return new LuceneIndexEntryFactory( multiTenancyStrategy, indexName );
+	LuceneIndexEntryFactory createLuceneIndexEntryFactory(String indexName, FacetsConfig facetsConfig) {
+		return new LuceneIndexEntryFactory( multiTenancyStrategy, indexName, facetsConfig );
 	}
 
 }

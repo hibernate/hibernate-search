@@ -16,8 +16,9 @@ import org.apache.lucene.index.IndexableField;
 
 public final class LuceneFloatFieldCodec extends AbstractLuceneNumericFieldCodec<Float, Float> {
 
-	public LuceneFloatFieldCodec(boolean projectable, boolean searchable, boolean sortable, Float indexNullAsValue) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	public LuceneFloatFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, Float indexNullAsValue) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 	}
 
 	@Override
@@ -40,6 +41,11 @@ public final class LuceneFloatFieldCodec extends AbstractLuceneNumericFieldCodec
 	@Override
 	public Float encode(Float value) {
 		return value;
+	}
+
+	@Override
+	public Float decode(Float encoded) {
+		return encoded;
 	}
 
 	@Override

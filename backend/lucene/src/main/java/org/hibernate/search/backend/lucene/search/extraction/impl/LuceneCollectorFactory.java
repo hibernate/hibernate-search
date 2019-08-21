@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
+import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.search.Collector;
 
 public interface LuceneCollectorFactory<C extends Collector> extends LuceneCollectorKey<C> {
@@ -15,5 +16,7 @@ public interface LuceneCollectorFactory<C extends Collector> extends LuceneColle
 	default boolean applyToNestedDocuments() {
 		return false;
 	}
+
+	LuceneCollectorFactory<FacetsCollector> FACETS = maxDocs -> new FacetsCollector();
 
 }

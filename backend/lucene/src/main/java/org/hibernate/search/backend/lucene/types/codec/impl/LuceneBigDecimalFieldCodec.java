@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
@@ -29,8 +30,9 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 	private final BigDecimal minScaledValue;
 	private final BigDecimal maxScaledValue;
 
-	public LuceneBigDecimalFieldCodec(boolean projectable, boolean searchable, boolean sortable, BigDecimal indexNullAsValue, int decimalScale) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	public LuceneBigDecimalFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, BigDecimal indexNullAsValue, int decimalScale) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 		this.decimalScale = decimalScale;
 		this.minScaledValue = new BigDecimal( NumberScaleConstants.MIN_LONG_AS_BIGINTEGER, decimalScale );
 		this.maxScaledValue = new BigDecimal( NumberScaleConstants.MAX_LONG_AS_BIGINTEGER, decimalScale );
@@ -63,6 +65,11 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
+	public BigDecimal decode(Long encoded) {
+		return scale( encoded );
+	}
+
+	@Override
 	public LuceneNumericDomain<Long> getDomain() {
 		return LuceneLongDomain.get();
 	}
@@ -83,6 +90,10 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 	private Long unscale(BigDecimal value) {
 		// See tck.DecimalScaleIT#roundingMode
 		return value.setScale( decimalScale, RoundingMode.HALF_UP ).unscaledValue().longValue();
+	}
+
+	private BigDecimal scale(Long value) {
+		return new BigDecimal( BigInteger.valueOf( value ), decimalScale );
 	}
 
 	private boolean isTooLarge(BigDecimal value) {

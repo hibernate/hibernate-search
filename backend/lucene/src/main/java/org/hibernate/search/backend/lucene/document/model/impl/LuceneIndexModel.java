@@ -14,6 +14,8 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
+import org.apache.lucene.facet.FacetsConfig;
+
 
 public class LuceneIndexModel implements AutoCloseable {
 
@@ -27,16 +29,20 @@ public class LuceneIndexModel implements AutoCloseable {
 
 	private final ScopedAnalyzer scopedAnalyzer;
 
+	private final FacetsConfig facetsConfig;
+
 	public LuceneIndexModel(String indexName,
 			ToDocumentIdentifierValueConverter<?> idDslConverter,
 			Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder,
 			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder,
-			ScopedAnalyzer scopedAnalyzer) {
+			ScopedAnalyzer scopedAnalyzer,
+			FacetsConfig facetsConfig) {
 		this.indexName = indexName;
 		this.idDslConverter = idDslConverter;
 		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodesBuilder );
 		this.objectNodes = CollectionHelper.toImmutableMap( objectNodesBuilder );
 		this.scopedAnalyzer = scopedAnalyzer;
+		this.facetsConfig = facetsConfig;
 	}
 
 	@Override
@@ -66,6 +72,10 @@ public class LuceneIndexModel implements AutoCloseable {
 
 	public ScopedAnalyzer getScopedAnalyzer() {
 		return scopedAnalyzer;
+	}
+
+	public FacetsConfig getFacetsConfig() {
+		return facetsConfig;
 	}
 
 	@Override

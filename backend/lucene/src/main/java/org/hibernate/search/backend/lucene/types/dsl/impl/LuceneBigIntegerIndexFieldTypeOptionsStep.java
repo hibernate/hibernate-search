@@ -44,13 +44,14 @@ class LuceneBigIntegerIndexFieldTypeOptionsStep
 
 	@Override
 	protected AbstractLuceneNumericFieldCodec<BigInteger, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, BigInteger indexNullAsValue) {
+			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
+			BigInteger indexNullAsValue) {
 		int resolvedDecimalScale = resolveDecimalScale();
 		if ( resolvedDecimalScale > 0 ) {
 			throw log.invalidDecimalScale( resolvedDecimalScale, getBuildContext().getEventContext() );
 		}
 		return new LuceneBigIntegerFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue,
+				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue,
 				resolvedDecimalScale
 		);
 	}

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -35,8 +37,9 @@ public final class LuceneZonedDateTimeFieldCodec extends AbstractLuceneNumericFi
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneZonedDateTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable, ZonedDateTime indexNullAsValue) {
-		super( projectable, searchable, sortable, indexNullAsValue );
+	public LuceneZonedDateTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable,
+			boolean aggregable, ZonedDateTime indexNullAsValue) {
+		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
 	}
 
 	@Override
@@ -65,6 +68,11 @@ public final class LuceneZonedDateTimeFieldCodec extends AbstractLuceneNumericFi
 	@Override
 	public Long encode(ZonedDateTime value) {
 		return value == null ? null : value.toInstant().toEpochMilli();
+	}
+
+	@Override
+	public ZonedDateTime decode(Long encoded) {
+		return Instant.ofEpochMilli( encoded ).atZone( ZoneOffset.UTC );
 	}
 
 	@Override

@@ -15,5 +15,7 @@ public interface LuceneIndexSchemaNodeCollector {
 
 	void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> schemaFieldNode);
 
+	void collectFacetConfig(String absoluteFieldPath, boolean multiValued);
+
 	void collectAnalyzer(String absoluteFieldPath, Analyzer analyzer);
 }
