@@ -35,7 +35,7 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Str
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
+	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
 		JsonArray source = REQUEST_SOURCE_ACCESSOR.getOrCreate( requestBody, JsonArray::new );
 		if ( !source.contains( WILDCARD_ALL ) ) {
 			source.add( WILDCARD_ALL );

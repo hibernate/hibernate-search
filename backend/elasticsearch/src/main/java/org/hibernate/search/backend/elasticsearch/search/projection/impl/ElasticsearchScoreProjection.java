@@ -26,7 +26,7 @@ class ElasticsearchScoreProjection implements ElasticsearchSearchProjection<Floa
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
+	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
 		TRACK_SCORES_ACCESSOR.set( requestBody, true );
 	}
 

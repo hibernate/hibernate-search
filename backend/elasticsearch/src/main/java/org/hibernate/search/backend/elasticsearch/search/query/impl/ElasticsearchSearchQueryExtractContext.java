@@ -6,10 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import java.util.Map;
-
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
@@ -24,18 +21,18 @@ import com.google.gson.JsonObject;
  */
 class ElasticsearchSearchQueryExtractContext {
 
-	private final Map<DistanceSortKey, Integer> distanceSorts;
+	private final ElasticsearchSearchQueryRequestContext requestContext;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final FromDocumentFieldValueConvertContext convertContext;
 
 	private final JsonObject responseBody;
 
-	ElasticsearchSearchQueryExtractContext(SessionContextImplementor sessionContext,
+	ElasticsearchSearchQueryExtractContext(ElasticsearchSearchQueryRequestContext requestContext,
+			SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
-			Map<DistanceSortKey, Integer> distanceSorts,
 			JsonObject responseBody) {
+		this.requestContext = requestContext;
 		this.projectionHitMapper = projectionHitMapper;
-		this.distanceSorts = distanceSorts;
 		this.convertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
 		this.responseBody = responseBody;
 	}
@@ -49,7 +46,7 @@ class ElasticsearchSearchQueryExtractContext {
 	}
 
 	SearchProjectionExtractContext createProjectionExtractContext() {
-		return new SearchProjectionExtractContext( distanceSorts );
+		return new SearchProjectionExtractContext( requestContext );
 	}
 
 	SearchProjectionTransformContext createProjectionTransformContext() {

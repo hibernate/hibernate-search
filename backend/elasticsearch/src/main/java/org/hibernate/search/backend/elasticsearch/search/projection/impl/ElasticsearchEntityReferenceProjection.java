@@ -24,8 +24,8 @@ public class ElasticsearchEntityReferenceProjection<R> implements ElasticsearchS
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
-		helper.contributeRequest( requestBody );
+	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+		helper.requestDocumentReference( requestBody );
 	}
 
 	@SuppressWarnings("unchecked")

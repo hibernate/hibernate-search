@@ -9,17 +9,15 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext.DistanceSortKey;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
+import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
 public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
@@ -34,14 +32,14 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD, null,
 				LOCATION, DistanceUnit.METERS );
 
-		Map<DistanceSortKey, Integer> distanceSorts = Collections.emptyMap();
-		SearchProjectionExtractContext extractContext = createExtractContext( distanceSorts );
-		assertThat( extractContext.getDistanceSortIndex( FIELD, LOCATION ) ).isNull();
+		SearchProjectionRequestContext requestContext = createMock( SearchProjectionRequestContext.class );
 
 		JsonObject requestBody = new JsonObject();
 		resetAll();
+		EasyMock.expect( requestContext.getDistanceSortIndex( FIELD, LOCATION ) )
+				.andReturn( null );
 		replayAll();
-		projection.contributeRequest( requestBody, extractContext );
+		projection.request( requestBody, requestContext );
 		verifyAll();
 
 		assertThat( requestBody.get( "script_fields" ) ).as( "script_fields" ).isNotNull();
@@ -52,22 +50,18 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD, null,
 				LOCATION, DistanceUnit.METERS );
 
-		Map<DistanceSortKey, Integer> distanceSorts = new HashMap<>();
-		distanceSorts.put( new DistanceSortKey( FIELD, LOCATION ), 1 );
-		SearchProjectionExtractContext extractContext = createExtractContext( distanceSorts );
-		assertThat( extractContext.getDistanceSortIndex( FIELD, LOCATION ) ).isEqualTo( 1 );
+		SearchProjectionRequestContext requestContext = createMock( SearchProjectionRequestContext.class );
 
 		JsonObject requestBody = new JsonObject();
 
 		resetAll();
+		EasyMock.expect( requestContext.getDistanceSortIndex( FIELD, LOCATION ) )
+				.andReturn( 1 );
 		replayAll();
-		projection.contributeRequest( requestBody, extractContext );
+		projection.request( requestBody, requestContext );
 		verifyAll();
 
 		assertThat( requestBody.get( "script_fields" ) ).as( "script_fields" ).isNull();
 	}
 
-	private SearchProjectionExtractContext createExtractContext(Map<DistanceSortKey, Integer> distanceSorts) {
-		return new SearchProjectionExtractContext( distanceSorts );
-	}
 }

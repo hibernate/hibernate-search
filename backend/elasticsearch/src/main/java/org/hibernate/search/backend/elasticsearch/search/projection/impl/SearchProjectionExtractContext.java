@@ -6,57 +6,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class SearchProjectionExtractContext {
 
-	private final Map<DistanceSortKey, Integer> distanceSorts;
+	private final SearchProjectionRequestContext requestContext;
 
-	public SearchProjectionExtractContext(Map<DistanceSortKey, Integer> distanceSorts) {
-		this.distanceSorts = distanceSorts != null ? Collections.unmodifiableMap( distanceSorts ) : null;
+	public SearchProjectionExtractContext(SearchProjectionRequestContext requestContext) {
+		this.requestContext = requestContext;
 	}
 
 	Integer getDistanceSortIndex(String absoluteFieldPath, GeoPoint location) {
-		if ( distanceSorts == null ) {
-			return null;
-		}
-
-		return distanceSorts.get( new DistanceSortKey( absoluteFieldPath, location ) );
+		return requestContext.getDistanceSortIndex( absoluteFieldPath, location );
 	}
 
-	public static class DistanceSortKey {
-
-		private final String absoluteFieldPath;
-
-		private final GeoPoint location;
-
-		public DistanceSortKey(String absoluteFieldPath, GeoPoint location) {
-			this.absoluteFieldPath = absoluteFieldPath;
-			this.location = location;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if ( obj == this ) {
-				return true;
-			}
-			if ( !(obj instanceof DistanceSortKey) ) {
-				return false;
-			}
-
-			DistanceSortKey other = (DistanceSortKey) obj;
-
-			return Objects.equals( this.absoluteFieldPath, other.absoluteFieldPath )
-					&& Objects.equals( this.location, other.location );
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash( absoluteFieldPath, location );
-		}
-	}
 }

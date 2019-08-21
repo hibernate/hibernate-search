@@ -67,7 +67,7 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
+	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
 		if ( context.getDistanceSortIndex( absoluteFieldPath, center ) == null ) {
 			// we rely on a script to compute the distance
 			SCRIPT_FIELDS_ACCESSOR

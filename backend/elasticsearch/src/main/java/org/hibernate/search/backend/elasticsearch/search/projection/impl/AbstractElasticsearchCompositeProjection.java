@@ -35,10 +35,10 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 	}
 
 	@Override
-	public final void contributeRequest(JsonObject requestBody,
-			SearchProjectionExtractContext context) {
+	public final void request(JsonObject requestBody,
+			SearchProjectionRequestContext context) {
 		for ( ElasticsearchSearchProjection<?, ?> child : children ) {
-			child.contributeRequest( requestBody, context );
+			child.request( requestBody, context );
 		}
 	}
 
