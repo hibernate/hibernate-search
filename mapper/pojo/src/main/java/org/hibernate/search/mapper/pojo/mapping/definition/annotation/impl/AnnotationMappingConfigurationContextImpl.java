@@ -76,7 +76,7 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 				.flatMap( PojoRawTypeModel::getAscendingSuperTypes )
 				// Ignore types that were already contributed
 				.filter( alreadyContributedTypes::add )
-				// TODO filter out standard Java types, e.g. Object or standard Java interfaces such as Serializable?
+				// TODO optimize by completely ignoring standard Java types, e.g. Object or standard Java interfaces such as Serializable?
 				.forEach( typeModel -> {
 					Optional<Indexed> indexedAnnotation = typeModel.getAnnotationByType( Indexed.class );
 					if ( indexedAnnotation.isPresent() ) {
@@ -95,9 +95,11 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 						}
 					}
 
-					PojoTypeMetadataContributor contributor = contributorFactory.create( typeModel );
-
-					collector.collectContributor( typeModel, contributor );
+					Optional<PojoTypeMetadataContributor> contributorOptional =
+							contributorFactory.createIfAnnotated( typeModel );
+					if ( contributorOptional.isPresent() ) {
+						collector.collectContributor( typeModel, contributorOptional.get() );
+					}
 				} );
 
 		/*
@@ -134,8 +136,8 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 			 */
 			boolean neverContributed = alreadyContributedTypes.add( pojoTypeModel );
 			if ( neverContributed ) {
-				// TODO filter out standard Java types, e.g. Object or standard Java interfaces such as Serializable?
-				return Optional.of( contributorFactory.create( pojoTypeModel ) );
+				// TODO optimize by completely ignoring standard Java types, e.g. Object or standard Java interfaces such as Serializable?
+				return contributorFactory.createIfAnnotated( pojoTypeModel );
 			}
 			else {
 				return Optional.empty();

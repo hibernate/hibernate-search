@@ -29,9 +29,12 @@ abstract class TypeAnnotationProcessor<A extends Annotation> {
 	 *
 	 * @param mappingContext The mapping context to push translated information to.
 	 * @param typeModel A model of the type holding the annotation.
+	 * @return {@code true} if at least one annotation was processed, {@code false} otherwise.
 	 */
-	public final void process(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel) {
-		processEach( mappingContext, typeModel, extractAnnotations( typeModel ) );
+	public final boolean process(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel) {
+		List<A> annotationList = extractAnnotations( typeModel ).collect( Collectors.toList() );
+		processEach( mappingContext, typeModel, annotationList );
+		return !annotationList.isEmpty();
 	}
 
 	abstract Stream<? extends A> extractAnnotations(PojoRawTypeModel<?> typeModel);
@@ -39,8 +42,7 @@ abstract class TypeAnnotationProcessor<A extends Annotation> {
 	abstract void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, A annotation);
 
 	private void processEach(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel,
-			Stream<? extends A> annotations) {
-		List<A> annotationList = annotations.collect( Collectors.toList() );
+			List<A> annotationList) {
 		for ( A annotation : annotationList ) {
 			try {
 				doProcess( mappingContext, typeModel, annotation );
