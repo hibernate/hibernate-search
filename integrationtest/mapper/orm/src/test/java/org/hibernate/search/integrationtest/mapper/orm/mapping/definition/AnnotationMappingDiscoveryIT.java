@@ -18,11 +18,11 @@ import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
@@ -37,6 +37,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContex
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -69,6 +70,7 @@ public class AnnotationMappingDiscoveryIT {
 						.objectField( "annotatedProperty", b3 -> {
 							// We do not expect any particular property in the object field added by the bridge
 						} )
+						.field( "alwaysPresent", String.class )
 				)
 				.objectField( "nonAnnotationMappedEmbedded", b2 -> b2
 						/*
@@ -76,20 +78,20 @@ public class AnnotationMappingDiscoveryIT {
 						 * which has not been registered explicitly.
 						 */
 						.field( "text", String.class )
+						.field( "alwaysPresent", String.class )
 				)
 		);
 
 		ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
-						new HibernateOrmSearchMappingConfigurer() {
-							@Override
-							public void configure(HibernateOrmMappingConfigurationContext context) {
-								context.programmaticMapping()
-										.type( IndexedEntity.class )
-										.property( "nonAnnotationMappedEmbedded" )
-										.indexedEmbedded();
-							}
+						(HibernateOrmSearchMappingConfigurer) context -> {
+							context.programmaticMapping()
+									.type( IndexedEntity.class )
+									.property( "nonAnnotationMappedEmbedded" )
+									.indexedEmbedded();
+
+							mapAlwaysPresentProperty( context.programmaticMapping() );
 						}
 				)
 				.setup(
@@ -106,15 +108,17 @@ public class AnnotationMappingDiscoveryIT {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "annotationMappedEmbedded", b2 -> {
 					/*
-					 * This object field should be empty because
-					 * the annotation mapping for the embedded type has *NOT* been automatically discovered.
+					 * This object field should contain only the property mapped using the programmatic API,
+					 * because the annotation mapping for the embedded type has *NOT* been automatically discovered.
 					 */
+					b2.field( "alwaysPresent", String.class );
 				} )
 				.objectField( "nonAnnotationMappedEmbedded", b2 -> {
 					/*
-					 * This object field should be empty because
-					 * the annotation mapping for the embedded type has *NOT* been automatically discovered.
+					 * This object field should contain only the property mapped using the programmatic API,
+					 * because the annotation mapping for the embedded type has *NOT* been automatically discovered.
 					 */
+					b2.field( "alwaysPresent", String.class );
 				} )
 		);
 
@@ -122,25 +126,24 @@ public class AnnotationMappingDiscoveryIT {
 				.withProperty( HibernateOrmMapperSettings.ENABLE_ANNOTATION_MAPPING, "false" )
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
-						new HibernateOrmSearchMappingConfigurer() {
-							@Override
-							public void configure(HibernateOrmMappingConfigurationContext context) {
-								context.programmaticMapping()
-										.type( IndexedEntity.class )
-										.property( "nonAnnotationMappedEmbedded" )
-										.indexedEmbedded();
+						(HibernateOrmSearchMappingConfigurer) context -> {
+							context.programmaticMapping()
+									.type( IndexedEntity.class )
+									.property( "nonAnnotationMappedEmbedded" )
+									.indexedEmbedded();
 
-								/*
-								 * Annotations should be completely ignored.
-								 * We add some of the annotation mapping programmatically,
-								 * just to check that discovery is disabled for nested types.
-								 */
-								context.programmaticMapping()
-										.type( IndexedEntity.class ).indexed( IndexedEntity.INDEX )
-										.property( "id" ).documentId()
-										.property( "annotationMappedEmbedded" )
-										.indexedEmbedded();
-							}
+							/*
+							 * Annotations should be completely ignored.
+							 * We add some of the annotation mapping programmatically,
+							 * just to check that discovery is disabled for nested types.
+							 */
+							context.programmaticMapping()
+									.type( IndexedEntity.class ).indexed( IndexedEntity.INDEX )
+									.property( "id" ).documentId()
+									.property( "annotationMappedEmbedded" )
+									.indexedEmbedded();
+
+							mapAlwaysPresentProperty( context.programmaticMapping() );
 						}
 				)
 				// We register NonExplicitlyRegistered* types here, but it's only for Hibernate ORM.
@@ -152,6 +155,14 @@ public class AnnotationMappingDiscoveryIT {
 						NonExplicitlyRegisteredNonAnnotationMappedType.class
 				);
 		backendMock.verifyExpectationsMet();
+	}
+
+	private void mapAlwaysPresentProperty(ProgrammaticMappingConfigurationContext mapping) {
+		mapping.type( NonExplicitlyRegisteredType.class )
+				.property( "alwaysPresent" ).genericField();
+
+		mapping.type( NonExplicitlyRegisteredNonAnnotationMappedType.class )
+				.property( "alwaysPresent" ).genericField();
 	}
 
 	@Entity(name = "indexed")
@@ -202,7 +213,7 @@ public class AnnotationMappingDiscoveryIT {
 	 */
 	@Embeddable
 	@Indexed(index = "SHOULD_NOT_BE_INDEXED")
-	public static class NonExplicitlyRegisteredType {
+	public static class NonExplicitlyRegisteredType extends AlwaysPresentPropertyType {
 		@CustomMarkerConsumingPropertyBinding
 		private NonExplicitlyRegisteredNonMappedType content;
 
@@ -242,7 +253,7 @@ public class AnnotationMappingDiscoveryIT {
 	 */
 	@Embeddable
 	@Indexed(index = "SHOULD_NOT_BE_INDEXED")
-	public static class NonExplicitlyRegisteredNonAnnotationMappedType {
+	public static class NonExplicitlyRegisteredNonAnnotationMappedType extends AlwaysPresentPropertyType {
 		@GenericField
 		private String text;
 
@@ -252,6 +263,19 @@ public class AnnotationMappingDiscoveryIT {
 
 		public void setText(String text) {
 			this.text = text;
+		}
+	}
+
+	@MappedSuperclass
+	public static class AlwaysPresentPropertyType {
+		private String alwaysPresent;
+
+		public String getAlwaysPresent() {
+			return alwaysPresent;
+		}
+
+		public void setAlwaysPresent(String alwaysPresent) {
+			this.alwaysPresent = alwaysPresent;
 		}
 	}
 
