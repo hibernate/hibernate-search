@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingStepImpl;
@@ -20,37 +22,47 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		this.annotationProcessorProvider = annotationProcessorProvider;
 	}
 
-	public PojoTypeMetadataContributor create(PojoRawTypeModel<?> typeModel) {
+	public Optional<PojoTypeMetadataContributor> createIfAnnotated(PojoRawTypeModel<?> typeModel) {
 		// Create a programmatic type mapping object
 		TypeMappingStepImpl typeMappingContext = new TypeMappingStepImpl( typeModel );
 
 		// Process annotations and add metadata to the type mapping
-		processTypeLevelAnnotations( typeMappingContext, typeModel );
-		typeModel.getDeclaredProperties()
-				.forEach( propertyModel -> processPropertyLevelAnnotations( typeMappingContext, typeModel, propertyModel ) );
+		boolean processedTypeLevelAnnotation = processTypeLevelAnnotations( typeMappingContext, typeModel );
+		boolean processedPropertyLevelAnnotation = typeModel.getDeclaredProperties()
+				.map( propertyModel -> processPropertyLevelAnnotations( typeMappingContext, typeModel, propertyModel ) )
+				.reduce( (processedAnnotationHere, processedAnnotationThere) -> processedAnnotationHere || processedAnnotationThere )
+				.orElse( false );
+
+		if ( !processedTypeLevelAnnotation && !processedPropertyLevelAnnotation ) {
+			// No annotation was processed, this type mapping is pointless.
+			return Optional.empty();
+		}
 
 		// Return the resulting mapping, which includes all the metadata extracted from annotations
-		return typeMappingContext;
+		return Optional.of( typeMappingContext );
 	}
 
-	private void processTypeLevelAnnotations(TypeMappingStepImpl typeMappingContext, PojoRawTypeModel<?> typeModel) {
+	private boolean processTypeLevelAnnotations(TypeMappingStepImpl typeMappingContext, PojoRawTypeModel<?> typeModel) {
+		boolean processedAtLeastOneAnnotation = false;
 		for ( TypeAnnotationProcessor<?> processor : annotationProcessorProvider.getTypeAnnotationProcessors() ) {
-			processor.process(
-					typeMappingContext, typeModel
-			);
+			if ( processor.process( typeMappingContext, typeModel ) ) {
+				processedAtLeastOneAnnotation = true;
+			}
 		}
+		return processedAtLeastOneAnnotation;
 	}
 
-	private void processPropertyLevelAnnotations(TypeMappingStepImpl typeMappingContext,
+	private boolean processPropertyLevelAnnotations(TypeMappingStepImpl typeMappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel) {
 		String propertyName = propertyModel.getName();
 		PropertyMappingStep mappingContext = typeMappingContext.property( propertyName );
-
+		boolean processedAtLeastOneAnnotation = false;
 		for ( PropertyAnnotationProcessor<?> processor : annotationProcessorProvider.getPropertyAnnotationProcessors() ) {
-			processor.process(
-					mappingContext, typeModel, propertyModel
-			);
+			if ( processor.process( mappingContext, typeModel, propertyModel ) ) {
+				processedAtLeastOneAnnotation = true;
+			}
 		}
+		return processedAtLeastOneAnnotation;
 	}
 
 }

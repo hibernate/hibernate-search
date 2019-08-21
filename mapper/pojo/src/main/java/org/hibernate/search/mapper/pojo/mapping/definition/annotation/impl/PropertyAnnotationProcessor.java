@@ -32,10 +32,13 @@ abstract class PropertyAnnotationProcessor<A extends Annotation> {
 	 * @param mappingContext The mapping context to push translated information to.
 	 * @param typeModel A model of the type holding the property holding the annotation.
 	 * @param propertyModel A model of the property holding the annotation.
+	 * @return {@code true} if at least one annotation was processed, {@code false} otherwise.
 	 */
-	public final void process(PropertyMappingStep mappingContext,
+	public final boolean process(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel) {
-		processEach( mappingContext, typeModel, propertyModel, extractAnnotations( propertyModel ) );
+		List<A> annotationList = extractAnnotations( propertyModel ).collect( Collectors.toList() );
+		processEach( mappingContext, typeModel, propertyModel, annotationList );
+		return !annotationList.isEmpty();
 	}
 
 	abstract Stream<? extends A> extractAnnotations(PojoPropertyModel<?> propertyModel);
@@ -44,8 +47,7 @@ abstract class PropertyAnnotationProcessor<A extends Annotation> {
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel, A annotation);
 
 	private void processEach(PropertyMappingStep mappingContext,
-			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel, Stream<? extends A> annotations) {
-		List<A> annotationList = annotations.collect( Collectors.toList() );
+			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel, List<A> annotationList) {
 		for ( A annotation : annotationList ) {
 			try {
 				doProcess( mappingContext, typeModel, propertyModel, annotation );
