@@ -33,6 +33,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
@@ -64,6 +65,7 @@ public class AnnotationMappingDiscoveryIT {
 						.objectField( "annotatedProperty", b3 -> {
 							// We do not expect any particular property in the object field added by the bridge
 						} )
+						.field( "alwaysPresent", String.class )
 				)
 				.objectField( "nonAnnotationMappedEmbedded", b2 -> b2
 						/*
@@ -71,6 +73,7 @@ public class AnnotationMappingDiscoveryIT {
 						 * which has not been registered explicitly.
 						 */
 						.field( "text", String.class )
+						.field( "alwaysPresent", String.class )
 				)
 		);
 
@@ -85,6 +88,8 @@ public class AnnotationMappingDiscoveryIT {
 							.type( IndexedEntity.class )
 									.property( "nonAnnotationMappedEmbedded" )
 											.indexedEmbedded();
+
+					mapAlwaysPresentProperty( builder.programmaticMapping() );
 				} )
 				.setup();
 
@@ -96,15 +101,17 @@ public class AnnotationMappingDiscoveryIT {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "annotationMappedEmbedded", b2 -> {
 					/*
-					 * This object field should be empty because
-					 * the annotation mapping for the embedded type has *NOT* been automatically discovered.
+					 * This object field should contain only the property mapped using the programmatic API,
+					 * because the annotation mapping for the embedded type has *NOT* been automatically discovered.
 					 */
+					b2.field( "alwaysPresent", String.class );
 				} )
 				.objectField( "nonAnnotationMappedEmbedded", b2 -> {
 					/*
-					 * This object field should be empty because
-					 * the annotation mapping for the embedded type has *NOT* been automatically discovered.
+					 * This object field should contain only the property mapped using the programmatic API,
+					 * because the annotation mapping for the embedded type has *NOT* been automatically discovered.
 					 */
+					b2.field( "alwaysPresent", String.class );
 				} )
 		);
 
@@ -120,10 +127,20 @@ public class AnnotationMappingDiscoveryIT {
 							.type( IndexedEntity.class )
 									.property( "nonAnnotationMappedEmbedded" )
 											.indexedEmbedded();
+
+					mapAlwaysPresentProperty( builder.programmaticMapping() );
 				} )
 				.setup();
 
 		backendMock.verifyExpectationsMet();
+	}
+
+	private void mapAlwaysPresentProperty(ProgrammaticMappingConfigurationContext mapping) {
+		mapping.type( NonExplicitlyRegisteredType.class )
+				.property( "alwaysPresent" ).genericField();
+
+		mapping.type( NonExplicitlyRegisteredNonAnnotationMappedType.class )
+				.property( "alwaysPresent" ).genericField();
 	}
 
 	@Indexed(index = IndexedEntity.INDEX)
@@ -170,7 +187,7 @@ public class AnnotationMappingDiscoveryIT {
 	 * BUT the fact that it is indexed should be ignored (only explicitly registered types are indexed).
 	 */
 	@Indexed(index = "SHOULD_NOT_BE_INDEXED")
-	public static class NonExplicitlyRegisteredType {
+	public static class NonExplicitlyRegisteredType extends AlwaysPresentPropertyType {
 		private NonExplicitlyRegisteredNonMappedType content;
 
 		@CustomMarkerConsumingPropertyBinding
@@ -208,7 +225,7 @@ public class AnnotationMappingDiscoveryIT {
 	 * if it isn't, the field "nonAnnotationMappedEmbedded.text" will be missing.
 	 */
 	@Indexed(index = "SHOULD_NOT_BE_INDEXED")
-	public static class NonExplicitlyRegisteredNonAnnotationMappedType {
+	public static class NonExplicitlyRegisteredNonAnnotationMappedType extends AlwaysPresentPropertyType {
 		private String text;
 
 		@GenericField
@@ -218,6 +235,18 @@ public class AnnotationMappingDiscoveryIT {
 
 		public void setText(String text) {
 			this.text = text;
+		}
+	}
+
+	public static class AlwaysPresentPropertyType {
+		private String alwaysPresent;
+
+		public String getAlwaysPresent() {
+			return alwaysPresent;
+		}
+
+		public void setAlwaysPresent(String alwaysPresent) {
+			this.alwaysPresent = alwaysPresent;
 		}
 	}
 
