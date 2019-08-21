@@ -40,7 +40,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState> {
 	@Override
 	public void addIndexed(MappableTypeModel typeModel, IndexManagerBuildingState<?> indexManagerBuildingState) {
 		indexManagerBuildingStates.put( (StubTypeModel) typeModel, indexManagerBuildingState );
-		contributorProvider.forEach( typeModel, c -> c.contribute( indexManagerBuildingState ) );
+		contributorProvider.get( typeModel ).forEach( c -> c.contribute( indexManagerBuildingState ) );
 	}
 
 	@Override

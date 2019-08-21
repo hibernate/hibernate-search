@@ -100,10 +100,10 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 					nestedBindingContext.getParentIndexObjectReferences()
 			);
 			typeNodeBuilders.add( nestedProcessorBuilder );
-			mappingHelper.getContributorProvider().forEach(
-					embeddedTypeModelPath.getTypeModel().getRawType(),
-					c -> c.contributeMapping( nestedProcessorBuilder )
-			);
+
+			mappingHelper.getContributorProvider().get( embeddedTypeModelPath.getTypeModel().getRawType() )
+					.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
+
 			Set<String> uselessIncludePaths = nestedBindingContext.getUselessIncludePaths();
 			if ( !uselessIncludePaths.isEmpty() ) {
 				Set<String> encounteredFieldPaths = nestedBindingContext.getEncounteredFieldPaths();
