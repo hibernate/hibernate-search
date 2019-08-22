@@ -56,7 +56,7 @@ abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneD
 
 	@Override
 	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String rootId,
-			Document currentDocument, List<Document> nestedDocuments) {
+			List<Document> nestedDocuments) {
 		for ( Map.Entry<String, EncounteredFieldStatus> entry : fieldStatus.entrySet() ) {
 			EncounteredFieldStatus status = entry.getValue();
 			if ( EncounteredFieldStatus.ENCOUNTERED_AND_NAME_INDEXED.equals( status ) ) {
@@ -67,7 +67,7 @@ abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneD
 
 		multiTenancyStrategy.contributeToIndexedDocument( document, tenantId );
 
-		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, currentDocument, nestedDocuments );
+		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, nestedDocuments );
 	}
 
 	private enum EncounteredFieldStatus {

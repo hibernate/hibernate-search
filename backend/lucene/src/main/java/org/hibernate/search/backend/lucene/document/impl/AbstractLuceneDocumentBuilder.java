@@ -121,17 +121,17 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 		}
 	}
 
-	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String rootId, Document currentDocument,
+	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String rootId,
 			List<Document> nestedDocuments) {
 		if ( flattenedObjectDocumentBuilders != null ) {
 			for ( LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder : flattenedObjectDocumentBuilders ) {
-				flattenedObjectDocumentBuilder.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, currentDocument, nestedDocuments );
+				flattenedObjectDocumentBuilder.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, nestedDocuments );
 			}
 		}
 
 		if ( nestedObjectDocumentBuilders != null ) {
 			for ( LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder : nestedObjectDocumentBuilders ) {
-				nestedObjectDocumentBuilder.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, currentDocument, nestedDocuments );
+				nestedObjectDocumentBuilder.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, nestedDocuments );
 			}
 		}
 	}
