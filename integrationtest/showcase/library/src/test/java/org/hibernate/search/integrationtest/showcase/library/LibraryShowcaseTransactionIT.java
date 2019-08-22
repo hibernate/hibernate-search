@@ -56,4 +56,22 @@ public class LibraryShowcaseTransactionIT {
 		// Check that inner transaction data has NOT been pushed to the index:
 		assertFalse( innerBook.isPresent() );
 	}
+
+	@Test
+	@TestForIssue( jiraKey = "HSEARCH-1270" )
+	public void innerTransactionRollback_flushBeforeInner() {
+		String outerIsbn = "0-4206-9749-7";
+		String innerIsbn = "0-1111-9749-7";
+
+		innerTransactionRollbackService.doOuterFlushBeforeInner( outerIsbn, innerIsbn );
+
+		Optional<Book> outerBook = documentService.getByIsbn( outerIsbn );
+		Optional<Book> innerBook = documentService.getByIsbn( innerIsbn );
+
+		// Check that outer transaction data has been pushed to the index:
+		assertTrue( outerBook.isPresent() );
+
+		// Check that inner transaction data has NOT been pushed to the index:
+		assertFalse( innerBook.isPresent() );
+	}
 }

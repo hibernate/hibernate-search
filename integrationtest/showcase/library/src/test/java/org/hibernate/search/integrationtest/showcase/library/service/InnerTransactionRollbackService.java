@@ -64,6 +64,23 @@ public class InnerTransactionRollbackService {
 		entityManager.flush();
 	}
 
+	public void doOuterFlushBeforeInner(String outerIsbn, String nestedIsbn) {
+		// This data is supposed to be pushed to the index:
+		Book book = new Book( 739, outerIsbn, "The Late Mattia Pascal", "Luigi Pirandello", "Describes the human life conditions...", "misfortune" );
+		entityManager.persist( book );
+
+		// flush before the execution of the inner transaction
+		entityManager.flush();
+
+		try {
+			self.doInner( nestedIsbn );
+		}
+		catch (MakeRollbackException e) {
+			// Do not rollback the outer transaction
+		}
+		entityManager.flush();
+	}
+
 	private static class MakeRollbackException extends RuntimeException {
 		public MakeRollbackException(String message) {
 			super( message );
