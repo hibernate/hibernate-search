@@ -84,7 +84,7 @@ public class SearchQueryFetchIT {
 
 	@Test
 	public void fetch_limit() {
-		assertThat( matchAllQuery().fetch(null) )
+		assertThat( matchAllQuery().fetch( null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -152,7 +152,7 @@ public class SearchQueryFetchIT {
 
 	@Test
 	public void fetchHits_limit() {
-		assertThat( matchAllQuery().fetchHits(null) )
+		assertThat( matchAllQuery().fetchHits( null ) )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
 						builder.doc( INDEX_NAME, docId( i ) );

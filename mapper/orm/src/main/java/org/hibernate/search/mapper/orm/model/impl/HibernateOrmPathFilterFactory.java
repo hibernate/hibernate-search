@@ -16,7 +16,6 @@ import org.hibernate.MappingException;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.mapping.Any;
 import org.hibernate.mapping.Component;
-import org.hibernate.mapping.IndexedCollection;
 import org.hibernate.mapping.OneToMany;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -24,8 +23,8 @@ import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
@@ -293,7 +292,6 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 		throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), path, null );
 	}
 
-	@SuppressWarnings("rawtypes")
 	private Value resolveContainedValue(org.hibernate.mapping.Collection collectionValue, String extractorName) {
 		if ( collectionValue instanceof org.hibernate.mapping.Array ) {
 			if ( extractorName == null || BuiltinContainerExtractors.ARRAY.equals( extractorName ) ) {
@@ -306,7 +304,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 				 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
 				 * but the value of the foreign key to the targeted entity...
 				 */
-				return ( (IndexedCollection) collectionValue ).getIndex();
+				return ( ( org.hibernate.mapping.Map ) collectionValue ).getIndex();
 			}
 			else if ( extractorName == null || BuiltinContainerExtractors.MAP_VALUE.equals( extractorName ) ) {
 				return collectionValue.getElement();
