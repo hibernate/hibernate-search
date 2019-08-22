@@ -35,7 +35,7 @@ final class CountingOutputStream extends FilterOutputStream {
 		count( len );
 	}
 
-	protected void count(int written) {
+	void count(int written) {
 		if ( written > 0 ) {
 			bytesWritten += written;
 		}

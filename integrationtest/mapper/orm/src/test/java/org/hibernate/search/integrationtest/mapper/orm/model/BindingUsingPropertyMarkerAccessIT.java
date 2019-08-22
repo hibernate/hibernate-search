@@ -163,10 +163,10 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 		private Integer id;
 
 		@Latitude
-		protected Double latitude;
+		Double latitude;
 
 		@Longitude
-		protected Double longitude;
+		Double longitude;
 	}
 
 	@Entity
@@ -295,29 +295,29 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 		// Put the @Id annotation here to set the Hibernate ORM access type to "property"
 		@Id
 		@DocumentId
-		protected Integer getId() {
+		Integer getId() {
 			return idWithUnpredictableName;
 		}
 
-		protected void setId(Integer id) {
+		void setId(Integer id) {
 			this.idWithUnpredictableName = id;
 		}
 
 		@Latitude
-		protected Double getLatitude() {
+		Double getLatitude() {
 			return latitudeWithUnpredictableName;
 		}
 
-		protected void setLatitude(Double latitude) {
+		void setLatitude(Double latitude) {
 			this.latitudeWithUnpredictableName = latitude;
 		}
 
 		@Longitude
-		protected Double getLongitude() {
+		Double getLongitude() {
 			return longitudeWithUnpredictableName;
 		}
 
-		protected void setLongitude(Double longitude) {
+		void setLongitude(Double longitude) {
 			this.longitudeWithUnpredictableName = longitude;
 		}
 	}
