@@ -13,7 +13,6 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTypeStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTokenizerStep;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchNormalizerOptionalComponentsStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchNormalizerTypeStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentParametersStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
@@ -49,14 +48,11 @@ public class ElasticsearchAnalysisConfigurationContextImpl
 
 	@Override
 	public ElasticsearchNormalizerTypeStep normalizer(String name) {
-		return new ElasticsearchNormalizerTypeStep() {
-			@Override
-			public ElasticsearchNormalizerOptionalComponentsStep custom() {
-				ElasticsearchNormalizerComponentsStep context =
-						new ElasticsearchNormalizerComponentsStep( name );
-				children.add( context );
-				return context;
-			}
+		return () -> {
+			ElasticsearchNormalizerComponentsStep context =
+				new ElasticsearchNormalizerComponentsStep( name );
+			children.add( context );
+			return context;
 		};
 	}
 

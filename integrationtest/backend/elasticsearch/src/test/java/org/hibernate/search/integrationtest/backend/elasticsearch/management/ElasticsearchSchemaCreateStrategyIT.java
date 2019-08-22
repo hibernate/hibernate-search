@@ -93,11 +93,8 @@ public class ElasticsearchSchemaCreateStrategyIT {
 						BACKEND_NAME,
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchAnalysisConfigurer() {
-							@Override
-							public void configure(ElasticsearchAnalysisConfigurationContext context) {
-								// No-op
-							}
+						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
+							// No-op
 						}
 				)
 				.setup();

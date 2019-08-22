@@ -94,17 +94,11 @@ public class TypeBridgeBaseIT {
 											f -> f.asString().analyzer( "myAnalyzer" )
 									)
 											.toReference();
-							context.setBridge(
-									new TypeBridge() {
-										@Override
-										public void write(DocumentElement target, Object bridgedElement,
-												TypeBridgeWriteContext context) {
-											target.addValue(
-													indexFieldReference, pojoPropertyAccessor.read( bridgedElement )
-											);
-										}
-									}
-							);
+							context.setBridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context1) -> {
+								target.addValue(
+									indexFieldReference, pojoPropertyAccessor.read( bridgedElement )
+								);
+							} );
 						} )
 		)
 				.setup( IndexedEntity.class );
@@ -172,18 +166,12 @@ public class TypeBridgeBaseIT {
 											f -> f.asString().analyzer( "myAnalyzer" )
 									)
 											.toReference();
-							context.setBridge(
-									new TypeBridge() {
-										@Override
-										public void write(DocumentElement target, Object bridgedElement,
-												TypeBridgeWriteContext context) {
-											IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
-											target.addValue(
-													indexFieldReference, castedBridgedElement.getStringProperty()
-											);
-										}
-									}
-							);
+							context.setBridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context1) -> {
+								IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
+								target.addValue(
+									indexFieldReference, castedBridgedElement.getStringProperty()
+								);
+							} );
 						} )
 		)
 				.setup( IndexedEntity.class );
@@ -296,22 +284,16 @@ public class TypeBridgeBaseIT {
 											f -> f.asString().analyzer( "myAnalyzer" )
 									)
 											.toReference();
-							context.setBridge(
-									new TypeBridge() {
-										@Override
-										public void write(DocumentElement target, Object bridgedElement,
-												TypeBridgeWriteContext context) {
-											IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
-											/*
-											 * In a real application this would run a query,
-											 * but we don't have the necessary infrastructure here
-											 * so we'll cut short and just index a constant.
-											 * We just need to know the bridge is executed anyway.
-											 */
-											target.addValue( indexFieldReference, "constant" );
-										}
-									}
-							);
+							context.setBridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context1) -> {
+								IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
+								/*
+								* In a real application this would run a query,
+								* but we don't have the necessary infrastructure here
+								* so we'll cut short and just index a constant.
+								* We just need to know the bridge is executed anyway.
+								*/
+								target.addValue( indexFieldReference, "constant" );
+							} );
 						} )
 		)
 				.setup( IndexedEntity.class, ContainedEntity.class );
@@ -699,15 +681,11 @@ public class TypeBridgeBaseIT {
 									f -> f.asString()
 							)
 									.toReference();
-							context.setBridge( new TypeBridge() {
-								@Override
-								public void write(DocumentElement target, Object bridgedElement,
-										TypeBridgeWriteContext context) {
-									CustomEnum castedBridgedElement = (CustomEnum) bridgedElement;
-									// This is a strange way to use bridges,
-									// but then again a type bridges that only uses the root *is* strange
-									target.addValue( indexFieldReference, castedBridgedElement.stringProperty );
-								}
+							context.setBridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context1) -> {
+								CustomEnum castedBridgedElement = (CustomEnum) bridgedElement;
+								// This is a strange way to use bridges,
+								// but then again a type bridges that only uses the root *is* strange
+								target.addValue( indexFieldReference, castedBridgedElement.stringProperty );
 							} );
 						} )
 		)

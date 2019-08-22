@@ -50,7 +50,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -174,13 +173,7 @@ public class LuceneExtensionIT {
 
 		// Unsupported extension
 		SubTest.expectException(
-				() -> query.extension( new SearchQueryExtension<Void, DocumentReference>() {
-					@Override
-					public Optional<Void> extendOptional(SearchQuery<DocumentReference> original,
-							LoadingContext<?, ?> loadingContext) {
-						return Optional.empty();
-					}
-				} )
+				() -> query.extension( (SearchQuery<DocumentReference> original, LoadingContext<?, ?> loadingContext) -> Optional.empty() )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class );

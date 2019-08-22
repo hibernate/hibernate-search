@@ -40,15 +40,12 @@ import org.hibernate.search.util.common.impl.SearchThreadFactory;
  */
 public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
 
-	public static final BeanReference<ElasticsearchClientFactory> REFERENCE = new BeanReference<ElasticsearchClientFactory>() {
-		@Override
-		public BeanHolder<ElasticsearchClientFactory> resolve(BeanResolver beanResolver) {
-			BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurerHolders =
-					beanResolver.resolveRole( ElasticsearchHttpClientConfigurer.class );
-			ElasticsearchClientFactoryImpl factory = new ElasticsearchClientFactoryImpl( httpClientConfigurerHolders.get() );
-			return BeanHolder.<ElasticsearchClientFactory>of( factory )
-					.withDependencyAutoClosing( httpClientConfigurerHolders );
-		}
+	public static final BeanReference<ElasticsearchClientFactory> REFERENCE = (BeanResolver beanResolver) -> {
+		BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurerHolders =
+			beanResolver.resolveRole( ElasticsearchHttpClientConfigurer.class );
+		ElasticsearchClientFactoryImpl factory = new ElasticsearchClientFactoryImpl( httpClientConfigurerHolders.get() );
+		return BeanHolder.<ElasticsearchClientFactory>of( factory )
+			.withDependencyAutoClosing( httpClientConfigurerHolders );
 	};
 
 	private static final ConfigurationProperty<List<String>> HOST =
