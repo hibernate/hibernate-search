@@ -39,6 +39,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Assume;
 import org.junit.Before;
@@ -144,9 +145,40 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void nested() {
-		Assume.assumeTrue( "Sorts on fields within nested fields are not supported yet", false );
-		// TODO HSEARCH-2254 support sorts on fields within nested fields
+	@TestForIssue( jiraKey = "HSEARCH-2254" )
+	public void byField_nested() {
+		SearchQuery<DocumentReference> query;
+		query = simpleQuery( b -> b.byField( "nestedObject.string" )
+				.asc().onMissingValue().sortLast() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.byField( "nestedObject.string" )
+				.desc().onMissingValue().sortLast() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.byField( "nestedObject.string" )
+				.asc().onMissingValue().sortFirst() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
+
+		query = simpleQuery( b -> b.byField( "nestedObject.string" )
+				.desc().onMissingValue().sortFirst() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
+
+		query = simpleQuery( b -> b.byField( "nestedObject.integer" )
+				.asc().onMissingValue().sortLast() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.byField( "nestedObject.integer" )
+				.desc().onMissingValue().sortLast() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.byField( "nestedObject.integer" )
+				.asc().onMissingValue().sortFirst() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
+
+		query = simpleQuery( b -> b.byField( "nestedObject.integer" )
+				.desc().onMissingValue().sortFirst() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
 	}
 
 	@Test
