@@ -12,6 +12,8 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityC
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentFieldContribution;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedNumericFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
@@ -19,11 +21,11 @@ public class LuceneNumericFieldSortBuilder<F, E extends Number>
 		extends AbstractLuceneStandardFieldSortBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
 
 	LuceneNumericFieldSortBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, String nestedDocumentPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, AbstractLuceneNumericFieldCodec<F, E> codec) {
 		super(
-				searchContext, absoluteFieldPath,
+				searchContext, absoluteFieldPath, nestedDocumentPath,
 				converter, rawConverter, converterChecker, codec,
 				codec.getDomain().getMinValue(),
 				codec.getDomain().getMaxValue()
@@ -32,13 +34,25 @@ public class LuceneNumericFieldSortBuilder<F, E extends Number>
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
+		collector.collectSortField( createSortField(), nestedFieldContribution );
+	}
+
+	private SortField createSortField() {
+		if ( nestedDocumentPath != null ) {
+			LuceneNestedNumericFieldComparatorSource fieldComparator = new LuceneNestedNumericFieldComparatorSource(
+					codec.getDomain().getSortFieldType(),
+					getEffectiveMissingValue( missingValue, order )
+			);
+			nestedFieldContribution = new LuceneNestedDocumentFieldContribution( nestedDocumentPath, fieldComparator );
+			return new SortField( absoluteFieldPath, fieldComparator, order == SortOrder.DESC );
+		}
+
 		SortField sortField = new SortField(
 				absoluteFieldPath,
 				codec.getDomain().getSortFieldType(),
 				order == SortOrder.DESC
 		);
 		setEffectiveMissingValue( sortField, missingValue, order );
-
-		collector.collectSortField( sortField );
+		return sortField;
 	}
 }

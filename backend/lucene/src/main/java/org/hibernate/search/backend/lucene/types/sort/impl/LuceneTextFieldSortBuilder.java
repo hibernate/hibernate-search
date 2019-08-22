@@ -11,6 +11,8 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.types.sort.missing.impl.LuceneMissingValueComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentFieldContribution;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedTextFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
@@ -21,10 +23,10 @@ public class LuceneTextFieldSortBuilder<F>
 		extends AbstractLuceneStandardFieldSortBuilder<F, String, LuceneTextFieldCodec<F>> {
 
 	LuceneTextFieldSortBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, String nestedDocumentPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec) {
-		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
+		super( searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
 	}
 
 	@Override
@@ -36,7 +38,14 @@ public class LuceneTextFieldSortBuilder<F>
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
 		// For STRING type, missing value must be either STRING_FIRST or STRING_LAST.
 		// Otherwise we need a CUSTOM type.
-		collector.collectSortField( ( useMissingValue() ) ? customType() : stringType() );
+		collector.collectSortField( createSortField(), nestedFieldContribution );
+	}
+
+	private SortField createSortField() {
+		if ( nestedDocumentPath != null ) {
+			return nestedType();
+		}
+		return ( useMissingValue() ) ? customType() : stringType();
 	}
 
 	private boolean useMissingValue() {
@@ -47,6 +56,12 @@ public class LuceneTextFieldSortBuilder<F>
 		SortField sortField = new SortField( absoluteFieldPath, SortField.Type.STRING, order == SortOrder.DESC );
 		setEffectiveMissingValue( sortField, missingValue, order );
 		return sortField;
+	}
+
+	private SortField nestedType() {
+		LuceneNestedTextFieldComparatorSource fieldComparator = new LuceneNestedTextFieldComparatorSource( missingValue );
+		nestedFieldContribution = new LuceneNestedDocumentFieldContribution( nestedDocumentPath, fieldComparator );
+		return new SortField( absoluteFieldPath, fieldComparator, order == SortOrder.DESC );
 	}
 
 	public SortField customType() {

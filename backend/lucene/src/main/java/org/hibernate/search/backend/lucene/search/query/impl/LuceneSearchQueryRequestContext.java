@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentsSort;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 
@@ -26,16 +27,18 @@ class LuceneSearchQueryRequestContext {
 	private final LoadingContext<?, ?> loadingContext;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
+	private final LuceneNestedDocumentsSort nestedDocumentsSort;
 
 	LuceneSearchQueryRequestContext(
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Query luceneQuery,
-			Sort luceneSort) {
+			Sort luceneSort, LuceneNestedDocumentsSort nestedDocumentsSort) {
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
+		this.nestedDocumentsSort = nestedDocumentsSort;
 	}
 
 	Query getLuceneQuery() {
@@ -44,6 +47,10 @@ class LuceneSearchQueryRequestContext {
 
 	Sort getLuceneSort() {
 		return luceneSort;
+	}
+
+	LuceneNestedDocumentsSort getNestedDocumentsSort() {
+		return nestedDocumentsSort;
 	}
 
 	LuceneSearchQueryExtractContext createExtractContext(IndexSearcher indexSearcher,

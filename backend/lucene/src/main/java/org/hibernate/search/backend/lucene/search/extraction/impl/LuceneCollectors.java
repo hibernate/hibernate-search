@@ -10,11 +10,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentsSort;
+
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
@@ -34,12 +37,17 @@ public class LuceneCollectors {
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
 
+	private final Sort sort;
+	private final LuceneNestedDocumentsSort nestedDocumentsSort;
+	private final int maxDocs;
+
 	private TopDocs topDocs = null;
 
 	LuceneCollectors(TopDocsCollector<?> topDocsCollector, TotalHitCountCollector totalHitCountCollector,
 			Collector compositeCollector, Collection<Collector> collectorsForNestedDocuments,
 			Map<LuceneCollectorKey<?>, Collector> collectors,
-			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring) {
+			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
+			Sort sort, LuceneNestedDocumentsSort nestedDocumentsSort, int maxDocs) {
 		this.topDocsCollector = topDocsCollector;
 		this.totalHitCountCollector = totalHitCountCollector;
 		this.compositeCollector = compositeCollector;
@@ -47,36 +55,67 @@ public class LuceneCollectors {
 		this.collectors = collectors;
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
+		this.nestedDocumentsSort = nestedDocumentsSort;
+		this.sort = sort;
+		this.maxDocs = maxDocs;
 	}
 
 	public void collect(IndexSearcher indexSearcher, Query luceneQuery, int offset, Integer limit) throws IOException {
 		indexSearcher.search( luceneQuery, compositeCollector );
 
-		if ( topDocsCollector != null ) {
-			if ( limit == null ) {
-				topDocs = topDocsCollector.topDocs( offset );
-			}
-			else {
-				topDocs = topDocsCollector.topDocs( offset, limit );
-			}
+		if ( topDocsCollector == null ) {
+			return;
+		}
+		extractTopDocs( offset, limit );
 
-			if ( requireFieldDocRescoring ) {
-				if ( scoreSortFieldIndexForRescoring != null ) {
-					// If there's a SCORE sort field, just get the score value from the sort field
-					for ( ScoreDoc scoreDoc : topDocs.scoreDocs ) {
-						FieldDoc fieldDoc = (FieldDoc) scoreDoc;
-						fieldDoc.score = (float) fieldDoc.fields[scoreSortFieldIndexForRescoring];
-					}
-				}
-				else {
-					// Failing that, we need to re-score the top documents after the query was executed.
-					// This feels wrong, but apparently that's the recommended practice...
-					TopFieldCollector.populateScores( topDocs.scoreDocs, indexSearcher, luceneQuery );
-				}
+		if ( !nestedDocumentsSort.isEmpty() ) {
+			extractTopDocsUsingTheirNested( indexSearcher, luceneQuery, offset, limit );
+		}
+		if ( requireFieldDocRescoring ) {
+			handleRescoring( indexSearcher, luceneQuery );
+		}
+	}
+
+	private void extractTopDocs(int offset, Integer limit) {
+		if ( limit == null ) {
+			topDocs = topDocsCollector.topDocs( offset );
+		}
+		else {
+			topDocs = topDocsCollector.topDocs( offset, limit );
+		}
+	}
+
+	private void extractTopDocsUsingTheirNested(IndexSearcher indexSearcher, Query luceneQuery, int offset, Integer limit) throws IOException {
+		nestedDocumentsSort.processNestedPaths( luceneQuery, indexSearcher, topDocs.scoreDocs );
+
+		TopDocsCollector topNestedCollector = TopFieldCollector.create( sort, maxDocs,
+				// TODO HSEARCH-3517 Avoid tracking the total hit count when possible
+				// Note this will also require to change how we combine collectors,
+				// as MultiCollector explicitly ignores the total hit count optimization
+				Integer.MAX_VALUE
+		);
+
+		indexSearcher.search( luceneQuery, topNestedCollector );
+		if ( limit == null ) {
+			topDocs = topNestedCollector.topDocs( offset );
+		}
+		else {
+			topDocs = topNestedCollector.topDocs( offset, limit );
+		}
+	}
+
+	private void handleRescoring(IndexSearcher indexSearcher, Query luceneQuery) throws IOException {
+		if ( scoreSortFieldIndexForRescoring != null ) {
+			// If there's a SCORE sort field, just get the score value from the sort field
+			for ( ScoreDoc scoreDoc : topDocs.scoreDocs ) {
+				FieldDoc fieldDoc = (FieldDoc) scoreDoc;
+				fieldDoc.score = (float) fieldDoc.fields[scoreSortFieldIndexForRescoring];
 			}
 		}
 		else {
-			topDocs = null;
+			// Failing that, we need to re-score the top documents after the query was executed.
+			// This feels wrong, but apparently that's the recommended practice...
+			TopFieldCollector.populateScores( topDocs.scoreDocs, indexSearcher, luceneQuery );
 		}
 	}
 
