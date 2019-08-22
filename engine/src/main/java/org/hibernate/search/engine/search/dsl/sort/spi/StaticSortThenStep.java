@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.dsl.sort.spi;
 
 public final class StaticSortThenStep<B> extends AbstractSortThenStep<B> {
-	protected final B builder;
+	final B builder;
 
 	public StaticSortThenStep(SearchSortDslContext<?, B> parentDslContext,
 			B builder) {
