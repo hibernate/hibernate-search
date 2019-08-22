@@ -30,6 +30,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Standar
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -190,13 +191,79 @@ public class CompositeSearchSortIT {
 	}
 
 	@Test
-	public void then_flattened() {
-		SearchQuery<DocumentReference> query = simpleQuery( f -> f
-				.byField( "flattened." + indexMapping.flattenedField.relativeFieldName ).asc()
-				.then().byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc()
-		);
+	public void then_flattened_nested() {
+		SearchQuery<DocumentReference> query;
+
+		String normalField = indexMapping.identicalForFirstTwo.relativeFieldName;
+		String flattenedField = "flattened." + indexMapping.flattenedField.relativeFieldName;
+		String nestedField = "nested." + indexMapping.flattenedField.relativeFieldName;
+
+		query = simpleQuery( f -> f.byField( flattenedField ).asc().then().byField( normalField ).asc() );
 		// [a b a][a a b] => {1 3 2}
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3, DOCUMENT_2 );
+
+		query = simpleQuery( f -> f.byField( nestedField ).asc().then().byField( flattenedField ).asc() );
+		// [b a a][a b a] => {3 2 1}
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+
+		query = simpleQuery( f -> f.byField( normalField ).asc().then().byField( nestedField ).asc() );
+		// [a a b][b a a] => {2 1 3}
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2254")
+	public void then_nested_normal_limit1() {
+		SearchQuery<DocumentReference> query;
+
+		String normalField = indexMapping.identicalForLastTwo.relativeFieldName;
+		String nestedField = "nested." + indexMapping.nestedField.relativeFieldName;
+
+		/*
+		 * This used to trigger a bug caused by the fact we were doing a two-pass sort,
+		 * first sorting without the nested documents and listing the top N documents (where N is the limit),
+		 * then collecting the values of the nested fields for these top N documents,
+		 * then sorting all documents again with the knowledge of the values of nested fields for the top N documents.
+		 * The test below would fail if, by chance, the top N documents of the first pass did not include
+		 * the expected top document overall (i.e. document 2 or 3).
+		 */
+		query = simpleQuery( f -> f.byField( nestedField ).asc().onMissingValue().sortLast()
+				.then().byField( normalField ).asc() );
+		// [b a a][a b b] => {[2 or 3] (3 or 2) 1}
+		assertThat( query.fetch( 1 ) ).hits().ordinal( 0 )
+				.isDocRefHit( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+	}
+
+	@Test
+	public void then_flattened_nested_filterByPredicate() {
+		SearchQuery<DocumentReference> query;
+
+		String normalField = indexMapping.identicalForFirstTwo.relativeFieldName;
+		String flattenedField = "flattened." + indexMapping.flattenedField.relativeFieldName;
+		String nestedField = "nested." + indexMapping.flattenedField.relativeFieldName;
+
+		query = indexManager.createScope().query()
+				.predicate( b -> b.match().onField( normalField ).matching( "aaa" ) )
+				.sort( f -> f.byField( flattenedField ).asc().then().byField( normalField ).asc() )
+				.toQuery();
+
+		// [a b a][a a b] => {1+ 3 2+}
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+
+		query = indexManager.createScope().query()
+				.predicate( b -> b.match().onField( normalField ).matching( "aaa" ) )
+				.sort( f -> f.byField( nestedField ).asc().then().byField( flattenedField ).asc() )
+				.toQuery();
+
+		// [b a a][a b a] => {3 2+ 1+}
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
+
+		query = indexManager.createScope().query()
+				.predicate( b -> b.match().onField( normalField ).matching( "aaa" ) )
+				.sort( f -> f.byField( normalField ).asc().then().byField( nestedField ).asc() )
+				.toQuery();
+		// [a a b][b a a] => {2+ 1+ 3}
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
@@ -227,6 +294,8 @@ public class CompositeSearchSortIT {
 
 			DocumentElement flattened = document.addObject( indexMapping.flattenedObject );
 			indexMapping.flattenedField.write( flattened, "aaa" );
+			DocumentElement nested = document.addObject( indexMapping.nestedObject );
+			indexMapping.nestedField.write( nested, "bbb" );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.identicalForFirstTwo.write( document, "aaa" );
@@ -234,6 +303,8 @@ public class CompositeSearchSortIT {
 
 			DocumentElement flattened = document.addObject( indexMapping.flattenedObject );
 			indexMapping.flattenedField.write( flattened, "bbb" );
+			DocumentElement nested = document.addObject( indexMapping.nestedObject );
+			indexMapping.nestedField.write( nested, "aaa" );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.identicalForFirstTwo.write( document, "bbb" );
@@ -241,6 +312,8 @@ public class CompositeSearchSortIT {
 
 			DocumentElement flattened = document.addObject( indexMapping.flattenedObject );
 			indexMapping.flattenedField.write( flattened, "aaa" );
+			DocumentElement nested = document.addObject( indexMapping.nestedObject );
+			indexMapping.nestedField.write( nested, "aaa" );
 		} );
 		workPlan.execute().join();
 
@@ -258,6 +331,8 @@ public class CompositeSearchSortIT {
 
 		final IndexObjectFieldReference flattenedObject;
 		final MainFieldModel<String> flattenedField;
+		final IndexObjectFieldReference nestedObject;
+		final MainFieldModel<String> nestedField;
 
 		IndexMapping(IndexSchemaElement root) {
 			identicalForFirstTwo = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
@@ -271,6 +346,11 @@ public class CompositeSearchSortIT {
 			flattenedObject = flattened.toReference();
 			flattenedField = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
 					.map( flattened, "field" );
+
+			IndexSchemaObjectField nested = root.objectField( "nested", ObjectFieldStorage.NESTED );
+			nestedObject = nested.toReference();
+			nestedField = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
+					.map( nested, "field" );
 		}
 	}
 
