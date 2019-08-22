@@ -13,7 +13,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
@@ -186,6 +189,16 @@ public class CompositeSearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
 	}
 
+	@Test
+	public void then_flattened() {
+		SearchQuery<DocumentReference> query = simpleQuery( f -> f
+				.byField( "flattened." + indexMapping.flattenedField.relativeFieldName ).asc()
+				.then().byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc()
+		);
+		// [a b a][a a b] => {1 3 2}
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3, DOCUMENT_2 );
+	}
+
 	private SearchQuery<DocumentReference> simpleQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		return simpleQuery( indexManager.createScope(), sortContributor );
@@ -211,14 +224,23 @@ public class CompositeSearchSortIT {
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.identicalForFirstTwo.write( document, "aaa" );
 			indexMapping.identicalForLastTwo.write( document, "aaa" );
+
+			DocumentElement flattened = document.addObject( indexMapping.flattenedObject );
+			indexMapping.flattenedField.write( flattened, "aaa" );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.identicalForFirstTwo.write( document, "aaa" );
 			indexMapping.identicalForLastTwo.write( document, "bbb" );
+
+			DocumentElement flattened = document.addObject( indexMapping.flattenedObject );
+			indexMapping.flattenedField.write( flattened, "bbb" );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.identicalForFirstTwo.write( document, "bbb" );
 			indexMapping.identicalForLastTwo.write( document, "bbb" );
+
+			DocumentElement flattened = document.addObject( indexMapping.flattenedObject );
+			indexMapping.flattenedField.write( flattened, "aaa" );
 		} );
 		workPlan.execute().join();
 
@@ -234,6 +256,9 @@ public class CompositeSearchSortIT {
 		final MainFieldModel<String> identicalForLastTwo;
 		final MainFieldModel<String> string3;
 
+		final IndexObjectFieldReference flattenedObject;
+		final MainFieldModel<String> flattenedField;
+
 		IndexMapping(IndexSchemaElement root) {
 			identicalForFirstTwo = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
 					.map( root, "identicalForFirstTwo" );
@@ -241,6 +266,11 @@ public class CompositeSearchSortIT {
 					.map( root, "identicalForLastTwo" );
 			string3 = MainFieldModel.mapper( f -> f.asString() )
 					.map( root, "string3" );
+
+			IndexSchemaObjectField flattened = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
+			flattenedObject = flattened.toReference();
+			flattenedField = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
+					.map( flattened, "field" );
 		}
 	}
 
