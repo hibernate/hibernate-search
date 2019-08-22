@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
@@ -19,34 +20,30 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributo
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
-import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
-
-
 public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 
 	private final LuceneWorkFactory factory;
-	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final LuceneIndexEntryFactory indexEntryFactory;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
-	private final String indexName;
 	private final String tenantId;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
 	private final Map<LuceneWriteWorkOrchestrator, List<LuceneWriteWork<?>>> worksByOrchestrator = new HashMap<>();
 
-	public LuceneIndexWorkPlan(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
+	public LuceneIndexWorkPlan(LuceneWorkFactory factory,
 			WorkExecutionIndexManagerContext indexManagerContext,
+			LuceneIndexEntryFactory indexEntryFactory,
 			SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.factory = factory;
-		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.indexEntryFactory = indexEntryFactory;
 		this.indexManagerContext = indexManagerContext;
-		this.indexName = indexManagerContext.getIndexName();
 		this.tenantId = sessionContext.getTenantIdentifier();
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
@@ -58,9 +55,7 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 
-		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
-		documentContributor.contribute( builder );
-		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
+		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, documentContributor );
 
 		collect( id, routingKey, factory.add( tenantId, id, indexEntry ) );
 	}
@@ -71,9 +66,7 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 
-		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
-		documentContributor.contribute( builder );
-		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
+		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, documentContributor );
 
 		collect( id, routingKey, factory.update( tenantId, id, indexEntry ) );
 	}

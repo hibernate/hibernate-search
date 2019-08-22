@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCreationContextImpl;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
@@ -52,6 +53,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.facet.FacetsConfig;
 
 public class IndexManagerBackendContext implements WorkExecutionBackendContext, SearchBackendContext {
 
@@ -90,13 +92,15 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	@Override
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(
 			WorkExecutionIndexManagerContext indexManagerContext,
+			LuceneIndexEntryFactory indexEntryFactory,
 			SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new LuceneIndexWorkPlan(
-				workFactory, multiTenancyStrategy,
+				workFactory,
 				indexManagerContext,
+				indexEntryFactory,
 				sessionContext,
 				commitStrategy, refreshStrategy
 		);
@@ -120,12 +124,14 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	@Override
 	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
 			WorkExecutionIndexManagerContext indexManagerContext,
+			LuceneIndexEntryFactory indexEntryFactory,
 			SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new LuceneIndexDocumentWorkExecutor(
-				workFactory, multiTenancyStrategy,
+				workFactory,
+				indexEntryFactory,
 				indexManagerContext,
 				sessionContext,
 				commitStrategy
@@ -198,6 +204,10 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			new SuppressingCloser( e ).push( directory );
 			throw e;
 		}
+	}
+
+	LuceneIndexEntryFactory createLuceneIndexEntryFactory(String indexName) {
+		return new LuceneIndexEntryFactory( multiTenancyStrategy, indexName );
 	}
 
 }

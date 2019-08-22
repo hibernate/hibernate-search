@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
@@ -45,15 +46,17 @@ public class LuceneIndexManagerImpl
 
 	private final String indexName;
 	private final LuceneIndexModel model;
+	private final LuceneIndexEntryFactory indexEntryFactory;
 
 	private final ShardHolder shardHolder;
 
 	LuceneIndexManagerImpl(IndexManagerBackendContext backendContext,
-			String indexName, LuceneIndexModel model) {
+			String indexName, LuceneIndexModel model, LuceneIndexEntryFactory indexEntryFactory) {
 		this.backendContext = backendContext;
 
 		this.indexName = indexName;
 		this.model = model;
+		this.indexEntryFactory = indexEntryFactory;
 
 		this.shardHolder = new ShardHolder( backendContext, model );
 	}
@@ -87,8 +90,8 @@ public class LuceneIndexManagerImpl
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return backendContext.createWorkPlan(
-				shardHolder, sessionContext,
-				commitStrategy, refreshStrategy
+				shardHolder, indexEntryFactory,
+				sessionContext, commitStrategy, refreshStrategy
 		);
 	}
 
@@ -96,8 +99,8 @@ public class LuceneIndexManagerImpl
 	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
 			SessionContextImplementor sessionContext, DocumentCommitStrategy commitStrategy) {
 		return backendContext.createDocumentWorkExecutor(
-				shardHolder, sessionContext,
-				commitStrategy
+				shardHolder, indexEntryFactory,
+				sessionContext, commitStrategy
 		);
 	}
 

@@ -88,11 +88,6 @@ class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIn
 	}
 
 	@Override
-	public String getIndexName() {
-		return model.getIndexName();
-	}
-
-	@Override
 	public void openIndexReaders(Set<String> routingKeys, Collection<IndexReaderHolder> readerCollector)
 			throws IOException {
 		Collection<Shard> enabledShards = toShards( routingKeys );

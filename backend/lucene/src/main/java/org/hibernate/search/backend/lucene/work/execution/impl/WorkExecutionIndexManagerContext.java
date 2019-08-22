@@ -23,8 +23,6 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrc
  */
 public interface WorkExecutionIndexManagerContext {
 
-	String getIndexName();
-
 	LuceneWriteWorkOrchestrator getWriteOrchestrator(String documentId, String routingKey);
 
 	Collection<LuceneWriteWorkOrchestrator> getAllWriteOrchestrators();
