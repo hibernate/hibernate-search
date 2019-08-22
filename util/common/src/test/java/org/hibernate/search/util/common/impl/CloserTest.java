@@ -36,11 +36,8 @@ public class CloserTest {
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
 		@SuppressWarnings("resource")
-		Closeable closeable = new Closeable() {
-			@Override
-			public void close() throws IOException {
-				throw exception1;
-			}
+		Closeable closeable = () -> {
+			throw exception1;
 		};
 
 		thrown.expect(
@@ -60,11 +57,8 @@ public class CloserTest {
 		Exception exception1 = new Exception();
 		RuntimeException exception2 = new IllegalStateException();
 		@SuppressWarnings("resource")
-		AutoCloseable closeable = new AutoCloseable() {
-			@Override
-			public void close() throws Exception {
-				throw exception1;
-			}
+		AutoCloseable closeable = () -> {
+			throw exception1;
 		};
 
 		thrown.expect(
@@ -127,11 +121,8 @@ public class CloserTest {
 		MyException1 exception1 = new MyException1();
 		RuntimeException exception2 = new IllegalStateException();
 		@SuppressWarnings("resource")
-		MyException1Closeable closeable = new MyException1Closeable() {
-			@Override
-			public void close() throws MyException1 {
-				throw exception1;
-			}
+		MyException1Closeable closeable = () -> {
+			throw exception1;
 		};
 
 		thrown.expect(

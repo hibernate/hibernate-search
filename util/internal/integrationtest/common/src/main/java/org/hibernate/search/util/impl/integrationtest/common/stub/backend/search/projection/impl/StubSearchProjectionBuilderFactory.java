@@ -61,22 +61,12 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return new EntityProjectionBuilder<E>() {
-			@Override
-			public SearchProjection<E> build() {
-				return StubEntitySearchProjection.get();
-			}
-		};
+		return StubEntitySearchProjection::get;
 	}
 
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
-		return new EntityReferenceProjectionBuilder<R>() {
-			@Override
-			public SearchProjection<R> build() {
-				return StubReferenceSearchProjection.get();
-			}
-		};
+		return StubReferenceSearchProjection::get;
 	}
 
 	@Override

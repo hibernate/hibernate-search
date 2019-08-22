@@ -548,16 +548,10 @@ public class ElasticsearchSchemaValidationIT {
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						IndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
 				)
-				.withBackendProperty(
-						BACKEND_NAME,
+				.withBackendProperty( BACKEND_NAME,
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
-						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchAnalysisConfigurer() {
-							@Override
-							public void configure(ElasticsearchAnalysisConfigurationContext context) {
-								// No-op
-							}
-						}
-				);
+						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER, (ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
+			// No-op
+		} );
 	}
 }
