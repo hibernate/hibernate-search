@@ -124,6 +124,26 @@ public class SearchSortIT {
 	}
 
 	@Test
+	public void byField_flattened() {
+		SearchQuery<DocumentReference> query;
+		query = simpleQuery( b -> b.byField( "flattenedObject.string" )
+				.asc().onMissingValue().sortLast() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.byField( "flattenedObject.string" )
+				.desc().onMissingValue().sortLast() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.byField( "flattenedObject.integer" )
+				.asc().onMissingValue().sortLast() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.byField( "flattenedObject.integer" )
+				.desc().onMissingValue().sortLast() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+	}
+
+	@Test
 	public void nested() {
 		Assume.assumeTrue( "Sorts on fields within nested fields are not supported yet", false );
 		// TODO HSEARCH-2254 support sorts on fields within nested fields
