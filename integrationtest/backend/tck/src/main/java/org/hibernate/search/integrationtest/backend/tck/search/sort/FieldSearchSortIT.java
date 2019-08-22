@@ -343,6 +343,49 @@ public class FieldSearchSortIT {
 	}
 
 	@Test
+	@TestForIssue( jiraKey = "HSEARCH-2254" )
+	public void byField_inNestedObject() {
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
+			SearchQuery<DocumentReference> query;
+			String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+
+			query = simpleQuery( b -> b.byField( fieldPath ).onMissingValue().sortLast() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortLast() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+
+			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortLast() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY );
+
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortFirst() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortFirst() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+
+			// Explicit order with onMissingValue().use( ... )
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.before1Value ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between1And2Value ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between2And3Value ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.after3Value ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		}
+	}
+
+	@Test
 	public void error_unsortable() {
 		StubMappingScope scope = indexManager.createScope();
 
