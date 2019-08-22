@@ -34,7 +34,7 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumen
 
 		// all the ancestors of a subdocument must be added after it
 		List<Document> documents = new ArrayList<>();
-		contribute( indexName, multiTenancyStrategy, tenantId, id, document, documents );
+		contribute( indexName, multiTenancyStrategy, tenantId, id, documents );
 		documents.add( document );
 
 		return documents;
