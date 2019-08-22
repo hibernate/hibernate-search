@@ -19,7 +19,7 @@ import org.apache.lucene.util.BytesRef;
  * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
  *
  */
-class LuceneReplaceMissingSortedDocValues extends SortedDocValues {
+public class LuceneReplaceMissingSortedDocValues extends SortedDocValues {
 	final SortedDocValues originalValues;
 	final BytesRef missingValue;
 	final int missingValuePosition;

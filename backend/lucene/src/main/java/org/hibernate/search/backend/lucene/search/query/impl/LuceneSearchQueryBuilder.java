@@ -30,6 +30,8 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentFieldContribution;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentsSort;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -53,6 +55,8 @@ public class LuceneSearchQueryBuilder<H>
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<?, H> rootProjection;
+
+	private LuceneNestedDocumentsSort nestedDocumentsSort = new LuceneNestedDocumentsSort();
 
 	private Query luceneQuery;
 	private List<SortField> sortFields;
@@ -102,6 +106,12 @@ public class LuceneSearchQueryBuilder<H>
 	}
 
 	@Override
+	public void collectSortField(SortField sortField, LuceneNestedDocumentFieldContribution nestedFieldContribution) {
+		collectSortField( sortField );
+		nestedDocumentsSort.add( nestedFieldContribution );
+	}
+
+	@Override
 	public void collectSortFields(SortField[] sortFields) {
 		if ( sortFields == null || sortFields.length == 0 ) {
 			return;
@@ -142,7 +152,7 @@ public class LuceneSearchQueryBuilder<H>
 		);
 
 		LuceneSearchQueryRequestContext requestContext = new LuceneSearchQueryRequestContext(
-				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
+				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort, nestedDocumentsSort
 		);
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(

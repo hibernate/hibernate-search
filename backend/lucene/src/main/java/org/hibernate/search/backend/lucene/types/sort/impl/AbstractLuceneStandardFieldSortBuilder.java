@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentFieldContribution;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
@@ -37,6 +38,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	private final LuceneSearchContext searchContext;
 
 	protected final String absoluteFieldPath;
+	protected final String nestedDocumentPath;
 
 	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
 	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
@@ -48,14 +50,17 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	protected Object missingValue;
 
+	protected LuceneNestedDocumentFieldContribution nestedFieldContribution;
+
 	protected AbstractLuceneStandardFieldSortBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, String nestedDocumentPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, C codec,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.nestedDocumentPath = nestedDocumentPath;
 		this.converter = converter;
 		this.rawConverter = rawConverter;
 		this.converterChecker = converterChecker;
@@ -96,7 +101,10 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 		if ( missingValue == null ) {
 			return;
 		}
+		sortField.setMissingValue( getEffectiveMissingValue( missingValue, order ) );
+	}
 
+	protected Object getEffectiveMissingValue(Object missingValue, SortOrder order) {
 		Object effectiveMissingValue;
 		if ( missingValue == SortMissingValue.MISSING_FIRST ) {
 			effectiveMissingValue = order == SortOrder.DESC ? sortMissingValueLastPlaceholder : sortMissingValueFirstPlaceholder;
@@ -107,8 +115,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 		else {
 			effectiveMissingValue = missingValue;
 		}
-
-		sortField.setMissingValue( effectiveMissingValue );
+		return effectiveMissingValue;
 	}
 
 	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {

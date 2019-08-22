@@ -11,6 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentsSort;
+
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.Sort;
@@ -23,7 +25,7 @@ import org.apache.lucene.search.TotalHitCountCollector;
 public class LuceneCollectorsBuilder {
 
 	private final Sort sort;
-
+	private final LuceneNestedDocumentsSort nestedDocumentsSort;
 	private final int maxDocs;
 
 	private final TotalHitCountCollector totalHitCountCollector;
@@ -34,8 +36,9 @@ public class LuceneCollectorsBuilder {
 	private final Map<LuceneCollectorKey<?>, Collector> luceneCollectors = new LinkedHashMap<>();
 	private final List<Collector> luceneCollectorsForNestedDocuments = new ArrayList<>();
 
-	public LuceneCollectorsBuilder(Sort sort, int maxDocs) {
+	public LuceneCollectorsBuilder(Sort sort, LuceneNestedDocumentsSort nestedDocumentsSort, int maxDocs) {
 		this.sort = sort;
+		this.nestedDocumentsSort = nestedDocumentsSort;
 		this.maxDocs = maxDocs;
 
 		this.totalHitCountCollector = new TotalHitCountCollector();
@@ -114,7 +117,8 @@ public class LuceneCollectorsBuilder {
 				topDocsCollector, totalHitCountCollector,
 				compositeCollector, luceneCollectorsForNestedDocuments,
 				luceneCollectors,
-				requireFieldDocRescoring, scoreSortFieldIndexForRescoring
+				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
+				sort, nestedDocumentsSort, maxDocs
 		);
 	}
 }

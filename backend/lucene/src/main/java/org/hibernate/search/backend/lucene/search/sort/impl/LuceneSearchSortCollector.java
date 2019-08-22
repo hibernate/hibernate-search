@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import java.util.List;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentFieldContribution;
 
 import org.apache.lucene.search.SortField;
 
@@ -16,12 +16,14 @@ import org.apache.lucene.search.SortField;
  * <p>
  * Used by Lucene-specific sort contributors.
  *
- * @see LuceneSearchSortBuilderFactoryImpl#contribute(Object, List)
+ * @see LuceneSearchSortBuilderFactoryImpl#contribute(LuceneSearchSortCollector, LuceneSearchSortBuilder)
  * @see LuceneSearchSortBuilder
  */
 public interface LuceneSearchSortCollector {
 
 	void collectSortField(SortField sortField);
+
+	void collectSortField(SortField sortField, LuceneNestedDocumentFieldContribution nestedFieldContribution);
 
 	void collectSortFields(SortField[] sortFields);
 
