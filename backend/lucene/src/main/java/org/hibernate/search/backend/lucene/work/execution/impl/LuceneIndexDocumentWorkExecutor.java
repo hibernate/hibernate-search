@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.work.execution.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
+import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
-import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -23,20 +23,19 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> {
 
 	private final LuceneWorkFactory factory;
-	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final LuceneIndexEntryFactory indexEntryFactory;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
-	private final String indexName;
 	private final String tenantId;
 	private final DocumentCommitStrategy commitStrategy;
 
-	public LuceneIndexDocumentWorkExecutor(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
+	public LuceneIndexDocumentWorkExecutor(LuceneWorkFactory factory,
+			LuceneIndexEntryFactory indexEntryFactory,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			SessionContextImplementor sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		this.factory = factory;
-		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.indexEntryFactory = indexEntryFactory;
 		this.indexManagerContext = indexManagerContext;
-		this.indexName = indexManagerContext.getIndexName();
 		this.tenantId = sessionContext.getTenantIdentifier();
 		this.commitStrategy = commitStrategy;
 	}
@@ -46,9 +45,7 @@ public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecuto
 		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 
-		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder();
-		documentContributor.contribute( builder );
-		LuceneIndexEntry indexEntry = builder.build( indexName, multiTenancyStrategy, tenantId, id );
+		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, documentContributor );
 
 		// Route the work to the appropriate shard
 		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( id, routingKey );

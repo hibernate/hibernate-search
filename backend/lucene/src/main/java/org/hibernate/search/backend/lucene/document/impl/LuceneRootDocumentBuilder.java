@@ -6,24 +6,35 @@
  */
 package org.hibernate.search.backend.lucene.document.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
+
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumentBuilder {
 
-	public LuceneRootDocumentBuilder() {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final String indexName;
+
+	LuceneRootDocumentBuilder(MultiTenancyStrategy multiTenancyStrategy, String indexName) {
 		super( LuceneIndexSchemaObjectNode.root() );
+		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.indexName = indexName;
 	}
 
-	public LuceneIndexEntry build(String indexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String id) {
+	public LuceneIndexEntry build(String tenantId, String id) {
 		return new LuceneIndexEntry( indexName, id, assembleDocuments( indexName, multiTenancyStrategy, tenantId, id ) );
 	}
 
@@ -35,6 +46,7 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumen
 		// all the ancestors of a subdocument must be added after it
 		List<Document> documents = new ArrayList<>();
 		contribute( indexName, multiTenancyStrategy, tenantId, id, documents );
+
 		documents.add( document );
 
 		return documents;
