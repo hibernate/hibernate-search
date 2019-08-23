@@ -6,16 +6,27 @@
  */
 package org.hibernate.search.mapper.orm.session;
 
-// TODO HSEARCH-3069 Also document what happens when a transaction is *not* active
 /**
  * An interface for writing to indexes in the context of an ORM Session.
  * <p>
- * When a transaction is active, operations are queued internally,
- * and are only applied on transaction commit.
+ * This class is stateful: it queues operations internally to apply them at a later time.
  * <p>
- * {@link #process()} and {@link #execute()} allow to control explicitly
- * how operations are applied, without relying on transaction commits,
- * which can be useful when indexing large amounts of data in batches.
+ * When {@link #process()} is called,
+ * or when {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY automatic indexing is enabled}
+ * and a Hibernate ORM Session {@code flush()} happens,
+ * the entities will be processed and index documents will be built
+ * and stored in an internal buffer.
+ * <p>
+ * When {@link #execute()} is called,
+ * or when {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY automatic indexing is enabled}
+ * and a Hibernate ORM transaction is committed or a Hibernate ORM Session {@code flush()} happens outside of any transaction,
+ * the operations will be actually sent to the index.
+ * <p>
+ * Note that {@link #execute()} will implicitly trigger processing of documents that weren't processed yet,
+ * if any, so calling {@link #process()} is not necessary if you call {@link #execute()} just next.
+ * <p>
+ * {@link #process()} and {@link #execute()} are mostly useful when automatic indexing is disabled,
+ * to control the indexing process explicitly.
  */
 public interface SearchSessionWritePlan {
 
@@ -64,17 +75,19 @@ public interface SearchSessionWritePlan {
 	void purge(Class<?> entityClass, Object providedId);
 
 	/**
-	 * Extract all data from objects passed to the writer so far,
-	 * without writing to the indexes.
+	 * Extract all data from objects passed to the write plan so far,
+	 * creates documents to be indexed and put them into an internal buffer,
+	 * without writing them to the indexes.
 	 * <p>
 	 * Calling this method is optional: the {@link #execute()} method
 	 * or the automatic write on transaction commit will perform the extraction as necessary.
 	 * <p>
-	 * However, calling this method can be useful before a session is cleared:
+	 * However, calling this method can be useful before a session is cleared
+	 * if {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY automatic indexing is disabled}:
 	 * it will make sure the data lost when clearing the session will no longer be necessary for indexing.
 	 * <p>
 	 * Caution: calling this method repeatedly without a call to {@link #execute()}
-	 * will add more and more data to an internal write buffer,
+	 * will add more and more data to an internal document buffer,
 	 * which may lead to an {@link OutOfMemoryError}.
 	 * Use with caution in batch processes.
 	 */

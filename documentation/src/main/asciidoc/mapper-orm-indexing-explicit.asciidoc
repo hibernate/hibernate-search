@@ -53,30 +53,32 @@ while keeping the memory footprint reasonably low.
 Below is an example of this pattern to persist a large number of entities
 when not using Hibernate Search.
 
-.A batch process without Hibernate Search
+.A batch process with JPA
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=persist-no-automatic-indexing]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-clear]
 ----
 <1> Execute a loop for a large number of elements, inside a transaction.
 <2> For every iteration of the loop, instantiate a new entity and persist it.
-<3> Every `BATCH_SIZE` iterations of the loop, `flush` the ORM session to send the changes to the database-side buffer.
+<3> Every `BATCH_SIZE` iterations of the loop, `flush` the entity manager to send the changes to the database-side buffer.
 <4> After a `flush`, `clear` the ORM session to release some memory.
 ====
 
-With Hibernate Search, that pattern is problematic,
-because clearing the session means entities that were registered for later indexing
-will be detached from the session,
-and as a result they will not be able to load lazy properties upon transaction commit,
-when Hibernate Search tries to process changes.
-This may lead to a `LazyInitializationException`.
+With Hibernate Search 6 (on contrary to Hibernate Search 5 and earlier),
+this pattern will work as expected:
+documents will be built on flushes,
+and sent to the index upon transaction commit.
 
-To address that problem, the `SearchSessionWritePlan` interface provides explicit control over execution of index writes.
+However, each `flush` call will potentially add data to an internal document buffer,
+which for large volumes of data may lead to an `OutOfMemoryException`,
+depending on the JVM heap size and on the complexity and number of documents.
 
-The first solution is to just write to indexes
-after the call to `session.flush()` and before the call to `session.clear()`,
-without waiting for the database transaction to be committed.
+If you run into memory issues,
+the first solution is to just write to indexes
+after the call to `session.flush()`/`session.clear()`,
+without waiting for the database transaction to be committed:
+the internal document buffer will be cleared after each write to indexes.
 
 This is done by calling the `execute()` method on the write plan,
 as shown in the example below.
@@ -88,7 +90,7 @@ part of the data will already be in the index, with no way to roll back the chan
 while the database changes will have been rolled back.
 The index will thus be inconsistent with the database.
 
-To fix that situation, you will have to either cancel your database changes manually,
+To recover from that situation, you will have to either cancel your database changes manually,
 or wipe the indexes clean and <<mapper-orm-indexing-explicit-massindexer,reindex>>.
 ====
 
@@ -96,7 +98,7 @@ or wipe the indexes clean and <<mapper-orm-indexing-explicit-massindexer,reindex
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=persist-automatic-indexing-periodic-execute]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-execute-clear]
 ----
 <1> Get the `SearchSession`.
 <2> Get the search session's write plan.
@@ -105,7 +107,7 @@ Note we're relying on automatic indexing to index the entity,
 but this would work just as well if automatic indexing was disabled,
 only requiring an extra call to index the entity.
 See <<mapper-orm-indexing-explicit-writeplan-writes>>.
-<4> After after a `flush()`, call `writePlan.execute()`.
+<4> After after a `flush()`/`clear()`, call `writePlan.execute()`.
 The entities will be processed and *the changes will be sent to the indexes immediately*.
 Hibernate Search will wait for index changes to be "completed"
 as required by the configured <<mapper-orm-indexing-automatic-synchronization,synchronization strategy>>.
@@ -115,9 +117,8 @@ The remaining entities that were not flushed/cleared will be flushed and indexed
 
 If leaving the index in an inconsistent state when the transaction fails is not an option,
 a second solution is to break down the batch process
-into multiple transactions, each handling a smaller number of elements,
-and to *not* apply a periodic `flush`/`clear`,
-so that entities are still attached to the session upon commit.
+into multiple transactions, each handling a smaller number of elements:
+the internal document buffer will be cleared after each transaction.
 
 See below for an example.
 
@@ -150,57 +151,12 @@ See <<mapper-orm-indexing-explicit-writeplan-writes>>.
 The entities will be flushed and indexed automatically.
 ====
 
-Finally, if the other solutions are unacceptable because
-the index needs to stay in its original state when the batch process fails,
-or because the process cannot be broken down in small enough transactions,
-there is a third solution: just tell Hibernate Search to process the entities
-after the call to `session.flush()` and before the call to `session.clear()`,
-without waiting for the database transaction to be committed.
-Hibernate Search will read the entities,
-build the corresponding documents and store them in an internal buffer,
-which will be written to indexes upon commit.
-
-This is done by calling the `process()` method on the write plan,
-as shown in the example below.
-
-[IMPORTANT]
-====
-This pattern will require less memory than without the periodic `flush`/`process`/`clear`,
-but it will still maintain an internal buffer that will grow as more entities are processed,
-and may lead to an `OutOfMemoryException` depending on the JVM heap size and the complexity and number of documents.
-Only use this in production after careful testing with an appropriate JVM heap size.
-
-However, if enough memory is available,
-this is the safest pattern, leaving both the database and indexes unaffected
-if an error happens during the batch process.
-====
-
-.A batch process with Hibernate Search using `process()`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=persist-automatic-indexing-periodic-process]
-----
-<1> Get the `SearchSession`.
-<2> Get the search session's write plan.
-<3> For every iteration of the loop, instantiate a new entity and persist it.
-Note we're relying on automatic indexing to index the entity,
-but this would work just as well if automatic indexing was disabled,
-only requiring an extra call to index the entity.
-See <<mapper-orm-indexing-explicit-writeplan-writes>>.
-<4> After after a `flush()`, call `writePlan.process()`.
-The entities will be processed but *the changes will not be sent to the indexes*,
-and will instead be stored in an internal buffer.
-<5> After the loop, commit the transaction.
-The changes stored in the internal buffer, as well as the remaining entities that were not flushed/cleared,
-will be indexed automatically.
-====
-
 [NOTE]
 ====
-The multi-transaction solution and the periodic `process()` solution can be combined,
+The multi-transaction solution
+and the original `flush()`/`clear()` loop pattern can be combined,
 breaking down the process in multiple medium-sized transactions,
-and periodically calling `flush`/`process`/`clear` inside each transaction.
+and periodically calling `flush`/`clear` inside each transaction.
 
 This combined solution is the most flexible,
 hence the most suitable if you want to fine-tune your batch process.
