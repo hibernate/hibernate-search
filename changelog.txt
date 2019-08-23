@@ -1,6 +1,36 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Alpha9 (23-08-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3644 ORM warning on bootstrap: HHH000450: Encountered request for Service by non-primary service role 
+    * HSEARCH-3643 Entities should be unproxied before getting field values when indexing
+    * HSEARCH-3551 Hibernate Search doesn't boot when declared as a dependency in a module-info.java
+    * HSEARCH-1350 Sequence of flush(); clear(); commit(); can lead to LazyInitializationException
+
+** Improvement
+    * HSEARCH-3660 Upgrade to Elasticsearch 7.3.0
+    * HSEARCH-3651 Do not specify a type in Elasticsearch _explain requests
+    * HSEARCH-3648 Upgrade to Hibernate ORM 5.4.4
+    * HSEARCH-3646 Upgrade to Lucene 8.2
+    * HSEARCH-3642 Merge the DslConverter and ProjectionConverter enums into one
+    * HSEARCH-3612 Normalize the terms to match in wildcard/prefix predicates
+    * HSEARCH-3447 Replace uses of deprecated Hibernate criteria with JPA criteria
+    * HSEARCH-3360 Correctly handle the flush() and clear() events in the ORM integration
+    * HSEARCH-1270 Clear the pending indexing tasks at Session.clear()
+    * HSEARCH-899 Check for illegal usage of @IndexedEmbedded
+
+** Task
+    * HSEARCH-3658 Upgrade to AWS Elasticsearch Service 6.7 in the Jenkinsfile
+    * HSEARCH-3656 Update mapper ORM documentation chapter: writeplan API process is no longer necessary
+    * HSEARCH-3652 Refresh Jenkinsfiles to match the new CI environment
+    * HSEARCH-3314 Search 6 groundwork - Restore support for (static) sharding
+    * HSEARCH-3075 Search 6 groundwork - Release WorkPlan resources when a transaction is rolled back
+    * HSEARCH-3068 Search 6 groundwork - Restore support for "simulated" transaction using a Flush listener
+    * HSEARCH-3062 Search 6 groundwork - Support (single-valued) projections on fields within nested object fields
+
 6.0.0.Alpha8 (19-07-2019)
 -------------------------
 
