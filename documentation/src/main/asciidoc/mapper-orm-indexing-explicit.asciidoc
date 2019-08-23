@@ -137,8 +137,15 @@ part of the data will already be in the index, with no way to roll back the chan
 while the database changes will have been rolled back.
 The index will thus be inconsistent with the database.
 
-To recover from that situation, you will have to either cancel your database changes manually,
-or wipe the indexes clean and <<mapper-orm-indexing-explicit-massindexer,reindex>>.
+To recover from that situation, you will have to either
+execute the exact same database changes that failed manually
+(to get the database back in sync with the index),
+or <<mapper-orm-indexing-explicit-writeplan-writes,reindex the entities>> affected by the transaction manually
+(to get the index back in sync with the database).
+
+Of course, if you can afford to take the indexes offline for a longer period of time,
+a simpler solution would be to wipe the indexes clean
+and <<mapper-orm-indexing-explicit-massindexer,reindex everything>>.
 ====
 
 .A batch process with Hibernate Search using `execute()`
