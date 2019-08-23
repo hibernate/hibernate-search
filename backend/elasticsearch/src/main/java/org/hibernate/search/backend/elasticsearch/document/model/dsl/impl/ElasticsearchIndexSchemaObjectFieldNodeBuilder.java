@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
@@ -77,8 +79,13 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 
-		String nestedPath = ( ObjectFieldStorage.NESTED.equals( storage ) ) ? absoluteFieldPath : parentNode.getNestedPath();
-		ElasticsearchIndexSchemaObjectNode fieldNode = new ElasticsearchIndexSchemaObjectNode( parentNode, absoluteFieldPath, nestedPath, storage, multiValued );
+		List<String> nestedPathHierarchy = parentNode.getNestedPathHierarchy();
+		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
+			// if we found a nested object, we add it to the nestedPathHierarchy
+			nestedPathHierarchy = new ArrayList<>( nestedPathHierarchy );
+			nestedPathHierarchy.add( absoluteFieldPath );
+		}
+		ElasticsearchIndexSchemaObjectNode fieldNode = new ElasticsearchIndexSchemaObjectNode( parentNode, absoluteFieldPath, nestedPathHierarchy, storage, multiValued );
 		collector.collect( absoluteFieldPath, fieldNode );
 
 		reference.enable( fieldNode );

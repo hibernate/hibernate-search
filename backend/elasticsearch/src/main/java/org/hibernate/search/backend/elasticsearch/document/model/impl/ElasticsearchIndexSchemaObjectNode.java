@@ -6,13 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 
 
 public class ElasticsearchIndexSchemaObjectNode {
 
 	private static final ElasticsearchIndexSchemaObjectNode ROOT =
-			new ElasticsearchIndexSchemaObjectNode( null, null, null, null, false );
+			// at the root object level the nestedPathHierarchy is empty
+			new ElasticsearchIndexSchemaObjectNode( null, null, Collections.emptyList(), null, false );
 
 	public static ElasticsearchIndexSchemaObjectNode root() {
 		return ROOT;
@@ -22,18 +26,18 @@ public class ElasticsearchIndexSchemaObjectNode {
 
 	private final String absolutePath;
 
-	private final String nestedPath;
+	private final List<String> nestedPathHierarchy;
 
 	private final ObjectFieldStorage storage;
 
 	private final boolean multiValued;
 
-	public ElasticsearchIndexSchemaObjectNode(ElasticsearchIndexSchemaObjectNode parent, String absolutePath, String nestedPath,
+	public ElasticsearchIndexSchemaObjectNode(ElasticsearchIndexSchemaObjectNode parent, String absolutePath, List<String> nestedPathHierarchy,
 			ObjectFieldStorage storage,
 			boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
-		this.nestedPath = nestedPath;
+		this.nestedPathHierarchy = nestedPathHierarchy;
 		this.storage = ObjectFieldStorage.DEFAULT.equals( storage ) ? ObjectFieldStorage.FLATTENED : storage;
 		this.multiValued = multiValued;
 	}
@@ -55,8 +59,8 @@ public class ElasticsearchIndexSchemaObjectNode {
 		return absolutePath == null ? relativeFieldName : absolutePath + "." + relativeFieldName;
 	}
 
-	public String getNestedPath() {
-		return nestedPath;
+	public List<String> getNestedPathHierarchy() {
+		return nestedPathHierarchy;
 	}
 
 	public ObjectFieldStorage getStorage() {

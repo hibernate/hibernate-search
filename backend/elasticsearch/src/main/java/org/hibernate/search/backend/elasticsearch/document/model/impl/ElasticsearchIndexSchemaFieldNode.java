@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
@@ -19,7 +21,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final String absolutePath;
 
-	private final String nestedPath;
+	private final List<String> nestedPathHierarchy;
 
 	private final boolean multiValued;
 
@@ -42,7 +44,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 			ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory) {
 		this.parent = parent;
 		this.absolutePath = parent.getAbsolutePath( relativeFieldName );
-		this.nestedPath = parent.getNestedPath();
+		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
@@ -60,7 +62,9 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 	}
 
 	public String getNestedPath() {
-		return nestedPath;
+		return ( nestedPathHierarchy.isEmpty() ) ? null :
+				// nested path is the LAST element on the path hierarchy
+				nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 	}
 
 	/**
