@@ -48,7 +48,11 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 					break;
 			}
 		}
+		enrichInnerObject( innerObject );
 		doBuildAndAddTo( collector, innerObject );
+	}
+
+	protected void enrichInnerObject(JsonObject innerObject) {
 	}
 
 	protected abstract void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject);

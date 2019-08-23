@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -23,7 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearchSortBuilder
+public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearchNestedSortBuilder
 		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -45,9 +46,10 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 	private JsonElement missing;
 
 	public ElasticsearchFieldSortBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
+		super( nestedPathHierarchy );
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;

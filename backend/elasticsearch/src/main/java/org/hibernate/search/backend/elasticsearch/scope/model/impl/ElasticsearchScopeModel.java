@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -166,6 +167,24 @@ public class ElasticsearchScopeModel {
 					}
 
 					throw log.conflictingNestedDocumentPathsForProjection(
+							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+				} )
+				.orElse( Optional.empty() );
+
+		return nestedDocumentPath.orElse( null );
+	}
+
+	public List<String> getNestedPathHierarchy(String absoluteFieldPath) {
+		Optional<List<String>> nestedDocumentPath = indexModels.stream()
+				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
+				.filter( Objects::nonNull )
+				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedPathHierarchy() ) )
+				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
+					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
+						return nestedDocumentPath1;
+					}
+
+					throw log.conflictingNestedDocumentPathHierarchyForProjection(
 							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
 				} )
 				.orElse( Optional.empty() );

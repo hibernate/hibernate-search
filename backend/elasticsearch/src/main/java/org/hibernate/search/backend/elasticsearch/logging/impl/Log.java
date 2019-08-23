@@ -587,4 +587,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 85,
 			value = "Multiple aggregations with the same key: '%1$s'")
 	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey key);
+
+	@Message(id = ID_OFFSET_3 + 86, value = "Multiple conflicting nested document paths to build a projection for field '%1$s'. '%2$s' vs. '%3$s'.")
+	SearchException conflictingNestedDocumentPathHierarchyForProjection(String absoluteFieldPath,
+			List<String> nestedDocumentPathHierarchy1, List<String> nestedDocumentPathHierarchy2, @Param EventContext context);
 }
