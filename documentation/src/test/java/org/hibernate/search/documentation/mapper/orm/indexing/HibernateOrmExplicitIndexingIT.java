@@ -69,6 +69,7 @@ public class HibernateOrmExplicitIndexingIT {
 			}
 			catch (RuntimeException e) {
 				entityManager.getTransaction().rollback();
+				throw e;
 			}
 			// end::persist-automatic-indexing-periodic-flush-clear[]
 
@@ -103,6 +104,7 @@ public class HibernateOrmExplicitIndexingIT {
 			}
 			catch (RuntimeException e) {
 				entityManager.getTransaction().rollback();
+				throw e;
 			}
 			// end::persist-automatic-indexing-periodic-flush-execute-clear[]
 
@@ -132,6 +134,7 @@ public class HibernateOrmExplicitIndexingIT {
 			}
 			catch (RuntimeException e) {
 				entityManager.getTransaction().rollback();
+				throw e;
 			}
 			// end::persist-automatic-indexing-multiple-transactions[]
 
@@ -162,6 +165,7 @@ public class HibernateOrmExplicitIndexingIT {
 			}
 			catch (RuntimeException e) {
 				entityManager.getTransaction().rollback();
+				throw e;
 			}
 			// end::write-plan-addOrUpdate[]
 
@@ -192,6 +196,7 @@ public class HibernateOrmExplicitIndexingIT {
 			}
 			catch (RuntimeException e) {
 				entityManager.getTransaction().rollback();
+				throw e;
 			}
 			// end::write-plan-delete[]
 
@@ -251,6 +256,7 @@ public class HibernateOrmExplicitIndexingIT {
 			}
 			catch (RuntimeException e) {
 				entityManager.getTransaction().rollback();
+				throw e;
 			}
 		} );
 	}
