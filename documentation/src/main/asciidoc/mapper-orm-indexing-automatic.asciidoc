@@ -7,6 +7,9 @@ By default, every time an entity is changed through a Hibernate ORM Session,
 if that entity is <<mapper-orm-entityindexmapping,mapped to an index>>,
 Hibernate Search updates the relevant index.
 
+To be precise, index updates happen on transaction commit or,
+if working outside of a transaction, on session flush.
+
 [[mapper-orm-indexing-automatic-configuration]]
 == Configuration
 
@@ -15,7 +18,7 @@ or if you update it regularly through <<mapper-orm-indexing-explicit,explicit in
 You can enable or disable automatic indexing by setting the configuration property
 `hibernate.search.automatic_indexing.strategy`:
 
-* when set to `session`, each change to an indexed entity
+* when set to `session` (the default), each change to an indexed entity
 (persist, update, delete) through a Hibernate ORM Session/EntityManager
 will automatically lead to a similar modification to the index.
 * when set to `none`, changes to entities are ignored,
@@ -35,22 +38,41 @@ are not detected by Hibernate Search.
 This is because queries are executed on the database side,
  without Hibernate having any knowledge of which entities are actually created, deleted or updated.
 One workaround is to <<mapper-orm-indexing-explicit,explicitly reindex>> after you run such queries.
-Indexing happens after transactions are committed::
-Indexes are not updated immediately, but only after transactions are successfully committed.
+Entity data is retrieved from entities upon session flushes::
+When a Hibernate ORM session is flushed,
+Hibernate Search will extract data from the entities
+to build documents to index,
+and will put these documents in an internal buffer for later indexing (see the next paragraphs).
++
+This means in particular that you can safely `clear()` the session after a `flush()`:
+entity changes performed up to the flush will be indexed correctly.
+[NOTE]
+====
+If you come from Hibernate Search 5 or earlier,
+you may see this as a significant improvement:
+there is no need to call `flushToIndexes()` and update indexes in the middle of a transaction anymore,
+except for larger volumes of data (see <<mapper-orm-indexing-explicit-writeplan-process-execute>>).
+====
+Inside transactions, indexing happens after transactions are committed::
+When entity changes happen inside a transaction,
+indexes are not updated immediately, but only after the transaction is successfully committed.
 That way, if a transaction is rolled back, the indexes will be left in a state consistent with the database,
 discarding all the index changes that were planned during the transaction.
 +
-This means in particular that Hibernate Search will retrieve the state of entities after the transaction is committed.
-As a result, clearing the session during the transaction may cause trouble:
-some entities may end up being referenced by Hibernate Search for indexing,
-without being attached to the session.
-When Hibernate Search will try to index them, they will not be being able to load some of their lazy properties,
-leading to a `LazyInitializationException`.
-See <<mapper-orm-indexing-explicit-writeplan-process-execute>> for a few solutions.
+However, if you perform a batch process inside a transaction,
+and perform flush/clear, regularly to save memory,
+be aware that Hibernate Search's internal buffer holding documents to index
+will grow on each flush, and will not be cleared until the transaction is committed or rolled back.
+If you encounter memory issues because of that,
+see <<mapper-orm-indexing-explicit-writeplan-process-execute>> for a few solutions.
+Outside of transactions, indexing happens on session flush::
+When entity changes happen outside of any transaction (not recommended),
+indexes are updated immediately upon session `flush()`.
+Without that flush, indexes will not be updated automatically.
 Index changes may not be visible immediately::
-By default, the transaction commit will return after index changes are committed to the indexes.
+By default, indexing will resume the application thread after index changes are committed to the indexes.
 This means index changes are safely stored to disk,
-but this does not mean a search query ran immediately after the transaction commit will take the changes into account:
+but this does not mean a search query ran immediately after indexing will take the changes into account:
 when using the Elasticsearch backend in particular, changes may take some time to be visible from search queries.
 +
 See <<mapper-orm-indexing-automatic-synchronization>> for details.
@@ -89,19 +111,19 @@ include::todo-placeholder.asciidoc[]
 
 Hibernate Search offers multiple strategies to control synchronization with the indexes
 during automatic indexing,
-i.e. to control the minimum progress of indexing before the transaction commit returns.
+i.e. to control the minimum progress of indexing before the application thread is resumed.
 
 You can define a default strategy for all sessions by setting the configuration property
 `hibernate.search.automatic_indexing.synchronization_strategy`:
 
-* when set to `queued`, the transaction commit will return as soon as
+* when set to `queued`, the application thread will be resumed as soon as
 the index changes are queued in the backend.
 +
 This strategy offers no guarantee as to whether indexing will be performed successfully,
 or even whether indexing will be performed at all:
 the local JVM may crash before the works are executed, in which case the indexing requests will be forgotten,
 or indexing may simply fail.
-* by default or when set to `committed`, the transaction commit will return as soon as
+* by default or when set to `committed`, the application thread will be resumed as soon as
 the index changes are committed to disk.
 +
 This generally means that at the very least
@@ -112,13 +134,13 @@ and confirmed to Hibernate Search it did so
 +
 This strategy offers no guarantee as to whether indexed documents are searchable:
 the backend may delay indexing in order to improve performance,
-meaning a search query executed immediately after Hibernate ORM returns from the transaction
+meaning a search query executed immediately after the application thread is resumed
 may return outdated information.
 +
 This is true in particular with the Elasticsearch backend,
 which is link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time]
 by default.
-* when set to `searchable`, the transaction commit will return as soon as
+* when set to `searchable`, the application thread will be resumed as soon as
 the index changes are committed to disk
 *and* the relevant documents are searchable.
 The backend will be told to make the documents searchable as soon as possible.

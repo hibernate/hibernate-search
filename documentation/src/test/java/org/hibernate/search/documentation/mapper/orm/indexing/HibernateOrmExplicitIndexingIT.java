@@ -47,13 +47,13 @@ public class HibernateOrmExplicitIndexingIT {
 	}
 
 	@Test
-	public void persist_noAutomaticIndexing() {
-		EntityManagerFactory entityManagerFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+	public void persist_automaticIndexing_periodicFlushClear() {
+		EntityManagerFactory entityManagerFactory = setup( HibernateOrmAutomaticIndexingStrategyName.SESSION );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			assertBookCount( entityManager, 0 );
 
-			// tag::persist-no-automatic-indexing[]
+			// tag::persist-automatic-indexing-periodic-flush-clear[]
 			entityManager.getTransaction().begin();
 			try {
 				for ( int i = 0 ; i < NUMBER_OF_BOOKS ; ++i ) { // <1>
@@ -70,54 +70,20 @@ public class HibernateOrmExplicitIndexingIT {
 			catch (RuntimeException e) {
 				entityManager.getTransaction().rollback();
 			}
-			// end::persist-no-automatic-indexing[]
-
-			assertBookCount( entityManager, 0 );
-		} );
-	}
-
-	@Test
-	public void persist_automaticIndexing_periodicProcess() {
-		EntityManagerFactory entityManagerFactory = setup( HibernateOrmAutomaticIndexingStrategyName.SESSION );
-
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			assertBookCount( entityManager, 0 );
-
-			// tag::persist-automatic-indexing-periodic-process[]
-			SearchSession searchSession = Search.session( entityManager ); // <1>
-			SearchSessionWritePlan searchWritePlan = searchSession.writePlan(); // <2>
-
-			entityManager.getTransaction().begin();
-			try {
-				for ( int i = 0 ; i < NUMBER_OF_BOOKS ; ++i ) {
-					Book book = newBook( i );
-					entityManager.persist( book ); // <3>
-
-					if ( ( i + 1 ) % BATCH_SIZE == 0 ) {
-						entityManager.flush();
-						searchWritePlan.process(); // <4>
-						entityManager.clear();
-					}
-				}
-				entityManager.getTransaction().commit(); // <5>
-			}
-			catch (RuntimeException e) {
-				entityManager.getTransaction().rollback();
-			}
-			// end::persist-automatic-indexing-periodic-process[]
+			// end::persist-automatic-indexing-periodic-flush-clear[]
 
 			assertBookCount( entityManager, NUMBER_OF_BOOKS );
 		} );
 	}
 
 	@Test
-	public void persist_automaticIndexing_periodicExecute() {
+	public void persist_automaticIndexing_periodicFlushExecuteClear() {
 		EntityManagerFactory entityManagerFactory = setup( HibernateOrmAutomaticIndexingStrategyName.SESSION );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			assertBookCount( entityManager, 0 );
 
-			// tag::persist-automatic-indexing-periodic-execute[]
+			// tag::persist-automatic-indexing-periodic-flush-execute-clear[]
 			SearchSession searchSession = Search.session( entityManager ); // <1>
 			SearchSessionWritePlan searchWritePlan = searchSession.writePlan(); // <2>
 
@@ -129,8 +95,8 @@ public class HibernateOrmExplicitIndexingIT {
 
 					if ( ( i + 1 ) % BATCH_SIZE == 0 ) {
 						entityManager.flush();
-						searchWritePlan.execute(); // <4>
 						entityManager.clear();
+						searchWritePlan.execute(); // <4>
 					}
 				}
 				entityManager.getTransaction().commit(); // <5>
@@ -138,7 +104,7 @@ public class HibernateOrmExplicitIndexingIT {
 			catch (RuntimeException e) {
 				entityManager.getTransaction().rollback();
 			}
-			// end::persist-automatic-indexing-periodic-execute[]
+			// end::persist-automatic-indexing-periodic-flush-execute-clear[]
 
 			assertBookCount( entityManager, NUMBER_OF_BOOKS );
 		} );
