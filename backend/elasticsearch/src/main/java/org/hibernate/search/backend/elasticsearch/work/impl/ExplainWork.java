@@ -85,11 +85,17 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
-					.pathComponent( indexName )
-					.pathComponent( typeName != null ? typeName : Paths._DOC ) // _doc for ES7+
-					.pathComponent( id )
-					.pathComponent( Paths._EXPLAIN )
-					.body( payload );
+					.pathComponent( indexName );
+			if ( typeName != null ) { // ES6.x and below only
+				builder.pathComponent( typeName )
+						.pathComponent( id )
+						.pathComponent( Paths._EXPLAIN );
+			}
+			else { // ES7.x and above
+				builder.pathComponent( Paths._EXPLAIN )
+						.pathComponent( id );
+			}
+			builder.body( payload );
 
 			if ( !routingKeys.isEmpty() ) {
 				builder.multiValuedParam( "routing", routingKeys );
