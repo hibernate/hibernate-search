@@ -67,6 +67,10 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 				nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 	}
 
+	public List<String> getNestedPathHierarchy() {
+		return nestedPathHierarchy;
+	}
+
 	/**
 	 * @return {@code true} if this node is multi-valued in its parent object.
 	 */

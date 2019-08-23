@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
@@ -32,7 +33,7 @@ public class ElasticsearchGeoPointFieldSortBuilderFactory implements Elasticsear
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker converterChecker) {
 		throw log.traditionalSortNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
