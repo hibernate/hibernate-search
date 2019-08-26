@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.AssertionFailure;
@@ -56,9 +57,12 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	public static HibernateOrmBootstrapIntrospector create(Metadata metadata,
 			ReflectionManager ormReflectionManager,
 			ConfigurationPropertySource propertySource) {
-		Collection<PersistentClass> persistentClasses = metadata.getEntityBindings();
+		Collection<PersistentClass> persistentClasses = metadata.getEntityBindings()
+				.stream()
+				.filter( PersistentClass::hasPojoRepresentation )
+				.collect( Collectors.toList() );
 		Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata = new HashMap<>();
-		collectPersistentTypes( typeMetadata, metadata.getEntityBindings() );
+		collectPersistentTypes( typeMetadata, persistentClasses );
 		for ( PersistentClass persistentClass : persistentClasses ) {
 			collectEmbeddedTypesRecursively( typeMetadata, persistentClass.getIdentifier() );
 			collectEmbeddedTypesRecursively( typeMetadata, persistentClass.getPropertyIterator() );
