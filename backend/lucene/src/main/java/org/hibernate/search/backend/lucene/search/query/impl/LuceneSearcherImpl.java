@@ -24,7 +24,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
-import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.search.impl.LuceneNestedQueries;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
@@ -35,7 +35,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Explanation;
@@ -44,8 +43,6 @@ import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.join.QueryBitSetProducer;
-import org.apache.lucene.search.join.ToChildBlockJoinQuery;
 
 class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult<H>> {
 
@@ -229,7 +226,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	private Map<String, Set<Integer>> fetchChildren(IndexSearcher indexSearcher, Set<String> nestedDocumentPaths,
 			Collection<Collector> collectorsForChildren) {
-		BooleanQuery booleanQuery = getChildQuery( nestedDocumentPaths );
+		BooleanQuery booleanQuery = LuceneNestedQueries.findChildQuery( nestedDocumentPaths, requestContext.getLuceneQuery() );
 
 		try {
 			ArrayList<Collector> luceneCollectors = new ArrayList<>();
@@ -243,25 +240,5 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		catch (IOException e) {
 			throw log.errorFetchingNestedDocuments( booleanQuery, e );
 		}
-	}
-
-	private BooleanQuery getChildQuery(Set<String> nestedDocumentPaths) {
-		QueryBitSetProducer parentsFilter = new QueryBitSetProducer( LuceneQueries.mainDocumentQuery() );
-		ToChildBlockJoinQuery parentQuery = new ToChildBlockJoinQuery( requestContext.getLuceneQuery(), parentsFilter );
-
-		return new BooleanQuery.Builder()
-				.add( parentQuery, BooleanClause.Occur.MUST )
-				.add( createNestedDocumentPathSubQuery( nestedDocumentPaths ), BooleanClause.Occur.FILTER )
-				.add( LuceneQueries.childDocumentQuery(), BooleanClause.Occur.FILTER )
-				.build();
-	}
-
-	private BooleanQuery createNestedDocumentPathSubQuery(Set<String> nestedDocumentPaths) {
-		BooleanQuery.Builder builder = new BooleanQuery.Builder();
-		for ( String nestedDocumentPath : nestedDocumentPaths ) {
-			builder.add( LuceneQueries.nestedDocumentPathQuery( nestedDocumentPath ), BooleanClause.Occur.SHOULD );
-		}
-		builder.setMinimumNumberShouldMatch( 1 );
-		return builder.build();
 	}
 }
