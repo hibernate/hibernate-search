@@ -259,9 +259,16 @@ See <<mapper-orm-directfieldmapping-annotations-fulltextfield,here>> for an expl
 
 [[mapper-orm-directfieldmapping-projectable]] `projectable`::
 Whether the field can be <<search-dsl-projection, projected on>>,
-i.e. whether the field value is stored in the index to allow later retrieval when querying.
+i.e. whether the field value is stored in the index to allow retrieval later when querying.
 +
 Value: `Projectable.YES`, `Projectable.NO`, `Projectable.DEFAULT`.
+
+[[mapper-orm-directfieldmapping-aggregable]] `aggregable`::
+Whether the field can be <<search-dsl-aggregation, aggregated>>,
+i.e. whether the field value is stored in a specific data structure in the index
+to allow aggregations later when querying.
++
+Value: `Aggregable.YES`, `Aggregable.NO`, `Aggregable.DEFAULT`.
 
 `searchable`::
 Whether the field can be searched on.
