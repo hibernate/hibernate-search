@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.showcase.library;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.ART_OF_COMPUTER_PROG_ID;
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.CALLIGRAPHY_ID;
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.CITY_CENTER_ID;
@@ -39,6 +40,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge;
+import org.hibernate.search.integrationtest.showcase.library.dto.LibraryFacetedSearchResult;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
@@ -50,6 +52,7 @@ import org.hibernate.search.integrationtest.showcase.library.service.BorrowalSer
 import org.hibernate.search.integrationtest.showcase.library.service.DocumentService;
 import org.hibernate.search.integrationtest.showcase.library.service.LibraryService;
 import org.hibernate.search.integrationtest.showcase.library.service.TestDataService;
+import org.hibernate.search.util.common.data.Range;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -381,5 +384,68 @@ public class LibraryShowcaseBaseIT {
 
 		results = documentService.getAuthorsOfBooksHavingTerms( "Indonesia", SortOrder.DESC );
 		assertThat( results ).containsExactly( "Mark Red", "Mark Red" );
+	}
+
+	@Test
+	public void searchFaceted() {
+		LibraryFacetedSearchResult result = libraryService.searchFaceted(
+				null, null, null,
+				0, 10
+		);
+		assertThat( result.getTotalHitCountByCollectionSize() )
+				.containsExactly(
+						entry( Range.of( 0, 1_000 ), 2L ),
+						entry( Range.of( 1_000, 5_000 ), 0L ),
+						entry( Range.of( 5_000, 10_000 ), 1L ),
+						entry( Range.of( 10_000, null ), 1L )
+				);
+		assertThat( result.getTotalHitCountByService() )
+				.containsExactly(
+						entry( LibraryServiceOption.DEMATERIALIZED_LOAN, 1L ),
+						entry( LibraryServiceOption.DISABLED_ACCESS, 2L ),
+						entry( LibraryServiceOption.HARDCOPY_LOAN, 4L ),
+						entry( LibraryServiceOption.READING_ROOMS, 3L )
+				);
+
+		// Drill-down by collection size
+		result = libraryService.searchFaceted(
+				null, 1000, null,
+				0, 10
+		);
+		assertThat( result.getTotalHitCountByCollectionSize() )
+				.containsExactly(
+						entry( Range.of( 0, 1_000 ), 0L ),
+						entry( Range.of( 1_000, 5_000 ), 0L ),
+						entry( Range.of( 5_000, 10_000 ), 1L ),
+						entry( Range.of( 10_000, null ), 1L )
+				);
+		assertThat( result.getTotalHitCountByService() )
+				.containsExactly(
+						entry( LibraryServiceOption.DEMATERIALIZED_LOAN, 1L ),
+						entry( LibraryServiceOption.DISABLED_ACCESS, 0L ),
+						entry( LibraryServiceOption.HARDCOPY_LOAN, 2L ),
+						entry( LibraryServiceOption.READING_ROOMS, 2L )
+				);
+
+		// Drill-down by service
+		result = libraryService.searchFaceted(
+				null, null,
+				Arrays.asList( LibraryServiceOption.HARDCOPY_LOAN, LibraryServiceOption.READING_ROOMS ),
+				0, 10
+		);
+		assertThat( result.getTotalHitCountByCollectionSize() )
+				.containsExactly(
+						entry( Range.of( 0, 1_000 ), 1L ),
+						entry( Range.of( 1_000, 5_000 ), 0L ),
+						entry( Range.of( 5_000, 10_000 ), 1L ),
+						entry( Range.of( 10_000, null ), 1L )
+				);
+		assertThat( result.getTotalHitCountByService() )
+				.containsExactly(
+						entry( LibraryServiceOption.DEMATERIALIZED_LOAN, 1L ),
+						entry( LibraryServiceOption.DISABLED_ACCESS, 1L ),
+						entry( LibraryServiceOption.HARDCOPY_LOAN, 3L ),
+						entry( LibraryServiceOption.READING_ROOMS, 3L )
+				);
 	}
 }

@@ -8,8 +8,14 @@ package org.hibernate.search.integrationtest.showcase.library.repository.indexse
 
 import java.util.List;
 
+import org.hibernate.search.integrationtest.showcase.library.dto.LibraryFacetedSearchResult;
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
+import org.hibernate.search.integrationtest.showcase.library.model.LibraryServiceOption;
 
 public interface IndexSearchLibraryRepository {
 	List<Library> search(String terms, int limit, int offset);
+
+	LibraryFacetedSearchResult searchFaceted(String terms,
+			Integer minCollectionSize, List<LibraryServiceOption> libraryServices,
+			int limit, int offset);
 }

@@ -38,7 +38,6 @@ public abstract class DocumentCopy<D extends Document<?>> extends AbstractEntity
 
 	@ManyToOne
 	@IndexedEmbedded(maxDepth = 1)
-	// TODO HSEARCH-3271 facet
 	private Library library;
 
 	@OneToMany(mappedBy = "copy")

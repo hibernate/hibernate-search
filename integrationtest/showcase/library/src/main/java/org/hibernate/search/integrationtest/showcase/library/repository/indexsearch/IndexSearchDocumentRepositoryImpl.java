@@ -128,7 +128,6 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 						);
 					}
 				} ) )
-				// TODO HSEARCH-3271 facets (tag, medium, library in particular)
 				.sort( f -> f.byComposite( b -> {
 					if ( myLocation != null ) {
 						// TODO HSEARCH-2254 sort by distance once we implement nested support for sorts ("copies" is a nested object field)

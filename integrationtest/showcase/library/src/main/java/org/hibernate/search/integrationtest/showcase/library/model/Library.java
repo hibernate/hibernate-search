@@ -16,6 +16,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
@@ -50,7 +51,7 @@ public class Library extends AbstractEntity<Integer> {
 	private String name;
 
 	@Basic
-	@GenericField(sortable = Sortable.YES)
+	@GenericField(sortable = Sortable.YES, aggregable = Aggregable.YES)
 	private Integer collectionSize;
 
 	@Basic
@@ -62,7 +63,7 @@ public class Library extends AbstractEntity<Integer> {
 	private Double longitude;
 
 	@ElementCollection
-	@GenericField
+	@GenericField(aggregable = Aggregable.YES)
 	private List<LibraryServiceOption> services;
 
 	@OneToMany(mappedBy = "library", cascade = CascadeType.REMOVE)
