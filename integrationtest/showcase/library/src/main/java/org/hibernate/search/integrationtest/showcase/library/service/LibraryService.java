@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.showcase.library.service;
 
 import java.util.List;
 
+import org.hibernate.search.integrationtest.showcase.library.dto.LibraryFacetedSearchResult;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
@@ -59,5 +60,11 @@ public class LibraryService {
 
 	public List<Library> search(String terms, int offset, int limit) {
 		return libraryRepo.search( terms, limit, offset );
+	}
+
+	public LibraryFacetedSearchResult searchFaceted(String terms,
+			Integer minCollectionSize, List<LibraryServiceOption> libraryServices,
+			int limit, int offset) {
+		return libraryRepo.searchFaceted( terms, minCollectionSize, libraryServices, limit, offset );
 	}
 }

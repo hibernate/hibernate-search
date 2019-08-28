@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 public class VideoCopy extends DocumentCopy<Video> {
 
 	@GenericField
-	// TODO HSEARCH-3271 facet
 	private VideoMedium medium;
 
 	public VideoMedium getMedium() {
