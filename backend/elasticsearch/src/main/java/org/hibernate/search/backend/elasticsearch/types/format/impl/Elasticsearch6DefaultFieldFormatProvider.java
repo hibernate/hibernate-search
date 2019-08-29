@@ -19,6 +19,8 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +50,8 @@ import org.hibernate.search.util.common.AssertionFailure;
  * or a year-of-era (~ absolute value of the year) instead of year (which can be negative).
  */
 public class Elasticsearch6DefaultFieldFormatProvider implements ElasticsearchDefaultFieldFormatProvider {
+
+	private static final String JAVA_TIME_FRACTION_OF_SECONDS_PATTERN = ".SSSSSSSSS";
 
 	private static final Map<Class<? extends TemporalAccessor>, List<String>> ELASTICSEARCH_6_FORMAT_PATTERNS_BY_TYPE;
 	static {
@@ -81,12 +85,43 @@ public class Elasticsearch6DefaultFieldFormatProvider implements ElasticsearchDe
 	public Elasticsearch6DefaultFieldFormatProvider() {
 		this.dateTimeFormatters = new HashMap<>();
 
-		// We use the same date/time formatters as ES7, but different mapping formats
+		/*
+		 * We use the mostly same date/time formatters as ES7,
+		 * only format patterns in the mapping are different,
+		 * because the different syntax of patterns in ES6 and below (JodaTime syntax instead of java.time syntax)
+		 */
 		for ( Map.Entry<Class<? extends TemporalAccessor>, String> entry :
 				Elasticsearch7DefaultFieldFormatProvider.JAVA_TIME_FORMAT_PATTERN_BY_TYPE.entrySet() ) {
 			Class<? extends TemporalAccessor> type = entry.getKey();
 			String pattern = entry.getValue();
-			dateTimeFormatters.put( type, DateTimeFormatter.ofPattern( pattern, Locale.ROOT ) );
+			dateTimeFormatters.put( type, lenientPattern( pattern ) );
+		}
+	}
+
+	private DateTimeFormatter lenientPattern(String pattern) {
+		int fractionOfSecondsIndex = pattern.indexOf( JAVA_TIME_FRACTION_OF_SECONDS_PATTERN );
+		if ( fractionOfSecondsIndex < 0 ) {
+			return DateTimeFormatter.ofPattern( pattern, Locale.ROOT );
+		}
+		else {
+			/*
+			 * We're a bit more lenient than ES7 when it comes to fraction of seconds:
+			 * for historical reasons, mapping formats for ES6 and below will output only 3 digits
+			 * for the fraction of seconds.
+			 * The fact that we lose precision is not important,
+			 * since ES only has millisecond precision anyway.
+			 * What is more important is that ES7 date/time formatters will fail
+			 * when there are less than 9 digits for the fraction of second.
+			 * This change allows parsing aggregation keys, in particular.
+			 */
+			return new DateTimeFormatterBuilder()
+					// Add the part of the pattern before the fraction of seconds
+					.appendPattern( pattern.substring( 0, fractionOfSecondsIndex ) )
+					// Replace the fraction of seconds pattern with this more lenient format (cannot be expressed as a pattern)
+					.appendFraction( ChronoField.NANO_OF_SECOND, 3, 9, true )
+					// Add the part of the pattern after the fraction of seconds
+					.appendPattern( pattern.substring( fractionOfSecondsIndex + JAVA_TIME_FRACTION_OF_SECONDS_PATTERN.length() ) )
+					.toFormatter( Locale.ROOT );
 		}
 	}
 
