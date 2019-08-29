@@ -27,17 +27,20 @@ public final class ElasticsearchSearchContext {
 
 	// Backend context
 	private final Gson userFacingGson;
+	private final ElasticsearchJsonSyntaxHelper jsonSyntaxHelper;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	// Targeted indexes
 	private final ElasticsearchScopeModel scopeModel;
 
 	public ElasticsearchSearchContext(MappingContextImplementor mappingContext,
-			Gson userFacingGson, MultiTenancyStrategy multiTenancyStrategy,
+			Gson userFacingGson, ElasticsearchJsonSyntaxHelper jsonSyntaxHelper,
+			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchScopeModel scopeModel) {
 		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
 		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
 		this.userFacingGson = userFacingGson;
+		this.jsonSyntaxHelper = jsonSyntaxHelper;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.scopeModel = scopeModel;
 	}
@@ -52,6 +55,10 @@ public final class ElasticsearchSearchContext {
 
 	public Gson getUserFacingGson() {
 		return userFacingGson;
+	}
+
+	public ElasticsearchJsonSyntaxHelper getJsonSyntaxHelper() {
+		return jsonSyntaxHelper;
 	}
 
 	public String toElasticsearchId(String tenantId, String id) {
