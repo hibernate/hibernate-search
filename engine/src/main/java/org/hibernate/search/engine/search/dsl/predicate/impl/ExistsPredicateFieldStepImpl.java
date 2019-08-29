@@ -30,7 +30,7 @@ final class ExistsPredicateFieldStepImpl<B>
 	}
 
 	@Override
-	public ExistsPredicateOptionsStep boostedTo(float boost) {
+	public ExistsPredicateOptionsStep boost(float boost) {
 		this.builder.boost( boost );
 		return this;
 	}

@@ -48,7 +48,7 @@ class PhrasePredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public PhrasePredicateFieldMoreStep boostedTo(float boost) {
+	public PhrasePredicateFieldMoreStep boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -94,7 +94,7 @@ class PhrasePredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public PhrasePredicateOptionsStep withSlop(int slop) {
+		public PhrasePredicateOptionsStep slop(int slop) {
 			if ( slop < 0 ) {
 				throw log.invalidPhrasePredicateSlop( slop );
 			}

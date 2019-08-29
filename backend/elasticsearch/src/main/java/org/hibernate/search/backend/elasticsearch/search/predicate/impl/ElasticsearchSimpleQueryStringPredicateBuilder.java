@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.scope.model.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerConstants;
+import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import com.google.gson.JsonArray;
@@ -51,8 +52,15 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	}
 
 	@Override
-	public void withAndAsDefaultOperator() {
-		this.defaultOperator = AND_OPERATOR_KEYWORD_JSON;
+	public void defaultOperator(BooleanOperator operator) {
+		switch ( operator ) {
+			case AND:
+				this.defaultOperator = AND_OPERATOR_KEYWORD_JSON;
+				break;
+			case OR:
+				this.defaultOperator = OR_OPERATOR_KEYWORD_JSON;
+				break;
+		}
 	}
 
 	@Override

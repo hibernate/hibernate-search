@@ -52,7 +52,7 @@ class RangePredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public RangePredicateFieldMoreStep boostedTo(float boost) {
+	public RangePredicateFieldMoreStep boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}

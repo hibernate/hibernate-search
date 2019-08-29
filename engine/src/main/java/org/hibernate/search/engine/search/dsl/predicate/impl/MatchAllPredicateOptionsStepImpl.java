@@ -37,7 +37,7 @@ class MatchAllPredicateOptionsStepImpl<B>
 	}
 
 	@Override
-	public MatchAllPredicateOptionsStep boostedTo(float boost) {
+	public MatchAllPredicateOptionsStep boost(float boost) {
 		this.matchAllBuilder.boost( boost );
 		return this;
 	}

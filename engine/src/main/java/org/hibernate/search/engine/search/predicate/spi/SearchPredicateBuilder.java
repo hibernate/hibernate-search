@@ -17,7 +17,7 @@ public interface SearchPredicateBuilder<B> {
 
 	void boost(float boost);
 
-	void withConstantScore();
+	void constantScore();
 
 	/**
 	 * @return An implementation-specific view of this builder,

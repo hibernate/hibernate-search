@@ -49,7 +49,7 @@ class MatchPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public MatchPredicateFieldMoreStep boostedTo(float boost) {
+	public MatchPredicateFieldMoreStep boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}

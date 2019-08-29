@@ -50,7 +50,7 @@ class SpatialWithinPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public SpatialWithinPredicateFieldMoreStep boostedTo(float boost) {
+	public SpatialWithinPredicateFieldMoreStep boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}

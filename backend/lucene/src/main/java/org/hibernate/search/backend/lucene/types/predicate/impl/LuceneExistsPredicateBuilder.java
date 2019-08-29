@@ -24,7 +24,7 @@ public class LuceneExistsPredicateBuilder extends AbstractLuceneSearchPredicateB
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 		// Score is always constant for this query
-		withConstantScore();
+		constantScore();
 	}
 
 	@Override

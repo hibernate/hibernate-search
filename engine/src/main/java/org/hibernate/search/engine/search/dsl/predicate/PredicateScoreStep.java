@@ -18,10 +18,19 @@ public interface PredicateScoreStep<S> extends PredicateBoostStep<S> {
 	 * Force the score of the predicate to a single constant, identical for all documents.
 	 * <p>
 	 * By default, the score will be {@code 1.0f},
-	 * but {@link #boostedTo(float) boosts}, if any, will still be applied to the predicate.
+	 * but {@link #boost(float) boosts}, if any, will still be applied to the predicate.
 	 *
 	 * @return {@code this}, for method chaining.
 	 */
-	S withConstantScore();
+	S constantScore();
+
+	/**
+	 * @deprecated Use {@link #constantScore()} instead.
+	 * @return {@code this}, for method chaining.
+	 */
+	@Deprecated
+	default S withConstantScore() {
+		return constantScore();
+	}
 
 }

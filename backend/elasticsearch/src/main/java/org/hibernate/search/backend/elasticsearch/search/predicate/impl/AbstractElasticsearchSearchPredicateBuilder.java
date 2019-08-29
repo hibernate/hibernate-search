@@ -28,7 +28,7 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 	}
 
 	@Override
-	public void withConstantScore() {
+	public void constantScore() {
 		this.withConstantScore = true;
 	}
 

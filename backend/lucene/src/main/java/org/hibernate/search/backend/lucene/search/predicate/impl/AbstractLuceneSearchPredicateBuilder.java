@@ -18,7 +18,7 @@ public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPred
 		LuceneSearchPredicateBuilder {
 
 	private Float boost;
-	private boolean withConstantScore;
+	private boolean constantScore;
 
 	@Override
 	public void boost(float boost) {
@@ -26,8 +26,8 @@ public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPred
 	}
 
 	@Override
-	public void withConstantScore() {
-		this.withConstantScore = true;
+	public void constantScore() {
+		this.constantScore = true;
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPred
 
 		// the boost should be applied on top of the constant score,
 		// otherwise the boost will simply be ignored
-		if ( withConstantScore ) {
+		if ( constantScore ) {
 			query = new ConstantScoreQuery( query );
 		}
 		if ( boost != null ) {
