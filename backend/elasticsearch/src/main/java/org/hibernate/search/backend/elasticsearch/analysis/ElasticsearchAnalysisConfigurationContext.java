@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.analysis;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentTypeStep;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisOptionalComponentsStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTokenizerStep;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerTypeStep;
@@ -17,8 +16,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.Elasticsear
  * A context allowing the definition of named analysis-related elements in an Elasticsearch backend:
  * analyzers, tokenizers, char filters, ...
  */
-public interface ElasticsearchAnalysisConfigurationContext
-		extends ElasticsearchAnalysisDefinitionContainerContext {
+public interface ElasticsearchAnalysisConfigurationContext {
 
 	/**
 	 * Start an analyzer definition.

@@ -24,7 +24,6 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 
 class LuceneNormalizerComponentsStep
-		extends DelegatingAnalysisDefinitionContainerContext
 		implements LuceneNormalizerOptionalComponentsStep, LuceneAnalyzerBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -35,8 +34,7 @@ class LuceneNormalizerComponentsStep
 
 	private final List<LuceneTokenFilterParametersStep> tokenFilters = new ArrayList<>();
 
-	LuceneNormalizerComponentsStep(LuceneAnalysisConfigurationContextImpl parentContext, String name) {
-		super( parentContext );
+	LuceneNormalizerComponentsStep(String name) {
 		this.name = name;
 	}
 
