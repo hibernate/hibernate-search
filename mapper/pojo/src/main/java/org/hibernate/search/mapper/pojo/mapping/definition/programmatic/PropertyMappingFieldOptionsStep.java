@@ -76,8 +76,8 @@ public interface PropertyMappingFieldOptionsStep<S extends PropertyMappingFieldO
 	 * @see GenericField#extraction()
 	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	default S withExtractor(String extractorName) {
-		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
+	default S extractor(String extractorName) {
+		return extractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
 	/**
@@ -86,8 +86,8 @@ public interface PropertyMappingFieldOptionsStep<S extends PropertyMappingFieldO
 	 * @return {@code this}, for method chaining.
 	 * @see GenericField#extraction()
 	 */
-	default S withoutExtractors() {
-		return withExtractors( ContainerExtractorPath.noExtractors() );
+	default S noExtractors() {
+		return extractors( ContainerExtractorPath.noExtractors() );
 	}
 
 	/**
@@ -96,6 +96,6 @@ public interface PropertyMappingFieldOptionsStep<S extends PropertyMappingFieldO
 	 * @see GenericField#extraction()
 	 * @see ContainerExtractorPath
 	 */
-	S withExtractors(ContainerExtractorPath extractorPath);
+	S extractors(ContainerExtractorPath extractorPath);
 
 }

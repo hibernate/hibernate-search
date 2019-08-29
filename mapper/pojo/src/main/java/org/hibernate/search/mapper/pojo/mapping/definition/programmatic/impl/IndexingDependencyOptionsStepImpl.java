@@ -67,7 +67,7 @@ class IndexingDependencyOptionsStepImpl
 	}
 
 	@Override
-	public IndexingDependencyOptionsStep withExtractors(ContainerExtractorPath extractorPath) {
+	public IndexingDependencyOptionsStep extractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return this;
 	}

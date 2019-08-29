@@ -43,8 +43,8 @@ public interface IndexingDependencyOptionsStep extends PropertyMappingStep {
 	 * @see IndexingDependency#extraction()
 	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	default IndexingDependencyOptionsStep withExtractor(String extractorName) {
-		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
+	default IndexingDependencyOptionsStep extractor(String extractorName) {
+		return extractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
 	/**
@@ -53,8 +53,8 @@ public interface IndexingDependencyOptionsStep extends PropertyMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see IndexingDependency#extraction()
 	 */
-	default IndexingDependencyOptionsStep withoutExtractors() {
-		return withExtractors( ContainerExtractorPath.noExtractors() );
+	default IndexingDependencyOptionsStep noExtractors() {
+		return extractors( ContainerExtractorPath.noExtractors() );
 	}
 
 	/**
@@ -63,6 +63,6 @@ public interface IndexingDependencyOptionsStep extends PropertyMappingStep {
 	 * @see IndexingDependency#extraction()
 	 * @see ContainerExtractorPath
 	 */
-	IndexingDependencyOptionsStep withExtractors(ContainerExtractorPath extractorPath);
+	IndexingDependencyOptionsStep extractors(ContainerExtractorPath extractorPath);
 
 }

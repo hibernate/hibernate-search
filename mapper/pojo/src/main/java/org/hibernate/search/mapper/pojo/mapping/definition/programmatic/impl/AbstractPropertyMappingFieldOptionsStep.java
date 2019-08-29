@@ -94,7 +94,7 @@ abstract class AbstractPropertyMappingFieldOptionsStep<
 	}
 
 	@Override
-	public S withExtractors(ContainerExtractorPath extractorPath) {
+	public S extractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return thisAsS();
 	}
