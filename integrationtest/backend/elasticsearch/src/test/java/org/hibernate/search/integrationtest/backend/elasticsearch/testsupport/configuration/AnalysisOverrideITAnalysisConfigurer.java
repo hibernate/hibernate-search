@@ -16,15 +16,15 @@ public class AnalysisOverrideITAnalysisConfigurer extends DefaultITAnalysisConfi
 		super.configure( context );
 
 		context.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ).custom()
-				.withTokenizer( "whitespace" );
+				.tokenizer( "whitespace" );
 
 		context.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ).custom()
-				.withTokenizer( "whitespace" )
-				.withTokenFilters( "lowercase" );
+				.tokenizer( "whitespace" )
+				.tokenFilters( "lowercase" );
 
 		String tokenizerName = OverrideAnalysisDefinitions.ANALYZER_NGRAM.name + "_tokenizer";
 		context.analyzer( OverrideAnalysisDefinitions.ANALYZER_NGRAM.name ).custom()
-				.withTokenizer( tokenizerName );
+				.tokenizer( tokenizerName );
 
 		context.tokenizer( tokenizerName )
 				.type( "ngram" )

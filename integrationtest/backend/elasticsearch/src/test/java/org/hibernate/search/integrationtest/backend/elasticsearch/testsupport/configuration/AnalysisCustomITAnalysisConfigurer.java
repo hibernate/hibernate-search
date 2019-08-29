@@ -19,20 +19,20 @@ public class AnalysisCustomITAnalysisConfigurer implements ElasticsearchAnalysis
 
 		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_NOOP.name ).custom();
 		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_LOWERCASE.name ).custom()
-				.withTokenFilters( "lowercase" );
+				.tokenFilters( "lowercase" );
 		context.normalizer( AnalysisCustomIT.AnalysisDefinitions.NORMALIZER_PATTERN_REPLACING.name ).custom()
-				.withCharFilters( charFilterName );
+				.charFilters( charFilterName );
 
 		context.analyzer( AnalysisCustomIT.AnalysisDefinitions.ANALYZER_NOOP.name ).custom()
-				.withTokenizer( "keyword" );
+				.tokenizer( "keyword" );
 		context.analyzer( AnalysisCustomIT.AnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ).custom()
-				.withTokenizer( "whitespace" )
-				.withTokenFilters( "lowercase" );
+				.tokenizer( "whitespace" )
+				.tokenFilters( "lowercase" );
 
 		context.analyzer( AnalysisCustomIT.AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD.name ).custom()
-				.withTokenizer( tokenizerName )
-				.withCharFilters( charFilterName )
-				.withTokenFilters( tokenFilterName );
+				.tokenizer( tokenizerName )
+				.charFilters( charFilterName )
+				.tokenFilters( tokenFilterName );
 		context.charFilter( charFilterName ).type( "pattern_replace" )
 				.param( "pattern", "\\s+" )
 				.param( "replacement", "," );

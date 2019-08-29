@@ -13,9 +13,9 @@ public class ElasticsearchAnalyzerManagementITAnalysisConfigurer implements Elas
 	@Override
 	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.analyzer( "custom-analyzer" ).custom()
-				.withTokenizer( "custom-edgeNGram" )
-				.withCharFilters( "custom-pattern-replace" )
-				.withTokenFilters( "custom-keep-types", "custom-word-delimiter" );
+				.tokenizer( "custom-edgeNGram" )
+				.charFilters( "custom-pattern-replace" )
+				.tokenFilters( "custom-keep-types", "custom-word-delimiter" );
 		context.charFilter( "custom-pattern-replace" )
 				.type( "pattern_replace" )
 				.param( "pattern", "[^0-9]" )

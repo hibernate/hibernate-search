@@ -13,20 +13,20 @@ class ElasticsearchSimpleMappingAnalysisConfigurer implements ElasticsearchAnaly
 	@Override
 	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.analyzer( "english" ).custom()
-				.withTokenizer( "standard" )
-				.withTokenFilters( "asciifolding", "lowercase", "snowball_english" );
+				.tokenizer( "standard" )
+				.tokenFilters( "asciifolding", "lowercase", "snowball_english" );
 
 		context.tokenFilter( "snowball_english" )
 				.type( "snowball" )
 				.param( "language", "English" );
 
 		context.analyzer( "name" ).custom()
-				.withTokenizer( "standard" )
-				.withTokenFilters( "asciifolding", "lowercase" );
+				.tokenizer( "standard" )
+				.tokenFilters( "asciifolding", "lowercase" );
 
 		context.analyzer( "autocomplete_indexing" ).custom()
-				.withTokenizer( "standard" )
-				.withTokenFilters( "asciifolding", "lowercase", "snowball_english", "autocomplete_edge_ngram" );
+				.tokenizer( "standard" )
+				.tokenFilters( "asciifolding", "lowercase", "snowball_english", "autocomplete_edge_ngram" );
 
 		context.tokenFilter( "autocomplete_edge_ngram" )
 				.type( "edge_ngram" )
@@ -35,15 +35,15 @@ class ElasticsearchSimpleMappingAnalysisConfigurer implements ElasticsearchAnaly
 
 		// Same as "autocomplete-indexing", but without the edge-ngram filter
 		context.analyzer( "autocomplete_query" ).custom()
-				.withTokenizer( "standard" )
-				.withTokenFilters( "asciifolding", "lowercase", "snowball_english" );
+				.tokenizer( "standard" )
+				.tokenFilters( "asciifolding", "lowercase", "snowball_english" );
 
 		// Normalizers
 
 		context.normalizer( "english" ).custom()
-				.withTokenFilters( "asciifolding", "lowercase" );
+				.tokenFilters( "asciifolding", "lowercase" );
 
 		context.normalizer( "name" ).custom()
-				.withTokenFilters( "asciifolding", "lowercase" );
+				.tokenFilters( "asciifolding", "lowercase" );
 	}
 }

@@ -34,7 +34,7 @@ public interface ElasticsearchAnalysisDefinitionContainerContext {
 	/**
 	 * Start a tokenizer definition.
 	 * @param name The name used to reference this tokenizer
-	 * {@link ElasticsearchAnalyzerTokenizerStep#withTokenizer(String) in analyzer definitions}.
+	 * {@link ElasticsearchAnalyzerTokenizerStep#tokenizer(String) in analyzer definitions}.
 	 * @return The initial step of a DSL where the tokenizer can be defined.
 	 */
 	ElasticsearchAnalysisComponentTypeStep tokenizer(String name);
@@ -42,7 +42,7 @@ public interface ElasticsearchAnalysisDefinitionContainerContext {
 	/**
 	 * Start a char filter definition.
 	 * @param name The name used to reference this char filter
-	 * {@link ElasticsearchAnalysisOptionalComponentsStep#withCharFilters(String...) in analyzer or normalizer definitions}.
+	 * {@link ElasticsearchAnalysisOptionalComponentsStep#charFilters(String...) in analyzer or normalizer definitions}.
 	 * @return The initial step of a DSL where the char filter can be defined.
 	 */
 	ElasticsearchAnalysisComponentTypeStep charFilter(String name);
@@ -50,7 +50,7 @@ public interface ElasticsearchAnalysisDefinitionContainerContext {
 	/**
 	 * Start a token filter definition.
 	 * @param name The name used to reference this token filter
-	 * {@link ElasticsearchAnalysisOptionalComponentsStep#withTokenFilters(String...) in analyzer or normalizer definitions}.
+	 * {@link ElasticsearchAnalysisOptionalComponentsStep#tokenFilters(String...) in analyzer or normalizer definitions}.
 	 * @return The initial step of a DSL where the token filter can be defined.
 	 */
 	ElasticsearchAnalysisComponentTypeStep tokenFilter(String name);

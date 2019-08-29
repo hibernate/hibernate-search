@@ -16,6 +16,6 @@ public class DefaultITAnalysisConfigurer implements ElasticsearchAnalysisConfigu
 		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).type( "standard" )
 				.param( "stopwords", "_english_" );
 		context.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ).custom()
-				.withTokenFilters( "lowercase" );
+				.tokenFilters( "lowercase" );
 	}
 }

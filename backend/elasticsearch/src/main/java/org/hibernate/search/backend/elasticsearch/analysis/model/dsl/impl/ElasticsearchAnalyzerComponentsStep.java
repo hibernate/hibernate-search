@@ -36,13 +36,13 @@ class ElasticsearchAnalyzerComponentsStep
 	}
 
 	@Override
-	public ElasticsearchAnalyzerOptionalComponentsStep withTokenizer(String tokenizerName) {
+	public ElasticsearchAnalyzerOptionalComponentsStep tokenizer(String tokenizerName) {
 		definition.setTokenizer( tokenizerName );
 		return this;
 	}
 
 	@Override
-	public ElasticsearchAnalyzerOptionalComponentsStep withCharFilters(String... names) {
+	public ElasticsearchAnalyzerOptionalComponentsStep charFilters(String... names) {
 		definition.setCharFilters( null );
 		for ( String charFilterName : names ) {
 			definition.addCharFilter( charFilterName );
@@ -51,7 +51,7 @@ class ElasticsearchAnalyzerComponentsStep
 	}
 
 	@Override
-	public ElasticsearchAnalyzerOptionalComponentsStep withTokenFilters(String... names) {
+	public ElasticsearchAnalyzerOptionalComponentsStep tokenFilters(String... names) {
 		definition.setTokenFilters( null );
 		for ( String tokenFilterName : names ) {
 			definition.addTokenFilter( tokenFilterName );
