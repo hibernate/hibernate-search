@@ -129,7 +129,12 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	@Override
 	public ElasticsearchSearchContext createSearchContext(MappingContextImplementor mappingContext,
 			ElasticsearchScopeModel scopeModel) {
-		return new ElasticsearchSearchContext( mappingContext, userFacingGson, multiTenancyStrategy, scopeModel );
+		return new ElasticsearchSearchContext(
+				mappingContext,
+				userFacingGson, link.getJsonSyntaxHelper(),
+				multiTenancyStrategy,
+				scopeModel
+		);
 	}
 
 	@Override
