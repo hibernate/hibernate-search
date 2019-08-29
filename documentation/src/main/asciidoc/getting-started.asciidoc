@@ -300,7 +300,7 @@ you can also call `fetchHits()` directly.
 If for some reason you don't want to use lambdas, you can use an alternative, object-based syntax,
 but it will be a bit more verbose:
 
-.Using Hibernate Search to query the indexes - object-based syntax
+.Using Hibernate Search to query the indexes -- object-based syntax
 ====
 [source, JAVA, indent=0]
 ----
