@@ -36,7 +36,7 @@ public interface PhrasePredicateFieldStep {
 	 * <p>
 	 * Equivalent to {@link #onField(String)} followed by multiple calls to
 	 * {@link PhrasePredicateFieldMoreStep#orField(String)},
-	 * the only difference being that calls to {@link PhrasePredicateFieldMoreStep#boostedTo(float)}
+	 * the only difference being that calls to {@link PhrasePredicateFieldMoreStep#boost(float)}
 	 * and other field-specific settings on the returned step will only need to be done once
 	 * and will apply to all the fields passed to this method.
 	 *

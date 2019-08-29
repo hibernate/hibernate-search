@@ -33,7 +33,7 @@ public interface MatchPredicateFieldStep {
 	 * <p>
 	 * Equivalent to {@link #onField(String)} followed by multiple calls to
 	 * {@link MatchPredicateFieldMoreStep#orField(String)},
-	 * the only difference being that calls to {@link MatchPredicateFieldMoreStep#boostedTo(float)}
+	 * the only difference being that calls to {@link MatchPredicateFieldMoreStep#boost(float)}
 	 * and other field-specific settings on the returned step will only need to be done once
 	 * and will apply to all the fields passed to this method.
 	 *

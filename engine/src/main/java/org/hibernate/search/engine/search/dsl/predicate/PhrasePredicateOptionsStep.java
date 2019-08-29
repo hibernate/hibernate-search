@@ -28,7 +28,17 @@ public interface PhrasePredicateOptionsStep
 	 * @param slop The slop value
 	 * @return {@code this}, for method chaining.
 	 */
-	PhrasePredicateOptionsStep withSlop(int slop);
+	PhrasePredicateOptionsStep slop(int slop);
+
+	/**
+	 * @deprecated Use {@link #slop(int)} instead.
+	 * @param slop The slop value
+	 * @return {@code this}, for method chaining.
+	 */
+	@Deprecated
+	default PhrasePredicateOptionsStep withSlop(int slop) {
+		return slop( slop );
+	}
 
 	/**
 	 * Define an analyzer to use at query time to interpret the value to match.

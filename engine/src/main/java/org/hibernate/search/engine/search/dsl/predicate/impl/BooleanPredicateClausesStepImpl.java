@@ -38,14 +38,14 @@ class BooleanPredicateClausesStepImpl<B>
 	}
 
 	@Override
-	public BooleanPredicateClausesStep boostedTo(float boost) {
+	public BooleanPredicateClausesStep boost(float boost) {
 		builder.boost( boost );
 		return this;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep withConstantScore() {
-		builder.withConstantScore();
+	public BooleanPredicateClausesStep constantScore() {
+		builder.constantScore();
 		return this;
 	}
 

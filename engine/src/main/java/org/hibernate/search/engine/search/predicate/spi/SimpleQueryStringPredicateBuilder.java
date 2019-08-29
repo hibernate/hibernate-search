@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import org.hibernate.search.engine.search.common.BooleanOperator;
+
 public interface SimpleQueryStringPredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
 	FieldState field(String absoluteFieldPath);
 
-	void withAndAsDefaultOperator();
+	void defaultOperator(BooleanOperator operator);
 
 	void simpleQueryString(String simpleQueryString);
 

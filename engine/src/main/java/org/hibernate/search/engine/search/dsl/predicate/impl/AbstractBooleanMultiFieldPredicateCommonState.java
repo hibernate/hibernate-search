@@ -63,12 +63,12 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 		return fieldSetStates;
 	}
 
-	public S boostedTo(float boost) {
+	public S boost(float boost) {
 		this.predicateLevelBoost = boost;
 		return thisAsS();
 	}
 
-	public S withConstantScore() {
+	public S constantScore() {
 		withConstantScore = true;
 		return thisAsS();
 	}
@@ -110,7 +110,7 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 		}
 
 		if ( withConstantScore ) {
-			predicateBuilder.withConstantScore();
+			predicateBuilder.constantScore();
 		}
 	}
 

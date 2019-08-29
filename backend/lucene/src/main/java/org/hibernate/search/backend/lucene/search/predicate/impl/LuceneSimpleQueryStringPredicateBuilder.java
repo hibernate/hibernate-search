@@ -23,6 +23,7 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQuer
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.util.impl.FieldContextSimpleQueryParser;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -51,8 +52,15 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	}
 
 	@Override
-	public void withAndAsDefaultOperator() {
-		this.defaultOperator = Occur.MUST;
+	public void defaultOperator(BooleanOperator operator) {
+		switch ( operator ) {
+			case AND:
+				this.defaultOperator = Occur.MUST;
+				break;
+			case OR:
+				this.defaultOperator = Occur.SHOULD;
+				break;
+		}
 	}
 
 	@Override

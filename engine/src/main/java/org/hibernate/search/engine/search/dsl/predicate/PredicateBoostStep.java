@@ -21,6 +21,17 @@ public interface PredicateBoostStep<S> {
 	 * between 0 and 1 lowers the weight. Lower than 0 is for experts only.
 	 * @return {@code this}, for method chaining.
 	 */
-	S boostedTo(float boost);
+	S boost(float boost);
+
+	/**
+	 * @deprecated Use {@link #boost(float)} instead.
+	 * @param boost The boost factor. Higher than 1 increases the weight in score computation,
+	 * between 0 and 1 lowers the weight. Lower than 0 is for experts only.
+	 * @return {@code this}, for method chaining.
+	 */
+	@Deprecated
+	default S boostedTo(float boost) {
+		return boost( boost );
+	}
 
 }

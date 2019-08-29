@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -113,7 +114,7 @@ public interface SearchPredicateFactory {
 	 * Note that by default, unless the query string contains explicit operators,
 	 * documents will match if <em>any</em> term mentioned in the query string is present in the document (OR operator).
 	 * This makes sense when sorting results by relevance, but is not ideal otherwise.
-	 * See {@link SimpleQueryStringPredicateOptionsStep#withAndAsDefaultOperator()} to change this behavior.
+	 * See {@link SimpleQueryStringPredicateOptionsStep#defaultOperator(BooleanOperator)} to change this behavior.
 	 *
 	 * @return The initial step of a DSL where the "simple query string" predicate can be defined.
 	 * @see SimpleQueryStringPredicateFieldStep

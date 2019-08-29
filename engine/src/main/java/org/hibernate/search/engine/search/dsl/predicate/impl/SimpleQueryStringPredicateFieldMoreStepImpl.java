@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateOptionsStep;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractPredicateFinalStep;
@@ -46,7 +47,7 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStep boostedTo(float boost) {
+	public SimpleQueryStringPredicateFieldMoreStep boost(float boost) {
 		fieldStates.forEach( c -> c.boost( boost ) );
 		return this;
 	}
@@ -90,20 +91,20 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public CommonState<B> withConstantScore() {
-			builder.withConstantScore();
+		public CommonState<B> constantScore() {
+			builder.constantScore();
 			return this;
 		}
 
 		@Override
-		public CommonState<B> boostedTo(float boost) {
+		public CommonState<B> boost(float boost) {
 			builder.boost( boost );
 			return this;
 		}
 
 		@Override
-		public SimpleQueryStringPredicateOptionsStep withAndAsDefaultOperator() {
-			builder.withAndAsDefaultOperator();
+		public SimpleQueryStringPredicateOptionsStep defaultOperator(BooleanOperator operator) {
+			builder.defaultOperator( operator );
 			return this;
 		}
 

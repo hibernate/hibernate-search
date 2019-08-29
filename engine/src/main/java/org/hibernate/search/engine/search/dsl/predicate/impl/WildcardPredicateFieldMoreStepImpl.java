@@ -48,7 +48,7 @@ class WildcardPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStep boostedTo(float boost) {
+	public WildcardPredicateFieldMoreStep boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
