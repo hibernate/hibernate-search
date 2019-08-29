@@ -14,16 +14,16 @@ public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisC
 	@Override
 	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.analyzer( "english" ).custom() // <1>
-				.withTokenizer( "standard" ) // <2>
-				.withTokenFilters( "asciifolding", "lowercase", "snowball_english" ); // <3>
+				.tokenizer( "standard" ) // <2>
+				.tokenFilters( "asciifolding", "lowercase", "snowball_english" ); // <3>
 
 		context.tokenFilter( "snowball_english" ) // <4>
 				.type( "snowball" )
 				.param( "language", "English" ); // <5>
 
 		context.analyzer( "name" ).custom() // <6>
-				.withTokenizer( "standard" )
-				.withTokenFilters( "asciifolding", "lowercase" );
+				.tokenizer( "standard" )
+				.tokenFilters( "asciifolding", "lowercase" );
 	}
 }
 // end::include[]

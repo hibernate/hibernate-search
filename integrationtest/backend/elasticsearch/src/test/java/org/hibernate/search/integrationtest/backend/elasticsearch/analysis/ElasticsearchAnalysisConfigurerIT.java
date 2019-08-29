@@ -102,8 +102,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 	public static class AnalyzerNamingConflictConfigurer implements ElasticsearchAnalysisConfigurer {
 		@Override
 		public void configure(ElasticsearchAnalysisConfigurationContext context) {
-			context.analyzer( "analyzerName" ).custom().withTokenizer( "whitespace" );
-			context.analyzer( "anotherAnalyzerName" ).custom().withTokenizer( "whitespace" );
+			context.analyzer( "analyzerName" ).custom().tokenizer( "whitespace" );
+			context.analyzer( "anotherAnalyzerName" ).custom().tokenizer( "whitespace" );
 			context.analyzer( "analyzerName" ).type( "someType" );
 		}
 	}

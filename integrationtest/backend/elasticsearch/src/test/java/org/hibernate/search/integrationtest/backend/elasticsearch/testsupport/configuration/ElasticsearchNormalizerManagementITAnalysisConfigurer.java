@@ -13,8 +13,8 @@ public class ElasticsearchNormalizerManagementITAnalysisConfigurer implements El
 	@Override
 	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.normalizer( "custom-normalizer" ).custom()
-				.withCharFilters( "custom-char-mapping" )
-				.withTokenFilters( "custom-elision" );
+				.charFilters( "custom-char-mapping" )
+				.tokenFilters( "custom-elision" );
 		context.charFilter( "custom-char-mapping" )
 				.type( "mapping" )
 				.param( "mappings", new String[] { "foo => bar" } ); // Explicit array to get a JSON array

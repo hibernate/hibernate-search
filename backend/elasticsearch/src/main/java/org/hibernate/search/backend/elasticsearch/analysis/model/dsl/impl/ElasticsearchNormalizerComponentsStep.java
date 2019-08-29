@@ -27,7 +27,7 @@ class ElasticsearchNormalizerComponentsStep
 	}
 
 	@Override
-	public ElasticsearchNormalizerOptionalComponentsStep withCharFilters(String... names) {
+	public ElasticsearchNormalizerOptionalComponentsStep charFilters(String... names) {
 		definition.setCharFilters( null );
 		for ( String charFilterName : names ) {
 			definition.addCharFilter( charFilterName );
@@ -36,7 +36,7 @@ class ElasticsearchNormalizerComponentsStep
 	}
 
 	@Override
-	public ElasticsearchNormalizerOptionalComponentsStep withTokenFilters(String... names) {
+	public ElasticsearchNormalizerOptionalComponentsStep tokenFilters(String... names) {
 		definition.setTokenFilters( null );
 		for ( String tokenFilterName : names ) {
 			definition.addTokenFilter( tokenFilterName );
