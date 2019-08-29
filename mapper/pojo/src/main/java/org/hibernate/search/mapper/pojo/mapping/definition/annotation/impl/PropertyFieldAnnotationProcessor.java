@@ -55,7 +55,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 
 		ContainerExtractorPath extractorPath =
 				helper.getExtractorPath( getExtraction( annotation ) );
-		fieldContext.withExtractors( extractorPath );
+		fieldContext.extractors( extractorPath );
 
 		Projectable projectable = getProjectable( annotation );
 		if ( !Projectable.DEFAULT.equals( projectable ) ) {

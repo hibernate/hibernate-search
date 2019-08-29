@@ -62,8 +62,8 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 * @see IndexedEmbedded#extraction()
 	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	default PropertyMappingIndexedEmbeddedStep withExtractor(String extractorName) {
-		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
+	default PropertyMappingIndexedEmbeddedStep extractor(String extractorName) {
+		return extractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
 	/**
@@ -72,8 +72,8 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 * @return {@code this}, for method chaining.
 	 * @see IndexedEmbedded#extraction()
 	 */
-	default PropertyMappingIndexedEmbeddedStep withoutExtractors() {
-		return withExtractors( ContainerExtractorPath.noExtractors() );
+	default PropertyMappingIndexedEmbeddedStep extractors() {
+		return extractors( ContainerExtractorPath.noExtractors() );
 	}
 
 	/**
@@ -82,6 +82,6 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 * @see IndexedEmbedded#extraction()
 	 * @see ContainerExtractorPath
 	 */
-	PropertyMappingIndexedEmbeddedStep withExtractors(ContainerExtractorPath extractorPath);
+	PropertyMappingIndexedEmbeddedStep extractors(ContainerExtractorPath extractorPath);
 
 }

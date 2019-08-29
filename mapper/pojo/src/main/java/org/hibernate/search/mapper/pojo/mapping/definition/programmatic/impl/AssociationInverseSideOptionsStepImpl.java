@@ -39,7 +39,7 @@ class AssociationInverseSideOptionsStepImpl
 	}
 
 	@Override
-	public AssociationInverseSideOptionsStep withExtractors(ContainerExtractorPath extractorPath) {
+	public AssociationInverseSideOptionsStep extractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return this;
 	}

@@ -20,8 +20,8 @@ public interface AssociationInverseSideOptionsStep extends PropertyMappingStep {
 	 * @see AssociationInverseSide#extraction()
 	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	default AssociationInverseSideOptionsStep withExtractor(String extractorName) {
-		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
+	default AssociationInverseSideOptionsStep extractor(String extractorName) {
+		return extractors( ContainerExtractorPath.explicitExtractor( extractorName ) );
 	}
 
 	/**
@@ -30,8 +30,8 @@ public interface AssociationInverseSideOptionsStep extends PropertyMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see AssociationInverseSide#extraction()
 	 */
-	default AssociationInverseSideOptionsStep withoutExtractors() {
-		return withExtractors( ContainerExtractorPath.noExtractors() );
+	default AssociationInverseSideOptionsStep noExtractors() {
+		return extractors( ContainerExtractorPath.noExtractors() );
 	}
 
 	/**
@@ -40,6 +40,6 @@ public interface AssociationInverseSideOptionsStep extends PropertyMappingStep {
 	 * @see AssociationInverseSide#extraction()
 	 * @see ContainerExtractorPath
 	 */
-	AssociationInverseSideOptionsStep withExtractors(ContainerExtractorPath extractorPath);
+	AssociationInverseSideOptionsStep extractors(ContainerExtractorPath extractorPath);
 
 }

@@ -387,7 +387,7 @@ public class ProgrammaticMappingSmokeIT {
 									.prefix( "embeddedList.otherPrefix_" )
 									.includePaths( "embedded.prefix_customBridgeOnClass.text" )
 					.property( "embeddedMap" )
-							.genericField( "embeddedMapKeys" ).withExtractor( BuiltinContainerExtractors.MAP_KEY )
+							.genericField( "embeddedMapKeys" ).extractor( BuiltinContainerExtractors.MAP_KEY )
 							.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 		}
 	}

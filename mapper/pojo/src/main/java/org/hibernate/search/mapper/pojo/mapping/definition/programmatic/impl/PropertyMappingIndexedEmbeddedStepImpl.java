@@ -77,7 +77,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 	}
 
 	@Override
-	public PropertyMappingIndexedEmbeddedStep withExtractors(ContainerExtractorPath extractorPath) {
+	public PropertyMappingIndexedEmbeddedStep extractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return this;
 	}

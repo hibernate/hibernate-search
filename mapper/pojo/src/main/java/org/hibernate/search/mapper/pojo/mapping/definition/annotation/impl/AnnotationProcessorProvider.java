@@ -139,7 +139,7 @@ class AnnotationProcessorProvider {
 			}
 
 			mappingContext.associationInverseSide( inversePathOptional.get() )
-					.withExtractors( extractorPath );
+					.extractors( extractorPath );
 		}
 	}
 
@@ -162,7 +162,7 @@ class AnnotationProcessorProvider {
 			ReindexOnUpdate reindexOnUpdate = annotation.reindexOnUpdate();
 
 			IndexingDependencyOptionsStep indexingDependencyContext = mappingContext.indexingDependency()
-					.withExtractors( extractorPath );
+					.extractors( extractorPath );
 
 			indexingDependencyContext.reindexOnUpdate( reindexOnUpdate );
 
@@ -533,7 +533,7 @@ class AnnotationProcessorProvider {
 			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
 
 			mappingContext.indexedEmbedded()
-					.withExtractors( extractorPath )
+					.extractors( extractorPath )
 					.prefix( cleanedUpPrefix )
 					.storage( annotation.storage() )
 					.maxDepth( cleanedUpMaxDepth )
