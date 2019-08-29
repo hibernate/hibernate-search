@@ -249,7 +249,7 @@ The identifiers must be provided as a String containing multiple shard identifie
 or a `Collection<String>` containing shard identifiers.
 A shard identifier can be any string.
 +
-This strategy will set up on shard per configured shard identifier.
+This strategy will set up one shard per configured shard identifier.
 +
 When routing, the routing key will be validated to make sure it matches a shard identifier exactly.
 If it does, the document will be routed to that shard.
