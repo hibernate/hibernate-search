@@ -45,9 +45,7 @@ public class LuceneAnalysisConfigurationContextImpl
 		return new LuceneAnalyzerTypeStep() {
 			@Override
 			public LuceneAnalyzerTokenizerStep custom() {
-				LuceneAnalyzerComponentsStep definition = new LuceneAnalyzerComponentsStep(
-						LuceneAnalysisConfigurationContextImpl.this, name
-				);
+				LuceneAnalyzerComponentsStep definition = new LuceneAnalyzerComponentsStep( name );
 				addAnalyzer( name, definition );
 				return definition;
 			}
@@ -66,9 +64,7 @@ public class LuceneAnalysisConfigurationContextImpl
 		return new LuceneNormalizerTypeStep() {
 			@Override
 			public LuceneNormalizerOptionalComponentsStep custom() {
-				LuceneNormalizerComponentsStep definition = new LuceneNormalizerComponentsStep(
-						LuceneAnalysisConfigurationContextImpl.this, name
-				);
+				LuceneNormalizerComponentsStep definition = new LuceneNormalizerComponentsStep( name );
 				addNormalizer( name, definition );
 				return definition;
 			}

@@ -26,7 +26,6 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 
 
 class LuceneAnalyzerComponentsStep
-		extends DelegatingAnalysisDefinitionContainerContext
 		implements LuceneAnalyzerTokenizerStep, LuceneAnalyzerOptionalComponentsStep,
 		LuceneAnalyzerBuilder {
 
@@ -40,8 +39,7 @@ class LuceneAnalyzerComponentsStep
 
 	private final List<LuceneTokenFilterParametersStep> tokenFilters = new ArrayList<>();
 
-	LuceneAnalyzerComponentsStep(LuceneAnalysisConfigurationContextImpl parentContext, String name) {
-		super( parentContext );
+	LuceneAnalyzerComponentsStep(String name) {
 		this.tokenizer = new LuceneTokenizerParametersStep( this );
 		this.name = name;
 	}

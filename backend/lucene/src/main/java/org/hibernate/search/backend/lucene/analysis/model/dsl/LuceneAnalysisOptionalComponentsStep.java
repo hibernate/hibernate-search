@@ -13,7 +13,7 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
  * The step in an analyzer/normalizer definition
  * where optional components such as char filters or token filters can be added.
  */
-public interface LuceneAnalysisOptionalComponentsStep extends LuceneAnalysisDefinitionContainerContext {
+public interface LuceneAnalysisOptionalComponentsStep {
 
 	/**
 	 * Add a char filter that the analyzer will use.

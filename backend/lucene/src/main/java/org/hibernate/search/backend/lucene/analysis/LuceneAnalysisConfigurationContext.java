@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.analysis;
 
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTypeStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerTypeStep;
 
 /**
  * A context allowing the definition of named analyzers and normalizers in a Lucene backend.
  */
-public interface LuceneAnalysisConfigurationContext extends LuceneAnalysisDefinitionContainerContext {
+public interface LuceneAnalysisConfigurationContext {
 
 	/**
 	 * Start a new analyzer definition.

@@ -20,7 +20,6 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 
 abstract class AbstractLuceneAnalysisComponentParametersStep<T>
-		extends DelegatingAnalysisDefinitionContainerContext
 		implements LuceneAnalysisComponentParametersStep, LuceneAnalysisComponentBuilder<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -30,7 +29,6 @@ abstract class AbstractLuceneAnalysisComponentParametersStep<T>
 	final Map<String, String> params = new LinkedHashMap<>();
 
 	AbstractLuceneAnalysisComponentParametersStep(LuceneAnalysisOptionalComponentsStep parentStep) {
-		super( parentStep );
 		this.parentStep = parentStep;
 	}
 
