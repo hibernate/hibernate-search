@@ -369,8 +369,8 @@ public class ElasticsearchExtensionIT {
 						.then().extension( ElasticsearchExtension.get() )
 								.fromJson( "{'sort3': 'asc'}" )
 						// Also test using the standard DSL on a field defined with the extension
-						.then().field( "sort4" ).asc().onMissingValue().sortLast()
-						.then().field( "sort5" ).asc().onMissingValue().sortFirst()
+						.then().field( "sort4" ).asc().missing().last()
+						.then().field( "sort5" ).asc().missing().first()
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
@@ -387,8 +387,8 @@ public class ElasticsearchExtensionIT {
 								.fromJson( "{'sort2': 'desc'}" )
 						.then().extension( ElasticsearchExtension.get() )
 								.fromJson( "{'sort3': 'desc'}" )
-						.then().field( "sort4" ).desc().onMissingValue().sortLast()
-						.then().field( "sort5" ).asc().onMissingValue().sortFirst()
+						.then().field( "sort4" ).desc().missing().last()
+						.then().field( "sort5" ).asc().missing().first()
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
@@ -412,8 +412,8 @@ public class ElasticsearchExtensionIT {
 				.toSort();
 		// Also test using the standard DSL on a field defined with the extension
 		SearchSort sort4Asc = scope.sort()
-				.field( "sort4" ).asc().onMissingValue().sortLast()
-				.then().field( "sort5" ).asc().onMissingValue().sortFirst()
+				.field( "sort4" ).asc().missing().last()
+				.then().field( "sort5" ).asc().missing().first()
 				.toSort();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -433,8 +433,8 @@ public class ElasticsearchExtensionIT {
 				.fromJson( "{'sort3': 'desc'}" )
 				.toSort();
 		SearchSort sort4Desc = scope.sort()
-				.field( "sort4" ).desc().onMissingValue().sortLast()
-				.then().field( "sort5" ).asc().onMissingValue().sortFirst()
+				.field( "sort4" ).desc().missing().last()
+				.then().field( "sort5" ).asc().missing().first()
 				.toSort();
 
 		query = scope.query()

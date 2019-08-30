@@ -165,7 +165,7 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query;
 
 		SearchSort sortAsc = scope.sort()
-				.field( "string" ).asc().onMissingValue().sortLast()
+				.field( "string" ).asc().missing().last()
 				.toSort();
 
 		query = scope.query()
@@ -176,7 +176,7 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		SearchSort sortDesc = scope.sort()
-				.field( "string" ).desc().onMissingValue().sortLast()
+				.field( "string" ).desc().missing().last()
 				.toSort();
 
 		query = scope.query()
@@ -191,7 +191,7 @@ public class SearchSortIT {
 	public void reuseSortInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchSort sort = scope
-				.sort().field( "string" ).asc().onMissingValue().sortLast().toSort();
+				.sort().field( "string" ).asc().missing().last().toSort();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -218,7 +218,7 @@ public class SearchSortIT {
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		sort = indexManager.createScope( anotherIndexManager )
-				.sort().field( "string" ).asc().onMissingValue().sortLast().toSort();
+				.sort().field( "string" ).asc().missing().last().toSort();
 
 		// reuse the same sort instance on a different scope,
 		// targeting same indexes
@@ -234,7 +234,7 @@ public class SearchSortIT {
 	public void reuseSortInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchSort sort = scope
-				.sort().field( "string" ).asc().onMissingValue().sortLast().toSort();
+				.sort().field( "string" ).asc().missing().last().toSort();
 
 		// reuse the same sort instance on a different scope,
 		// targeting a different index
@@ -313,12 +313,12 @@ public class SearchSortIT {
 
 		// Mandatory extension, supported
 		query = simpleQuery( c -> c
-				.extension( new SupportedExtension() ).field( "string" ).onMissingValue().sortLast()
+				.extension( new SupportedExtension() ).field( "string" ).missing().last()
 		);
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
-				.extension( new SupportedExtension() ).field( "string" ).desc().onMissingValue().sortLast()
+				.extension( new SupportedExtension() ).field( "string" ).desc().missing().last()
 		);
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -335,7 +335,7 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.field( "string" ).onMissingValue().sortLast()
+								c -> c.field( "string" ).missing().last()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -349,7 +349,7 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.field( "string" ).desc().onMissingValue().sortLast()
+								c -> c.field( "string" ).desc().missing().last()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -369,7 +369,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.field( "string" ).onMissingValue().sortLast()
+								c -> c.field( "string" ).missing().last()
 						)
 						.orElse( ignored -> Assertions.fail( "This should not be called" ) )
 		);
@@ -383,7 +383,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.field( "string" ).desc().onMissingValue().sortLast()
+								c -> c.field( "string" ).desc().missing().last()
 						)
 						.orElse( ignored -> Assertions.fail( "This should not be called" ) )
 		);
@@ -402,7 +402,7 @@ public class SearchSortIT {
 								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.orElse(
-								c -> c.field( "string" ).onMissingValue().sortLast()
+								c -> c.field( "string" ).missing().last()
 						)
 		);
 		assertThat( query )
@@ -418,7 +418,7 @@ public class SearchSortIT {
 								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.orElse(
-								c -> c.field( "string" ).desc().onMissingValue().sortLast()
+								c -> c.field( "string" ).desc().missing().last()
 						)
 		);
 	}

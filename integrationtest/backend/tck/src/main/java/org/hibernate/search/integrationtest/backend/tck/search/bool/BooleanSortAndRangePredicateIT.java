@@ -94,19 +94,19 @@ public class BooleanSortAndRangePredicateIT {
 	@Test
 	public void sortByFieldQuery() {
 		// Default order
-		SearchQuery<DocumentReference> query = sortQuery( c -> c.field( FIELD_PATH ).onMissingValue().sortLast() );
+		SearchQuery<DocumentReference> query = sortQuery( c -> c.field( FIELD_PATH ).missing().last() );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE, null );
 
-		// Explicit order with onMissingValue().sortLast()
-		query = sortQuery( c -> c.field( FIELD_PATH ).asc().onMissingValue().sortLast() );
+		// Explicit order with missing().last()
+		query = sortQuery( c -> c.field( FIELD_PATH ).asc().missing().last() );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE, null );
-		query = sortQuery( b -> b.field( FIELD_PATH ).desc().onMissingValue().sortLast() );
+		query = sortQuery( b -> b.field( FIELD_PATH ).desc().missing().last() );
 		assertHasHitsWithBooleanProperties( query, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, null );
 
-		// Explicit order with onMissingValue().sortFirst()
-		query = sortQuery( c -> c.field( FIELD_PATH ).asc().onMissingValue().sortFirst() );
+		// Explicit order with missing().first()
+		query = sortQuery( c -> c.field( FIELD_PATH ).asc().missing().first() );
 		assertHasHitsWithBooleanProperties( query, null, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE );
-		query = sortQuery( b -> b.field( FIELD_PATH ).desc().onMissingValue().sortFirst() );
+		query = sortQuery( b -> b.field( FIELD_PATH ).desc().missing().first() );
 		assertHasHitsWithBooleanProperties( query, null, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE );
 	}
 
@@ -133,7 +133,7 @@ public class BooleanSortAndRangePredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.range().field( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.TRUE ) )
-				.sort( f -> f.field( FIELD_PATH ).onMissingValue().sortLast() )
+				.sort( f -> f.field( FIELD_PATH ).missing().last() )
 				.toQuery();
 
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE );
