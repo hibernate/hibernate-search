@@ -113,7 +113,7 @@ public class AnnotationMappingRoutingIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
 					.asEntityReference()
-					.predicate( f -> f.match().onField( "value" ).matching( "val1" ) )
+					.predicate( f -> f.match().field( "value" ).matching( "val1" ) )
 					.routing( "category_2" )
 					.toQuery();
 

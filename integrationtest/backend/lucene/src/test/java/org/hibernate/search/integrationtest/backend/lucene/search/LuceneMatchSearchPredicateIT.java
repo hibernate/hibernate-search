@@ -54,13 +54,13 @@ public class LuceneMatchSearchPredicateIT {
 	@Test
 	public void match_skipAnalysis_normalizedStringField() {
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
-				.predicate( f -> f.match().onField( "normalizedStringField" ).matching( TEST_TERM ) )
+				.predicate( f -> f.match().field( "normalizedStringField" ).matching( TEST_TERM ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 
 		query = indexManager.createScope().query()
-				.predicate( f -> f.match().onField( "normalizedStringField" ).matching( TEST_TERM ).skipAnalysis() )
+				.predicate( f -> f.match().field( "normalizedStringField" ).matching( TEST_TERM ).skipAnalysis() )
 				.toQuery();
 
 		assertThat( query ).hasNoHits();

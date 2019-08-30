@@ -1659,7 +1659,7 @@ See <<mapper-orm-bridge-valuebridge>> and <<mapper-orm-bridge-typeandpropertybri
 
 Sometimes a predicate/sort/projection targets *multiple* field, which may have conflicting definitions:
 
-* when multiple field names are passed to the `onFields` method in the predicate DSL (each field has its own definition);
+* when multiple field names are passed to the `fields` method in the predicate DSL (each field has its own definition);
 * or when the search query targets multiple indexes (each index has its own definition of each field).
 
 In such cases, the definition of the targeted fields is expected to be compatible.

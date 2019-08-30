@@ -93,7 +93,7 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
+				.predicate( f -> f.match().field( "string" ).matching( STRING_VALUE_1 ) )
 				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
@@ -104,7 +104,7 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
+				.predicate( f -> f.match().field( "string" ).matching( STRING_VALUE_1 ) )
 				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
@@ -149,9 +149,9 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+				.predicate( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.match()
-								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+								.field( "nestedObject.string" ).matching( STRING_VALUE_1 )
 						)
 				)
 				.toQuery();
@@ -164,9 +164,9 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+				.predicate( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.match()
-								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+								.field( "nestedObject.string" ).matching( STRING_VALUE_1 )
 						)
 				)
 				.toQuery();
@@ -255,7 +255,7 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.predicate( f -> f.match().onField( "string" ).matching( UPDATED_STRING ) )
+				.predicate( f -> f.match().field( "string" ).matching( UPDATED_STRING ) )
 				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
@@ -266,9 +266,9 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+				.predicate( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.match()
-								.onField( "nestedObject.string" ).matching( UPDATED_STRING )
+								.field( "nestedObject.string" ).matching( UPDATED_STRING )
 						)
 				)
 				.toQuery();
@@ -283,7 +283,7 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.predicate( f -> f.match().onField( "nestedObject.string" ).matching( UPDATED_STRING ) )
+				.predicate( f -> f.match().field( "nestedObject.string" ).matching( UPDATED_STRING ) )
 				.toQuery();
 		assertThat( query ).hasNoHits();
 
@@ -294,9 +294,9 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+				.predicate( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.match()
-								.onField( "nestedObject.string" ).matching( UPDATED_STRING )
+								.field( "nestedObject.string" ).matching( UPDATED_STRING )
 						)
 				)
 				.toQuery();
@@ -309,7 +309,7 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
+				.predicate( f -> f.match().field( "string" ).matching( STRING_VALUE_1 ) )
 				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
@@ -320,9 +320,9 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+				.predicate( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.match()
-								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+								.field( "nestedObject.string" ).matching( STRING_VALUE_1 )
 						)
 				)
 				.toQuery();

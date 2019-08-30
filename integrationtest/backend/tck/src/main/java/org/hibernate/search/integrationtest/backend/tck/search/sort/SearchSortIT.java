@@ -135,7 +135,7 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query;
 
 		SearchPredicate predicate = scope.predicate()
-				.match().onField( "string_analyzed_forScore" ).matching( "hooray" ).toPredicate();
+				.match().field( "string_analyzed_forScore" ).matching( "hooray" ).toPredicate();
 
 		query = scope.query()
 				.predicate( predicate )

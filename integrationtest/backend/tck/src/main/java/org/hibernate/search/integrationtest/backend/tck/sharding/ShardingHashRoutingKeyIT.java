@@ -110,7 +110,7 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 		 * Let's test this.
 		 */
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.match().onField( "indexedRoutingKey" ).matching( someRoutingKey ) )
+				.predicate( f -> f.match().field( "indexedRoutingKey" ).matching( someRoutingKey ) )
 				.routing( someRoutingKey )
 				.toQuery()
 		)

@@ -242,7 +242,7 @@ public class ProjectionDslIT {
 			// tag::score[]
 			List<Float> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.score() )
-					.predicate( f -> f.match().onField( "title" )
+					.predicate( f -> f.match().field( "title" )
 							.matching( "robot dawn" ) )
 					.fetchHits();
 			// end::score[]

@@ -116,7 +116,7 @@ public class SearchMultiIndexIT {
 		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
+				.predicate( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( c -> {
@@ -174,7 +174,7 @@ public class SearchMultiIndexIT {
 
 		// Predicate
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
+				.predicate( f -> f.match().field( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
@@ -206,7 +206,7 @@ public class SearchMultiIndexIT {
 		// Predicate
 		SubTest.expectException(
 				"predicate on unknown field with multiple targeted indexes",
-				() -> scope.predicate().match().onField( "unknownField" )
+				() -> scope.predicate().match().field( "unknownField" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -258,7 +258,7 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"predicate on field with different type among the targeted indexes",
-				() -> scope.predicate().match().onField( "differentTypesField" )
+				() -> scope.predicate().match().field( "differentTypesField" )
 						.matching( DIFFERENT_TYPES_FIELD_1_1_1 )
 		)
 				.assertThrown()

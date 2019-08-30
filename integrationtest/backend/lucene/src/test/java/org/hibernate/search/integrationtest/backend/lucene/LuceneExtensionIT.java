@@ -421,7 +421,7 @@ public class LuceneExtensionIT {
 		SubTest.expectException(
 				"match() predicate on unsupported native field",
 				() -> scope.query()
-						.predicate( f -> f.match().onField( "nativeField" ).matching( "37" ) )
+						.predicate( f -> f.match().field( "nativeField" ).matching( "37" ) )
 						.toQuery()
 				)
 				.assertThrown()
@@ -471,7 +471,7 @@ public class LuceneExtensionIT {
 
 		SubTest.expectException(
 				"exists() predicate on unsupported native field",
-				() -> scope.predicate().exists().onField( "nativeField" )
+				() -> scope.predicate().exists().field( "nativeField" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -487,7 +487,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<Integer> query = scope.query()
 				.asProjection( f -> f.field( "nativeField", Integer.class ) )
-				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ) )
+				.predicate( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder( 37 );

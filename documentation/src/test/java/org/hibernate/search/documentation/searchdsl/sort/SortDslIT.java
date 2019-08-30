@@ -120,7 +120,7 @@ public class SortDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::score[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.match().onField( "title" )
+					.predicate( f -> f.match().field( "title" )
 							.matching( "robot dawn" ) )
 					.sort( f -> f.score() )
 					.fetchHits();

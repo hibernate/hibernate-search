@@ -109,7 +109,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.exists().onField( absoluteFieldPath ) )
+					.predicate( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
@@ -129,7 +129,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.exists().onField( absoluteFieldPath ) )
+					.predicate( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
@@ -149,7 +149,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.bool().mustNot( f.exists().onField( absoluteFieldPath ) ) )
+					.predicate( f -> f.bool().mustNot( f.exists().field( absoluteFieldPath ) ) )
 					.toQuery();
 
 			assertThat( query )
@@ -163,8 +163,8 @@ public class ExistsSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
-						.should( f.exists().onField( indexMapping.string1Field.relativeFieldName ) )
-						.should( f.exists().onField( indexMapping.string2Field.relativeFieldName ).boost( 7 ) )
+						.should( f.exists().field( indexMapping.string1Field.relativeFieldName ) )
+						.should( f.exists().field( indexMapping.string2Field.relativeFieldName ).boost( 7 ) )
 				)
 				.sort( f -> f.score() )
 				.toQuery();
@@ -174,8 +174,8 @@ public class ExistsSearchPredicateIT {
 
 		query = scope.query()
 				.predicate( f -> f.bool()
-						.should( f.exists().onField( indexMapping.string1Field.relativeFieldName ).boost( 39 ) )
-						.should( f.exists().onField( indexMapping.string2Field.relativeFieldName ) )
+						.should( f.exists().field( indexMapping.string1Field.relativeFieldName ).boost( 39 ) )
+						.should( f.exists().field( indexMapping.string2Field.relativeFieldName ) )
 				)
 				.sort( f -> f.score() )
 				.toQuery();
@@ -192,7 +192,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.exists().onField( absoluteFieldPath ) )
+					.predicate( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
@@ -212,7 +212,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.exists().onField( absoluteFieldPath ) )
+					.predicate( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
@@ -231,7 +231,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.exists().onField( absoluteFieldPath ) )
+					.predicate( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query ).hasNoHits();
@@ -246,8 +246,8 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.nested().onObjectField( indexMapping.nestedObject.relativeFieldName )
-							.nest( f.exists().onField( absoluteFieldPath ) ) )
+					.predicate( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
+							.nest( f.exists().field( absoluteFieldPath ) ) )
 					.toQuery();
 
 			assertThat( query )
@@ -267,8 +267,8 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.nested().onObjectField( indexMapping.nestedObject.relativeFieldName )
-							.nest( f.exists().onField( absoluteFieldPath ) ) )
+					.predicate( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
+							.nest( f.exists().field( absoluteFieldPath ) ) )
 					.toQuery();
 
 			assertThat( query )
@@ -288,8 +288,8 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.nested().onObjectField( indexMapping.nestedObject.relativeFieldName )
-							.nest( f.bool().mustNot( f.exists().onField( absoluteFieldPath ) ) ) )
+					.predicate( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
+							.nest( f.bool().mustNot( f.exists().field( absoluteFieldPath ) ) ) )
 					.toQuery();
 
 			assertThat( query )
@@ -304,7 +304,7 @@ public class ExistsSearchPredicateIT {
 
 		SubTest.expectException(
 				"exists() predicate with unknown field",
-				() -> scope.predicate().exists().onField( "unknown_field" )
+				() -> scope.predicate().exists().field( "unknown_field" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -321,7 +321,7 @@ public class ExistsSearchPredicateIT {
 				String absoluteFieldPath = model.relativeFieldName;
 
 				SearchQuery<DocumentReference> query = scope.query()
-						.predicate( f -> f.exists().onField( absoluteFieldPath ) )
+						.predicate( f -> f.exists().field( absoluteFieldPath ) )
 						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -342,7 +342,7 @@ public class ExistsSearchPredicateIT {
 				String absoluteFieldPath = model.relativeFieldName;
 
 				SearchQuery<DocumentReference> query = scope.query()
-						.predicate( f -> f.exists().onField( absoluteFieldPath ) )
+						.predicate( f -> f.exists().field( absoluteFieldPath ) )
 						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -369,7 +369,7 @@ public class ExistsSearchPredicateIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			SubTest.expectException(
-					() -> scope.predicate().exists().onField( fieldPath )
+					() -> scope.predicate().exists().field( fieldPath )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )

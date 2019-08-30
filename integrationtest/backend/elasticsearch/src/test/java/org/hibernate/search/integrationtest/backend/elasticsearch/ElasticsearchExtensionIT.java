@@ -308,7 +308,7 @@ public class ElasticsearchExtensionIT {
 								)
 						)
 						// Also test using the standard DSL on a field defined with the extension
-						.should( f.match().onField( "dateWithColons" ).matching( "'2018:01:12'" ) )
+						.should( f.match().field( "dateWithColons" ).matching( "'2018:01:12'" ) )
 				)
 				.toQuery();
 		assertThat( query )
@@ -338,7 +338,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toPredicate();
 		// Also test using the standard DSL on a field defined with the extension
-		SearchPredicate predicate4 = scope.predicate().match().onField( "dateWithColons" )
+		SearchPredicate predicate4 = scope.predicate().match().field( "dateWithColons" )
 				.matching( "'2018:01:12'" ).toPredicate();
 		SearchPredicate booleanPredicate = scope.predicate().bool()
 				.should( predicate1 )

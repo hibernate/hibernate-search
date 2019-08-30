@@ -435,7 +435,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().onField( "scaled" ).below( tooLargeDecimal ) );
+					.predicate( p -> p.range().field( "scaled" ).below( tooLargeDecimal ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -524,7 +524,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().onField( "scaled" ).above( tooLargeInteger ) );
+					.predicate( p -> p.range().field( "scaled" ).above( tooLargeInteger ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -592,7 +592,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().onField( "scaled" ).above( tooLargeDecimal ) );
+					.predicate( p -> p.range().field( "scaled" ).above( tooLargeDecimal ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -639,7 +639,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().onField( "scaled" ).below( tooLargeInteger ) );
+					.predicate( p -> p.range().field( "scaled" ).below( tooLargeInteger ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -776,7 +776,7 @@ public class DecimalScaleIT {
 	private void matchAbove(BigDecimal value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
+				.predicate( p -> p.range().field( "scaled" ).above( value ).excludeLimit() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 	}
@@ -784,7 +784,7 @@ public class DecimalScaleIT {
 	private void matchAbove(BigInteger value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
+				.predicate( p -> p.range().field( "scaled" ).above( value ).excludeLimit() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 	}
@@ -792,7 +792,7 @@ public class DecimalScaleIT {
 	public void doNotMatchAbove(BigDecimal value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
+				.predicate( p -> p.range().field( "scaled" ).above( value ).excludeLimit() )
 				.toQuery();
 		assertThat( query ).hasNoHits();
 	}
@@ -800,7 +800,7 @@ public class DecimalScaleIT {
 	public void doNotMatchAbove(BigInteger value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().onField( "scaled" ).above( value ).excludeLimit() )
+				.predicate( p -> p.range().field( "scaled" ).above( value ).excludeLimit() )
 				.toQuery();
 		assertThat( query ).hasNoHits();
 	}
@@ -824,7 +824,7 @@ public class DecimalScaleIT {
 	private void match(BigDecimal matching, String match1, String match2 ) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.match().onField( "scaled" ).matching( matching ) )
+				.predicate( p -> p.match().field( "scaled" ).matching( matching ) )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, match1, match2 );
 	}
@@ -832,7 +832,7 @@ public class DecimalScaleIT {
 	private void match(BigInteger matching, String match1, String match2 ) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.match().onField( "scaled" ).matching( matching ) )
+				.predicate( p -> p.match().field( "scaled" ).matching( matching ) )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, match1, match2 );
 	}

@@ -49,7 +49,7 @@ public class LuceneBoolSearchPredicateIT {
 				() -> scope.query()
 						.predicate( f -> f.bool()
 								.minimumShouldMatchNumber( 3 )
-								.should( f.match().onField( "fieldName" ).matching( "blablabla" ) )
+								.should( f.match().field( "fieldName" ).matching( "blablabla" ) )
 						)
 						.toQuery()
 		)

@@ -38,7 +38,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onField( "geoPoint" )
+						.field( "geoPoint" )
 						.circle( METRO_GARIBALDI, 1_500 )
 				)
 				.toQuery();
@@ -48,7 +48,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onField( "geoPoint" )
+						.field( "geoPoint" )
 						.circle( METRO_HOTEL_DE_VILLE, 500 )
 				)
 				.toQuery();
@@ -58,7 +58,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onField( "geoPoint" )
+						.field( "geoPoint" )
 						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1_500 )
 				)
 				.toQuery();
@@ -68,7 +68,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onField( "geoPoint" )
+						.field( "geoPoint" )
 						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1.5, DistanceUnit.KILOMETERS )
 				)
 				.toQuery();
@@ -78,7 +78,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onField( "geoPoint" )
+						.field( "geoPoint" )
 						.circle( METRO_GARIBALDI, 1.5, DistanceUnit.KILOMETERS )
 				)
 				.toQuery();
@@ -92,7 +92,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 
 		SubTest.expectException( () ->
-				scope.predicate().spatial().within().onField( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 )
+				scope.predicate().spatial().within().field( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 )
 		).assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "is not searchable" )
@@ -107,7 +107,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		SubTest.expectException(
 				"spatial().within().circle() predicate on field with unsupported type",
 				() -> scope.predicate().spatial().within()
-						.onField( "string" )
+						.field( "string" )
 						.circle( METRO_GARIBALDI, 400 )
 		)
 				.assertThrown()
@@ -126,11 +126,11 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.bool()
 						// Base score: less than 2
 						.should( f.spatial().within()
-								.onField( "geoPoint" )
+								.field( "geoPoint" )
 								.circle( METRO_GARIBALDI, 400 )
 						)
 						// Constant score: 2
-						.should( f.match().onField( "string" )
+						.should( f.match().field( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
 								.constantScore().boost( 2 )
 						)
@@ -145,11 +145,11 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.bool()
 						// Base score boosted 42x: more than 2
 						.should( f.spatial().within()
-								.onField( "geoPoint" ).boost( 42 )
+								.field( "geoPoint" ).boost( 42 )
 								.circle( METRO_GARIBALDI, 400 )
 						)
 						// Constant score: 2
-						.should( f.match().onField( "string" )
+						.should( f.match().field( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
 								.constantScore().boost( 2 )
 						)
@@ -169,12 +169,12 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.bool()
 						// Base score boosted 0.123x: less than 2
 						.should( f.spatial().within()
-								.onField( "geoPoint" )
+								.field( "geoPoint" )
 								.circle( METRO_GARIBALDI, 400 )
 								.boost( 0.123f )
 						)
 						// Constant score: 2
-						.should( f.match().onField( "string" )
+						.should( f.match().field( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
 								.constantScore().boost( 2 )
 						)
@@ -189,12 +189,12 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.bool()
 						// Base score boosted 39x: more than 2
 						.should( f.spatial().within()
-								.onField( "geoPoint" )
+								.field( "geoPoint" )
 								.circle( METRO_GARIBALDI, 400 )
 								.boost( 39 )
 						)
 						// Constant score: 2
-						.should( f.match().onField( "string" )
+						.should( f.match().field( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
 								.constantScore().boost( 2 )
 						)
@@ -214,12 +214,12 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.bool()
 						// Base score boosted 0.123*4=0.492x: less than 2
 						.should( f.spatial().within()
-								.onField( "geoPoint" ).boost( 4 )
+								.field( "geoPoint" ).boost( 4 )
 								.circle( METRO_GARIBALDI, 400 )
 								.boost( 0.123f )
 						)
 						// Constant score: 2
-						.should( f.match().onField( "string" )
+						.should( f.match().field( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
 								.constantScore().boost( 2 )
 						)
@@ -234,12 +234,12 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.bool()
 						// Base score boosted 39*7*4=273x: more than 2
 						.should( f.spatial().within()
-								.onField( "geoPoint" ).boost( 7 )
+								.field( "geoPoint" ).boost( 7 )
 								.circle( METRO_GARIBALDI, 400 )
 								.boost( 39 )
 						)
 						// Constant score: 2
-						.should( f.match().onField( "string" )
+						.should( f.match().field( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
 								.constantScore().boost( 2 )
 						)
@@ -259,12 +259,12 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.bool()
 						// Base score boosted 0.123x: less than 2
 						.should( f.spatial().within()
-								.onField( "geoPoint" ).orField( "geoPoint_1" )
+								.field( "geoPoint" ).field( "geoPoint_1" )
 								.circle( METRO_GARIBALDI, 400 )
 								.boost( 0.123f )
 						)
 						// Constant score: 2
-						.should( f.match().onField( "string" )
+						.should( f.match().field( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
 								.constantScore().boost( 2 )
 						)
@@ -279,12 +279,12 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.bool()
 						// Base score boosted 39x: more than 2
 						.should( f.spatial().within()
-								.onField( "geoPoint" ).orField( "geoPoint_1" )
+								.field( "geoPoint" ).field( "geoPoint_1" )
 								.circle( METRO_GARIBALDI, 400 )
 								.boost( 39 )
 						)
 						// Constant score: 2
-						.should( f.match().onField( "string" )
+						.should( f.match().field( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
 								.constantScore().boost( 2 )
 						)
@@ -300,11 +300,11 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void multi_fields() {
 		StubMappingScope scope = indexManager.createScope();
 
-		// onField(...).orField(...)
+		// field(...).field(...)
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onField( "geoPoint" ).orField( "geoPoint_1" )
+						.field( "geoPoint" ).field( "geoPoint_1" )
 						.circle( METRO_GARIBALDI, 400 )
 				)
 				.toQuery();
@@ -314,7 +314,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onField( "geoPoint" ).orField( "geoPoint_1" )
+						.field( "geoPoint" ).field( "geoPoint_1" )
 						.circle( METRO_HOTEL_DE_VILLE_1, 500 )
 				)
 				.toQuery();
@@ -322,11 +322,11 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
-		// onField().orFields(...)
+		// field().fields(...)
 
 		query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
+						.field( "geoPoint" ).fields( "geoPoint_1" ).fields( "geoPoint_2" )
 						.circle( METRO_HOTEL_DE_VILLE, 500 )
 				)
 				.toQuery();
@@ -336,7 +336,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
+						.field( "geoPoint" ).fields( "geoPoint_1" ).fields( "geoPoint_2" )
 						.circle( METRO_GARIBALDI_1, 1_500 )
 				)
 				.toQuery();
@@ -346,7 +346,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
+						.field( "geoPoint" ).fields( "geoPoint_1" ).fields( "geoPoint_2" )
 						.circle( METRO_GARIBALDI_2, 400 )
 				)
 				.toQuery();
@@ -354,11 +354,11 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
-		// onFields(...)
+		// fields(...)
 
 		query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onFields( "geoPoint", "geoPoint_2" )
+						.fields( "geoPoint", "geoPoint_2" )
 						.circle( METRO_GARIBALDI, 400 )
 				)
 				.toQuery();
@@ -368,7 +368,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		query = scope.query()
 				.predicate( f -> f.spatial().within()
-						.onFields( "geoPoint", "geoPoint_2" )
+						.fields( "geoPoint", "geoPoint_2" )
 						.circle( METRO_HOTEL_DE_VILLE_2, 500 )
 				)
 				.toQuery();
@@ -383,7 +383,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		SubTest.expectException(
 				"spatial().within().circle() predicate with null center",
-				() -> scope.predicate().spatial().within().onField( "geoPoint" )
+				() -> scope.predicate().spatial().within().field( "geoPoint" )
 						.circle( null, 100 )
 		)
 				.assertThrown()
@@ -392,7 +392,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		SubTest.expectException(
 				"spatial().within().circle() predicate with null distance unit",
-				() -> scope.predicate().spatial().within().onField( "geoPoint" )
+				() -> scope.predicate().spatial().within().field( "geoPoint" )
 						.circle( GeoPoint.of( 45, 4 ), 100, null )
 		)
 				.assertThrown()
@@ -406,7 +406,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		SubTest.expectException(
 				"spatial().within().circle() predicate on unknown field",
-				() -> scope.predicate().spatial().within().onField( "unknown_field" )
+				() -> scope.predicate().spatial().within().field( "unknown_field" )
 						.circle( METRO_GARIBALDI, 100 ).toPredicate()
 		)
 				.assertThrown()
@@ -420,7 +420,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.spatial().within().onField( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
+				.predicate( f -> f.spatial().within().field( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
@@ -430,7 +430,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void multiIndex_incompatibleSearchable() {
 		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
 
-		SubTest.expectException( () -> scope.predicate().spatial().within().onField( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
+		SubTest.expectException( () -> scope.predicate().spatial().within().field( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )

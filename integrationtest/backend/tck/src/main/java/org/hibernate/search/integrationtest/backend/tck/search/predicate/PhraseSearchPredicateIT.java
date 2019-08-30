@@ -136,7 +136,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
 		assertThat( query )
@@ -149,7 +149,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException( () ->
-				scope.predicate().phrase().onField( absoluteFieldPath )
+				scope.predicate().phrase().field( absoluteFieldPath )
 		).assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "is not searchable" )
@@ -168,7 +168,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringFieldWithDslConverter.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
 		assertThat( query )
@@ -182,7 +182,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
 				.toQuery();
 
 		assertThat( query )
@@ -195,7 +195,7 @@ public class PhraseSearchPredicateIT {
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.phrase().onField( fieldModel.relativeFieldName ).matching( "" ) )
+				.predicate( f -> f.phrase().field( fieldModel.relativeFieldName ).matching( "" ) )
 				.toQuery();
 
 		assertThat( query )
@@ -209,7 +209,7 @@ public class PhraseSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				// Use stopwords, which should be removed by the analysis
-				.predicate( f -> f.phrase().onField( fieldModel.relativeFieldName ).matching( "the a" ) )
+				.predicate( f -> f.phrase().field( fieldModel.relativeFieldName ).matching( "the a" ) )
 				.toQuery();
 
 		assertThat( query )
@@ -224,21 +224,21 @@ public class PhraseSearchPredicateIT {
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.phrase().onField( whitespaceAnalyzedField ).matching( "ONCE UPON" ) )
+				.predicate( f -> f.phrase().field( whitespaceAnalyzedField ).matching( "ONCE UPON" ) )
 				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
 		query = scope.query()
-				.predicate( f -> f.phrase().onField( whitespaceLowercaseAnalyzedField ).matching( "ONCE UPON" ) )
+				.predicate( f -> f.phrase().field( whitespaceLowercaseAnalyzedField ).matching( "ONCE UPON" ) )
 				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = scope.query()
-				.predicate( f -> f.phrase().onField( whitespaceAnalyzedField ).matching( "ONCE UPON" )
+				.predicate( f -> f.phrase().field( whitespaceAnalyzedField ).matching( "ONCE UPON" )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 
@@ -252,7 +252,7 @@ public class PhraseSearchPredicateIT {
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 
 		SubTest.expectException( () -> scope.query()
-				.predicate( f -> f.phrase().onField( whitespaceAnalyzedField ).matching( "ONCE UPON" )
+				.predicate( f -> f.phrase().field( whitespaceAnalyzedField ).matching( "ONCE UPON" )
 						// we don't have any analyzer with that name
 						.analyzer( "this_name_does_actually_not_exist" ) )
 				.toQuery().fetch()
@@ -268,7 +268,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( "quick fox" ) )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( "quick fox" ) )
 				.toQuery();
 
 		assertThat( query )
@@ -277,7 +277,7 @@ public class PhraseSearchPredicateIT {
 		// ignoring the analyzer means that the parameter of match predicate will not be tokenized
 		// so it will not match any token
 		query = scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( "quick fox" ).skipAnalysis() )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( "quick fox" ).skipAnalysis() )
 				.toQuery();
 
 		assertThat( query )
@@ -285,7 +285,7 @@ public class PhraseSearchPredicateIT {
 
 		// to have a match with the skipAnalysis option enabled, we have to pass the parameter as a token is
 		query = scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( "fox" ).skipAnalysis() )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( "fox" ).skipAnalysis() )
 				.toQuery();
 
 		assertThat( query )
@@ -301,7 +301,7 @@ public class PhraseSearchPredicateIT {
 
 			SubTest.expectException(
 					"phrase() predicate with unsupported type on field " + absoluteFieldPath,
-					() -> scope.predicate().phrase().onField( absoluteFieldPath )
+					() -> scope.predicate().phrase().field( absoluteFieldPath )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -321,7 +321,7 @@ public class PhraseSearchPredicateIT {
 
 		SubTest.expectException(
 				"phrase() predicate with null value to match",
-				() -> scope.predicate().phrase().onField( absoluteFieldPath ).matching( null )
+				() -> scope.predicate().phrase().field( absoluteFieldPath ).matching( null )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -336,7 +336,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		Function<Integer, SearchQuery<DocumentReference>> createQuery = slop -> scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ).slop( slop ) )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ).slop( slop ) )
 				.toQuery();
 
 		assertThat( createQuery.apply( 0 ) )
@@ -362,7 +362,7 @@ public class PhraseSearchPredicateIT {
 
 		SubTest.expectException(
 				() -> scope.predicate().phrase()
-						.onField( absoluteFieldPath ).boost( 2.1f )
+						.field( absoluteFieldPath ).boost( 2.1f )
 						.matching( PHRASE_1 )
 						.constantScore()
 						.toPredicate()
@@ -380,8 +380,8 @@ public class PhraseSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.phrase()
-						.onField( absoluteFieldPath1 ).boost( 42 )
-						.orField( absoluteFieldPath2 )
+						.field( absoluteFieldPath1 ).boost( 42 )
+						.field( absoluteFieldPath2 )
 						.matching( PHRASE_1 )
 				)
 				.sort( f -> f.score() )
@@ -392,8 +392,8 @@ public class PhraseSearchPredicateIT {
 
 		query = scope.query()
 				.predicate( f -> f.phrase()
-						.onField( absoluteFieldPath1 )
-						.orField( absoluteFieldPath2 ).boost( 42 )
+						.field( absoluteFieldPath1 )
+						.field( absoluteFieldPath2 ).boost( 42 )
 						.matching( PHRASE_1 )
 				)
 				.sort( f -> f.score() )
@@ -411,10 +411,10 @@ public class PhraseSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
-						.should( f.phrase().onField( absoluteFieldPath1 )
+						.should( f.phrase().field( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
 						)
-						.should( f.phrase().onField( absoluteFieldPath2 )
+						.should( f.phrase().field( absoluteFieldPath2 )
 								.matching( PHRASE_1 )
 								.boost( 7 )
 						)
@@ -427,11 +427,11 @@ public class PhraseSearchPredicateIT {
 
 		query = scope.query()
 				.predicate( f -> f.bool()
-						.should( f.phrase().onField( absoluteFieldPath1 )
+						.should( f.phrase().field( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
 								.boost( 39 )
 						)
-						.should( f.phrase().onField( absoluteFieldPath2 )
+						.should( f.phrase().field( absoluteFieldPath2 )
 								.matching( PHRASE_1 )
 						)
 				)
@@ -450,11 +450,11 @@ public class PhraseSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
-						.should( f.phrase().onField( absoluteFieldPath1 )
+						.should( f.phrase().field( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
 								.constantScore().boost( 7 )
 						)
-						.should( f.phrase().onField( absoluteFieldPath2 )
+						.should( f.phrase().field( absoluteFieldPath2 )
 								.matching( PHRASE_1 )
 								.constantScore().boost( 39 )
 						)
@@ -467,11 +467,11 @@ public class PhraseSearchPredicateIT {
 
 		query = scope.query()
 				.predicate( f -> f.bool()
-						.should( f.phrase().onField( absoluteFieldPath1 )
+						.should( f.phrase().field( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
 								.constantScore().boost( 39 )
 						)
-						.should( f.phrase().onField( absoluteFieldPath2 )
+						.should( f.phrase().field( absoluteFieldPath2 )
 								.matching( PHRASE_1 )
 								.constantScore().boost( 7 )
 						)
@@ -491,10 +491,10 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath3 = indexMapping.analyzedStringField3.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery;
 
-		// onField(...)
+		// field(...)
 
 		createQuery = phrase -> scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath1 )
+				.predicate( f -> f.phrase().field( absoluteFieldPath1 )
 						.matching( phrase )
 				)
 				.toQuery();
@@ -506,11 +506,11 @@ public class PhraseSearchPredicateIT {
 		assertThat( createQuery.apply( PHRASE_3 ) )
 				.hasNoHits();
 
-		// onField(...).orField(...)
+		// field(...).field(...)
 
 		createQuery = phrase -> scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath1 )
-						.orField( absoluteFieldPath2 )
+				.predicate( f -> f.phrase().field( absoluteFieldPath1 )
+						.field( absoluteFieldPath2 )
 						.matching( phrase )
 				)
 				.toQuery();
@@ -522,11 +522,11 @@ public class PhraseSearchPredicateIT {
 		assertThat( createQuery.apply( PHRASE_3 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 
-		// onField().orFields(...)
+		// field().fields(...)
 
 		createQuery = phrase -> scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath1 )
-						.orFields( absoluteFieldPath2, absoluteFieldPath3 )
+				.predicate( f -> f.phrase().field( absoluteFieldPath1 )
+						.fields( absoluteFieldPath2, absoluteFieldPath3 )
 						.matching( phrase )
 				)
 				.toQuery();
@@ -538,11 +538,11 @@ public class PhraseSearchPredicateIT {
 		assertThat( createQuery.apply( PHRASE_3 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 
-		// onFields(...)
+		// fields(...)
 
 		createQuery = phrase -> scope.query()
 				.predicate( f -> f.phrase()
-						.onFields( absoluteFieldPath1, absoluteFieldPath2 )
+						.fields( absoluteFieldPath1, absoluteFieldPath2 )
 						.matching( phrase )
 				)
 				.toQuery();
@@ -562,7 +562,7 @@ public class PhraseSearchPredicateIT {
 
 		SubTest.expectException(
 				"phrase() predicate with unknown field",
-				() -> scope.predicate().phrase().onField( "unknown_field" )
+				() -> scope.predicate().phrase().field( "unknown_field" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -572,7 +572,7 @@ public class PhraseSearchPredicateIT {
 		SubTest.expectException(
 				"phrase() predicate with unknown field",
 				() -> scope.predicate().phrase()
-						.onFields( absoluteFieldPath, "unknown_field" )
+						.fields( absoluteFieldPath, "unknown_field" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -581,8 +581,8 @@ public class PhraseSearchPredicateIT {
 
 		SubTest.expectException(
 				"phrase() predicate with unknown field",
-				() -> scope.predicate().phrase().onField( absoluteFieldPath )
-						.orField( "unknown_field" )
+				() -> scope.predicate().phrase().field( absoluteFieldPath )
+						.field( "unknown_field" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -591,8 +591,8 @@ public class PhraseSearchPredicateIT {
 
 		SubTest.expectException(
 				"phrase() predicate with unknown field",
-				() -> scope.predicate().phrase().onField( absoluteFieldPath )
-						.orFields( "unknown_field" )
+				() -> scope.predicate().phrase().field( absoluteFieldPath )
+						.fields( "unknown_field" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -607,7 +607,7 @@ public class PhraseSearchPredicateIT {
 
 		SubTest.expectException(
 				"phrase() predicate with negative slop",
-				() -> scope.predicate().phrase().onField( absoluteFieldPath )
+				() -> scope.predicate().phrase().field( absoluteFieldPath )
 						.matching( "foo" ).slop( -1 )
 		)
 				.assertThrown()
@@ -617,7 +617,7 @@ public class PhraseSearchPredicateIT {
 
 		SubTest.expectException(
 				"phrase() predicate with negative slop",
-				() -> scope.predicate().phrase().onField( absoluteFieldPath )
+				() -> scope.predicate().phrase().field( absoluteFieldPath )
 						.matching( "foo" ).slop( Integer.MIN_VALUE )
 		)
 				.assertThrown()
@@ -635,7 +635,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -650,7 +650,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -667,7 +667,7 @@ public class PhraseSearchPredicateIT {
 		SubTest.expectException(
 				() -> {
 					scope.query()
-							.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
+							.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
 							.toQuery();
 				}
 		)
@@ -687,7 +687,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 
@@ -703,7 +703,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM )
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM )
 						.skipAnalysis() )
 				.toQuery();
 
@@ -718,7 +718,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException( () -> scope.predicate().phrase().onField( absoluteFieldPath ) )
+		SubTest.expectException( () -> scope.predicate().phrase().field( absoluteFieldPath ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
