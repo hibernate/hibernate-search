@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.SearchSort;
  * The initial and final step in a composite sort definition, where sort elements can be added.
  * <p>
  * This is only used in "explicit" composite sorts,
- * for example when calling {@link SearchSortFactory#byComposite()},
+ * for example when calling {@link SearchSortFactory#composite()},
  * but not in "implicit" composite sorts such as when calling {@link SortThenStep#then()}.
  */
 public interface CompositeSortComponentsStep extends SortFinalStep, SortThenStep {

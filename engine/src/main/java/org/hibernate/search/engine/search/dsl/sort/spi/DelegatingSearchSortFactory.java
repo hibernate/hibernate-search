@@ -32,38 +32,38 @@ public class DelegatingSearchSortFactory implements SearchSortFactory {
 	}
 
 	@Override
-	public ScoreSortOptionsStep byScore() {
-		return delegate.byScore();
+	public ScoreSortOptionsStep score() {
+		return delegate.score();
 	}
 
 	@Override
-	public SortThenStep byIndexOrder() {
-		return delegate.byIndexOrder();
+	public SortThenStep indexOrder() {
+		return delegate.indexOrder();
 	}
 
 	@Override
-	public FieldSortOptionsStep byField(String absoluteFieldPath) {
-		return delegate.byField( absoluteFieldPath );
+	public FieldSortOptionsStep field(String absoluteFieldPath) {
+		return delegate.field( absoluteFieldPath );
 	}
 
 	@Override
-	public DistanceSortOptionsStep byDistance(String absoluteFieldPath, GeoPoint location) {
-		return delegate.byDistance( absoluteFieldPath, location );
+	public DistanceSortOptionsStep distance(String absoluteFieldPath, GeoPoint location) {
+		return delegate.distance( absoluteFieldPath, location );
 	}
 
 	@Override
-	public DistanceSortOptionsStep byDistance(String absoluteFieldPath, double latitude, double longitude) {
-		return delegate.byDistance( absoluteFieldPath, latitude, longitude );
+	public DistanceSortOptionsStep distance(String absoluteFieldPath, double latitude, double longitude) {
+		return delegate.distance( absoluteFieldPath, latitude, longitude );
 	}
 
 	@Override
-	public CompositeSortComponentsStep byComposite() {
-		return delegate.byComposite();
+	public CompositeSortComponentsStep composite() {
+		return delegate.composite();
 	}
 
 	@Override
-	public SortThenStep byComposite(Consumer<? super CompositeSortComponentsStep> elementContributor) {
-		return delegate.byComposite( elementContributor );
+	public SortThenStep composite(Consumer<? super CompositeSortComponentsStep> elementContributor) {
+		return delegate.composite( elementContributor );
 	}
 
 	@Override
