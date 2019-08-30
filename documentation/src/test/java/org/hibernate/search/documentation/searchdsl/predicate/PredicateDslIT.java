@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
+import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -475,13 +476,13 @@ public class PredicateDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::phrase-withSlop[]
+			// tag::phrase-slop[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.phrase().onField( "title" )
 							.matching( "dawn robot" )
-							.withSlop( 3 ) )
+							.slop( 3 ) )
 					.fetchHits();
-			// end::phrase-withSlop[]
+			// end::phrase-slop[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK3_ID );
@@ -515,13 +516,13 @@ public class PredicateDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::simpleQueryString-withAndAsDefaultOperator[]
+			// tag::simpleQueryString-defaultOperator-and[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.simpleQueryString().onField( "description" )
 							.matching( "robots investigation" )
-							.withAndAsDefaultOperator() )
+							.defaultOperator( BooleanOperator.AND ) )
 					.fetchHits();
-			// end::simpleQueryString-withAndAsDefaultOperator[]
+			// end::simpleQueryString-defaultOperator-and[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK2_ID );
@@ -564,12 +565,12 @@ public class PredicateDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::simpleQueryString-phrase-withSlop[]
+			// tag::simpleQueryString-phrase-slop[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.simpleQueryString().onField( "title" )
 							.matching( "\"dawn robot\"~3" ) )
 					.fetchHits();
-			// end::simpleQueryString-phrase-withSlop[]
+			// end::simpleQueryString-phrase-slop[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK3_ID );

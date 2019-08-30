@@ -336,7 +336,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		Function<Integer, SearchQuery<DocumentReference>> createQuery = slop -> scope.query()
-				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ).withSlop( slop ) )
+				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ).slop( slop ) )
 				.toQuery();
 
 		assertThat( createQuery.apply( 0 ) )
@@ -362,9 +362,9 @@ public class PhraseSearchPredicateIT {
 
 		SubTest.expectException(
 				() -> scope.predicate().phrase()
-						.onField( absoluteFieldPath ).boostedTo( 2.1f )
+						.onField( absoluteFieldPath ).boost( 2.1f )
 						.matching( PHRASE_1 )
-						.withConstantScore()
+						.constantScore()
 						.toPredicate()
 		)
 				.assertThrown()
@@ -380,7 +380,7 @@ public class PhraseSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.phrase()
-						.onField( absoluteFieldPath1 ).boostedTo( 42 )
+						.onField( absoluteFieldPath1 ).boost( 42 )
 						.orField( absoluteFieldPath2 )
 						.matching( PHRASE_1 )
 				)
@@ -393,7 +393,7 @@ public class PhraseSearchPredicateIT {
 		query = scope.query()
 				.predicate( f -> f.phrase()
 						.onField( absoluteFieldPath1 )
-						.orField( absoluteFieldPath2 ).boostedTo( 42 )
+						.orField( absoluteFieldPath2 ).boost( 42 )
 						.matching( PHRASE_1 )
 				)
 				.sort( f -> f.byScore() )
@@ -416,7 +416,7 @@ public class PhraseSearchPredicateIT {
 						)
 						.should( f.phrase().onField( absoluteFieldPath2 )
 								.matching( PHRASE_1 )
-								.boostedTo( 7 )
+								.boost( 7 )
 						)
 				)
 				.sort( f -> f.byScore() )
@@ -429,7 +429,7 @@ public class PhraseSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.should( f.phrase().onField( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
-								.boostedTo( 39 )
+								.boost( 39 )
 						)
 						.should( f.phrase().onField( absoluteFieldPath2 )
 								.matching( PHRASE_1 )
@@ -452,11 +452,11 @@ public class PhraseSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.should( f.phrase().onField( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
-								.withConstantScore().boostedTo( 7 )
+								.constantScore().boost( 7 )
 						)
 						.should( f.phrase().onField( absoluteFieldPath2 )
 								.matching( PHRASE_1 )
-								.withConstantScore().boostedTo( 39 )
+								.constantScore().boost( 39 )
 						)
 				)
 				.sort( f -> f.byScore() )
@@ -469,11 +469,11 @@ public class PhraseSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.should( f.phrase().onField( absoluteFieldPath1 )
 								.matching( PHRASE_1 )
-								.withConstantScore().boostedTo( 39 )
+								.constantScore().boost( 39 )
 						)
 						.should( f.phrase().onField( absoluteFieldPath2 )
 								.matching( PHRASE_1 )
-								.withConstantScore().boostedTo( 7 )
+								.constantScore().boost( 7 )
 						)
 				)
 				.sort( f -> f.byScore() )
@@ -608,7 +608,7 @@ public class PhraseSearchPredicateIT {
 		SubTest.expectException(
 				"phrase() predicate with negative slop",
 				() -> scope.predicate().phrase().onField( absoluteFieldPath )
-						.matching( "foo" ).withSlop( -1 )
+						.matching( "foo" ).slop( -1 )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -618,7 +618,7 @@ public class PhraseSearchPredicateIT {
 		SubTest.expectException(
 				"phrase() predicate with negative slop",
 				() -> scope.predicate().phrase().onField( absoluteFieldPath )
-						.matching( "foo" ).withSlop( Integer.MIN_VALUE )
+						.matching( "foo" ).slop( Integer.MIN_VALUE )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

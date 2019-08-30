@@ -297,7 +297,7 @@ refer to the following sections.
 
 include::todo-placeholder.asciidoc[]
 
-// TODO boostedTo, withConstantScore, ...
+// TODO boost, constantScore, ...
 
 [[search-dsl-predicate-match-all]]
 === `matchAll`: match all documents
@@ -462,7 +462,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/Pred
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/PredicateDslIT.java[tags=phrase-withSlop]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/PredicateDslIT.java[tags=phrase-slop]
 ----
 ====
 
@@ -690,7 +690,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/Pred
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/PredicateDslIT.java[tags=simpleQueryString-withAndAsDefaultOperator]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/PredicateDslIT.java[tags=simpleQueryString-defaultOperator-and]
 ----
 ====
 
@@ -722,7 +722,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/Pred
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/PredicateDslIT.java[tags=simpleQueryString-phrase-withSlop]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/predicate/PredicateDslIT.java[tags=simpleQueryString-phrase-slop]
 ----
 ====
 

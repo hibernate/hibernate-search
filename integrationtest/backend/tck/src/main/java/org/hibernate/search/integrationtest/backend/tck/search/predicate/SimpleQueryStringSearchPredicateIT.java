@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
@@ -196,7 +197,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testSimpleQueryString")
-	public void withAndAsDefaultOperator() {
+	public void defaultOperator() {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		SearchQuery<DocumentReference> query;
@@ -211,7 +212,15 @@ public class SimpleQueryStringSearchPredicateIT {
 		query = scope.query()
 				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath )
 						.matching( TERM_1 + " " + TERM_2 )
-						.withAndAsDefaultOperator() )
+						.defaultOperator( BooleanOperator.OR ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+		query = scope.query()
+				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath )
+						.matching( TERM_1 + " " + TERM_2 )
+						.defaultOperator( BooleanOperator.AND ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -434,7 +443,7 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		query = scope.query()
 				.predicate( f -> f.simpleQueryString()
-						.onField( absoluteFieldPath1 ).boostedTo( 5f )
+						.onField( absoluteFieldPath1 ).boost( 5f )
 						.orField( absoluteFieldPath2 )
 						.matching( TERM_3 )
 				)
@@ -446,7 +455,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		query = scope.query()
 				.predicate( f -> f.simpleQueryString()
 						.onField( absoluteFieldPath1 )
-						.orField( absoluteFieldPath2 ).boostedTo( 5f )
+						.orField( absoluteFieldPath2 ).boost( 5f )
 						.matching( TERM_3 )
 				)
 				.sort( f -> f.byScore() )
@@ -468,7 +477,7 @@ public class SimpleQueryStringSearchPredicateIT {
 						)
 						.should( f.simpleQueryString().onField( absoluteFieldPath2 )
 								.matching( TERM_3 )
-								.boostedTo( 7 )
+								.boost( 7 )
 						)
 				)
 				.sort( f -> f.byScore() )
@@ -481,7 +490,7 @@ public class SimpleQueryStringSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.should( f.simpleQueryString().onField( absoluteFieldPath1 )
 								.matching( TERM_3 )
-								.boostedTo( 39 )
+								.boost( 39 )
 						)
 						.should( f.simpleQueryString().onField( absoluteFieldPath2 )
 								.matching( TERM_3 )
@@ -504,11 +513,11 @@ public class SimpleQueryStringSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.should( f.simpleQueryString().onField( absoluteFieldPath1 )
 								.matching( TERM_3 )
-								.withConstantScore().boostedTo( 7 )
+								.constantScore().boost( 7 )
 						)
 						.should( f.simpleQueryString().onField( absoluteFieldPath2 )
 								.matching( TERM_3 )
-								.withConstantScore().boostedTo( 39 )
+								.constantScore().boost( 39 )
 						)
 				)
 				.sort( f -> f.byScore() )
@@ -521,11 +530,11 @@ public class SimpleQueryStringSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.should( f.simpleQueryString().onField( absoluteFieldPath1 )
 								.matching( TERM_3 )
-								.withConstantScore().boostedTo( 39 )
+								.constantScore().boost( 39 )
 						)
 						.should( f.simpleQueryString().onField( absoluteFieldPath2 )
 								.matching( TERM_3 )
-								.withConstantScore().boostedTo( 7 )
+								.constantScore().boost( 7 )
 						)
 				)
 				.sort( f -> f.byScore() )
