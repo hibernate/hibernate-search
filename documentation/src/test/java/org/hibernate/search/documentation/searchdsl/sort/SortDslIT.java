@@ -162,36 +162,36 @@ public class SortDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::field_onMissingValue_sortFirst[]
+			// tag::field-missing-first[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.field( "pageCount" ).onMissingValue().sortFirst() )
+					.sort( f -> f.field( "pageCount" ).missing().first() )
 					.fetchHits();
-			// end::field_onMissingValue_sortFirst[]
+			// end::field-missing-first[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK4_ID, BOOK2_ID, BOOK1_ID, BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::field_onMissingValue_sortLast[]
+			// tag::field-missing-last[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.field( "pageCount" ).onMissingValue().sortLast() )
+					.sort( f -> f.field( "pageCount" ).missing().last() )
 					.fetchHits();
-			// end::field_onMissingValue_sortLast[]
+			// end::field-missing-last[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK3_ID, BOOK4_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::field_onMissingValue_use[]
+			// tag::field-missing-use[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.field( "pageCount" ).onMissingValue().use( 300 ) )
+					.sort( f -> f.field( "pageCount" ).missing().use( 300 ) )
 					.fetchHits();
-			// end::field_onMissingValue_use[]
+			// end::field-missing-use[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK4_ID, BOOK3_ID );

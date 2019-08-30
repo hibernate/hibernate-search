@@ -914,7 +914,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=field_onMissingValue_sortFirst]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=field-missing-first]
 ----
 ====
 
@@ -922,7 +922,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=field_onMissingValue_sortLast]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=field-missing-last]
 ----
 ====
 
@@ -930,7 +930,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=field_onMissingValue_use]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=field-missing-use]
 ----
 ====
 
@@ -1520,7 +1520,7 @@ include::todo-placeholder.asciidoc[]
 Some predicates, such as the `match` predicate or the `range` predicate,
 require a parameter of type `Object` at some point (`matching(Object)`, `above(Object)`, ...).
 Similarly, it is possible to pass an argument of type `Object` in the sort DSL
-when defining the behavior for missing values (`onMissingValue().use(Object)`).
+when defining the behavior for missing values (`missing().use(Object)`).
 
 These methods do not actually accept *any* object,
 and will throw an exception when passed an argument with the wrong type.
@@ -1715,7 +1715,7 @@ and combine them with a <<search-dsl-predicate-boolean,boolean junction>>.
 
 Incompatible DSL converters are only a problem when you need to pass an argument to the DSL in certain methods:
 `matching(Object)`/`to(Object)`/`above(Object)`/`below(Object)`/etc. in the predicate DSL,
-or `onMissingValue().use(Object) in the sort DSL.
+or `missing().use(Object) in the sort DSL.
 
 If two fields encoded in a compatible way (for example both as `String`),
 but that have different DSL converters
