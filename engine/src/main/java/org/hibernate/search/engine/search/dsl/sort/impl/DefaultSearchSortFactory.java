@@ -30,35 +30,35 @@ public class DefaultSearchSortFactory<B> implements SearchSortFactory {
 	}
 
 	@Override
-	public ScoreSortOptionsStep byScore() {
+	public ScoreSortOptionsStep score() {
 		return new ScoreSortOptionsStepImpl<>( dslContext );
 	}
 
 	@Override
-	public SortThenStep byIndexOrder() {
+	public SortThenStep indexOrder() {
 		return staticThenStep( dslContext.getBuilderFactory().indexOrder() );
 	}
 
 	@Override
-	public FieldSortOptionsStep byField(String absoluteFieldPath) {
+	public FieldSortOptionsStep field(String absoluteFieldPath) {
 		return new FieldSortOptionsStepImpl<>( dslContext, absoluteFieldPath );
 	}
 
 	@Override
-	public DistanceSortOptionsStep byDistance(String absoluteFieldPath, GeoPoint location) {
+	public DistanceSortOptionsStep distance(String absoluteFieldPath, GeoPoint location) {
 		return new DistanceSortOptionsStepImpl<>(
 				dslContext, absoluteFieldPath, location
 		);
 	}
 
 	@Override
-	public CompositeSortComponentsStep byComposite() {
+	public CompositeSortComponentsStep composite() {
 		return new CompositeSortComponentsStepImpl<>( dslContext );
 	}
 
 	@Override
-	public SortThenStep byComposite(Consumer<? super CompositeSortComponentsStep> elementContributor) {
-		CompositeSortComponentsStep next = byComposite();
+	public SortThenStep composite(Consumer<? super CompositeSortComponentsStep> elementContributor) {
+		CompositeSortComponentsStep next = composite();
 		elementContributor.accept( next );
 		return next;
 	}
