@@ -265,14 +265,14 @@ public class SearchQueryFetchIT {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.byField( "integer" ).asc() );
+				.sort( f -> f.field( "integer" ).asc() );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchFirstHalfQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.predicate( f -> f.range().onField( "integer" ).below( DOCUMENT_COUNT / 2 ).excludeLimit() )
-				.sort( f -> f.byField( "integer" ).asc() );
+				.sort( f -> f.field( "integer" ).asc() );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchOneQuery(int id) {

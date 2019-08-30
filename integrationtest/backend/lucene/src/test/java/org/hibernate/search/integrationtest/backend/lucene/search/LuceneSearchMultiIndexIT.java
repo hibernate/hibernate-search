@@ -87,7 +87,7 @@ public class LuceneSearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.byField( "additionalField" ).asc().onMissingValue().sortLast() )
+				.sort( f -> f.field( "additionalField" ).asc().onMissingValue().sortLast() )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -97,7 +97,7 @@ public class LuceneSearchMultiIndexIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.byField( "additionalField" ).desc().onMissingValue().sortLast() )
+				.sort( f -> f.field( "additionalField" ).desc().onMissingValue().sortLast() )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {

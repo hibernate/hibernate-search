@@ -369,8 +369,8 @@ public class ElasticsearchExtensionIT {
 						.then().extension( ElasticsearchExtension.get() )
 								.fromJson( "{'sort3': 'asc'}" )
 						// Also test using the standard DSL on a field defined with the extension
-						.then().byField( "sort4" ).asc().onMissingValue().sortLast()
-						.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
+						.then().field( "sort4" ).asc().onMissingValue().sortLast()
+						.then().field( "sort5" ).asc().onMissingValue().sortFirst()
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
@@ -387,8 +387,8 @@ public class ElasticsearchExtensionIT {
 								.fromJson( "{'sort2': 'desc'}" )
 						.then().extension( ElasticsearchExtension.get() )
 								.fromJson( "{'sort3': 'desc'}" )
-						.then().byField( "sort4" ).desc().onMissingValue().sortLast()
-						.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
+						.then().field( "sort4" ).desc().onMissingValue().sortLast()
+						.then().field( "sort5" ).asc().onMissingValue().sortFirst()
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
@@ -412,13 +412,13 @@ public class ElasticsearchExtensionIT {
 				.toSort();
 		// Also test using the standard DSL on a field defined with the extension
 		SearchSort sort4Asc = scope.sort()
-				.byField( "sort4" ).asc().onMissingValue().sortLast()
-				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
+				.field( "sort4" ).asc().onMissingValue().sortLast()
+				.then().field( "sort5" ).asc().onMissingValue().sortFirst()
 				.toSort();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.byComposite().add( sort1Asc ).add( sort2Asc ).add( sort3Asc ).add( sort4Asc ) )
+				.sort( f -> f.composite().add( sort1Asc ).add( sort2Asc ).add( sort3Asc ).add( sort4Asc ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
@@ -433,13 +433,13 @@ public class ElasticsearchExtensionIT {
 				.fromJson( "{'sort3': 'desc'}" )
 				.toSort();
 		SearchSort sort4Desc = scope.sort()
-				.byField( "sort4" ).desc().onMissingValue().sortLast()
-				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
+				.field( "sort4" ).desc().onMissingValue().sortLast()
+				.then().field( "sort5" ).asc().onMissingValue().sortFirst()
 				.toSort();
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.byComposite().add( sort1Desc ).add( sort2Desc ).add( sort3Desc ).add( sort4Desc ) )
+				.sort( f -> f.composite().add( sort1Desc ).add( sort2Desc ).add( sort3Desc ).add( sort4Desc ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );

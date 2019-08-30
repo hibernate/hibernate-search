@@ -384,7 +384,7 @@ public class PhraseSearchPredicateIT {
 						.orField( absoluteFieldPath2 )
 						.matching( PHRASE_1 )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -396,7 +396,7 @@ public class PhraseSearchPredicateIT {
 						.orField( absoluteFieldPath2 ).boost( 42 )
 						.matching( PHRASE_1 )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -419,7 +419,7 @@ public class PhraseSearchPredicateIT {
 								.boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -435,7 +435,7 @@ public class PhraseSearchPredicateIT {
 								.matching( PHRASE_1 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -459,7 +459,7 @@ public class PhraseSearchPredicateIT {
 								.constantScore().boost( 39 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -476,7 +476,7 @@ public class PhraseSearchPredicateIT {
 								.constantScore().boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )

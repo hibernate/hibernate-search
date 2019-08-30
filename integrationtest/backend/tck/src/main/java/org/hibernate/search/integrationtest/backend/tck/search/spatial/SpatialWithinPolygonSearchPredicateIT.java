@@ -116,7 +116,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -132,7 +132,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -156,7 +156,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -175,7 +175,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -199,7 +199,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 								.constantScore().boost( 8 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -218,7 +218,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 								.constantScore().boost( 8 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -243,7 +243,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -263,7 +263,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )

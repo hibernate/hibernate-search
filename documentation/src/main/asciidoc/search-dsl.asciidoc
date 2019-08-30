@@ -875,35 +875,35 @@ include::todo-placeholder.asciidoc[]
 // TODO asc(), desc(), order(SortOrder), ...
 
 [[search-dsl-sort-score]]
-=== `byScore`: sort by matching score (relevance)
+=== `score`: sort by matching score (relevance)
 
 .Sorting by relevance
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byScore]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=score]
 ----
 ====
 
 [[search-dsl-sort-index-order]]
-=== `byIndexOrder`: sort according to the order of documents on storage
+=== `indexOrder`: sort according to the order of documents on storage
 
 .Sorting according to the order of documents on storage
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byIndexOrder]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=indexOrder]
 ----
 ====
 
 [[search-dsl-sort-field]]
-=== `byField`: sort by field values
+=== `field`: sort by field values
 
 .Sorting by field values
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byField]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=field]
 ----
 ====
 
@@ -914,7 +914,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byField_onMissingValue_sortFirst]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=field_onMissingValue_sortFirst]
 ----
 ====
 
@@ -922,7 +922,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byField_onMissingValue_sortLast]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=field_onMissingValue_sortLast]
 ----
 ====
 
@@ -930,31 +930,31 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byField_onMissingValue_use]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=field_onMissingValue_use]
 ----
 ====
 
 [[search-dsl-sort-distance]]
-=== `byDistance`: sort by distance to a point
+=== `distance`: sort by distance to a point
 
 .Sorting by distance to a point
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byDistance]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=distance]
 ----
 ====
 
 // TODO alternative syntaxes?
 
 [[search-dsl-sort-composite]]
-=== `byComposite`: combine sorts
+=== `composite`: combine sorts
 
-.Sorting by multiple composed sorts using `byComposite()`
+.Sorting by multiple composed sorts using `composite()`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byComposite]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=composite]
 ----
 ====
 
@@ -970,10 +970,10 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=byComposite_dynamicParameters]
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/sort/SortDslIT.java[tags=composite_dynamicParameters]
 ----
 <1> Get a custom object holding the search parameters provided by the user through a web form, for example.
-<2> Call `.byComposite(Consumer)`.
+<2> Call `.composite(Consumer)`.
 The consumer, implemented by a lambda expression, will receive a builder as an argument
 and will add sorts to that builder as necessary.
 <3> Inside the lambda, the code is free to do whatever is necessary before adding sorts.

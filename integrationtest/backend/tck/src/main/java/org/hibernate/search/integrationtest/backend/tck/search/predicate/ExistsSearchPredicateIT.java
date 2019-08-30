@@ -166,7 +166,7 @@ public class ExistsSearchPredicateIT {
 						.should( f.exists().onField( indexMapping.string1Field.relativeFieldName ) )
 						.should( f.exists().onField( indexMapping.string2Field.relativeFieldName ).boost( 7 ) )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -177,7 +177,7 @@ public class ExistsSearchPredicateIT {
 						.should( f.exists().onField( indexMapping.string1Field.relativeFieldName ).boost( 39 ) )
 						.should( f.exists().onField( indexMapping.string2Field.relativeFieldName ) )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )

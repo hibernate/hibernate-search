@@ -86,8 +86,8 @@ public class SortDslIT {
 
 			List<Book> result = searchSession.search( Book.class ) // <1>
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byField( "pageCount" ).desc() // <2>
-							.then().byField( "title_sort" ) )
+					.sort( f -> f.field( "pageCount" ).desc() // <2>
+							.then().field( "title_sort" ) )
 					.fetchHits(); // <3>
 			// end::entryPoint-lambdas[]
 			assertThat( result )
@@ -104,8 +104,8 @@ public class SortDslIT {
 			List<Book> result = scope.search()
 					.predicate( scope.predicate().matchAll().toPredicate() )
 					.sort( scope.sort()
-							.byField( "pageCount" ).desc()
-							.then().byField( "title_sort" )
+							.field( "pageCount" ).desc()
+							.then().field( "title_sort" )
 							.toSort() )
 					.fetchHits();
 			// end::entryPoint-objects[]
@@ -116,15 +116,15 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void byScore() {
+	public void score() {
 		withinSearchSession( searchSession -> {
-			// tag::byScore[]
+			// tag::score[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.match().onField( "title" )
 							.matching( "robot dawn" ) )
-					.sort( f -> f.byScore() )
+					.sort( f -> f.score() )
 					.fetchHits();
-			// end::byScore[]
+			// end::score[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK3_ID, BOOK1_ID );
@@ -132,14 +132,14 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void byIndexOrder() {
+	public void indexOrder() {
 		withinSearchSession( searchSession -> {
-			// tag::byIndexOrder[]
+			// tag::indexOrder[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byIndexOrder() )
+					.sort( f -> f.indexOrder() )
 					.fetchHits();
-			// end::byIndexOrder[]
+			// end::indexOrder[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					// Not checking the order here, it's implementation-dependent
@@ -148,50 +148,50 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void byField() {
+	public void field() {
 		withinSearchSession( searchSession -> {
-			// tag::byField[]
+			// tag::field[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byField( "title_sort" ) )
+					.sort( f -> f.field( "title_sort" ) )
 					.fetchHits();
-			// end::byField[]
+			// end::field[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::byField_onMissingValue_sortFirst[]
+			// tag::field_onMissingValue_sortFirst[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byField( "pageCount" ).onMissingValue().sortFirst() )
+					.sort( f -> f.field( "pageCount" ).onMissingValue().sortFirst() )
 					.fetchHits();
-			// end::byField_onMissingValue_sortFirst[]
+			// end::field_onMissingValue_sortFirst[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK4_ID, BOOK2_ID, BOOK1_ID, BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::byField_onMissingValue_sortLast[]
+			// tag::field_onMissingValue_sortLast[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byField( "pageCount" ).onMissingValue().sortLast() )
+					.sort( f -> f.field( "pageCount" ).onMissingValue().sortLast() )
 					.fetchHits();
-			// end::byField_onMissingValue_sortLast[]
+			// end::field_onMissingValue_sortLast[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK3_ID, BOOK4_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::byField_onMissingValue_use[]
+			// tag::field_onMissingValue_use[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byField( "pageCount" ).onMissingValue().use( 300 ) )
+					.sort( f -> f.field( "pageCount" ).onMissingValue().use( 300 ) )
 					.fetchHits();
-			// end::byField_onMissingValue_use[]
+			// end::field_onMissingValue_use[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK4_ID, BOOK3_ID );
@@ -199,43 +199,43 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void byComposite() {
+	public void composite() {
 		withinSearchSession( searchSession -> {
-			// tag::byComposite[]
+			// tag::composite[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byComposite() // <1>
-							.add( f.byField( "genre_sort" ) ) // <2>
-							.add( f.byField( "title_sort" ) ) ) // <3>
+					.sort( f -> f.composite() // <1>
+							.add( f.field( "genre_sort" ) ) // <2>
+							.add( f.field( "title_sort" ) ) ) // <3>
 					.fetchHits(); // <4>
-			// end::byComposite[]
+			// end::composite[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::byComposite_dynamicParameters[]
+			// tag::composite_dynamicParameters[]
 			MySearchParameters searchParameters = getSearchParameters(); // <1>
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byComposite( b -> { // <2>
+					.sort( f -> f.composite( b -> { // <2>
 						for ( MySort mySort : searchParameters.getSorts() ) { // <3>
 							switch ( mySort.getType() ) {
 								case GENRE:
-									b.add( f.byField( "genre_sort" ).order( mySort.getOrder() ) );
+									b.add( f.field( "genre_sort" ).order( mySort.getOrder() ) );
 									break;
 								case TITLE:
-									b.add( f.byField( "title_sort" ).order( mySort.getOrder() ) );
+									b.add( f.field( "title_sort" ).order( mySort.getOrder() ) );
 									break;
 								case PAGE_COUNT:
-									b.add( f.byField( "pageCount" ).order( mySort.getOrder() ) );
+									b.add( f.field( "pageCount" ).order( mySort.getOrder() ) );
 									break;
 							}
 						}
 					} ) )
 					.fetchHits(); // <4>
-			// end::byComposite_dynamicParameters[]
+			// end::composite_dynamicParameters[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK4_ID, BOOK3_ID, BOOK2_ID, BOOK1_ID );
@@ -248,8 +248,8 @@ public class SortDslIT {
 			// tag::then[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byField( "genre_sort" ) // <2>
-							.then().byField( "title_sort" ) ) // <3>
+					.sort( f -> f.field( "genre_sort" ) // <2>
+							.then().field( "title_sort" ) ) // <3>
 					.fetchHits(); // <4>
 			// end::then[]
 			assertThat( hits )
@@ -259,15 +259,15 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void byDistance() {
+	public void distance() {
 		withinSearchSession( searchSession -> {
-			// tag::byDistance[]
+			// tag::distance[]
 			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
 			List<Author> hits = searchSession.search( Author.class )
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byDistance( "placeOfBirth", center ) )
+					.sort( f -> f.distance( "placeOfBirth", center ) )
 					.fetchHits();
-			// end::byDistance[]
+			// end::distance[]
 			assertThat( hits )
 					.extracting( Author::getId )
 					.containsExactly( ASIMOV_ID, MARTINEZ_ID );

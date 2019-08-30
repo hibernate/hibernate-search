@@ -150,7 +150,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -168,7 +168,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -191,7 +191,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -210,7 +210,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -234,7 +234,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.constantScore().boost( 8 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -253,7 +253,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.constantScore().boost( 8 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -278,7 +278,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -298,7 +298,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )

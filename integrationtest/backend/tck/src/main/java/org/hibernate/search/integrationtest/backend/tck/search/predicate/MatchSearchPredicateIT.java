@@ -298,7 +298,7 @@ public class MatchSearchPredicateIT {
 								.matching( indexMapping.string1Field.document3Value.indexedValue )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -313,7 +313,7 @@ public class MatchSearchPredicateIT {
 								.matching( indexMapping.string1Field.document3Value.indexedValue )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -334,7 +334,7 @@ public class MatchSearchPredicateIT {
 								.boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -350,7 +350,7 @@ public class MatchSearchPredicateIT {
 								.matching( indexMapping.string1Field.document3Value.indexedValue )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -374,7 +374,7 @@ public class MatchSearchPredicateIT {
 								.boost( 3 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -392,7 +392,7 @@ public class MatchSearchPredicateIT {
 								.boost( 0.1f )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -415,7 +415,7 @@ public class MatchSearchPredicateIT {
 								.constantScore()
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -433,7 +433,7 @@ public class MatchSearchPredicateIT {
 								.matching( indexMapping.string1Field.document3Value.indexedValue )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -455,7 +455,7 @@ public class MatchSearchPredicateIT {
 								.constantScore().boost( 39 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -472,7 +472,7 @@ public class MatchSearchPredicateIT {
 								.constantScore().boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -496,7 +496,7 @@ public class MatchSearchPredicateIT {
 								.boost( 39 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -515,7 +515,7 @@ public class MatchSearchPredicateIT {
 								.boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )

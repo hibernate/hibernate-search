@@ -447,7 +447,7 @@ public class SimpleQueryStringSearchPredicateIT {
 						.orField( absoluteFieldPath2 )
 						.matching( TERM_3 )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
@@ -458,7 +458,7 @@ public class SimpleQueryStringSearchPredicateIT {
 						.orField( absoluteFieldPath2 ).boost( 5f )
 						.matching( TERM_3 )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -480,7 +480,7 @@ public class SimpleQueryStringSearchPredicateIT {
 								.boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -496,7 +496,7 @@ public class SimpleQueryStringSearchPredicateIT {
 								.matching( TERM_3 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -520,7 +520,7 @@ public class SimpleQueryStringSearchPredicateIT {
 								.constantScore().boost( 39 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -537,7 +537,7 @@ public class SimpleQueryStringSearchPredicateIT {
 								.constantScore().boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )

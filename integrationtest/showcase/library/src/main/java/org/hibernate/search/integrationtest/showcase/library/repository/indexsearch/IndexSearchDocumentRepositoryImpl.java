@@ -73,7 +73,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 							.nest( f.match().onField( "copies.medium" ).matching( medium ) )
 					);
 				} ) )
-				.sort( b -> b.byField( "title_sort" ) )
+				.sort( b -> b.field( "title_sort" ) )
 				.fetchHits( limit, offset );
 	}
 
@@ -128,12 +128,12 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 						);
 					}
 				} ) )
-				.sort( f -> f.byComposite( b -> {
+				.sort( f -> f.composite( b -> {
 					if ( myLocation != null ) {
 						// TODO HSEARCH-2254 sort by distance once we implement nested support for sorts ("copies" is a nested object field)
 						//b.add( f.byDistance( "copies.library.location", myLocation ) );
 					}
-					b.add( f.byScore() );
+					b.add( f.score() );
 				} ) )
 				.fetchHits( limit, offset );
 	}
@@ -147,7 +147,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 						.orField( "summary" )
 						.matching( terms )
 				)
-				.sort( b -> b.byField( "author" ).order( order ) )
+				.sort( b -> b.field( "author" ).order( order ) )
 				.fetchHits();
 	}
 }
