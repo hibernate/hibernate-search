@@ -27,7 +27,7 @@ In the ORM integration, this root is `hibernate.search`,
 but other integrations (Infinispan, ...) may use a different one.
 This documentation will use `hibernate.search` in all examples.
 
-Under that root, we can distinguish between four categories of properties.
+Under that root, we can distinguish between three categories of properties.
 
 Global properties::
 These properties potentially affect all Hibernate Search.
