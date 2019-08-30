@@ -89,7 +89,7 @@ public class PredicateDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.match().onField( "title" ) // <2>
+					.predicate( f -> f.match().field( "title" ) // <2>
 							.matching( "robot" ) )
 					.fetchHits(); // <3>
 			// end::entryPoint-lambdas[]
@@ -105,7 +105,7 @@ public class PredicateDslIT {
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			List<Book> result = scope.search()
-					.predicate( scope.predicate().match().onField( "title" )
+					.predicate( scope.predicate().match().field( "title" )
 							.matching( "robot" )
 							.toPredicate() )
 					.fetchHits();
@@ -134,7 +134,7 @@ public class PredicateDslIT {
 			// tag::matchAll-except[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll()
-							.except( f.match().onField( "title" )
+							.except( f.match().field( "title" )
 									.matching( "robot" ) )
 					)
 					.fetchHits();
@@ -182,9 +182,9 @@ public class PredicateDslIT {
 			// tag::bool-or[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.bool()
-							.should( f.match().onField( "title" )
+							.should( f.match().field( "title" )
 									.matching( "robot" ) ) // <1>
-							.should( f.match().onField( "description" )
+							.should( f.match().field( "description" )
 									.matching( "investigation" ) ) // <2>
 					)
 					.fetchHits(); // <3>
@@ -198,9 +198,9 @@ public class PredicateDslIT {
 			// tag::bool-and[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.bool()
-							.must( f.match().onField( "title" )
+							.must( f.match().field( "title" )
 									.matching( "robot" ) ) // <1>
-							.must( f.match().onField( "description" )
+							.must( f.match().field( "description" )
 									.matching( "crime" ) ) // <2>
 					)
 					.fetchHits(); // <3>
@@ -214,9 +214,9 @@ public class PredicateDslIT {
 			// tag::bool-mustNot[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.bool()
-							.must( f.match().onField( "title" )
+							.must( f.match().field( "title" )
 									.matching( "robot" ) ) // <1>
-							.mustNot( f.match().onField( "description" )
+							.mustNot( f.match().field( "description" )
 									.matching( "investigation" ) ) // <2>
 					)
 					.fetchHits(); // <3>
@@ -231,15 +231,15 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.bool() // <1>
 							.should( f.bool() // <2>
-									.filter( f.match().onField( "genre" )
+									.filter( f.match().field( "genre" )
 											.matching( Genre.SCIENCE_FICTION ) ) // <3>
-									.must( f.match().onFields( "description" )
+									.must( f.match().fields( "description" )
 											.matching( "crime" ) ) // <4>
 							)
 							.should( f.bool() // <5>
-									.filter( f.match().onField( "genre" )
+									.filter( f.match().field( "genre" )
 											.matching( Genre.CRIME_FICTION ) ) // <6>
-									.must( f.match().onFields( "description" )
+									.must( f.match().fields( "description" )
 											.matching( "robot" ) ) // <7>
 							)
 					)
@@ -254,11 +254,11 @@ public class PredicateDslIT {
 			// tag::bool-mustAndShould[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.bool()
-							.must( f.match().onField( "title" )
+							.must( f.match().field( "title" )
 									.matching( "robot" ) ) // <1>
-							.should( f.match().onField( "description" )
+							.should( f.match().field( "description" )
 									.matching( "crime" ) ) // <2>
-							.should( f.match().onField( "description" )
+							.should( f.match().field( "description" )
 									.matching( "investigation" ) ) // <3>
 					)
 					.fetchHits(); // <4>
@@ -273,11 +273,11 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.bool()
 							.minimumShouldMatchNumber( 2 ) // <1>
-							.should( f.match().onField( "description" )
+							.should( f.match().field( "description" )
 									.matching( "robot" ) ) // <2>
-							.should( f.match().onField( "description" )
+							.should( f.match().field( "description" )
 									.matching( "investigation" ) ) // <3>
-							.should( f.match().onField( "description" )
+							.should( f.match().field( "description" )
 									.matching( "disappearance" ) ) // <4>
 					)
 					.fetchHits(); // <5>
@@ -294,15 +294,15 @@ public class PredicateDslIT {
 					.predicate( f -> f.bool( b -> { // <2>
 						b.must( f.matchAll() ); // <3>
 						if ( searchParameters.getGenreFilter() != null ) { // <4>
-							b.must( f.match().onField( "genre" )
+							b.must( f.match().field( "genre" )
 									.matching( searchParameters.getGenreFilter() ) );
 						}
 						if ( searchParameters.getFullTextFilter() != null ) {
-							b.must( f.match().onFields( "title", "description" )
+							b.must( f.match().fields( "title", "description" )
 									.matching( searchParameters.getFullTextFilter() ) );
 						}
 						if ( searchParameters.getPageCountMaxFilter() != null ) {
-							b.must( f.range().onField( "pageCount" )
+							b.must( f.range().field( "pageCount" )
 									.below( searchParameters.getPageCountMaxFilter() ) );
 						}
 					} ) )
@@ -319,7 +319,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::match[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.match().onField( "title" )
+					.predicate( f -> f.match().field( "title" )
 							.matching( "robot" ) )
 					.fetchHits();
 			// end::match[]
@@ -331,7 +331,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::match-multipleTerms[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.match().onField( "title" )
+					.predicate( f -> f.match().field( "title" )
 							.matching( "robot dawn" ) ) // <1>
 					.fetchHits(); // <2>
 			// end::match-multipleTerms[]
@@ -344,7 +344,7 @@ public class PredicateDslIT {
 			// tag::match-orField[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.match()
-							.onField( "title" ).orField( "description" )
+							.field( "title" ).field( "description" )
 							.matching( "robot" ) )
 					.fetchHits();
 			// end::match-orField[]
@@ -357,7 +357,7 @@ public class PredicateDslIT {
 			// tag::match-fields[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.match()
-							.onFields( "title", "description" )
+							.fields( "title", "description" )
 							.matching( "robot" ) )
 					.fetchHits();
 			// end::match-fields[]
@@ -370,7 +370,7 @@ public class PredicateDslIT {
 			// tag::match-fuzzy[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.match()
-							.onField( "title" )
+							.field( "title" )
 							.matching( "robto" )
 							.fuzzy() )
 					.fetchHits();
@@ -384,7 +384,7 @@ public class PredicateDslIT {
 			// tag::match-analyzer[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.match()
-							.onField( "title_autocomplete" )
+							.field( "title_autocomplete" )
 							.matching( "robo" )
 							.analyzer( "autocomplete_query" ) )
 					.fetchHits();
@@ -398,7 +398,7 @@ public class PredicateDslIT {
 			// tag::match-skipAnalysis[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.match()
-							.onField( "title" )
+							.field( "title" )
 							.matching( "robot" )
 							.skipAnalysis() )
 					.fetchHits();
@@ -414,7 +414,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::range-between[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.range().onField( "pageCount" )
+					.predicate( f -> f.range().field( "pageCount" )
 							.from( 210 ).to( 250 ) )
 					.fetchHits();
 			// end::range-between[]
@@ -426,7 +426,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::range-above[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.range().onField( "pageCount" )
+					.predicate( f -> f.range().field( "pageCount" )
 							.above( 400 ) )
 					.fetchHits();
 			// end::range-above[]
@@ -438,7 +438,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::range-below[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.range().onField( "pageCount" )
+					.predicate( f -> f.range().field( "pageCount" )
 							.below( 400 ) )
 					.fetchHits();
 			// end::range-below[]
@@ -450,7 +450,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::range-excludeLimit[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.range().onField( "pageCount" )
+					.predicate( f -> f.range().field( "pageCount" )
 							.from( 200 ).excludeLimit()
 							.to( 250 ).excludeLimit() )
 					.fetchHits();
@@ -466,7 +466,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::phrase[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.phrase().onField( "title" )
+					.predicate( f -> f.phrase().field( "title" )
 							.matching( "robots of dawn" ) )
 					.fetchHits();
 			// end::phrase[]
@@ -478,7 +478,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::phrase-slop[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.phrase().onField( "title" )
+					.predicate( f -> f.phrase().field( "title" )
 							.matching( "dawn robot" )
 							.slop( 3 ) )
 					.fetchHits();
@@ -494,7 +494,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::simpleQueryString-boolean[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.simpleQueryString().onField( "description" )
+					.predicate( f -> f.simpleQueryString().field( "description" )
 							.matching( "robots + (crime | investigation | disappearance)" ) )
 					.fetchHits();
 			// end::simpleQueryString-boolean[]
@@ -506,7 +506,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::simpleQueryString-not[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.simpleQueryString().onField( "description" )
+					.predicate( f -> f.simpleQueryString().field( "description" )
 							.matching( "robots + -investigation" ) )
 					.fetchHits();
 			// end::simpleQueryString-not[]
@@ -518,7 +518,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::simpleQueryString-defaultOperator-and[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.simpleQueryString().onField( "description" )
+					.predicate( f -> f.simpleQueryString().field( "description" )
 							.matching( "robots investigation" )
 							.defaultOperator( BooleanOperator.AND ) )
 					.fetchHits();
@@ -531,7 +531,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::simpleQueryString-prefix[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.simpleQueryString().onField( "description" )
+					.predicate( f -> f.simpleQueryString().field( "description" )
 							.matching( "rob*" ) )
 					.fetchHits();
 			// end::simpleQueryString-prefix[]
@@ -543,7 +543,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::simpleQueryString-fuzzy[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.simpleQueryString().onField( "description" )
+					.predicate( f -> f.simpleQueryString().field( "description" )
 							.matching( "robto~2" ) )
 					.fetchHits();
 			// end::simpleQueryString-fuzzy[]
@@ -555,7 +555,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::simpleQueryString-phrase[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.simpleQueryString().onField( "title" )
+					.predicate( f -> f.simpleQueryString().field( "title" )
 							.matching( "\"robots of dawn\"" ) )
 					.fetchHits();
 			// end::simpleQueryString-phrase[]
@@ -567,7 +567,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::simpleQueryString-phrase-slop[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.simpleQueryString().onField( "title" )
+					.predicate( f -> f.simpleQueryString().field( "title" )
 							.matching( "\"dawn robot\"~3" ) )
 					.fetchHits();
 			// end::simpleQueryString-phrase-slop[]
@@ -582,7 +582,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::exists[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.exists().onField( "comment" ) )
+					.predicate( f -> f.exists().field( "comment" ) )
 					.fetchHits();
 			// end::exists[]
 			assertThat( hits )
@@ -596,7 +596,7 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::wildcard[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.wildcard().onField( "description" )
+					.predicate( f -> f.wildcard().field( "description" )
 							.matching( "rob*t" ) )
 					.fetchHits();
 			// end::wildcard[]
@@ -611,11 +611,11 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::nested[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.nested().onObjectField( "authors" ) // <1>
+					.predicate( f -> f.nested().objectField( "authors" ) // <1>
 							.nest( f.bool()
-									.must( f.match().onField( "authors.firstName" )
+									.must( f.match().field( "authors.firstName" )
 											.matching( "isaac" ) ) // <2>
-									.must( f.match().onField( "authors.lastName" )
+									.must( f.match().field( "authors.lastName" )
 											.matching( "asimov" ) ) // <3>
 							) )
 					.fetchHits(); // <4>
@@ -632,7 +632,7 @@ public class PredicateDslIT {
 			// tag::within-circle[]
 			GeoPoint center = GeoPoint.of( 53.970000, 32.150000 );
 			List<Author> hits = searchSession.search( Author.class )
-					.predicate( f -> f.spatial().within().onField( "placeOfBirth" )
+					.predicate( f -> f.spatial().within().field( "placeOfBirth" )
 							.circle( center, 50, DistanceUnit.KILOMETERS ) )
 					.fetchHits();
 			// end::within-circle[]
@@ -648,7 +648,7 @@ public class PredicateDslIT {
 					53.95, 32.17
 			);
 			List<Author> hits = searchSession.search( Author.class )
-					.predicate( f -> f.spatial().within().onField( "placeOfBirth" )
+					.predicate( f -> f.spatial().within().field( "placeOfBirth" )
 							.boundingBox( box ) )
 					.fetchHits();
 			// end::within-box[]
@@ -668,7 +668,7 @@ public class PredicateDslIT {
 					GeoPoint.of( 53.976177, 32.138627 )
 			);
 			List<Author> hits = searchSession.search( Author.class )
-					.predicate( f -> f.spatial().within().onField( "placeOfBirth" )
+					.predicate( f -> f.spatial().within().field( "placeOfBirth" )
 							.polygon( polygon ) )
 					.fetchHits();
 			// end::within-polygon[]

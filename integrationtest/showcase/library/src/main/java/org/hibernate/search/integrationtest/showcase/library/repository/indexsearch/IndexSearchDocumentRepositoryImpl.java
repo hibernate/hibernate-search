@@ -54,7 +54,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 
 		return Search.session( entityManager ).search( Book.class )
 				// onRawField option allows to bypass the bridge in the DSL
-				.predicate( f -> f.match().onField( "isbn" ).matching( isbnAsString, ValueConvert.NO ) )
+				.predicate( f -> f.match().field( "isbn" ).matching( isbnAsString, ValueConvert.NO ) )
 				.fetchSingleHit();
 	}
 
@@ -64,13 +64,13 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				.predicate( f -> f.bool( b -> {
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
-								.onField( "title" ).boost( 2.0f )
-								.orField( "summary" )
+								.field( "title" ).boost( 2.0f )
+								.field( "summary" )
 								.matching( terms )
 						);
 					}
-					b.must( f.nested().onObjectField( "copies" )
-							.nest( f.match().onField( "copies.medium" ).matching( medium ) )
+					b.must( f.nested().objectField( "copies" )
+							.nest( f.match().field( "copies.medium" ).matching( medium ) )
 					);
 				} ) )
 				.sort( b -> b.field( "title_sort" ) )
@@ -87,8 +87,8 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
-								.onField( "title" ).boost( 2.0f )
-								.orField( "summary" )
+								.field( "title" ).boost( 2.0f )
+								.field( "summary" )
 								.matching( terms )
 						);
 					}
@@ -98,7 +98,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 						b.must( f.bool( b2 -> {
 							for ( String tag : splitTags ) {
 								b2.must( f.match()
-										.onField( "tags" )
+										.field( "tags" )
 										.matching( tag )
 								);
 							}
@@ -106,21 +106,21 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					}
 					// Spatial query
 					if ( myLocation != null && maxDistanceInKilometers != null ) {
-						b.must( f.nested().onObjectField( "copies" )
+						b.must( f.nested().objectField( "copies" )
 								.nest( f.spatial()
 										.within()
-										.onField( "copies.library.location" )
+										.field( "copies.library.location" )
 										.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
 								)
 						);
 					}
 					// Nested query + must loop
 					if ( libraryServices != null && !libraryServices.isEmpty() ) {
-						b.must( f.nested().onObjectField( "copies" )
+						b.must( f.nested().objectField( "copies" )
 								.nest( f.bool( b2 -> {
 									for ( LibraryServiceOption service : libraryServices ) {
 										b2.must( f.match()
-												.onField( "copies.library.services" )
+												.field( "copies.library.services" )
 												.matching( service )
 										);
 									}
@@ -143,8 +143,8 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		return Search.session( entityManager ).search( Document.class )
 				.asProjection( f -> f.field( "author", String.class ) )
 				.predicate( f -> f.match()
-						.onField( "title" ).boost( 2.0f )
-						.orField( "summary" )
+						.field( "title" ).boost( 2.0f )
+						.field( "summary" )
 						.matching( terms )
 				)
 				.sort( b -> b.field( "author" ).order( order ) )

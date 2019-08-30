@@ -71,7 +71,7 @@ public class DslConverterIT {
 
 			// tag::dsl-converter-enabled[]
 			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
-					.predicate( f -> f.match().onField( "outcome" )
+					.predicate( f -> f.match().field( "outcome" )
 							.matching( AuthenticationOutcome.INVALID_PASSWORD ) )
 					.fetchHits();
 			// end::dsl-converter-enabled[]
@@ -89,7 +89,7 @@ public class DslConverterIT {
 
 			// tag::dsl-converter-disabled[]
 			List<AuthenticationEvent> result = searchSession.search( AuthenticationEvent.class )
-					.predicate( f -> f.match().onField( "outcome" )
+					.predicate( f -> f.match().field( "outcome" )
 							.matching( "Invalid password", ValueConvert.NO ) )
 					.fetchHits();
 			// end::dsl-converter-disabled[]

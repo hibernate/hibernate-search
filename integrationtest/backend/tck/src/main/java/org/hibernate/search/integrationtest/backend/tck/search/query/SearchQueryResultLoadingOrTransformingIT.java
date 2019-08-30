@@ -432,7 +432,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		assertEquals( 2L, query.fetchTotalHitCount() );
 
 		query = scope.query()
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
+				.predicate( f -> f.match().field( "string" ).matching( STRING_VALUE ) )
 				.toQuery();
 
 		assertEquals( 1L, query.fetchTotalHitCount() );
@@ -464,7 +464,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 		query = scope.query()
 				.asProjection( f -> f.field( "string", String.class ) )
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
+				.predicate( f -> f.match().field( "string" ).matching( STRING_VALUE ) )
 				.toQuery();
 
 		assertEquals( 1L, query.fetchTotalHitCount() );

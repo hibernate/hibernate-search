@@ -106,7 +106,7 @@ public class GettingStartedWithoutAnalysisIT {
 
 			SearchResult<Book> result = scope.search() // <3>
 					.predicate( scope.predicate().match() // <4>
-							.onFields( "title", "authors.name" )
+							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 							.toPredicate()
 					)
@@ -120,7 +120,7 @@ public class GettingStartedWithoutAnalysisIT {
 			// end::searching-objects[]
 					scope.search()
 					.predicate( scope.predicate().match()
-							.onFields( "title", "authors.name" )
+							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 							.toPredicate()
 					)
@@ -143,7 +143,7 @@ public class GettingStartedWithoutAnalysisIT {
 
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
 					.predicate( f -> f.match() // <3>
-							.onFields( "title", "authors.name" )
+							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
 					.fetch(); // <4>
@@ -156,7 +156,7 @@ public class GettingStartedWithoutAnalysisIT {
 			// end::searching-lambdas[]
 					searchSession.search( Book.class )
 							.predicate( f -> f.match()
-									.onFields( "title", "authors.name" )
+									.fields( "title", "authors.name" )
 									.matching( "Refactoring: Improving the Design of Existing Code" )
 							)
 			// tag::searching-lambdas[]
@@ -178,7 +178,7 @@ public class GettingStartedWithoutAnalysisIT {
 
 			long totalHitCount = searchSession.search( Book.class )
 					.predicate( f -> f.match()
-							.onFields( "title", "authors.name" )
+							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
 					.fetchTotalHitCount(); // <1>

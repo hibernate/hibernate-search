@@ -80,7 +80,7 @@ public class SearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
+				.predicate( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
 		assertThat( query )
@@ -91,7 +91,7 @@ public class SearchPredicateIT {
 	public void match_search_predicate() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SearchPredicate predicate = scope.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( predicate )
@@ -106,7 +106,7 @@ public class SearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
+				.predicate( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
 		assertThat( query )
@@ -117,7 +117,7 @@ public class SearchPredicateIT {
 	public void reuseRootPredicateInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchPredicate predicate = scope
-				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( predicate )
@@ -141,7 +141,7 @@ public class SearchPredicateIT {
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		predicate = indexManager.createScope( anotherIndexManager )
-				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		// reuse the same predicate instance on a different scope,
 		// targeting same indexes
@@ -156,7 +156,7 @@ public class SearchPredicateIT {
 	public void reuseRootPredicateInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchPredicate predicate = scope
-				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		// reuse the same predicate instance on a different scope,
 		// targeting a different index
@@ -187,7 +187,7 @@ public class SearchPredicateIT {
 	public void reuseNonRootPredicateInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = indexManager.createScope();
 		final SearchPredicate predicate = scope
-				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool().must( predicate ) )
@@ -211,7 +211,7 @@ public class SearchPredicateIT {
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		final SearchPredicate multiIndexScopedPredicate = indexManager.createScope( anotherIndexManager )
-				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		// reuse the same predicate instance on a different scope,
 		// targeting same indexes
@@ -224,7 +224,7 @@ public class SearchPredicateIT {
 		query = anotherIndexManager.createScope( indexManager ).query()
 				.predicate( f -> f.bool()
 						.should( multiIndexScopedPredicate )
-						.should( f.match().onField( "string" ).matching( STRING_2 ) )
+						.should( f.match().field( "string" ).matching( STRING_2 ) )
 				)
 				.toQuery();
 
@@ -235,7 +235,7 @@ public class SearchPredicateIT {
 	public void reuseNonRootPredicateInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchPredicate predicate = scope
-				.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		// reuse the same predicate instance on a different scope,
 		// targeting a different index
@@ -331,7 +331,7 @@ public class SearchPredicateIT {
 								shouldNotBeCalled()
 						)
 						.orElse(
-								c -> c.match().onField( "string" ).matching( STRING_1 )
+								c -> c.match().field( "string" ).matching( STRING_1 )
 						)
 				)
 				.toQuery();
@@ -401,7 +401,7 @@ public class SearchPredicateIT {
 		}
 
 		public PredicateFinalStep extendedPredicate(String fieldName, String value) {
-			return delegate.match().onField( fieldName ).matching( value );
+			return delegate.match().field( fieldName ).matching( value );
 		}
 	}
 }

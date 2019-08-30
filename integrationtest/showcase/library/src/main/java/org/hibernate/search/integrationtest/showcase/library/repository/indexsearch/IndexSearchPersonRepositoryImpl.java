@@ -42,7 +42,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 		}
 
 		return Search.session( entityManager ).search( Person.class )
-				.predicate( f -> f.match().onFields( "firstName", "lastName" ).matching( terms ) )
+				.predicate( f -> f.match().fields( "firstName", "lastName" ).matching( terms ) )
 				.sort( f -> f.field( "lastName_sort" )
 						.then().field( "firstName_sort" )
 				)

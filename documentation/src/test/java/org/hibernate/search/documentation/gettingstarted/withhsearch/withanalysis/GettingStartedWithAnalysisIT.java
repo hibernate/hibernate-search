@@ -80,7 +80,7 @@ public class GettingStartedWithAnalysisIT {
 
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.predicate( factory -> factory.match()
-							.onFields( "title", "authors.name" )
+							.fields( "title", "authors.name" )
 							.matching( "refactor" )
 					)
 					.fetch();
@@ -98,7 +98,7 @@ public class GettingStartedWithAnalysisIT {
 			for ( String term : new String[] { "Refactor", "refactors", "refactored", "refactoring" } ) {
 				SearchResult<Book> result = searchSession.search( Book.class )
 						.predicate( factory -> factory.match()
-								.onFields( "title", "authors.name" )
+								.fields( "title", "authors.name" )
 								.matching( term )
 						)
 						.fetch();

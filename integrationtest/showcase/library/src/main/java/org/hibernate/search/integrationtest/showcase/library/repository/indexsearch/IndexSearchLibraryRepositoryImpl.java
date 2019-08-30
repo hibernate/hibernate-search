@@ -33,7 +33,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 		}
 		return Search.session( entityManager )
 				.search( Library.class )
-				.predicate( f -> f.match().onField( "name" ).matching( terms ) )
+				.predicate( f -> f.match().field( "name" ).matching( terms ) )
 				.sort( f -> f.field( "collectionSize" ).desc()
 						.then().field( "name_sort" )
 				)
@@ -52,18 +52,18 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
-								.onField( "name" )
+								.field( "name" )
 								.matching( terms )
 						);
 					}
 					if ( minCollectionSize != null ) {
-						b.must( f.range().onField( "collectionSize" ).above( minCollectionSize ) );
+						b.must( f.range().field( "collectionSize" ).above( minCollectionSize ) );
 					}
 					// Nested query + must loop
 					if ( libraryServices != null && !libraryServices.isEmpty() ) {
 							for ( LibraryServiceOption service : libraryServices ) {
 								b.must( f.match()
-										.onField( "services" )
+										.field( "services" )
 										.matching( service )
 								);
 							}

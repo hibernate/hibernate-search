@@ -75,7 +75,7 @@ public class QueryDslIT {
 
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
 					.predicate( f -> f.match() // <3>
-							.onField( "title" )
+							.field( "title" )
 							.matching( "robot" ) )
 					.fetch(); // <4>
 
@@ -105,7 +105,7 @@ public class QueryDslIT {
 							EntityLoadingCacheLookupStrategy.PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE
 					) // <2>
 					.predicate( f -> f.match()
-							.onField( "title" )
+							.field( "title" )
 							.matching( "robot" ) )
 					.fetch(); // <3>
 			// end::cacheLookupStrategy-persistenceContextThenSecondLevelCache[]
@@ -125,7 +125,7 @@ public class QueryDslIT {
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
 					.fetchSize( 50 ) // <2>
 					.predicate( f -> f.match()
-							.onField( "title" )
+							.field( "title" )
 							.matching( "robot" ) )
 					.fetch(); // <3>
 			// end::fetchSize[]

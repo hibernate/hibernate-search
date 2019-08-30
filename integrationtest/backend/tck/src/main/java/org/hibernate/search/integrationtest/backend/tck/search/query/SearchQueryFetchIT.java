@@ -271,20 +271,20 @@ public class SearchQueryFetchIT {
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchFirstHalfQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( f -> f.range().onField( "integer" ).below( DOCUMENT_COUNT / 2 ).excludeLimit() )
+				.predicate( f -> f.range().field( "integer" ).below( DOCUMENT_COUNT / 2 ).excludeLimit() )
 				.sort( f -> f.field( "integer" ).asc() );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchOneQuery(int id) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( f -> f.match().onField( "integer" ).matching( id ) );
+				.predicate( f -> f.match().field( "integer" ).matching( id ) );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchNoneQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( f -> f.match().onField( "integer" ).matching( DOCUMENT_COUNT + 2 ) );
+				.predicate( f -> f.match().field( "integer" ).matching( DOCUMENT_COUNT + 2 ) );
 	}
 
 	private void initData() {

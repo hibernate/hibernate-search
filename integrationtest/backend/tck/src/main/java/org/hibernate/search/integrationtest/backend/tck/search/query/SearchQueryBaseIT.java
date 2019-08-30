@@ -71,7 +71,7 @@ public class SearchQueryBaseIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
+				.predicate( f -> f.match().field( "string" ).matching( "platypus" ) )
 				.toQuery();
 
 		assertThat( query.getQueryString() ).contains( "platypus" );
@@ -223,8 +223,8 @@ public class SearchQueryBaseIT {
 
 		public SearchQuery<T> extendedFeature(String fieldName, String value1, String value2) {
 			return delegate.predicate( f -> f.bool()
-					.should( f.match().onField( fieldName ).matching( value1 ) )
-					.should( f.match().onField( fieldName ).matching( value2 ) )
+					.should( f.match().field( fieldName ).matching( value1 ) )
+					.should( f.match().field( fieldName ).matching( value2 ) )
 			)
 					.sort( f -> f.field( fieldName ) )
 					.toQuery();

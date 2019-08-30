@@ -122,10 +122,10 @@ public class ObjectFieldStorageIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "flattenedObject.string" ).matching( MATCHING_STRING ) )
-						.must( f.match().onField( "flattenedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ) )
-						.must( f.match().onField( "flattenedObject.integer" ).matching( MATCHING_INTEGER ) )
-						.must( f.match().onField( "flattenedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
+						.must( f.match().field( "flattenedObject.string" ).matching( MATCHING_STRING ) )
+						.must( f.match().field( "flattenedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ) )
+						.must( f.match().field( "flattenedObject.integer" ).matching( MATCHING_INTEGER ) )
+						.must( f.match().field( "flattenedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
 				)
 				.toQuery();
 		assertThat( query )
@@ -133,12 +133,12 @@ public class ObjectFieldStorageIT {
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+				.predicate( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
-								.must( f.match().onField( "nestedObject.string" ).matching( MATCHING_STRING ) )
-								.must( f.match().onField( "nestedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ) )
-								.must( f.match().onField( "nestedObject.integer" ).matching( MATCHING_INTEGER ) )
-								.must( f.match().onField( "nestedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
+								.must( f.match().field( "nestedObject.string" ).matching( MATCHING_STRING ) )
+								.must( f.match().field( "nestedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ) )
+								.must( f.match().field( "nestedObject.integer" ).matching( MATCHING_INTEGER ) )
+								.must( f.match().field( "nestedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
 						)
 				)
 				.toQuery();
@@ -153,13 +153,13 @@ public class ObjectFieldStorageIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
-						.must( f.range().onField( "flattenedObject.string" )
+						.must( f.range().field( "flattenedObject.string" )
 								.from( MATCHING_STRING ).to( MATCHING_STRING )
 						)
-						.must( f.range().onField( "flattenedObject.integer" )
+						.must( f.range().field( "flattenedObject.integer" )
 								.from( MATCHING_INTEGER - 1 ).to( MATCHING_INTEGER + 1 )
 						)
-						.must( f.range().onField( "flattenedObject.localDate" )
+						.must( f.range().field( "flattenedObject.localDate" )
 								.from( MATCHING_LOCAL_DATE.minusDays( 1 ) ).to( MATCHING_LOCAL_DATE.plusDays( 1 ) )
 						)
 				)
@@ -169,15 +169,15 @@ public class ObjectFieldStorageIT {
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+				.predicate( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
-								.must( f.range().onField( "nestedObject.string" )
+								.must( f.range().field( "nestedObject.string" )
 										.from( MATCHING_STRING ).to( MATCHING_STRING )
 								)
-								.must( f.range().onField( "nestedObject.integer" )
+								.must( f.range().field( "nestedObject.integer" )
 										.from( MATCHING_INTEGER - 1 ).to( MATCHING_INTEGER + 1 )
 								)
-								.must( f.range().onField( "nestedObject.localDate" )
+								.must( f.range().field( "nestedObject.localDate" )
 										.from( MATCHING_LOCAL_DATE.minusDays( 1 ) )
 										.to( MATCHING_LOCAL_DATE.plusDays( 1 ) )
 								)
@@ -196,7 +196,7 @@ public class ObjectFieldStorageIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "'flattenedObject'" );
 		thrown.expectMessage( "is not stored as nested" );
-		scope.predicate().nested().onObjectField( "flattenedObject" );
+		scope.predicate().nested().objectField( "flattenedObject" );
 	}
 
 	@Test
@@ -206,7 +206,7 @@ public class ObjectFieldStorageIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "'flattenedObject.string'" );
 		thrown.expectMessage( "is not an object field" );
-		scope.predicate().nested().onObjectField( "flattenedObject.string" );
+		scope.predicate().nested().objectField( "flattenedObject.string" );
 	}
 
 	@Test
@@ -216,7 +216,7 @@ public class ObjectFieldStorageIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "'doesNotExist'" );
-		scope.predicate().nested().onObjectField( "doesNotExist" );
+		scope.predicate().nested().objectField( "doesNotExist" );
 	}
 
 	private void initData() {

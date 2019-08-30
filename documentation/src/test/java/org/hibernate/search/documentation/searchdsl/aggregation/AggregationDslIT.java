@@ -80,7 +80,7 @@ public class AggregationDslIT {
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" ); // <1>
 
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
-					.predicate( f -> f.match().onField( "title" ) // <3>
+					.predicate( f -> f.match().field( "title" ) // <3>
 							.matching( "robot" ) )
 					.aggregation( countsByGenreKey, f -> f.terms() // <4>
 							.field( "genre", Genre.class ) )
@@ -103,7 +103,7 @@ public class AggregationDslIT {
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( scope.predicate().match().onField( "title" )
+					.predicate( scope.predicate().match().field( "title" )
 							.matching( "robot" )
 							.toPredicate() )
 					.aggregation( countsByGenreKey, scope.aggregation().terms()
