@@ -24,15 +24,25 @@ public interface MatchPredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
+	default MatchPredicateFieldMoreStep field(String absoluteFieldPath) {
+		return fields( absoluteFieldPath );
+	}
+
+	/**
+	 * @deprecated Use {@link #field(String)} instead.
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return The next step.
+	 */
+	@Deprecated
 	default MatchPredicateFieldMoreStep onField(String absoluteFieldPath) {
-		return onFields( absoluteFieldPath );
+		return field( absoluteFieldPath );
 	}
 
 	/**
 	 * Target the given fields in the match predicate.
 	 * <p>
-	 * Equivalent to {@link #onField(String)} followed by multiple calls to
-	 * {@link MatchPredicateFieldMoreStep#orField(String)},
+	 * Equivalent to {@link #field(String)} followed by multiple calls to
+	 * {@link MatchPredicateFieldMoreStep#field(String)},
 	 * the only difference being that calls to {@link MatchPredicateFieldMoreStep#boost(float)}
 	 * and other field-specific settings on the returned step will only need to be done once
 	 * and will apply to all the fields passed to this method.
@@ -40,7 +50,17 @@ public interface MatchPredicateFieldStep {
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return The next step.
 	 *
-	 * @see #onField(String)
+	 * @see #field(String)
 	 */
-	MatchPredicateFieldMoreStep onFields(String ... absoluteFieldPaths);
+	MatchPredicateFieldMoreStep fields(String ... absoluteFieldPaths);
+
+	/**
+	 * @deprecated Use {@link #fields(String...)} instead.
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default MatchPredicateFieldMoreStep onFields(String ... absoluteFieldPaths) {
+		return fields( absoluteFieldPaths );
+	}
 }

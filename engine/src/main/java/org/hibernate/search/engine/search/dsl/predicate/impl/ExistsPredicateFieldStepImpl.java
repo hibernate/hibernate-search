@@ -24,7 +24,7 @@ final class ExistsPredicateFieldStepImpl<B>
 	}
 
 	@Override
-	public ExistsPredicateOptionsStep onField(String absoluteFieldPath) {
+	public ExistsPredicateOptionsStep field(String absoluteFieldPath) {
 		this.builder = builderFactory.exists( absoluteFieldPath );
 		return this;
 	}

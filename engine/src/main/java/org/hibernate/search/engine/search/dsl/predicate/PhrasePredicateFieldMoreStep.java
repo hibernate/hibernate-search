@@ -21,15 +21,25 @@ public interface PhrasePredicateFieldMoreStep
 	 * <p>
 	 * Only text fields are supported.
 	 * <p>
-	 * See {@link PhrasePredicateFieldStep#onField(String)} for more information on targeted fields.
+	 * See {@link PhrasePredicateFieldStep#field(String)} for more information on targeted fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 *
-	 * @see PhrasePredicateFieldStep#onField(String)
+	 * @see PhrasePredicateFieldStep#field(String)
 	 */
+	default PhrasePredicateFieldMoreStep field(String absoluteFieldPath) {
+		return fields( absoluteFieldPath );
+	}
+
+	/**
+	 * @deprecated Use {@link #field(String)} instead.
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return The next step.
+	 */
+	@Deprecated
 	default PhrasePredicateFieldMoreStep orField(String absoluteFieldPath) {
-		return orFields( absoluteFieldPath );
+		return field( absoluteFieldPath );
 	}
 
 	/**
@@ -38,13 +48,23 @@ public interface PhrasePredicateFieldMoreStep
 	 * <p>
 	 * Only text fields are supported.
 	 * <p>
-	 * See {@link PhrasePredicateFieldStep#onFields(String...)} for more information on targeted fields.
+	 * See {@link PhrasePredicateFieldStep#fields(String...)} for more information on targeted fields.
 	 *
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return The next step.
 	 *
-	 * @see PhrasePredicateFieldStep#onFields(String...)
+	 * @see PhrasePredicateFieldStep#fields(String...)
 	 */
-	PhrasePredicateFieldMoreStep orFields(String... absoluteFieldPaths);
+	PhrasePredicateFieldMoreStep fields(String... absoluteFieldPaths);
+
+	/**
+	 * @deprecated Use {@link #fields(String...)} instead.
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default PhrasePredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+		return fields( absoluteFieldPaths );
+	}
 
 }

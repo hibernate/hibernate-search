@@ -22,7 +22,7 @@ class WildcardPredicateFieldStepImpl<B> implements WildcardPredicateFieldStep {
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStep onFields(String ... absoluteFieldPaths) {
+	public WildcardPredicateFieldMoreStep fields(String ... absoluteFieldPaths) {
 		return new WildcardPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

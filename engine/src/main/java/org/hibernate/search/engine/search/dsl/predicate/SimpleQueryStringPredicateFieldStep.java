@@ -25,8 +25,18 @@ public interface SimpleQueryStringPredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
+	default SimpleQueryStringPredicateFieldMoreStep field(String absoluteFieldPath) {
+		return fields( absoluteFieldPath );
+	}
+
+	/**
+	 * @deprecated Use {@link #field(String)} instead.
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return The next step.
+	 */
+	@Deprecated
 	default SimpleQueryStringPredicateFieldMoreStep onField(String absoluteFieldPath) {
-		return onFields( absoluteFieldPath );
+		return field( absoluteFieldPath );
 	}
 
 	/**
@@ -34,8 +44,8 @@ public interface SimpleQueryStringPredicateFieldStep {
 	 * <p>
 	 * Only text fields are supported.
 	 * <p>
-	 * Equivalent to {@link #onField(String)} followed by multiple calls to
-	 * {@link SimpleQueryStringPredicateFieldMoreStep#orField(String)},
+	 * Equivalent to {@link #field(String)} followed by multiple calls to
+	 * {@link SimpleQueryStringPredicateFieldMoreStep#field(String)},
 	 * the only difference being that calls to {@link SimpleQueryStringPredicateFieldMoreStep#boost(float)}
 	 * and other field-specific settings on the returned step will only need to be done once
 	 * and will apply to all the fields passed to this method.
@@ -43,8 +53,18 @@ public interface SimpleQueryStringPredicateFieldStep {
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return The next step.
 	 *
-	 * @see #onField(String)
+	 * @see #field(String)
 	 */
-	SimpleQueryStringPredicateFieldMoreStep onFields(String... absoluteFieldPaths);
+	SimpleQueryStringPredicateFieldMoreStep fields(String... absoluteFieldPaths);
+
+	/**
+	 * @deprecated Use {@link #fields(String...)} instead.
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default SimpleQueryStringPredicateFieldMoreStep onFields(String... absoluteFieldPaths) {
+		return fields( absoluteFieldPaths );
+	}
 
 }

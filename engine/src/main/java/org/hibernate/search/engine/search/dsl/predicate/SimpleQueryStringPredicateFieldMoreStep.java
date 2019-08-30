@@ -22,15 +22,25 @@ public interface SimpleQueryStringPredicateFieldMoreStep
 	 * <p>
 	 * Only text fields are supported.
 	 * <p>
-	 * See {@link SimpleQueryStringPredicateFieldStep#onField(String)} for more information on targeted fields.
+	 * See {@link SimpleQueryStringPredicateFieldStep#field(String)} for more information on targeted fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 *
-	 * @see SimpleQueryStringPredicateFieldStep#onField(String)
+	 * @see SimpleQueryStringPredicateFieldStep#field(String)
 	 */
+	default SimpleQueryStringPredicateFieldMoreStep field(String absoluteFieldPath) {
+		return fields( absoluteFieldPath );
+	}
+
+	/**
+	 * @deprecated Use {@link #field(String)} instead.
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return The next step.
+	 */
+	@Deprecated
 	default SimpleQueryStringPredicateFieldMoreStep orField(String absoluteFieldPath) {
-		return orFields( absoluteFieldPath );
+		return field( absoluteFieldPath );
 	}
 
 	/**
@@ -39,13 +49,23 @@ public interface SimpleQueryStringPredicateFieldMoreStep
 	 * <p>
 	 * Only text fields are supported.
 	 * <p>
-	 * See {@link SimpleQueryStringPredicateFieldStep#onFields(String...)} for more information on targeted fields.
+	 * See {@link SimpleQueryStringPredicateFieldStep#fields(String...)} for more information on targeted fields.
 	 *
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return The next step.
 	 *
-	 * @see SimpleQueryStringPredicateFieldStep#onFields(String...)
+	 * @see SimpleQueryStringPredicateFieldStep#fields(String...)
 	 */
-	SimpleQueryStringPredicateFieldMoreStep orFields(String... absoluteFieldPaths);
+	SimpleQueryStringPredicateFieldMoreStep fields(String... absoluteFieldPaths);
+
+	/**
+	 * @deprecated Use {@link #fields(String...)} instead.
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default SimpleQueryStringPredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+		return fields( absoluteFieldPaths );
+	}
 
 }

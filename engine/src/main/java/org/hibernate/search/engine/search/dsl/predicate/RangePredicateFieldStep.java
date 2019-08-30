@@ -24,15 +24,25 @@ public interface RangePredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
+	default RangePredicateFieldMoreStep field(String absoluteFieldPath) {
+		return fields( absoluteFieldPath );
+	}
+
+	/**
+	 * @deprecated Use {@link #field(String)} instead.
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return The next step.
+	 */
+	@Deprecated
 	default RangePredicateFieldMoreStep onField(String absoluteFieldPath) {
-		return onFields( absoluteFieldPath );
+		return field( absoluteFieldPath );
 	}
 
 	/**
 	 * Target the given fields in the range predicate.
 	 * <p>
-	 * Equivalent to {@link #onField(String)} followed by multiple calls to
-	 * {@link RangePredicateFieldMoreStep#orField(String)},
+	 * Equivalent to {@link #field(String)} followed by multiple calls to
+	 * {@link RangePredicateFieldMoreStep#field(String)},
 	 * the only difference being that calls to {@link RangePredicateFieldMoreStep#boost(float)}
 	 * and other field-specific settings on the returned step will only need to be done once
 	 * and will apply to all the fields passed to this method.
@@ -40,7 +50,17 @@ public interface RangePredicateFieldStep {
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return The next step.
 	 *
-	 * @see #onField(String)
+	 * @see #field(String)
 	 */
-	RangePredicateFieldMoreStep onFields(String ... absoluteFieldPaths);
+	RangePredicateFieldMoreStep fields(String ... absoluteFieldPaths);
+
+	/**
+	 * @deprecated Use {@link #fields(String...)} instead.
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default RangePredicateFieldMoreStep onFields(String ... absoluteFieldPaths) {
+		return fields( absoluteFieldPaths );
+	}
 }

@@ -22,7 +22,7 @@ class SimpleQueryStringPredicateFieldStepImpl<B> implements SimpleQueryStringPre
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStep onFields(String ... absoluteFieldPaths) {
+	public SimpleQueryStringPredicateFieldMoreStep fields(String ... absoluteFieldPaths) {
 		return new SimpleQueryStringPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

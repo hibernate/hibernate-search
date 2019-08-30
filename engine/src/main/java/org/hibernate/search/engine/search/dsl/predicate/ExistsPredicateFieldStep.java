@@ -18,6 +18,16 @@ public interface ExistsPredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
-	ExistsPredicateOptionsStep onField(String absoluteFieldPath);
+	ExistsPredicateOptionsStep field(String absoluteFieldPath);
+
+	/**
+	 * @deprecated Use {@link #field(String)} instead.
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default ExistsPredicateOptionsStep onField(String absoluteFieldPath) {
+		return field( absoluteFieldPath );
+	}
 
 }

@@ -47,7 +47,7 @@ class RangePredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public RangePredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+	public RangePredicateFieldMoreStep fields(String... absoluteFieldPaths) {
 		return new RangePredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 

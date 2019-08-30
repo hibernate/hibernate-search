@@ -45,7 +45,7 @@ class SpatialWithinPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public SpatialWithinPredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+	public SpatialWithinPredicateFieldMoreStep fields(String... absoluteFieldPaths) {
 		return new SpatialWithinPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 

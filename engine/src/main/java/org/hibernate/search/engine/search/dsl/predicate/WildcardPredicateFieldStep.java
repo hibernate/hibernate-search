@@ -25,8 +25,18 @@ public interface WildcardPredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
+	default WildcardPredicateFieldMoreStep field(String absoluteFieldPath) {
+		return fields( absoluteFieldPath );
+	}
+
+	/**
+	 * @deprecated Use {@link #field(String)} instead.
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return The next step.
+	 */
+	@Deprecated
 	default WildcardPredicateFieldMoreStep onField(String absoluteFieldPath) {
-		return onFields( absoluteFieldPath );
+		return field( absoluteFieldPath );
 	}
 
 	/**
@@ -34,8 +44,8 @@ public interface WildcardPredicateFieldStep {
 	 * <p>
 	 * Only text fields are supported.
 	 * <p>
-	 * Equivalent to {@link #onField(String)} followed by multiple calls to
-	 * {@link WildcardPredicateFieldMoreStep#orField(String)},
+	 * Equivalent to {@link #field(String)} followed by multiple calls to
+	 * {@link WildcardPredicateFieldMoreStep#field(String)},
 	 * the only difference being that calls to {@link WildcardPredicateFieldMoreStep#boost(float)}
 	 * and other field-specific settings on the returned step will only need to be done once
 	 * and will apply to all the fields passed to this method.
@@ -43,8 +53,18 @@ public interface WildcardPredicateFieldStep {
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return The next step.
 	 *
-	 * @see #onField(String)
+	 * @see #field(String)
 	 */
-	WildcardPredicateFieldMoreStep onFields(String... absoluteFieldPaths);
+	WildcardPredicateFieldMoreStep fields(String... absoluteFieldPaths);
+
+	/**
+	 * @deprecated Use {@link #fields(String...)} instead.
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default WildcardPredicateFieldMoreStep onFields(String... absoluteFieldPaths) {
+		return fields( absoluteFieldPaths );
+	}
 
 }

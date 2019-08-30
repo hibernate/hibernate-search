@@ -43,7 +43,7 @@ class PhrasePredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public PhrasePredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+	public PhrasePredicateFieldMoreStep fields(String... absoluteFieldPaths) {
 		return new PhrasePredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
