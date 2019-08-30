@@ -164,7 +164,7 @@ public class ExistsSearchPredicateIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
 						.should( f.exists().onField( indexMapping.string1Field.relativeFieldName ) )
-						.should( f.exists().onField( indexMapping.string2Field.relativeFieldName ).boostedTo( 7 ) )
+						.should( f.exists().onField( indexMapping.string2Field.relativeFieldName ).boost( 7 ) )
 				)
 				.sort( f -> f.byScore() )
 				.toQuery();
@@ -174,7 +174,7 @@ public class ExistsSearchPredicateIT {
 
 		query = scope.query()
 				.predicate( f -> f.bool()
-						.should( f.exists().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 39 ) )
+						.should( f.exists().onField( indexMapping.string1Field.relativeFieldName ).boost( 39 ) )
 						.should( f.exists().onField( indexMapping.string2Field.relativeFieldName ) )
 				)
 				.sort( f -> f.byScore() )

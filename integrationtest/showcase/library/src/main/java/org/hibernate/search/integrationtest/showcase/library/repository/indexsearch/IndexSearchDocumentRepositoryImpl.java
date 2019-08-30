@@ -64,7 +64,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				.predicate( f -> f.bool( b -> {
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
-								.onField( "title" ).boostedTo( 2.0f )
+								.onField( "title" ).boost( 2.0f )
 								.orField( "summary" )
 								.matching( terms )
 						);
@@ -87,7 +87,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
-								.onField( "title" ).boostedTo( 2.0f )
+								.onField( "title" ).boost( 2.0f )
 								.orField( "summary" )
 								.matching( terms )
 						);
@@ -143,7 +143,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		return Search.session( entityManager ).search( Document.class )
 				.asProjection( f -> f.field( "author", String.class ) )
 				.predicate( f -> f.match()
-						.onField( "title" ).boostedTo( 2.0f )
+						.onField( "title" ).boost( 2.0f )
 						.orField( "summary" )
 						.matching( terms )
 				)

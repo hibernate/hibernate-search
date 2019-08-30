@@ -385,7 +385,7 @@ public class BoolSearchPredicateIT {
 	}
 
 	@Test
-	public void withConstantScore() {
+	public void constantScore() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -394,7 +394,7 @@ public class BoolSearchPredicateIT {
 						.should( f.bool().must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
 
 						// withConstantScore 0.287682 => 1
-						.should( f.bool().withConstantScore().must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
+						.should( f.bool().constantScore().must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
 				.sort( f -> f.byScore() )
 				.toQuery();
@@ -405,7 +405,7 @@ public class BoolSearchPredicateIT {
 		query = scope.query()
 				.predicate( f -> f.bool()
 						// withConstantScore 0.287682 => 1
-						.should( f.bool().withConstantScore().must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
+						.should( f.bool().constantScore().must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
 
 						// 0.287682
 						.should( f.bool().must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
@@ -423,8 +423,8 @@ public class BoolSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
-						.should( f.bool().withConstantScore().boostedTo( 7 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
-						.should( f.bool().withConstantScore().boostedTo( 39 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
+						.should( f.bool().constantScore().boost( 7 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
+						.should( f.bool().constantScore().boost( 39 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
 				.sort( f -> f.byScore() )
 				.toQuery();
@@ -434,8 +434,8 @@ public class BoolSearchPredicateIT {
 
 		query = scope.query()
 				.predicate( f -> f.bool()
-						.should( f.bool().withConstantScore().boostedTo( 39 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
-						.should( f.bool().withConstantScore().boostedTo( 7 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
+						.should( f.bool().constantScore().boost( 39 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
+						.should( f.bool().constantScore().boost( 7 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
 				.sort( f -> f.byScore() )
 				.toQuery();
