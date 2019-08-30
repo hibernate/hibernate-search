@@ -78,7 +78,7 @@ public class NestedDocumentDistanceProjectionIT {
 		List<Double> hits = scope.query()
 				.asProjection( f -> f.distance( "flattened.geoPoint", METRO_GARIBALDI ) )
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.byField( "ordinal" ).desc() )
+				.sort( f -> f.field( "ordinal" ).desc() )
 				.fetchHits();
 
 		assertEquals( hits.size(), 3 );
@@ -93,7 +93,7 @@ public class NestedDocumentDistanceProjectionIT {
 		List<Double> hits = scope.query()
 				.asProjection( f -> f.distance( "nested.geoPoint", METRO_GARIBALDI ) )
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.byField( "ordinal" ).desc() )
+				.sort( f -> f.field( "ordinal" ).desc() )
 				.fetchHits();
 
 		assertEquals( hits.size(), 3 );

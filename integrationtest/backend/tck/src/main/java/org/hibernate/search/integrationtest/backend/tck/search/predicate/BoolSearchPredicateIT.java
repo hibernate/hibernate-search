@@ -396,7 +396,7 @@ public class BoolSearchPredicateIT {
 						// withConstantScore 0.287682 => 1
 						.should( f.bool().constantScore().must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -410,7 +410,7 @@ public class BoolSearchPredicateIT {
 						// 0.287682
 						.should( f.bool().must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -426,7 +426,7 @@ public class BoolSearchPredicateIT {
 						.should( f.bool().constantScore().boost( 7 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
 						.should( f.bool().constantScore().boost( 39 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -437,7 +437,7 @@ public class BoolSearchPredicateIT {
 						.should( f.bool().constantScore().boost( 39 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
 						.should( f.bool().constantScore().boost( 7 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )

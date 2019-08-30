@@ -131,7 +131,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.byField( "sortField" ).asc() )
+				.sort( f -> f.field( "sortField" ).asc() )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -142,7 +142,7 @@ public class SearchMultiIndexIT {
 
 		query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.byField( "sortField" ).desc() )
+				.sort( f -> f.field( "sortField" ).desc() )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -222,7 +222,7 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"sort on unknown field with multiple targeted indexes",
-				() -> scope.sort().byField( "unknownField" )
+				() -> scope.sort().field( "unknownField" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -275,7 +275,7 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"sort on field with different type among the targeted indexes",
-				() -> scope.sort().byField( "differentTypesField" )
+				() -> scope.sort().field( "differentTypesField" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

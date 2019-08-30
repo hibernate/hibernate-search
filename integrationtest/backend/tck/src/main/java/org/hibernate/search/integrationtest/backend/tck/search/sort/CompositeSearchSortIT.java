@@ -67,30 +67,30 @@ public class CompositeSearchSortIT {
 	public void byComposite() {
 		SearchQuery<DocumentReference> query;
 
-		query = simpleQuery( f -> f.byComposite( c -> {
-			c.add( f.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() );
-			c.add( f.byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc() );
+		query = simpleQuery( f -> f.composite( c -> {
+			c.add( f.field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() );
+			c.add( f.field( indexMapping.identicalForLastTwo.relativeFieldName ).asc() );
 		} ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
-		query = simpleQuery( f -> f.byComposite( c -> {
-			c.add( f.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() );
-			c.add( f.byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc() );
+		query = simpleQuery( f -> f.composite( c -> {
+			c.add( f.field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() );
+			c.add( f.field( indexMapping.identicalForLastTwo.relativeFieldName ).desc() );
 		} ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
-		query = simpleQuery( f -> f.byComposite( c -> {
-			c.add( f.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() );
-			c.add( f.byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc() );
+		query = simpleQuery( f -> f.composite( c -> {
+			c.add( f.field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() );
+			c.add( f.field( indexMapping.identicalForLastTwo.relativeFieldName ).desc() );
 		} ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
 
-		query = simpleQuery( f -> f.byComposite( c -> {
-			c.add( f.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() );
-			c.add( f.byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc() );
+		query = simpleQuery( f -> f.composite( c -> {
+			c.add( f.field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() );
+			c.add( f.field( indexMapping.identicalForLastTwo.relativeFieldName ).asc() );
 		} ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
@@ -103,9 +103,9 @@ public class CompositeSearchSortIT {
 
 		query = simpleQuery(
 				scope,
-				scope.sort().byComposite()
-						.add( scope.sort().byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() )
-						.add( scope.sort().byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc() )
+				scope.sort().composite()
+						.add( scope.sort().field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() )
+						.add( scope.sort().field( indexMapping.identicalForLastTwo.relativeFieldName ).asc() )
 						.toSort()
 		);
 		assertThat( query )
@@ -113,9 +113,9 @@ public class CompositeSearchSortIT {
 
 		query = simpleQuery(
 				scope,
-				scope.sort().byComposite()
-						.add( scope.sort().byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() )
-						.add( scope.sort().byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc() )
+				scope.sort().composite()
+						.add( scope.sort().field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() )
+						.add( scope.sort().field( indexMapping.identicalForLastTwo.relativeFieldName ).desc() )
 						.toSort()
 		);
 		assertThat( query )
@@ -123,9 +123,9 @@ public class CompositeSearchSortIT {
 
 		query = simpleQuery(
 				scope,
-				scope.sort().byComposite()
-						.add( scope.sort().byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() )
-						.add( scope.sort().byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc() )
+				scope.sort().composite()
+						.add( scope.sort().field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() )
+						.add( scope.sort().field( indexMapping.identicalForLastTwo.relativeFieldName ).desc() )
 						.toSort()
 		);
 		assertThat( query )
@@ -133,9 +133,9 @@ public class CompositeSearchSortIT {
 
 		query = simpleQuery(
 				scope,
-				scope.sort().byComposite()
-						.add( scope.sort().byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() )
-						.add( scope.sort().byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc() )
+				scope.sort().composite()
+						.add( scope.sort().field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() )
+						.add( scope.sort().field( indexMapping.identicalForLastTwo.relativeFieldName ).asc() )
 						.toSort()
 		);
 		assertThat( query )
@@ -146,7 +146,7 @@ public class CompositeSearchSortIT {
 	public void byComposite_empty() {
 		SearchQuery<DocumentReference> query;
 
-		query = simpleQuery( f -> f.byComposite() );
+		query = simpleQuery( f -> f.composite() );
 
 		// Just check that the query is executed (the empty sort is ignored and nothing fails)
 		assertThat( query )
@@ -158,29 +158,29 @@ public class CompositeSearchSortIT {
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( f -> f
-				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc()
-				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc()
+				.field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc()
+				.then().field( indexMapping.identicalForLastTwo.relativeFieldName ).asc()
 		);
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = simpleQuery( f -> f
-				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc()
-				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc()
+				.field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc()
+				.then().field( indexMapping.identicalForLastTwo.relativeFieldName ).desc()
 		);
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		query = simpleQuery( f -> f
-				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc()
-				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc()
+				.field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc()
+				.then().field( indexMapping.identicalForLastTwo.relativeFieldName ).desc()
 		);
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
 
 		query = simpleQuery( f -> f
-				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc()
-				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc()
+				.field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc()
+				.then().field( indexMapping.identicalForLastTwo.relativeFieldName ).asc()
 		);
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );

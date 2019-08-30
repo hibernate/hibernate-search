@@ -392,7 +392,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.sort( f -> f.byComposite().add( sort1 ).add( sort2 ).add( sort3 ) )
+				.sort( f -> f.composite().add( sort1 ).add( sort2 ).add( sort3 ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
@@ -440,7 +440,7 @@ public class LuceneExtensionIT {
 				"sort on unsupported native field",
 				() -> scope.query()
 						.predicate( f -> f.matchAll() )
-						.sort( f -> f.byField( "nativeField" ) )
+						.sort( f -> f.field( "nativeField" ) )
 						.toQuery()
 				)
 				.assertThrown()

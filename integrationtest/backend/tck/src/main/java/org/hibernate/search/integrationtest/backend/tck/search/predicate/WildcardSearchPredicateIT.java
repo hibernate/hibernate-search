@@ -258,7 +258,7 @@ public class WildcardSearchPredicateIT {
 						.orField( indexMapping.analyzedStringField2.relativeFieldName )
 						.matching( PATTERN_1 )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -270,7 +270,7 @@ public class WildcardSearchPredicateIT {
 						.orField( indexMapping.analyzedStringField2.relativeFieldName ).boost( 42 )
 						.matching( PATTERN_1 )
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -291,7 +291,7 @@ public class WildcardSearchPredicateIT {
 								.boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -307,7 +307,7 @@ public class WildcardSearchPredicateIT {
 								.matching( PATTERN_1 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )

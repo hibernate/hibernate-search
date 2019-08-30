@@ -135,7 +135,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -154,7 +154,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -179,7 +179,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -199,7 +199,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -224,7 +224,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -244,7 +244,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -269,7 +269,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -289,7 +289,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 								.constantScore().boost( 2 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )

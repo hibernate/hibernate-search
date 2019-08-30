@@ -110,7 +110,7 @@ public class SearchSortIT {
 		 * Thus we just test that the order stays the same over several calls.
 		 */
 
-		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byIndexOrder() );
+		SearchQuery<DocumentReference> query = simpleQuery( b -> b.indexOrder() );
 		SearchResult<DocumentReference> firstCallResult = query.fetch();
 		assertThat( firstCallResult ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
@@ -118,7 +118,7 @@ public class SearchSortIT {
 
 		for ( int i = 0; i < INDEX_ORDER_CHECKS; ++i ) {
 			// Rebuild the query to bypass any cache in the query object
-			query = simpleQuery( b -> b.byIndexOrder() );
+			query = simpleQuery( b -> b.indexOrder() );
 			assertThat( query ).hasHitsExactOrder( firstCallHits );
 		}
 	}
@@ -139,21 +139,21 @@ public class SearchSortIT {
 
 		query = scope.query()
 				.predicate( predicate )
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = scope.query()
 				.predicate( predicate )
-				.sort( f -> f.byScore().desc() )
+				.sort( f -> f.score().desc() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = scope.query()
 				.predicate( predicate )
-				.sort( f -> f.byScore().asc() )
+				.sort( f -> f.score().asc() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID );
@@ -165,7 +165,7 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query;
 
 		SearchSort sortAsc = scope.sort()
-				.byField( "string" ).asc().onMissingValue().sortLast()
+				.field( "string" ).asc().onMissingValue().sortLast()
 				.toSort();
 
 		query = scope.query()
@@ -176,7 +176,7 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		SearchSort sortDesc = scope.sort()
-				.byField( "string" ).desc().onMissingValue().sortLast()
+				.field( "string" ).desc().onMissingValue().sortLast()
 				.toSort();
 
 		query = scope.query()
@@ -191,7 +191,7 @@ public class SearchSortIT {
 	public void reuseSortInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchSort sort = scope
-				.sort().byField( "string" ).asc().onMissingValue().sortLast().toSort();
+				.sort().field( "string" ).asc().onMissingValue().sortLast().toSort();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
@@ -218,7 +218,7 @@ public class SearchSortIT {
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		sort = indexManager.createScope( anotherIndexManager )
-				.sort().byField( "string" ).asc().onMissingValue().sortLast().toSort();
+				.sort().field( "string" ).asc().onMissingValue().sortLast().toSort();
 
 		// reuse the same sort instance on a different scope,
 		// targeting same indexes
@@ -234,7 +234,7 @@ public class SearchSortIT {
 	public void reuseSortInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchSort sort = scope
-				.sort().byField( "string" ).asc().onMissingValue().sortLast().toSort();
+				.sort().field( "string" ).asc().onMissingValue().sortLast().toSort();
 
 		// reuse the same sort instance on a different scope,
 		// targeting a different index
@@ -265,15 +265,15 @@ public class SearchSortIT {
 
 	@Test
 	public void byDistance_asc() {
-		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
+		SearchQuery<DocumentReference> query = simpleQuery( b -> b.distance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
-		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ) );
+		query = simpleQuery( b -> b.distance( "geoPoint", 45.757864, 4.834496 ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
-		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ).asc() );
+		query = simpleQuery( b -> b.distance( "geoPoint", 45.757864, 4.834496 ).asc() );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 	}
@@ -286,12 +286,12 @@ public class SearchSortIT {
 		);
 
 		SearchQuery<DocumentReference> query = simpleQuery(
-				b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
+				b -> b.distance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
 		);
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
 
-		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ).desc() );
+		query = simpleQuery( b -> b.distance( "geoPoint", 45.757864, 4.834496 ).desc() );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
 	}
@@ -303,7 +303,7 @@ public class SearchSortIT {
 		thrown.expectMessage( "string" );
 
 		simpleQuery(
-				b -> b.byDistance( "string", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
+				b -> b.distance( "string", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
 		);
 	}
 
@@ -313,12 +313,12 @@ public class SearchSortIT {
 
 		// Mandatory extension, supported
 		query = simpleQuery( c -> c
-				.extension( new SupportedExtension() ).byField( "string" ).onMissingValue().sortLast()
+				.extension( new SupportedExtension() ).field( "string" ).onMissingValue().sortLast()
 		);
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
-				.extension( new SupportedExtension() ).byField( "string" ).desc().onMissingValue().sortLast()
+				.extension( new SupportedExtension() ).field( "string" ).desc().onMissingValue().sortLast()
 		);
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -335,7 +335,7 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).onMissingValue().sortLast()
+								c -> c.field( "string" ).onMissingValue().sortLast()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -349,7 +349,7 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).desc().onMissingValue().sortLast()
+								c -> c.field( "string" ).desc().onMissingValue().sortLast()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -369,7 +369,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).onMissingValue().sortLast()
+								c -> c.field( "string" ).onMissingValue().sortLast()
 						)
 						.orElse( ignored -> Assertions.fail( "This should not be called" ) )
 		);
@@ -383,7 +383,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).desc().onMissingValue().sortLast()
+								c -> c.field( "string" ).desc().onMissingValue().sortLast()
 						)
 						.orElse( ignored -> Assertions.fail( "This should not be called" ) )
 		);
@@ -402,7 +402,7 @@ public class SearchSortIT {
 								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.orElse(
-								c -> c.byField( "string" ).onMissingValue().sortLast()
+								c -> c.field( "string" ).onMissingValue().sortLast()
 						)
 		);
 		assertThat( query )
@@ -418,7 +418,7 @@ public class SearchSortIT {
 								ignored -> Assertions.fail( "This should not be called" )
 						)
 						.orElse(
-								c -> c.byField( "string" ).desc().onMissingValue().sortLast()
+								c -> c.field( "string" ).desc().onMissingValue().sortLast()
 						)
 		);
 	}

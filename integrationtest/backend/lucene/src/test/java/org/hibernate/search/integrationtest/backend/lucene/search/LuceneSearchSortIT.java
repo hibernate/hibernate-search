@@ -76,7 +76,7 @@ public class LuceneSearchSortIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH600043" );
 
-		simpleQuery( b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc() );
+		simpleQuery( b -> b.distance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc() );
 	}
 
 	private void initData() {

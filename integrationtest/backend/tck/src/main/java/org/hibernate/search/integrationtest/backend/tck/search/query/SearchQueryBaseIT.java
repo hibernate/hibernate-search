@@ -226,7 +226,7 @@ public class SearchQueryBaseIT {
 					.should( f.match().onField( fieldName ).matching( value1 ) )
 					.should( f.match().onField( fieldName ).matching( value2 ) )
 			)
-					.sort( f -> f.byField( fieldName ) )
+					.sort( f -> f.field( fieldName ) )
 					.toQuery();
 		}
 	}

@@ -73,8 +73,8 @@ public class HibernateOrmSimpleMappingIT {
 
 			List<Book> result = searchSession.search( Book.class ) // <1>
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byField( "pageCount" ).desc() // <2>
-							.then().byField( "title_sort" )
+					.sort( f -> f.field( "pageCount" ).desc() // <2>
+							.then().field( "title_sort" )
 					)
 					.fetchHits(); // <3>
 

@@ -441,7 +441,7 @@ public class RangeSearchPredicateIT {
 								.below( indexMapping.string1Field.document1Value.indexedValue )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -456,7 +456,7 @@ public class RangeSearchPredicateIT {
 								.below( indexMapping.string1Field.document1Value.indexedValue )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -477,7 +477,7 @@ public class RangeSearchPredicateIT {
 								.boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -493,7 +493,7 @@ public class RangeSearchPredicateIT {
 								.below( indexMapping.string1Field.document1Value.indexedValue )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -517,7 +517,7 @@ public class RangeSearchPredicateIT {
 								.boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -536,7 +536,7 @@ public class RangeSearchPredicateIT {
 								.boost( 3 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -560,7 +560,7 @@ public class RangeSearchPredicateIT {
 								.boost( 7 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
@@ -579,7 +579,7 @@ public class RangeSearchPredicateIT {
 								.boost( 3 )
 						)
 				)
-				.sort( f -> f.byScore() )
+				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
