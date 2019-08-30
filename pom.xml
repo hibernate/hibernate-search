@@ -216,6 +216,10 @@
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
         <version.org.jboss.jboss-transaction-spi>7.6.0.Final</version.org.jboss.jboss-transaction-spi>
 
+        <!-- Jackson: used by the Elasticsearch REST client, Avro, and in tests (wiremock, ...) -->
+        <version.com.fasterxml.jackson>2.9.9</version.com.fasterxml.jackson>
+        <version.com.fasterxml.jackson.databind>2.9.9.3</version.com.fasterxml.jackson.databind>
+
         <!-- Elasticsearch -->
         <!-- When updating the following versions you will likely need to update the
              matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
@@ -250,8 +254,6 @@
         <version.org.assertj.assertj-core>3.9.1</version.org.assertj.assertj-core>
         <version.org.skyscreamer.jsonassert>1.2.3</version.org.skyscreamer.jsonassert>
         <version.com.github.tomakehurst.wiremock>2.5.1</version.com.github.tomakehurst.wiremock>
-        <!-- Fixes dependency convergence within Wiremock, see below -->
-        <version.com.fasterxml.jackson>2.8.6</version.com.fasterxml.jackson>
         <version.org.jboss.byteman>4.0.14</version.org.jboss.byteman>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
         <version.com.h2database>1.4.178</version.com.h2database>
@@ -950,7 +952,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${version.com.fasterxml.jackson}</version>
+                <version>${version.com.fasterxml.jackson.databind}</version>
             </dependency>
             <!--
             We need to keep the slf4j dependencies listed here even though we are not using slf4j anymore.
@@ -2286,8 +2288,7 @@
 
                  mvn clean test -Pelasticsearch-2.0 -Dtest.elasticsearch.version=2.1.0
           -->
-
-        <!-- Profile enabled when an Elasticsearch instance must be run by Maven -->
+<!-- Profile enabled when an Elasticsearch instance must be run by Maven -->
         <profile>
             <id>elasticsearch-run</id>
             <activation>
@@ -2314,7 +2315,6 @@
                 <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
             </properties>
         </profile>
-
         <!-- Elasticsearch [2.0,2.2) test environment -->
         <profile>
             <id>elasticsearch-2.0</id>
