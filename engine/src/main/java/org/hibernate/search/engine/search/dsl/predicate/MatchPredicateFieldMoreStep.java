@@ -19,28 +19,48 @@ public interface MatchPredicateFieldMoreStep
 	 * Target the given field in the match predicate,
 	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * See {@link MatchPredicateFieldStep#onField(String)} for more information about targeting fields.
+	 * See {@link MatchPredicateFieldStep#field(String)} for more information about targeting fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 *
-	 * @see MatchPredicateFieldStep#onField(String)
+	 * @see MatchPredicateFieldStep#field(String)
 	 */
+	default MatchPredicateFieldMoreStep field(String absoluteFieldPath) {
+		return fields( absoluteFieldPath );
+	}
+
+	/**
+	 * @deprecated Use {@link #field(String)} instead.
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return The next step.
+	 */
+	@Deprecated
 	default MatchPredicateFieldMoreStep orField(String absoluteFieldPath) {
-		return orFields( absoluteFieldPath );
+		return field( absoluteFieldPath );
 	}
 
 	/**
 	 * Target the given fields in the match predicate,
 	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * See {@link MatchPredicateFieldStep#onFields(String...)} for more information about targeting fields.
+	 * See {@link MatchPredicateFieldStep#fields(String...)} for more information about targeting fields.
 	 *
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return The next step.
 	 *
-	 * @see MatchPredicateFieldStep#onFields(String...)
+	 * @see MatchPredicateFieldStep#fields(String...)
 	 */
-	MatchPredicateFieldMoreStep orFields(String ... absoluteFieldPaths);
+	MatchPredicateFieldMoreStep fields(String ... absoluteFieldPaths);
+
+	/**
+	 * @deprecated Use {@link #fields(String...)} instead.
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default MatchPredicateFieldMoreStep orFields(String ... absoluteFieldPaths) {
+		return fields( absoluteFieldPaths );
+	}
 
 }

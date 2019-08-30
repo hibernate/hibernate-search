@@ -42,7 +42,7 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+	public SimpleQueryStringPredicateFieldMoreStep fields(String... absoluteFieldPaths) {
 		return new SimpleQueryStringPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 

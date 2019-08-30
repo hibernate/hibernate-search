@@ -21,15 +21,25 @@ public interface WildcardPredicateFieldMoreStep
 	 * <p>
 	 * Only text fields are supported.
 	 * <p>
-	 * See {@link WildcardPredicateFieldStep#onField(String)} for more information on targeted fields.
+	 * See {@link WildcardPredicateFieldStep#field(String)} for more information on targeted fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 *
-	 * @see WildcardPredicateFieldStep#onField(String)
+	 * @see WildcardPredicateFieldStep#field(String)
 	 */
+	default WildcardPredicateFieldMoreStep field(String absoluteFieldPath) {
+		return fields( absoluteFieldPath );
+	}
+
+	/**
+	 * @deprecated Use {@link #field(String)} instead.
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return The next step.
+	 */
+	@Deprecated
 	default WildcardPredicateFieldMoreStep orField(String absoluteFieldPath) {
-		return orFields( absoluteFieldPath );
+		return field( absoluteFieldPath );
 	}
 
 	/**
@@ -38,13 +48,23 @@ public interface WildcardPredicateFieldMoreStep
 	 * <p>
 	 * Only text fields are supported.
 	 * <p>
-	 * See {@link WildcardPredicateFieldStep#onFields(String...)} for more information on targeted fields.
+	 * See {@link WildcardPredicateFieldStep#fields(String...)} for more information on targeted fields.
 	 *
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return The next step.
 	 *
-	 * @see WildcardPredicateFieldStep#onFields(String...)
+	 * @see WildcardPredicateFieldStep#fields(String...)
 	 */
-	WildcardPredicateFieldMoreStep orFields(String... absoluteFieldPaths);
+	WildcardPredicateFieldMoreStep fields(String... absoluteFieldPaths);
+
+	/**
+	 * @deprecated Use {@link #fields(String...)} instead.
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default WildcardPredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+		return fields( absoluteFieldPaths );
+	}
 
 }

@@ -43,7 +43,7 @@ class WildcardPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+	public WildcardPredicateFieldMoreStep fields(String... absoluteFieldPaths) {
 		return new WildcardPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 

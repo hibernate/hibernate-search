@@ -44,7 +44,7 @@ class MatchPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public MatchPredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+	public MatchPredicateFieldMoreStep fields(String... absoluteFieldPaths) {
 		return new MatchPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 

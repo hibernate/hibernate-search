@@ -38,7 +38,7 @@ class NestedPredicateFieldStepImpl<B>
 	}
 
 	@Override
-	public NestedPredicateNestStep onObjectField(String absoluteFieldPath) {
+	public NestedPredicateNestStep objectField(String absoluteFieldPath) {
 		this.builder = builderFactory.nested( absoluteFieldPath );
 		return this;
 	}

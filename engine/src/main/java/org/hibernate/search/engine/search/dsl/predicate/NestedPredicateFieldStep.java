@@ -22,6 +22,16 @@ public interface NestedPredicateFieldStep {
 	 * @param absoluteFieldPath The path to the object.
 	 * @return The next step.
 	 */
-	NestedPredicateNestStep onObjectField(String absoluteFieldPath);
+	NestedPredicateNestStep objectField(String absoluteFieldPath);
+
+	/**
+	 * @deprecated Use {@link #objectField(String)} instead.
+	 * @param absoluteFieldPath The path to the object.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default NestedPredicateNestStep onObjectField(String absoluteFieldPath) {
+		return objectField( absoluteFieldPath );
+	}
 
 }

@@ -20,28 +20,48 @@ public interface SpatialWithinPredicateFieldMoreStep
 	 * Target the given field in the "within" predicate,
 	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * See {@link SpatialWithinPredicateFieldStep#onField(String)} for more information on targeted fields.
+	 * See {@link SpatialWithinPredicateFieldStep#field(String)} for more information on targeted fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 *
-	 * @see SpatialWithinPredicateFieldStep#onField(String)
+	 * @see SpatialWithinPredicateFieldStep#field(String)
 	 */
+	default SpatialWithinPredicateFieldMoreStep field(String absoluteFieldPath) {
+		return fields( absoluteFieldPath );
+	}
+
+	/**
+	 * @deprecated Use {@link #field(String)} instead.
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return The next step.
+	 */
+	@Deprecated
 	default SpatialWithinPredicateFieldMoreStep orField(String absoluteFieldPath) {
-		return orFields( absoluteFieldPath );
+		return field( absoluteFieldPath );
 	}
 
 	/**
 	 * Target the given fields in the "within" predicate,
 	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * See {@link SpatialWithinPredicateFieldStep#onFields(String...)} for more information on targeted fields.
+	 * See {@link SpatialWithinPredicateFieldStep#fields(String...)} for more information on targeted fields.
 	 *
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return The next step.
 	 *
-	 * @see SpatialWithinPredicateFieldStep#onFields(String...)
+	 * @see SpatialWithinPredicateFieldStep#fields(String...)
 	 */
-	SpatialWithinPredicateFieldMoreStep orFields(String ... absoluteFieldPaths);
+	SpatialWithinPredicateFieldMoreStep fields(String ... absoluteFieldPaths);
+
+	/**
+	 * @deprecated Use {@link #fields(String...)} instead.
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default SpatialWithinPredicateFieldMoreStep orFields(String ... absoluteFieldPaths) {
+		return fields( absoluteFieldPaths );
+	}
 
 }
