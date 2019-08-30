@@ -12,7 +12,7 @@ import org.hibernate.search.util.common.SearchException;
 /**
  * The step in a sort definition where the behavior on missing values can be set.
  *
- * @param <N> The type of the next step (returned by {@link FieldSortMissingValueBehaviorStep#sortFirst()}, for example).
+ * @param <N> The type of the next step (returned by {@link FieldSortMissingValueBehaviorStep#first()}, for example).
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
@@ -26,7 +26,16 @@ public interface FieldSortMissingValueBehaviorStep<N> {
 	 *
 	 * @return The next step.
 	 */
-	N sortLast();
+	N last();
+
+	/**
+	 * @deprecated Use {@link #last()} instead.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default N sortLast() {
+		return last();
+	}
 
 	/**
 	 * Put documents with missing values first in the sorting.
@@ -36,7 +45,16 @@ public interface FieldSortMissingValueBehaviorStep<N> {
 	 *
 	 * @return The next step.
 	 */
-	N sortFirst();
+	N first();
+
+	/**
+	 * @deprecated Use {@link #first()} instead.
+	 * @return The next step.
+	 */
+	@Deprecated
+	default N sortFirst() {
+		return first();
+	}
 
 	/**
 	 * When documents are missing a value on the sort field, use the given value instead.

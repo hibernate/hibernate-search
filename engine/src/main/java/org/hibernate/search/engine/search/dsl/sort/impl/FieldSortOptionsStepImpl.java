@@ -33,18 +33,18 @@ class FieldSortOptionsStepImpl<B>
 	}
 
 	@Override
-	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStep> onMissingValue() {
+	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStep> missing() {
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStep sortFirst() {
+	public FieldSortOptionsStep first() {
 		builder.missingFirst();
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStep sortLast() {
+	public FieldSortOptionsStep last() {
 		builder.missingLast();
 		return this;
 	}
