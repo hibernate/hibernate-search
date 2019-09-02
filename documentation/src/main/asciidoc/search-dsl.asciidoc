@@ -72,13 +72,61 @@ to group hits and compute aggregated metrics for each group -- hit count by cate
 // Search 5 anchors backward compatibility
 [[_result_size]]
 
-include::todo-placeholder.asciidoc[]
+In Hibernate Search, the default search result is a little bit more complicated than just "a list of hits".
+This is why the default methods return a composite `SearchResult` object offering getters
+to retrieve the part of the result you want,
+as shown in the example below.
 
-// TODO
-//  1. Fetching the top hits and other results (total hit count, aggregations, ...)
-//  2. Fetching the top hits only
-//  3. Fetching the only hit
-//  4. Fetching the total hit count only
+.Getting information from a `SearchResult`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=fetching-searchResult]
+----
+<1> Start building the query as usual.
+<2> Fetch the results, limiting to the top 20 hits.
+<3> Retrieve the total hit count, i.e. the total number of matching entities/documents,
+which could be 10,000 even if you only retrieved the top 20 hits.
+This is useful to give end users and idea of how many more hits they query produced.
+<4> Retrieve the top hits, in this case the top 20 matching entities/documents.
+<5> Other kinds of results and information can be retrieved from `SearchResult`.
+They are explained in dedicated sections, such as <<search-dsl-aggregation>>.
+====
+
+It is possible to retrieve the total hit count alone,
+for cases where only the number of hits is of interest,
+not the hits themselves:
+
+.Getting the total hit count directly
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=fetching-totalHitCount]
+----
+====
+
+The top hits can also be obtained directly,
+without going through a `SearchResult`,
+which can be handy if only the top hits are useful, and not the total hit count:
+
+.Getting the top hits directly
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=fetching-hits]
+----
+====
+
+If only zero to one hit is expected, it is possible to retrieve it as an `Optional`.
+An exception will be thrown if more than one hits are returned.
+
+.Getting the only hit directly
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=fetching-singleHit]
+----
+====
 
 [[search-dsl-query-fetching-results-all]]
 ==== Fetching all hits

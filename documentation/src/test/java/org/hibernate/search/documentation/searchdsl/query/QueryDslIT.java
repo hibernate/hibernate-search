@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.searchdsl.query;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.SharedCacheMode;
 
@@ -87,6 +88,61 @@ public class QueryDslIT {
 			assertThat( totalHitCount ).isEqualTo( 2 );
 			assertThat( hits ).extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void fetchingBasics() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::fetching-searchResult[]
+			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
+					.predicate( f -> f.matchAll() )
+					.fetch( 20 ); // <2>
+
+			long totalHitCount = result.getTotalHitCount(); // <3>
+			List<Book> hits = result.getHits(); // <4>
+			// ... // <5>
+			// end::fetching-searchResult[]
+
+			assertThat( totalHitCount ).isEqualTo( 4 );
+			assertThat( hits ).extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::fetching-totalHitCount[]
+			long totalHitCount = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.fetchTotalHitCount();
+			// end::fetching-totalHitCount[]
+
+			assertThat( totalHitCount ).isEqualTo( 4 );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::fetching-hits[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.fetchHits( 20 );
+			// end::fetching-hits[]
+
+			assertThat( hits ).extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::fetching-singleHit[]
+			Optional<Book> hit = searchSession.search( Book.class )
+					.predicate( f -> f.id().matching( 1 ) )
+					.fetchSingleHit();
+			// end::fetching-singleHit[]
+
+			assertThat( hit ).get().extracting( Book::getId )
+					.isEqualTo( BOOK1_ID );
 		} );
 	}
 
