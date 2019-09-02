@@ -33,7 +33,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDsl
 <3> Define that only documents matching the given predicate should be returned.
 The predicate is created using a factory `f` passed as an argument to the lambda expression.
 See <<search-dsl-predicate>> for more information about predicates.
-<4> Build the query and fetch the results.
+<4> Build the query and fetch the results, limiting to the top 20 hits.
 <5> Retrieve the total number of matching entities.
 <6> Retrieve matching entities.
 ====
@@ -238,7 +238,7 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDsl
 ----
 <1> Start building the query.
 <2> Set the fetch size to an arbitrary value (must be `1` or more).
-<3> Fetch the results.
+<3> Fetch the results, limiting to the top 200 hits.
 One query will be executed to load the hits if there are less hits than the given fetch size;
 two queries if there are more hits than the fetch size but less than twice the fetch size,
 etc.

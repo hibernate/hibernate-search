@@ -91,7 +91,7 @@ public class PredicateDslIT {
 			List<Book> result = searchSession.search( Book.class ) // <1>
 					.predicate( f -> f.match().field( "title" ) // <2>
 							.matching( "robot" ) )
-					.fetchHits(); // <3>
+					.fetchHits( 20 ); // <3>
 			// end::entryPoint-lambdas[]
 			assertThat( result )
 					.extracting( Book::getId )
@@ -108,7 +108,7 @@ public class PredicateDslIT {
 					.predicate( scope.predicate().match().field( "title" )
 							.matching( "robot" )
 							.toPredicate() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::entryPoint-objects[]
 			assertThat( result )
 					.extracting( Book::getId )
@@ -123,7 +123,7 @@ public class PredicateDslIT {
 			// tag::matchAll[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::matchAll[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -137,7 +137,7 @@ public class PredicateDslIT {
 							.except( f.match().field( "title" )
 									.matching( "robot" ) )
 					)
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::matchAll-except[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -154,7 +154,7 @@ public class PredicateDslIT {
 			// tag::id[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.id().matching( 1 ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::id[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -168,7 +168,7 @@ public class PredicateDslIT {
 			ids.add( 2 );
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.id().matchingAny( ids ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::id-matchingAny[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -187,7 +187,7 @@ public class PredicateDslIT {
 							.should( f.match().field( "description" )
 									.matching( "investigation" ) ) // <2>
 					)
-					.fetchHits(); // <3>
+					.fetchHits( 20 ); // <3>
 			// end::bool-or[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -203,7 +203,7 @@ public class PredicateDslIT {
 							.must( f.match().field( "description" )
 									.matching( "crime" ) ) // <2>
 					)
-					.fetchHits(); // <3>
+					.fetchHits( 20 ); // <3>
 			// end::bool-and[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -219,7 +219,7 @@ public class PredicateDslIT {
 							.mustNot( f.match().field( "description" )
 									.matching( "investigation" ) ) // <2>
 					)
-					.fetchHits(); // <3>
+					.fetchHits( 20 ); // <3>
 			// end::bool-mustNot[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -243,7 +243,7 @@ public class PredicateDslIT {
 											.matching( "robot" ) ) // <7>
 							)
 					)
-					.fetchHits(); // <8>
+					.fetchHits( 20 ); // <8>
 			// end::bool-filter[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -261,7 +261,7 @@ public class PredicateDslIT {
 							.should( f.match().field( "description" )
 									.matching( "investigation" ) ) // <3>
 					)
-					.fetchHits(); // <4>
+					.fetchHits( 20 ); // <4>
 			// end::bool-mustAndShould[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -280,7 +280,7 @@ public class PredicateDslIT {
 							.should( f.match().field( "description" )
 									.matching( "disappearance" ) ) // <4>
 					)
-					.fetchHits(); // <5>
+					.fetchHits( 20 ); // <5>
 			// end::bool-minimumShouldMatchNumber[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -306,7 +306,7 @@ public class PredicateDslIT {
 									.below( searchParameters.getPageCountMaxFilter() ) );
 						}
 					} ) )
-					.fetchHits(); // <5>
+					.fetchHits( 20 ); // <5>
 			// end::bool-dynamicParameters[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -321,7 +321,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.match().field( "title" )
 							.matching( "robot" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::match[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -333,7 +333,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.match().field( "title" )
 							.matching( "robot dawn" ) ) // <1>
-					.fetchHits(); // <2>
+					.fetchHits( 20 ); // <2>
 			// end::match-multipleTerms[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -346,7 +346,7 @@ public class PredicateDslIT {
 					.predicate( f -> f.match()
 							.field( "title" ).field( "description" )
 							.matching( "robot" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::match-orField[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -359,7 +359,7 @@ public class PredicateDslIT {
 					.predicate( f -> f.match()
 							.fields( "title", "description" )
 							.matching( "robot" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::match-fields[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -373,7 +373,7 @@ public class PredicateDslIT {
 							.field( "title" )
 							.matching( "robto" )
 							.fuzzy() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::match-fuzzy[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -387,7 +387,7 @@ public class PredicateDslIT {
 							.field( "title_autocomplete" )
 							.matching( "robo" )
 							.analyzer( "autocomplete_query" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::match-analyzer[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -401,7 +401,7 @@ public class PredicateDslIT {
 							.field( "title" )
 							.matching( "robot" )
 							.skipAnalysis() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::match-skipAnalysis[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -416,7 +416,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.range().field( "pageCount" )
 							.from( 210 ).to( 250 ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::range-between[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -428,7 +428,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.range().field( "pageCount" )
 							.above( 400 ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::range-above[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -440,7 +440,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.range().field( "pageCount" )
 							.below( 400 ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::range-below[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -453,7 +453,7 @@ public class PredicateDslIT {
 					.predicate( f -> f.range().field( "pageCount" )
 							.from( 200 ).excludeLimit()
 							.to( 250 ).excludeLimit() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::range-excludeLimit[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -468,7 +468,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.phrase().field( "title" )
 							.matching( "robots of dawn" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::phrase[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -481,7 +481,7 @@ public class PredicateDslIT {
 					.predicate( f -> f.phrase().field( "title" )
 							.matching( "dawn robot" )
 							.slop( 3 ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::phrase-slop[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -496,7 +496,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.simpleQueryString().field( "description" )
 							.matching( "robots + (crime | investigation | disappearance)" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::simpleQueryString-boolean[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -508,7 +508,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.simpleQueryString().field( "description" )
 							.matching( "robots + -investigation" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::simpleQueryString-not[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -521,7 +521,7 @@ public class PredicateDslIT {
 					.predicate( f -> f.simpleQueryString().field( "description" )
 							.matching( "robots investigation" )
 							.defaultOperator( BooleanOperator.AND ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::simpleQueryString-defaultOperator-and[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -533,7 +533,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.simpleQueryString().field( "description" )
 							.matching( "rob*" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::simpleQueryString-prefix[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -545,7 +545,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.simpleQueryString().field( "description" )
 							.matching( "robto~2" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::simpleQueryString-fuzzy[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -557,7 +557,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.simpleQueryString().field( "title" )
 							.matching( "\"robots of dawn\"" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::simpleQueryString-phrase[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -569,7 +569,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.simpleQueryString().field( "title" )
 							.matching( "\"dawn robot\"~3" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::simpleQueryString-phrase-slop[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -583,7 +583,7 @@ public class PredicateDslIT {
 			// tag::exists[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.exists().field( "comment" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::exists[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -598,7 +598,7 @@ public class PredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.wildcard().field( "description" )
 							.matching( "rob*t" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::wildcard[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -618,7 +618,7 @@ public class PredicateDslIT {
 									.must( f.match().field( "authors.lastName" )
 											.matching( "asimov" ) ) // <3>
 							) )
-					.fetchHits(); // <4>
+					.fetchHits( 20 ); // <4>
 			// end::nested[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -634,7 +634,7 @@ public class PredicateDslIT {
 			List<Author> hits = searchSession.search( Author.class )
 					.predicate( f -> f.spatial().within().field( "placeOfBirth" )
 							.circle( center, 50, DistanceUnit.KILOMETERS ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::within-circle[]
 			assertThat( hits )
 					.extracting( Author::getId )
@@ -650,7 +650,7 @@ public class PredicateDslIT {
 			List<Author> hits = searchSession.search( Author.class )
 					.predicate( f -> f.spatial().within().field( "placeOfBirth" )
 							.boundingBox( box ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::within-box[]
 			assertThat( hits )
 					.extracting( Author::getId )
@@ -670,7 +670,7 @@ public class PredicateDslIT {
 			List<Author> hits = searchSession.search( Author.class )
 					.predicate( f -> f.spatial().within().field( "placeOfBirth" )
 							.polygon( polygon ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::within-polygon[]
 			assertThat( hits )
 					.extracting( Author::getId )
@@ -689,7 +689,7 @@ public class PredicateDslIT {
 					.predicate( f -> f.fromLuceneQuery(
 							new RegexpQuery( new Term( "description", "neighbor|neighbour" ) )
 					) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::lucene-fromLuceneQuery[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -710,7 +710,7 @@ public class PredicateDslIT {
 											+ "\"description\": \"neighbor|neighbour\""
 									+ "}"
 							+ "}" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::elasticsearch-fromJson[]
 			assertThat( hits )
 					.extracting( Book::getId )

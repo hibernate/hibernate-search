@@ -83,7 +83,7 @@ public class GettingStartedWithAnalysisIT {
 							.fields( "title", "authors.name" )
 							.matching( "refactor" )
 					)
-					.fetch();
+					.fetch( 20 );
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching[]
 
@@ -101,7 +101,7 @@ public class GettingStartedWithAnalysisIT {
 								.fields( "title", "authors.name" )
 								.matching( term )
 						)
-						.fetch();
+						.fetch( 20 );
 				assertThat( result.getHits() ).as( "Result of searching for '" + term + "'" )
 						.extracting( "id" )
 						.containsExactlyInAnyOrder( bookIdHolder.get() );

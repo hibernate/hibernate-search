@@ -76,7 +76,7 @@ public class HibernateOrmSimpleMappingIT {
 					.sort( f -> f.field( "pageCount" ).desc() // <2>
 							.then().field( "title_sort" )
 					)
-					.fetchHits(); // <3>
+					.fetchHits( 20 ); // <3>
 
 			assertThat( result )
 					.extracting( "title" )
@@ -92,7 +92,7 @@ public class HibernateOrmSimpleMappingIT {
 			List<String> result = searchSession.search( Book.class ) // <1>
 					.asProjection( f -> f.field( "title", String.class ) ) // <2>
 					.predicate( f -> f.matchAll() )
-					.fetchHits(); // <3>
+					.fetchHits( 20 ); // <3>
 
 			assertThat( result )
 					.containsExactlyInAnyOrder( BOOK1_TITLE, BOOK2_TITLE, BOOK3_TITLE );

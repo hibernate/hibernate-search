@@ -84,7 +84,7 @@ public class AggregationDslIT {
 							.matching( "robot" ) )
 					.aggregation( countsByGenreKey, f -> f.terms() // <4>
 							.field( "genre", Genre.class ) )
-					.fetch(); // <5>
+					.fetch( 20 ); // <5>
 
 			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey ); // <6>
 			// end::entryPoint-lambdas[]
@@ -109,7 +109,7 @@ public class AggregationDslIT {
 					.aggregation( countsByGenreKey, scope.aggregation().terms()
 							.field( "genre", Genre.class )
 							.toAggregation() )
-					.fetch();
+					.fetch( 20 );
 
 			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
 			// end::entryPoint-objects[]
@@ -129,7 +129,7 @@ public class AggregationDslIT {
 					.predicate( f -> f.matchAll() )
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class ) ) // <1>
-					.fetch();
+					.fetch( 20 );
 			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
 			// end::terms[]
 			assertThat( countsByGenre )
@@ -146,7 +146,7 @@ public class AggregationDslIT {
 					.predicate( f -> f.matchAll() )
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", String.class, ValueConvert.NO ) )
-					.fetch();
+					.fetch( 20 );
 			Map<String, Long> countsByGenre = result.getAggregation( countsByGenreKey );
 			// end::terms-noConverter[]
 			assertThat( countsByGenre )
@@ -164,7 +164,7 @@ public class AggregationDslIT {
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.maxTermCount( 1 ) )
-					.fetch();
+					.fetch( 20 );
 			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
 			// end::terms-max-term-count[]
 			assertThat( countsByGenre )
@@ -181,7 +181,7 @@ public class AggregationDslIT {
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.minDocumentCount( 0 ) )
-					.fetch();
+					.fetch( 20 );
 			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
 			// end::terms-min-doc-count-zero[]
 			assertThat( countsByGenre )
@@ -199,7 +199,7 @@ public class AggregationDslIT {
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.minDocumentCount( 2 ) )
-					.fetch();
+					.fetch( 20 );
 			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
 			// end::terms-min-doc-count-high[]
 			assertThat( countsByGenre )
@@ -216,7 +216,7 @@ public class AggregationDslIT {
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.orderByTermAscending() )
-					.fetch();
+					.fetch( 20 );
 			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
 			// end::terms-order-term-ascending[]
 			assertThat( countsByGenre )
@@ -234,7 +234,7 @@ public class AggregationDslIT {
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.orderByTermDescending() )
-					.fetch();
+					.fetch( 20 );
 			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
 			// end::terms-order-term-descending[]
 			assertThat( countsByGenre )
@@ -252,7 +252,7 @@ public class AggregationDslIT {
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.orderByCountAscending() )
-					.fetch();
+					.fetch( 20 );
 			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
 			// end::terms-order-count-ascending[]
 			assertThat( countsByGenre )
@@ -276,7 +276,7 @@ public class AggregationDslIT {
 							.range( 10.0, 20.0 )
 							.range( 20.0, null ) // <3>
 					)
-					.fetch();
+					.fetch( 20 );
 			Map<Range<Double>, Long> countsByPrice = result.getAggregation( countsByPriceKey );
 			// end::range[]
 			assertThat( countsByPrice )
@@ -299,7 +299,7 @@ public class AggregationDslIT {
 									20.0, RangeBoundInclusion.EXCLUDED ) ) // <2>
 							.range( Range.atLeast( 20.0 ) ) // <3>
 					)
-					.fetch();
+					.fetch( 20 );
 			Map<Range<Double>, Long> countsByPrice = result.getAggregation( countsByPriceKey );
 			// end::range-objects[]
 			assertThat( countsByPrice )
@@ -329,7 +329,7 @@ public class AggregationDslIT {
 											.atStartOfDay().toInstant( ZoneOffset.UTC ),
 									null )
 					)
-					.fetch();
+					.fetch( 20 );
 			Map<Range<Instant>, Long> countsByPrice = result.getAggregation( countsByPriceKey );
 			// end::range-noConverter[]
 			assertThat( countsByPrice )
