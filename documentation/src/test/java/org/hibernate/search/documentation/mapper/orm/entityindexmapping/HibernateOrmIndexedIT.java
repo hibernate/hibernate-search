@@ -74,12 +74,12 @@ public class HibernateOrmIndexedIT {
 
 			List<Author> authorResult = searchSession.search( Author.class )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			assertThat( authorResult ).hasSize( 1 );
 
 			List<User> userResult = searchSession.search( User.class )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			assertThat( userResult ).hasSize( 1 );
 		} );
 	}
@@ -96,7 +96,7 @@ public class HibernateOrmIndexedIT {
 									Arrays.asList( Author.class, User.class )
 							)
 							.predicate( f -> f.matchAll() )
-							.fetchHits();
+							.fetchHits( 20 );
 					// end::cross-backend-search[]
 				} )
 		)

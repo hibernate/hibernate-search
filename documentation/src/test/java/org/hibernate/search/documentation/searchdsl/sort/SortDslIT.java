@@ -88,7 +88,7 @@ public class SortDslIT {
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).desc() // <2>
 							.then().field( "title_sort" ) )
-					.fetchHits(); // <3>
+					.fetchHits( 20 ); // <3>
 			// end::entryPoint-lambdas[]
 			assertThat( result )
 					.extracting( Book::getId )
@@ -107,7 +107,7 @@ public class SortDslIT {
 							.field( "pageCount" ).desc()
 							.then().field( "title_sort" )
 							.toSort() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::entryPoint-objects[]
 			assertThat( result )
 					.extracting( Book::getId )
@@ -123,7 +123,7 @@ public class SortDslIT {
 					.predicate( f -> f.match().field( "title" )
 							.matching( "robot dawn" ) )
 					.sort( f -> f.score() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::score[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -138,7 +138,7 @@ public class SortDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.indexOrder() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::indexOrder[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -154,7 +154,7 @@ public class SortDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.field( "title_sort" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::field[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -166,7 +166,7 @@ public class SortDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().first() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::field-missing-first[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -178,7 +178,7 @@ public class SortDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().last() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::field-missing-last[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -190,7 +190,7 @@ public class SortDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().use( 300 ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::field-missing-use[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -207,7 +207,7 @@ public class SortDslIT {
 					.sort( f -> f.composite() // <1>
 							.add( f.field( "genre_sort" ) ) // <2>
 							.add( f.field( "title_sort" ) ) ) // <3>
-					.fetchHits(); // <4>
+					.fetchHits( 20 ); // <4>
 			// end::composite[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -234,7 +234,7 @@ public class SortDslIT {
 							}
 						}
 					} ) )
-					.fetchHits(); // <4>
+					.fetchHits( 20 ); // <4>
 			// end::composite_dynamicParameters[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -250,7 +250,7 @@ public class SortDslIT {
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.field( "genre_sort" ) // <2>
 							.then().field( "title_sort" ) ) // <3>
-					.fetchHits(); // <4>
+					.fetchHits( 20 ); // <4>
 			// end::then[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -266,7 +266,7 @@ public class SortDslIT {
 			List<Author> hits = searchSession.search( Author.class )
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.distance( "placeOfBirth", center ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::distance[]
 			assertThat( hits )
 					.extracting( Author::getId )
@@ -289,7 +289,7 @@ public class SortDslIT {
 									new SortField( "pageCount", SortField.Type.INT )
 							)
 					) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::lucene-fromLuceneSort[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -304,7 +304,7 @@ public class SortDslIT {
 					.sort( f -> f.fromLuceneSortField(
 							new SortField( "title_sort", SortField.Type.STRING )
 					) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::lucene-fromLuceneSortField[]
 			assertThat( hits )
 					.extracting( Book::getId )
@@ -324,7 +324,7 @@ public class SortDslIT {
 					.sort( f -> f.fromJson( "{"
 									+ "\"title_sort\": \"asc\""
 							+ "}" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::elasticsearch-fromJson[]
 			assertThat( hits )
 					.extracting( Book::getId )

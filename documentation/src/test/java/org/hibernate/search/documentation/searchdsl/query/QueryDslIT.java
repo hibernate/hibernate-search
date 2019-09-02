@@ -77,7 +77,7 @@ public class QueryDslIT {
 					.predicate( f -> f.match() // <3>
 							.field( "title" )
 							.matching( "robot" ) )
-					.fetch(); // <4>
+					.fetch( 20 ); // <4>
 
 			long totalHitCount = result.getTotalHitCount(); // <5>
 			List<Book> hits = result.getHits(); // <6>
@@ -107,7 +107,7 @@ public class QueryDslIT {
 					.predicate( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
-					.fetch(); // <3>
+					.fetch( 20 ); // <3>
 			// end::cacheLookupStrategy-persistenceContextThenSecondLevelCache[]
 
 			assertThat( result.getHits() ).extracting( Book::getId )
@@ -127,7 +127,7 @@ public class QueryDslIT {
 					.predicate( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
-					.fetch(); // <3>
+					.fetch( 200 ); // <3>
 			// end::fetchSize[]
 
 			assertThat( result.getHits() ).extracting( Book::getId )

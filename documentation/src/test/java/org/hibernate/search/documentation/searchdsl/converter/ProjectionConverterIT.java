@@ -73,7 +73,7 @@ public class ProjectionConverterIT {
 			List<OrderStatus> result = searchSession.search( Order.class )
 					.asProjection( f -> f.field( "status", OrderStatus.class ) )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::projection-converter-enabled[]
 
 			assertThat( result )
@@ -90,7 +90,7 @@ public class ProjectionConverterIT {
 			List<String> result = searchSession.search( Order.class )
 					.asProjection( f -> f.field( "status", String.class, ValueConvert.NO ) )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::projection-converter-disabled[]
 
 			assertThat( result )

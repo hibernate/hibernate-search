@@ -290,7 +290,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 <2> Initiate a search query on the index mapped to the `Book` entity.
 <3> Define that only documents matching the given predicate should be returned.
 The predicate is created using a factory `f` passed as an argument to the lambda expression.
-<4> Build the query and fetch the results.
+<4> Build the query and fetch the results, limiting to the top 20 hits.
 <5> Retrieve the total number of matching entities.
 <6> Retrieve matching entities.
 <7> In case you're not interested in the whole result, but only in the hits,
@@ -311,7 +311,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 <3> Initiate a search query targeting the search scope.
 <4> Define that only documents matching the given predicate should be returned.
 The predicate is created using the same search scope as the query.
-<5> Build the query and fetch the results.
+<5> Build the query and fetch the results, limiting to the top 20 hits.
 <6> Retrieve the total number of matching entities.
 <7> Retrieve matching entities.
 <8> In case you're not interested in the whole result, but only in the hits,

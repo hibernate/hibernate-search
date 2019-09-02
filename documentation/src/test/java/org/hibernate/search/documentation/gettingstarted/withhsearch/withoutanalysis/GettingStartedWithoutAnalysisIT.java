@@ -110,7 +110,7 @@ public class GettingStartedWithoutAnalysisIT {
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 							.toPredicate()
 					)
-					.fetch(); // <5>
+					.fetch( 20 ); // <5>
 
 			long totalHitCount = result.getTotalHitCount(); // <6>
 			List<Book> hits = result.getHits(); // <7>
@@ -125,7 +125,7 @@ public class GettingStartedWithoutAnalysisIT {
 							.toPredicate()
 					)
 			// tag::searching-objects[]
-					.fetchHits(); // <8>
+					.fetchHits( 20 ); // <8>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-objects[]
 
@@ -146,7 +146,7 @@ public class GettingStartedWithoutAnalysisIT {
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
-					.fetch(); // <4>
+					.fetch( 20 ); // <4>
 
 			long totalHitCount = result.getTotalHitCount(); // <5>
 			List<Book> hits = result.getHits(); // <6>
@@ -160,7 +160,7 @@ public class GettingStartedWithoutAnalysisIT {
 									.matching( "Refactoring: Improving the Design of Existing Code" )
 							)
 			// tag::searching-lambdas[]
-					.fetchHits(); // <7>
+					.fetchHits( 20 ); // <7>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-lambdas[]
 

@@ -96,7 +96,7 @@ public class ProjectionDslIT {
 			List<String> result = searchSession.search( Book.class ) // <1>
 					.asProjection( f -> f.field( "title", String.class ) ) // <2>
 					.predicate( f -> f.matchAll() )
-					.fetchHits(); // <3>
+					.fetchHits( 20 ); // <3>
 			// end::entryPoint-lambdas[]
 			assertThat( result ).containsExactlyInAnyOrder(
 					entityManager.getReference( Book.class, BOOK1_ID ).getTitle(),
@@ -116,7 +116,7 @@ public class ProjectionDslIT {
 					.asProjection( scope.projection().field( "title", String.class )
 							.toProjection() )
 					.predicate( scope.predicate().matchAll().toPredicate() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::entryPoint-objects[]
 			assertThat( result ).containsExactlyInAnyOrder(
 					entityManager.getReference( Book.class, BOOK1_ID ).getTitle(),
@@ -134,7 +134,7 @@ public class ProjectionDslIT {
 			List<DocumentReference> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.documentReference() )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::documentReference[]
 			SearchHitsAssert.assertThat( hits ).hasDocRefHitsAnyOrder(
 					BOOK_INDEX_NAME,
@@ -153,7 +153,7 @@ public class ProjectionDslIT {
 			List<EntityReference> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.entityReference() )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::reference[]
 			assertThat( hits ).containsExactlyInAnyOrder(
 					new EntityReferenceImpl( Book.class, BOOK1_ID ),
@@ -171,7 +171,7 @@ public class ProjectionDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.entity() )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::entity[]
 			Session session = searchSession.toOrmSession();
 			assertThat( hits ).containsExactlyInAnyOrder(
@@ -190,7 +190,7 @@ public class ProjectionDslIT {
 			List<Genre> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.field( "genre", Genre.class ) )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::field[]
 			Session session = searchSession.toOrmSession();
 			assertThat( hits ).containsExactlyInAnyOrder(
@@ -206,7 +206,7 @@ public class ProjectionDslIT {
 			List<Object> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.field( "genre" ) )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::field-noType[]
 			Session session = searchSession.toOrmSession();
 			assertThat( hits ).containsExactlyInAnyOrder(
@@ -224,7 +224,7 @@ public class ProjectionDslIT {
 							"genre", String.class, ValueConvert.NO
 					) )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::field-noProjectionConverter[]
 			Session session = searchSession.toOrmSession();
 			assertThat( hits ).containsExactlyInAnyOrder(
@@ -244,7 +244,7 @@ public class ProjectionDslIT {
 					.asProjection( f -> f.score() )
 					.predicate( f -> f.match().field( "title" )
 							.matching( "robot dawn" ) )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::score[]
 			assertThat( hits )
 					.hasSize( 2 )
@@ -262,7 +262,7 @@ public class ProjectionDslIT {
 			SearchResult<Double> result = searchSession.search( Author.class )
 					.asProjection( f -> f.distance( "placeOfBirth", center ) )
 					.predicate( f -> f.matchAll() )
-					.fetch(); // <3>
+					.fetch( 20 ); // <3>
 			// end::distance[]
 			assertThat( result.getHits() )
 					.hasSize( 2 )
@@ -278,7 +278,7 @@ public class ProjectionDslIT {
 					.asProjection( f -> f.distance( "placeOfBirth", center )
 							.unit( DistanceUnit.KILOMETERS ) )
 					.predicate( f -> f.matchAll() )
-					.fetch(); // <3>
+					.fetch( 20 ); // <3>
 			// end::distance-unit[]
 			assertThat( result.getHits() )
 					.hasSize( 2 )
@@ -299,7 +299,7 @@ public class ProjectionDslIT {
 							f.field( "genre", Genre.class ) // <4>
 					) )
 					.predicate( f -> f.matchAll() )
-					.fetchHits(); // <5>
+					.fetchHits( 20 ); // <5>
 			// end::composite-customObject[]
 			Session session = searchSession.toOrmSession();
 			assertThat( hits ).containsExactlyInAnyOrder(
@@ -330,7 +330,7 @@ public class ProjectionDslIT {
 							f.field( "genre", Genre.class ) // <3>
 					) )
 					.predicate( f -> f.matchAll() )
-					.fetchHits(); // <4>
+					.fetchHits( 20 ); // <4>
 			// end::composite-list[]
 			Session session = searchSession.toOrmSession();
 			assertThat( hits ).containsExactlyInAnyOrder(
@@ -364,7 +364,7 @@ public class ProjectionDslIT {
 					.extension( LuceneExtension.get() )
 					.asProjection( f -> f.document() )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::lucene-document[]
 			assertThat( hits ).hasSize( 4 );
 		} );
@@ -375,7 +375,7 @@ public class ProjectionDslIT {
 					.extension( LuceneExtension.get() )
 					.asProjection( f -> f.explanation() )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::lucene-explanation[]
 			assertThat( hits ).hasSize( 4 );
 		} );
@@ -391,7 +391,7 @@ public class ProjectionDslIT {
 					.extension( ElasticsearchExtension.get() )
 					.asProjection( f -> f.source() )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::elasticsearch-source[]
 			assertThat( hits ).hasSize( 4 );
 		} );
@@ -402,7 +402,7 @@ public class ProjectionDslIT {
 					.extension( ElasticsearchExtension.get() )
 					.asProjection( f -> f.explanation() )
 					.predicate( f -> f.matchAll() )
-					.fetchHits();
+					.fetchHits( 20 );
 			// end::elasticsearch-explanation[]
 			assertThat( hits ).hasSize( 4 );
 		} );

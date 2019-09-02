@@ -71,7 +71,7 @@ public class HibernateOrmRoutingIT {
 							.field( "genre" )
 							.matching( Genre.SCIENCE_FICTION ) ) // <2>
 					.routing( Genre.SCIENCE_FICTION.name() ) // <3>
-					.fetch(); // <4>
+					.fetch( 20 ); // <4>
 			// end::routing-single[]
 
 			// We can't really test whether sharding worked here; see the backend TCK for such test.
