@@ -450,16 +450,80 @@ use <<search-dsl-projection-composite,composite projections>> instead.
 [[search-dsl-query-debugging-matches]]
 ==== Explaining matches
 
-include::todo-placeholder.asciidoc[]
-// TODO toString(), getQueryString(), and logging, too?
+When some documents unexpectedly match or don't match,
+you will need information about the exact query being executed,
+and about the index content.
+
+To gain insight about what ends up being executed exactly,
+one option is to <<search-dsl-query-object,create a `SearchQuery` object>>
+using `toQuery()` at the end of the query definition,
+then call `toString()` to get a String representation of that query.
+
+Another option is to take advantage of logs:
+all executed search queries are logged to the log category `org.hibernate.search.query`
+at the `DEBUG` level.
+
+You may also need to inspect the content of the index.
+This is rather obvious with Elasticsearch: run simpler queries using either Hibernate Search or the REST APIs directly.
+For the Lucene backend,
+https://medium.com/@mocobeta/luke-become-an-apache-lucene-module-as-of-lucene-8-1-7d139c998b2[use the Luke tool]
+distributed as part of the https://lucene.apache.org/core/downloads.html[Lucene binary packages].
 
 [[search-dsl-query-debugging-scores]]
 ==== Explaining scores
 // Search 5 anchors backward compatibility
 [[_understanding_results]]
 
-include::todo-placeholder.asciidoc[]
-// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_understanding_results
+When the score of some documents is higher or lower than expected,
+the best way to gain insight is to <<search-dsl-query-object,create a `SearchQuery` object>>
+using `toQuery()` at the end of the query definition,
+and then use the backend-specific `explain` methods;
+the result of these methods will explain how the score of a specific document was computed.
+See below for examples.
+
+To retrieve an explanation for all matches in one call,
+`explanation` projections are available:
+see <<search-dsl-projection-extensions-lucene-explanation,here for Lucene>>
+and <<search-dsl-projection-extensions-elasticsearch-explanation,here for Elasticsearch>>.
+
+[WARNING]
+====
+Regardless of the API used, explanations are rather costly performance-wise:
+only use them for debugging purposes.
+====
+
+.Retrieving score explanation -- Lucene
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=explain-lucene]
+----
+<1> Build the query as usual,
+but using the Lucene extension so that the retrieved query exposes Lucene-specific operations.
+<2> Retrieve a `SearchQuery` object.
+<3> Retrieve the explanation of the score of the document with ID `1`.
+The explanation is of type `Explanation`, but you can convert it to a readable string using `toString()`.
+<4> For multi-index queries, it is necessary to refer to the document not only by its ID,
+but also by the name of the index it's located in.
+<5> If you cannot change the code building the query to use the Lucene extension,
+you can instead use the Lucene extension on the `SearchQuery` to convert it after its creation.
+====
+
+.Retrieving score explanation -- Elasticsearch
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=explain-elasticsearch]
+----
+<1> Build the query as usual,
+but using the Elasticsearch extension so that the retrieved query exposes Elasticsearch-specific operations.
+<2> Retrieve a `SearchQuery` object.
+<3> Retrieve the explanation of the score of the document with ID `1`.
+<4> For multi-index queries, it is necessary to refer to the document not only by its ID,
+but also by the name of the index it's located in.
+<5> If you cannot change the code building the query to use the Elasticsearch extension,
+you can instead use the Elasticsearch extension on the `SearchQuery` to convert it after its creation.
+====
 
 [[search-dsl-predicate]]
 == Predicate DSL
@@ -1453,6 +1517,12 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/Pro
 [[search-dsl-projection-extensions-lucene-explanation]]
 ==== Lucene: `explanation`
 
+[WARNING]
+====
+Explanations are rather costly performance-wise:
+only use them for <<search-dsl-query-debugging-scores,debugging>> purposes.
+====
+
 .Returning the score explanation as a native `org.apache.lucene.search.Explanation`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -1474,6 +1544,12 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/projection/Pro
 
 [[search-dsl-projection-extensions-elasticsearch-explanation]]
 ==== Elasticsearch: `explanation`
+
+[WARNING]
+====
+Explanations are rather costly performance-wise:
+only use them for <<search-dsl-query-debugging-scores,debugging>> purposes.
+====
 
 .Returning the score explanation as a JSON-formatted String
 ====

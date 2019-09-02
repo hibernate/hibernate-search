@@ -16,7 +16,13 @@ import javax.persistence.SharedCacheMode;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
+import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
+import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
@@ -29,11 +35,14 @@ import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.stat.Statistics;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.apache.lucene.search.Explanation;
 
 @RunWith(Parameterized.class)
 public class QueryDslIT {
@@ -51,10 +60,13 @@ public class QueryDslIT {
 	@Rule
 	public OrmSetupHelper setupHelper;
 
+	private final BackendConfiguration backendConfiguration;
+
 	private EntityManagerFactory entityManagerFactory;
 
 	public QueryDslIT(BackendConfiguration backendConfiguration) {
 		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
+		this.backendConfiguration = backendConfiguration;
 	}
 
 	@Before
@@ -237,6 +249,60 @@ public class QueryDslIT {
 			hits = ormQuery.list();
 			assertThat( hits ).extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+	}
+
+	@Test
+	public void explain_lucene() {
+		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::explain-lucene[]
+			LuceneSearchQuery<Book> query = searchSession.search( Book.class )
+					.extension( LuceneExtension.get() ) // <1>
+					.predicate( f -> f.match()
+							.onField( "title" )
+							.matching( "robot" ) )
+					.toQuery(); // <2>
+
+			Explanation explanation1 = query.explain( "1" ); // <3>
+			Explanation explanation2 = query.explain( "Book", "1" ); // <4>
+
+			LuceneSearchQuery<Book> luceneQuery = query.extension( LuceneExtension.get() ); // <5>
+			// end::explain-lucene[]
+
+			assertThat( explanation1 ).asString()
+					.contains( "title" );
+			assertThat( explanation2 ).asString()
+					.contains( "title" );
+			assertThat( luceneQuery ).isNotNull();
+		} );
+	}
+
+	@Test
+	public void explain_elasticsearch() {
+		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::explain-elasticsearch[]
+			ElasticsearchSearchQuery<Book> query = searchSession.search( Book.class )
+					.extension( ElasticsearchExtension.get() ) // <1>
+					.predicate( f -> f.match()
+							.onField( "title" )
+							.matching( "robot" ) )
+					.toQuery(); // <2>
+
+			String explanation1 = query.explain( "1" ); // <3>
+			String explanation2 = query.explain( "Book", "1" ); // <4>
+
+			ElasticsearchSearchQuery<Book> elasticsearchQuery = query.extension( ElasticsearchExtension.get() ); // <5>
+			// end::explain-elasticsearch[]
+
+			assertThat( explanation1 ).contains( "title" );
+			assertThat( explanation2 ).contains( "title" );
+			assertThat( elasticsearchQuery ).isNotNull();
 		} );
 	}
 
