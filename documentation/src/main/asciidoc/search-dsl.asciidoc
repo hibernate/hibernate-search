@@ -67,14 +67,46 @@ to group hits and compute aggregated metrics for each group -- hit count by cate
 // Search 5 anchors backward compatibility
 [[_retrieving_the_results]]
 
+[[search-dsl-query-fetching-results-basics]]
+==== Basics
+// Search 5 anchors backward compatibility
+[[_result_size]]
+
 include::todo-placeholder.asciidoc[]
 
-// TODO [[_pagination]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_pagination
-// TODO [[_performance_considerations]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_performance_considerations
-// TODO [[_result_size]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_result_size
+// TODO
+//  1. Fetching the top hits and other results (total hit count, aggregations, ...)
+//  2. Fetching the top hits only
+//  3. Fetching the only hit
+//  4. Fetching the total hit count only
+
+[[search-dsl-query-fetching-results-all]]
+==== Fetching all hits
+
+include::todo-placeholder.asciidoc[]
+
+// TODO fetching all hits (warning)
+
+[[search-dsl-query-fetching-results-pagination]]
+==== Pagination
+// Search 5 anchors backward compatibility
+[[_pagination]]
+
+include::todo-placeholder.asciidoc[]
+
+// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_pagination
+
+[[search-dsl-query-fetching-results-scrolling]]
+==== Scrolling
+// Search 5 anchors backward compatibility
+[[_performance_considerations]]
+
+include::todo-placeholder.asciidoc[]
+
+// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_performance_considerations
 
 [[search-dsl-query-routing]]
-==== Routing
+=== Routing
 
 include::components/sharding-intro-note.asciidoc[]
 
@@ -120,16 +152,6 @@ We know all documents will have the given `genre` value,
 so we can specify the routing key to limit the query to relevant shards.
 <4> Build the query and fetch the results.
 ====
-
-[[search-dsl-query-timeout]]
-=== Timeout
-// Search 5 anchors backward compatibility
-[[_limiting_the_time_of_a_query]]
-
-include::todo-placeholder.asciidoc[]
-
-// TODO [[_raise_an_exception_on_time_limit]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_raise_an_exception_on_time_limit
-// TODO [[_limit_the_number_of_results_when_the_time_limit_is_reached]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_limit_the_number_of_results_when_the_time_limit_is_reached
 
 [[search-dsl-query-entity-loading-options]]
 === Entity loading options
@@ -230,10 +252,22 @@ include::todo-placeholder.asciidoc[]
 
 // TODO HSEARCH-3628 https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_fetching_strategy
 
-[[search-dsl-query-turning-into-jpa-query]]
-=== Turning the `SearchQuery` into a JPA or Hibernate ORM query
+[[search-dsl-query-timeout]]
+=== Timeout
+// Search 5 anchors backward compatibility
+[[_limiting_the_time_of_a_query]]
 
 include::todo-placeholder.asciidoc[]
+
+// TODO [[_raise_an_exception_on_time_limit]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_raise_an_exception_on_time_limit
+// TODO [[_limit_the_number_of_results_when_the_time_limit_is_reached]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_limit_the_number_of_results_when_the_time_limit_is_reached
+
+[[search-dsl-query-object]]
+=== Obtaining a query object
+
+include::todo-placeholder.asciidoc[]
+
+// TODO toQuery() and potential uses (=> ORM query, explain(), ...)
 
 // TODO turning a SearchQuery into a JPA/ORM query
 
@@ -241,13 +275,20 @@ include::todo-placeholder.asciidoc[]
 
 [[search-dsl-query-debugging]]
 === Debugging a query
+
+[[search-dsl-query-debugging-matches]]
+==== Explaining matches
+
+include::todo-placeholder.asciidoc[]
+// TODO toString(), getQueryString(), and logging, too?
+
+[[search-dsl-query-debugging-scores]]
+==== Explaining scores
 // Search 5 anchors backward compatibility
 [[_understanding_results]]
 
 include::todo-placeholder.asciidoc[]
-
 // TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_understanding_results
-// TODO toString(), getQueryString(), and logging, too?
 
 [[search-dsl-predicate]]
 == Predicate DSL
