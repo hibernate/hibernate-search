@@ -17,6 +17,7 @@ import javax.persistence.SharedCacheMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
@@ -203,6 +204,39 @@ public class QueryDslIT {
 			// end::fetching-pagination-hits[]
 
 			assertThat( hits ).isEmpty();
+		} );
+	}
+
+	@Test
+	public void searchQuery() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::searchQuery[]
+			SearchQuery<Book> query = searchSession.search( Book.class ) // <1>
+					.predicate( f -> f.matchAll() )
+					.toQuery(); // <2>
+			List<Book> hits = query.fetchHits( 20 ); // <3>
+			// end::searchQuery[]
+
+			assertThat( hits ).extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::searchQuery-toORM[]
+			SearchQuery<Book> query = searchSession.search( Book.class ) // <1>
+					.predicate( f -> f.matchAll() )
+					.toQuery(); // <2>
+			javax.persistence.TypedQuery<Book> jpaQuery = Search.toJpaQuery( query ); // <3>
+			org.hibernate.query.Query<Book> ormQuery = Search.toOrmQuery( query ); // <4>
+			// end::searchQuery-toORM[]
+			List<Book> hits = jpaQuery.getResultList();
+			assertThat( hits ).extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+			hits = ormQuery.list();
+			assertThat( hits ).extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
 		} );
 	}
 
