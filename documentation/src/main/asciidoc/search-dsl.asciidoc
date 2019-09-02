@@ -374,13 +374,75 @@ include::todo-placeholder.asciidoc[]
 [[search-dsl-query-object]]
 === Obtaining a query object
 
-include::todo-placeholder.asciidoc[]
+The example presented in most of this documentation fetch the query results
+directly at the end of the query definition DSL,
+not showing any "query" object that can be manipulated.
+This is because the query object generally only makes code more verbose
+without bringing anything worthwhile.
 
-// TODO toQuery() and potential uses (=> ORM query, explain(), ...)
+However, in some cases a query object can be useful.
+To get a query object, just call `toQuery()` at the end of the query definition:
 
-// TODO turning a SearchQuery into a JPA/ORM query
+.Getting a `SearchQuery` object
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=searchQuery]
+----
+<1> Build the query as usual.
+<2> Retrieve a `SearchQuery` object.
+<3> Fetch the results.
+====
 
-// TODO [[_resulttransformer]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_resulttransformer
+This query object supports all <<search-dsl-query-fetching-results,`fetch*` methods supported by the query DSL>>.
+The main advantage over calling these methods directly at the end of a query definition
+is mostly related to debugging (see <<search-dsl-query-debugging>>),
+but the query object can also be useful if you need an adapter to another API.
+
+Hibernate Search provides an adapter to JPA and Hibernate ORM's native APIs,
+i.e. a way to turn a `SearchQuery` into a `javax.persistence.TypedQuery` (JPA)
+or a `org.hibernate.query.Query` (native ORM API):
+
+.Getting a `SearchQuery` object
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=searchQuery-toORM]
+----
+<1> Build the query as usual.
+<2> Retrieve a `SearchQuery` object.
+<3> Turn the `SearchQuery` object into a JPA query.
+<4> Turn the `SearchQuery` object into a Hibernate ORM query.
+====
+
+// Search 5 anchors backward compatibility
+[[_resulttransformer]]
+[WARNING]
+====
+The resulting query *does not support all operations*,
+so is recommended to only convert search queries when absolutely required,
+for example when integrating with code that only works with Hibernate ORM queries.
+
+The following operations are expected to work correctly in most cases,
+even though they may behave slightly differently from what is expected from a JPA `TypedQuery`
+or Hibernate ORM `Query` in some cases
+(including, but not limited to, the type of thrown exceptions):
+
+* Hit retrieval methods (`list`, `getResultList`, `uniqueResult`, ... ).
+* `setFirstResult`/`setMaxResults` and getters.
+* `setFetchSize`
+* `unwrap`
+
+The following operations are known not to work correctly,
+with no plan to fix them at the moment:
+
+* Hints (`setHint`, ...).
+* Parameter-related methods (`setParameter`, ...).
+* Result transformer (`setResultTransformer`, ...);
+use <<search-dsl-projection-composite,composite projections>> instead.
+* Lock-related methods (`setLockOptions`, ...).
+* And more (this list is not exhaustive).
+====
 
 [[search-dsl-query-debugging]]
 === Debugging a query
