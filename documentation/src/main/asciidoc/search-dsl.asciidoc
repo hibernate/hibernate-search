@@ -173,9 +173,37 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDsl
 // Search 5 anchors backward compatibility
 [[_pagination]]
 
-include::todo-placeholder.asciidoc[]
+Pagination is the concept of splitting hits in successive "pages",
+all pages containing a fixed number of elements (except potentially the last one).
+When displaying results on a web page,
+the user will be able to go to an arbitrary page and see the corresponding results,
+for example "results 151 to 170 of 14,265".
 
-// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_pagination
+Pagination is achieved in Hibernate Search by passing a limit and offset to the `fetch` or `fetchHits` method:
+
+* The limit defines the maximum number of hits to return, i.e. the page size.
+* The offset defines the number of documents that should be skipped because they were displayed in previous pages.
+It is a *number of documents*, not a number of pages,
+so you will usually want to compute it from the page number and page size this way:
+`offset = zero-based-page-number * page-size`.
+
+.Pagination retrieving a `SearchResult`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=fetching-pagination-searchResult]
+----
+<1> Set the limit to `20` and the offset to `40`.
+====
+
+.Pagination retrieving hits directly
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=fetching-pagination-hits]
+----
+<1> Set the limit to `20` and the offset to `40`.
+====
 
 [[search-dsl-query-fetching-results-scrolling]]
 ==== Scrolling

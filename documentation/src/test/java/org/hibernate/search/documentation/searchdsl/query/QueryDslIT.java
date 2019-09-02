@@ -179,6 +179,34 @@ public class QueryDslIT {
 	}
 
 	@Test
+	public void pagination() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::fetching-pagination-searchResult[]
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.fetch( 20, 40 ); // <1>
+			// end::fetching-pagination-searchResult[]
+			long totalHitCount = result.getTotalHitCount();
+			List<Book> hits = result.getHits();
+
+			assertThat( totalHitCount ).isEqualTo( 4 );
+			assertThat( hits ).isEmpty();
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::fetching-pagination-hits[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.fetchHits( 20, 40 ); // <1>
+			// end::fetching-pagination-hits[]
+
+			assertThat( hits ).isEmpty();
+		} );
+	}
+
+	@Test
 	public void cacheLookupStrategy() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			Statistics statistics = entityManagerFactory.unwrap( SessionFactory.class ).getStatistics();
