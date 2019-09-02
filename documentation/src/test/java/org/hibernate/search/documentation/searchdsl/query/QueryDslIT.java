@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.searchdsl.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManagerFactory;
@@ -143,6 +144,37 @@ public class QueryDslIT {
 
 			assertThat( hit ).get().extracting( Book::getId )
 					.isEqualTo( BOOK1_ID );
+		} );
+	}
+
+	@Test
+	public void fetchingAllHits() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::fetching-all-searchResult[]
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.predicate( f -> f.id().matchingAny( Arrays.asList( 1, 2 ) ) )
+					.fetch();
+
+			long totalHitCount = result.getTotalHitCount();
+			List<Book> hits = result.getHits();
+			// end::fetching-all-searchResult[]
+
+			assertThat( totalHitCount ).isEqualTo( 2 );
+			assertThat( hits ).extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::fetching-all-hits[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.id().matchingAny( Arrays.asList( 1, 2 ) ) )
+					.fetchHits();
+			// end::fetching-all-hits[]
+
+			assertThat( hits ).extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID );
 		} );
 	}
 

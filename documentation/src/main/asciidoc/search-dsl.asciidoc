@@ -131,9 +131,42 @@ include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDsl
 [[search-dsl-query-fetching-results-all]]
 ==== Fetching all hits
 
-include::todo-placeholder.asciidoc[]
+[WARNING]
+====
+Fetching all hits is rarely a good idea:
+if the query matches many entities/documents,
+this may lead to loading millions of entities in memory,
+which will likely crash the JVM,
+or at the very least slow it down to a crawl.
 
-// TODO fetching all hits (warning)
+If you know your query will always have less than N hits,
+consider setting the limit to N to avoid memory issues.
+
+If there is no bound to the number of hits you expect,
+you should consider <<search-dsl-query-fetching-results-pagination>>
+or <<search-dsl-query-fetching-results-scrolling>>
+to retrieve data in batches.
+
+If you still want to fetch all hits in one call,
+be aware that the Elasticsearch backend will only ever return 10,000 hits at a time,
+due to internal safety mechanisms in the Elasticsearch cluster.
+====
+
+.Getting all hits in a `SearchResult`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=fetching-all-searchResult]
+----
+====
+
+.Getting all hits directly
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/searchdsl/query/QueryDslIT.java[tags=fetching-all-hits]
+----
+====
 
 [[search-dsl-query-fetching-results-pagination]]
 ==== Pagination
