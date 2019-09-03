@@ -25,20 +25,19 @@ public enum ObjectFieldStorage {
 	 * <p>
 	 * For instance this structure:
 	 * <ul>
-	 *     <li>firstName = Bruce</li>
-	 *     <li>lastName = Wayne</li>
-	 *     <li>sidekicks =
+	 *     <li>title = Levianthan Wakes</li>
+	 *     <li>authors =
 	 *         <ul>
 	 *             <li>(first element)
 	 *                 <ul>
-	 *                     <li>firstName = Dick</li>
-	 *                     <li>lastName = Grayson</li>
+	 *                     <li>firstName = Daniel</li>
+	 *                     <li>lastName = Abraham</li>
 	 *                 </ul>
 	 *             </li>
 	 *             <li>(second element)
 	 *                 <ul>
-	 *                     <li>firstName = Barbara</li>
-	 *                     <li>lastName = Gordon</li>
+	 *                     <li>firstName = Ty</li>
+	 *                     <li>lastName = Frank</li>
 	 *                 </ul>
 	 *             </li>
 	 *         </ul>
@@ -46,24 +45,23 @@ public enum ObjectFieldStorage {
 	 * </ul>
 	 * Will be stored as:
 	 * <ul>
-	 *     <li>firstName = Bruce</li>
-	 *     <li>lastName = Wayne</li>
-	 *     <li>sidekicks.firstName =
+	 *     <li>title = Levianthan Wakes</li>
+	 *     <li>authors.firstName =
 	 *         <ul>
-	 *             <li>(first element) Dick</li>
-	 *             <li>(second element) Barbara</li>
+	 *             <li>(first element) Daniel</li>
+	 *             <li>(second element) Ty</li>
 	 *         </ul>
 	 *     </li>
-	 *     <li>sidekicks.lastName =
+	 *     <li>authors.lastName =
 	 *         <ul>
-	 *             <li>(first element) Grayson</li>
-	 *             <li>(second element) Gordon</li>
+	 *             <li>(first element) Abraham</li>
+	 *             <li>(second element) Frank</li>
 	 *         </ul>
 	 *     </li>
 	 * </ul>
 	 *
-	 * As a result, a search for <code>sidekicks.firstname:Barbara AND sidekicks.lastname=Grayson</code>
-	 * would return the above document even though Barbara Grayson does not exist.
+	 * As a result, a search for <code>authors.firstname:Ty AND authors.lastname=Abraham</code>
+	 * would return the above document even though Ty Abraham does not exist.
 	 */
 	FLATTENED,
 	/**
