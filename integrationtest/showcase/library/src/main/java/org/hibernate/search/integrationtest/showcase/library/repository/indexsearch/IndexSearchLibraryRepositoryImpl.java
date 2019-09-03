@@ -52,8 +52,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
-								.onField( "title" ).boostedTo( 2.0f )
-								.orField( "summary" )
+								.onField( "name" )
 								.matching( terms )
 						);
 					}
