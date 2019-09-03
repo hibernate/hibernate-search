@@ -13,6 +13,7 @@ Davide Di Somma
 Dawid Kurzyniec
 Elmer van Chastelet
 Emmanuel Bernard
+Fabio Massimo Ercoli
 Gail Badner
 Gavin King
 Grégoire Rolland

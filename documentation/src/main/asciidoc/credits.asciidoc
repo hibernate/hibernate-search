@@ -9,6 +9,7 @@ The following contributors have been involved in this documentation:
  * Emmanuel Bernard
  * Hardy Ferentschik
  * Gustavo Fernandes
+ * Fabio Massimo Ercoli
  * Sanne Grinovero
  * Mincong Huang
  * Nabeel Ali Memon
