@@ -23,47 +23,44 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
  * For example, let's consider this (incomplete) mapping:
  * <pre>{@code
  * {@literal @}Indexed
- * public class Hero {
+ * public class Book {
  *     {@literal @}GenericField
- *     private String firstName;
- *     {@literal @}GenericField
- *     private String lastName;
+ *     private String title;
  *     {@literal @}IndexedEmbedded
- *     private List<Sidekick> sidekicks;
+ *     private List<Author> authors;
  * }
- * public class Sidekick {
+ * public class Author {
  *     {@literal @}GenericField
  *     private String firstName;
  *     {@literal @}GenericField
  *     private String lastName;
- *     private Hero hero;
+ *     private List<Book> books;
  * }
  * }</pre>
  * <p>
- * The names of sidekicks are stored in different objects,
+ * The names of authors are stored in different objects,
  * thus by default they would not be included in documents created
- * for {@code Hero} entities.
- * But we added the {@code @IndexedEmbedded} annotation to the {@code sidekicks} property,
- * so Hibernate Search will <em>embed</em> this data in a {@code sidekicks} field
- * of documents created for {@code Hero} entities.
+ * for {@code Book} entities.
+ * But we added the {@code @IndexedEmbedded} annotation to the {@code authors} property,
+ * so Hibernate Search will <em>embed</em> this data in a {@code authors} field
+ * of documents created for {@code Book} entities.
  * <p>
  * How exactly this embedding will happen depends on the configured {@link #storage() storage type}.
- * Let's consider this representation of the hero Bruce Wayne:
+ * Let's consider this representation of the book "Levianthan Wakes":
  * <ul>
- *     <li>firstName = Bruce</li>
- *     <li>lastName = Wayne</li>
- *     <li>sidekicks =
+ *     <li>title = Levianthan Wakes</li>
+ *     <li>authors =
  *         <ul>
  *             <li>(first element)
  *                 <ul>
- *                     <li>firstName = Dick</li>
- *                     <li>lastName = Grayson</li>
+ *                     <li>firstName = Daniel</li>
+ *                     <li>lastName = Abraham</li>
  *                 </ul>
  *             </li>
  *             <li>(second element)
  *                 <ul>
- *                     <li>firstName = Barbara</li>
- *                     <li>lastName = Gordon</li>
+ *                     <li>firstName = Ty</li>
+ *                     <li>lastName = Frank</li>
  *                 </ul>
  *             </li>
  *         </ul>
@@ -73,18 +70,17 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
  * With the default {@link ObjectFieldStorage#FLATTENED flattened storage type} (more efficient),
  * the structure will be a little different from what one would expect:
  * <ul>
- *     <li>firstName = Bruce</li>
- *     <li>lastName = Wayne</li>
- *     <li>sidekicks.firstName =
+ *     <li>title = Levianthan Wakes</li>
+ *     <li>authors.firstName =
  *         <ul>
- *             <li>(first element) Dick</li>
- *             <li>(second element) Barbara</li>
+ *             <li>(first element) Daniel</li>
+ *             <li>(second element) Ty</li>
  *         </ul>
  *     </li>
- *     <li>sidekicks.lastName =
+ *     <li>authors.lastName =
  *         <ul>
- *             <li>(first element) Grayson</li>
- *             <li>(second element) Gordon</li>
+ *             <li>(first element) Abraham</li>
+ *             <li>(second element) Frank</li>
  *         </ul>
  *     </li>
  * </ul>
