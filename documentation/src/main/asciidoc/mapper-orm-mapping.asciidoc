@@ -503,6 +503,65 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
 |org.hibernate.search.engine.spatial.GeoPoint and subtypes|-| Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
 |===
 
+[[mapper-orm-legacy-date-time-apis]]
+=== Support for legacy java.util date/time APIs
+
+Using legacy date/time types such as `java.util.Calendar`, `java.util.Date`, `java.sql.Timestamp`, `java.sql.Date`, `java.sql.Time`
+is not recommended,
+due to their numerous quirks and shortcomings.
+The https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html[`java.time`] package introduced
+in Java 8 should generally be preferred.
+
+That being said, integration constraints may force you to rely on the legacy date/time APIs,
+which is why Hibernate Search still attempts to support them on a best effort basis.
+
+Since Hibernate Search uses the `java.time` APIs to represent date/time internally,
+the legacy date/time types need to be converted before they can be indexed.
+Hibernate Search keeps things simple:
+`java.util.Date`, `java.util.Calendar`, etc. will be converted using their time-value (number of milliseconds since the epoch),
+which will be assumed to represent the same date/time in Java 8 APIs.
+In the case of `java.util.Calendar`, timezone information will be preserved for projections.
+
+For all dates after 1900, this will work exactly as expected.
+
+Before 1900, indexing and searching through Hibernate Search APIs will also work as expected,
+but *if you need to access the index natively*, for example through direct HTTP calls to an Elasticsearch server,
+you will notice that the indexed values are slightly "off".
+This is caused by differences in the implementation of `java.time` and legacy date/time APIs
+which lead to slight differences in the interpretation of time-values (number of milliseconds since the epoch).
+
+The "drifts" are consistent: they will also happen when building a predicate,
+and they will happen in the opposite direction when projecting.
+As a result, the differences will not be visible from an application relying on the Hibernate Search APIs exclusively.
+They will, however, be visible when accessing indexes natively.
+
+For the large majority of use cases, this will not be a problem.
+If this behavior is not acceptable for your application,
+you should look into implementing custom <<mapper-orm-bridge-valuebridge,value bridges>>
+and instructing Hibernate Search to use them by default for `java.util.Date`, `java.util.Calendar`, etc.:
+see <<mapper-orm-bridge-resolver>>.
+
+[TIP]
+====
+Technically, conversions are difficult because the `java.time` APIs
+and the legacy date/time APIs do not have the same internal calendar.
+
+In particular:
+
+* `java.time` assumes a "Local Mean Time" before 1900, while legacy date/time APIs do not support it
+(https://bugs.openjdk.java.net/browse/JDK-6281408[JDK-6281408]),
+As a result, time values (number of milliseconds since the epoch) reported by the two APIs
+will be different for dates before 1900.
+* `java.time` uses a proleptic Gregorian calendar before October 15, 1582,
+meaning it acts as if the Gregorian calendar, along with its system of leap years, had always existed.
+Legacy date/time APIs, on the other hand, use the Julian calendar before that date (by default),
+meaning the leap years are not exactly the same ones.
+As a result, some dates that are deemed valid by one API will be deemed invalid by the other,
+for example February 29, 1500.
+
+Those are the two main problems, but there may be others.
+====
+
 [[mapper-orm-directfieldmapping-custom-types]]
 === Mapping custom property types
 
@@ -591,65 +650,6 @@ include::todo-placeholder.asciidoc[]
 === Routing key bridges
 
 include::todo-placeholder.asciidoc[]
-
-[[mapper-orm-legacy-date-time-apis]]
-=== Support for legacy java.util date/time APIs
-
-Using legacy date/time types such as `java.util.Calendar`, `java.util.Date`, `java.sql.Timestamp`, `java.sql.Date`, `java.sql.Time`
-is not recommended,
-due to their numerous quirks and shortcomings.
-The https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html[`java.time`] package introduced
-in Java 8 should generally be preferred.
-
-That being said, integration constraints may force you to rely on the legacy date/time APIs,
-which is why Hibernate Search still attempts to support them on a best effort basis.
-
-Since Hibernate Search uses the `java.time` APIs to represent date/time internally,
-the legacy date/time types need to be converted before they can be indexed.
-Hibernate Search keeps things simple:
-`java.util.Date`, `java.util.Calendar`, etc. will be converted using their time-value (number of milliseconds since the epoch),
-which will be assumed to represent the same date/time in Java 8 APIs.
-In the case of `java.util.Calendar`, timezone information will be preserved for projections.
-
-For all dates after 1900, this will work exactly as expected.
-
-Before 1900, indexing and searching through Hibernate Search APIs will also work as expected,
-but *if you need to access the index natively*, for example through direct HTTP calls to an Elasticsearch server,
-you will notice that the indexed values are slightly "off".
-This is caused by differences in the implementation of `java.time` and legacy date/time APIs
-which lead to slight differences in the interpretation of time-values (number of milliseconds since the epoch).
-
-The "drifts" are consistent: they will also happen when building a predicate,
-and they will happen in the opposite direction when projecting.
-As a result, the differences will not be visible from an application relying on the Hibernate Search APIs exclusively.
-They will, however, be visible when accessing indexes natively.
-
-For the large majority of use cases, this will not be a problem.
-If this behavior is not acceptable for your application,
-you should look into implementing custom <<mapper-orm-bridge-valuebridge,value bridges>>
-and instructing Hibernate Search to use them by default for `java.util.Date`, `java.util.Calendar`, etc.:
-see <<mapper-orm-bridge-resolver>>.
-
-[TIP]
-====
-Technically, conversions are difficult because the `java.time` APIs
-and the legacy date/time APIs do not have the same internal calendar.
-
-In particular:
-
-* `java.time` assumes a "Local Mean Time" before 1900, while legacy date/time APIs do not support it
-(https://bugs.openjdk.java.net/browse/JDK-6281408[JDK-6281408]),
-As a result, time values (number of milliseconds since the epoch) reported by the two APIs
-will be different for dates before 1900.
-* `java.time` uses a proleptic Gregorian calendar before October 15, 1582,
-meaning it acts as if the Gregorian calendar, along with its system of leap years, had always existed.
-Legacy date/time APIs, on the other hand, use the Julian calendar before that date (by default),
-meaning the leap years are not exactly the same ones.
-As a result, some dates that are deemed valid by one API will be deemed invalid by the other,
-for example February 29, 1500.
-
-Those are the two main problems, but there may be others.
-====
 
 [[mapper-orm-bridge-resolver]]
 === Default bridge resolver
