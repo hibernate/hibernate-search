@@ -354,7 +354,7 @@ Some types are not supported directly by the Elasticsearch backend,
 but will work anyway because they are "bridged" by the mapper.
 For example a `java.util.Date` in your entity model is "bridged" to `java.time.Instant`,
 which is supported by the Elasticsearch backend.
-See <<mapper-orm-bridge-valuebridge-builtin>> for more information.
+See <<mapper-orm-directfieldmapping-supported-types>> for more information.
 ====
 
 [cols="l,1",options="header"]
