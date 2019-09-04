@@ -18,6 +18,9 @@ set the `hibernate.search.enabled` <<configuration-property-types,boolean proper
 
 By default, Hibernate Search will automatically process mapping annotations for entity types,
 as well as nested types in those entity types, for instance embedded types.
+See <<mapper-orm-entityindexmapping>> and <<mapper-orm-directfieldmapping>>
+to get started with annotation-based mapping.
+
 If you want to ignore these annotations, set `hibernate.search.mapping.process_annotations` to `false`.
 
 To configure the mapping manually, you can set a mapping configurer.
@@ -25,7 +28,13 @@ By setting `hibernate.search.mapping.configurer`
 to a <<configuration-property-types,bean reference>> of type `org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer`,
 you can use a programmatic API to define the mapping.
 
-// TODO add an example
+.Implementing a mapping configurer
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/mappingconfigurer/MySearchMappingConfigurer.java[tags=include]
+----
+====
 
 See <<mapper-orm-programmatic-mapping>> for more information about the programmatic mapping API.
 
