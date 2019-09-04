@@ -434,13 +434,6 @@ NOTE: Using Hibernate ORM mapping,
 a default `decimalScale` is taken automatically from the underlying `scale` value of the relative SQL `@Column`,
 using the Hibernate ORM metadata. The value could be overridden explicitly using the `decimalScale` attribute.
 
-[[mapper-orm-directfieldmapping-spatial-types]]
-=== Mapping spatial types
-// Search 5 anchors backward compatibility
-[[spatial]]
-
-include::todo-placeholder.asciidoc[]
-
 [[mapper-orm-directfieldmapping-supported-types]]
 === Supported property types
 // Search 5 anchors backward compatibility
@@ -1024,6 +1017,13 @@ which will extract the collection size (the number of authors).
 and not to each author,
 the `extraction` attribute is used to disable container extraction.
 ====
+
+[[mapper-orm-spatial-types]]
+== Mapping spatial types
+// Search 5 anchors backward compatibility
+[[spatial]]
+
+include::todo-placeholder.asciidoc[]
 
 [[mapper-orm-reindexing]]
 == Tuning automatic reindexing
