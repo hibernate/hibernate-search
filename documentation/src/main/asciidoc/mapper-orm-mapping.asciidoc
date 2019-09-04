@@ -118,7 +118,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexma
 include::todo-placeholder.asciidoc[]
 
 [[mapper-orm-directfieldmapping]]
-== Direct field mapping
+== Mapping a property to an index field with `@GenericField`, `@FullTextField`, ...
 
 include::todo-placeholder.asciidoc[]
 
@@ -127,11 +127,11 @@ TODO The getting started section has a link pointing here and expects the sectio
 include a detailed description of each @*Field annotation.
 ////
 
-Direct field mapping allows to map a property to an index field directly:
+Properties of an entity can be mapped to an index field directly:
 you just need to add an annotation, configure the field through the annotation attributes,
 and Hibernate Search will take care of extracting the property value and populating the index field when necessary.
 
-Direct field mapping looks like this:
+Mapping a property to an index field looks like this:
 
 .Mapping properties to fields directly
 ====
@@ -155,7 +155,7 @@ You can map a property to as many fields as you want, but each must have a uniqu
 Before you map a property, you must consider two things:
 
 The `@*Field` annotation::
-In its simplest form, direct field mapping is achieved by applying the `@GenericField` annotation to a property.
+In its simplest form, property/field mapping is achieved by applying the `@GenericField` annotation to a property.
 This annotation will work for every supported property type, but is rather limited:
 it does not allow full-text search in particular.
 To go further, you will need to rely on different, more specific annotations,
@@ -171,7 +171,7 @@ or custom types.
 [[mapper-orm-directfieldmapping-annotations]]
 === Available field annotations
 
-Various direct field mapping annotations exist,
+Various field annotations exist,
 each offering its own set of attributes.
 
 This section lists the different annotations and their use.
@@ -232,7 +232,7 @@ This annotation allows to set <<mapper-orm-directfieldmapping-decimalscale, the 
 [[mapper-orm-directfieldmapping-annotation-attributes]]
 === Field annotation attributes
 
-Various direct field mapping annotations exist,
+Various field mapping annotations exist,
 each offering its own set of attributes.
 
 This section lists the different annotation attributes and their use.
@@ -456,7 +456,7 @@ include::todo-placeholder.asciidoc[]
 [[section-built-in-bridges]]
 
 Some types have built-in value bridges,
-meaning they are supported out-of-the box for <<mapper-orm-directfieldmapping,direct field mapping>> using `@*Field` annotations.
+meaning they are supported out-of-the box for <<mapper-orm-directfieldmapping,property/field mapping>> using `@*Field` annotations.
 
 Below is a table listing all types with built-in value bridges,
 along with the value assigned to the "raw" fields, i.e. the value passed to the underlying backend.
