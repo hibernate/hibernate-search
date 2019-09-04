@@ -113,9 +113,55 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexma
 ====
 
 [[mapper-orm-identifiermapping]]
-== Identifier mapping
+== Mapping the document identifier
+// Search 5 anchors backward compatibility
+[[id-annotation]]
 
-include::todo-placeholder.asciidoc[]
+[[mapper-orm-identifiermapping-basics]]
+=== Basics
+// Search 5 anchors backward compatibility
+[[example-document-id-default-orm]]
+
+Index documents, much like entities, need to be assigned an identifier
+so that Hibernate Search can handle updates and deletion.
+
+When indexing Hibernate ORM entities,
+the entity identifier is used as a document identifier by default.
+
+Provided the entity identifier has a <<mapper-orm-bridge-identifierbridge-builtin,supported type>>,
+identifier mapping will work out of the box and no explicit mapping is necessary.
+
+=== Explicit identifier mapping
+
+Explicit identifier mapping is required in the following cases:
+
+* The document identifier is not the entity identifier.
+* OR the entity identifier has a type that is not supported by default.
+This is the case of composite identifiers, in particular.
+
+To select a property to map to the document identifier,
+just apply the `@DocumentId` annotation to that property:
+
+[[example-document-id-explicit]]
+.Mapping a property to the document identifier explicitly with `@DocumentId`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/identifiermapping/naturalid/Book.java[tags=include;!getters-setters]
+----
+====
+
+When the property type is not supported,
+it is also necessary to <<mapper-orm-bridge-identifierbridge,implement a custom identifier bridge>>,
+then refer to it in the `@DocumentId` annotation:
+
+.Mapping a property with unsupported type to the document identifier with `@DocumentId`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/identifiermapping/customtype/Book.java[tags=include;!getters-setters]
+----
+====
 
 [[mapper-orm-directfieldmapping]]
 == Mapping a property to an index field with `@GenericField`, `@FullTextField`, ...
@@ -520,6 +566,8 @@ which is why they are mapped using a different type of bridge.
 
 [[mapper-orm-bridge-identifierbridge-builtin]]
 ==== Built-in identifier bridges
+// Search 5 anchors backward compatibility
+[[_supported_identifier_types]]
 
 Some types have built-in identifier bridges,
 meaning they are supported out-of-the box for <<mapper-orm-identifiermapping,document ID mapping>>.
