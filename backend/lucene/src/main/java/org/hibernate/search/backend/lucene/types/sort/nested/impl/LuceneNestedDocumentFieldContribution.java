@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.types.sort.nested.impl;
 
 import java.util.Map;
-import java.util.Set;
 
 public class LuceneNestedDocumentFieldContribution {
 
@@ -23,7 +22,7 @@ public class LuceneNestedDocumentFieldContribution {
 		return nestedDocumentPath;
 	}
 
-	public void setNestedDocumentMap(Map<Integer, Set<Integer>> nestedDocumentMap) {
+	public void setNestedDocumentMap(Map<Integer, Integer> nestedDocumentMap) {
 		fieldComparatorSource.setNestedDocumentMap( nestedDocumentMap );
 	}
 }
