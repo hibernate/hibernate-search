@@ -299,6 +299,11 @@
         <jboss.public.repo.id>jboss-public-repository-group</jboss.public.repo.id>
         <jboss.public.repo.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</jboss.public.repo.url>
 
+        <!-- Eclipse repository (for the ECJ compiler, disabled by default) -->
+
+        <eclipse.repo.id>eclipse-staging</eclipse.repo.id>
+        <eclipse.repo.url>https://repo.eclipse.org/content/repositories/eclipse-staging/</eclipse.repo.url>
+
         <!-- Repository Deployment URLs -->
 
         <jboss.releases.repo.id>jboss-releases-repository</jboss.releases.repo.id>
@@ -334,7 +339,7 @@
                 is outdated and leads to compilation errors.
          -->
         <version.org.codehaus.plexus.plexus-compiler-eclipse>2.8.5</version.org.codehaus.plexus.plexus-compiler-eclipse>
-        <version.org.eclipse.jdt.ecj>3.17.0</version.org.eclipse.jdt.ecj>
+        <version.org.eclipse.jdt.ecj>3.19.0.v20190826-1051</version.org.eclipse.jdt.ecj>
 
         <!--
             The absolute path to the root project directory.
@@ -1981,6 +1986,27 @@
                     </plugins>
                 </pluginManagement>
             </build>
+            <pluginRepositories>
+                <!--
+                     This is needed to access pre-release versions of ECJ,
+                     where bugs that affect us are fixed.
+                     See in particular https://bugs.eclipse.org/bugs/show_bug.cgi?id=547807,
+                     not fixed in 3.18.0, the latest ECJ release at the moment.
+                     This configuration *MUST STAY IN A SPECIFIC PROFILE*,
+                     otherwise it would "taint" projects that depend on Hibernate Search.
+                 -->
+                <pluginRepository>
+                    <id>${eclipse.repo.id}</id>
+                    <url>${eclipse.repo.url}</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
         </profile>
 
         <profile>
