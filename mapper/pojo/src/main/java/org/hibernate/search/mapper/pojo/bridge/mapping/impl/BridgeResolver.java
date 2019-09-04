@@ -57,6 +57,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateV
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultPeriodValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultShortIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultStringIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneIdValueBridge;
@@ -89,6 +90,7 @@ public final class BridgeResolver {
 
 		TypePatternMatcher concreteGeoPointPattern = typePatternMatcherFactory.createRawSuperTypeMatcher( GeoPoint.class );
 
+		addIdentifierBridgeForExactRawType( String.class, new DefaultStringIdentifierBridge() );
 		addIdentifierBridgeForExactRawType( Integer.class, new DefaultIntegerIdentifierBridge() );
 		addIdentifierBridgeForExactRawType( Long.class, new DefaultLongIdentifierBridge() );
 		addIdentifierBinderForTypePattern( concreteEnumPattern, new DefaultEnumIdentifierBridge.Binder() );
