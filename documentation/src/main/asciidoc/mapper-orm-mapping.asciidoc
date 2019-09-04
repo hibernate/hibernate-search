@@ -128,7 +128,7 @@ so that Hibernate Search can handle updates and deletion.
 When indexing Hibernate ORM entities,
 the entity identifier is used as a document identifier by default.
 
-Provided the entity identifier has a <<mapper-orm-bridge-identifierbridge-builtin,supported type>>,
+Provided the entity identifier has a <<mapper-orm-identifiermapping-supported-types,supported type>>,
 identifier mapping will work out of the box and no explicit mapping is necessary.
 
 === Explicit identifier mapping
@@ -162,6 +162,31 @@ then refer to it in the `@DocumentId` annotation:
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/identifiermapping/customtype/Book.java[tags=include;!getters-setters]
 ----
 ====
+
+[[mapper-orm-identifiermapping-supported-types]]
+=== Supported identifier property types
+// Search 5 anchors backward compatibility
+[[_supported_identifier_types]]
+
+Below is a table listing all types with built-in identifier bridges,
+i.e. property types that are supported out of the box
+when mapping a property to a document identifier.
+
+The table also explains the value assigned to the document identifier,
+i.e. the value passed to the underlying backend.
+
+[cols="l,1",options="header"]
+.Property types with built-in identifier bridges
+|====
+|Property type|Value of document identifiers
+|java.lang.String|Unchanged
+|java.lang.Short, short|`toString()`
+|java.lang.Integer, int|`toString()`
+|java.lang.Long, long|`toString()`
+|java.math.BigInteger|`toString()`
+|All enum types|`name()`
+|java.util.UUID|`toString()`
+|====
 
 [[mapper-orm-directfieldmapping]]
 == Mapping a property to an index field with `@GenericField`, `@FullTextField`, ...
@@ -205,7 +230,7 @@ which offer specific attributes.
 The available annotations are described in details in <<mapper-orm-directfieldmapping-annotations>>.
 The type of the property::
 In order for the `@*Field` annotation to work correctly, the type of the mapped property must be supported by Hibernate Search.
-See <<mapper-orm-bridge-valuebridge-builtin>> for a list of all types that are supported out of the box,
+See <<mapper-orm-directfieldmapping-supported-types>> for a list of all types that are supported out of the box,
 and <<mapper-orm-directfieldmapping-custom-types>> for indications on how to handle more complex types,
 be it simply containers (`List<String>`, `Map<String, Integer>`, ...)
 or custom types.
@@ -326,7 +351,7 @@ Disabled by default.
 [IMPORTANT]
 ====
 The replacement is defined as a String. Thus its value has to be parsed.
-Look up the column _Parsing method for 'indexNullAs'_ in <<mapper-orm-bridge-valuebridge-builtin>> to find out the format used when parsing.
+Look up the column _Parsing method for 'indexNullAs'_ in <<mapper-orm-directfieldmapping-supported-types>> to find out the format used when parsing.
 ====
 
 `extraction`::
@@ -418,10 +443,70 @@ using the Hibernate ORM metadata. The value could be overridden explicitly using
 
 include::todo-placeholder.asciidoc[]
 
+[[mapper-orm-directfieldmapping-supported-types]]
+=== Supported property types
+// Search 5 anchors backward compatibility
+[[section-built-in-bridges]]
+
+Below is a table listing all types with built-in value bridges,
+i.e. property types that are supported out of the box
+when mapping a property to an index field.
+
+The table also explains the value assigned to the index field,
+i.e. the value passed to the underlying backend for indexing.
+
+[NOTE]
+====
+For information about the underlying indexing and storage used by the backend,
+see <<backend-lucene-field-types,Lucene field types>>
+or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on your backend.
+====
+
+[cols="l,1,1",options="header"]
+.Property types with built-in value bridges
+|===
+|Property type|Value of index field (if different)| Parsing method for 'indexNullAs'
+|All enum types|`name()` as a `java.lang.String`| `Enum.valueOf(String)`
+|java.lang.String|- | -
+|java.lang.Character, char|A single-character `java.lang.String`| Accepts any single-character `java.lang.String`
+|java.lang.Byte, byte|-| `Byte.parseByte(String)`
+|java.lang.Short, short|-| `Short.parseShort(String)`
+|java.lang.Integer, int|-| `Integer.parseInt(String)`
+|java.lang.Long, long|-| `Long.parseLong(String)`
+|java.lang.Double, double|-| `Double.parseDouble(String)`
+|java.lang.Float, float|-| `Float.parseFloat(String)`
+|java.lang.Boolean, boolean|-| Accepts the strings `true` or `false`, ignoring case
+|java.math.BigDecimal|-| `new BigDecimal(String)`
+|java.math.BigInteger|-| `new BigInteger(String)`
+|java.net.URI|`toString()` as a `java.lang.String` | `new URI(String)`
+|java.net.URL|`toExternalForm()` as a `java.lang.String`| `new URL(String)`
+|java.time.Instant|- | `Instant.parse(String)`
+|java.time.LocalDate|- | `LocalDate.parse(String)`
+|java.time.LocalTime|- | `LocalTime.parse(String)`
+|java.time.LocalDateTime|- | `LocalDateTime.parse(String)`
+|java.time.OffsetDateTime|- | `OffsetDateTime.parse(String)`
+|java.time.OffsetTime|- | `OffsetTime.parse(String)`
+|java.time.ZonedDateTime|- | `ZonedDateTime.parse(String)`
+|java.time.ZoneId|`getId()` as a `java.lang.String` | `ZoneId.of(String)`
+|java.time.ZoneOffset|`getTotalSeconds()` as a `java.lang.Integer` | `ZoneOffset.of(String)`
+|java.time.Period|A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>` |`Period.parse(String)`
+|java.time.Duration|`toNanos()` as a `java.lang.Long` | `Duration.parse(String)`
+|java.time.Year|- | `Year.parse(String)`
+|java.time.YearMonth|- | `YearMonth.parse(String)`
+|java.time.MonthDay|- | `MonthDay.parse(String)`
+|java.util.UUID|`toString()` as a `java.lang.String` | `UUID.fromString(String)`
+|java.util.Calendar|A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>> | `ZonedDateTime.parse(String)`
+|java.util.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|java.sql.Timestamp|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|java.sql.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|java.sql.Time|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|org.hibernate.search.engine.spatial.GeoPoint and subtypes|-| Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
+|===
+
 [[mapper-orm-directfieldmapping-custom-types]]
 === Mapping custom property types
 
-Even types that are not <<mapper-orm-bridge-valuebridge-builtin,supported out of the box>> can be mapped.
+Even types that are not <<mapper-orm-directfieldmapping-supported-types,supported out of the box>> can be mapped.
 There are various solutions, some simple and some more powerful,
 but they all come down to extracting data from the unsupported type and converting it to types that are
 supported by the backend.
@@ -492,65 +577,6 @@ The corresponding annotation is `org.hibernate.search.integrationtest.showcase.l
 
 include::todo-placeholder.asciidoc[]
 
-[[mapper-orm-bridge-valuebridge-builtin]]
-==== Built-in value bridges
-// Search 5 anchors backward compatibility
-[[section-built-in-bridges]]
-
-Some types have built-in value bridges,
-meaning they are supported out-of-the box for <<mapper-orm-directfieldmapping,property/field mapping>> using `@*Field` annotations.
-
-Below is a table listing all types with built-in value bridges,
-along with the value assigned to the "raw" fields, i.e. the value passed to the underlying backend.
-
-[NOTE]
-====
-For information about the underlying indexing and storage used by the backend,
-see <<backend-lucene-field-types,Lucene field types>>
-or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on your backend.
-====
-
-[cols="l,1,1",options="header"]
-.Property types with built-in value bridges
-|===
-|Property type|Value of "raw" fields (if different)| Parsing method for 'indexNullAs'
-|All enum types|`name()` as a `java.lang.String`| `Enum.valueOf(String)`
-|java.lang.String|- | -
-|java.lang.Character, char|A single-character `java.lang.String`| Accepts any single-character `java.lang.String`
-|java.lang.Byte, byte|-| `Byte.parseByte(String)`
-|java.lang.Short, short|-| `Short.parseShort(String)`
-|java.lang.Integer, int|-| `Integer.parseInt(String)`
-|java.lang.Long, long|-| `Long.parseLong(String)`
-|java.lang.Double, double|-| `Double.parseDouble(String)`
-|java.lang.Float, float|-| `Float.parseFloat(String)`
-|java.lang.Boolean, boolean|-| Accepts the strings `true` or `false`, ignoring case
-|java.math.BigDecimal|-| `new BigDecimal(String)`
-|java.math.BigInteger|-| `new BigInteger(String)`
-|java.net.URI|`toString()` as a `java.lang.String` | `new URI(String)`
-|java.net.URL|`toExternalForm()` as a `java.lang.String`| `new URL(String)`
-|java.time.Instant|- | `Instant.parse(String)`
-|java.time.LocalDate|- | `LocalDate.parse(String)`
-|java.time.LocalTime|- | `LocalTime.parse(String)`
-|java.time.LocalDateTime|- | `LocalDateTime.parse(String)`
-|java.time.OffsetDateTime|- | `OffsetDateTime.parse(String)`
-|java.time.OffsetTime|- | `OffsetTime.parse(String)`
-|java.time.ZonedDateTime|- | `ZonedDateTime.parse(String)`
-|java.time.ZoneId|`getId()` as a `java.lang.String` | `ZoneId.of(String)`
-|java.time.ZoneOffset|`getTotalSeconds()` as a `java.lang.Integer` | `ZoneOffset.of(String)`
-|java.time.Period|A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>` |`Period.parse(String)`
-|java.time.Duration|`toNanos()` as a `java.lang.Long` | `Duration.parse(String)`
-|java.time.Year|- | `Year.parse(String)`
-|java.time.YearMonth|- | `YearMonth.parse(String)`
-|java.time.MonthDay|- | `MonthDay.parse(String)`
-|java.util.UUID|`toString()` as a `java.lang.String` | `UUID.fromString(String)`
-|java.util.Calendar|A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>> | `ZonedDateTime.parse(String)`
-|java.util.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|java.sql.Timestamp|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|java.sql.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|java.sql.Time|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|org.hibernate.search.engine.spatial.GeoPoint|-| Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
-|===
-
 [[mapper-orm-bridge-typeandpropertybridge]]
 === Type bridges and property bridges
 
@@ -560,33 +586,6 @@ include::todo-placeholder.asciidoc[]
 === Identifier bridges
 
 include::todo-placeholder.asciidoc[]
-
-Document identifiers have slightly different requirements than index fields,
-which is why they are mapped using a different type of bridge.
-
-[[mapper-orm-bridge-identifierbridge-builtin]]
-==== Built-in identifier bridges
-// Search 5 anchors backward compatibility
-[[_supported_identifier_types]]
-
-Some types have built-in identifier bridges,
-meaning they are supported out-of-the box for <<mapper-orm-identifiermapping,document ID mapping>>.
-
-Below is a table listing all types with built-in identifier bridges,
-along with the value of the document identifier, i.e. the value passed to the underlying backend.
-
-[cols="l,1",options="header"]
-.Property types with built-in identifier bridges
-|====
-|Property type|Value of document identifiers
-|java.lang.String|Same
-|java.lang.Short, short|`toString()`
-|java.lang.Integer, int|`toString()`
-|java.lang.Long, long|`toString()`
-|java.math.BigInteger|`toString()`
-|All enum types|`name()`
-|java.util.UUID|`toString()`
-|====
 
 [[mapper-orm-bridge-routingkeybridge]]
 === Routing key bridges
