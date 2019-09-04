@@ -21,6 +21,7 @@ public abstract class PropertyTypeDescriptor<V> {
 	public static List<PropertyTypeDescriptor<?>> getAll() {
 		if ( all == null ) {
 			all = Collections.unmodifiableList( Arrays.asList(
+					new StringPropertyTypeDescriptor(),
 					new BoxedIntegerPropertyTypeDescriptor(),
 					new BoxedLongPropertyTypeDescriptor(),
 					new BoxedBooleanPropertyTypeDescriptor(),

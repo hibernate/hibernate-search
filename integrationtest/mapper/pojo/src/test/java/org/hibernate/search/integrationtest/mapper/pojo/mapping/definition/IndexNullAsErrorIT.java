@@ -16,6 +16,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.SubTest;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,13 +52,17 @@ public class IndexNullAsErrorIT<V, F> {
 
 	@Test
 	public void testParsingException() {
+		String unparsableNullAsValue = expectations.getUnparsableNullAsValue();
+		// Null means "there's no value I can't parse". Useful for the String type.
+		Assume.assumeNotNull( unparsableNullAsValue );
+
 		SubTest.expectException( () ->
 				setupHelper.start().withConfiguration( c -> c
 						.addEntityType( expectations.getTypeWithValueBridge1() )
 						.programmaticMapping()
 						.type( expectations.getTypeWithValueBridge1() ).indexed()
 						.property( FIELD_NAME ).genericField( FIELD_NAME )
-						.property( FIELD_NAME ).genericField( FIELD_INDEXNULLAS_NAME ).indexNullAs( expectations.getUnparsableNullAsValue() )
+						.property( FIELD_NAME ).genericField( FIELD_INDEXNULLAS_NAME ).indexNullAs( unparsableNullAsValue )
 				).setup()
 		)
 				.assertThrown()
