@@ -46,22 +46,23 @@ public class LuceneNestedDocumentsSort {
 	public void processNestedPaths(Query luceneQuery, IndexSearcher indexSearcher, ScoreDoc[] scoreDocs) throws IOException {
 		for ( Map.Entry<String, Set<LuceneNestedDocumentFieldContribution>> fieldEntry : contributions.entrySet() ) {
 			String nestedDocumentPath = fieldEntry.getKey();
-			Map<Integer, Set<Integer>> nestedDocumentMap = getFetchNestedDocumentMap( nestedDocumentPath, luceneQuery, indexSearcher, scoreDocs );
+			Map<Integer, Integer> nestedDocumentMap = getFetchNestedDocumentMap( nestedDocumentPath, luceneQuery, indexSearcher, scoreDocs );
 			for ( LuceneNestedDocumentFieldContribution fieldContribution : fieldEntry.getValue() ) {
 				fieldContribution.setNestedDocumentMap( nestedDocumentMap );
 			}
 		}
 	}
 
-	private Map<Integer, Set<Integer>> getFetchNestedDocumentMap(String nestedDocumentPath, Query luceneQuery, IndexSearcher indexSearcher,
+	private Map<Integer, Integer> getFetchNestedDocumentMap(String nestedDocumentPath, Query luceneQuery, IndexSearcher indexSearcher,
 			ScoreDoc[] scoreDocs) throws IOException {
 
 		BooleanQuery childQuery = LuceneNestedQueries.findChildQuery( Collections.singleton( nestedDocumentPath ), luceneQuery );
 		LuceneChildrenCollector childrenCollector = new LuceneChildrenCollector();
 		indexSearcher.search( childQuery, childrenCollector );
 
-		Map<String, Set<Integer>> children = childrenCollector.getChildren();
-		Map<Integer, Set<Integer>> result = new HashMap<>();
+		// Given a single nested document path we can have at most one nested document for each root document.
+		Map<String, Integer> children = childrenCollector.getSingleChildMap();
+		Map<Integer, Integer> result = new HashMap<>();
 
 		// TODO HSEARCH-3657 this could be avoided
 		for ( ScoreDoc hit : scoreDocs ) {
@@ -70,11 +71,11 @@ public class LuceneNestedDocumentsSort {
 			if ( parentId == null ) {
 				continue;
 			}
-			Set<Integer> childIds = children.get( parentId );
-			if ( childIds == null ) {
+			Integer childId = children.get( parentId );
+			if ( childId == null ) {
 				continue;
 			}
-			result.put( hit.doc, childIds );
+			result.put( hit.doc, childId );
 		}
 
 		return result;

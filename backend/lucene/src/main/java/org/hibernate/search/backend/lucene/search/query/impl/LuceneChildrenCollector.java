@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
@@ -39,6 +40,11 @@ public class LuceneChildrenCollector implements Collector {
 
 	public Map<String, Set<Integer>> getChildren() {
 		return children;
+	}
+
+	public Map<String, Integer> getSingleChildMap() {
+		return children.entrySet().stream().
+				collect( Collectors.toMap( Map.Entry::getKey, entry -> entry.getValue().iterator().next() ) );
 	}
 
 	private class FieldLeafCollector implements LeafCollector {

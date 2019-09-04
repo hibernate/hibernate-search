@@ -7,15 +7,14 @@
 package org.hibernate.search.backend.lucene.types.sort.nested.impl;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.lucene.search.FieldComparatorSource;
 
 public abstract class LuceneNestedFieldComparator extends FieldComparatorSource {
 
-	protected Map<Integer, Set<Integer>> nestedDocumentMap;
+	protected Map<Integer, Integer> nestedDocumentMap;
 
-	public void setNestedDocumentMap(Map<Integer, Set<Integer>> nestedDocumentMap) {
+	public void setNestedDocumentMap(Map<Integer, Integer> nestedDocumentMap) {
 		this.nestedDocumentMap = nestedDocumentMap;
 	}
 
@@ -26,13 +25,7 @@ public abstract class LuceneNestedFieldComparator extends FieldComparatorSource 
 		}
 
 		// it is possible that a document does not have a value set for the nested field
-		Set<Integer> nestedDocs = nestedDocumentMap.get( rootDocument );
-		if ( nestedDocs == null ) {
-			return rootDocument;
-		}
-
-		// TODO at the moment we do not support multi value sorting on nested document
-		// using one of them in case
-		return nestedDocs.iterator().next();
+		Integer nestedDoc = nestedDocumentMap.get( rootDocument );
+		return ( nestedDoc == null ) ? rootDocument : nestedDoc;
 	}
 }
