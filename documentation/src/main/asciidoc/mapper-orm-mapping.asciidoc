@@ -120,12 +120,8 @@ include::todo-placeholder.asciidoc[]
 [[mapper-orm-directfieldmapping]]
 == Mapping a property to an index field with `@GenericField`, `@FullTextField`, ...
 
-include::todo-placeholder.asciidoc[]
-
-////
-TODO The getting started section has a link pointing here and expects the section to
-include a detailed description of each @*Field annotation.
-////
+[[mapper-orm-directfieldmapping-basics]]
+=== Basics
 
 Properties of an entity can be mapped to an index field directly:
 you just need to add an annotation, configure the field through the annotation attributes,
