@@ -3,19 +3,8 @@
 // Search 5 anchors backward compatibility
 [[search-mapping]]
 
-include::todo-placeholder.asciidoc[]
-
-////
-TODO The getting started section has a link pointing here and expects the section to
-include a description of how to:
- * define a mapping using annotations.
- * define a mapping programmatically.
-////
-
 [[mapper-orm-mapping-configuration]]
 == Configuration
-
-include::todo-placeholder.asciidoc[]
 
 === Enabling the integration
 // Search 5 anchors backward compatibility
