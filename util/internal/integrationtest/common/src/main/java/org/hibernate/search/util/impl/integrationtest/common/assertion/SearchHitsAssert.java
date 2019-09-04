@@ -54,7 +54,7 @@ public class SearchHitsAssert<H> {
 		shouldHaveOnlyElementsOfTypeOrNull( asIs(), List.class );
 		@SuppressWarnings( "unchecked" ) // We check that at runtime, that's what the assertion is for
 		List<List<?>> normalized = ( (List<? extends List<?>>) actual ).stream()
-				.map( NormalizationUtils::normalize )
+				.map( NormalizationUtils::<List<?>>normalize )
 				.collect( Collectors.toList() );
 		return Assertions.assertThat( normalized ).as( description );
 	}
