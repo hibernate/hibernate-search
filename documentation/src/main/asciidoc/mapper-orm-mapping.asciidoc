@@ -287,6 +287,17 @@ The replacement is defined as a String. Thus its value has to be parsed.
 Look up the column _Parsing method for 'indexNullAs'_ in <<mapper-orm-bridge-valuebridge-builtin>> to find out the format used when parsing.
 ====
 
+`extraction`::
+How elements to index should be extracted from the property in the case of container types
+(`List`, `Optional`, `Map`, ...).
++
+By default, for properties that have a container type,
+the innermost elements will be indexed.
+For example for a property of type `List<String>`, elements of type `String` will be indexed.
++
+This default behavior and ways to override it are described
+in the section <<mapper-orm-containerextractor>>.
+
 [[mapper-orm-directfieldmapping-analyzer]] `analyzer`::
 The analyzer to apply to field values when indexing and querying.
 Only available on `@FullTextField`.
@@ -370,25 +381,16 @@ include::todo-placeholder.asciidoc[]
 
 Even types that are not <<mapper-orm-bridge-valuebridge-builtin,supported out of the box>> can be mapped.
 There are various solutions, some simple and some more powerful,
-but they all come down to extracting data from the unsupported type and convert it to types that are
+but they all come down to extracting data from the unsupported type and converting it to types that are
 supported by the backend.
 
-There are two cases to distinguish:
+There are two cases to distinguish between:
 
 1. If the unsupported type is simply a container (`List<String>`)
 or multiple nested containers (`Map<Integer, List<String>>`)
 whose elements have a supported type,
-then what you need is a container value extractor.
-+
-By default, built-in extractors are transparently applied to standard container types:
-`Iterable` and subtypes, `Map` (extracting the value), `Optional`, `OptionalInt`, ...
-If that is all you need, then no extra configuration is necessary.
-+
-If your container is a custom one, or you need a different behavior than the default
-(extract keys instead of values from a `Map`, for example),
-then you will need to set a custom extractor chain on the `@*Field` annotation.
-All `@*Field` annotations expose an `extraction` attribute to that end.
-See <<mapper-orm-containerextractor>> for more information on available extractors and custom extractors.
+then what you need is a container extractor.
+See <<mapper-orm-containerextractor>> for more information.
 2. Otherwise, you will have to rely on a custom component, called a bridge, to extract data from your type.
 See <<mapper-orm-bridge>> for more information on custom bridges.
 
@@ -756,6 +758,17 @@ has or doesn't have a value:
 simply pass the name of the object field to the `exists` predicate,
 for example `authors` in the example above.
 
+[[mapper-orm-indexedembedded-multivalued]]
+=== `@IndexedEmbedded` on container types
+
+When properties targeted by an `@IndexedEmbedded` have a container type
+(`List`, `Optional`, `Map`, ...),
+the innermost elements will be embedded.
+For example for a property of type `List<MyEntity>`, elements of type `MyEntity` will be embedded.
+
+This default behavior and ways to override it are described
+in the section <<mapper-orm-containerextractor>>.
+
 [[mapper-orm-indexedembedded-prefix]]
 === Setting the field name prefix with `prefix`
 
@@ -969,15 +982,83 @@ would *not* show up as a match to a query such as `authors.firstname:Ty AND auth
 as long as a `nested` predicate is used.
 
 [[mapper-orm-containerextractor]]
-== Container value extractors
+== Mapping container types with container extractors
 
-include::todo-placeholder.asciidoc[]
+=== Basics
 
-// TODO add sections to documentation of direct field mapping and indexed-embedded briefly explaining multi-valued handling and pointing here for details
+Most built-in annotations applied to properties will work transparently when applied to container types:
 
-////
-TODO Detailed description of container value extractors, list of built-in extractors, instructions to create one's own
-////
+* `@GenericField` applied to a property of type `String` will index the property value directly.
+* `@GenericField` applied to a property of type `OptionalInt` will index the optional's value (an integer).
+* `@GenericField` applied to a property of type `List<String>` will index the list elements (strings).
+* `@GenericField` applied to a property of type `Map<Integer, String>` will index the map values (strings).
+* `@GenericField` applied to a property of type `Map<Integer, List<String>>` will index the list elements in the map values (strings).
+* Etc.
+
+Same goes for other field annotations such as `@FullTextField`,
+as well as `@IndexedEmbedded` in particular.
+
+What happens behind the scenes is that Hibernate Search will inspect the property type
+and attempt to apply "container extractors", picking the first that works.
+
+=== Explicit container extraction
+
+In some cases, you will want to pick the container extractors to use explicitly.
+This is the case when a map's keys must be indexed, instead of the values.
+Relevant annotations offer an `extraction` attribute to configure this,
+as shown in the example below.
+
+TIP: All built-in extractor names are available as constants
+in `org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors`.
+
+.Mapping map keys to an index field using explicit container extractor definition
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/containerextractor/Book.java[tags=explicit-extractor]
+----
+<1> This annotation, and those below, are just Hibernate ORM configuration.
+<2> Declare an index field based on the `priceByFormat` property.
+<3> By default, Hibernate Search would index the map values (the book prices).
+This uses the `extraction` attribute to specify that map keys (the book formats)
+must be indexed instead.
+====
+
+TIP: When multiple levels of extractions are necessary,
+multiple extractors can be configured:
+`extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY, BuiltinContainerExtractors.OPTIONAL)`.
+However, such complex mappings are unlikely since they are generally not supported by Hibernate ORM.
+
+[NOTE]
+====
+It is possible to implement and use custom container extractors,
+but at the moment these extractors will not be handled correctly for automatic reindexing,
+so the corresponding property must <<mapper-orm-reindexing-reindexonupdate,have automatic reindexing disabled>>.
+
+See https://hibernate.atlassian.net/browse/HSEARCH-3688[HSEARCH-3688] for more information.
+====
+
+=== Disabling container extraction
+
+In some rare cases, container extraction is not wanted,
+and the `@GenericField`/`@IndexedEmbedded` is meant to be applied to the `List`/`Optional`/etc. directly.
+To ignore the default container extractors,
+most annotations offer an `extraction` attribute.
+Set it as below to disable extraction altogether:
+
+.Disabling container extraction
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/containerextractor/Book.java[tags=no-extractor]
+----
+<1> Declare an index field based on the `authors` property.
+<2> Instruct Hibernate Search to use the given bridge,
+which will extract the collection size (the number of authors).
+<3> Because the bridge is applied to the collection as a whole,
+and not to each author,
+the `extraction` attribute is used to disable container extraction.
+====
 
 [[mapper-orm-reindexing]]
 == Tuning automatic reindexing
