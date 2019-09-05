@@ -140,9 +140,9 @@ public final class HibernateOrmMapperSettings {
 		public static final String ENABLE_CONFIGURATION_PROPERTY_TRACKING = "enable_configuration_property_tracking";
 		public static final String AUTOREGISTER_LISTENERS = "autoregister_listeners";
 		public static final String AUTOMATIC_INDEXING_STRATEGY = "automatic_indexing.strategy";
-		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = "automatic_indexing.synchronization_strategy";
+		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = "automatic_indexing.synchronization.strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = "automatic_indexing.enable_dirty_check";
-		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup_strategy";
+		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String ENABLE_ANNOTATION_MAPPING = "enable_annotation_mapping";
 		public static final String MAPPING_CONFIGURER = "mapping_configurer";

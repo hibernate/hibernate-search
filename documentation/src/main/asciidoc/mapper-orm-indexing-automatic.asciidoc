@@ -114,7 +114,7 @@ during automatic indexing,
 i.e. to control the minimum progress of indexing before the application thread is resumed.
 
 You can define a default strategy for all sessions by setting the configuration property
-`hibernate.search.automatic_indexing.synchronization_strategy`:
+`hibernate.search.automatic_indexing.synchronization.strategy`:
 
 * when set to `queued`, the application thread will be resumed as soon as
 the index changes are queued in the backend.

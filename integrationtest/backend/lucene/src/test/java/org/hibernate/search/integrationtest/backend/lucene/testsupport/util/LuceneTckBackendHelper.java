@@ -37,7 +37,7 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	public TckBackendSetupStrategy createMultiTenancyBackendSetupStrategy() {
 		return TckBackendSetupStrategy.of(
 				DEFAULT_BACKEND_PROPERTIES_PATH,
-				Collections.singletonMap( "multi_tenancy_strategy", "discriminator" )
+				Collections.singletonMap( "multi_tenancy.strategy", "discriminator" )
 		);
 	}
 

@@ -88,7 +88,7 @@
             <!-- Make this test work even if there is only a single node in the cluster -->
             <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.minimal_required_status"
                       value="yellow"/>
-            <property name="hibernate.search.automatic_indexing.synchronization_strategy"
+            <property name="hibernate.search.automatic_indexing.synchronization.strategy"
                       value="searchable"/>
         </properties>
     </persistence-unit>
@@ -157,7 +157,7 @@
             <!-- Make this test work even if there is only a single node in the cluster -->
             <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.minimal_required_status"
                       value="yellow"/>
-            <property name="hibernate.search.automatic_indexing.synchronization_strategy"
+            <property name="hibernate.search.automatic_indexing.synchronization.strategy"
                       value="searchable"/>
         </properties>
     </persistence-unit>
