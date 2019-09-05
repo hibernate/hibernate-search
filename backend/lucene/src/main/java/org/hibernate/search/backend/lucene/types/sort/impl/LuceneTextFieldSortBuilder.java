@@ -11,8 +11,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.types.sort.missing.impl.LuceneMissingValueComparatorSource;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentFieldContribution;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedTextFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl.NestedTextFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
@@ -38,7 +37,7 @@ public class LuceneTextFieldSortBuilder<F>
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
 		// For STRING type, missing value must be either STRING_FIRST or STRING_LAST.
 		// Otherwise we need a CUSTOM type.
-		collector.collectSortField( createSortField(), nestedFieldContribution );
+		collector.collectSortField( createSortField(), nestedFieldSort );
 	}
 
 	private SortField createSortField() {
@@ -59,9 +58,8 @@ public class LuceneTextFieldSortBuilder<F>
 	}
 
 	private SortField nestedType() {
-		LuceneNestedTextFieldComparatorSource fieldComparator = new LuceneNestedTextFieldComparatorSource( missingValue );
-		nestedFieldContribution = new LuceneNestedDocumentFieldContribution( nestedDocumentPath, fieldComparator );
-		return new SortField( absoluteFieldPath, fieldComparator, order == SortOrder.DESC );
+		nestedFieldSort = new NestedTextFieldComparatorSource( nestedDocumentPath, missingValue );
+		return new SortField( absoluteFieldPath, nestedFieldSort, order == SortOrder.DESC );
 	}
 
 	public SortField customType() {

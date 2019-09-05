@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentsSort;
+import org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl.NestedFieldComparatorSource;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 
@@ -27,18 +29,18 @@ class LuceneSearchQueryRequestContext {
 	private final LoadingContext<?, ?> loadingContext;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
-	private final LuceneNestedDocumentsSort nestedDocumentsSort;
+	private final List<NestedFieldComparatorSource> nestedFieldSorts;
 
 	LuceneSearchQueryRequestContext(
 			SessionContextImplementor sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Query luceneQuery,
-			Sort luceneSort, LuceneNestedDocumentsSort nestedDocumentsSort) {
+			Sort luceneSort, List<NestedFieldComparatorSource> nestedFieldSorts) {
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
-		this.nestedDocumentsSort = nestedDocumentsSort;
+		this.nestedFieldSorts = nestedFieldSorts;
 	}
 
 	Query getLuceneQuery() {
@@ -49,8 +51,8 @@ class LuceneSearchQueryRequestContext {
 		return luceneSort;
 	}
 
-	LuceneNestedDocumentsSort getNestedDocumentsSort() {
-		return nestedDocumentsSort;
+	List<NestedFieldComparatorSource> getNestedFieldSorts() {
+		return nestedFieldSorts;
 	}
 
 	LuceneSearchQueryExtractContext createExtractContext(IndexSearcher indexSearcher,
