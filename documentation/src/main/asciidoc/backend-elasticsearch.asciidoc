@@ -265,7 +265,7 @@ link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[set the pro
 
 Hibernate Search includes a feature named "index lifecycle management",
 where it will automatically create, validate, update, or drop an index on startup or shutdown.
-`hibernate.search.default.elasticsearch.index_schema_management_strategy CREATE` (default)
+`hibernate.search.default.elasticsearch.lifecycle.strategy CREATE` (default)
 
 The following strategies are available:
 
