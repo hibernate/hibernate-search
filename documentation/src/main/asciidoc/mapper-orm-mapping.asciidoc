@@ -632,6 +632,33 @@ include::todo-placeholder.asciidoc[]
 TODO Detailed description of container value extractors, list of built-in extractors, instructions to create one's own
 ////
 
+[[mapper-orm-reindexing]]
+== Tuning automatic reindexing
+
+[[mapper-orm-reindexing-basics]]
+=== Basics
+
+include::todo-placeholder.asciidoc[]
+// TODO
+
+[[mapper-orm-reindexing-associationinverseside]]
+=== Enriching the entity model with `@AssociationInverseSide`
+
+include::todo-placeholder.asciidoc[]
+// TODO
+
+[[mapper-orm-reindexing-derivedfrom]]
+=== Reindexing when a derived value changes with `@IndexingDependency`
+
+include::todo-placeholder.asciidoc[]
+// TODO
+
+[[mapper-orm-reindexing-reindexonupdate]]
+=== Disabling reindexing with `@IndexingDependency`
+
+include::todo-placeholder.asciidoc[]
+// TODO
+
 [[mapper-orm-programmatic-mapping]]
 == Programmatic mapping
 // Search 5 anchors backward compatibility
