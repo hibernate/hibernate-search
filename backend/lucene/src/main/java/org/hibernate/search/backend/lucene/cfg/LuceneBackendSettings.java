@@ -99,7 +99,7 @@ public final class LuceneBackendSettings {
 	 * <p>
 	 * Defaults to {@link Defaults#MULTI_TENANCY_STRATEGY}.
 	 */
-	public static final String MULTI_TENANCY_STRATEGY = "multi_tenancy_strategy";
+	public static final String MULTI_TENANCY_STRATEGY = "multi_tenancy.strategy";
 
 	/**
 	 * The analysis configurer to use.

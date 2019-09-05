@@ -157,7 +157,7 @@ but the query will likely have to fetch fewer entities,
 leading to better performance and lower stress on your database.
 
 This is done through the cache lookup strategy,
-which can be configured by setting the configuration property `hibernate.search.query.loading.cache_lookup_strategy`:
+which can be configured by setting the configuration property `hibernate.search.query.loading.cache_lookup.strategy`:
 
 * `skip` (the default) will not perform any cache lookup.
 * `persistence-context` will only look into the persistence context,

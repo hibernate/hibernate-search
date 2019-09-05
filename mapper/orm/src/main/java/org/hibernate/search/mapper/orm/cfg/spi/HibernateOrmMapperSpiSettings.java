@@ -33,7 +33,7 @@ public final class HibernateOrmMapperSpiSettings {
 		private Radicals() {
 		}
 
-		public static final String REFLECTION_STRATEGY = "reflection_strategy";
+		public static final String REFLECTION_STRATEGY = "reflection.strategy";
 
 		public static final String INTEGRATION_PARTIAL_BUILD_STATE = "integration_partial_build_state";
 	}

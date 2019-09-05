@@ -8,7 +8,7 @@ spring.jpa:
         # This really is only for tests:
         # it makes documents searchable directly upon returning from a transaction,
         # but it also hurts performance.
-        synchronization_strategy: searchable
+        synchronization.strategy: searchable
       backends:
         elasticsearch1:
           index_defaults:

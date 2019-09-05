@@ -459,7 +459,7 @@ according to the tenant ID defined in the current session:
 * queries will filter results appropriately.
 
 However, multi-tenancy must be enabled explicitly.
-To do so, set the `hibernate.search.backends.<backend name>.multi_tenancy_strategy` property:
+To do so, set the `hibernate.search.backends.<backend name>.multi_tenancy.strategy` property:
 
 * to `none` (the default) for single-tenancy;
 * to `discriminator` for discriminator-based multi-tenancy: adds a "tenant ID" field to every document.

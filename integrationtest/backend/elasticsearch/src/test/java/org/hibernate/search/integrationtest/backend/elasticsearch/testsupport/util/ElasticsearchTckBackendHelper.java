@@ -46,7 +46,7 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	public TckBackendSetupStrategy createMultiTenancyBackendSetupStrategy() {
 		return TckBackendSetupStrategy.of(
 				DEFAULT_BACKEND_PROPERTIES_PATH,
-				createProperties( c -> c.accept( "multi_tenancy_strategy", "discriminator" ) )
+				createProperties( c -> c.accept( "multi_tenancy.strategy", "discriminator" ) )
 		);
 	}
 
