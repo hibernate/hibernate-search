@@ -103,19 +103,34 @@ public @interface IndexedEmbedded {
 	String prefix() default "";
 
 	/**
+	 * The paths of index fields from the indexed-embedded element that should be embedded.
+	 * <p>
+	 * This takes precedence over {@link #maxDepth()}.
+	 * <p>
+	 * By default, if neither {@code includePaths} nor {@link #maxDepth()} is defined,
+	 * all index fields are included.
+	 *
+	 * @return The paths of index fields to include explicitly.
+	 * Provided paths must be relative to the indexed-embedded element,
+	 * i.e. they must not include the {@link #prefix()}.
+	 */
+	String[] includePaths() default {};
+
+	/**
 	 * The max recursion depth for indexed-embedded processing.
 	 * <p>
-	 * {@code maxDepth=0} means fields defined on the associated element are <strong>not</strong> indexed,
-	 * nor is any field of embedded elements inside the associated element,
-	 * unless they are included explicitly through {@link #includePaths()}.
-	 * <p>
-	 * {@code maxDepth=1} means fields defined on the associated element <strong>are</strong> indexed,
-	 * but <strong>not</strong> fields of embedded elements inside the associated element,
-	 * unless they are included explicitly through {@link #includePaths()}.
-	 * <p>
-	 * And so on. In short, the max depth is the number of {@code @IndexedEmbedded} that will be traversed
-	 * and for which all fields will be included, even if they are not included explicitly through {@link #includePaths()}.
-	 * <p>
+	 * {@code maxDepth} is the number of `@IndexedEmbedded` that will be traversed
+	 * and for which all fields of the indexed-embedded element will be included,
+	 * even if these fields are not included explicitly through {@code includePaths}:
+	 * <ul>
+	 * <li>{@code maxDepth=0} means fields of the indexed-embedded element are <strong>not</strong> included,
+	 * nor is any field of nested indexed-embedded elements,
+	 * unless these fields are included explicitly through {@link #includePaths()}.
+	 * <li>{@code maxDepth=1} means fields of the indexed-embedded element <strong>are</strong> included,
+	 * but <strong>not</strong> fields of nested indexed-embedded elements,
+	 * unless these fields are included explicitly through {@link #includePaths()}.
+	 * <li>And so on.
+	 * </ul>
 	 * The default value depends on the value of the {@link #includePaths()} attribute:
 	 * if {@link #includePaths()} is empty, the default is {@code Integer.MAX_VALUE} (no limit)
 	 * if {@link #includePaths()} is <strong>not</strong> empty, the default is {@code 0}
@@ -124,16 +139,6 @@ public @interface IndexedEmbedded {
 	 * @return The max depth size.
 	 */
 	int maxDepth() default -1;
-
-	/**
-	 * Defines paths of index fields from the associated object that should be embedded,
-	 * even if they are beyond the {@link #maxDepth()}.
-	 *
-	 * @return The paths of index fields to include explicitly.
-	 * Provided paths must be relative to the associated object,
-	 * i.e. they must not include the {@link #prefix()}.
-	 */
-	String[] includePaths() default {};
 
 	/**
 	 * @return The storage strategy of the object field created for this indexed-embedded.
