@@ -612,21 +612,368 @@ Those are the two main problems, but there may be others.
 include::todo-placeholder.asciidoc[]
 
 [[mapper-orm-indexedembedded]]
-== Indexed-embedded
+== Mapping associated elements with `@IndexedEmbedded`
 // Search 5 anchors backward compatibility
 [[search-mapping-associated]]
 
-include::todo-placeholder.asciidoc[]
+[[mapper-orm-indexedembedded-basics]]
+=== Basics
 
-////
-TODO The getting started section has a link pointing here and expects the section to
-include a detailed description of @IndexedEmbedded
-////
+Using only `@Indexed` combined with `@*Field` annotations allows indexing an entity and its direct properties,
+which is nice but simplistic.
+A real-world model will include multiple object types holding references to one another,
+like the `authors` association in the example below.
+
+.A multi-entity model with associations
+====
+This mapping will declare the following fields in the `Book` index:
+
+* `title`
+* ... and nothing else.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/none/Book.java[tags=include;!getters-setters]
+----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/none/Author.java[tags=include;!getters-setters]
+----
+<1> The `Book` entity is indexed.
+<2> The `title` of the book is mapped to an index field.
+<3> But how to index the `Author` name into the `Book` index?
+====
+
+When searching for a book, users will likely need to search by author name.
+In the world of high-performance indexes, cross-index joins are costly and usually not an option.
+The best way to address such use cases is generally to copy data:
+when indexing a `Book`, just copy the name of all its authors into the `Book` document.
+
+That's what `@IndexedEmbedded` does:
+it instructs Hibernate Search to _embed_ the fields of an associated object into the main object.
+In the example below, it will instruct Hibernate Search to embed the `name` field
+defined in `Author` into `Book`, creating the field `authors.name`.
+
+[NOTE]
+====
+`@IndexedEmbedded` can be used on Hibernate ORM's `@Embedded` properties
+as well as associations (`@OneToOne`, `@OneToMany`, `@ManyToMany`, ...).
+====
+
+[[example-indexing-associations]]
+.Using `@IndexedEmbedded` to index associated elements
+====
+This mapping will declare the following fields in the `Book` index:
+
+* `title`
+* `authors.name`
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/onelevel/Book.java[tags=include;!getters-setters]
+----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/onelevel/Author.java[tags=include;!getters-setters]
+----
+<1> Add an `@IndexedEmbedded` to the `authors` property.
+<2> Map `Author.name` to an index field, even though `Author` is not directly mapped to an index (no `@Indexed`).
+====
+
+[NOTE]
+====
+<<mapper-orm-identifiermapping,Document identifiers>> are not index fields.
+Consequently, they will be ignored by `@IndexedEmbedded`.
+
+To embed another entity's identifier with `@IndexedEmbedded`,
+map that identifier to a field explicitly using `@GenericField` or another `@*Field` annotation.
+====
+
+[WARNING]
+====
+When `@IndexedEmbedded` is applied to an association,
+i.e. to a property that refers to entities (like the example above),
+*the association must be bi-directional*.
+Otherwise, Hibernate Search will throw an exception on startup.
+
+See <<mapper-orm-indexedembedded-reindexing>> for the reasons behind this restriction
+and ways to circumvent it.
+====
+
+Index-embedding can be nested on multiple levels;
+for example you can decide to index-embed the place of birth of authors,
+so as to be able to search for books written by Russian authors exclusively:
+
+[[example-nested-index-embedded]]
+.Nesting multiple `@IndexedEmbedded`
+====
+This mapping will declare the following fields in the `Book` index:
+
+* `title`
+* `authors.name`
+* `authors.placeOfBirth.country`
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/twolevels/Book.java[tags=include;!getters-setters]
+----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/twolevels/Author.java[tags=include;!getters-setters]
+----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/twolevels/Address.java[tags=include;!getters-setters]
+----
+<1> Add an `@IndexedEmbedded` to the `authors` property.
+<2> Map `Author.name` to an index field, even though `Author` is not directly mapped to an index (no `@Indexed`).
+<3> Add an `@IndexedEmbedded` to the `placeOfBirth` property.
+<4> Map `Address.country` to an index field, even though `Address` is not directly mapped to an index (no `@Indexed`).
+====
+
+[WARNING]
+====
+By default, `@IndexedEmbedded` will nest other `@IndexedEmbedded`
+encountered in the indexed-embedded type recursively,
+without any sort of limit, which can cause infinite recursion.
+
+To address this, see <<mapper-orm-indexedembedded-filtering>>.
+====
+
+[[mapper-orm-indexedembedded-null]]
+=== `@IndexedEmbedded` and `null` values
+// Search 5 anchors backward compatibility
+[[_indexing_null_embeddeds]]
+
+When properties targeted by an `@IndexedEmbedded` contain `null` elements,
+these elements are simply not indexed.
+
+On contrary to <<mapper-orm-directfieldmapping>>,
+there is no `indexNullAs` feature to index a specific value for `null` objects,
+but you can take advantage of the <<search-dsl-predicate-exists,`exists`>> predicate
+in search queries to look for documents where a given `@IndexedEmbedded`
+has or doesn't have a value:
+simply pass the name of the object field to the `exists` predicate,
+for example `authors` in the example above.
+
+[[mapper-orm-indexedembedded-prefix]]
+=== Setting the field name prefix with `prefix`
+
+By default, `@IndexedEmbedded` will prepend the name of embedded fields
+with the name of the property it is applied to followed by a dot.
+So if `@IndexedEmbedded` is applied to a property named `authors` in a `Book` entity,
+the `name` field of the authors will be copied to the `authors.name` field when `Book` is indexed.
+
+It is possible to change this prefix by setting the `prefix` attribute,
+for example `@IndexedEmbedded(prefix = "author.")` (do not forget the trailing dot!).
+
+[CAUTION]
+====
+The prefix should generally be a sequence of non-dots ending with a single dot, for example `my_Property.`.
+
+Changing the prefix to a string that does not include any dot at the end (`my_Property`),
+or that includes a dot anywhere but at the very end (`my.Property.`),
+will lead to complex, undocumented, legacy behavior.
+Do this at your own risk.
+====
+
+[[mapper-orm-indexedembedded-reindexing]]
+=== Reindexing when embedded elements change
+// Search 5 anchors backward compatibility
+[[_associated_objects_building_a_dependency_graph_with_containedin]]
+
+When the "embedded" entity changes,
+Hibernate Search will handle reindexing of the "embedding" entity.
+
+This will work transparently most of the time,
+as long as the association `@IndexedEmbedded` is applied to is bi-directional
+(uses Hibernate ORM's `mappedBy`).
+
+When Hibernate Search is unable to handle an association,
+it will throw an exception on bootstrap.
+If this happens, refer to <<mapper-orm-reindexing-basics>> to know more.
+
+[[mapper-orm-indexedembedded-filtering]]
+=== Filtering embedded fields and breaking `@IndexedEmbedded` cycles
+// Search 5 anchors backward compatibility
+[[search-mapping-associated-viapaths]]
+
+By default, `@IndexedEmbedded` will "embed" everything:
+every field encountered in the indexed-embedded element,
+and every `@IndexedEmbedded` encountered in the indexed-embedded element,
+recursively.
+
+This will work just fine for simpler use cases, but may lead to problems for more complex models:
+
+* If the indexed-embedded element declares many index fields (Hibernate Search fields),
+only some of which are actually useful to the "index-embedding" type,
+the extra fields will decrease indexing performance needlessly.
+* If there is a cycle of `@IndexedEmbedded`
+(e.g. `A` index-embeds `b` of type `B`, which index-embeds `a` of type `A`)
+the index-embedding type will end up with an infinite amount of fields
+(`a.b.someField`, `a.b.a.b.someField`, `a.b.a.b.a.b.someField`, ...),
+which Hibernate Search will detect and reject with an exception.
+
+To address these problems, it is possible to filter the fields to embed,
+to only include those that are actually useful.
+Two filtering attributes are available on `@IndexedEmbedded` and may be combined:
+
+`includePaths`::
+The paths of index fields from the indexed-embedded element that should be embedded.
++
+Provided paths must be relative to the indexed-embedded element,
+i.e. they must not include the <<mapper-orm-indexedembedded-prefix,prefix>>.
++
+This takes precedence over `maxDepth` (see below).
+`maxDepth`::
+The max recursion depth for indexed-embedded processing.
++
+`maxDepth` is the number of `@IndexedEmbedded` that will be traversed
+and for which all fields of the indexed-embedded element will be included,
+even if these fields are not included explicitly through `includePaths`:
++
+ * `maxDepth=0` means fields of the indexed-embedded element are *not* included,
+nor is any field of nested indexed-embedded elements,
+unless these fields are included explicitly through `includePaths`.
+ * `maxDepth=1` means fields of the indexed-embedded element *are* included,
+but *not* fields of nested indexed-embedded elements,
+unless these fields are included explicitly through `includePaths`.
+ * And so on.
++
+The default value depends on the value of the `includePaths` attribute:
+if `includePaths` is empty, the default is `Integer.MAX_VALUE` (no limit)
+if `includePaths` is *not* empty, the default is `0`
+(only include fields included explicitly).
+
+Below are two examples: one leveraging `includePaths` only,
+and one leveraging `includePaths` and `maxDepth`.
+
+[[indexedembedded-includePath]]
+.Filtering indexed-embedded fields with `includePaths`
+====
+This mapping will declare the following fields in the `Human` index:
+
+* `name`
+* `nickname`
+* `parents.name` (explicitly included using `includePaths`)
+* `parents.nickname` (explicitly included using `includePaths`)
+* `parents.parents.name` (explicitly included using `includePaths`)
+
+`parents.nickname`, `parents.parents.parents.name`
+and other fields not mentioned in the list above will be excluded,
+because `maxDepth` defaults to `0` when `includePaths` is used.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/includepaths/Human.java[tags=include;!getters-setters]
+----
+====
+
+[[indexedembedded-includePathsAndDepth]]
+.Filtering indexed-embedded fields with `includePaths` and `maxDepth`
+====
+This mapping will declare the following fields in the `Human` index:
+
+* `name`
+* `surname`
+* `parents.name` (implicitly included because `maxDepth >= 1`)
+* `parents.nickname` (implicitly included because `maxDepth >= 1`)
+* `parents.parents.name` (implicitly included because `maxDepth >= 2`)
+* `parents.parents.nickname` (implicitly included because `maxDepth >= 2`)
+* `parents.parents.parents.name` (explicitly included using `includePaths` even though `maxDepth < 3`)
+
+`parents.parents.parents.nickname`, `parents.parents.parents.parents.name`
+and other fields not mentioned in the list above will be excluded,
+because `maxDepth` is explicitly set to `3`.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/includepathsanddepth/Human.java[tags=include;!getters-setters]
+----
+====
+
+[[mapper-orm-indexedembedded-storage]]
+=== Storing embedded elements in nested documents using `storage`
+
+Indexed-embedded fields can be stored in one of two ways,
+configured through the `storage` attribute of the `@IndexedEmbedded` annotation.
+To illustrate storage options, let's consider the following object tree,
+assuming the class `Book` is annotated with `@Indexed`
+and its `authors` property is annotated with  `@IndexedEmbedded`:
+
+* Book instance
+** title = Levianthan Wakes
+** authors =
+*** Author instance
+**** firstName = Daniel
+**** lastName = Abraham
+*** Author instance
+**** firstName = Ty
+**** lastName = Frank
+
+==== `DEFAULT` or `FLATTENED` storage
+
+By default, indexed-embedded fields are "flattened",
+meaning that the tree structure is not preserved.
+
+The book instance mentioned above would be indexed with a structure roughly similar to this:
+
+ * Book document
+ ** title = Levianthan Wakes
+ ** authors.firstName = [Daniel, Ty]
+ ** authors.lastName = [Abraham, Frank]
+
+The `authors.firstName` and `authors.lastName` fields were "flattened"
+and now each has two values;
+the knowledge of which last name corresponds to which first name has been lost.
+
+This is more efficient for storage and querying,
+but can cause unexpected behavior when querying the index
+on both the author's first name and the author's last name.
+The book given in example
+would show up as a match to a query such as `authors.firstname:Ty AND authors.lastname:Abraham`,
+even though "Ty Abraham" is not one of this book's authors.
+
+==== `NESTED` storage
+
+When indexed-embedded elements are "nested",
+the tree structure is preserved by transparently creating one separate "nested" document
+for every indexed-embedded element.
+
+The book instance mentioned above would be indexed with a structure roughly similar to this:
+
+ * Book document
+ ** title = Levianthan Wakes
+ ** Nested documents
+ *** Nested documents for "authors"
+ **** authors.firstName = Daniel
+ **** authors.lastName = Abraham
+ *** Nested documents for "authors"
+ **** authors.firstName = Ty
+ **** authors.lastName = Frank
+
+The book is effectively indexed as three documents:
+the root document for the book, and two internal, "nested" documents for the authors,
+preserving the knowledge of which last name corresponds to which first name
+at the cost of degraded performance when indexing and querying.
+
+NOTE: The nested documents are "hidden" and won't directly show up in search results.
+No need to worry about nested documents being "mixed up" with root documents.
+
+If special care is taken when building predicates on fields within nested documents,
+using a <<search-dsl-predicate-nested,`nested` predicate>>,
+queries containing predicates on both the author's first name and the author's last name
+will behave as one would (intuitively) expect.
+The book given in example
+would *not* show up as a match to a query such as `authors.firstname:Ty AND authors.lastname:Abraham`,
+as long as a `nested` predicate is used.
 
 [[mapper-orm-containerextractor]]
 == Container value extractors
 
 include::todo-placeholder.asciidoc[]
+
+// TODO add sections to documentation of direct field mapping and indexed-embedded briefly explaining multi-valued handling and pointing here for details
 
 ////
 TODO Detailed description of container value extractors, list of built-in extractors, instructions to create one's own
