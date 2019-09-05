@@ -30,8 +30,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentFieldContribution;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentsSort;
+import org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl.NestedFieldComparatorSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -56,7 +55,7 @@ public class LuceneSearchQueryBuilder<H>
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
-	private LuceneNestedDocumentsSort nestedDocumentsSort = new LuceneNestedDocumentsSort();
+	private List<NestedFieldComparatorSource> nestedFieldSorts;
 
 	private Query luceneQuery;
 	private List<SortField> sortFields;
@@ -106,9 +105,16 @@ public class LuceneSearchQueryBuilder<H>
 	}
 
 	@Override
-	public void collectSortField(SortField sortField, LuceneNestedDocumentFieldContribution nestedFieldContribution) {
+	public void collectSortField(SortField sortField, NestedFieldComparatorSource nestedFieldSort) {
 		collectSortField( sortField );
-		nestedDocumentsSort.add( nestedFieldContribution );
+		if ( nestedFieldSort == null ) {
+			return;
+		}
+
+		if ( nestedFieldSorts == null ) {
+			nestedFieldSorts = new ArrayList<>( 5 );
+		}
+		nestedFieldSorts.add( nestedFieldSort );
 	}
 
 	@Override
@@ -152,7 +158,7 @@ public class LuceneSearchQueryBuilder<H>
 		);
 
 		LuceneSearchQueryRequestContext requestContext = new LuceneSearchQueryRequestContext(
-				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort, nestedDocumentsSort
+				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort, nestedFieldSorts
 		);
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
@@ -170,7 +176,6 @@ public class LuceneSearchQueryBuilder<H>
 				routingKeys,
 				definitiveLuceneQuery,
 				luceneSort,
-
 				searcher
 		);
 	}

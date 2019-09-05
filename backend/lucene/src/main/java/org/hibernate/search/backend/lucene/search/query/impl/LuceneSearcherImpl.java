@@ -124,8 +124,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
 		// TODO HSEARCH-3352 implement timeout handling by wrapping the collector with the timeout limiting one
-		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( requestContext.getLuceneSort(), requestContext.getNestedDocumentsSort(),
-				maxDocs );
+		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( requestContext.getLuceneSort(), requestContext.getNestedFieldSorts(), maxDocs );
 		rootProjection.contributeCollectors( luceneCollectorsBuilder );
 		for ( LuceneSearchAggregation<?> aggregation : aggregations.values() ) {
 			aggregation.contributeCollectors( luceneCollectorsBuilder );

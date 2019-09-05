@@ -12,8 +12,7 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityC
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedDocumentFieldContribution;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.LuceneNestedNumericFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl.NestedNumericFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
@@ -34,22 +33,19 @@ public class LuceneNumericFieldSortBuilder<F, E extends Number>
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		collector.collectSortField( createSortField(), nestedFieldContribution );
+		collector.collectSortField( createSortField(), nestedFieldSort );
 	}
 
 	private SortField createSortField() {
+		SortField.Type sortFieldType = codec.getDomain().getSortFieldType();
 		if ( nestedDocumentPath != null ) {
-			LuceneNestedNumericFieldComparatorSource fieldComparator = new LuceneNestedNumericFieldComparatorSource(
-					codec.getDomain().getSortFieldType(),
-					getEffectiveMissingValue( missingValue, order )
-			);
-			nestedFieldContribution = new LuceneNestedDocumentFieldContribution( nestedDocumentPath, fieldComparator );
-			return new SortField( absoluteFieldPath, fieldComparator, order == SortOrder.DESC );
+			nestedFieldSort = new NestedNumericFieldComparatorSource( nestedDocumentPath, sortFieldType, getEffectiveMissingValue( missingValue, order ) );
+			return new SortField( absoluteFieldPath, nestedFieldSort, order == SortOrder.DESC );
 		}
 
 		SortField sortField = new SortField(
 				absoluteFieldPath,
-				codec.getDomain().getSortFieldType(),
+				sortFieldType,
 				order == SortOrder.DESC
 		);
 		setEffectiveMissingValue( sortField, missingValue, order );
