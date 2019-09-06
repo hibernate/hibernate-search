@@ -184,7 +184,7 @@ public final class ElasticsearchBackendSettings {
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
-	public static final String ANALYSIS_CONFIGURER = "analysis_configurer";
+	public static final String ANALYSIS_CONFIGURER = "analysis.configurer";
 
 	/**
 	 * Default values for the different settings if no values are given.

@@ -55,7 +55,7 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 		return TckBackendSetupStrategy.of(
 				DEFAULT_BACKEND_PROPERTIES_PATH,
 				createProperties( c ->
-						c.accept( "analysis_configurer", AnalysisCustomITAnalysisConfigurer.class.getName() )
+						c.accept( "analysis.configurer", AnalysisCustomITAnalysisConfigurer.class.getName() )
 				)
 		);
 	}
@@ -65,7 +65,7 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 		return TckBackendSetupStrategy.of(
 				DEFAULT_BACKEND_PROPERTIES_PATH,
 				createProperties( c ->
-						c.accept( "analysis_configurer", AnalysisOverrideITAnalysisConfigurer.class.getName() )
+						c.accept( "analysis.configurer", AnalysisOverrideITAnalysisConfigurer.class.getName() )
 				)
 		);
 	}

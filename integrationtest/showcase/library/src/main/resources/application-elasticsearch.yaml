@@ -14,4 +14,4 @@ spring.jpa:
             secret_key: ${ELASTICSEARCH_AWS_SIGNING_SECRET_LEY} # From environment variable
             region: ${ELASTICSEARCH_AWS_SIGNING_REGION} # From environment variable
           discovery.enabled: true
-          analysis_configurer: elasticsearchAnalysisConfigurer
+          analysis.configurer: elasticsearchAnalysisConfigurer

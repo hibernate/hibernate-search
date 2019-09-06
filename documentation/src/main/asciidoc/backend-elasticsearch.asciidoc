@@ -431,7 +431,7 @@ To configure analysis in an Elasticsearch backend, you will need to:
 
 * Implement a bean that implements the `org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer` interface.
 * Configure your backend to use that bean by setting the configuration property
-`hibernate.search.backends.<backend name>.analysis_configurer`
+`hibernate.search.backends.<backend name>.analysis.configurer`
 to a <<configuration-property-types,bean reference>> pointing to your bean.
 
 // TODO add a simple example: configurer implementation + settings

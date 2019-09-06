@@ -111,7 +111,7 @@ public final class LuceneBackendSettings {
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
-	public static final String ANALYSIS_CONFIGURER = "analysis_configurer";
+	public static final String ANALYSIS_CONFIGURER = "analysis.configurer";
 
 	/**
 	 * Configuration property keys for directories without the {@link #DIRECTORY_PREFIX prefix}.
