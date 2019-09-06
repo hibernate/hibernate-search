@@ -21,9 +21,11 @@ import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
+import org.hibernate.search.mapper.orm.cfg.impl.ConfigurationPropertyChecker;
+import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationServicePropertySource;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -62,8 +64,11 @@ public class HibernateSearchIntegrator implements Integrator {
 	@Override
 	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
 		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
-		HibernateOrmConfigurationPropertySource propertySource =
-				new HibernateOrmConfigurationPropertySource( configurationService );
+		ConfigurationPropertyChecker propertyChecker = ConfigurationPropertyChecker.create();
+		ConfigurationPropertySource propertySource =
+				propertyChecker.wrap(
+						new HibernateOrmConfigurationServicePropertySource( configurationService )
+				);
 		if ( ! ENABLED.get( propertySource ) ) {
 			log.debug( "Hibernate Search is disabled through configuration properties." );
 			return;
@@ -73,9 +78,8 @@ public class HibernateSearchIntegrator implements Integrator {
 		BootstrapContext bootstrapContext = ( (MetadataImplementor) metadata ).getTypeConfiguration()
 				.getMetadataBuildingContext().getBootstrapContext();
 		HibernateOrmIntegrationBooterImpl booter = new HibernateOrmIntegrationBooterImpl(
-				metadata, bootstrapContext, propertySource
+				metadata, bootstrapContext, propertySource, propertyChecker
 		);
-
 		// Orchestrate bootstrap and shutdown
 		CompletableFuture<SessionFactoryImplementor> sessionFactoryCreatedFuture = new CompletableFuture<>();
 		CompletableFuture<?> sessionFactoryClosingFuture = new CompletableFuture<>();

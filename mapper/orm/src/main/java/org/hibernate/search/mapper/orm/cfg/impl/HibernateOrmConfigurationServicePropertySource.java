@@ -7,20 +7,19 @@
 package org.hibernate.search.mapper.orm.cfg.impl;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.engine.config.spi.ConfigurationService;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
-class HibernateOrmConfigurationServicePropertySource implements ConfigurationPropertySource {
+public class HibernateOrmConfigurationServicePropertySource implements
+		HibernateOrmAllAwareConfigurationServicePropertySource {
 
 	private static final ConfigurationService.Converter<Object> OBJECT_CONVERTER = value -> value;
 
 	private final ConfigurationService configurationService;
 
-	HibernateOrmConfigurationServicePropertySource(ConfigurationService configurationService) {
+	public HibernateOrmConfigurationServicePropertySource(ConfigurationService configurationService) {
 		this.configurationService = configurationService;
 	}
 
@@ -34,10 +33,7 @@ class HibernateOrmConfigurationServicePropertySource implements ConfigurationPro
 		return Optional.of( key );
 	}
 
-	public Map<?, ?> getAllRawProperties() {
-		return configurationService.getSettings();
-	}
-
+	@Override
 	public Set<String> resolveAll(String prefix) {
 		Set<String> hibernateSearchPropertyKeys = new HashSet<>();
 		for ( Object key : configurationService.getSettings().keySet() ) {
