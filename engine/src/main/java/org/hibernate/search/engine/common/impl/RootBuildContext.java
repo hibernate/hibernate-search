@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
@@ -13,14 +14,18 @@ import org.hibernate.search.engine.reporting.spi.FailureCollector;
 
 class RootBuildContext {
 
+	private final ConfigurationPropertySource propertySource;
+
 	private final ClassResolver classResolver;
 	private final ResourceResolver resourceResolver;
 	private final BeanResolver beanResolver;
 
 	private final FailureCollector failureCollector;
 
-	RootBuildContext(ClassResolver classResolver, ResourceResolver resourceResolver,
+	RootBuildContext(ConfigurationPropertySource propertySource,
+			ClassResolver classResolver, ResourceResolver resourceResolver,
 			BeanResolver beanResolver, FailureCollector failureCollector) {
+		this.propertySource = propertySource;
 		this.classResolver = classResolver;
 		this.resourceResolver = resourceResolver;
 		this.beanResolver = beanResolver;
@@ -41,5 +46,9 @@ class RootBuildContext {
 
 	FailureCollector getFailureCollector() {
 		return failureCollector;
+	}
+
+	ConfigurationPropertySource getConfigurationPropertySource() {
+		return propertySource;
 	}
 }

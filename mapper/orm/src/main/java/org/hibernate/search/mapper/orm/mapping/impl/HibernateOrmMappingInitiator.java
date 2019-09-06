@@ -13,6 +13,7 @@ import java.util.function.Function;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -23,7 +24,6 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
@@ -48,27 +48,25 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionManager reflectionManager,
-			HibernateOrmConfigurationPropertySource propertySource) {
+			ConfigurationService ormConfigurationService,
+			ConfigurationPropertySource propertySource) {
 		HibernateOrmBootstrapIntrospector introspector =
 				HibernateOrmBootstrapIntrospector.create( metadata, reflectionManager, propertySource );
 
 		return new HibernateOrmMappingInitiator(
-				metadata, propertySource,
-				introspector
+				metadata, ormConfigurationService, introspector
 		);
 	}
 
 	private final Metadata metadata;
-	private final ConfigurationPropertySource propertySource;
 	private final HibernateOrmBootstrapIntrospector introspector;
 
 	private HibernateOrmMappingInitiator(Metadata metadata,
-			HibernateOrmConfigurationPropertySource propertySource,
+			ConfigurationService ormConfigurationService,
 			HibernateOrmBootstrapIntrospector introspector) {
 		super( introspector );
 
 		this.metadata = metadata;
-		this.propertySource = propertySource;
 		this.introspector = introspector;
 
 		/*
@@ -78,7 +76,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		 * Since it only happens when the configuration is invalid,
 		 * we can live with this quirk.
 		 */
-		MultiTenancyStrategy multiTenancyStrategy = MultiTenancyStrategy.determineMultiTenancyStrategy( propertySource.getAllRawProperties() );
+		MultiTenancyStrategy multiTenancyStrategy =
+				MultiTenancyStrategy.determineMultiTenancyStrategy( ormConfigurationService.getSettings() );
 
 		setMultiTenancyEnabled(
 				!MultiTenancyStrategy.NONE.equals( multiTenancyStrategy )
@@ -88,6 +87,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
+		ConfigurationPropertySource propertySource = buildContext.getConfigurationPropertySource();
+
 		Map<String, PersistentClass> persistentClasses = metadata.getEntityBindings().stream()
 				// getMappedClass() can return null, which should be ignored
 				.filter( persistentClass -> persistentClass.getMappedClass() != null )

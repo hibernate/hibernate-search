@@ -161,7 +161,11 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			ConfigurationPropertySource propertySource = mainPropertySource;
 
 			BeanResolver beanResolver = new ConfiguredBeanResolver( serviceResolver, beanProvider, propertySource );
-			RootBuildContext rootBuildContext = new RootBuildContext( classResolver, resourceResolver, beanResolver, failureCollector );
+			RootBuildContext rootBuildContext = new RootBuildContext(
+					propertySource,
+					classResolver, resourceResolver, beanResolver,
+					failureCollector
+			);
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanResolver, propertySource, rootBuildContext );
 

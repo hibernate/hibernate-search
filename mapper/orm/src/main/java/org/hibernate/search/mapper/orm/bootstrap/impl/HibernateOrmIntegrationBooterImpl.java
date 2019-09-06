@@ -22,6 +22,7 @@ import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.container.spi.ExtendedBeanManager;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
@@ -30,8 +31,8 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
-import org.hibernate.search.mapper.orm.cfg.impl.ConsumedPropertyKeysReport;
-import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
+import org.hibernate.search.mapper.orm.cfg.impl.ConfigurationPropertyChecker;
+import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationServicePropertySource;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
@@ -54,27 +55,40 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private final Metadata metadata;
 	private final ServiceRegistryImplementor serviceRegistry;
 	private final ReflectionManager reflectionManager;
+	private final ConfigurationService ormConfigurationService;
+	private final ConfigurationPropertySource propertySource;
+	private final ConfigurationPropertyChecker propertyChecker;
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
-	private final HibernateOrmConfigurationPropertySource propertySource;
 
 	public HibernateOrmIntegrationBooterImpl(Metadata metadata, BootstrapContext bootstrapContext) {
 		this(
 				metadata, bootstrapContext,
-				new HibernateOrmConfigurationPropertySource(
-						bootstrapContext.getServiceRegistry().getService( ConfigurationService.class )
-				)
+				ConfigurationPropertyChecker.create()
+		);
+	}
+
+	private HibernateOrmIntegrationBooterImpl(Metadata metadata, BootstrapContext bootstrapContext,
+			ConfigurationPropertyChecker propertyChecker) {
+		this(
+				metadata, bootstrapContext,
+				propertyChecker.wrap(
+						new HibernateOrmConfigurationServicePropertySource(
+								bootstrapContext.getServiceRegistry().getService( ConfigurationService.class )
+						)
+				),
+				propertyChecker
 		);
 	}
 
 	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
 	HibernateOrmIntegrationBooterImpl(Metadata metadata, BootstrapContext bootstrapContext,
-			HibernateOrmConfigurationPropertySource propertySource) {
+			ConfigurationPropertySource checkerWrappedPropertySource, ConfigurationPropertyChecker propertyChecker) {
 		this.metadata = metadata;
 		this.serviceRegistry = (ServiceRegistryImplementor) bootstrapContext.getServiceRegistry();
 		this.reflectionManager = bootstrapContext.getReflectionManager();
-		this.propertySource = propertySource;
-
-		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
+		this.propertySource = checkerWrappedPropertySource;
+		this.propertyChecker = propertyChecker;
+		this.ormConfigurationService = serviceRegistry.getService( ConfigurationService.class );
 
 		Optional<EnvironmentSynchronizer> providedEnvironmentSynchronizer = getOrmServiceOrEmpty( EnvironmentSynchronizer.class );
 		if ( providedEnvironmentSynchronizer.isPresent() ) {
@@ -82,7 +96,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			this.environmentSynchronizer = providedEnvironmentSynchronizer;
 		}
 		else {
-			Object unknownBeanManager = configurationService.getSettings().get( AvailableSettings.CDI_BEAN_MANAGER );
+			Object unknownBeanManager = ormConfigurationService.getSettings().get( AvailableSettings.CDI_BEAN_MANAGER );
 			if ( unknownBeanManager instanceof ExtendedBeanManager ) {
 				ExtendedBeanManager extendedBeanManager = (ExtendedBeanManager) unknownBeanManager;
 				ExtendedBeanManagerSynchronizer synchronizer = new ExtendedBeanManagerSynchronizer();
@@ -193,13 +207,13 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		BeanProvider beanProvider = null;
 		SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
 		try {
-			propertySource.beforeBoot();
+			propertyChecker.beforeBoot();
 
 			SearchIntegrationBuilder builder = SearchIntegration.builder( propertySource );
 
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
-					metadata, reflectionManager, propertySource
+					metadata, reflectionManager, ormConfigurationService, propertySource
 			);
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
@@ -232,7 +246,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			return new HibernateOrmIntegrationPartialBuildState(
 					searchIntegrationPartialBuildState,
 					mappingKey,
-					propertySource.getConsumedPropertiesReport()
+					propertyChecker
 			);
 		}
 		catch (RuntimeException e) {
@@ -267,7 +281,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 //		this.jmx = new JMXHook( propertySource );
 //		this.jmx.registerIfEnabled( extendedIntegrator, factory );
 
-		propertySource.afterBoot( partialBuildState.bootFirstPhaseConsumedPropertyKeysReport );
+		propertyChecker.afterBoot( partialBuildState.bootFirstPhasePropertyChecker, propertySource );
 
 		return contextService;
 	}
@@ -312,15 +326,15 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 		private final SearchIntegrationPartialBuildState integrationBuildState;
 		private final HibernateOrmMappingKey mappingKey;
-		private final Optional<ConsumedPropertyKeysReport> bootFirstPhaseConsumedPropertyKeysReport;
+		private final ConfigurationPropertyChecker bootFirstPhasePropertyChecker;
 
 		HibernateOrmIntegrationPartialBuildState(
 				SearchIntegrationPartialBuildState integrationBuildState,
 				HibernateOrmMappingKey mappingKey,
-				Optional<ConsumedPropertyKeysReport> bootFirstPhaseConsumedPropertyKeysReport) {
+				ConfigurationPropertyChecker bootFirstPhasePropertyChecker) {
 			this.integrationBuildState = integrationBuildState;
 			this.mappingKey = mappingKey;
-			this.bootFirstPhaseConsumedPropertyKeysReport = bootFirstPhaseConsumedPropertyKeysReport;
+			this.bootFirstPhasePropertyChecker = bootFirstPhasePropertyChecker;
 		}
 
 		void closeOnFailure() {

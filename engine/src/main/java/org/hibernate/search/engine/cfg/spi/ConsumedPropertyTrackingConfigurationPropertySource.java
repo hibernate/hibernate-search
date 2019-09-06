@@ -6,27 +6,26 @@
  */
 package org.hibernate.search.engine.cfg.spi;
 
-import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 public final class ConsumedPropertyTrackingConfigurationPropertySource implements ConfigurationPropertySource {
 
 	private final ConfigurationPropertySource delegate;
 
-	private final Set<String> consumedPropertyKeys;
+	private final Consumer<String> tracker;
 
-	public ConsumedPropertyTrackingConfigurationPropertySource(ConfigurationPropertySource delegate) {
+	public ConsumedPropertyTrackingConfigurationPropertySource(ConfigurationPropertySource delegate,
+			Consumer<String> tracker) {
 		this.delegate = delegate;
-		this.consumedPropertyKeys = ConcurrentHashMap.newKeySet();
+		this.tracker = tracker;
 	}
 
 	@Override
 	public Optional<?> get(String key) {
 		Optional<String> resolved = resolve( key );
 		if ( resolved.isPresent() ) {
-			consumedPropertyKeys.add( resolved.get() );
+			tracker.accept( resolved.get() );
 		}
 		return delegate.get( key );
 	}
@@ -36,7 +35,4 @@ public final class ConsumedPropertyTrackingConfigurationPropertySource implement
 		return delegate.resolve( key );
 	}
 
-	public Set<String> getConsumedPropertyKeys() {
-		return Collections.unmodifiableSet( consumedPropertyKeys );
-	}
 }
