@@ -17,6 +17,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
@@ -30,7 +31,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingInitiator;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingKey;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingPartialBuildState;
 
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
@@ -166,11 +166,12 @@ public class SearchSetupHelper implements TestRule {
 			integrationPartialBuildStates.add( integrationPartialBuildState );
 
 			return () -> {
-				StubMapping mapping = integrationPartialBuildState.finalizeMapping(
-						mappingKey, StubMappingPartialBuildState::finalizeMapping
+				SearchIntegrationFinalizer finalizer = integrationPartialBuildState.finalizer( propertySource );
+				StubMapping mapping = finalizer.finalizeMapping(
+						mappingKey, (context, partialMapping) -> partialMapping.finalizeMapping()
 				);
 
-				SearchIntegration integration = integrationPartialBuildState.finalizeIntegration( propertySource );
+				SearchIntegration integration = finalizer.finalizeIntegration();
 				integrations.add( integration );
 				integrationPartialBuildStates.remove( integrationPartialBuildState );
 

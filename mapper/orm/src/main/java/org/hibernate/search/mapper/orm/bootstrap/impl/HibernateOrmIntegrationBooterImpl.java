@@ -25,6 +25,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
@@ -235,11 +236,13 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private HibernateSearchContextProviderService doBootSecondPhase(
 			HibernateOrmIntegrationPartialBuildState partialBuildState,
 			SessionFactoryImplementor sessionFactoryImplementor) {
-		HibernateOrmMapping mapping = partialBuildState.integrationBuildState.finalizeMapping(
+		SearchIntegrationFinalizer finalizer = partialBuildState.integrationBuildState.finalizer( propertySource );
+
+		HibernateOrmMapping mapping = finalizer.finalizeMapping(
 				partialBuildState.mappingKey,
-				mappingPartialBuildState -> mappingPartialBuildState.bindToSessionFactory( sessionFactoryImplementor, propertySource )
+				(context, partialMapping) -> partialMapping.bindToSessionFactory( context, sessionFactoryImplementor )
 		);
-		SearchIntegration integration = partialBuildState.integrationBuildState.finalizeIntegration( propertySource );
+		SearchIntegration integration = finalizer.finalizeIntegration();
 
 		/*
 		 * Make the booted integration available to the user (through Search.getFullTextEntityManager(em))
