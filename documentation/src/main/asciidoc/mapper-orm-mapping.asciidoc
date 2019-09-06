@@ -23,7 +23,7 @@ include::todo-placeholder.asciidoc[]
 
 The Hibernate ORM integration is enabled by default as soon as it is present in the classpath.
 If for some reason you need to disable it,
-set the `hibernate.search.autoregister_listeners` <<configuration-property-types,boolean property>> to `false`.
+set the `hibernate.search.enabled` <<configuration-property-types,boolean property>> to `false`.
 
 === Configuring the mapping
 

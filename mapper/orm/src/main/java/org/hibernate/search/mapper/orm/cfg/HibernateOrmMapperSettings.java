@@ -39,15 +39,14 @@ public final class HibernateOrmMapperSettings {
 			PREFIX + Radicals.ENABLE_CONFIGURATION_PROPERTY_TRACKING;
 
 	/**
-	 * Whether Hibernate Search should automatically register listeners to entity changes,
-	 * so that changes to entities result in automatic indexing.
+	 * Whether Hibernate Search is enabled or not.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed to such Boolean value.
 	 * <p>
-	 * Defaults to {@link Defaults#AUTOREGISTER_LISTENERS}.
+	 * Defaults to {@link Defaults#ENABLED}.
 	 */
-	public static final String AUTOREGISTER_LISTENERS = PREFIX + Radicals.AUTOREGISTER_LISTENERS;
+	public static final String ENABLED = PREFIX + Radicals.ENABLED;
 
 	/**
 	 * The automatic indexing strategy to use.
@@ -137,8 +136,8 @@ public final class HibernateOrmMapperSettings {
 		private Radicals() {
 		}
 
+		public static final String ENABLED = "enabled";
 		public static final String ENABLE_CONFIGURATION_PROPERTY_TRACKING = "enable_configuration_property_tracking";
-		public static final String AUTOREGISTER_LISTENERS = "autoregister_listeners";
 		public static final String AUTOMATIC_INDEXING_STRATEGY = "automatic_indexing.strategy";
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = "automatic_indexing.synchronization.strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = "automatic_indexing.enable_dirty_check";
@@ -157,7 +156,7 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final boolean ENABLE_CONFIGURATION_PROPERTY_TRACKING = true;
-		public static final boolean AUTOREGISTER_LISTENERS = true;
+		public static final boolean ENABLED = true;
 		public static final HibernateOrmAutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
 				HibernateOrmAutomaticIndexingStrategyName.SESSION;
 		public static final HibernateOrmAutomaticIndexingSynchronizationStrategyName AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
