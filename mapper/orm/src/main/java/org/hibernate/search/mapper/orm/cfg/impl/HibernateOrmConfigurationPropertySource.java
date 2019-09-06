@@ -17,7 +17,7 @@ import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConsumedPropertyTrackingConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmConfigurationPropertyCheckingStrategyName;
+import org.hibernate.search.mapper.orm.cfg.ConfigurationPropertyCheckingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -28,10 +28,10 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<HibernateOrmConfigurationPropertyCheckingStrategyName>
+	private static final ConfigurationProperty<ConfigurationPropertyCheckingStrategyName>
 			CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
-					.as( HibernateOrmConfigurationPropertyCheckingStrategyName.class, HibernateOrmConfigurationPropertyCheckingStrategyName::of )
+					.as( ConfigurationPropertyCheckingStrategyName.class, ConfigurationPropertyCheckingStrategyName::of )
 					.withDefault( HibernateOrmMapperSettings.Defaults.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
 					.build();
 
@@ -43,7 +43,7 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 		this.configurationServiceSource = new HibernateOrmConfigurationServicePropertySource( configurationService );
 		ConfigurationPropertySource maskedSource = configurationServiceSource.withMask( "hibernate.search" );
 
-		HibernateOrmConfigurationPropertyCheckingStrategyName checkingStrategy =
+		ConfigurationPropertyCheckingStrategyName checkingStrategy =
 				CONFIGURATION_PROPERTY_CHECKING_STRATEGY.get( maskedSource );
 		switch ( checkingStrategy ) {
 			case WARN:
@@ -119,7 +119,7 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 			log.configurationPropertyTrackingUnusedProperties(
 					unconsumedPropertyKeys,
 					CONFIGURATION_PROPERTY_CHECKING_STRATEGY.resolveOrRaw( this ),
-					HibernateOrmConfigurationPropertyCheckingStrategyName.IGNORE.getExternalRepresentation()
+					ConfigurationPropertyCheckingStrategyName.IGNORE.getExternalRepresentation()
 			);
 		}
 	}

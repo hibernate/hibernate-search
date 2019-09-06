@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -58,7 +58,7 @@ public class ElasticsearchSchemaNoneStrategyIT {
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						ElasticsearchIndexLifecycleStrategyName.NONE.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE.getExternalRepresentation()
 				)
 				.withIndex(
 						INDEX_NAME,

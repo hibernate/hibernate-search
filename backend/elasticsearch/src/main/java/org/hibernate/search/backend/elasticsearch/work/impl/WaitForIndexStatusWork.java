@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -29,10 +29,10 @@ public class WaitForIndexStatusWork extends AbstractSimpleElasticsearchWork<Void
 			extends AbstractBuilder<Builder>
 			implements WaitForIndexStatusWorkBuilder {
 		private final URLEncodedString indexName;
-		private final ElasticsearchIndexStatus requiredStatus;
+		private final IndexStatus requiredStatus;
 		private final String timeout;
 
-		public Builder(URLEncodedString indexName, ElasticsearchIndexStatus requiredStatus, String timeout) {
+		public Builder(URLEncodedString indexName, IndexStatus requiredStatus, String timeout) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.requiredStatus = requiredStatus;

@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.LuceneAnalysisConfigurationContextImpl;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyName;
+import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProviderInitializationContextImpl;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;

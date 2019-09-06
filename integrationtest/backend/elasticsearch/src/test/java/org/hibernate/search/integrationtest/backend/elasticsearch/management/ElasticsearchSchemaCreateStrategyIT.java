@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgn
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.util.impl.integrationtest.elasticsearch.rule.TestElasticsearchClient;
@@ -87,7 +87,7 @@ public class ElasticsearchSchemaCreateStrategyIT {
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						ElasticsearchIndexLifecycleStrategyName.CREATE.getExternalRepresentation()
+						IndexLifecycleStrategyName.CREATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
 						BACKEND_NAME,

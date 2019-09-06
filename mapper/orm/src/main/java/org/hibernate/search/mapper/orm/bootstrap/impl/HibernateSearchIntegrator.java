@@ -21,7 +21,7 @@ import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
@@ -47,9 +47,9 @@ public class HibernateSearchIntegrator implements Integrator {
 					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLED )
 					.build();
 
-	private static final ConfigurationProperty<HibernateOrmAutomaticIndexingStrategyName> AUTOMATIC_INDEXING_STRATEGY =
+	private static final ConfigurationProperty<AutomaticIndexingStrategyName> AUTOMATIC_INDEXING_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY )
-					.as( HibernateOrmAutomaticIndexingStrategyName.class, HibernateOrmAutomaticIndexingStrategyName::of )
+					.as( AutomaticIndexingStrategyName.class, AutomaticIndexingStrategyName::of )
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_STRATEGY )
 					.build();
 
@@ -90,9 +90,9 @@ public class HibernateSearchIntegrator implements Integrator {
 		sessionFactory.addObserver( observer );
 
 		// Listen to Hibernate ORM events to index automatically
-		HibernateOrmAutomaticIndexingStrategyName automaticIndexingStrategyName =
+		AutomaticIndexingStrategyName automaticIndexingStrategyName =
 				AUTOMATIC_INDEXING_STRATEGY.get( propertySource );
-		if ( HibernateOrmAutomaticIndexingStrategyName.SESSION.equals( automaticIndexingStrategyName ) ) {
+		if ( AutomaticIndexingStrategyName.SESSION.equals( automaticIndexingStrategyName ) ) {
 			log.debug( "Hibernate Search event listeners activated" );
 			HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
 					contextFuture.thenApply( Supplier::get ),

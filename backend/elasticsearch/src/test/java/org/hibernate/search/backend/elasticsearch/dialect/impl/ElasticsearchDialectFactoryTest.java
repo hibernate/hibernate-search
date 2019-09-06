@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.dialect.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch56ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch6ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch7ModelDialect;

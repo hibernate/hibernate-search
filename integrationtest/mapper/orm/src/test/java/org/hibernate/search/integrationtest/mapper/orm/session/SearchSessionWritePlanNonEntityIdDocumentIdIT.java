@@ -13,7 +13,7 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -75,7 +75,7 @@ public class SearchSessionWritePlanNonEntityIdDocumentIdIT {
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-						HibernateOrmAutomaticIndexingStrategyName.NONE
+						AutomaticIndexingStrategyName.NONE
 				)
 				.setup( IndexedEntity.class );
 

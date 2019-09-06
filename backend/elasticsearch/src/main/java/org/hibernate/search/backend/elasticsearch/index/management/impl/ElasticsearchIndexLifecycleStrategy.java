@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.management.impl;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -14,11 +14,11 @@ import org.hibernate.search.util.common.AssertionFailure;
 
 public class ElasticsearchIndexLifecycleStrategy {
 
-	private final ElasticsearchIndexLifecycleStrategyName strategyName;
+	private final IndexLifecycleStrategyName strategyName;
 	protected final ElasticsearchIndexLifecycleExecutionOptions executionOptions;
 
 	public ElasticsearchIndexLifecycleStrategy(
-			ElasticsearchIndexLifecycleStrategyName strategyName,
+			IndexLifecycleStrategyName strategyName,
 			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		this.strategyName = strategyName;
 		this.executionOptions = executionOptions;

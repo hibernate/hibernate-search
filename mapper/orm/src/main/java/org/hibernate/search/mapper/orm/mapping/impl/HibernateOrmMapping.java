@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -38,9 +38,9 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<HibernateOrmAutomaticIndexingSynchronizationStrategyName> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+	private static final ConfigurationProperty<AutomaticIndexingSynchronizationStrategyName> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY )
-					.as( HibernateOrmAutomaticIndexingSynchronizationStrategyName.class, HibernateOrmAutomaticIndexingSynchronizationStrategyName::of )
+					.as( AutomaticIndexingSynchronizationStrategyName.class, AutomaticIndexingSynchronizationStrategyName::of )
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY )
 					.build();
 
@@ -59,7 +59,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public static MappingImplementor<HibernateOrmMapping> create(
 			PojoMappingDelegate mappingDelegate, HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactory, ConfigurationPropertySource propertySource) {
-		HibernateOrmAutomaticIndexingSynchronizationStrategyName synchronizationStrategyName =
+		AutomaticIndexingSynchronizationStrategyName synchronizationStrategyName =
 				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.get( propertySource );
 		AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 		switch ( synchronizationStrategyName ) {

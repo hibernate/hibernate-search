@@ -9,7 +9,9 @@ package org.hibernate.search.backend.elasticsearch.cfg;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
+import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
 
 /**
  * Configuration properties for Elasticsearch backends.

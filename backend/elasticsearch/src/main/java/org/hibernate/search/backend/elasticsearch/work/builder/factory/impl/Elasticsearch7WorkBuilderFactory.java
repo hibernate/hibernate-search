@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
@@ -177,7 +177,7 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, ElasticsearchIndexStatus requiredStatus, String timeout) {
+	public WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, IndexStatus requiredStatus, String timeout) {
 		return new WaitForIndexStatusWork.Builder( indexName, requiredStatus, timeout );
 	}
 

@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import java.util.EnumSet;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchAnalyzerManagementITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.elasticsearch.rule.TestElasticsearchClient;
@@ -35,10 +35,10 @@ public class ElasticsearchAnalyzerDefinitionCreationIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
-	public static EnumSet<ElasticsearchIndexLifecycleStrategyName> strategies() {
+	public static EnumSet<IndexLifecycleStrategyName> strategies() {
 		return EnumSet.complementOf( EnumSet.of(
 				// Those strategies don't create the schema, so we don't test them
-				ElasticsearchIndexLifecycleStrategyName.NONE, ElasticsearchIndexLifecycleStrategyName.VALIDATE
+				IndexLifecycleStrategyName.NONE, IndexLifecycleStrategyName.VALIDATE
 		) );
 	}
 
@@ -48,9 +48,9 @@ public class ElasticsearchAnalyzerDefinitionCreationIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexLifecycleStrategyName strategy;
+	private final IndexLifecycleStrategyName strategy;
 
-	public ElasticsearchAnalyzerDefinitionCreationIT(ElasticsearchIndexLifecycleStrategyName strategy) {
+	public ElasticsearchAnalyzerDefinitionCreationIT(IndexLifecycleStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}

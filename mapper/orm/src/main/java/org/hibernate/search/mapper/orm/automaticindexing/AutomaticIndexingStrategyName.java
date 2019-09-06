@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.cfg;
+package org.hibernate.search.mapper.orm.automaticindexing;
 
 
 import java.lang.invoke.MethodHandles;
@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * Strategy for automatic indexing in Hibernate Search.
  */
-public enum HibernateOrmAutomaticIndexingStrategyName {
+public enum AutomaticIndexingStrategyName {
 
 	/**
 	 * No automatic indexing is performed:
@@ -35,10 +35,10 @@ public enum HibernateOrmAutomaticIndexingStrategyName {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
-	public static HibernateOrmAutomaticIndexingStrategyName of(String value) {
+	public static AutomaticIndexingStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
-				HibernateOrmAutomaticIndexingStrategyName.values(),
-				HibernateOrmAutomaticIndexingStrategyName::getExternalRepresentation,
+				AutomaticIndexingStrategyName.values(),
+				AutomaticIndexingStrategyName::getExternalRepresentation,
 				log::invalidAutomaticIndexingStrategyName,
 				value
 		);
@@ -46,7 +46,7 @@ public enum HibernateOrmAutomaticIndexingStrategyName {
 
 	private final String externalRepresentation;
 
-	HibernateOrmAutomaticIndexingStrategyName(String externalRepresentation) {
+	AutomaticIndexingStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 

@@ -14,7 +14,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -53,7 +53,7 @@ public class HibernateOrmAutomaticIndexingIT {
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						// To be overridden below
-						HibernateOrmAutomaticIndexingSynchronizationStrategyName.QUEUED
+						AutomaticIndexingSynchronizationStrategyName.QUEUED
 				)
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory );

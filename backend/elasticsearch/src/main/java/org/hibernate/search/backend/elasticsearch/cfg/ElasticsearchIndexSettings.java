@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.cfg;
 
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
+
 /**
  * Configuration properties for Elasticsearch indexes.
  * <p>
@@ -20,7 +23,7 @@ public final class ElasticsearchIndexSettings {
 	/**
 	 * The index lifecycle strategy to use, i.e. how to automatically administrate the index on startup/shutdown.
 	 * <p>
-	 * Expects an {@link ElasticsearchIndexLifecycleStrategyName} value, or a String representation of such value.
+	 * Expects an {@link IndexLifecycleStrategyName} value, or a String representation of such value.
 	 * <p>
 	 * Defaults to {@link Defaults#LIFECYCLE_STRATEGY}.
 	 */
@@ -29,7 +32,7 @@ public final class ElasticsearchIndexSettings {
 	/**
 	 * The minimal required status of the index on startup, before Hibernate Search can start using it.
 	 * <p>
-	 * Expects an {@link ElasticsearchIndexStatus} value, or a String representation of such value.
+	 * Expects an {@link IndexStatus} value, or a String representation of such value.
 	 * <p>
 	 * Defaults to {@link Defaults#LIFECYCLE_MINIMAL_REQUIRED_STATUS}.
 	 */
@@ -53,8 +56,8 @@ public final class ElasticsearchIndexSettings {
 		private Defaults() {
 		}
 
-		public static final ElasticsearchIndexLifecycleStrategyName LIFECYCLE_STRATEGY = ElasticsearchIndexLifecycleStrategyName.CREATE;
-		public static final ElasticsearchIndexStatus LIFECYCLE_MINIMAL_REQUIRED_STATUS = ElasticsearchIndexStatus.GREEN;
+		public static final IndexLifecycleStrategyName LIFECYCLE_STRATEGY = IndexLifecycleStrategyName.CREATE;
+		public static final IndexStatus LIFECYCLE_MINIMAL_REQUIRED_STATUS = IndexStatus.GREEN;
 		public static final int LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
 	}
 

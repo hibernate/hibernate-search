@@ -16,7 +16,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -46,7 +46,7 @@ public class MassIndexingPrimitiveIdIT {
 		backendMock.expectAnySchema( EntityWithPrimitiveId.INDEX );
 
 		sessionFactory = ormSetupHelper.start()
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, HibernateOrmAutomaticIndexingStrategyName.NONE )
+				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyName.NONE )
 				.setup( EntityWithPrimitiveId.class );
 
 		backendMock.verifyExpectationsMet();

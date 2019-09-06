@@ -21,7 +21,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -52,7 +52,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void queued() throws InterruptedException, ExecutionException, TimeoutException {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.QUEUED );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.QUEUED );
 		testAsynchronous( sessionFactory, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 	}
 
@@ -64,19 +64,19 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void committed_explicit() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.COMMITTED );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
 		testSynchronous( sessionFactory, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 	}
 
 	@Test
 	public void searchable() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.SEARCHABLE );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.SEARCHABLE );
 		testSynchronous( sessionFactory, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
 	}
 
 	@Test
 	public void override_committedToSearchable() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.COMMITTED );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
 		testSynchronous(
 				sessionFactory, AutomaticIndexingSynchronizationStrategy.searchable(),
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE
@@ -85,7 +85,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void override_committedToCustom() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingSynchronizationStrategyName.COMMITTED );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
 		CompletableFuture<?> workFuture = new CompletableFuture<>();
 
 		AtomicReference<CompletableFuture<?>> futurePushedToBackgroundServiceReference = new AtomicReference<>( null );
@@ -247,7 +247,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		return transactionFuture;
 	}
 
-	private SessionFactory setup(HibernateOrmAutomaticIndexingSynchronizationStrategyName strategyName) {
+	private SessionFactory setup(AutomaticIndexingSynchronizationStrategyName strategyName) {
 		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start();
 		if ( strategyName != null ) {
 			setupContext.withProperty(
