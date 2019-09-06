@@ -72,8 +72,9 @@ public class HibernateSearchIntegrator implements Integrator {
 		// TODO When we'll move to Hibernate ORM 6, use the bootstrapContext parameter passed to the integrate() method
 		BootstrapContext bootstrapContext = ( (MetadataImplementor) metadata ).getTypeConfiguration()
 				.getMetadataBuildingContext().getBootstrapContext();
-		HibernateOrmIntegrationBooterImpl booter = new HibernateOrmIntegrationBooterImpl( metadata, bootstrapContext );
-
+		HibernateOrmIntegrationBooterImpl booter = new HibernateOrmIntegrationBooterImpl(
+				metadata, bootstrapContext, propertySource
+		);
 
 		// Orchestrate bootstrap and shutdown
 		CompletableFuture<SessionFactoryImplementor> sessionFactoryCreatedFuture = new CompletableFuture<>();

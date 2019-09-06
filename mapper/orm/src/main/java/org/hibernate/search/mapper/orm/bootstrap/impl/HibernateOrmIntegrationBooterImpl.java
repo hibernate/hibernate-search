@@ -57,13 +57,24 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
 	private final HibernateOrmConfigurationPropertySource propertySource;
 
-	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
 	public HibernateOrmIntegrationBooterImpl(Metadata metadata, BootstrapContext bootstrapContext) {
+		this(
+				metadata, bootstrapContext,
+				new HibernateOrmConfigurationPropertySource(
+						bootstrapContext.getServiceRegistry().getService( ConfigurationService.class )
+				)
+		);
+	}
+
+	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
+	HibernateOrmIntegrationBooterImpl(Metadata metadata, BootstrapContext bootstrapContext,
+			HibernateOrmConfigurationPropertySource propertySource) {
 		this.metadata = metadata;
 		this.serviceRegistry = (ServiceRegistryImplementor) bootstrapContext.getServiceRegistry();
 		this.reflectionManager = bootstrapContext.getReflectionManager();
+		this.propertySource = propertySource;
+
 		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
-		this.propertySource = new HibernateOrmConfigurationPropertySource( configurationService );
 
 		Optional<EnvironmentSynchronizer> providedEnvironmentSynchronizer = getOrmServiceOrEmpty( EnvironmentSynchronizer.class );
 		if ( providedEnvironmentSynchronizer.isPresent() ) {
