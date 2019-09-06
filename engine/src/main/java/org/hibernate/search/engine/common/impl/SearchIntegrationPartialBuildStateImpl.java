@@ -8,15 +8,17 @@ package org.hibernate.search.engine.common.impl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingFinalizationContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingFinalizer;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
@@ -64,61 +66,79 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	}
 
 	@Override
-	public <PBM, M> M finalizeMapping(MappingKey<PBM, M> mappingKey,
-			Function<PBM, MappingImplementor<M>> director) {
-		// We know this cast will work because of how
-		@SuppressWarnings("unchecked")
-		PBM partiallyBuiltMapping = (PBM) partiallyBuiltMappings.get( mappingKey );
-		if ( partiallyBuiltMapping == null ) {
-			throw new AssertionFailure(
-					"Some partially built mapping could not be found during bootstrap; there is probably a bug in Hibernate Search."
-					+ " Key: " + mappingKey
-			);
-		}
-
-		MappingImplementor<M> mapping = director.apply( partiallyBuiltMapping );
-		fullyBuiltMappings.put( mappingKey, mapping );
-		partiallyBuiltMappings.remove( mappingKey );
-
-		return mapping.toConcreteType();
+	public SearchIntegrationFinalizer finalizer(ConfigurationPropertySource propertySource) {
+		return new SearchIntegrationFinalizerImpl(
+				propertySource.withMask( "hibernate.search" )
+		);
 	}
 
-	@Override
-	public SearchIntegration finalizeIntegration(ConfigurationPropertySource configurationPropertySource) {
-		if ( !partiallyBuiltMappings.isEmpty() ) {
-			throw new AssertionFailure(
-					"Some mappings were not fully built; there is probably a bug in Hibernate Search."
-							+ " Partially built mappings: " + partiallyBuiltMappings
-			);
+	private class SearchIntegrationFinalizerImpl implements SearchIntegrationFinalizer {
+
+		private final ConfigurationPropertySource propertySource;
+
+		private SearchIntegrationFinalizerImpl(ConfigurationPropertySource propertySource) {
+			this.propertySource = propertySource;
 		}
 
-		RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
+		@Override
+		public <PBM, M> M finalizeMapping(MappingKey<PBM, M> mappingKey,
+				MappingFinalizer<PBM, M> finalizer) {
+			// We know this cast will work because of how
+			@SuppressWarnings("unchecked")
+			PBM partiallyBuiltMapping = (PBM) partiallyBuiltMappings.get( mappingKey );
+			if ( partiallyBuiltMapping == null ) {
+				throw new AssertionFailure(
+						"Some partially built mapping could not be found during bootstrap; there is probably a bug in Hibernate Search."
+								+ " Key: " + mappingKey
+				);
+			}
 
-		// Start backends
-		for ( Map.Entry<String, BackendPartialBuildState> entry : partiallyBuiltBackends.entrySet() ) {
-			// TODO HSEARCH-3084 perform backend initialization in parallel for all backends?
-			fullyBuiltBackends.put(
-					entry.getKey(),
-					entry.getValue().finalizeBuild( failureCollector, beanResolver, configurationPropertySource )
+			MappingFinalizationContext mappingFinalizationContext = new MappingFinalizationContextImpl( propertySource );
+
+			MappingImplementor<M> mapping = finalizer.finalizeMapping( mappingFinalizationContext, partiallyBuiltMapping );
+			fullyBuiltMappings.put( mappingKey, mapping );
+			partiallyBuiltMappings.remove( mappingKey );
+
+			return mapping.toConcreteType();
+		}
+
+		@Override
+		public SearchIntegration finalizeIntegration() {
+			if ( !partiallyBuiltMappings.isEmpty() ) {
+				throw new AssertionFailure(
+						"Some mappings were not fully built; there is probably a bug in Hibernate Search."
+								+ " Partially built mappings: " + partiallyBuiltMappings
+				);
+			}
+
+			RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
+
+			// Start backends
+			for ( Map.Entry<String, BackendPartialBuildState> entry : partiallyBuiltBackends.entrySet() ) {
+				// TODO HSEARCH-3084 perform backend initialization in parallel for all backends?
+				fullyBuiltBackends.put(
+						entry.getKey(),
+						entry.getValue().finalizeBuild( failureCollector, beanResolver, propertySource )
+				);
+			}
+			failureCollector.checkNoFailure();
+
+			// Start indexes
+			for ( Map.Entry<String, IndexManagerPartialBuildState> entry : partiallyBuiltIndexManagers.entrySet() ) {
+				// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
+				fullyBuiltIndexManagers.put(
+						entry.getKey(),
+						entry.getValue().finalizeBuild( failureCollector, beanResolver, propertySource )
+				);
+			}
+			failureCollector.checkNoFailure();
+
+			return new SearchIntegrationImpl(
+					beanProvider,
+					fullyBuiltMappings,
+					fullyBuiltBackends,
+					fullyBuiltIndexManagers
 			);
 		}
-		failureCollector.checkNoFailure();
-
-		// Start indexes
-		for ( Map.Entry<String, IndexManagerPartialBuildState> entry : partiallyBuiltIndexManagers.entrySet() ) {
-			// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
-			fullyBuiltIndexManagers.put(
-					entry.getKey(),
-					entry.getValue().finalizeBuild( failureCollector, beanResolver, configurationPropertySource )
-			);
-		}
-		failureCollector.checkNoFailure();
-
-		return new SearchIntegrationImpl(
-				beanProvider,
-				fullyBuiltMappings,
-				fullyBuiltBackends,
-				fullyBuiltIndexManagers
-		);
 	}
 }

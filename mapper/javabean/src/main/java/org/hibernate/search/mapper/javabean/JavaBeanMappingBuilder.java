@@ -14,11 +14,11 @@ import java.util.Set;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingImpl;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
-import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingPartialBuildState;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
@@ -109,11 +109,12 @@ public final class JavaBeanMappingBuilder {
 		SearchIntegration integration = null;
 		JavaBeanMapping mapping;
 		try {
-			mapping = integrationPartialBuildState.finalizeMapping(
+			SearchIntegrationFinalizer finalizer = integrationPartialBuildState.finalizer( propertySource );
+			mapping = finalizer.finalizeMapping(
 					mappingKey,
-					JavaBeanMappingPartialBuildState::finalizeMapping
+					(context, partialMapping) -> partialMapping.finalizeMapping()
 			);
-			integration = integrationPartialBuildState.finalizeIntegration( propertySource );
+			integration = finalizer.finalizeIntegration();
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
