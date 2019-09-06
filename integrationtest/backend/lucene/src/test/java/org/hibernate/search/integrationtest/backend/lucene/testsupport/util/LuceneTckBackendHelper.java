@@ -45,7 +45,7 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	public TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy() {
 		return TckBackendSetupStrategy.of(
 				DEFAULT_BACKEND_PROPERTIES_PATH,
-				Collections.singletonMap( "analysis_configurer", AnalysisCustomITAnalysisConfigurer.class.getName() )
+				Collections.singletonMap( "analysis.configurer", AnalysisCustomITAnalysisConfigurer.class.getName() )
 		);
 	}
 
@@ -53,7 +53,7 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	public TckBackendSetupStrategy createAnalysisOverrideBackendSetupStrategy() {
 		return TckBackendSetupStrategy.of(
 				DEFAULT_BACKEND_PROPERTIES_PATH,
-				Collections.singletonMap( "analysis_configurer", AnalysisOverrideITAnalysisConfigurer.class.getName() )
+				Collections.singletonMap( "analysis.configurer", AnalysisOverrideITAnalysisConfigurer.class.getName() )
 		);
 	}
 

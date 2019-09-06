@@ -5,5 +5,5 @@ spring.jpa:
       backends:
         lucene1:
           type: lucene
-          analysis_configurer: luceneAnalysisConfigurer
+          analysis.configurer: luceneAnalysisConfigurer
           directory.root: ${LUCENE_ROOT_PATH} # From environment variable

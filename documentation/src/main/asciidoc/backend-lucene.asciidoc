@@ -377,7 +377,7 @@ To configure analysis in a Lucene backend, you will need to:
 
 * Implement a bean that implements the `org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer` interface.
 * Configure your backend to use that bean by setting the configuration property
-`hibernate.search.backends.<backend name>.analysis_configurer`
+`hibernate.search.backends.<backend name>.analysis.configurer`
 to a <<configuration-property-types,bean reference>> pointing to your bean.
 
 // TODO add a simple example: configurer implementation + settings
