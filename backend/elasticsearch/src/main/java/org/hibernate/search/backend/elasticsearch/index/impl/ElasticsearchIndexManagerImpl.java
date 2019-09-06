@@ -54,13 +54,13 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_STRATEGY )
 					.build();
 
-	private static final ConfigurationProperty<IndexStatus> MANAGEMENT_REQUIRED_STATUS =
+	private static final ConfigurationProperty<IndexStatus> LIFECYCLE_MINIMAL_REQUIRED_STATUS =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS )
 					.as( IndexStatus.class, IndexStatus::of )
 					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS )
 					.build();
 
-	private static final ConfigurationProperty<Integer> MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT =
+	private static final ConfigurationProperty<Integer> LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
 					.asInteger()
 					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
@@ -213,8 +213,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 		return new ElasticsearchIndexLifecycleStrategy(
 				LIFECYCLE_STRATEGY.get( propertySource ),
 				new ElasticsearchIndexLifecycleExecutionOptions(
-						MANAGEMENT_REQUIRED_STATUS.get( propertySource ),
-						MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT.get( propertySource )
+						LIFECYCLE_MINIMAL_REQUIRED_STATUS.get( propertySource ),
+						LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT.get( propertySource )
 				)
 		);
 	}
