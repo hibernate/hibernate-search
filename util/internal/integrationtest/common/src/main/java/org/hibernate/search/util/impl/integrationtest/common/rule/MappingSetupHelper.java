@@ -77,7 +77,9 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		protected AbstractSetupContext() {
 		}
 
-		protected abstract C withPropertyRadical(String keyRadical, Object value);
+		public final C withPropertyRadical(String keyRadical, Object value) {
+			return withProperty( EngineSettings.PREFIX + keyRadical, value );
+		}
 
 		public abstract C withProperty(String keyRadical, Object value);
 
@@ -91,7 +93,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		}
 
 		public C withIndexDefaultsProperty(String backendName, String keyRadical, Object value) {
-			return withPropertyRadical(
+			return withProperty(
 					EngineSettings.BACKENDS + "." + backendName
 							+ "." + BackendSettings.INDEX_DEFAULTS + "." + keyRadical,
 					value

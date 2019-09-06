@@ -98,12 +98,6 @@ public final class JavaBeanMappingSetupHelper
 		}
 
 		@Override
-		protected SetupContext withPropertyRadical(String keyRadical, Object value) {
-			// The JavaBean mapper doesn't use any particular prefix, so the key radical is the whole key.
-			return withProperty( keyRadical, value );
-		}
-
-		@Override
 		protected JavaBeanMappingBuilder createBuilder() {
 			return JavaBeanMapping.builder( lookup ).setProperties( properties );
 		}

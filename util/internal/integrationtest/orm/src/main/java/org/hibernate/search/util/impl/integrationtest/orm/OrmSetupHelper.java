@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
@@ -73,11 +72,6 @@ public final class OrmSetupHelper
 		public SetupContext withTcclLookupPrecedenceBefore() {
 			withConfiguration( builder -> builder.setTcclLookupPrecedenceBefore() );
 			return thisAsC();
-		}
-
-		@Override
-		public SetupContext withPropertyRadical(String keyRadical, Object value) {
-			return withProperty( HibernateOrmMapperSettings.PREFIX + keyRadical, value );
 		}
 
 		@Override

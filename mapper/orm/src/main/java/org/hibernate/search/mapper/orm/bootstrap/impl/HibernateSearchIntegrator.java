@@ -42,19 +42,19 @@ public class HibernateSearchIntegrator implements Integrator {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> ENABLED =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.ENABLED )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.ENABLED )
 					.asBoolean()
 					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLED )
 					.build();
 
 	private static final ConfigurationProperty<AutomaticIndexingStrategyName> AUTOMATIC_INDEXING_STRATEGY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY )
 					.as( AutomaticIndexingStrategyName.class, AutomaticIndexingStrategyName::of )
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_STRATEGY )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> DIRTY_CHECK_ENABLED =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
 					.asBoolean()
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
 					.build();

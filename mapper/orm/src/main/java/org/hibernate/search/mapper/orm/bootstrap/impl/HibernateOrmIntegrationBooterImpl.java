@@ -47,7 +47,7 @@ import org.hibernate.service.spi.ServiceRegistryImplementor;
 public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegrationBooter {
 
 	private static final OptionalConfigurationProperty<HibernateOrmIntegrationPartialBuildState> INTEGRATION_PARTIAL_BUILD_STATE =
-			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.Radicals.INTEGRATION_PARTIAL_BUILD_STATE )
+			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.INTEGRATION_PARTIAL_BUILD_STATE )
 					.as( HibernateOrmIntegrationPartialBuildState.class, HibernateOrmIntegrationPartialBuildState::parse )
 					.build();
 

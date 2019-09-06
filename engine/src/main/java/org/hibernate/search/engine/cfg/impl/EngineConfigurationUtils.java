@@ -16,7 +16,7 @@ public final class EngineConfigurationUtils {
 	}
 
 	public static ConfigurationPropertySource getBackend(ConfigurationPropertySource engineSource, String backendName) {
-		return engineSource.withMask( EngineSettings.BACKENDS ).withMask( backendName );
+		return engineSource.withMask( EngineSettings.Radicals.BACKENDS ).withMask( backendName );
 	}
 
 	public static ConfigurationPropertySource getIndex(ConfigurationPropertySource backendSource,
