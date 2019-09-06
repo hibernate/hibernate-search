@@ -136,8 +136,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 6,
 			value = "Some properties in the Hibernate Search configuration were not used;"
 					+ " there might be misspelled property keys in your configuration. Unused properties were: %1$s."
-					+ " To disable this warning, set the property '%2$s' to false.")
-	void configurationPropertyTrackingUnusedProperties(Set<String> propertyKeys, String disableWarningKey);
+					+ " To disable this warning, set the property '%2$s' to '%3$s'.")
+	void configurationPropertyTrackingUnusedProperties(Set<String> propertyKeys, String disableWarningKey,
+			String disableWarningValue);
 
 	@Message(id = ID_OFFSET_2 + 7,
 			value = "Path '%2$s' on entity type '%1$s' cannot be resolved using Hibernate ORM metadata."
@@ -200,4 +201,8 @@ public interface Log extends BasicLogger {
 					+ " because caching is not enabled for this entity type.")
 	void skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
 			@FormatWith(ClassFormatter.class) Class<?> entityType);
+
+	@Message(id = ID_OFFSET_2 + 21,
+			value = "Invalid configuration property checking strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidConfigurationPropertyCheckingStrategyName(String invalidRepresentation, List<String> validRepresentations);
 }

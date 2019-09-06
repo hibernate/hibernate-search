@@ -25,18 +25,18 @@ public final class HibernateOrmMapperSettings {
 	public static final String PREFIX = "hibernate.search.";
 
 	/**
-	 * Whether usage of configuration property should be tracked.
+	 * The strategy to use when reporting the results of configuration property checking.
 	 * <p>
-	 * When enabled, Hibernate Search will track the parts of the provided configuration that are actually used
-	 * and log a warning if any configuration property is never used, which might indicate a configuration issue.
+	 * Configuration property checking will detect an configuration property that is never used,
+	 * which might indicate a configuration issue.
 	 * <p>
-	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * Expects a {@link HibernateOrmConfigurationPropertyCheckingStrategyName} value,
+	 * or a String representation of such value.
 	 * <p>
-	 * Defaults to {@link Defaults#ENABLE_CONFIGURATION_PROPERTY_TRACKING}.
+	 * Defaults to {@link Defaults#CONFIGURATION_PROPERTY_CHECKING_STRATEGY}.
 	 */
-	public static final String ENABLE_CONFIGURATION_PROPERTY_TRACKING =
-			PREFIX + Radicals.ENABLE_CONFIGURATION_PROPERTY_TRACKING;
+	public static final String CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
+			PREFIX + Radicals.CONFIGURATION_PROPERTY_CHECKING_STRATEGY;
 
 	/**
 	 * Whether Hibernate Search is enabled or not.
@@ -137,7 +137,7 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final String ENABLED = "enabled";
-		public static final String ENABLE_CONFIGURATION_PROPERTY_TRACKING = "enable_configuration_property_tracking";
+		public static final String CONFIGURATION_PROPERTY_CHECKING_STRATEGY = "configuration_property_checking.strategy";
 		public static final String AUTOMATIC_INDEXING_STRATEGY = "automatic_indexing.strategy";
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = "automatic_indexing.synchronization.strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = "automatic_indexing.enable_dirty_check";
@@ -155,7 +155,8 @@ public final class HibernateOrmMapperSettings {
 		private Defaults() {
 		}
 
-		public static final boolean ENABLE_CONFIGURATION_PROPERTY_TRACKING = true;
+		public static final HibernateOrmConfigurationPropertyCheckingStrategyName CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
+				HibernateOrmConfigurationPropertyCheckingStrategyName.WARN;
 		public static final boolean ENABLED = true;
 		public static final HibernateOrmAutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
 				HibernateOrmAutomaticIndexingStrategyName.SESSION;

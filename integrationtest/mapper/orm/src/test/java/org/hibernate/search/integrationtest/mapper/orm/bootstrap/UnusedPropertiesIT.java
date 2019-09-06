@@ -46,7 +46,7 @@ public class UnusedPropertiesIT {
 		log.expectMessage( "Configuration property tracking is disabled" )
 				.once();
 		setup( builder -> {
-			builder.setProperty( HibernateOrmMapperSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, false );
+			builder.setProperty( HibernateOrmMapperSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "ignore" );
 			builder.setProperty( unusedPropertyKey, "bar" );
 		} );
 	}
@@ -73,7 +73,7 @@ public class UnusedPropertiesIT {
 	@Test
 	public void checkEnabledExplicitly_noUnusedProperty() {
 		/*
-		 * Check that the "enable configuration property tracking" property is considered used.
+		 * Check that the "configuration property tracking strategy" property is considered used.
 		 * This is a corner case worth testing, since the property may legitimately be accessed before
 		 * we start tracking property usage.
  		 */
@@ -82,7 +82,7 @@ public class UnusedPropertiesIT {
 		log.expectMessage( "Configuration property tracking is disabled" )
 				.never();
 		setup( builder -> {
-			builder.setProperty( HibernateOrmMapperSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, true );
+			builder.setProperty( HibernateOrmMapperSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "warn" );
 		} );
 	}
 

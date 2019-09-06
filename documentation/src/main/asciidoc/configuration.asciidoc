@@ -127,8 +127,8 @@ Hibernate Search will track the parts of the provided configuration that are act
 and will log a warning if any configuration property is never used,
 because that might indicate a configuration issue.
 
-To disable this warning, set the `hibernate.search.enable_configuration_property_tracking`
-<<configuration-property-types,boolean property>> to `false`.
+To disable this warning, set the `hibernate.search.configuration_property_checking.strategy`
+property to `ignore`.
 
 [[configuration-bean-resolution]]
 == Bean resolution
