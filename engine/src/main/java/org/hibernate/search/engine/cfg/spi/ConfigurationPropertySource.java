@@ -93,12 +93,12 @@ public interface ConfigurationPropertySource {
 	 * @param map The {@link Map} object to extract property values from.
 	 * @return A source containing the properties from the given {@link Map} object.
 	 */
-	static ConfigurationPropertySource fromMap(Map<String, ?> map) {
+	static AllAwareConfigurationPropertySource fromMap(Map<String, ?> map) {
 		return new MapConfigurationPropertySource( map );
 	}
 
 	/**
-	 * @return An source without any property.
+	 * @return A source without any property.
 	 */
 	static ConfigurationPropertySource empty() {
 		return EmptyConfigurationPropertySource.get();

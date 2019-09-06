@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.MetadataImplementor;
-import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.DuplicationStrategy;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -24,8 +23,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.cfg.impl.ConfigurationPropertyChecker;
-import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationServicePropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -63,12 +61,10 @@ public class HibernateSearchIntegrator implements Integrator {
 
 	@Override
 	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
-		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
 		ConfigurationPropertyChecker propertyChecker = ConfigurationPropertyChecker.create();
-		ConfigurationPropertySource propertySource =
-				propertyChecker.wrap(
-						new HibernateOrmConfigurationServicePropertySource( configurationService )
-				);
+		ConfigurationPropertySource propertySource = HibernateOrmIntegrationBooterImpl.getPropertySource(
+				serviceRegistry, propertyChecker
+		);
 		if ( ! ENABLED.get( propertySource ) ) {
 			log.debug( "Hibernate Search is disabled through configuration properties." );
 			return;

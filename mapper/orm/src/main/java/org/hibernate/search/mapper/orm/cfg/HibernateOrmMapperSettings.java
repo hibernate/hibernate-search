@@ -28,20 +28,6 @@ public final class HibernateOrmMapperSettings {
 	public static final String PREFIX = EngineSettings.PREFIX;
 
 	/**
-	 * The strategy to use when reporting the results of configuration property checking.
-	 * <p>
-	 * Configuration property checking will detect an configuration property that is never used,
-	 * which might indicate a configuration issue.
-	 * <p>
-	 * Expects a {@link ConfigurationPropertyCheckingStrategyName} value,
-	 * or a String representation of such value.
-	 * <p>
-	 * Defaults to {@link Defaults#CONFIGURATION_PROPERTY_CHECKING_STRATEGY}.
-	 */
-	public static final String CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
-			PREFIX + Radicals.CONFIGURATION_PROPERTY_CHECKING_STRATEGY;
-
-	/**
 	 * Whether Hibernate Search is enabled or not.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
@@ -140,7 +126,6 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final String ENABLED = "enabled";
-		public static final String CONFIGURATION_PROPERTY_CHECKING_STRATEGY = "configuration_property_checking.strategy";
 		public static final String AUTOMATIC_INDEXING_STRATEGY = "automatic_indexing.strategy";
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = "automatic_indexing.synchronization.strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = "automatic_indexing.enable_dirty_check";
@@ -158,8 +143,6 @@ public final class HibernateOrmMapperSettings {
 		private Defaults() {
 		}
 
-		public static final ConfigurationPropertyCheckingStrategyName CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
-				ConfigurationPropertyCheckingStrategyName.WARN;
 		public static final boolean ENABLED = true;
 		public static final AutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
 				AutomaticIndexingStrategyName.SESSION;

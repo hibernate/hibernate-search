@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.cfg.impl;
+package org.hibernate.search.engine.cfg.spi;
 
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
@@ -12,12 +12,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConsumedPropertyTrackingConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.cfg.ConfigurationPropertyCheckingStrategyName;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.engine.cfg.ConfigurationPropertyCheckingStrategyName;
+import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -33,9 +30,9 @@ public class ConfigurationPropertyChecker {
 
 	private static final ConfigurationProperty<ConfigurationPropertyCheckingStrategyName>
 			CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
+			ConfigurationProperty.forKey( EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
 					.as( ConfigurationPropertyCheckingStrategyName.class, ConfigurationPropertyCheckingStrategyName::of )
-					.withDefault( HibernateOrmMapperSettings.Defaults.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
+					.withDefault( EngineSettings.Defaults.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
 					.build();
 
 	public static ConfigurationPropertyChecker create() {
@@ -50,7 +47,7 @@ public class ConfigurationPropertyChecker {
 	private ConfigurationPropertyChecker() {
 	}
 
-	public ConfigurationPropertySource wrap(HibernateOrmAllAwareConfigurationServicePropertySource source) {
+	public ConfigurationPropertySource wrap(AllAwareConfigurationPropertySource source) {
 		ConfigurationPropertySource trackingSource =
 				new ConsumedPropertyTrackingConfigurationPropertySource(
 						source, this::addConsumedPropertyKey
@@ -60,7 +57,7 @@ public class ConfigurationPropertyChecker {
 		switch ( checkingStrategy ) {
 			case WARN:
 				this.warn = true;
-				availablePropertyKeys.addAll( source.resolveAll( HibernateOrmMapperSettings.PREFIX ) );
+				availablePropertyKeys.addAll( source.resolveAll( EngineSettings.PREFIX ) );
 				return trackingSource;
 			case IGNORE:
 				return source;

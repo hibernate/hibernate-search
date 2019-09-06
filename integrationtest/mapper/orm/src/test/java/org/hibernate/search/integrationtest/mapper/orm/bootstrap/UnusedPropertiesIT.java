@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -44,7 +43,7 @@ public class UnusedPropertiesIT {
 		log.expectMessage( "Configuration property tracking is disabled" )
 				.once();
 		setup( builder -> {
-			builder.setProperty( HibernateOrmMapperSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "ignore" );
+			builder.setProperty( EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "ignore" );
 			builder.setProperty( unusedPropertyKey, "bar" );
 		} );
 	}
@@ -80,7 +79,7 @@ public class UnusedPropertiesIT {
 		log.expectMessage( "Configuration property tracking is disabled" )
 				.never();
 		setup( builder -> {
-			builder.setProperty( HibernateOrmMapperSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "warn" );
+			builder.setProperty( EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "warn" );
 		} );
 	}
 

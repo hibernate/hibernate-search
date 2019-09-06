@@ -8,6 +8,7 @@ package org.hibernate.search.engine.common.spi;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.impl.SearchIntegrationBuilderImpl;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
@@ -23,7 +24,8 @@ public interface SearchIntegration extends AutoCloseable {
 	@Override
 	void close();
 
-	static SearchIntegrationBuilder builder(ConfigurationPropertySource propertySource) {
-		return new SearchIntegrationBuilderImpl( propertySource );
+	static SearchIntegrationBuilder builder(ConfigurationPropertySource propertySource,
+			ConfigurationPropertyChecker propertyChecker) {
+		return new SearchIntegrationBuilderImpl( propertySource, propertyChecker );
 	}
 }

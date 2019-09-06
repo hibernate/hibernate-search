@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
@@ -28,6 +29,12 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public final class JavaBeanMappingBuilder {
 
+	private static ConfigurationPropertySource getPropertySource(Map<String, Object> properties,
+			ConfigurationPropertyChecker propertyChecker) {
+		return propertyChecker.wrap( ConfigurationPropertySource.fromMap( properties ) );
+	}
+
+	private final ConfigurationPropertyChecker propertyChecker;
 	private final Map<String, Object> properties = new HashMap<>();
 	private final ConfigurationPropertySource propertySource;
 	private final SearchIntegrationBuilder integrationBuilder;
@@ -35,8 +42,9 @@ public final class JavaBeanMappingBuilder {
 	private final JavaBeanMappingInitiator mappingInitiator;
 
 	JavaBeanMappingBuilder(MethodHandles.Lookup lookup) {
-		propertySource = ConfigurationPropertySource.fromMap( properties );
-		integrationBuilder = SearchIntegration.builder( propertySource );
+		propertyChecker = ConfigurationPropertyChecker.create();
+		propertySource = getPropertySource( properties, propertyChecker );
+		integrationBuilder = SearchIntegration.builder( propertySource, propertyChecker );
 		JavaBeanBootstrapIntrospector introspector = JavaBeanBootstrapIntrospector.create( lookup );
 		mappingKey = new JavaBeanMappingKey();
 		mappingInitiator = new JavaBeanMappingInitiator( introspector );
@@ -109,7 +117,8 @@ public final class JavaBeanMappingBuilder {
 		SearchIntegration integration = null;
 		JavaBeanMapping mapping;
 		try {
-			SearchIntegrationFinalizer finalizer = integrationPartialBuildState.finalizer( propertySource );
+			SearchIntegrationFinalizer finalizer =
+					integrationPartialBuildState.finalizer( propertySource, propertyChecker );
 			mapping = finalizer.finalizeMapping(
 					mappingKey,
 					(context, partialMapping) -> partialMapping.finalizeMapping()

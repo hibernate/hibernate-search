@@ -16,6 +16,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
@@ -104,6 +105,7 @@ public class SearchSetupHelper implements TestRule {
 
 	public class SetupContext {
 
+		private final ConfigurationPropertyChecker unusedPropertyChecker;
 		private final ConfigurationPropertySource propertySource;
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
@@ -111,6 +113,7 @@ public class SearchSetupHelper implements TestRule {
 		private boolean multiTenancyEnabled = false;
 
 		SetupContext(ConfigurationPropertySource basePropertySource) {
+			this.unusedPropertyChecker = ConfigurationPropertyChecker.create();
 			this.propertySource = basePropertySource.withOverride( ConfigurationPropertySource.fromMap( overriddenProperties ) );
 		}
 
@@ -160,7 +163,8 @@ public class SearchSetupHelper implements TestRule {
 		}
 
 		public PartialSetup setupFirstPhaseOnly() {
-			SearchIntegrationBuilder integrationBuilder = SearchIntegration.builder( propertySource );
+			SearchIntegrationBuilder integrationBuilder =
+					SearchIntegration.builder( propertySource, unusedPropertyChecker );
 
 			StubMappingInitiator initiator = new StubMappingInitiator( multiTenancyEnabled );
 			StubMappingKey mappingKey = new StubMappingKey();
@@ -171,7 +175,8 @@ public class SearchSetupHelper implements TestRule {
 			integrationPartialBuildStates.add( integrationPartialBuildState );
 
 			return () -> {
-				SearchIntegrationFinalizer finalizer = integrationPartialBuildState.finalizer( propertySource );
+				SearchIntegrationFinalizer finalizer =
+						integrationPartialBuildState.finalizer( propertySource, unusedPropertyChecker );
 				StubMapping mapping = finalizer.finalizeMapping(
 						mappingKey, (context, partialMapping) -> partialMapping.finalizeMapping()
 				);
