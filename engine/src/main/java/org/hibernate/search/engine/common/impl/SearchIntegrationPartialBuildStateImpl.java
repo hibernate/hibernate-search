@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
@@ -36,6 +37,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	private final Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings;
 	private final Map<MappingKey<?, ?>, MappingImplementor<?>> fullyBuiltMappings = new LinkedHashMap<>();
 	private final Map<String, BackendPartialBuildState> partiallyBuiltBackends;
+	private final ConfigurationPropertyChecker partialConfigurationPropertyChecker;
+
 	private final Map<String, BackendImplementor<?>> fullyBuiltBackends = new LinkedHashMap<>();
 	private final Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers;
 	private final Map<String, IndexManagerImplementor<?>> fullyBuiltIndexManagers = new LinkedHashMap<>();
@@ -44,12 +47,14 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			BeanProvider beanProvider, BeanResolver beanResolver,
 			Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings,
 			Map<String, BackendPartialBuildState> partiallyBuiltBackends,
-			Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers) {
+			Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers,
+			ConfigurationPropertyChecker partialConfigurationPropertyChecker) {
 		this.beanProvider = beanProvider;
 		this.beanResolver = beanResolver;
 		this.partiallyBuiltMappings = partiallyBuiltMappings;
 		this.partiallyBuiltBackends = partiallyBuiltBackends;
 		this.partiallyBuiltIndexManagers = partiallyBuiltIndexManagers;
+		this.partialConfigurationPropertyChecker = partialConfigurationPropertyChecker;
 	}
 
 	@Override
@@ -66,18 +71,23 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	}
 
 	@Override
-	public SearchIntegrationFinalizer finalizer(ConfigurationPropertySource propertySource) {
+	public SearchIntegrationFinalizer finalizer(ConfigurationPropertySource propertySource,
+			ConfigurationPropertyChecker configurationPropertyChecker) {
 		return new SearchIntegrationFinalizerImpl(
-				propertySource.withMask( "hibernate.search" )
+				propertySource.withMask( "hibernate.search" ),
+				configurationPropertyChecker
 		);
 	}
 
 	private class SearchIntegrationFinalizerImpl implements SearchIntegrationFinalizer {
 
 		private final ConfigurationPropertySource propertySource;
+		private final ConfigurationPropertyChecker propertyChecker;
 
-		private SearchIntegrationFinalizerImpl(ConfigurationPropertySource propertySource) {
+		private SearchIntegrationFinalizerImpl(ConfigurationPropertySource propertySource,
+				ConfigurationPropertyChecker propertyChecker) {
 			this.propertySource = propertySource;
+			this.propertyChecker = propertyChecker;
 		}
 
 		@Override
@@ -132,6 +142,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 				);
 			}
 			failureCollector.checkNoFailure();
+
+			propertyChecker.afterBoot( partialConfigurationPropertyChecker, propertySource );
 
 			return new SearchIntegrationImpl(
 					beanProvider,

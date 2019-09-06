@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.common.spi;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 public interface SearchIntegrationPartialBuildState {
@@ -20,9 +21,12 @@ public interface SearchIntegrationPartialBuildState {
 	/**
 	 * @param propertySource The configuration property source,
 	 * which may hold additional configuration compared to the one passed to
-	 * {@link SearchIntegration#builder(ConfigurationPropertySource)}.
+	 * {@link SearchIntegration#builder(ConfigurationPropertySource, ConfigurationPropertyChecker)}.
+	 * @param propertyChecker The configuration property checker
+	 * tracking the given {@code configurationPropertySource}.
 	 * @return An object allowing the finalization of the search integration.
 	 */
-	SearchIntegrationFinalizer finalizer(ConfigurationPropertySource propertySource);
+	SearchIntegrationFinalizer finalizer(ConfigurationPropertySource propertySource,
+			ConfigurationPropertyChecker propertyChecker);
 
 }

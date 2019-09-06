@@ -13,7 +13,6 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
@@ -127,19 +126,6 @@ public interface Log extends BasicLogger {
 			value = "Invalid automatic indexing strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidAutomaticIndexingStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
-	@LogMessage(level = Logger.Level.INFO)
-	@Message(id = ID_OFFSET_2 + 5,
-			value = "Configuration property tracking is disabled; unused properties will not be logged.")
-	void configurationPropertyTrackingDisabled();
-
-	@LogMessage(level = Logger.Level.WARN)
-	@Message(id = ID_OFFSET_2 + 6,
-			value = "Some properties in the Hibernate Search configuration were not used;"
-					+ " there might be misspelled property keys in your configuration. Unused properties were: %1$s."
-					+ " To disable this warning, set the property '%2$s' to '%3$s'.")
-	void configurationPropertyTrackingUnusedProperties(Set<String> propertyKeys, String disableWarningKey,
-			String disableWarningValue);
-
 	@Message(id = ID_OFFSET_2 + 7,
 			value = "Path '%2$s' on entity type '%1$s' cannot be resolved using Hibernate ORM metadata."
 					+ " Please check that this path points to a persisted value.")
@@ -201,8 +187,4 @@ public interface Log extends BasicLogger {
 					+ " because caching is not enabled for this entity type.")
 	void skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
 			@FormatWith(ClassFormatter.class) Class<?> entityType);
-
-	@Message(id = ID_OFFSET_2 + 21,
-			value = "Invalid configuration property checking strategy name: '%1$s'. Valid names are: %2$s.")
-	SearchException invalidConfigurationPropertyCheckingStrategyName(String invalidRepresentation, List<String> validRepresentations);
 }

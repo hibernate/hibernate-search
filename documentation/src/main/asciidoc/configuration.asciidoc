@@ -122,9 +122,8 @@ or a reference by type as a `java.lang.Class`
 [[configuration-property-tracking]]
 == Configuration property tracking
 
-When using the ORM integration,
 Hibernate Search will track the parts of the provided configuration that are actually used
-and will log a warning if any configuration property is never used,
+and will log a warning if any configuration property starting with "hibernate.search." is never used,
 because that might indicate a configuration issue.
 
 To disable this warning, set the `hibernate.search.configuration_property_checking.strategy`

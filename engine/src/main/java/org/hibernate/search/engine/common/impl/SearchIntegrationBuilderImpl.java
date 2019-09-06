@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
@@ -61,7 +62,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 	private static final int FAILURE_LIMIT = 100;
 
-	private final ConfigurationPropertySource mainPropertySource;
+	private final ConfigurationPropertyChecker propertyChecker;
+	private final ConfigurationPropertySource propertySource;
 	private final Map<MappingKey<?, ?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
 
 	private ClassResolver classResolver;
@@ -70,8 +72,11 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	private BeanProvider beanProvider;
 	private boolean frozen = false;
 
-	public SearchIntegrationBuilderImpl(ConfigurationPropertySource mainPropertySource) {
-		this.mainPropertySource = mainPropertySource.withMask( "hibernate.search" );
+	public SearchIntegrationBuilderImpl(ConfigurationPropertySource propertySource,
+			ConfigurationPropertyChecker propertyChecker) {
+		this.propertyChecker = propertyChecker;
+		this.propertySource = propertySource.withMask( "hibernate.search" );
+		propertyChecker.beforeBoot();
 	}
 
 	@Override
@@ -158,8 +163,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				beanProvider = ReflectionBeanProvider.create( classResolver );
 			}
 
-			ConfigurationPropertySource propertySource = mainPropertySource;
-
 			BeanResolver beanResolver = new ConfiguredBeanResolver( serviceResolver, beanProvider, propertySource );
 			RootBuildContext rootBuildContext = new RootBuildContext(
 					propertySource,
@@ -214,7 +217,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 					beanProvider, beanResolver,
 					partiallyBuiltMappings,
 					indexManagerBuildingStateHolder.getBackendPartialBuildStates(),
-					indexManagerBuildingStateHolder.getIndexManagersByName()
+					indexManagerBuildingStateHolder.getIndexManagersByName(),
+					propertyChecker
 			);
 		}
 		catch (RuntimeException e) {

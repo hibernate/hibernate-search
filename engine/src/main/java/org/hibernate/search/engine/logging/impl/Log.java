@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
@@ -291,4 +292,21 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 65,
 			value = "Unknown aggregation key '%1$s'. This key was not used when building the search query." )
 	SearchException unknownAggregationKey(AggregationKey<?> key);
+
+	@Message(id = ID_OFFSET_2 + 66,
+			value = "Invalid configuration property checking strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidConfigurationPropertyCheckingStrategyName(String invalidRepresentation, List<String> validRepresentations);
+
+	@LogMessage(level = Logger.Level.INFO)
+	@Message(id = ID_OFFSET_2 + 67,
+			value = "Configuration property tracking is disabled; unused properties will not be logged.")
+	void configurationPropertyTrackingDisabled();
+
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET_2 + 68,
+			value = "Some properties in the Hibernate Search configuration were not used;"
+					+ " there might be misspelled property keys in your configuration. Unused properties were: %1$s."
+					+ " To disable this warning, set the property '%2$s' to '%3$s'.")
+	void configurationPropertyTrackingUnusedProperties(Set<String> propertyKeys, String disableWarningKey,
+			String disableWarningValue);
 }

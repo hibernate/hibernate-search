@@ -31,8 +31,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
-import org.hibernate.search.mapper.orm.cfg.impl.ConfigurationPropertyChecker;
-import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationServicePropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
@@ -42,22 +41,34 @@ import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.service.Service;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceBinding;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegrationBooter {
 
+	@SuppressWarnings("unchecked")
+	static ConfigurationPropertySource getPropertySource(ServiceRegistry serviceRegistry,
+			ConfigurationPropertyChecker propertyChecker) {
+		return propertyChecker.wrap(
+				ConfigurationPropertySource.fromMap(
+						serviceRegistry.getService( ConfigurationService.class )
+								.getSettings()
+				)
+		);
+	}
+
 	private static final OptionalConfigurationProperty<HibernateOrmIntegrationPartialBuildState> INTEGRATION_PARTIAL_BUILD_STATE =
 			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.INTEGRATION_PARTIAL_BUILD_STATE )
 					.as( HibernateOrmIntegrationPartialBuildState.class, HibernateOrmIntegrationPartialBuildState::parse )
 					.build();
-
 	private final Metadata metadata;
 	private final ServiceRegistryImplementor serviceRegistry;
 	private final ReflectionManager reflectionManager;
 	private final ConfigurationService ormConfigurationService;
 	private final ConfigurationPropertySource propertySource;
 	private final ConfigurationPropertyChecker propertyChecker;
+
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
 
 	public HibernateOrmIntegrationBooterImpl(Metadata metadata, BootstrapContext bootstrapContext) {
@@ -71,11 +82,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			ConfigurationPropertyChecker propertyChecker) {
 		this(
 				metadata, bootstrapContext,
-				propertyChecker.wrap(
-						new HibernateOrmConfigurationServicePropertySource(
-								bootstrapContext.getServiceRegistry().getService( ConfigurationService.class )
-						)
-				),
+				getPropertySource( bootstrapContext.getServiceRegistry(), propertyChecker ),
 				propertyChecker
 		);
 	}
@@ -207,9 +214,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		BeanProvider beanProvider = null;
 		SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
 		try {
-			propertyChecker.beforeBoot();
-
-			SearchIntegrationBuilder builder = SearchIntegration.builder( propertySource );
+			SearchIntegrationBuilder builder = SearchIntegration.builder( propertySource, propertyChecker );
 
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
@@ -245,8 +250,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 			return new HibernateOrmIntegrationPartialBuildState(
 					searchIntegrationPartialBuildState,
-					mappingKey,
-					propertyChecker
+					mappingKey
 			);
 		}
 		catch (RuntimeException e) {
@@ -261,7 +265,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private HibernateSearchContextProviderService doBootSecondPhase(
 			HibernateOrmIntegrationPartialBuildState partialBuildState,
 			SessionFactoryImplementor sessionFactoryImplementor) {
-		SearchIntegrationFinalizer finalizer = partialBuildState.integrationBuildState.finalizer( propertySource );
+		SearchIntegrationFinalizer finalizer =
+				partialBuildState.integrationBuildState.finalizer( propertySource, propertyChecker );
 
 		HibernateOrmMapping mapping = finalizer.finalizeMapping(
 				partialBuildState.mappingKey,
@@ -280,8 +285,6 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		// TODO HSEARCH-3057 JMX
 //		this.jmx = new JMXHook( propertySource );
 //		this.jmx.registerIfEnabled( extendedIntegrator, factory );
-
-		propertyChecker.afterBoot( partialBuildState.bootFirstPhasePropertyChecker, propertySource );
 
 		return contextService;
 	}
@@ -326,15 +329,12 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 		private final SearchIntegrationPartialBuildState integrationBuildState;
 		private final HibernateOrmMappingKey mappingKey;
-		private final ConfigurationPropertyChecker bootFirstPhasePropertyChecker;
 
 		HibernateOrmIntegrationPartialBuildState(
 				SearchIntegrationPartialBuildState integrationBuildState,
-				HibernateOrmMappingKey mappingKey,
-				ConfigurationPropertyChecker bootFirstPhasePropertyChecker) {
+				HibernateOrmMappingKey mappingKey) {
 			this.integrationBuildState = integrationBuildState;
 			this.mappingKey = mappingKey;
-			this.bootFirstPhasePropertyChecker = bootFirstPhasePropertyChecker;
 		}
 
 		void closeOnFailure() {
