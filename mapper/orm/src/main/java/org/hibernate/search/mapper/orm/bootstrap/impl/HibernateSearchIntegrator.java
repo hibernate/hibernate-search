@@ -41,10 +41,10 @@ public class HibernateSearchIntegrator implements Integrator {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<Boolean> AUTOREGISTER_LISTENERS =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOREGISTER_LISTENERS )
+	private static final ConfigurationProperty<Boolean> ENABLED =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.ENABLED )
 					.asBoolean()
-					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOREGISTER_LISTENERS )
+					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLED )
 					.build();
 
 	private static final ConfigurationProperty<HibernateOrmAutomaticIndexingStrategyName> AUTOMATIC_INDEXING_STRATEGY =
@@ -64,8 +64,8 @@ public class HibernateSearchIntegrator implements Integrator {
 		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
 		HibernateOrmConfigurationPropertySource propertySource =
 				new HibernateOrmConfigurationPropertySource( configurationService );
-		if ( ! AUTOREGISTER_LISTENERS.get( propertySource ) ) {
-			log.debug( "Skipping Hibernate Search event listener auto registration" );
+		if ( ! ENABLED.get( propertySource ) ) {
+			log.debug( "Hibernate Search is disabled through configuration properties." );
 			return;
 		}
 
