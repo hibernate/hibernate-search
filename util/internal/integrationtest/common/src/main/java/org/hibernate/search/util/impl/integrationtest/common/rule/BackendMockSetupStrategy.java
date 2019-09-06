@@ -30,6 +30,6 @@ class BackendMockSetupStrategy implements BackendSetupStrategy {
 					backendMock.getBackendName(), "type", StubBackendFactory.class.getName()
 			);
 		}
-		return setupContext.withPropertyRadical( EngineSettings.DEFAULT_BACKEND, defaultBackendName );
+		return setupContext.withProperty( EngineSettings.DEFAULT_BACKEND, defaultBackendName );
 	}
 }

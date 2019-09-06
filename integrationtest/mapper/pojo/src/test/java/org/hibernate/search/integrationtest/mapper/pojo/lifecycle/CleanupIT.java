@@ -355,7 +355,7 @@ public class CleanupIT {
 				 * that will return a BeanHolder that increments static counters
 				 * (so that we can check the bean holders are properly closed).
 				 */
-				.withProperty( EngineSpiSettings.BEAN_CONFIGURERS, Arrays.asList(
+				.withPropertyRadical( EngineSpiSettings.BEAN_CONFIGURERS, Arrays.asList(
 						new BeanConfigurer() {
 							@Override
 							public void configure(BeanConfigurationContext context) {

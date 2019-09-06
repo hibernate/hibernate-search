@@ -48,6 +48,6 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 			BackendConfiguration configuration = entry.getValue();
 			setupContext = configuration.setupWithName( setupContext, name, configurationProvider );
 		}
-		return setupContext.withPropertyRadical( EngineSettings.DEFAULT_BACKEND, defaultBackendName );
+		return setupContext.withProperty( EngineSettings.DEFAULT_BACKEND, defaultBackendName );
 	}
 }

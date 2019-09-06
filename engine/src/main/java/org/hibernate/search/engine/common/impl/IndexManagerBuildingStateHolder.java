@@ -46,7 +46,7 @@ class IndexManagerBuildingStateHolder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<String> DEFAULT_INDEX_BACKEND_NAME =
-			ConfigurationProperty.forKey( EngineSettings.DEFAULT_BACKEND ).asString().build();
+			ConfigurationProperty.forKey( EngineSettings.Radicals.DEFAULT_BACKEND ).asString().build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends BackendFactory>> BACKEND_TYPE =
 			ConfigurationProperty.forKey( BackendSettings.TYPE ).asBeanReference( BackendFactory.class )

@@ -25,8 +25,6 @@ import org.junit.Test;
 
 public class UnusedPropertiesIT {
 
-	private static final String DEFAULT_BACKEND_PROPERTY_KEY = HibernateOrmMapperSettings.PREFIX + "." + EngineSettings.DEFAULT_BACKEND;
-
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
@@ -62,7 +60,7 @@ public class UnusedPropertiesIT {
 		log.expectMessage( "Configuration property tracking is disabled" )
 				.never();
 		// Also check that used properties are not reported as unused
-		log.expectMessage( "not used", DEFAULT_BACKEND_PROPERTY_KEY )
+		log.expectMessage( "not used", EngineSettings.DEFAULT_BACKEND )
 				.never();
 
 		setup( builder -> {

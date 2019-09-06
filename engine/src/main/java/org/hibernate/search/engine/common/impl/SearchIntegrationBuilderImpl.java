@@ -71,7 +71,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	private boolean frozen = false;
 
 	public SearchIntegrationBuilderImpl(ConfigurationPropertySource mainPropertySource) {
-		this.mainPropertySource = mainPropertySource;
+		this.mainPropertySource = mainPropertySource.withMask( "hibernate.search" );
 	}
 
 	@Override

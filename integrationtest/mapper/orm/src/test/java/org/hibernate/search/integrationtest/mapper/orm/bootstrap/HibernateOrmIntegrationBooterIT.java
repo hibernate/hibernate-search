@@ -109,11 +109,11 @@ public class HibernateOrmIntegrationBooterIT {
 
 		// Configure the backend
 		registryBuilder.applySetting(
-				HibernateOrmMapperSettings.PREFIX + EngineSettings.DEFAULT_BACKEND,
+				EngineSettings.DEFAULT_BACKEND,
 				backendMock.getBackendName()
 		);
 		registryBuilder.applySetting(
-				HibernateOrmMapperSettings.PREFIX + EngineSettings.BACKENDS
+				EngineSettings.BACKENDS
 						+ "." + backendMock.getBackendName() + "." + BackendSettings.TYPE,
 				StubBackendFactory.class.getName()
 		);

@@ -65,7 +65,7 @@ public class SearchSetupHelper implements TestRule {
 
 	public SetupContext start(String backendName) {
 		ConfigurationPropertySource propertySource = setupStrategy.createBackendConfigurationPropertySource( configurationProvider )
-				.withPrefix( "backends." + backendName );
+				.withPrefix( EngineSettings.BACKENDS + "." + backendName );
 
 		// Hack to have the resolve() method ignore the various masks and prefixes that we added for TCK purposes only
 		propertySource = ConfigurationPropertySource.empty().withOverride( propertySource );
@@ -116,6 +116,11 @@ public class SearchSetupHelper implements TestRule {
 
 		public SetupContext withProperty(String key, Object value) {
 			overriddenProperties.put( key, value );
+			return this;
+		}
+
+		public SetupContext withPropertyRadical(String keyRadical, Object value) {
+			overriddenProperties.put( EngineSettings.PREFIX + keyRadical, value );
 			return this;
 		}
 

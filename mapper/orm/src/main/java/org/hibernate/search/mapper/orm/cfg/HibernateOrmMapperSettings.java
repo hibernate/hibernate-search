@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.cfg;
 
+import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
@@ -24,7 +25,7 @@ public final class HibernateOrmMapperSettings {
 	 * The prefix expected for the key of every Hibernate Search configuration property
 	 * when using the Hibernate ORM mapper.
 	 */
-	public static final String PREFIX = "hibernate.search.";
+	public static final String PREFIX = EngineSettings.PREFIX;
 
 	/**
 	 * The strategy to use when reporting the results of configuration property checking.

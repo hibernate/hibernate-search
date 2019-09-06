@@ -30,7 +30,7 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 
 	private static final ConfigurationProperty<ConfigurationPropertyCheckingStrategyName>
 			CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
 					.as( ConfigurationPropertyCheckingStrategyName.class, ConfigurationPropertyCheckingStrategyName::of )
 					.withDefault( HibernateOrmMapperSettings.Defaults.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
 					.build();
@@ -41,21 +41,20 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 
 	public HibernateOrmConfigurationPropertySource(ConfigurationService configurationService) {
 		this.configurationServiceSource = new HibernateOrmConfigurationServicePropertySource( configurationService );
-		ConfigurationPropertySource maskedSource = configurationServiceSource.withMask( "hibernate.search" );
 
 		ConfigurationPropertyCheckingStrategyName checkingStrategy =
-				CONFIGURATION_PROPERTY_CHECKING_STRATEGY.get( maskedSource );
+				CONFIGURATION_PROPERTY_CHECKING_STRATEGY.get( configurationServiceSource );
 		switch ( checkingStrategy ) {
 			case WARN:
 				consumedPropertyTrackingPropertySource =
-						new ConsumedPropertyTrackingConfigurationPropertySource( maskedSource );
+						new ConsumedPropertyTrackingConfigurationPropertySource( configurationServiceSource );
 				// Make sure to mark the "enable configuration property tracking" property as used
 				CONFIGURATION_PROPERTY_CHECKING_STRATEGY.get( consumedPropertyTrackingPropertySource );
 				delegate = consumedPropertyTrackingPropertySource;
 				break;
 			case IGNORE:
 				consumedPropertyTrackingPropertySource = null;
-				delegate = maskedSource;
+				delegate = configurationServiceSource;
 				break;
 			default:
 				throw new AssertionFailure(
