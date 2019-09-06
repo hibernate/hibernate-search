@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.cfg;
+package org.hibernate.search.backend.elasticsearch.index;
 
 import java.lang.invoke.MethodHandles;
 
@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.impl.StringHelper;
  *
  * @author Gunnar Morling
  */
-public enum ElasticsearchIndexLifecycleStrategyName {
+public enum IndexLifecycleStrategyName {
 
 	/**
 	 * Indexes will never be created or deleted.
@@ -66,10 +66,10 @@ public enum ElasticsearchIndexLifecycleStrategyName {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
-	public static ElasticsearchIndexLifecycleStrategyName of(String value) {
+	public static IndexLifecycleStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
-				ElasticsearchIndexLifecycleStrategyName.values(),
-				ElasticsearchIndexLifecycleStrategyName::getExternalRepresentation,
+				IndexLifecycleStrategyName.values(),
+				IndexLifecycleStrategyName::getExternalRepresentation,
 				log::invalidIndexLifecycleStrategyName,
 				value
 		);
@@ -77,7 +77,7 @@ public enum ElasticsearchIndexLifecycleStrategyName {
 
 	private final String externalRepresentation;
 
-	ElasticsearchIndexLifecycleStrategyName(String externalRepresentation) {
+	IndexLifecycleStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 

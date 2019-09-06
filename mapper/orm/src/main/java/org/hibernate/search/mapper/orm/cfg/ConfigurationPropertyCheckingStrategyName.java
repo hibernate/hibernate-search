@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public enum HibernateOrmConfigurationPropertyCheckingStrategyName {
+public enum ConfigurationPropertyCheckingStrategyName {
 
 	/**
 	 * Ignore the result of configuration property checking.
@@ -27,10 +27,10 @@ public enum HibernateOrmConfigurationPropertyCheckingStrategyName {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
-	public static HibernateOrmConfigurationPropertyCheckingStrategyName of(String value) {
+	public static ConfigurationPropertyCheckingStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
-				HibernateOrmConfigurationPropertyCheckingStrategyName.values(),
-				HibernateOrmConfigurationPropertyCheckingStrategyName::getExternalRepresentation,
+				ConfigurationPropertyCheckingStrategyName.values(),
+				ConfigurationPropertyCheckingStrategyName::getExternalRepresentation,
 				log::invalidConfigurationPropertyCheckingStrategyName,
 				value
 		);
@@ -38,7 +38,7 @@ public enum HibernateOrmConfigurationPropertyCheckingStrategyName {
 
 	private final String externalRepresentation;
 
-	HibernateOrmConfigurationPropertyCheckingStrategyName(String externalRepresentation) {
+	ConfigurationPropertyCheckingStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 

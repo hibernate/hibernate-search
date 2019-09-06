@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 
 /**
  * @author Gunnar Morling
  */
 public class ElasticsearchIndexLifecycleExecutionOptions {
 
-	private final ElasticsearchIndexStatus requiredStatus;
+	private final IndexStatus requiredStatus;
 
 	private final int requiredStatusTimeoutInMs;
 
 	public ElasticsearchIndexLifecycleExecutionOptions(
-			ElasticsearchIndexStatus requiredStatus, int requiredStatusTimeoutInMs) {
+			IndexStatus requiredStatus, int requiredStatusTimeoutInMs) {
 		this.requiredStatus = requiredStatus;
 		this.requiredStatusTimeoutInMs = requiredStatusTimeoutInMs;
 	}
@@ -26,7 +26,7 @@ public class ElasticsearchIndexLifecycleExecutionOptions {
 	/**
 	 * @return the status the index needs to be at least in, otherwise we'll fail starting up.
 	 */
-	public ElasticsearchIndexStatus getRequiredStatus() {
+	public IndexStatus getRequiredStatus() {
 		return requiredStatus;
 	}
 

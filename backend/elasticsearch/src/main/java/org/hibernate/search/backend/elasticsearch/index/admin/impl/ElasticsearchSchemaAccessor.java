@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletionException;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -119,7 +119,7 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public void waitForIndexStatus(final URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		ElasticsearchIndexStatus requiredIndexStatus = executionOptions.getRequiredStatus();
+		IndexStatus requiredIndexStatus = executionOptions.getRequiredStatus();
 		String timeoutAndUnit = executionOptions.getRequiredStatusTimeoutInMs() + "ms";
 
 		ElasticsearchWork<?> work =

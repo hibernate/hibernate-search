@@ -17,7 +17,7 @@ import javax.persistence.OneToMany;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmAutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -49,7 +49,7 @@ public class SearchSessionWritePlanBaseIT {
 
 	@Test
 	public void simple() {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -78,7 +78,7 @@ public class SearchSessionWritePlanBaseIT {
 
 	@Test
 	public void mergedEvents() {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -154,7 +154,7 @@ public class SearchSessionWritePlanBaseIT {
 
 	@Test
 	public void purgeContained() {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
 
 		withinTransaction( sessionFactory, session -> {
 			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
@@ -170,7 +170,7 @@ public class SearchSessionWritePlanBaseIT {
 
 	@Test
 	public void earlyProcess() {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.SESSION );
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.SESSION );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -212,7 +212,7 @@ public class SearchSessionWritePlanBaseIT {
 
 	@Test
 	public void earlyExecute() {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.SESSION );
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.SESSION );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -247,7 +247,7 @@ public class SearchSessionWritePlanBaseIT {
 
 	@Test
 	public void mixedExplicitAndAutomaticIndexing() {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.SESSION );
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.SESSION );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -287,7 +287,7 @@ public class SearchSessionWritePlanBaseIT {
 
 	@Test
 	public void multiIndexMultiBackend() {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -317,7 +317,7 @@ public class SearchSessionWritePlanBaseIT {
 
 	@Test
 	public void outOfSession() {
-		SessionFactory sessionFactory = setup( HibernateOrmAutomaticIndexingStrategyName.NONE );
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
 
 		SearchSessionWritePlan writePlan;
 		IndexedEntity1 entity;
@@ -356,7 +356,7 @@ public class SearchSessionWritePlanBaseIT {
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 	}
 
-	private SessionFactory setup(HibernateOrmAutomaticIndexingStrategyName automaticIndexingStrategy) {
+	private SessionFactory setup(AutomaticIndexingStrategyName automaticIndexingStrategy) {
 		backend1Mock.expectAnySchema( IndexedEntity1.INDEX_NAME );
 		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
 

@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
@@ -39,10 +39,10 @@ public class ElasticsearchSchemaCreationIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
-	public static EnumSet<ElasticsearchIndexLifecycleStrategyName> strategies() {
+	public static EnumSet<IndexLifecycleStrategyName> strategies() {
 		return EnumSet.complementOf( EnumSet.of(
 				// Those strategies don't create the schema, so we don't test them
-				ElasticsearchIndexLifecycleStrategyName.NONE, ElasticsearchIndexLifecycleStrategyName.VALIDATE
+				IndexLifecycleStrategyName.NONE, IndexLifecycleStrategyName.VALIDATE
 				) );
 	}
 
@@ -52,9 +52,9 @@ public class ElasticsearchSchemaCreationIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexLifecycleStrategyName strategy;
+	private final IndexLifecycleStrategyName strategy;
 
-	public ElasticsearchSchemaCreationIT(ElasticsearchIndexLifecycleStrategyName strategy) {
+	public ElasticsearchSchemaCreationIT(IndexLifecycleStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}

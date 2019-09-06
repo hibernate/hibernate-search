@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.cfg;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+
 import org.junit.Test;
 
 import org.assertj.core.api.AbstractBooleanAssert;

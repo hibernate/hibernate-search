@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
@@ -48,15 +48,15 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<ElasticsearchIndexLifecycleStrategyName> LIFECYCLE_STRATEGY =
+	private static final ConfigurationProperty<IndexLifecycleStrategyName> LIFECYCLE_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_STRATEGY )
-					.as( ElasticsearchIndexLifecycleStrategyName.class, ElasticsearchIndexLifecycleStrategyName::of )
+					.as( IndexLifecycleStrategyName.class, IndexLifecycleStrategyName::of )
 					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_STRATEGY )
 					.build();
 
-	private static final ConfigurationProperty<ElasticsearchIndexStatus> MANAGEMENT_REQUIRED_STATUS =
+	private static final ConfigurationProperty<IndexStatus> MANAGEMENT_REQUIRED_STATUS =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS )
-					.as( ElasticsearchIndexStatus.class, ElasticsearchIndexStatus::of )
+					.as( IndexStatus.class, IndexStatus::of )
 					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS )
 					.build();
 

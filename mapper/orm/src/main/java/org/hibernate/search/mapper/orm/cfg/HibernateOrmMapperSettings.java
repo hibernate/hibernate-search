@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.cfg;
 
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
@@ -30,7 +32,7 @@ public final class HibernateOrmMapperSettings {
 	 * Configuration property checking will detect an configuration property that is never used,
 	 * which might indicate a configuration issue.
 	 * <p>
-	 * Expects a {@link HibernateOrmConfigurationPropertyCheckingStrategyName} value,
+	 * Expects a {@link ConfigurationPropertyCheckingStrategyName} value,
 	 * or a String representation of such value.
 	 * <p>
 	 * Defaults to {@link Defaults#CONFIGURATION_PROPERTY_CHECKING_STRATEGY}.
@@ -51,23 +53,23 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The automatic indexing strategy to use.
 	 * <p>
-	 * Expects a {@link HibernateOrmAutomaticIndexingStrategyName} value, or a String representation of such value.
+	 * Expects a {@link AutomaticIndexingStrategyName} value, or a String representation of such value.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_STRATEGY}.
 	 *
-	 * @see HibernateOrmAutomaticIndexingStrategyName
+	 * @see AutomaticIndexingStrategyName
 	 */
 	public static final String AUTOMATIC_INDEXING_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_STRATEGY;
 
 	/**
 	 * The synchronization strategy to use when indexing automatically.
 	 * <p>
-	 * Expects a {@link HibernateOrmAutomaticIndexingSynchronizationStrategyName} value,
+	 * Expects a {@link AutomaticIndexingSynchronizationStrategyName} value,
 	 * or a String representation of such value.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY}.
 	 *
-	 * @see HibernateOrmAutomaticIndexingSynchronizationStrategyName
+	 * @see AutomaticIndexingSynchronizationStrategyName
 	 */
 	public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
 
@@ -155,13 +157,13 @@ public final class HibernateOrmMapperSettings {
 		private Defaults() {
 		}
 
-		public static final HibernateOrmConfigurationPropertyCheckingStrategyName CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
-				HibernateOrmConfigurationPropertyCheckingStrategyName.WARN;
+		public static final ConfigurationPropertyCheckingStrategyName CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
+				ConfigurationPropertyCheckingStrategyName.WARN;
 		public static final boolean ENABLED = true;
-		public static final HibernateOrmAutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
-				HibernateOrmAutomaticIndexingStrategyName.SESSION;
-		public static final HibernateOrmAutomaticIndexingSynchronizationStrategyName AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
-				HibernateOrmAutomaticIndexingSynchronizationStrategyName.COMMITTED;
+		public static final AutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
+				AutomaticIndexingStrategyName.SESSION;
+		public static final AutomaticIndexingSynchronizationStrategyName AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+				AutomaticIndexingSynchronizationStrategyName.COMMITTED;
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;

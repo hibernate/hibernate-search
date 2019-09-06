@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.cfg;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
+import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 
 import org.apache.lucene.util.Version;
 

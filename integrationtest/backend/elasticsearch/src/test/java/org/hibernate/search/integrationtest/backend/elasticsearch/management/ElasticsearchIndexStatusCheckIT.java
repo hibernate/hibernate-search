@@ -8,9 +8,9 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
 import java.util.EnumSet;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.util.impl.integrationtest.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -36,9 +36,9 @@ public class ElasticsearchIndexStatusCheckIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
-	public static EnumSet<ElasticsearchIndexLifecycleStrategyName> strategies() {
+	public static EnumSet<IndexLifecycleStrategyName> strategies() {
 		// The "NONE" strategy never checks that the index exists.
-		return EnumSet.complementOf( EnumSet.of( ElasticsearchIndexLifecycleStrategyName.NONE ) );
+		return EnumSet.complementOf( EnumSet.of( IndexLifecycleStrategyName.NONE ) );
 	}
 
 	@Rule
@@ -47,9 +47,9 @@ public class ElasticsearchIndexStatusCheckIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private ElasticsearchIndexLifecycleStrategyName strategy;
+	private IndexLifecycleStrategyName strategy;
 
-	public ElasticsearchIndexStatusCheckIT(ElasticsearchIndexLifecycleStrategyName strategy) {
+	public ElasticsearchIndexStatusCheckIT(IndexLifecycleStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}
@@ -154,7 +154,7 @@ public class ElasticsearchIndexStatusCheckIT {
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS,
-						ElasticsearchIndexStatus.GREEN.getElasticsearchString()
+						IndexStatus.GREEN.getElasticsearchString()
 				)
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
@@ -163,9 +163,9 @@ public class ElasticsearchIndexStatusCheckIT {
 				);
 	}
 
-	private boolean createsIndex(ElasticsearchIndexLifecycleStrategyName strategy) {
-		return !ElasticsearchIndexLifecycleStrategyName.NONE.equals( strategy )
-				&& !ElasticsearchIndexLifecycleStrategyName.VALIDATE.equals( strategy );
+	private boolean createsIndex(IndexLifecycleStrategyName strategy) {
+		return !IndexLifecycleStrategyName.NONE.equals( strategy )
+				&& !IndexLifecycleStrategyName.VALIDATE.equals( strategy );
 	}
 
 }

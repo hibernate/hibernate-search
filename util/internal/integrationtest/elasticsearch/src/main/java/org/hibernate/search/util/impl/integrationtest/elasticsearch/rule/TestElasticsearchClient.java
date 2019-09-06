@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
@@ -310,7 +310,7 @@ public class TestElasticsearchClient implements TestRule {
 				 * We only wait for YELLOW: it's perfectly fine, and some tests actually expect
 				 * the indexes to never reach a green status
 				 */
-				.param( "wait_for_status", ElasticsearchIndexStatus.YELLOW.getElasticsearchString() )
+				.param( "wait_for_status", IndexStatus.YELLOW.getElasticsearchString() )
 				.param( "timeout", ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT + "ms" )
 				.build() );
 	}

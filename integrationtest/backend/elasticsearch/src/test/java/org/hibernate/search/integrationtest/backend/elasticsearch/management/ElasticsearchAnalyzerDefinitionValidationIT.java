@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchAnalyzerManagementITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.elasticsearch.rule.TestElasticsearchClient;
@@ -662,7 +662,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						ElasticsearchIndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
+						IndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
 						BACKEND_NAME,
