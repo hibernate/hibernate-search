@@ -200,7 +200,4 @@ public interface Log extends BasicLogger {
 					+ " because caching is not enabled for this entity type.")
 	void skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
 			@FormatWith(ClassFormatter.class) Class<?> entityType);
-
-	@Message(id = ID_OFFSET_2 + 21, value = "Hibernate Search event listener not found.")
-	SearchException hibernateSearchEventListenerNotFound();
 }
