@@ -115,7 +115,7 @@ public final class HibernateOrmMapperSettings {
 	 * <p>
 	 * Defaults to {@code Defaults#ENABLE_ANNOTATION_MAPPING}.
 	 */
-	public static final String ENABLE_ANNOTATION_MAPPING = PREFIX + Radicals.ENABLE_ANNOTATION_MAPPING;
+	public static final String MAPPING_PROCESS_ANNOTATIONS = PREFIX + Radicals.MAPPING_PROCESS_ANNOTATIONS;
 
 	/**
 	 * The mapping configurer to use.
@@ -144,8 +144,8 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = "automatic_indexing.enable_dirty_check";
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
-		public static final String ENABLE_ANNOTATION_MAPPING = "enable_annotation_mapping";
-		public static final String MAPPING_CONFIGURER = "mapping_configurer";
+		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
+		public static final String MAPPING_CONFIGURER = "mapping.configurer";
 	}
 
 	/**
@@ -166,7 +166,7 @@ public final class HibernateOrmMapperSettings {
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
-		public static final boolean ENABLE_ANNOTATION_MAPPING = true;
+		public static final boolean MAPPING_PROCESS_ANNOTATIONS = true;
 	}
 
 }

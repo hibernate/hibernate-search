@@ -36,10 +36,10 @@ import org.hibernate.search.util.common.impl.StreamHelper;
 public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMappingPartialBuildState>
 		implements HibernateOrmMappingConfigurationContext {
 
-	private static final ConfigurationProperty<Boolean> ENABLE_ANNOTATION_MAPPING =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.ENABLE_ANNOTATION_MAPPING )
+	private static final ConfigurationProperty<Boolean> MAPPING_PROCESS_ANNOTATIONS =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.MAPPING_PROCESS_ANNOTATIONS )
 					.asBoolean()
-					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLE_ANNOTATION_MAPPING )
+					.withDefault( HibernateOrmMapperSettings.Defaults.MAPPING_PROCESS_ANNOTATIONS )
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends HibernateOrmSearchMappingConfigurer>> MAPPING_CONFIGURER =
@@ -106,8 +106,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		);
 
 		// Enable annotation mapping if necessary
-		boolean enableAnnotationMapping = ENABLE_ANNOTATION_MAPPING.get( propertySource );
-		if ( enableAnnotationMapping ) {
+		boolean processAnnotations = MAPPING_PROCESS_ANNOTATIONS.get( propertySource );
+		if ( processAnnotations ) {
 			setAnnotatedTypeDiscoveryEnabled( true );
 
 			AnnotationMappingConfigurationContext annotationMapping = annotationMapping();

@@ -123,7 +123,7 @@ public class AnnotationMappingDiscoveryIT {
 		);
 
 		ormSetupHelper.start()
-				.withProperty( HibernateOrmMapperSettings.ENABLE_ANNOTATION_MAPPING, "false" )
+				.withProperty( HibernateOrmMapperSettings.MAPPING_PROCESS_ANNOTATIONS, "false" )
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {

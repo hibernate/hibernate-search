@@ -29,10 +29,10 @@ set the `hibernate.search.autoregister_listeners` <<configuration-property-types
 
 By default, Hibernate Search will automatically process mapping annotations for entity types,
 as well as nested types in those entity types, for instance embedded types.
-If you want to ignore these annotations, set `hibernate.search.enable_annotation_mapping` to `false`.
+If you want to ignore these annotations, set `hibernate.search.mapping.process_annotations` to `false`.
 
 To configure the mapping manually, you can set a mapping configurer.
-By setting `hibernate.search.mapping_configurer`
+By setting `hibernate.search.mapping.configurer`
 to a <<configuration-property-types,bean reference>> of type `org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer`,
 you can use a programmatic API to define the mapping.
 
