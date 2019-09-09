@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm;
 
-import java.lang.invoke.MethodHandles;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
@@ -17,17 +16,14 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.impl.LazyInitSearchSession;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class Search {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private Search() {
 		// Private constructor
@@ -41,14 +37,8 @@ public final class Search {
 	 * @throws org.hibernate.search.util.common.SearchException if the session NOT {@link Session#isOpen()}.
 	 */
 	public static SearchMapping mapping(SessionFactory sessionFactory) {
-		SessionFactoryImplementor sessionFactoryImpl;
-		try {
-			sessionFactoryImpl = sessionFactory.unwrap( SessionFactoryImplementor.class );
-		}
-		catch (IllegalStateException e) {
-			throw log.hibernateSessionFactoryAccessError( e );
-		}
-
+		SessionFactoryImplementor sessionFactoryImpl =
+				HibernateOrmUtils.toSessionFactoryImplementor( sessionFactory );
 		return getSearchMapping( sessionFactoryImpl );
 	}
 
@@ -60,14 +50,8 @@ public final class Search {
 	 * @throws org.hibernate.search.util.common.SearchException if the session NOT {@link Session#isOpen()}.
 	 */
 	public static SearchMapping mapping(EntityManagerFactory entityManagerFactory) {
-		SessionFactoryImplementor sessionFactoryImpl;
-		try {
-			sessionFactoryImpl = entityManagerFactory.unwrap( SessionFactoryImplementor.class );
-		}
-		catch (IllegalStateException e) {
-			throw log.hibernateSessionFactoryAccessError( e );
-		}
-
+		SessionFactoryImplementor sessionFactoryImpl =
+				HibernateOrmUtils.toSessionFactoryImplementor( entityManagerFactory );
 		return getSearchMapping( sessionFactoryImpl );
 	}
 
@@ -83,14 +67,7 @@ public final class Search {
 	 * @throws org.hibernate.search.util.common.SearchException if the session NOT {@link Session#isOpen()}.
 	 */
 	public static SearchSession session(Session session) {
-		SessionImplementor sessionImpl;
-		try {
-			sessionImpl = session.unwrap( SessionImplementor.class );
-		}
-		catch (IllegalStateException e) {
-			throw log.hibernateSessionAccessError( e );
-		}
-
+		SessionImplementor sessionImpl = HibernateOrmUtils.toSessionImplementor( session );
 		return createSearchSession( sessionImpl );
 	}
 
@@ -106,14 +83,7 @@ public final class Search {
 	 * @throws org.hibernate.search.util.common.SearchException if the entity manager NOT {@link EntityManager#isOpen()}.
 	 */
 	public static SearchSession session(EntityManager entityManager) {
-		SessionImplementor sessionImpl;
-		try {
-			sessionImpl = entityManager.unwrap( SessionImplementor.class );
-		}
-		catch (IllegalStateException e) {
-			throw log.hibernateSessionAccessError( e );
-		}
-
+		SessionImplementor sessionImpl = HibernateOrmUtils.toSessionImplementor( entityManager );
 		return createSearchSession( sessionImpl );
 	}
 
