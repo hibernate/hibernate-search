@@ -28,9 +28,13 @@ class FacetCountsUtils {
 			longRanges[i] = new LongRange(
 					String.valueOf( i ),
 					lowerBoundValue == null ? Long.MIN_VALUE : lowerBoundValue.longValue(),
-					lowerBoundValue == null || RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() ),
+					// null means -Infinity: if -Infinity is the lower bound, included or not, then Long.MIN_VALUE is included.
+					lowerBoundValue == null
+							|| RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() ),
 					upperBoundValue == null ? Long.MAX_VALUE : upperBoundValue.longValue(),
-					upperBoundValue == null || RangeBoundInclusion.INCLUDED.equals( range.getUpperBoundInclusion() )
+					// null means +Infinity: if +Infinity is the lower bound, included or not, then Long.MAX_VALUE is included.
+					upperBoundValue == null
+							|| RangeBoundInclusion.INCLUDED.equals( range.getUpperBoundInclusion() )
 			);
 			++i;
 		}
@@ -46,9 +50,9 @@ class FacetCountsUtils {
 			doubleRanges[i] = new DoubleRange(
 					String.valueOf( i ),
 					lowerBoundValue == null ? Double.NEGATIVE_INFINITY : lowerBoundValue.doubleValue(),
-					lowerBoundValue == null || RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() ),
+					RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() ),
 					upperBoundValue == null ? Double.POSITIVE_INFINITY : upperBoundValue.doubleValue(),
-					upperBoundValue == null || RangeBoundInclusion.INCLUDED.equals( range.getUpperBoundInclusion() )
+					RangeBoundInclusion.INCLUDED.equals( range.getUpperBoundInclusion() )
 			);
 			++i;
 		}

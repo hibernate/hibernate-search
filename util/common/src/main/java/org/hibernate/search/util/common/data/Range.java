@@ -34,21 +34,20 @@ public final class Range<T> {
 	 * May be {@code null} to represent {@code +Infinity} (no upper bound).
 	 * @param <T> The type of range bounds.
 	 * @return The range {@code [lowerBoundValue, upperBoundValue)} (lower bound included, upper bound excluded),
-	 * or {@code (-Infinity, upperBoundValue)} (both bounds excluded) if the lower bound is {@code -Infinity}.
+	 * or {@code [lowerBoundValue, +Infinity]} (both bounds included) if the upper bound is {@code +Infinity}.
 	 */
 	public static <T> Range<T> of(T lowerBoundValue, T upperBoundValue) {
-		return new Range<>( lowerBoundValue, RangeBoundInclusion.INCLUDED, upperBoundValue, RangeBoundInclusion.EXCLUDED );
+		return new Range<>( lowerBoundValue, RangeBoundInclusion.INCLUDED,
+				upperBoundValue, upperBoundValue == null ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED );
 	}
 
 	/**
 	 * @param lowerBoundValue The value of the lower bound of the range.
 	 * May be {@code null} to represent {@code -Infinity} (no lower bound).
 	 * @param lowerBoundInclusion Whether the lower bound is included in the range or excluded.
-	 * Ignored and replaced with {@link RangeBoundInclusion#EXCLUDED} if the lower bound is {@code null}.
 	 * @param upperBoundValue The value of the upper bound of the range.
 	 * May be {@code null} to represent {@code +Infinity} (no upper bound).
 	 * @param upperBoundInclusion Whether the upper bound is included in the range or excluded.
-	 * Ignored and replaced with {@link RangeBoundInclusion#EXCLUDED} if the upper bound is {@code null}.
 	 * @param <T> The type of range bounds.
 	 * @return A {@link Range}.
 	 */
@@ -59,50 +58,50 @@ public final class Range<T> {
 
 	/**
 	 * @param <T> The type of range bounds.
-	 * @return The range {@code (-Infinity, +Infinity)} (both bounds excluded).
+	 * @return The range {@code [-Infinity, +Infinity]} (both bounds included).
 	 */
 	public static <T> Range<T> all() {
-		return of( null, RangeBoundInclusion.EXCLUDED, null, RangeBoundInclusion.EXCLUDED );
+		return of( null, RangeBoundInclusion.INCLUDED, null, RangeBoundInclusion.INCLUDED );
 	}
 
 	/**
 	 * @param lowerBoundValue The value of the lower bound of the range. Must not be {@code null}.
 	 * @param <T> The type of range bounds.
-	 * @return The range {@code [lowerBoundValue, +Infinity)} (lower bound included).
+	 * @return The range {@code [lowerBoundValue, +Infinity]} (both bounds included).
 	 */
 	public static <T> Range<T> atLeast(T lowerBoundValue) {
 		Contracts.assertNotNull( lowerBoundValue, "lowerBoundValue" );
-		return of( lowerBoundValue, RangeBoundInclusion.INCLUDED, null, RangeBoundInclusion.EXCLUDED );
+		return of( lowerBoundValue, RangeBoundInclusion.INCLUDED, null, RangeBoundInclusion.INCLUDED );
 	}
 
 	/**
 	 * @param lowerBoundValue The value of the lower bound of the range. Must not be {@code null}.
 	 * @param <T> The type of range bounds.
-	 * @return The range {@code (lowerBoundValue, +Infinity)} (lower bound excluded).
+	 * @return The range {@code (lowerBoundValue, +Infinity]} (lower bound excluded, upper bound included).
 	 */
 	public static <T> Range<T> greaterThan(T lowerBoundValue) {
 		Contracts.assertNotNull( lowerBoundValue, "lowerBoundValue" );
-		return of( lowerBoundValue, RangeBoundInclusion.EXCLUDED, null, RangeBoundInclusion.EXCLUDED );
+		return of( lowerBoundValue, RangeBoundInclusion.EXCLUDED, null, RangeBoundInclusion.INCLUDED );
 	}
 
 	/**
 	 * @param upperBoundValue The value of the upper bound of the range. Must not be {@code null}.
 	 * @param <T> The type of range bounds.
-	 * @return The range {@code (-Infinity, upperBoundValue]} (upper bound included).
+	 * @return The range {@code [-Infinity, upperBoundValue]} (both bounds included).
 	 */
 	public static <T> Range<T> atMost(T upperBoundValue) {
 		Contracts.assertNotNull( upperBoundValue, "upperBoundValue" );
-		return of( null, RangeBoundInclusion.EXCLUDED, upperBoundValue, RangeBoundInclusion.INCLUDED );
+		return of( null, RangeBoundInclusion.INCLUDED, upperBoundValue, RangeBoundInclusion.INCLUDED );
 	}
 
 	/**
 	 * @param upperBoundValue The value of the upper bound of the range. Must not be {@code null}.
 	 * @param <T> The type of range bounds.
-	 * @return The range {@code (-Infinity, upperBoundValue)} (upper bound excluded).
+	 * @return The range {@code [-Infinity, upperBoundValue)} (lower bound included, upper bound excluded).
 	 */
 	public static <T> Range<T> lessThan(T upperBoundValue) {
 		Contracts.assertNotNull( upperBoundValue, "upperBoundValue" );
-		return of( null, RangeBoundInclusion.EXCLUDED, upperBoundValue, RangeBoundInclusion.EXCLUDED );
+		return of( null, RangeBoundInclusion.INCLUDED, upperBoundValue, RangeBoundInclusion.EXCLUDED );
 	}
 
 	private final Optional<T> lowerBoundValue;
@@ -115,9 +114,9 @@ public final class Range<T> {
 		Contracts.assertNotNull( lowerBoundInclusion, "lowerBoundInclusion" );
 		Contracts.assertNotNull( upperBoundInclusion, "upperBoundInclusion" );
 		this.lowerBoundValue = Optional.ofNullable( lowerBoundValue );
-		this.lowerBoundInclusion = lowerBoundValue == null ? RangeBoundInclusion.EXCLUDED : lowerBoundInclusion;
+		this.lowerBoundInclusion = lowerBoundInclusion;
 		this.upperBoundValue = Optional.ofNullable( upperBoundValue );
-		this.upperBoundInclusion = upperBoundValue == null ? RangeBoundInclusion.EXCLUDED : upperBoundInclusion;
+		this.upperBoundInclusion = upperBoundInclusion;
 	}
 
 	@Override
