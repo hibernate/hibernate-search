@@ -4,13 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.sort.nested.impl;
+package org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl;
 
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.OnTheFlyNestedSorter;
 import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
-import org.hibernate.search.backend.lucene.types.sort.missing.impl.LuceneReplaceMissingSortedDocValues;
 
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
@@ -19,11 +18,11 @@ import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.util.BitSet;
 import org.apache.lucene.util.BytesRef;
 
-public class NestedTextFieldComparatorSource extends NestedFieldComparatorSource {
+public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource {
 
 	private final Object missingValue;
 
-	public NestedTextFieldComparatorSource(String nestedDocumentPath, Object missingValue) {
+	public LuceneTextFieldComparatorSource(String nestedDocumentPath, Object missingValue) {
 		super( nestedDocumentPath );
 		this.missingValue = missingValue;
 	}
@@ -37,10 +36,12 @@ public class NestedTextFieldComparatorSource extends NestedFieldComparatorSource
 			protected SortedDocValues getSortedDocValues(LeafReaderContext context, String field) throws IOException {
 				SortedDocValues sortedDocValues = super.getSortedDocValues( context, field );
 
-				BitSet parentDocs = nestedDocsProvider.parentDocs( context );
-				DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
-				if ( parentDocs != null && childDocs != null ) {
-					sortedDocValues = OnTheFlyNestedSorter.sort( sortedDocValues, parentDocs, childDocs );
+				if ( nestedDocsProvider != null ) {
+					BitSet parentDocs = nestedDocsProvider.parentDocs( context );
+					DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
+					if ( parentDocs != null && childDocs != null ) {
+						sortedDocValues = OnTheFlyNestedSorter.sort( sortedDocValues, parentDocs, childDocs );
+					}
 				}
 
 				if ( missingValue == null || missingFirst() || missingLast() ) {

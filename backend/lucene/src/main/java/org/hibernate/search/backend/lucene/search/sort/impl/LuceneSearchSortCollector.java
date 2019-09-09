@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 
 import org.apache.lucene.search.SortField;
 
@@ -23,7 +23,7 @@ public interface LuceneSearchSortCollector {
 
 	void collectSortField(SortField sortField);
 
-	void collectSortField(SortField sortField, NestedFieldComparatorSource nestedFieldSort);
+	void collectSortField(SortField sortField, LuceneFieldComparatorSource nestedFieldSort);
 
 	void collectSortFields(SortField[] sortFields);
 

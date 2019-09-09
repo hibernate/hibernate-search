@@ -4,20 +4,20 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.sort.nested.impl;
+package org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl;
 
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.NestedDocsProvider;
 
 import org.apache.lucene.search.FieldComparatorSource;
 import org.apache.lucene.search.Query;
 
-public abstract class NestedFieldComparatorSource extends FieldComparatorSource {
+public abstract class LuceneFieldComparatorSource extends FieldComparatorSource {
 
 	private final String nestedDocumentPath;
 
 	protected NestedDocsProvider nestedDocsProvider;
 
-	public NestedFieldComparatorSource(String nestedDocumentPath) {
+	public LuceneFieldComparatorSource(String nestedDocumentPath) {
 		this.nestedDocumentPath = nestedDocumentPath;
 	}
 

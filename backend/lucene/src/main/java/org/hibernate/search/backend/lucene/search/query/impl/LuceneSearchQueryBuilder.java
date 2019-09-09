@@ -30,7 +30,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -55,7 +55,7 @@ public class LuceneSearchQueryBuilder<H>
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
-	private List<NestedFieldComparatorSource> nestedFieldSorts;
+	private List<LuceneFieldComparatorSource> nestedFieldSorts;
 
 	private Query luceneQuery;
 	private List<SortField> sortFields;
@@ -105,7 +105,7 @@ public class LuceneSearchQueryBuilder<H>
 	}
 
 	@Override
-	public void collectSortField(SortField sortField, NestedFieldComparatorSource nestedFieldSort) {
+	public void collectSortField(SortField sortField, LuceneFieldComparatorSource nestedFieldSort) {
 		collectSortField( sortField );
 		if ( nestedFieldSort == null ) {
 			return;
@@ -157,8 +157,14 @@ public class LuceneSearchQueryBuilder<H>
 				luceneQueryBuilder.build(), sessionContext.getTenantIdentifier()
 		);
 
+		if ( nestedFieldSorts != null ) {
+			for ( LuceneFieldComparatorSource nestedField : nestedFieldSorts ) {
+				nestedField.setOriginalParentQuery( definitiveLuceneQuery );
+			}
+		}
+
 		LuceneSearchQueryRequestContext requestContext = new LuceneSearchQueryRequestContext(
-				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort, nestedFieldSorts
+				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
 		);
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
