@@ -23,6 +23,7 @@
         <module>backend/lucene</module>
         <module>mapper/pojo</module>
         <module>mapper/orm</module>
+        <module>mapper/orm-envers</module>
         <module>showcase/library</module>
     </modules>
 
