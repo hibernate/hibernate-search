@@ -5,6 +5,10 @@
 
 include::mapper-orm-indexing-automatic.asciidoc[]
 
-include::mapper-orm-indexing-explicit.asciidoc[]
+include::mapper-orm-indexing-massindexer.asciidoc[]
+
+include::mapper-orm-indexing-jsr352.asciidoc[]
+
+include::mapper-orm-indexing-manual.asciidoc[]
 
 :leveloffset: -1

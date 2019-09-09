@@ -1,0 +1,6 @@
+[[mapper-orm-indexing-jsr352]]
+= Reindexing large volumes of data with the JSR-352 integration
+// Search 5 anchors backward compatibility
+[[jsr352-integration]]
+
+include::todo-placeholder.asciidoc[]

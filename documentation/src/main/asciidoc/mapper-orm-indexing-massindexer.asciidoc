@@ -1,0 +1,21 @@
+[[mapper-orm-indexing-massindexer]]
+= Reindexing large volumes of data with the `MassIndexer`
+// Search 5 anchors backward compatibility
+[[search-batchindex-massindexer]]
+
+include::todo-placeholder.asciidoc[]
+
+== Basics
+
+There are cases where automatic indexing is not enough,
+because a pre-existing database has to be indexed:
+
+* when restoring a database backup;
+* when indexes had to be wiped,
+for example because the Hibernate Search mapping or some core settings changed;
+* when automatic indexing had to be disabled for performance reasons,
+and periodic reindexing (every night, ...) is preferred.
+
+To address these situations, Hibernate Search provides the `MassIndexer`:
+a tool to rebuild indexes completely based on the content of the database.
+It can be told to reindex a few selected indexed types, or all of them.

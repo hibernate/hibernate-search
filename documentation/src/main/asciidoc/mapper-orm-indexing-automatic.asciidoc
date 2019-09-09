@@ -14,7 +14,9 @@ if working outside of a transaction, on session flush.
 == Configuration
 
 Automatic indexing may be unnecessary if your index is read-only
-or if you update it regularly through <<mapper-orm-indexing-explicit,explicit indexing>>.
+or if you update it regularly by reindexing,
+either using the  <<mapper-orm-indexing-massindexer,`MassIndexer`>>
+or <<mapper-orm-indexing-manual,manually>>.
 You can enable or disable automatic indexing by setting the configuration property
 `hibernate.search.automatic_indexing.strategy`:
 
@@ -22,7 +24,7 @@ You can enable or disable automatic indexing by setting the configuration proper
 (persist, update, delete) through a Hibernate ORM Session/EntityManager
 will automatically lead to a similar modification to the index.
 * when set to `none`, changes to entities are ignored,
-and indexing requires an explicit action (see <<mapper-orm-indexing-explicit>>).
+and indexing requires an explicit action.
 
 [[mapper-orm-indexing-automatic-concepts]]
 == How automatic indexing works
@@ -37,7 +39,9 @@ Conversely, changes resulting from `insert`/`delete`/`update` queries, be it SQL
 are not detected by Hibernate Search.
 This is because queries are executed on the database side,
  without Hibernate having any knowledge of which entities are actually created, deleted or updated.
-One workaround is to <<mapper-orm-indexing-explicit,explicitly reindex>> after you run such queries.
+One workaround is to explicitly reindex after you run such queries,
+either using the  <<mapper-orm-indexing-massindexer,`MassIndexer`>>
+or <<mapper-orm-indexing-manual,manually>>.
 Entity data is retrieved from entities upon session flushes::
 When a Hibernate ORM session is flushed,
 Hibernate Search will extract data from the entities
@@ -51,7 +55,7 @@ entity changes performed up to the flush will be indexed correctly.
 If you come from Hibernate Search 5 or earlier,
 you may see this as a significant improvement:
 there is no need to call `flushToIndexes()` and update indexes in the middle of a transaction anymore,
-except for larger volumes of data (see <<mapper-orm-indexing-explicit-writeplan-process-execute>>).
+except for larger volumes of data (see <<mapper-orm-indexing-manual-writeplan-process-execute>>).
 ====
 Inside transactions, indexing happens after transactions are committed::
 When entity changes happen inside a transaction,
@@ -64,7 +68,7 @@ and perform flush/clear, regularly to save memory,
 be aware that Hibernate Search's internal buffer holding documents to index
 will grow on each flush, and will not be cleared until the transaction is committed or rolled back.
 If you encounter memory issues because of that,
-see <<mapper-orm-indexing-explicit-writeplan-process-execute>> for a few solutions.
+see <<mapper-orm-indexing-manual-writeplan-process-execute>> for a few solutions.
 Outside of transactions, indexing happens on session flush::
 When entity changes happen outside of any transaction (not recommended),
 indexes are updated immediately upon session `flush()`.

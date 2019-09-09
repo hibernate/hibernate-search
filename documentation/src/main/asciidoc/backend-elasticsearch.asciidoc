@@ -41,7 +41,7 @@ with the one expected by Hibernate Search for Elasticsearch 7.
 
 In such cases, the easiest way to upgrade is to delete your indexes manually,
 make Hibernate Search re-create the indexes along with their schema,
-and <<mapper-orm-indexing-explicit-massindexer,reindex your data>>.
+and <<mapper-orm-indexing-massindexer,reindex your data>>.
 
 [[backend-elasticsearch-configuration]]
 == General configuration

@@ -267,7 +267,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ----
 <1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Create an "indexer", passing the entity types you want to index. Pass no type to index all of them.
-<3> It is possible to set the number of threads to be used. For the complete option list see <<mapper-orm-indexing-explicit-massindexer>>.
+<3> It is possible to set the number of threads to be used. For the complete option list see <<mapper-orm-indexing-massindexer>>.
 <4> Invoke the batch indexing process.
 ====
 
