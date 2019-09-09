@@ -17,10 +17,17 @@ import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.facet.range.LongRangeFacetCounts;
+import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.SortedNumericDocValues;
+import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.util.BitSet;
 
 public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	private static final LuceneNumericDomain<Integer> INSTANCE = new LuceneIntegerDomain();
@@ -96,5 +103,42 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	@Override
 	public IndexableField createDocValuesField(String absoluteFieldPath, Integer numericValue) {
 		return new NumericDocValuesField( absoluteFieldPath, numericValue.longValue() );
+	}
+
+	@Override
+	public NumericNestedFieldComparator<Integer> createNestedFieldComparator(String fieldName, int numHits, Integer missingValue) {
+		return new IntegerNestedFieldComparator( numHits, fieldName, missingValue );
+	}
+
+	public static class IntegerNestedFieldComparator extends FieldComparator.IntComparator implements NumericNestedFieldComparator<Integer> {
+		private NestedDocsProvider nestedDocsProvider;
+
+		public IntegerNestedFieldComparator(int numHits, String field, Integer missingValue) {
+			super( numHits, field, missingValue );
+		}
+
+		@Override
+		public NumericComparator<Integer> getComparator() {
+			return this;
+		}
+
+		@Override
+		public void setNestedDocsProvider(NestedDocsProvider nestedDocsProvider) {
+			this.nestedDocsProvider = nestedDocsProvider;
+		}
+
+		@Override
+		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
+			NumericDocValues numericDocValues = super.getNumericDocValues( context, field );
+			SortedNumericDocValues sortedNumericDocValues = DocValues.singleton( numericDocValues );
+
+			BitSet parentDocs = nestedDocsProvider.parentDocs( context );
+			DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
+			if ( parentDocs != null && childDocs != null ) {
+				numericDocValues = OnTheFlyNestedSorter.sort( sortedNumericDocValues, missingValue, parentDocs, childDocs );
+			}
+
+			return numericDocValues;
+		}
 	}
 }

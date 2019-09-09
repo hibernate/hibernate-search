@@ -4,12 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl;
+package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.backend.lucene.types.lowlevel.impl.NumericDoubleValues;
-import org.hibernate.search.backend.lucene.types.lowlevel.impl.SortedNumericDoubleValues;
 import org.hibernate.search.util.common.impl.Contracts;
 
 import org.apache.lucene.index.NumericDocValues;

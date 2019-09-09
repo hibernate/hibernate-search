@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
-import org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl.NestedFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedFieldComparatorSource;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 

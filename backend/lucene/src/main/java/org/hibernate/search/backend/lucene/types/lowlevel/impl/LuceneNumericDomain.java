@@ -15,10 +15,11 @@ import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 
-public interface LuceneNumericDomain<E> {
+public interface LuceneNumericDomain<E extends Number> {
 
 	E getMinValue();
 
@@ -44,4 +45,22 @@ public interface LuceneNumericDomain<E> {
 	IndexableField createIndexField(String absoluteFieldPath, E numericValue);
 
 	IndexableField createDocValuesField(String absoluteFieldPath, E numericValue);
+
+	NumericNestedFieldComparator<E> createNestedFieldComparator(String absoluteFieldPath, int numHits, E missingValue);
+
+	interface NumericNestedFieldComparator<E extends Number> {
+
+		/**
+		 * @return a not yet working instance of {@link FieldComparator.NumericComparator}.
+		 */
+		FieldComparator.NumericComparator<E> getComparator();
+
+		/**
+		 * Set a mandatory {@link NestedDocsProvider instance}.
+		 * That is required to having a full working instance of {@link FieldComparator.NumericComparator}.
+		 *
+		 * @param nestedDocsProvider a nested document provider based on the current query.
+		 */
+		void setNestedDocsProvider( NestedDocsProvider nestedDocsProvider );
+	}
 }

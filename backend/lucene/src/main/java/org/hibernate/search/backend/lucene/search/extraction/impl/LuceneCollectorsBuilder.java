@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl.NestedFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedFieldComparatorSource;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.MultiCollector;
