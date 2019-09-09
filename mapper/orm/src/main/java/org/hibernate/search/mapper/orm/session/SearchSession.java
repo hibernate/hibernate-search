@@ -118,7 +118,7 @@ public interface SearchSession {
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default <T> org.hibernate.search.mapper.orm.search.SearchScope<T> scope(Class<T> type) {
+	default <T> SearchScope<T> scope(Class<T> type) {
 		return scope( Collections.singleton( type ) );
 	}
 
@@ -130,7 +130,7 @@ public interface SearchSession {
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	<T> org.hibernate.search.mapper.orm.search.SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
+	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
 
 	/**
 	 * Creates a {@link MassIndexer} to rebuild the indexes of some or all indexed entity types.
