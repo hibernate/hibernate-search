@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
@@ -68,7 +68,7 @@ public class FieldDefaultBridgeIT<V, F> {
 
 	private PropertyTypeDescriptor<V> typeDescriptor;
 	private DefaultValueBridgeExpectations<V, F> expectations;
-	private JavaBeanMapping mapping;
+	private SearchMapping mapping;
 	private StubIndexSchemaNode index1FieldSchemaNode;
 	private StubIndexSchemaNode index2FieldSchemaNode;
 

@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
@@ -44,7 +44,7 @@ public class AnnotationMappingRoutingIT {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private JavaBeanMapping mapping;
+	private SearchMapping mapping;
 
 	@Before
 	public void setup() {

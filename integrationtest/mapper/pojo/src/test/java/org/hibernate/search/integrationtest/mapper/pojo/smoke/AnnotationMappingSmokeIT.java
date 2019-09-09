@@ -26,7 +26,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPrope
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBinding;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
@@ -64,7 +64,7 @@ public class AnnotationMappingSmokeIT {
 	@Rule
 	public StaticCounters counters = new StaticCounters();
 
-	private JavaBeanMapping mapping;
+	private SearchMapping mapping;
 
 	@Before
 	public void setup() {

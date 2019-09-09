@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -68,7 +68,7 @@ public class FieldContainerExtractorBaseIT {
 				.field( "text", String.class, f -> f.multiValued( true ) )
 		);
 
-		JavaBeanMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start()
 				.withConfiguration( builder -> {
 					builder.containerExtractors().define( MyContainerExtractor.NAME, MyContainerExtractor.class );
 				} )

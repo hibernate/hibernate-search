@@ -24,7 +24,7 @@ import java.util.TreeSet;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
@@ -297,7 +297,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 					}
 				} )
 		);
-		JavaBeanMapping mapping = setupHelper.start().setup( testModel.getEntityClass() );
+		SearchMapping mapping = setupHelper.start().setup( testModel.getEntityClass() );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
@@ -332,7 +332,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 					}
 				} )
 		);
-		JavaBeanMapping mapping = setupHelper.start().setup( testModel.getEntityClass() );
+		SearchMapping mapping = setupHelper.start().setup( testModel.getEntityClass() );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing

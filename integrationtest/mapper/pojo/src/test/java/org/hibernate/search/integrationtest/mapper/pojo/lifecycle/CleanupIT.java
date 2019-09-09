@@ -19,7 +19,7 @@ import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubContainerExtractor;
-import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
@@ -69,7 +69,7 @@ public class CleanupIT {
 	@Rule
 	public StaticCounters counters = new StaticCounters();
 
-	private CloseableJavaBeanMapping mapping;
+	private CloseableSearchMapping mapping;
 
 	@Test
 	public void successfulBuilding() {

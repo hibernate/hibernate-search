@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
@@ -413,7 +413,7 @@ public class KeywordFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "myProperty", indexedFieldType, b2 -> b2.normalizerName( NORMALIZER_NAME ) )
 		);
-		JavaBeanMapping mapping = setupHelper.start().setup( entityType );
+		SearchMapping mapping = setupHelper.start().setup( entityType );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing

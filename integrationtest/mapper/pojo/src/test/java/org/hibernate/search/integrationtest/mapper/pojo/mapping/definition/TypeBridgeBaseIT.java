@@ -16,7 +16,7 @@ import java.util.List;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
@@ -82,7 +82,7 @@ public class TypeBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
+		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.binder( (TypeBinder<?>) context -> {
 							PojoElementAccessor<String> pojoPropertyAccessor =
@@ -156,7 +156,7 @@ public class TypeBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
+		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.binder( (TypeBinder<?>) context -> {
 							context.getDependencies().use( "stringProperty" );
@@ -272,7 +272,7 @@ public class TypeBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
+		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.binder( (TypeBinder<?>) context -> {
 							context.getDependencies()
@@ -672,7 +672,7 @@ public class TypeBridgeBaseIT {
 				)
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
+		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( CustomEnum.class )
 						.binder( (TypeBinder<?>) context -> {
 							context.getDependencies().useRootOnly();
@@ -769,7 +769,7 @@ public class TypeBridgeBaseIT {
 				)
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
+		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( Contained.class )
 						.binder( (TypeBinder<?>) context -> {
 							context.getDependencies().useRootOnly();

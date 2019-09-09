@@ -12,7 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -45,7 +45,7 @@ public class ProvidedIdIT {
 
 		// Schema
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
-		JavaBeanMapping mapping = withBaseConfiguration().setup( IndexedEntity.class );
+		SearchMapping mapping = withBaseConfiguration().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
@@ -89,7 +89,7 @@ public class ProvidedIdIT {
 		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
-		JavaBeanMapping mapping = withBaseConfiguration().setup( IndexedEntity.class );
+		SearchMapping mapping = withBaseConfiguration().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
 		try ( SearchSession session = mapping.createSession() ) {

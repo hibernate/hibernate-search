@@ -19,7 +19,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.smoke.AnnotationMappingS
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker;
@@ -114,7 +114,7 @@ public class IndexedEmbeddedBaseIT {
 						)
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class, IndexedEmbeddedLevel2.class )
 				.setup();
@@ -199,7 +199,7 @@ public class IndexedEmbeddedBaseIT {
 						)
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
@@ -282,7 +282,7 @@ public class IndexedEmbeddedBaseIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "customPrefix_level1Property", String.class )
 		);
-		JavaBeanMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
@@ -340,7 +340,7 @@ public class IndexedEmbeddedBaseIT {
 						.field( "includedProperty", String.class )
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
@@ -468,7 +468,7 @@ public class IndexedEmbeddedBaseIT {
 						.field( "level1Property", String.class )
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class, IndexedEmbeddedLevel2.class )
 				.setup();
@@ -521,7 +521,7 @@ public class IndexedEmbeddedBaseIT {
 						.field( "level1Property", String.class )
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 				.setup();
@@ -582,7 +582,7 @@ public class IndexedEmbeddedBaseIT {
 						.field( "level1IncludedField", String.class )
 				)
 		);
-		JavaBeanMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start()
 				.withConfiguration( b -> {
 					b.addEntityType( IndexedEntity.class );
 					b.programmaticMapping().type( IndexedEntity.class )
@@ -722,7 +722,7 @@ public class IndexedEmbeddedBaseIT {
 				);
 	}
 
-	private <E> void doTestEmbeddedRuntime(JavaBeanMapping mapping,
+	private <E> void doTestEmbeddedRuntime(SearchMapping mapping,
 			Function<Integer, E> newEntityFunction,
 			Consumer<StubDocumentNode.Builder> expectedDocumentContributor) {
 		try ( SearchSession session = mapping.createSession() ) {
