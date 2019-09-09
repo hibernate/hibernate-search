@@ -22,8 +22,11 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
+
 import org.hibernate.testing.SkipForDialect;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -35,6 +38,7 @@ import static org.junit.Assert.assertNull;
  * @author Davide Di Somma <davide.disomma@gmail.com>
  */
 @SkipForDialect(jiraKey = "HSEARCH-1943", value = PostgreSQL81Dialect.class)
+@Category(PortedToSearch6.class)
 public class SearchAndEnversIntegrationTest extends SearchTestBase {
 
 	private Person harryPotter;
