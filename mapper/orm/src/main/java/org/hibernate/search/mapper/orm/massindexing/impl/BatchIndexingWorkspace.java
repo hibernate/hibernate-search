@@ -37,7 +37,6 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SessionFactoryImplementor sessionFactory;
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedSessionContextImplementor sessionContext;
 
@@ -64,14 +63,12 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 
 	private final List<Future<?>> tasks = new ArrayList<>();
 
-	BatchIndexingWorkspace(SessionFactoryImplementor sessionFactory,
-			HibernateOrmMassIndexingMappingContext mappingContext,
+	BatchIndexingWorkspace(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedSessionContextImplementor sessionContext,
 			Class<E> type, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
 			CountDownLatch endAllSignal, MassIndexingMonitor monitor, long objectsLimit,
 			int idFetchSize, Integer transactionTimeout) {
-		this.sessionFactory = sessionFactory;
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 
@@ -105,7 +102,8 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 		}
 
 		try {
-			final BatchTransactionalContext transactionalContext = new BatchTransactionalContext( sessionFactory );
+			final BatchTransactionalContext transactionalContext =
+					new BatchTransactionalContext( mappingContext.getSessionFactory() );
 			//first start the consumers, then the producers (reverse order):
 			//from primary keys to LuceneWork ADD operations:
 			//TODO HSEARCH-3110 implement and pass the error handler
@@ -138,7 +136,7 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction(
 				transactionalContext,
 				new IdentifierProducer<>(
-						primaryKeyStream, sessionFactory, objectLoadingBatchSize,
+						primaryKeyStream, mappingContext.getSessionFactory(), objectLoadingBatchSize,
 						indexedType, idAttributeOfIndexedType, monitor, objectsLimit,
 						idFetchSize, sessionContext.getTenantIdentifier()
 				),
@@ -157,7 +155,7 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 	private void startTransformationToLuceneWork() {
 		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer<>(
 				primaryKeyStream, monitor,
-				sessionFactory, mappingContext,
+				mappingContext,
 				producerEndSignal, cacheMode,
 				indexedType, idAttributeOfIndexedType,
 				transactionTimeout,

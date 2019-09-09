@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.CacheMode;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -35,7 +34,6 @@ public class MassIndexerImpl implements MassIndexer {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
-	private final SessionFactoryImplementor sessionFactory;
 	private final DetachedSessionContextImplementor sessionContext;
 
 	private final Set<Class<?>> rootEntities;
@@ -54,12 +52,10 @@ public class MassIndexerImpl implements MassIndexer {
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 	private Integer idLoadingTransactionTimeout;
 
-	public MassIndexerImpl(SessionFactoryImplementor sessionFactory,
-			HibernateOrmMassIndexingMappingContext mappingContext,
+	public MassIndexerImpl(HibernateOrmMassIndexingMappingContext mappingContext,
 			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			DetachedSessionContextImplementor sessionContext,
 			PojoScopeWorkExecutor scopeWorkExecutor) {
-		this.sessionFactory = sessionFactory;
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntities = toRootEntities( targetedIndexedTypes );
@@ -175,7 +171,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	protected BatchCoordinator createCoordinator() {
 		return new BatchCoordinator(
-				sessionFactory, mappingContext, sessionContext,
+				mappingContext, sessionContext,
 				rootEntities, scopeWorkExecutor,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,

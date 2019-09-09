@@ -151,6 +151,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
+	public SessionFactoryImplementor getSessionFactory() {
+		return mappingContext.getSessionFactory();
+	}
+
+	@Override
 	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor session, boolean createIfDoesNotExist) {
 		return HibernateOrmSearchSession.get( this, session ).getCurrentWorkPlan( createIfDoesNotExist );
 	}

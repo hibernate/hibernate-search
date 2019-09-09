@@ -20,8 +20,6 @@ import javax.transaction.TransactionManager;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.query.Query;
@@ -49,7 +47,6 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ProducerConsumerQueue<List<I>> source;
-	private final SessionFactory sessionFactory;
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final CacheMode cacheMode;
 	private final Class<E> type;
@@ -66,12 +63,11 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 	IdentifierConsumerDocumentProducer(
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities, MassIndexingMonitor monitor,
-			SessionFactory sessionFactory, HibernateOrmMassIndexingMappingContext mappingContext,
+			HibernateOrmMassIndexingMappingContext mappingContext,
 			CountDownLatch producerEndSignal, CacheMode cacheMode,
 			Class<E> indexedType, SingularAttribute<? super E, I> idAttributeOfIndexedType, Integer transactionTimeout,
 			String tenantId) {
 		this.source = fromIdentifierListToEntities;
-		this.sessionFactory = sessionFactory;
 		this.mappingContext = mappingContext;
 		this.cacheMode = cacheMode;
 		this.type = indexedType;
@@ -80,7 +76,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		this.producerEndSignal = producerEndSignal;
 		this.transactionTimeout = transactionTimeout;
 		this.tenantId = tenantId;
-		this.transactionManager = ( (SessionFactoryImplementor) sessionFactory )
+		this.transactionManager = mappingContext.getSessionFactory()
 				.getServiceRegistry()
 				.getService( JtaPlatform.class )
 				.retrieveTransactionManager();
@@ -91,7 +87,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	@Override
 	public void run() {
 		log.trace( "started" );
-		SessionImplementor session = (SessionImplementor) sessionFactory
+		SessionImplementor session = (SessionImplementor) mappingContext.getSessionFactory()
 				.withOptions()
 				.tenantIdentifier( tenantId )
 				.openSession();
