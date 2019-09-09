@@ -29,17 +29,20 @@ import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
@@ -117,6 +120,21 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	public void close() {
 		// Nothing to do
+	}
+
+	@Override
+	public <T> HibernateOrmSearchQueryHitTypeStep<T> search(Collection<? extends Class<? extends T>> types) {
+		return scope( types ).search();
+	}
+
+	@Override
+	public SearchWriter writer(Collection<? extends Class<?>> types) {
+		return scope( types ).writer();
+	}
+
+	@Override
+	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
+		return scope( types ).massIndexer();
 	}
 
 	@Override
