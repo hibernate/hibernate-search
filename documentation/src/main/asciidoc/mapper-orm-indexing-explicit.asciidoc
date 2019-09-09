@@ -15,22 +15,6 @@ for example because the Hibernate Search mapping or some core settings changed.
 * when automatic indexing had to be disabled for performance reasons,
 and periodic reindexing (every night, ...) is preferred.
 
-[TIP]
-====
-When the mapping changes,
-wiping the index and reindexing is *not* required if the mapping changes include *only*:
-
-* *adding* new indexed entities that will not have any persisted instance,
-   e.g. adding an `@Indexed` annotation on an entity which has no rows in database.
-* *adding* new fields that will be empty for all currently persisted entities,
-   e.g. adding a new property on an entity type and mapping it to a field,
-   but with the guarantee that this property will initially be null for every instance of this entity;
-* and/or *removing* data from existing indexes/fields,
-   e.g. removing an index field, or removing the need for a field to be stored.
-
-Wiping the index and reindexing *is* required if the mapping changes include anything that is not mentioned above.
-====
-
 To address these use cases, Hibernate Search exposes several APIs
 explained if the following sections.
 
