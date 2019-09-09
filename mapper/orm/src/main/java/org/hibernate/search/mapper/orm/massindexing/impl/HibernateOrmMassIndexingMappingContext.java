@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 
 public interface HibernateOrmMassIndexingMappingContext {
+
+	SessionFactoryImplementor getSessionFactory();
 
 	PojoSessionWorkExecutor createSessionWorkExecutor(SessionImplementor sessionImplementor,
 			DocumentCommitStrategy commitStrategy);

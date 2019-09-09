@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
@@ -37,7 +36,6 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SessionFactoryImplementor sessionFactory;
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedSessionContextImplementor sessionContext;
 	private final Set<Class<?>> rootEntities; //entity types to reindex excluding all subtypes of each-other
@@ -57,15 +55,13 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final Integer transactionTimeout;
 	private final List<Future<?>> indexingTasks = new ArrayList<>();
 
-	public BatchCoordinator(SessionFactoryImplementor sessionFactory,
-			HibernateOrmMassIndexingMappingContext mappingContext,
+	public BatchCoordinator(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedSessionContextImplementor sessionContext,
 			Set<Class<?>> rootEntities, PojoScopeWorkExecutor scopeWorkExecutor,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
 			int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,
 			boolean purgeAtStart, boolean optimizeAfterPurge, MassIndexingMonitor monitor,
 			int idFetchSize, Integer transactionTimeout) {
-		this.sessionFactory = sessionFactory;
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntities = rootEntities;
@@ -132,11 +128,11 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	}
 
 	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(Class<E> indexedType) {
-		IdentifiableType<E> indexTypeModel = sessionFactory.getMetamodel().entity( indexedType );
+		IdentifiableType<E> indexTypeModel = mappingContext.getSessionFactory().getMetamodel().entity( indexedType );
 		SingularAttribute<? super E, ?> idAttributeOfIndexedType = indexTypeModel.getId( indexTypeModel.getIdType().getJavaType() );
 
 		return new BatchIndexingWorkspace<>(
-				sessionFactory, mappingContext, sessionContext,
+				mappingContext, sessionContext,
 				indexedType, idAttributeOfIndexedType,
 				documentBuilderThreads, cacheMode,
 				objectLoadingBatchSize, endAllSignal,

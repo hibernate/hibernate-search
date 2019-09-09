@@ -74,7 +74,6 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	@Override
 	public MassIndexer massIndexer() {
 		return new MassIndexerImpl(
-				sessionContext.getSession().getFactory(),
 				mappingContext,
 				delegate.getIncludedIndexedTypes(),
 				sessionContext.getDetachedSessionContext(),

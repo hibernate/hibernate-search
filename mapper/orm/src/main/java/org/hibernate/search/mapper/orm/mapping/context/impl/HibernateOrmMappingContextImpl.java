@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.mapping.context.impl;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
@@ -19,7 +18,7 @@ public class HibernateOrmMappingContextImpl extends AbstractPojoMappingContextIm
 	}
 
 	@Override
-	public SessionFactory getSessionFactory() {
+	public SessionFactoryImplementor getSessionFactory() {
 		return sessionFactory;
 	}
 }
