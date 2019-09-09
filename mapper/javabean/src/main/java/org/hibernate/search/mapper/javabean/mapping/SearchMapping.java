@@ -4,14 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.javabean;
+package org.hibernate.search.mapper.javabean.mapping;
 
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 
-public interface JavaBeanMapping {
+public interface SearchMapping {
 
 	/**
 	 * @return A new session allowing to {@link SearchSession#getMainWorkPlan() index} or
@@ -26,12 +26,12 @@ public interface JavaBeanMapping {
 	 */
 	SearchSessionBuilder createSessionWithOptions();
 
-	static JavaBeanMappingBuilder builder() {
+	static SearchMappingBuilder builder() {
 		return builder( MethodHandles.publicLookup() );
 	}
 
-	static JavaBeanMappingBuilder builder(MethodHandles.Lookup lookup) {
-		return new JavaBeanMappingBuilder( lookup );
+	static SearchMappingBuilder builder(MethodHandles.Lookup lookup) {
+		return new SearchMappingBuilder( lookup );
 	}
 
 }

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
-import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
@@ -15,7 +15,8 @@ import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSession;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 
-public class JavaBeanMappingImpl extends AbstractPojoMappingImplementor<JavaBeanMapping> implements CloseableJavaBeanMapping {
+public class JavaBeanMappingImpl extends AbstractPojoMappingImplementor<SearchMapping> implements
+		CloseableSearchMapping {
 
 	private final JavaBeanMappingContext mappingContext;
 	private final JavaBeanTypeContextContainer typeContextContainer;
@@ -27,7 +28,7 @@ public class JavaBeanMappingImpl extends AbstractPojoMappingImplementor<JavaBean
 	}
 
 	@Override
-	public JavaBeanMapping toConcreteType() {
+	public SearchMapping toConcreteType() {
 		return this;
 	}
 

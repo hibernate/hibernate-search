@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 
 public class JavaBeanMappingPartialBuildState implements MappingPartialBuildState {
@@ -27,7 +27,7 @@ public class JavaBeanMappingPartialBuildState implements MappingPartialBuildStat
 		mappingDelegate.close();
 	}
 
-	public MappingImplementor<JavaBeanMapping> finalizeMapping() {
+	public MappingImplementor<SearchMapping> finalizeMapping() {
 		return new JavaBeanMappingImpl( mappingDelegate, typeContextContainer );
 	}
 

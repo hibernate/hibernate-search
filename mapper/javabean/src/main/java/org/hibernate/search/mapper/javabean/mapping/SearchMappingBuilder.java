@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.javabean;
+package org.hibernate.search.mapper.javabean.mapping;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Annotation
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
-public final class JavaBeanMappingBuilder {
+public final class SearchMappingBuilder {
 
 	private static ConfigurationPropertySource getPropertySource(Map<String, Object> properties,
 			ConfigurationPropertyChecker propertyChecker) {
@@ -41,7 +41,7 @@ public final class JavaBeanMappingBuilder {
 	private final JavaBeanMappingKey mappingKey;
 	private final JavaBeanMappingInitiator mappingInitiator;
 
-	JavaBeanMappingBuilder(MethodHandles.Lookup lookup) {
+	SearchMappingBuilder(MethodHandles.Lookup lookup) {
 		propertyChecker = ConfigurationPropertyChecker.create();
 		propertySource = getPropertySource( properties, propertyChecker );
 		integrationBuilder = SearchIntegration.builder( propertySource, propertyChecker );
@@ -70,7 +70,7 @@ public final class JavaBeanMappingBuilder {
 	 * and whose instances be added/updated/deleted through the {@link SearchSession#getMainWorkPlan() work plan}.
 	 * @return {@code this}, for call chaining.
 	 */
-	public JavaBeanMappingBuilder addEntityType(Class<?> type) {
+	public SearchMappingBuilder addEntityType(Class<?> type) {
 		mappingInitiator.addEntityType( type );
 		return this;
 	}
@@ -80,42 +80,42 @@ public final class JavaBeanMappingBuilder {
 	 * and whose instances be added/updated/deleted through the {@link SearchSession#getMainWorkPlan() work plan}.
 	 * @return {@code this}, for call chaining.
 	 */
-	public JavaBeanMappingBuilder addEntityTypes(Set<Class<?>> types) {
+	public SearchMappingBuilder addEntityTypes(Set<Class<?>> types) {
 		for ( Class<?> type : types ) {
 			addEntityType( type );
 		}
 		return this;
 	}
 
-	public JavaBeanMappingBuilder setMultiTenancyEnabled(boolean multiTenancyEnabled) {
+	public SearchMappingBuilder setMultiTenancyEnabled(boolean multiTenancyEnabled) {
 		mappingInitiator.setMultiTenancyEnabled( multiTenancyEnabled );
 		return this;
 	}
 
-	public JavaBeanMappingBuilder setImplicitProvidedId(boolean multiTenancyEnabled) {
+	public SearchMappingBuilder setImplicitProvidedId(boolean multiTenancyEnabled) {
 		mappingInitiator.setImplicitProvidedId( multiTenancyEnabled );
 		return this;
 	}
 
-	public JavaBeanMappingBuilder setAnnotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
+	public SearchMappingBuilder setAnnotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
 		mappingInitiator.setAnnotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
 		return this;
 	}
 
-	public JavaBeanMappingBuilder setProperty(String name, Object value) {
+	public SearchMappingBuilder setProperty(String name, Object value) {
 		properties.put( name, value );
 		return this;
 	}
 
-	public JavaBeanMappingBuilder setProperties(Map<String, Object> map) {
+	public SearchMappingBuilder setProperties(Map<String, Object> map) {
 		properties.putAll( map );
 		return this;
 	}
 
-	public CloseableJavaBeanMapping build() {
+	public CloseableSearchMapping build() {
 		SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
 		SearchIntegration integration = null;
-		JavaBeanMapping mapping;
+		SearchMapping mapping;
 		try {
 			SearchIntegrationFinalizer finalizer =
 					integrationPartialBuildState.finalizer( propertySource, propertyChecker );

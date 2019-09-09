@@ -18,7 +18,7 @@ import java.util.List;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
@@ -89,7 +89,7 @@ public class PropertyBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
+		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" )
 						.binder( (PropertyBinder<?>) context -> {
@@ -168,7 +168,7 @@ public class PropertyBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
+		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "contained" )
 						.binder( (PropertyBinder<?>) context -> {
@@ -328,7 +328,7 @@ public class PropertyBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
+		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 						.property( "child" )
 						.binder( (PropertyBinder<?>) context -> {
@@ -774,7 +774,7 @@ public class PropertyBridgeBaseIT {
 				} )
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
+		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" )
 						.binder( (PropertyBinder<?>) context -> {
@@ -850,7 +850,7 @@ public class PropertyBridgeBaseIT {
 				.field( "listFromBridge", String.class, b2 -> b2.multiValued( true ) )
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().withConfiguration(
+		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
 						.binder( (PropertyBinder<?>) context -> {
 							context.getDependencies().useRootOnly();

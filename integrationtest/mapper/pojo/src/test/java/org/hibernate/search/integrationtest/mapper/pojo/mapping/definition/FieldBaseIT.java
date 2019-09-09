@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
@@ -293,7 +293,7 @@ public class FieldBaseIT {
 				.field( "integer", Integer.class, f -> f.indexNullAs( 7 ) )
 		);
 
-		JavaBeanMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
 		try ( SearchSession session = mapping.createSession() ) {

@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.log.impl.JavaBeanEventContextMessages;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
 import org.jboss.logging.Messages;
 
-public final class JavaBeanMappingKey implements MappingKey<JavaBeanMappingPartialBuildState, JavaBeanMapping> {
+public final class JavaBeanMappingKey implements MappingKey<JavaBeanMappingPartialBuildState, SearchMapping> {
 	private static final JavaBeanEventContextMessages MESSAGES =
 			Messages.getBundle( JavaBeanEventContextMessages.class );
 

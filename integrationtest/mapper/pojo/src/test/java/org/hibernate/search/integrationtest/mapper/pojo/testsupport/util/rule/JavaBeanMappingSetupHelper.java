@@ -11,16 +11,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.JavaBeanMappingBuilder;
+import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.mapping.SearchMappingBuilder;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
 public final class JavaBeanMappingSetupHelper
-		extends MappingSetupHelper<JavaBeanMappingSetupHelper.SetupContext, JavaBeanMappingBuilder, CloseableJavaBeanMapping> {
+		extends MappingSetupHelper<JavaBeanMappingSetupHelper.SetupContext, SearchMappingBuilder, CloseableSearchMapping> {
 
 	/**
 	 * @param lookup A {@link MethodHandles.Lookup} with private access to the test method,
@@ -53,12 +53,12 @@ public final class JavaBeanMappingSetupHelper
 	}
 
 	@Override
-	protected void close(CloseableJavaBeanMapping toClose) {
+	protected void close(CloseableSearchMapping toClose) {
 		toClose.close();
 	}
 
 	public final class SetupContext
-			extends MappingSetupHelper<SetupContext, JavaBeanMappingBuilder, CloseableJavaBeanMapping>.AbstractSetupContext {
+			extends MappingSetupHelper<SetupContext, SearchMappingBuilder, CloseableSearchMapping>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> properties = new LinkedHashMap<>();
@@ -93,17 +93,17 @@ public final class JavaBeanMappingSetupHelper
 			return withConfiguration( builder -> builder.annotationMapping().add( annotatedTypes ) );
 		}
 
-		public JavaBeanMapping setup(Class<?> ... annotatedEntityTypes) {
+		public SearchMapping setup(Class<?> ... annotatedEntityTypes) {
 			return withAnnotatedEntityTypes( annotatedEntityTypes ).setup();
 		}
 
 		@Override
-		protected JavaBeanMappingBuilder createBuilder() {
-			return JavaBeanMapping.builder( lookup ).setProperties( properties );
+		protected SearchMappingBuilder createBuilder() {
+			return SearchMapping.builder( lookup ).setProperties( properties );
 		}
 
 		@Override
-		protected CloseableJavaBeanMapping build(JavaBeanMappingBuilder builder) {
+		protected CloseableSearchMapping build(SearchMappingBuilder builder) {
 			return builder.build();
 		}
 
