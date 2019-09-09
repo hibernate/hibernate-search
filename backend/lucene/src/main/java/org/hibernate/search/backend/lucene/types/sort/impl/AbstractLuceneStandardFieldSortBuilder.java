@@ -8,14 +8,12 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
@@ -49,8 +47,6 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	private final Object sortMissingValueLastPlaceholder;
 
 	protected Object missingValue;
-
-	protected NestedFieldComparatorSource nestedFieldSort;
 
 	protected AbstractLuceneStandardFieldSortBuilder(
 			LuceneSearchContext searchContext,
@@ -95,13 +91,6 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	protected Object encodeMissingAs(F converted) {
 		return codec.encode( converted );
-	}
-
-	protected void setEffectiveMissingValue(SortField sortField, Object missingValue, SortOrder order) {
-		if ( missingValue == null ) {
-			return;
-		}
-		sortField.setMissingValue( getEffectiveMissingValue( missingValue, order ) );
 	}
 
 	protected Object getEffectiveMissingValue(Object missingValue, SortOrder order) {

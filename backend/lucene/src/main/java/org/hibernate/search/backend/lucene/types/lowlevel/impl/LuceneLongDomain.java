@@ -26,7 +26,6 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.SortField;
 import org.apache.lucene.util.BitSet;
 
 public class LuceneLongDomain implements LuceneNumericDomain<Long> {
@@ -69,11 +68,6 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	}
 
 	@Override
-	public SortField.Type getSortFieldType() {
-		return SortField.Type.LONG;
-	}
-
-	@Override
 	public Long fromDocValue(Long longValue) {
 		return longValue;
 	}
@@ -106,32 +100,26 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	}
 
 	@Override
-	public NumericNestedFieldComparator<Long> createNestedFieldComparator(String fieldName, int numHits, Long missingValue) {
-		return new LongNestedFieldComparator( numHits, fieldName, missingValue );
+	public FieldComparator.NumericComparator<Long> createFieldComparator(String fieldName, int numHits, Long missingValue, NestedDocsProvider nestedDocsProvider) {
+		return new LongFieldComparator( numHits, fieldName, missingValue, nestedDocsProvider );
 	}
 
-	public static class LongNestedFieldComparator extends FieldComparator.LongComparator implements NumericNestedFieldComparator<Long> {
+	public static class LongFieldComparator extends FieldComparator.LongComparator {
 		private NestedDocsProvider nestedDocsProvider;
 
-		public LongNestedFieldComparator(int numHits, String field, Long missingValue) {
+		public LongFieldComparator(int numHits, String field, Long missingValue, NestedDocsProvider nestedDocsProvider) {
 			super( numHits, field, missingValue );
-		}
-
-		@Override
-		public NumericComparator<Long> getComparator() {
-			return this;
-		}
-
-		@Override
-		public void setNestedDocsProvider(NestedDocsProvider nestedDocsProvider) {
 			this.nestedDocsProvider = nestedDocsProvider;
 		}
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
 			NumericDocValues numericDocValues = super.getNumericDocValues( context, field );
-			SortedNumericDocValues sortedNumericDocValues = DocValues.singleton( numericDocValues );
+			if ( nestedDocsProvider == null ) {
+				return numericDocValues;
+			}
 
+			SortedNumericDocValues sortedNumericDocValues = DocValues.singleton( numericDocValues );
 			BitSet parentDocs = nestedDocsProvider.parentDocs( context );
 			DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
 			if ( parentDocs != null && childDocs != null ) {

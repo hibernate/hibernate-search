@@ -8,10 +8,7 @@ package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedFieldComparatorSource;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
@@ -37,15 +34,12 @@ public class LuceneCollectors {
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
 
-	private final List<NestedFieldComparatorSource> nestedFieldSorts;
-
 	private TopDocs topDocs = null;
 
 	LuceneCollectors(TopDocsCollector<?> topDocsCollector, TotalHitCountCollector totalHitCountCollector,
 			Collector compositeCollector, Collection<Collector> collectorsForNestedDocuments,
 			Map<LuceneCollectorKey<?>, Collector> collectors,
-			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
-			List<NestedFieldComparatorSource> nestedFieldSorts) {
+			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring) {
 		this.topDocsCollector = topDocsCollector;
 		this.totalHitCountCollector = totalHitCountCollector;
 		this.compositeCollector = compositeCollector;
@@ -53,15 +47,9 @@ public class LuceneCollectors {
 		this.collectors = collectors;
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
-		this.nestedFieldSorts = nestedFieldSorts;
 	}
 
 	public void collect(IndexSearcher indexSearcher, Query luceneQuery, int offset, Integer limit) throws IOException {
-		if ( nestedFieldSorts != null ) {
-			for ( NestedFieldComparatorSource nestedField : nestedFieldSorts ) {
-				nestedField.setOriginalParentQuery( luceneQuery );
-			}
-		}
 		indexSearcher.search( luceneQuery, compositeCollector );
 
 		if ( topDocsCollector == null ) {

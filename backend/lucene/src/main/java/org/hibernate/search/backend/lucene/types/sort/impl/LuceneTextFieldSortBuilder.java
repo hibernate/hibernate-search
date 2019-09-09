@@ -10,13 +10,11 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityC
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
-import org.hibernate.search.backend.lucene.types.sort.missing.impl.LuceneMissingValueComparatorSource;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedTextFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneTextFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.util.BytesRef;
 
 public class LuceneTextFieldSortBuilder<F>
 		extends AbstractLuceneStandardFieldSortBuilder<F, String, LuceneTextFieldCodec<F>> {
@@ -35,34 +33,9 @@ public class LuceneTextFieldSortBuilder<F>
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		// For STRING type, missing value must be either STRING_FIRST or STRING_LAST.
-		// Otherwise we need a CUSTOM type.
-		collector.collectSortField( createSortField(), nestedFieldSort );
-	}
+		LuceneTextFieldComparatorSource fieldComparatorSource = new LuceneTextFieldComparatorSource( nestedDocumentPath, missingValue );
+		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
 
-	private SortField createSortField() {
-		if ( nestedDocumentPath != null ) {
-			return nestedType();
-		}
-		return ( useMissingValue() ) ? customType() : stringType();
-	}
-
-	private boolean useMissingValue() {
-		return missingValue != null && !SortMissingValue.MISSING_FIRST.equals( missingValue ) && !SortMissingValue.MISSING_LAST.equals( missingValue );
-	}
-
-	private SortField stringType() {
-		SortField sortField = new SortField( absoluteFieldPath, SortField.Type.STRING, order == SortOrder.DESC );
-		setEffectiveMissingValue( sortField, missingValue, order );
-		return sortField;
-	}
-
-	private SortField nestedType() {
-		nestedFieldSort = new NestedTextFieldComparatorSource( nestedDocumentPath, missingValue );
-		return new SortField( absoluteFieldPath, nestedFieldSort, order == SortOrder.DESC );
-	}
-
-	public SortField customType() {
-		return new SortField( absoluteFieldPath, new LuceneMissingValueComparatorSource( (BytesRef) missingValue ), order == SortOrder.DESC );
+		collector.collectSortField( sortField, ( nestedDocumentPath != null ) ? fieldComparatorSource : null );
 	}
 }

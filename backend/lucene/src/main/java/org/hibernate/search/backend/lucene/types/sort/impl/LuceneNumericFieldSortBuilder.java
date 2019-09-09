@@ -10,8 +10,7 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityC
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
-import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedNumericFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneNumericFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
@@ -34,22 +33,10 @@ public class LuceneNumericFieldSortBuilder<F, E extends Number>
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		collector.collectSortField( createSortField(), nestedFieldSort );
-	}
+		LuceneNumericFieldComparatorSource<E> fieldComparatorSource = new LuceneNumericFieldComparatorSource<>(
+				nestedDocumentPath, codec.getDomain(), (E) getEffectiveMissingValue( missingValue, order ) );
+		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
 
-	private SortField createSortField() {
-		LuceneNumericDomain<E> numericDomain = codec.getDomain();
-		if ( nestedDocumentPath != null ) {
-			nestedFieldSort = new NestedNumericFieldComparatorSource( nestedDocumentPath, numericDomain, (E) getEffectiveMissingValue( missingValue, order ) );
-			return new SortField( absoluteFieldPath, nestedFieldSort, order == SortOrder.DESC );
-		}
-
-		SortField sortField = new SortField(
-				absoluteFieldPath,
-				numericDomain.getSortFieldType(),
-				order == SortOrder.DESC
-		);
-		setEffectiveMissingValue( sortField, missingValue, order );
-		return sortField;
+		collector.collectSortField( sortField, ( nestedDocumentPath != null ) ? fieldComparatorSource : null );
 	}
 }

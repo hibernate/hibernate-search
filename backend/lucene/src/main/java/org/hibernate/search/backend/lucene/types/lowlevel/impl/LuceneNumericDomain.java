@@ -17,7 +17,6 @@ import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.SortField;
 
 public interface LuceneNumericDomain<E extends Number> {
 
@@ -33,8 +32,6 @@ public interface LuceneNumericDomain<E extends Number> {
 
 	Query createRangeQuery(String absoluteFieldPath, E lowerLimit, E upperLimit);
 
-	SortField.Type getSortFieldType();
-
 	E fromDocValue(Long longValue);
 
 	LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector) throws IOException;
@@ -46,21 +43,5 @@ public interface LuceneNumericDomain<E extends Number> {
 
 	IndexableField createDocValuesField(String absoluteFieldPath, E numericValue);
 
-	NumericNestedFieldComparator<E> createNestedFieldComparator(String absoluteFieldPath, int numHits, E missingValue);
-
-	interface NumericNestedFieldComparator<E extends Number> {
-
-		/**
-		 * @return a not yet working instance of {@link FieldComparator.NumericComparator}.
-		 */
-		FieldComparator.NumericComparator<E> getComparator();
-
-		/**
-		 * Set a mandatory {@link NestedDocsProvider instance}.
-		 * That is required to having a full working instance of {@link FieldComparator.NumericComparator}.
-		 *
-		 * @param nestedDocsProvider a nested document provider based on the current query.
-		 */
-		void setNestedDocsProvider( NestedDocsProvider nestedDocsProvider );
-	}
+	FieldComparator.NumericComparator<E> createFieldComparator(String absoluteFieldPath, int numHits, E missingValue, NestedDocsProvider nestedDocsProvider);
 }
