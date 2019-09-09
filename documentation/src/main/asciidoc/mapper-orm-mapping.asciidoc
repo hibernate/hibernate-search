@@ -1316,6 +1316,42 @@ should not be reindexed when the content of a `BookCategory` changes.
 If we rename a `BookCategory`, we will need to reindex the corresponding books manually.
 ====
 
+[[mapper-orm-mapping-changes]]
+== Changing the mapping of an existing application
+
+Over the lifetime of an application,
+it will happen that the mapping of a particular indexed entity type has to change.
+When this happens, the mapping changes are likely to require changes to the structure of the index.
+Hibernate Search does *not* handle this structure change automatically,
+so manual intervention is required.
+
+The simplest solution when the index structure needs to change is to simply:
+
+1. Wipe out the existing index,
+e.g. by deleting the filesystem directory for Lucene
+or using the REST API to delete the index for Elasticsearch.
+2. Rebuild the index, for example using the <<mapper-orm-indexing-explicit-massindexer,`MassIndexer`>>.
+
+[TIP]
+====
+When the mapping changes,
+wiping the index and reindexing is *not* required if the mapping changes include *only*:
+
+* *adding* new indexed entities that will not have any persisted instance,
+e.g. adding an `@Indexed` annotation on an entity which has no rows in database.
+* *adding* new fields that will be empty for all currently persisted entities,
+e.g. adding a new property on an entity type and mapping it to a field,
+but with the guarantee that this property will initially be null for every instance of this entity;
+* and/or *removing* data from existing indexes/fields,
+e.g. removing an index field, or removing the need for a field to be stored.
+
+Some extra steps may still be needed in the case of Elasticsearch
+to update its (internal) mapping;
+see the `update` strategy in <<backend-elasticsearch-index-lifecycle>>.
+
+Wiping the index and reindexing *is* required if the mapping changes include anything that is not mentioned above.
+====
+
 [[mapper-orm-bridge]]
 == Bridges
 // Search 5 anchors backward compatibility
