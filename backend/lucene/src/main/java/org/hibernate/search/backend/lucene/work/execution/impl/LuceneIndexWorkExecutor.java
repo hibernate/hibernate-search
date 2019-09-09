@@ -15,17 +15,17 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 
 public class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 
 	private final LuceneWorkFactory factory;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
-	private final DetachedSessionContextImplementor sessionContext;
+	private final DetachedBackendSessionContext sessionContext;
 
 	public LuceneIndexWorkExecutor(LuceneWorkFactory factory,
 			WorkExecutionIndexManagerContext indexManagerContext,
-			DetachedSessionContextImplementor sessionContext) {
+			DetachedBackendSessionContext sessionContext) {
 		this.factory = factory;
 		this.indexManagerContext = indexManagerContext;
 		this.sessionContext = sessionContext;

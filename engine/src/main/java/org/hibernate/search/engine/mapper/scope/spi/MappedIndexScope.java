@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.scope.spi;
 
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -31,7 +31,7 @@ public interface MappedIndexScope<R, E> {
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> with any T.
 	 */
 	SearchQueryHitTypeStep<?, R, E, SearchProjectionFactory<R, E>, ?> search(
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder);
 
 	SearchPredicateFactory predicate();

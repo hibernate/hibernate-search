@@ -94,7 +94,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		);
 	}
 
-	private final HibernateOrmMappingContextImpl mappingContext;
+	private final HibernateOrmMappingContextImpl backendMappingContext;
 	private final HibernateOrmTypeContextContainer typeContextContainer;
 	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
@@ -108,7 +108,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			int fetchSize) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
-		this.mappingContext = new HibernateOrmMappingContextImpl( sessionFactory );
+		this.backendMappingContext = new HibernateOrmMappingContextImpl( sessionFactory );
 		this.synchronizationStrategy = synchronizationStrategy;
 		this.cacheLookupStrategy = cacheLookupStrategy;
 		this.fetchSize = fetchSize;
@@ -116,12 +116,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public EntityManagerFactory toEntityManagerFactory() {
-		return mappingContext.getSessionFactory();
+		return backendMappingContext.getSessionFactory();
 	}
 
 	@Override
 	public SessionFactory toOrmSessionFactory() {
-		return mappingContext.getSessionFactory();
+		return backendMappingContext.getSessionFactory();
 	}
 
 	@Override
@@ -152,7 +152,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public SessionFactoryImplementor getSessionFactory() {
-		return mappingContext.getSessionFactory();
+		return backendMappingContext.getSessionFactory();
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder createSessionBuilder(
 			SessionImplementor sessionImplementor) {
-		SessionFactory expectedSessionFactory = mappingContext.getSessionFactory();
+		SessionFactory expectedSessionFactory = backendMappingContext.getSessionFactory();
 		SessionFactory givenSessionFactory = sessionImplementor.getSessionFactory();
 
 		if ( !givenSessionFactory.equals( expectedSessionFactory ) ) {
@@ -176,7 +176,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		}
 
 		return new HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder(
-				getDelegate(), mappingContext, this, typeContextContainer,
+				getDelegate(), backendMappingContext, this, typeContextContainer,
 				sessionImplementor,
 				synchronizationStrategy
 		);

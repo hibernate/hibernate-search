@@ -18,9 +18,9 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -71,24 +71,24 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public IndexWorkPlan<StubDocumentElement> createWorkPlan(SessionContextImplementor context,
+	public IndexWorkPlan<StubDocumentElement> createWorkPlan(BackendSessionContext context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new StubIndexWorkPlan( this, context, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public IndexDocumentWorkExecutor<StubDocumentElement> createDocumentWorkExecutor(SessionContextImplementor context,
+	public IndexDocumentWorkExecutor<StubDocumentElement> createDocumentWorkExecutor(BackendSessionContext context,
 			DocumentCommitStrategy commitStrategy) {
 		return new StubIndexDocumentWorkExecutor( this, context, commitStrategy );
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
+	public IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext) {
 		return new StubIndexWorkExecutor( name, backend.getBehavior(), sessionContext );
 	}
 
 	@Override
-	public IndexScopeBuilder createScopeBuilder(MappingContextImplementor mappingContext) {
+	public IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext) {
 		return new StubIndexScope.Builder( backend, mappingContext, name, rootSchemaNode );
 	}
 

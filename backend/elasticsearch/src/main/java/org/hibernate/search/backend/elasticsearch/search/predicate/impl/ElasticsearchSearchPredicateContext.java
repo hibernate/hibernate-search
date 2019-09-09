@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 public class ElasticsearchSearchPredicateContext {
 
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 
-	public ElasticsearchSearchPredicateContext(SessionContextImplementor sessionContext) {
+	public ElasticsearchSearchPredicateContext(BackendSessionContext sessionContext) {
 		this.sessionContext = sessionContext;
 	}
 

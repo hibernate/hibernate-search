@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -63,7 +63,7 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // As long as T is not a proxy-specific interface, it will also be implemented by the unproxified object
-	public final void process(DocumentElement target, T source, AbstractPojoSessionContextImplementor sessionContext) {
+	public final void process(DocumentElement target, T source, AbstractPojoBackendSessionContext sessionContext) {
 		if ( source == null ) {
 			return;
 		}

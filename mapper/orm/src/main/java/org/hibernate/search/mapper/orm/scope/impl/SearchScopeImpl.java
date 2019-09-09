@@ -76,7 +76,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 		return new MassIndexerImpl(
 				mappingContext,
 				delegate.getIncludedIndexedTypes(),
-				sessionContext.getDetachedSessionContext(),
+				sessionContext.getDetachedBackendSessionContext(),
 				delegate.executor()
 		);
 	}

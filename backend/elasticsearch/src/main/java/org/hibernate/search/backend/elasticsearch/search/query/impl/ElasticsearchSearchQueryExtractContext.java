@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchP
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
@@ -29,7 +29,7 @@ class ElasticsearchSearchQueryExtractContext implements AggregationExtractContex
 	private final JsonObject responseBody;
 
 	ElasticsearchSearchQueryExtractContext(ElasticsearchSearchQueryRequestContext requestContext,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			JsonObject responseBody) {
 		this.requestContext = requestContext;

@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 
 import org.junit.Rule;
@@ -51,9 +51,9 @@ public class IndexWorkExecutorIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private final StubSessionContext noTenantSessionContext = new StubSessionContext();
-	private final StubSessionContext tenant1SessionContext = new StubSessionContext( TENANT_1 );
-	private final StubSessionContext tenant2SessionContext = new StubSessionContext( TENANT_2 );
+	private final StubBackendSessionContext noTenantSessionContext = new StubBackendSessionContext();
+	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( TENANT_1 );
+	private final StubBackendSessionContext tenant2SessionContext = new StubBackendSessionContext( TENANT_2 );
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -118,7 +118,7 @@ public class IndexWorkExecutorIT {
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 	}
 
-	private void createBookIndexes(StubSessionContext sessionContext) {
+	private void createBookIndexes(StubBackendSessionContext sessionContext) {
 		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor =
 				indexManager.createDocumentWorkExecutor( sessionContext, DocumentCommitStrategy.NONE );
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
@@ -132,7 +132,7 @@ public class IndexWorkExecutorIT {
 		CompletableFuture.allOf( tasks ).join();
 	}
 
-	private void assertBookNumberIsEqualsTo(long bookNumber, StubSessionContext sessionContext) {
+	private void assertBookNumberIsEqualsTo(long bookNumber, StubBackendSessionContext sessionContext) {
 		SearchQuery<DocumentReference> query = indexManager.createScope().query( sessionContext )
 				.predicate( f -> f.matchAll() )
 				.toQuery();

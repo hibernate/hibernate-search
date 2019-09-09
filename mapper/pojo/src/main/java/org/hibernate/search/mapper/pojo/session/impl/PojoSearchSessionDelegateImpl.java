@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContextProvider;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.work.impl.PojoSessionWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkPlanImpl;
@@ -26,19 +26,19 @@ public final class PojoSearchSessionDelegateImpl implements PojoSearchSessionDel
 
 	private final PojoScopeIndexedTypeContextProvider indexedTypeContextProvider;
 	private final PojoScopeContainedTypeContextProvider containedTypeContextProvider;
-	private final AbstractPojoSessionContextImplementor sessionContext;
+	private final AbstractPojoBackendSessionContext backendSessionContext;
 
 	public PojoSearchSessionDelegateImpl(PojoScopeIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoScopeContainedTypeContextProvider containedTypeContextProvider,
-			AbstractPojoSessionContextImplementor sessionContext) {
+			AbstractPojoBackendSessionContext backendSessionContext) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
 		this.containedTypeContextProvider = containedTypeContextProvider;
-		this.sessionContext = sessionContext;
+		this.backendSessionContext = backendSessionContext;
 	}
 
 	@Override
-	public AbstractPojoSessionContextImplementor getSessionContext() {
-		return sessionContext;
+	public AbstractPojoBackendSessionContext getBackendSessionContext() {
+		return backendSessionContext;
 	}
 
 	@Override
@@ -49,21 +49,21 @@ public final class PojoSearchSessionDelegateImpl implements PojoSearchSessionDel
 				containedTypeContextProvider,
 				targetedTypes,
 				indexedTypeExtendedContextProvider,
-				sessionContext
+				backendSessionContext
 		);
 	}
 
 	@Override
 	public PojoWorkPlan createWorkPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new PojoWorkPlanImpl(
-				indexedTypeContextProvider, containedTypeContextProvider, sessionContext,
+				indexedTypeContextProvider, containedTypeContextProvider, backendSessionContext,
 				commitStrategy, refreshStrategy
 		);
 	}
 
 	@Override
 	public PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy) {
-		return new PojoSessionWorkExecutorImpl( indexedTypeContextProvider, sessionContext, commitStrategy );
+		return new PojoSessionWorkExecutorImpl( indexedTypeContextProvider, backendSessionContext, commitStrategy );
 	}
 
 }

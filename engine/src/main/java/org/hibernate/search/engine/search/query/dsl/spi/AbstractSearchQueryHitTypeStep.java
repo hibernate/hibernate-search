@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.query.dsl.spi;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.impl.DefaultSearchProjectionFactory;
@@ -43,7 +43,7 @@ public abstract class AbstractSearchQueryHitTypeStep<
 
 	protected abstract IndexScope<C> getIndexScope();
 
-	protected abstract SessionContextImplementor getSessionContext();
+	protected abstract BackendSessionContext getSessionContext();
 
 	protected abstract LoadingContextBuilder<R, E> getLoadingContextBuilder();
 }

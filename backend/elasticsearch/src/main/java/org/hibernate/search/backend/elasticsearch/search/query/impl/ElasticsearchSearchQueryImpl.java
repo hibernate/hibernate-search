@@ -23,7 +23,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
@@ -48,7 +48,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchSearchContext searchContext;
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
@@ -57,7 +57,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			ElasticsearchSearchContext searchContext,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
 			JsonObject payload,

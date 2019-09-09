@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryHit
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -38,11 +38,11 @@ public class LuceneSearchQueryHitTypeStepImpl<R, E>
 		implements LuceneSearchQueryHitTypeStep<R, E> {
 
 	private final LuceneIndexScope indexScope;
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 	private final LoadingContextBuilder<R, E> loadingContextBuilder;
 
 	public LuceneSearchQueryHitTypeStepImpl(LuceneIndexScope indexScope,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		this.indexScope = indexScope;
 		this.sessionContext = sessionContext;
@@ -103,7 +103,7 @@ public class LuceneSearchQueryHitTypeStepImpl<R, E>
 	}
 
 	@Override
-	protected SessionContextImplementor getSessionContext() {
+	protected BackendSessionContext getSessionContext() {
 		return sessionContext;
 	}
 

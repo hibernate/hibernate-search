@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -34,7 +34,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <E> SearchQueryBuilder<E, StubQueryElementCollector> asEntity(SessionContextImplementor sessionContext,
+	public <E> SearchQueryBuilder<E, StubQueryElementCollector> asEntity(BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, E> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.OBJECTS,
@@ -45,7 +45,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <R> SearchQueryBuilder<R, StubQueryElementCollector> asReference(SessionContextImplementor sessionContext,
+	public <R> SearchQueryBuilder<R, StubQueryElementCollector> asReference(BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.REFERENCES,
@@ -56,7 +56,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <P> SearchQueryBuilder<P, StubQueryElementCollector> asProjection(SessionContextImplementor sessionContext,
+	public <P> SearchQueryBuilder<P, StubQueryElementCollector> asProjection(BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,
@@ -67,7 +67,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public SearchQueryBuilder<List<?>, StubQueryElementCollector> asProjections(SessionContextImplementor sessionContext,
+	public SearchQueryBuilder<List<?>, StubQueryElementCollector> asProjections(BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<?>... projections) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,

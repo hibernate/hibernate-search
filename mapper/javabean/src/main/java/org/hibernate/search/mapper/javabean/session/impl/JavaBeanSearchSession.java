@@ -15,18 +15,18 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
-import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
+import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanBackendMappingContext;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
-import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
+import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanBackendSessionContext;
 import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
 import org.hibernate.search.mapper.javabean.work.impl.SearchWorkPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -89,19 +89,19 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 			);
 		}
 		Object id = typeContext.getIdentifierMapping()
-				.fromDocumentIdentifier( reference.getId(), getDelegate().getSessionContext() );
+				.fromDocumentIdentifier( reference.getId(), getDelegate().getBackendSessionContext() );
 		return new EntityReferenceImpl( typeContext.getJavaClass(), id );
 	}
 
 	public static class JavaBeanSearchSessionBuilder extends AbstractBuilder<JavaBeanSearchSession>
 			implements SearchSessionBuilder {
-		private final JavaBeanMappingContext mappingContext;
+		private final JavaBeanBackendMappingContext mappingContext;
 		private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
 		private String tenantId;
 		private DocumentCommitStrategy commitStrategy = DocumentCommitStrategy.FORCE;
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
-		public JavaBeanSearchSessionBuilder(PojoMappingDelegate mappingDelegate, JavaBeanMappingContext mappingContext,
+		public JavaBeanSearchSessionBuilder(PojoMappingDelegate mappingDelegate, JavaBeanBackendMappingContext mappingContext,
 				JavaBeanSearchSessionTypeContextProvider typeContextProvider) {
 			super( mappingDelegate );
 			this.mappingContext = mappingContext;
@@ -126,8 +126,8 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 			return this;
 		}
 
-		protected AbstractPojoSessionContextImplementor buildSessionContext() {
-			return new JavaBeanSessionContext( mappingContext, tenantId, PojoRuntimeIntrospector.noProxy() );
+		protected AbstractPojoBackendSessionContext buildSessionContext() {
+			return new JavaBeanBackendSessionContext( mappingContext, tenantId, PojoRuntimeIntrospector.noProxy() );
 		}
 
 		@Override

@@ -8,7 +8,7 @@ package org.hibernate.search.engine.backend.types.converter.runtime.spi;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 
 /**
  * An extension to {@link ToDocumentIdentifierValueConvertContext}, allowing to access non-standard context
@@ -31,10 +31,10 @@ public interface ToDocumentIdentifierValueConvertContextExtension<T> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link ToDocumentIdentifierValueConvertContext}.
-	 * @param mappingContext A {@link MappingContextImplementor}.
+	 * @param mappingContext A {@link BackendMappingContext}.
 	 * @return An optional containing the extended context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(ToDocumentIdentifierValueConvertContext original, MappingContextImplementor mappingContext);
+	Optional<T> extendOptional(ToDocumentIdentifierValueConvertContext original, BackendMappingContext mappingContext);
 
 }

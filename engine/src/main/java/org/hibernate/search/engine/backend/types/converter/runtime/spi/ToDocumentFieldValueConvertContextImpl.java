@@ -9,12 +9,12 @@ package org.hibernate.search.engine.backend.types.converter.runtime.spi;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 
 public class ToDocumentFieldValueConvertContextImpl implements ToDocumentFieldValueConvertContext {
-	private final MappingContextImplementor mappingContext;
+	private final BackendMappingContext mappingContext;
 
-	public ToDocumentFieldValueConvertContextImpl(MappingContextImplementor mappingContext) {
+	public ToDocumentFieldValueConvertContextImpl(BackendMappingContext mappingContext) {
 		this.mappingContext = mappingContext;
 	}
 

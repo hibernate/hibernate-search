@@ -12,12 +12,12 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 
 class PojoValueBridgeContextExtension
 		implements ToDocumentFieldValueConvertContextExtension<ValueBridgeToIndexedValueContext>,
@@ -26,9 +26,9 @@ class PojoValueBridgeContextExtension
 
 	@Override
 	public Optional<ValueBridgeToIndexedValueContext> extendOptional(ToDocumentFieldValueConvertContext original,
-		MappingContextImplementor mappingContext) {
-		if ( mappingContext instanceof AbstractPojoMappingContextImplementor ) {
-			AbstractPojoMappingContextImplementor pojoMappingContext = (AbstractPojoMappingContextImplementor) mappingContext;
+		BackendMappingContext mappingContext) {
+		if ( mappingContext instanceof AbstractPojoBackendMappingContext ) {
+			AbstractPojoBackendMappingContext pojoMappingContext = (AbstractPojoBackendMappingContext) mappingContext;
 			return Optional.of( pojoMappingContext.getToIndexedValueContext() );
 		}
 		else {
@@ -38,9 +38,9 @@ class PojoValueBridgeContextExtension
 
 	@Override
 	public Optional<ValueBridgeFromIndexedValueContext> extendOptional(FromDocumentFieldValueConvertContext original,
-			SessionContextImplementor sessionContext) {
-		if ( sessionContext instanceof AbstractPojoSessionContextImplementor ) {
-			AbstractPojoSessionContextImplementor pojoSessionContext = (AbstractPojoSessionContextImplementor) sessionContext;
+			BackendSessionContext sessionContext) {
+		if ( sessionContext instanceof AbstractPojoBackendSessionContext ) {
+			AbstractPojoBackendSessionContext pojoSessionContext = (AbstractPojoBackendSessionContext) sessionContext;
 			return Optional.of( pojoSessionContext.getValueBridgeFromIndexedValueContext() );
 		}
 		else {

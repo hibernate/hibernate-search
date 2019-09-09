@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactoryImpl;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 
@@ -30,7 +30,7 @@ public class ElasticsearchIndexScope
 	private final ElasticsearchSearchQueryBuilderFactory searchQueryFactory;
 
 	public ElasticsearchIndexScope(
-			MappingContextImplementor mappingContext,
+			BackendMappingContext mappingContext,
 			SearchBackendContext backendContext,
 			ElasticsearchScopeModel model) {
 		ElasticsearchSearchContext searchContext = backendContext.createSearchContext(

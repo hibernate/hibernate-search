@@ -9,12 +9,12 @@ package org.hibernate.search.engine.backend.types.converter.runtime.spi;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 public class FromDocumentFieldValueConvertContextImpl implements FromDocumentFieldValueConvertContext {
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 
-	public FromDocumentFieldValueConvertContextImpl(SessionContextImplementor sessionContext) {
+	public FromDocumentFieldValueConvertContextImpl(BackendSessionContext sessionContext) {
 		this.sessionContext = sessionContext;
 	}
 

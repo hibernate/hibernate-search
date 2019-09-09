@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.query.spi;
 
 import java.util.List;
 
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
@@ -22,16 +22,16 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  */
 public interface SearchQueryBuilderFactory<C> {
 
-	<E> SearchQueryBuilder<E, C> asEntity(SessionContextImplementor sessionContext,
+	<E> SearchQueryBuilder<E, C> asEntity(BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, E> loadingContextBuilder);
 
-	<R> SearchQueryBuilder<R, C> asReference(SessionContextImplementor sessionContext,
+	<R> SearchQueryBuilder<R, C> asReference(BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, ?> loadingContextBuilder);
 
-	<P> SearchQueryBuilder<P, C> asProjection(SessionContextImplementor sessionContext,
+	<P> SearchQueryBuilder<P, C> asProjection(BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
-	SearchQueryBuilder<List<?>, C> asProjections(SessionContextImplementor sessionContext,
+	SearchQueryBuilder<List<?>, C> asProjections(BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<?>... projections);
 
 }

@@ -20,7 +20,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.Proper
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
+import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanBackendMappingContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
@@ -160,7 +160,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 		ToDocumentIdentifierValueConverter<?> compatibleDslToIndexConverter =
 				index2RootSchemaNode.getIdDslConverter();
 		ToDocumentIdentifierValueConvertContextImpl convertContext =
-				new ToDocumentIdentifierValueConvertContextImpl( new JavaBeanMappingContext() );
+				new ToDocumentIdentifierValueConvertContextImpl( new JavaBeanBackendMappingContext() );
 
 		// isCompatibleWith must return true when appropriate
 		assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();

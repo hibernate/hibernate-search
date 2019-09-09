@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
@@ -37,7 +37,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
-	private final DetachedSessionContextImplementor sessionContext;
+	private final DetachedBackendSessionContext sessionContext;
 	private final Set<Class<?>> rootEntities; //entity types to reindex excluding all subtypes of each-other
 	private final PojoScopeWorkExecutor scopeWorkExecutor;
 
@@ -56,7 +56,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final List<Future<?>> indexingTasks = new ArrayList<>();
 
 	public BatchCoordinator(HibernateOrmMassIndexingMappingContext mappingContext,
-			DetachedSessionContextImplementor sessionContext,
+			DetachedBackendSessionContext sessionContext,
 			Set<Class<?>> rootEntities, PojoScopeWorkExecutor scopeWorkExecutor,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
 			int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,

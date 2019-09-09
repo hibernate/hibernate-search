@@ -23,7 +23,7 @@ import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
@@ -106,15 +106,15 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private SearchSessionWritePlanImpl writePlan;
 
 	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder) {
-		this( builder, builder.buildSessionContext() );
+		this( builder, builder.buildBackendSessionContext() );
 	}
 
 	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder,
-			HibernateOrmSessionContextImpl sessionContext) {
-		super( builder, sessionContext );
+			HibernateOrmSessionContextImpl backendSessionContext) {
+		super( builder, backendSessionContext );
 		this.scopeMappingContext = builder.scopeMappingContext;
 		this.typeContextProvider = builder.typeContextProvider;
-		this.sessionContext = sessionContext;
+		this.sessionContext = backendSessionContext;
 		this.synchronizationStrategy = builder.synchronizationStrategy;
 	}
 
@@ -179,8 +179,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public DetachedSessionContextImplementor getDetachedSessionContext() {
-		return DetachedSessionContextImplementor.of( sessionContext );
+	public DetachedBackendSessionContext getDetachedBackendSessionContext() {
+		return DetachedBackendSessionContext.of( sessionContext );
 	}
 
 	@Override
@@ -347,7 +347,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			this.synchronizationStrategy = synchronizationStrategy;
 		}
 
-		private HibernateOrmSessionContextImpl buildSessionContext() {
+		private HibernateOrmSessionContextImpl buildBackendSessionContext() {
 			return new HibernateOrmSessionContextImpl( mappingContext, sessionImplementor );
 		}
 

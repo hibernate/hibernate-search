@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.query.dsl.impl;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -34,11 +34,11 @@ public final class DefaultSearchQueryHitTypeStep<R, E, C>
 						> {
 
 	private final IndexScope<C> indexScope;
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 	private final LoadingContextBuilder<R, E> loadingContextBuilder;
 
 	public DefaultSearchQueryHitTypeStep(IndexScope<C> indexScope,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		this.indexScope = indexScope;
 		this.sessionContext = sessionContext;
@@ -98,7 +98,7 @@ public final class DefaultSearchQueryHitTypeStep<R, E, C>
 	}
 
 	@Override
-	protected SessionContextImplementor getSessionContext() {
+	protected BackendSessionContext getSessionContext() {
 		return sessionContext;
 	}
 

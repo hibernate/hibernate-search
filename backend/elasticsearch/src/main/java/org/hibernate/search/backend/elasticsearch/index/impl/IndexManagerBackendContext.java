@@ -33,9 +33,9 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkE
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -83,7 +83,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,
 			DocumentRefreshStrategy refreshStrategy,
-			SessionContextImplementor sessionContext) {
+			BackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexWorkPlan(
@@ -98,7 +98,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	public IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,
-			SessionContextImplementor sessionContext) {
+			BackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexDocumentWorkExecutor( link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator,
@@ -107,7 +107,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 
 	@Override
 	public IndexWorkExecutor createWorkExecutor(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName,
-			DetachedSessionContextImplementor sessionContext) {
+			DetachedBackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexWorkExecutor(
@@ -127,7 +127,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public ElasticsearchSearchContext createSearchContext(MappingContextImplementor mappingContext,
+	public ElasticsearchSearchContext createSearchContext(BackendMappingContext mappingContext,
 			ElasticsearchScopeModel scopeModel) {
 		return new ElasticsearchSearchContext(
 				mappingContext,
@@ -140,7 +140,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	@Override
 	public <H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
 			ElasticsearchSearchContext searchContext,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );

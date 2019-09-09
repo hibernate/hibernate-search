@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.runtime;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 
 /**
  * An extension to {@link ValueBridgeToIndexedValueContext}, allowing to access non-standard context
@@ -32,11 +32,11 @@ public interface ValueBridgeToIndexedValueContextExtension<T> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link ValueBridgeToIndexedValueContext}.
-	 * @param mappingContext A {@link MappingContextImplementor}.
+	 * @param mappingContext A {@link BackendMappingContext}.
 	 * @return An optional containing the extended context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
 	Optional<T> extendOptional(ValueBridgeToIndexedValueContext original,
-			MappingContextImplementor mappingContext);
+			BackendMappingContext mappingContext);
 
 }

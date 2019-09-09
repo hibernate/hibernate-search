@@ -13,8 +13,8 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 /**
  * An interface with knowledge of the backend internals,
@@ -33,14 +33,14 @@ public interface WorkExecutionBackendContext {
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,
 			DocumentRefreshStrategy refreshStrategy,
-			SessionContextImplementor sessionContext);
+			BackendSessionContext sessionContext);
 
 	IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,
-			SessionContextImplementor sessionContext);
+			BackendSessionContext sessionContext);
 
 	IndexWorkExecutor createWorkExecutor(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName,
-			DetachedSessionContextImplementor sessionContext);
+			DetachedBackendSessionContext sessionContext);
 
 }

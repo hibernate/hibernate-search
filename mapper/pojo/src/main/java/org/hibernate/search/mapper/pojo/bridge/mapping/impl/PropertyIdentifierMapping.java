@@ -10,8 +10,8 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.impl.Closer;
@@ -53,12 +53,12 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMappingImpleme
 	}
 
 	@Override
-	public String toDocumentIdentifier(I identifier, AbstractPojoMappingContextImplementor context) {
+	public String toDocumentIdentifier(I identifier, AbstractPojoBackendMappingContext context) {
 		return bridgeHolder.get().toDocumentIdentifier( identifier, context.getIdentifierBridgeToDocumentIdentifierContext() );
 	}
 
 	@Override
-	public I fromDocumentIdentifier(String documentId, AbstractPojoSessionContextImplementor context) {
+	public I fromDocumentIdentifier(String documentId, AbstractPojoBackendSessionContext context) {
 		return bridgeHolder.get().fromDocumentIdentifier( documentId, context.getIdentifierBridgeFromDocumentIdentifierContext() );
 	}
 

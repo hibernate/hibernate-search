@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -26,13 +26,13 @@ class ElasticsearchIndexScopeBuilder implements IndexScopeBuilder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexManagerBackendContext backendContext;
-	private final MappingContextImplementor mappingContext;
+	private final BackendMappingContext mappingContext;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<ElasticsearchIndexManagerImpl> indexManagers = new LinkedHashSet<>();
 
 	ElasticsearchIndexScopeBuilder(IndexManagerBackendContext backendContext,
-			MappingContextImplementor mappingContext, ElasticsearchIndexManagerImpl indexManager) {
+			BackendMappingContext mappingContext, ElasticsearchIndexManagerImpl indexManager) {
 		this.backendContext = backendContext;
 		this.mappingContext = mappingContext;
 		this.indexManagers.add( indexManager );

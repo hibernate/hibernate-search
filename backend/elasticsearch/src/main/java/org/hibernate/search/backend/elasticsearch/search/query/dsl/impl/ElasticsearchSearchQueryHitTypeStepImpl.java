@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.dsl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -38,11 +38,11 @@ public class ElasticsearchSearchQueryHitTypeStepImpl<R, E>
 		implements ElasticsearchSearchQueryHitTypeStep<R, E> {
 
 	private final ElasticsearchIndexScope indexScope;
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 	private final LoadingContextBuilder<R, E> loadingContextBuilder;
 
 	public ElasticsearchSearchQueryHitTypeStepImpl(ElasticsearchIndexScope indexScope,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		this.indexScope = indexScope;
 		this.sessionContext = sessionContext;
@@ -103,7 +103,7 @@ public class ElasticsearchSearchQueryHitTypeStepImpl<R, E>
 	}
 
 	@Override
-	protected SessionContextImplementor getSessionContext() {
+	protected BackendSessionContext getSessionContext() {
 		return sessionContext;
 	}
 

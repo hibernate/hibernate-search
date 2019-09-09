@@ -15,9 +15,9 @@ import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 /**
  * The object responsible for applying works and searches to a full-text index.
@@ -42,15 +42,15 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 	 */
 	IndexManager toAPI();
 
-	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext,
+	IndexWorkPlan<D> createWorkPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext,
+	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
-	IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext);
+	IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext);
 
-	IndexScopeBuilder createScopeBuilder(MappingContextImplementor mappingContext);
+	IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext);
 
 	void addTo(IndexScopeBuilder builder);
 

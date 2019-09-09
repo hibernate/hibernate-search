@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 
 import org.apache.lucene.search.IndexSearcher;
@@ -22,13 +22,13 @@ import org.apache.lucene.search.Sort;
  */
 class LuceneSearchQueryRequestContext {
 
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 
 	LuceneSearchQueryRequestContext(
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Query luceneQuery,
 			Sort luceneSort) {

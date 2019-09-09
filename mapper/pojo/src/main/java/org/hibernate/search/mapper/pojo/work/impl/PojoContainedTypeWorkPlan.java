@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -31,7 +31,7 @@ public class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
 	private final Map<Object, ContainedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
 
 	public PojoContainedTypeWorkPlan(PojoWorkContainedTypeContext<E> typeContext,
-			AbstractPojoSessionContextImplementor sessionContext) {
+			AbstractPojoBackendSessionContext sessionContext) {
 		super( sessionContext );
 		this.typeContext = typeContext;
 	}

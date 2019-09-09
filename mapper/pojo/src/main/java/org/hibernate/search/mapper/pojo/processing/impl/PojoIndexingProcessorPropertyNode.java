@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -63,7 +63,7 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 	}
 
 	@Override
-	public final void process(DocumentElement target, T source, AbstractPojoSessionContextImplementor sessionContext) {
+	public final void process(DocumentElement target, T source, AbstractPojoBackendSessionContext sessionContext) {
 		P propertyValue = handle.get( source );
 		for ( BeanHolder<? extends PropertyBridge> bridgeHolder : propertyBridgeHolders ) {
 			bridgeHolder.get().write( target, propertyValue, sessionContext.getPropertyBridgeWriteContext() );

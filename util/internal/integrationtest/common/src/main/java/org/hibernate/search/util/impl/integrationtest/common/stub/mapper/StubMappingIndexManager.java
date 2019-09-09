@@ -14,10 +14,10 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubMappingContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendMappingContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendSessionContext;
 
 /**
  * A wrapper around {@link MappedIndexManager} providing some syntactic sugar,
@@ -36,10 +36,10 @@ public class StubMappingIndexManager {
 	}
 
 	public IndexWorkPlan<? extends DocumentElement> createWorkPlan() {
-		return createWorkPlan( new StubSessionContext() );
+		return createWorkPlan( new StubBackendSessionContext() );
 	}
 
-	public IndexWorkPlan<? extends DocumentElement> createWorkPlan(StubSessionContext sessionContext) {
+	public IndexWorkPlan<? extends DocumentElement> createWorkPlan(StubBackendSessionContext sessionContext) {
 		/*
 		 * Use the same defaults as in the ORM mapper for the commit strategy,
 		 * but force refreshes because it's more convenient for tests.
@@ -47,30 +47,30 @@ public class StubMappingIndexManager {
 		return indexManager.createWorkPlan( sessionContext, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
 	}
 
-	public IndexWorkPlan<? extends DocumentElement> createWorkPlan(StubSessionContext sessionContext,
+	public IndexWorkPlan<? extends DocumentElement> createWorkPlan(StubBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return indexManager.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );
 	}
 
 	public IndexDocumentWorkExecutor<? extends DocumentElement> createDocumentWorkExecutor(
 			DocumentCommitStrategy commitStrategy) {
-		return createDocumentWorkExecutor( new StubSessionContext(), commitStrategy );
+		return createDocumentWorkExecutor( new StubBackendSessionContext(), commitStrategy );
 	}
 
 	public IndexDocumentWorkExecutor<? extends DocumentElement> createDocumentWorkExecutor(
-			StubSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
+			StubBackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
 		return indexManager.createDocumentWorkExecutor( sessionContext, commitStrategy );
 	}
 
 	public IndexWorkExecutor createWorkExecutor() {
-		return createWorkExecutor( new StubSessionContext() );
+		return createWorkExecutor( new StubBackendSessionContext() );
 	}
 
-	public IndexWorkExecutor createWorkExecutor(StubSessionContext sessionContext) {
-		return createWorkExecutor( DetachedSessionContextImplementor.of( sessionContext ) );
+	public IndexWorkExecutor createWorkExecutor(StubBackendSessionContext sessionContext) {
+		return createWorkExecutor( DetachedBackendSessionContext.of( sessionContext ) );
 	}
 
-	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
+	public IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext) {
 		return indexManager.createWorkExecutor( sessionContext );
 	}
 
@@ -79,7 +79,7 @@ public class StubMappingIndexManager {
 	 */
 	public StubMappingScope createScope() {
 		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
-				indexManager.createScopeBuilder( new StubMappingContext() );
+				indexManager.createScopeBuilder( new StubBackendMappingContext() );
 		return new StubMappingScope( builder.build() );
 	}
 
@@ -88,7 +88,7 @@ public class StubMappingIndexManager {
 	 */
 	public StubMappingScope createScope(StubMappingIndexManager... others) {
 		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
-				indexManager.createScopeBuilder( new StubMappingContext() );
+				indexManager.createScopeBuilder( new StubBackendMappingContext() );
 		for ( StubMappingIndexManager other : others ) {
 			other.indexManager.addTo( builder );
 		}
@@ -100,7 +100,7 @@ public class StubMappingIndexManager {
 	 */
 	public <R, E> GenericStubMappingScope<R, E> createGenericScope(StubMappingIndexManager... others) {
 		MappedIndexScopeBuilder<R, E> builder =
-				indexManager.createScopeBuilder( new StubMappingContext() );
+				indexManager.createScopeBuilder( new StubBackendMappingContext() );
 		for ( StubMappingIndexManager other : others ) {
 			other.indexManager.addTo( builder );
 		}

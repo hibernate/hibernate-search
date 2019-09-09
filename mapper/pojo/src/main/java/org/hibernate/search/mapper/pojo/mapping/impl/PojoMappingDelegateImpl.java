@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.impl.PojoSearchSessionDelegateImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
 
 
@@ -34,10 +34,10 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	@Override
 	public PojoSearchSessionDelegate createSearchSessionDelegate(
-			AbstractPojoSessionContextImplementor sessionContextImplementor) {
+			AbstractPojoBackendSessionContext backendSessionContext) {
 		return new PojoSearchSessionDelegateImpl(
 				indexedTypeManagers, containedTypeManagers,
-				sessionContextImplementor
+				backendSessionContext
 		);
 	}
 }

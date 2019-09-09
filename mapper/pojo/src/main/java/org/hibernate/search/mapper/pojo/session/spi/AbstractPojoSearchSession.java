@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.session.spi;
 
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 
 
 public abstract class AbstractPojoSearchSession {
@@ -15,8 +15,8 @@ public abstract class AbstractPojoSearchSession {
 	private final PojoSearchSessionDelegate delegate;
 
 	protected AbstractPojoSearchSession(AbstractBuilder<? extends AbstractPojoSearchSession> builder,
-			AbstractPojoSessionContextImplementor sessionContext) {
-		this.delegate = builder.mappingDelegate.createSearchSessionDelegate( sessionContext );
+			AbstractPojoBackendSessionContext backendSessionContext) {
+		this.delegate = builder.mappingDelegate.createSearchSessionDelegate( backendSessionContext );
 	}
 
 	protected final PojoSearchSessionDelegate getDelegate() {

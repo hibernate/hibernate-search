@@ -30,7 +30,7 @@ import org.hibernate.search.backend.elasticsearch.search.sort.dsl.impl.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
@@ -114,7 +114,7 @@ public final class ElasticsearchExtension<H, R, E>
 	public Optional<ElasticsearchSearchQueryHitTypeStep<R, E>> extendOptional(
 			SearchQueryHitTypeStep<?, R, E, ?, ?> original,
 			IndexScope<?> indexScope,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		if ( indexScope instanceof ElasticsearchIndexScope ) {
 			return Optional.of( new ElasticsearchSearchQueryHitTypeStepImpl<>(

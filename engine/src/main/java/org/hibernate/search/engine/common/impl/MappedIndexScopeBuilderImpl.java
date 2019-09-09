@@ -8,7 +8,7 @@ package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 
@@ -16,7 +16,7 @@ class MappedIndexScopeBuilderImpl<R, E> implements MappedIndexScopeBuilder<R, E>
 	private final IndexScopeBuilder delegate;
 
 	MappedIndexScopeBuilderImpl(IndexManagerImplementor<?> firstIndexManager,
-			MappingContextImplementor mappingContext) {
+			BackendMappingContext mappingContext) {
 		this.delegate = firstIndexManager.createScopeBuilder( mappingContext );
 	}
 

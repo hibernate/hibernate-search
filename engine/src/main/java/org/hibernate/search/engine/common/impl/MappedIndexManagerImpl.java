@@ -15,9 +15,9 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 
 class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexManager<D> {
@@ -34,24 +34,24 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext,
+	public IndexWorkPlan<D> createWorkPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return implementor.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext,
+	public IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		return implementor.createDocumentWorkExecutor( sessionContext, commitStrategy );
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
+	public IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext) {
 		return implementor.createWorkExecutor( sessionContext );
 	}
 
 	@Override
-	public <R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(MappingContextImplementor mappingContext) {
+	public <R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(BackendMappingContext mappingContext) {
 		return new MappedIndexScopeBuilderImpl<>(
 				implementor, mappingContext
 		);

@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchEntityReferenceProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
@@ -40,7 +40,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 
 	@Override
 	public <E> ElasticsearchSearchQueryBuilder<E> asEntity(
-			SessionContextImplementor sessionContext, LoadingContextBuilder<?, E> loadingContextBuilder) {
+			BackendSessionContext sessionContext, LoadingContextBuilder<?, E> loadingContextBuilder) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
 				new ElasticsearchEntityProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractorHelper() )
@@ -49,7 +49,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 
 	@Override
 	public <R> ElasticsearchSearchQueryBuilder<R> asReference(
-			SessionContextImplementor sessionContext, LoadingContextBuilder<R, ?> loadingContextBuilder) {
+			BackendSessionContext sessionContext, LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
 				new ElasticsearchEntityReferenceProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractorHelper() )
@@ -58,7 +58,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 
 	@Override
 	public <P> ElasticsearchSearchQueryBuilder<P> asProjection(
-			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
+			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			SearchProjection<P> projection) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
@@ -68,7 +68,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 
 	@Override
 	public ElasticsearchSearchQueryBuilder<List<?>> asProjections(
-			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
+			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			SearchProjection<?>... projections) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, createRootProjection( projections ) );
 	}
@@ -84,7 +84,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 	}
 
 	private <H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
-			SessionContextImplementor sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
+			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
 				searchContext,

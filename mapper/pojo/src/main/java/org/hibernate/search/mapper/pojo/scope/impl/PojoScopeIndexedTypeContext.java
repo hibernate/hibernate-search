@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.scope.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
 
@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
 public interface PojoScopeIndexedTypeContext<I, E, D extends DocumentElement>
 		extends PojoWorkIndexedTypeContext<I, E, D> {
 
-	<R, E2> MappedIndexScopeBuilder<R, E2> createScopeBuilder(MappingContextImplementor mappingContext);
+	<R, E2> MappedIndexScopeBuilder<R, E2> createScopeBuilder(BackendMappingContext mappingContext);
 
 	void addTo(MappedIndexScopeBuilder<?, ?> builder);
 

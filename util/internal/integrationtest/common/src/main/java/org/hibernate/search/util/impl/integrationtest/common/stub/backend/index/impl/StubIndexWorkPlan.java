@@ -15,14 +15,14 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 
 class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 	private final StubIndexManager indexManager;
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
@@ -30,7 +30,7 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 
 	private int preparedIndex = 0;
 
-	StubIndexWorkPlan(StubIndexManager indexManager, SessionContextImplementor sessionContext,
+	StubIndexWorkPlan(StubIndexManager indexManager, BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.sessionContext = sessionContext;
 		this.indexManager = indexManager;
