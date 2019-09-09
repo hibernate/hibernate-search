@@ -1,19 +1,21 @@
-[[mapper-orm-indexing-explicit]]
-= Explicit indexing
+[[mapper-orm-indexing-manual]]
+= Manual indexing
 // Search 5 anchors backward compatibility
 [[manual-index-changes]]
-//[[search-batchindex]] // There can only be one anchor per paragraph, unfortunately...
 
-While <<mapper-orm-indexing-automatic,automatic indexing>> should take care of most needs,
-it is sometimes necessary to control indexing explicitly:
+[[mapper-orm-indexing-manual-basics]]
+== Basics
+// Search 5 anchors backward compatibility
+[[search-batchindex]]
 
-* when applying changes to the database that automatic indexing cannot detect,
-such as JPQL/SQL `insert`, `update` or `delete` queries,
-or simply restoring a database backup.
-* when indexes had to be wiped,
-for example because the Hibernate Search mapping or some core settings changed.
-* when automatic indexing had to be disabled for performance reasons,
-and periodic reindexing (every night, ...) is preferred.
+While <<mapper-orm-indexing-automatic,automatic indexing>> and
+the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
+or <<mapper-orm-indexing-jsr352,the mass indexing job>>
+should take care of most needs,
+it is sometimes necessary to control indexing manually,
+for example to reindex just a few entity instances
+that were affected by changes to the database that automatic indexing cannot detect,
+such as JPQL/SQL `insert`, `update` or `delete` queries.
 
 To address these use cases, Hibernate Search exposes several APIs
 explained if the following sections.
@@ -22,7 +24,7 @@ As with everything in Hibernate Search,
 these APIs only affect the Hibernate Search indexes:
 they do not write anything to the database.
 
-[[mapper-orm-indexing-explicit-writeplan-process-execute]]
+[[mapper-orm-indexing-manual-writeplan-process-execute]]
 == Controlling entity reads and index writes with `SearchSessionWritePlan`
 // Search 5 anchors backward compatibility
 [[search-batchindex-flushtoindexes]]
@@ -41,7 +43,7 @@ when not using Hibernate Search.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-clear]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-clear]
 ----
 <1> Execute a loop for a large number of elements, inside a transaction.
 <2> For every iteration of the loop, instantiate a new entity and persist it.
@@ -80,7 +82,7 @@ from the last transaction that failed.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=persist-automatic-indexing-multiple-transactions]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=persist-automatic-indexing-multiple-transactions]
 ----
 <1> Add an outer loop that creates one transaction per iteration.
 <2> Begin the transaction at the beginning of each iteration of the outer loop.
@@ -89,7 +91,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 Note we're relying on automatic indexing to index the entity,
 but this would work just as well if automatic indexing was disabled,
 only requiring an extra call to index the entity.
-See <<mapper-orm-indexing-explicit-writeplan-writes>>.
+See <<mapper-orm-indexing-manual-writeplan-writes>>.
 <5> Commit the transaction at the end of each iteration of the outer loop.
 The entities will be flushed and indexed automatically.
 ====
@@ -124,19 +126,19 @@ The index will thus be inconsistent with the database.
 To recover from that situation, you will have to either
 execute the exact same database changes that failed manually
 (to get the database back in sync with the index),
-or <<mapper-orm-indexing-explicit-writeplan-writes,reindex the entities>> affected by the transaction manually
+or <<mapper-orm-indexing-manual-writeplan-writes,reindex the entities>> affected by the transaction manually
 (to get the index back in sync with the database).
 
 Of course, if you can afford to take the indexes offline for a longer period of time,
 a simpler solution would be to wipe the indexes clean
-and <<mapper-orm-indexing-explicit-massindexer,reindex everything>>.
+and <<mapper-orm-indexing-massindexer,reindex everything>>.
 ====
 
 .A batch process with Hibernate Search using `execute()`
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-execute-clear]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-execute-clear]
 ----
 <1> Get the `SearchSession`.
 <2> Get the search session's write plan.
@@ -144,7 +146,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 Note we're relying on automatic indexing to index the entity,
 but this would work just as well if automatic indexing was disabled,
 only requiring an extra call to index the entity.
-See <<mapper-orm-indexing-explicit-writeplan-writes>>.
+See <<mapper-orm-indexing-manual-writeplan-writes>>.
 <4> After after a `flush()`/`clear()`, call `writePlan.execute()`.
 The entities will be processed and *the changes will be sent to the indexes immediately*.
 Hibernate Search will wait for index changes to be "completed"
@@ -154,7 +156,7 @@ The remaining entities that were not flushed/cleared will be flushed and indexed
 ====
 
 
-[[mapper-orm-indexing-explicit-writeplan-writes]]
+[[mapper-orm-indexing-manual-writeplan-writes]]
 == Explicitly indexing and deleting specific documents
 // Search 5 anchors backward compatibility
 [[_adding_instances_to_the_index]]
@@ -191,7 +193,7 @@ Respectively, process the changes and apply them to indexes.
 +
 These methods will be executed automatically on commit,
 so they are only useful when processing large number of items,
-as explained in <<mapper-orm-indexing-explicit-writeplan-process-execute>>.
+as explained in <<mapper-orm-indexing-manual-writeplan-process-execute>>.
 
 Below are examples of using `addOrUpdate` and `delete`.
 
@@ -199,7 +201,7 @@ Below are examples of using `addOrUpdate` and `delete`.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=write-plan-addOrUpdate]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=write-plan-addOrUpdate]
 ----
 <1> Get the `SearchSession`.
 <2> Get the search session's write plan.
@@ -214,7 +216,7 @@ but will be delayed until the transaction is committed.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=write-plan-delete]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=write-plan-delete]
 ----
 <1> Get the `SearchSession`.
 <2> Get the search session's write plan.
@@ -236,7 +238,7 @@ This will work fine for any reasonable number of entities,
 but changing or simply loading large numbers of entities in a single session
 requires special care with Hibernate ORM,
 and then some extra care with Hibernate Search.
-See <<mapper-orm-indexing-explicit-writeplan-process-execute>> for more information.
+See <<mapper-orm-indexing-manual-writeplan-process-execute>> for more information.
 ====
 
 == Explicitly altering a whole index
@@ -287,7 +289,7 @@ Below is an example using a `SearchWriter` to purge several indexes.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=writer-purge]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=writer-purge]
 ----
 <1> Get a `SearchSession`.
 <2> Get a writer targeting the indexes mapped to the `Book` and `Author` entity types.
@@ -302,24 +304,10 @@ There are multiple ways to retrieve the `SearchWriter` to target one, several or
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmExplicitIndexingIT.java[tags=writer-retrieval]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=writer-retrieval]
 ----
 <1> Get a `SearchSession`.
 <2> Get a writer targeting all indexes.
 <3> Get a writer targeting the index mapped to the `Book` entity type.
 <4> Get a writer targeting the indexes mapped to the `Book` and `Author` entity types.
 ====
-
-[[mapper-orm-indexing-explicit-massindexer]]
-== Using a `MassIndexer`
-// Search 5 anchors backward compatibility
-[[search-batchindex-massindexer]]
-
-include::todo-placeholder.asciidoc[]
-
-[[mapper-orm-indexing-explicit-jsr352]]
-== Using the JSR-352 integration
-// Search 5 anchors backward compatibility
-[[jsr352-integration]]
-
-include::todo-placeholder.asciidoc[]

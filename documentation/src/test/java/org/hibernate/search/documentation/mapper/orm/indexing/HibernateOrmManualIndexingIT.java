@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class HibernateOrmExplicitIndexingIT {
+public class HibernateOrmManualIndexingIT {
 
 	private static final int NUMBER_OF_BOOKS = 1000;
 	private static final int BATCH_SIZE = 100;
@@ -42,7 +42,7 @@ public class HibernateOrmExplicitIndexingIT {
 	@Rule
 	public OrmSetupHelper setupHelper;
 
-	public HibernateOrmExplicitIndexingIT(BackendConfiguration backendConfiguration) {
+	public HibernateOrmManualIndexingIT(BackendConfiguration backendConfiguration) {
 		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
 	}
 

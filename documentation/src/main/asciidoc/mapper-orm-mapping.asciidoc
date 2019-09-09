@@ -1298,7 +1298,7 @@ in thousands of other entities.
 When that happens, it is possible to tell Hibernate Search to ignore updates
 to a particular property (and, in the case of `@IndexedEmbedded`, anything beyond that property).
 The index will become slightly out-of-sync whenever the property is modified,
-but this can be solved by <<mapper-orm-indexing-explicit,triggering reindexing manually>>,
+but this can be solved by <<mapper-orm-indexing-massindexer,reindexing>>,
 for example every night.
 
 .Disabling automatic reindexing with `@IndexingDependency.reindexOnUpdate`
@@ -1330,7 +1330,7 @@ The simplest solution when the index structure needs to change is to simply:
 1. Wipe out the existing index,
 e.g. by deleting the filesystem directory for Lucene
 or using the REST API to delete the index for Elasticsearch.
-2. Rebuild the index, for example using the <<mapper-orm-indexing-explicit-massindexer,`MassIndexer`>>.
+2. Rebuild the index, for example using the <<mapper-orm-indexing-massindexer,`MassIndexer`>>.
 
 [TIP]
 ====
