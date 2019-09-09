@@ -13,13 +13,13 @@ import java.util.Arrays;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Id;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Table;
 import javax.persistence.TypedQuery;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -49,17 +49,17 @@ public class ToJpaIT {
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	private SessionFactory sessionFactory;
+	private EntityManagerFactory entityManagerFactory;
 
 	@Before
 	public void setup() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
-		sessionFactory = ormSetupHelper.start()
+		entityManagerFactory = ormSetupHelper.start()
 				.withProperty( AvailableSettings.JPA_QUERY_COMPLIANCE, true )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinJPATransaction( sessionFactory, entityManager -> {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setText( "this is text (1)" );
@@ -84,7 +84,7 @@ public class ToJpaIT {
 
 	@Test
 	public void toJpaEntityManager() {
-		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
+		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			assertThat( searchSession.toEntityManager() ).isSameAs( entityManager );
 		} );
@@ -92,9 +92,9 @@ public class ToJpaIT {
 
 	@Test
 	public void toJpaEntityManager_withClosedEntityManager() {
-		EntityManager entityManager = sessionFactory.createEntityManager();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		try {
-			entityManager = sessionFactory.createEntityManager();
+			entityManager = entityManagerFactory.createEntityManager();
 		}
 		finally {
 			if ( entityManager != null ) {
@@ -113,7 +113,7 @@ public class ToJpaIT {
 
 	@Test
 	public void toJpaQuery() {
-		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
+		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
@@ -122,7 +122,7 @@ public class ToJpaIT {
 
 	@Test
 	public void getResultList() {
-		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
+		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -147,7 +147,7 @@ public class ToJpaIT {
 
 	@Test
 	public void getSingleResult() {
-		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
+		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -210,7 +210,7 @@ public class ToJpaIT {
 
 	@Test
 	public void pagination() {
-		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
+		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -238,7 +238,7 @@ public class ToJpaIT {
 	@Test
 	@TestForIssue( jiraKey = "HSEARCH-1857" )
 	public void reuseSearchSessionAfterEntityManagerIsClosed_noMatching() {
-		EntityManager entityManager = sessionFactory.createEntityManager();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		SearchSession searchSession = Search.session( entityManager );
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
@@ -255,7 +255,7 @@ public class ToJpaIT {
 
 	@Test
 	public void lazyCreateSearchSessionAfterEntityManagerIsClosed() {
-		EntityManager entityManager = sessionFactory.createEntityManager();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( entityManager );
 		entityManager.close();
