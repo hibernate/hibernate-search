@@ -31,7 +31,7 @@ public interface SearchSession {
 	 * @see HibernateOrmSearchQueryHitTypeStep
 	 */
 	default <T> HibernateOrmSearchQueryHitTypeStep<T> search(Class<T> type) {
-		return scope( type ).search();
+		return search( Collections.singleton( type ) );
 	}
 
 	/**
@@ -44,9 +44,7 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see HibernateOrmSearchQueryHitTypeStep
 	 */
-	default <T> HibernateOrmSearchQueryHitTypeStep<T> search(Collection<? extends Class<? extends T>> types) {
-		return scope( types ).search();
-	}
+	<T> HibernateOrmSearchQueryHitTypeStep<T> search(Collection<? extends Class<? extends T>> types);
 
 	/**
 	 * Create a {@link SearchWriter} for the indexes mapped to all indexed types.
@@ -73,9 +71,7 @@ public interface SearchSession {
 	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the writer.
 	 * @return A {@link SearchWriter}.
 	 */
-	default SearchWriter writer(Collection<? extends Class<?>> types) {
-		return scope( types ).writer();
-	}
+	SearchWriter writer(Collection<? extends Class<?>> types);
 
 	/**
 	 * Creates a {@link MassIndexer} to rebuild the indexes of all indexed entity types.
@@ -106,9 +102,7 @@ public interface SearchSession {
 	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the writer.
 	 * @return A {@link SearchWriter}.
 	 */
-	default MassIndexer massIndexer(Collection<? extends Class<?>> types) {
-		return scope( types ).massIndexer();
-	}
+	MassIndexer massIndexer(Collection<? extends Class<?>> types);
 
 	/**
 	 * Create a {@link SearchScope} limited to the given type.
