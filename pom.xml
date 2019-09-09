@@ -580,6 +580,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-integrationtest-mapper-orm-envers</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -728,6 +733,11 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
+                <version>${version.org.hibernate}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-envers</artifactId>
                 <version>${version.org.hibernate}</version>
             </dependency>
             <dependency>
