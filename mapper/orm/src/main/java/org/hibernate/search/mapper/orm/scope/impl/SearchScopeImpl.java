@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.orm.writing.impl.SearchWriterImpl;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
-public class SearchScopeImpl<E> implements SearchScope<E>, org.hibernate.search.mapper.orm.search.SearchScope<E> {
+public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	private final HibernateOrmScopeMappingContext mappingContext;
 	private final HibernateOrmScopeSessionContext sessionContext;
