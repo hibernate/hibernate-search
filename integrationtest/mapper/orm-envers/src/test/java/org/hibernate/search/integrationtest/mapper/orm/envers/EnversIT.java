@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.envers;
 
+import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
+
+import java.util.Arrays;
+import java.util.Optional;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,10 +20,12 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.query.AuditEntity;
+import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -94,6 +100,7 @@ public class EnversIT {
 				1, 1, 1, 1 );
 		checkEnversAuditedCorrectly( ContainedEntity.class,
 				1, 1, 1, 1 );
+		checkSearchLoadedEntityIsLastVersion( "1", "initial", "initial" );
 
 		// Update the indexed entity
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -114,6 +121,7 @@ public class EnversIT {
 				2, 2, 1, 2 );
 		checkEnversAuditedCorrectly( ContainedEntity.class,
 				2, 1, 0, 1 );
+		checkSearchLoadedEntityIsLastVersion( "1", "updated", "initial" );
 
 		// Update the contained entity
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -134,6 +142,7 @@ public class EnversIT {
 				3, 2, 0, 2 );
 		checkEnversAuditedCorrectly( ContainedEntity.class,
 				3, 3, 1, 2 );
+		checkSearchLoadedEntityIsLastVersion( "1", "updated", "updated" );
 
 		// Delete the indexed entity
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -168,6 +177,33 @@ public class EnversIT {
 				assertions.assertThat( howManyAuditedObjectsSoFar( auditReader, type ) )
 						.as( "Number of audited objects so far for entity type " + type )
 						.isEqualTo( expectedAuditedObjectCountSoFar );
+			} );
+		} );
+	}
+
+	private void checkSearchLoadedEntityIsLastVersion(String id,
+			String expectedIndexedEntityText, String expectedContainedEntityText) {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.INDEX ),
+					b -> b.limit( 2 ), // fetchSingleHit() (see below) sets the limit to 2 to check if there really is a single hit
+					StubSearchWorkBehavior.of(
+							1L,
+							reference( IndexedEntity.INDEX, id )
+					)
+			);
+			Optional<IndexedEntity> loadedEntity = Search.session( session ).search( IndexedEntity.class )
+					.predicate( f -> f.matchAll() )
+					.fetchSingleHit();
+			SoftAssertions.assertSoftly( assertions -> {
+				assertions.assertThat( loadedEntity ).get()
+						.as( "getText()" )
+						.extracting( IndexedEntity::getText )
+						.isEqualTo( expectedIndexedEntityText );
+				assertions.assertThat( loadedEntity ).get()
+						.as( "getContained().getText()" )
+						.extracting( e -> e.getContained().getText() )
+						.isEqualTo( expectedContainedEntityText );
 			} );
 		} );
 	}
