@@ -23,6 +23,7 @@ import javax.persistence.TypedQuery;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -80,6 +81,12 @@ public class ToJpaIT {
 					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void toJpaEntityManagerFactory() {
+		SearchMapping searchMapping = Search.mapping( entityManagerFactory );
+		assertThat( searchMapping.toEntityManagerFactory() ).isSameAs( entityManagerFactory );
 	}
 
 	@Test

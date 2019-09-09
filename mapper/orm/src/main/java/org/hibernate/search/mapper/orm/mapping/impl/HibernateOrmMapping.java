@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -19,6 +21,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchr
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -33,7 +36,8 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
-		implements HibernateOrmListenerContextProvider,
+		implements SearchMapping,
+				HibernateOrmListenerContextProvider,
 				HibernateOrmScopeMappingContext, HibernateOrmSearchSessionMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -108,6 +112,16 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		this.synchronizationStrategy = synchronizationStrategy;
 		this.cacheLookupStrategy = cacheLookupStrategy;
 		this.fetchSize = fetchSize;
+	}
+
+	@Override
+	public EntityManagerFactory toEntityManagerFactory() {
+		return mappingContext.getSessionFactory();
+	}
+
+	@Override
+	public SessionFactory toOrmSessionFactory() {
+		return mappingContext.getSessionFactory();
 	}
 
 	@Override
