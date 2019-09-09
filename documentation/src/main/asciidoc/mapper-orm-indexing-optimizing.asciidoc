@@ -1,0 +1,33 @@
+[[mapper-orm-indexing-optimizing]]
+= Optimizing Hibernate Search indexing
+// Search 5 anchors backward compatibility
+[[_useful_parameters_for_batch_indexing]]
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO HSEARCH-3117 restore this documentation (maybe in the Lucene section)
+     and link to it when we restore the configuration properties
+
+Other parameters which affect indexing time and memory consumption are:
+
+* `hibernate.search.[default|<indexname>].exclusive_index_use`
+* `hibernate.search.[default|<indexname>].indexwriter.max_buffered_docs`
+* `hibernate.search.[default|<indexname>].indexwriter.max_merge_docs`
+* `hibernate.search.[default|<indexname>].indexwriter.merge_factor`
+* `hibernate.search.[default|<indexname>].indexwriter.merge_min_size`
+* `hibernate.search.[default|<indexname>].indexwriter.merge_max_size`
+* `hibernate.search.[default|<indexname>].indexwriter.merge_max_optimize_size`
+* `hibernate.search.[default|<indexname>].indexwriter.merge_calibrate_by_deletes`
+* `hibernate.search.[default|<indexname>].indexwriter.ram_buffer_size`
+
+Previous versions also had a `max_field_length` but this was removed from Lucene, it's possible
+to obtain a similar effect by using a `LimitTokenCountAnalyzer`.
+
+All `.indexwriter` parameters are Lucene specific and Hibernate Search is just passing these
+parameters through - see <<lucene-indexing-performance>> for more details.
+
+The MassIndexer uses a forward only scrollable result to iterate on the primary keys to be loaded,
+but MySQL's JDBC driver will load all values in memory; to avoid this "optimization" set
+`idFetchSize` to `Integer.MIN_VALUE`.
+////

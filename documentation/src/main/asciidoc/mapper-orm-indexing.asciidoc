@@ -11,4 +11,6 @@ include::mapper-orm-indexing-jsr352.asciidoc[]
 
 include::mapper-orm-indexing-manual.asciidoc[]
 
+include::mapper-orm-indexing-optimizing.asciidoc[]
+
 :leveloffset: -1
