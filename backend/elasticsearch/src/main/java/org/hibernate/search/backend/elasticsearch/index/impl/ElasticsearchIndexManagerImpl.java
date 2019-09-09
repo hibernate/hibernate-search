@@ -32,10 +32,10 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkE
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.impl.Closer;
@@ -141,7 +141,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(SessionContextImplementor sessionContext,
+	public IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
 		return backendContext.createWorkPlan(
@@ -154,7 +154,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	@Override
 	public IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(
-			SessionContextImplementor sessionContext, DocumentCommitStrategy commitStrategy) {
+			BackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
 		return backendContext.createDocumentWorkExecutor(
 				parallelOrchestrator, elasticsearchIndexName, sessionContext
@@ -162,14 +162,14 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
+	public IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext) {
 		return backendContext.createWorkExecutor(
 				parallelOrchestrator, elasticsearchIndexName, sessionContext
 		);
 	}
 
 	@Override
-	public IndexScopeBuilder createScopeBuilder(MappingContextImplementor mappingContext) {
+	public IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext) {
 		return new ElasticsearchIndexScopeBuilder(
 				backendContext, mappingContext, this
 		);

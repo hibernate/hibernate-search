@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
@@ -33,9 +33,9 @@ public final class BridgeSessionContext
 				PropertyBridgeWriteContext,
 				ValueBridgeFromIndexedValueContext {
 
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 
-	public BridgeSessionContext(SessionContextImplementor sessionContext) {
+	public BridgeSessionContext(BackendSessionContext sessionContext) {
 		this.sessionContext = sessionContext;
 	}
 

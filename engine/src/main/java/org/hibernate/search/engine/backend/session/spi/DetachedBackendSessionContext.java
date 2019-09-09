@@ -4,47 +4,47 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.mapper.session.context.spi;
+package org.hibernate.search.engine.backend.session.spi;
 
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 
 /**
  * Provides visibility from the lower layers of Hibernate Search (engine, backend)
  * to the session defined in the upper layers (mapping).
  * <p>
- * On contrary to {@link SessionContextImplementor},
+ * On contrary to {@link BackendSessionContext},
  * this context is expected to be detached from the actual session,
  * allowing it to be used after the session was closed.
  * The main downside is that this context cannot be used
- * everywhere {@link SessionContextImplementor} can.
+ * everywhere {@link BackendSessionContext} can.
  * In particular, it cannot be used when creating document-related
- * {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createWorkPlan(SessionContextImplementor, DocumentCommitStrategy, DocumentRefreshStrategy) work plans}
- * or {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createDocumentWorkExecutor(SessionContextImplementor, DocumentCommitStrategy) work executors}
+ * {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createWorkPlan(BackendSessionContext, DocumentCommitStrategy, DocumentRefreshStrategy) work plans}
+ * or {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createDocumentWorkExecutor(BackendSessionContext, DocumentCommitStrategy) work executors}
  * because these may need access to the session.
  */
-public final class DetachedSessionContextImplementor {
+public final class DetachedBackendSessionContext {
 
-	public static DetachedSessionContextImplementor of(SessionContextImplementor sessionContext) {
-		return new DetachedSessionContextImplementor(
+	public static DetachedBackendSessionContext of(BackendSessionContext sessionContext) {
+		return new DetachedBackendSessionContext(
 				sessionContext.getMappingContext(),
 				sessionContext.getTenantIdentifier()
 		);
 	}
 
-	private final MappingContextImplementor mappingContext;
+	private final BackendMappingContext mappingContext;
 
 	private final String tenantIdentifier;
 
-	private DetachedSessionContextImplementor(
-			MappingContextImplementor mappingContext, String tenantIdentifier) {
+	private DetachedBackendSessionContext(
+			BackendMappingContext mappingContext, String tenantIdentifier) {
 		this.mappingContext = mappingContext;
 		this.tenantIdentifier = tenantIdentifier;
 	}
 
-	public MappingContextImplementor getMappingContext() {
+	public BackendMappingContext getMappingContext() {
 		return mappingContext;
 	}
 

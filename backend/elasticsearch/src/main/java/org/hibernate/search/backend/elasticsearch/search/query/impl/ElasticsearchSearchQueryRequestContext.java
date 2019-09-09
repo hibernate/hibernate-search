@@ -12,7 +12,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -31,12 +31,12 @@ import com.google.gson.JsonObject;
  */
 class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestContext, AggregationRequestContext {
 
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final Map<DistanceSortKey, Integer> distanceSorts;
 
 	ElasticsearchSearchQueryRequestContext(
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Map<DistanceSortKey, Integer> distanceSorts) {
 		this.sessionContext = sessionContext;

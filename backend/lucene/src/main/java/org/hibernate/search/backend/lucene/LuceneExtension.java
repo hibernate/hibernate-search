@@ -30,7 +30,7 @@ import org.hibernate.search.backend.lucene.search.sort.dsl.impl.LuceneSearchSort
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
@@ -114,7 +114,7 @@ public final class LuceneExtension<H, R, E>
 	public Optional<LuceneSearchQueryHitTypeStep<R, E>> extendOptional(
 			SearchQueryHitTypeStep<?, R, E, ?, ?> original,
 			IndexScope<?> indexScope,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		if ( indexScope instanceof LuceneIndexScope ) {
 			return Optional.of( new LuceneSearchQueryHitTypeStepImpl<>(

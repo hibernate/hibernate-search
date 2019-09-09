@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> {
 
@@ -31,7 +31,7 @@ public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecuto
 	public LuceneIndexDocumentWorkExecutor(LuceneWorkFactory factory,
 			LuceneIndexEntryFactory indexEntryFactory,
 			WorkExecutionIndexManagerContext indexManagerContext,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		this.factory = factory;
 		this.indexEntryFactory = indexEntryFactory;

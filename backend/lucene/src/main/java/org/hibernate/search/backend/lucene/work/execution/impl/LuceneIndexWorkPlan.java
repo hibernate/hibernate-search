@@ -23,7 +23,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuild
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 
@@ -39,7 +39,7 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 	public LuceneIndexWorkPlan(LuceneWorkFactory factory,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.factory = factory;
 		this.indexEntryFactory = indexEntryFactory;

@@ -26,9 +26,9 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.Proper
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
+import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanBackendMappingContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
+import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanBackendSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
@@ -173,7 +173,7 @@ public class FieldDefaultBridgeIT<V, F> {
 		ToDocumentFieldValueConverter<?, ?> compatibleDslToIndexConverter =
 				index2FieldSchemaNode.getConverter().getDslToIndexConverter();
 		ToDocumentFieldValueConvertContext toDocumentConvertContext =
-				new ToDocumentFieldValueConvertContextImpl( new JavaBeanMappingContext() );
+				new ToDocumentFieldValueConvertContextImpl( new JavaBeanBackendMappingContext() );
 
 		// isCompatibleWith must return true when appropriate
 		assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
@@ -224,8 +224,8 @@ public class FieldDefaultBridgeIT<V, F> {
 				index2FieldSchemaNode.getConverter().getIndexToProjectionConverter();
 		FromDocumentFieldValueConvertContext fromDocumentConvertContext =
 				new FromDocumentFieldValueConvertContextImpl(
-						new JavaBeanSessionContext(
-								new JavaBeanMappingContext(),
+						new JavaBeanBackendSessionContext(
+								new JavaBeanBackendMappingContext(),
 								null,
 								PojoRuntimeIntrospector.noProxy()
 						)

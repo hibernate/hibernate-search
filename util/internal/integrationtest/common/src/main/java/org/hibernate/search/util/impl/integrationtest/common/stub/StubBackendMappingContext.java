@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub;
 
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 
-public class StubMappingContext implements MappingContextImplementor {
+public class StubBackendMappingContext implements BackendMappingContext {
 
-	public StubMappingContext() {
+	public StubBackendMappingContext() {
 	}
 }

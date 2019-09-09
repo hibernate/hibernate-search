@@ -16,8 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.CacheMode;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -38,7 +37,7 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
-	private final DetachedSessionContextImplementor sessionContext;
+	private final DetachedBackendSessionContext sessionContext;
 
 	private final ProducerConsumerQueue<List<I>> primaryKeyStream;
 
@@ -64,7 +63,7 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 	private final List<Future<?>> tasks = new ArrayList<>();
 
 	BatchIndexingWorkspace(HibernateOrmMassIndexingMappingContext mappingContext,
-			DetachedSessionContextImplementor sessionContext,
+			DetachedBackendSessionContext sessionContext,
 			Class<E> type, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
 			CountDownLatch endAllSignal, MassIndexingMonitor monitor, long objectsLimit,

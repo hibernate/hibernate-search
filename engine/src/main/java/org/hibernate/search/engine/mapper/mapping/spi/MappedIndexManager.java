@@ -13,10 +13,10 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkE
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 /**
  * The object responsible for applying works and searches to a full-text index.
@@ -27,15 +27,15 @@ public interface MappedIndexManager<D extends DocumentElement> {
 
 	IndexManager toAPI();
 
-	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext,
+	IndexWorkPlan<D> createWorkPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext,
+	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
-	IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext);
+	IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext);
 
-	<R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(MappingContextImplementor mappingContext);
+	<R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(BackendMappingContext mappingContext);
 
 	void addTo(MappedIndexScopeBuilder<?, ?> builder);
 }

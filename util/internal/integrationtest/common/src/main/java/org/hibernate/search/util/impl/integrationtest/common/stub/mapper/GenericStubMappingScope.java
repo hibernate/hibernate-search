@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendSessionContext;
 
 /**
  * A wrapper around {@link MappedIndexScope} providing some syntactic sugar,
@@ -29,10 +29,10 @@ public class GenericStubMappingScope<R, E> {
 	}
 
 	public SearchQueryHitTypeStep<?, R, E, ?, ?> query(LoadingContext<R, E> loadingContext) {
-		return query( new StubSessionContext(), loadingContext );
+		return query( new StubBackendSessionContext(), loadingContext );
 	}
 
-	public SearchQueryHitTypeStep<?, R, E, ?, ?> query(StubSessionContext sessionContext,
+	public SearchQueryHitTypeStep<?, R, E, ?, ?> query(StubBackendSessionContext sessionContext,
 			LoadingContext<R, E> loadingContext) {
 		LoadingContextBuilder<R, E> loadingContextBuilder = () -> loadingContext;
 		return delegate.search( sessionContext, loadingContextBuilder );

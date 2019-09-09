@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 
@@ -38,7 +38,7 @@ public class MultiTenancyMismatchIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private final StubSessionContext tenant1SessionContext = new StubSessionContext( "tenant_1" );
+	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( "tenant_1" );
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;

@@ -12,8 +12,8 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
@@ -66,7 +66,7 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmMappingContext> extendOptional(IdentifierBridgeToDocumentIdentifierContext original,
-			MappingContextImplementor mappingContext) {
+			BackendMappingContext mappingContext) {
 		return extendToOrmMappingContext( mappingContext );
 	}
 
@@ -75,7 +75,7 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmSessionContext> extendOptional(IdentifierBridgeFromDocumentIdentifierContext original,
-			SessionContextImplementor sessionContext) {
+			BackendSessionContext sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}
 
@@ -84,7 +84,7 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmSessionContext> extendOptional(RoutingKeyBridgeToRoutingKeyContext original,
-			SessionContextImplementor sessionContext) {
+			BackendSessionContext sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}
 
@@ -93,7 +93,7 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmSessionContext> extendOptional(TypeBridgeWriteContext original,
-			SessionContextImplementor sessionContext) {
+			BackendSessionContext sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}
 
@@ -102,7 +102,7 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmSessionContext> extendOptional(PropertyBridgeWriteContext original,
-			SessionContextImplementor sessionContext) {
+			BackendSessionContext sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}
 
@@ -111,7 +111,7 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmMappingContext> extendOptional(ValueBridgeToIndexedValueContext original,
-			MappingContextImplementor mappingContext) {
+			BackendMappingContext mappingContext) {
 		return extendToOrmMappingContext( mappingContext );
 	}
 
@@ -120,7 +120,7 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmSessionContext> extendOptional(ValueBridgeFromIndexedValueContext original,
-			SessionContextImplementor sessionContext) {
+			BackendSessionContext sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}
 
@@ -129,7 +129,7 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmMappingContext> extendOptional(ToDocumentFieldValueConvertContext original,
-			MappingContextImplementor mappingContext) {
+			BackendMappingContext mappingContext) {
 		return extendToOrmMappingContext( mappingContext );
 	}
 
@@ -138,11 +138,11 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmSessionContext> extendOptional(FromDocumentFieldValueConvertContext original,
-			SessionContextImplementor sessionContext) {
+			BackendSessionContext sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}
 
-	private Optional<HibernateOrmMappingContext> extendToOrmMappingContext(MappingContextImplementor mappingContext) {
+	private Optional<HibernateOrmMappingContext> extendToOrmMappingContext(BackendMappingContext mappingContext) {
 		if ( mappingContext instanceof HibernateOrmMappingContext ) {
 			return Optional.of( (HibernateOrmMappingContext) mappingContext );
 		}
@@ -151,7 +151,7 @@ public final class HibernateOrmExtension
 		}
 	}
 
-	private Optional<HibernateOrmSessionContext> extendToOrmSessionContext(SessionContextImplementor sessionContext) {
+	private Optional<HibernateOrmSessionContext> extendToOrmSessionContext(BackendSessionContext sessionContext) {
 		if ( sessionContext instanceof HibernateOrmSessionContext ) {
 			return Optional.of( (HibernateOrmSessionContext) sessionContext );
 		}

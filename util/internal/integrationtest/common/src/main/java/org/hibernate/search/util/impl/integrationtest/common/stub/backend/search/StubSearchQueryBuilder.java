@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search;
 
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -26,7 +26,7 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQuer
 
 	public StubSearchQueryBuilder(StubBackend backend, StubScopeModel scopeModel,
 			StubSearchWork.ResultType resultType,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder, StubSearchProjection<H> rootProjection) {
 		this.backend = backend;
 		this.scopeModel = scopeModel;

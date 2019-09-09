@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 
 /**
  * @param <I> The identifier type for the mapped entity type.
@@ -33,7 +33,7 @@ public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends Ab
 	private final Map<I, IndexedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
 
 	public PojoIndexedTypeWorkPlan(PojoWorkIndexedTypeContext<I, E, D> typeContext,
-			AbstractPojoSessionContextImplementor sessionContext,
+			AbstractPojoBackendSessionContext sessionContext,
 			IndexWorkPlan<D> delegate) {
 		super( sessionContext );
 		this.typeContext = typeContext;

@@ -32,7 +32,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -48,7 +48,7 @@ public class LuceneSearchQueryBuilder<H>
 	private final LuceneReadWorkOrchestrator queryOrchestrator;
 
 	private final LuceneSearchContext searchContext;
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 	private final Set<String> routingKeys;
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
@@ -65,7 +65,7 @@ public class LuceneSearchQueryBuilder<H>
 			LuceneWorkFactory workFactory,
 			LuceneReadWorkOrchestrator queryOrchestrator,
 			LuceneSearchContext searchContext,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {

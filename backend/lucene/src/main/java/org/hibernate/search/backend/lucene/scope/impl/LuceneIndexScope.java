@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactoryImpl;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 
@@ -31,7 +31,7 @@ public class LuceneIndexScope
 	private final LuceneSearchAggregationBuilderFactory searchAggregationFactory;
 
 	public LuceneIndexScope(SearchBackendContext backendContext,
-			MappingContextImplementor mappingContext,
+			BackendMappingContext mappingContext,
 			LuceneScopeModel model) {
 		this.model = model;
 		LuceneSearchContext searchContext = backendContext.createSearchContext( mappingContext, model );

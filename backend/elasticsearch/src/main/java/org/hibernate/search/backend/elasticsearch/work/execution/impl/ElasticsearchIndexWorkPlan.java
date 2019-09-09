@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 import com.google.gson.JsonObject;
 
@@ -42,7 +42,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,
 			DocumentRefreshStrategy refreshStrategy,
-			SessionContextImplementor sessionContext) {
+			BackendSessionContext sessionContext) {
 		this.builderFactory = builderFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;

@@ -14,10 +14,10 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.RoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentContributor;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentReferenceProvider;
@@ -105,13 +105,13 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public Supplier<E> toEntitySupplier(AbstractPojoSessionContextImplementor sessionContext, Object entity) {
+	public Supplier<E> toEntitySupplier(AbstractPojoBackendSessionContext sessionContext, Object entity) {
 		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
 	}
 
 	@Override
-	public DocumentReferenceProvider toDocumentReferenceProvider(AbstractPojoSessionContextImplementor sessionContext,
+	public DocumentReferenceProvider toDocumentReferenceProvider(AbstractPojoBackendSessionContext sessionContext,
 			I identifier, Supplier<E> entitySupplier) {
 		String documentIdentifier = identifierMapping.toDocumentIdentifier(
 				identifier, sessionContext.getMappingContext()
@@ -123,7 +123,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier, AbstractPojoSessionContextImplementor sessionContext) {
+	public PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier, AbstractPojoBackendSessionContext sessionContext) {
 		return new PojoDocumentContributor<>( processor, sessionContext, entitySupplier );
 	}
 
@@ -142,7 +142,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 
 	@Override
 	public PojoTypeDocumentWorkExecutor<I, E, D> createDocumentWorkExecutor(
-			AbstractPojoSessionContextImplementor sessionContext,
+			AbstractPojoBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		return new PojoTypeDocumentWorkExecutor<>(
 				this, sessionContext,
@@ -151,12 +151,12 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
+	public IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext) {
 		return indexManager.createWorkExecutor( sessionContext );
 	}
 
 	@Override
-	public PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext,
+	public PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(AbstractPojoBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new PojoIndexedTypeWorkPlan<>(
 				this, sessionContext,
@@ -165,7 +165,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public <R, E2> MappedIndexScopeBuilder<R, E2> createScopeBuilder(MappingContextImplementor mappingContext) {
+	public <R, E2> MappedIndexScopeBuilder<R, E2> createScopeBuilder(BackendMappingContext mappingContext) {
 		return indexManager.createScopeBuilder( mappingContext );
 	}
 

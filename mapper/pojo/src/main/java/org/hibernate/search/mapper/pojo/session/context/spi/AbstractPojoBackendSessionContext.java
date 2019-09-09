@@ -6,26 +6,26 @@
  */
 package org.hibernate.search.mapper.pojo.session.context.spi;
 
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.BridgeSessionContext;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
-public abstract class AbstractPojoSessionContextImplementor implements SessionContextImplementor {
+public abstract class AbstractPojoBackendSessionContext implements BackendSessionContext {
 
 	private final BridgeSessionContext bridgeSessionContext;
 
-	public AbstractPojoSessionContextImplementor() {
+	public AbstractPojoBackendSessionContext() {
 		this.bridgeSessionContext = new BridgeSessionContext( this );
 	}
 
 	@Override
-	public abstract AbstractPojoMappingContextImplementor getMappingContext();
+	public abstract AbstractPojoBackendMappingContext getMappingContext();
 
 	public abstract PojoRuntimeIntrospector getRuntimeIntrospector();
 

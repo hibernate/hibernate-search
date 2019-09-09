@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 /**
@@ -26,12 +26,12 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  */
 public interface SearchBackendContext {
 
-	LuceneSearchContext createSearchContext(MappingContextImplementor mappingContext,
+	LuceneSearchContext createSearchContext(BackendMappingContext mappingContext,
 			LuceneScopeModel scopeModel);
 
 	<H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
 			LuceneSearchContext searchContext,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection);
 

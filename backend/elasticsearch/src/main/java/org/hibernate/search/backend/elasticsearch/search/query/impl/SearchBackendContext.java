@@ -11,8 +11,8 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 /**
@@ -32,12 +32,12 @@ public interface SearchBackendContext {
 
 	SearchProjectionBackendContext getSearchProjectionBackendContext();
 
-	ElasticsearchSearchContext createSearchContext(MappingContextImplementor mappingContext,
+	ElasticsearchSearchContext createSearchContext(BackendMappingContext mappingContext,
 			ElasticsearchScopeModel scopeModel);
 
 	<H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
 			ElasticsearchSearchContext searchContext,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection);
 

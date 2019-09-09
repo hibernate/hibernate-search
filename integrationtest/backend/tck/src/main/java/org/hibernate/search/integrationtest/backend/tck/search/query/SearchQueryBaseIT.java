@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryPredicateStep;
@@ -190,7 +190,7 @@ public class SearchQueryBaseIT {
 			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E> {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryHitTypeStep<?, R, E, ?, ?> original,
-				IndexScope<?> indexScope, SessionContextImplementor sessionContext,
+				IndexScope<?> indexScope, BackendSessionContext sessionContext,
 				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( indexScope ).isNotNull();
@@ -204,7 +204,7 @@ public class SearchQueryBaseIT {
 			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E> {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryHitTypeStep<?, R, E, ?, ?> original,
-				IndexScope<?> indexScope, SessionContextImplementor sessionContext,
+				IndexScope<?> indexScope, BackendSessionContext sessionContext,
 				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( indexScope ).isNotNull();

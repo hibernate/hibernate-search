@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.runtime;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 /**
  * An extension to {@link TypeBridgeWriteContext}, allowing to access non-standard context
@@ -32,10 +32,10 @@ public interface TypeBridgeWriteContextExtension<T> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link TypeBridgeWriteContext}.
-	 * @param sessionContext A {@link SessionContextImplementor}.
+	 * @param sessionContext A {@link BackendSessionContext}.
 	 * @return An optional containing the extended context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(TypeBridgeWriteContext original, SessionContextImplementor sessionContext);
+	Optional<T> extendOptional(TypeBridgeWriteContext original, BackendSessionContext sessionContext);
 
 }

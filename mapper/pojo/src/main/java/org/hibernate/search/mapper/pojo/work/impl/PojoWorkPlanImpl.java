@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -30,7 +30,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
 	private final PojoWorkContainedTypeContextProvider containedTypeContextProvider;
-	private final AbstractPojoSessionContextImplementor sessionContext;
+	private final AbstractPojoBackendSessionContext sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
@@ -43,7 +43,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	public PojoWorkPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
-			AbstractPojoSessionContextImplementor sessionContext,
+			AbstractPojoBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;

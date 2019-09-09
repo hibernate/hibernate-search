@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.DefaultSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.SearchAggregationDslContextImpl;
@@ -42,7 +42,7 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 
 	@Override
 	public SearchQueryHitTypeStep<?, R, E, SearchProjectionFactory<R, E>, ?> search(
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		return new DefaultSearchQueryHitTypeStep<>( delegate, sessionContext, loadingContextBuilder );
 	}

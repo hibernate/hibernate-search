@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -27,12 +27,12 @@ class LuceneIndexScopeBuilder implements IndexScopeBuilder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexManagerBackendContext backendContext;
-	private final MappingContextImplementor mappingContext;
+	private final BackendMappingContext mappingContext;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<LuceneIndexManagerImpl> indexManagers = new LinkedHashSet<>();
 
-	LuceneIndexScopeBuilder(IndexManagerBackendContext backendContext, MappingContextImplementor mappingContext,
+	LuceneIndexScopeBuilder(IndexManagerBackendContext backendContext, BackendMappingContext mappingContext,
 			LuceneIndexManagerImpl indexManager) {
 		this.backendContext = backendContext;
 		this.mappingContext = mappingContext;

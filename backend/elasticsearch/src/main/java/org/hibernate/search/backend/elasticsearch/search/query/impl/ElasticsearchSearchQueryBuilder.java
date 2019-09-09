@@ -25,7 +25,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -50,7 +50,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final ElasticsearchSearchContext searchContext;
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 
 	private final ElasticsearchSearchPredicateContext rootPredicateContext;
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
@@ -68,7 +68,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchSearchContext searchContext,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {
 		this.workFactory = workFactory;

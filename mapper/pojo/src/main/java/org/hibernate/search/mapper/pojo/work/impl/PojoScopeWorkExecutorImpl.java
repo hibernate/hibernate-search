@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 
 public class PojoScopeWorkExecutorImpl implements PojoScopeWorkExecutor {
@@ -21,7 +21,7 @@ public class PojoScopeWorkExecutorImpl implements PojoScopeWorkExecutor {
 	private final List<IndexWorkExecutor> workExecutors = new ArrayList<>();
 
 	public PojoScopeWorkExecutorImpl(Set<? extends PojoWorkIndexedTypeContext<?, ?, ?>> targetedTypeContexts,
-			DetachedSessionContextImplementor sessionContext) {
+			DetachedBackendSessionContext sessionContext) {
 		for ( PojoWorkIndexedTypeContext<?, ?, ?> targetedTypeContext : targetedTypeContexts ) {
 			workExecutors.add( targetedTypeContext.createWorkExecutor( sessionContext ) );
 		}

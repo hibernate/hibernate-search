@@ -11,10 +11,10 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextExtension;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 
 final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> implements ToDocumentIdentifierValueConverter<I> {
 
@@ -60,9 +60,9 @@ final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> implements
 		@Override
 		public Optional<IdentifierBridgeToDocumentIdentifierContext> extendOptional(
 				ToDocumentIdentifierValueConvertContext original,
-			MappingContextImplementor mappingContext) {
-			if ( mappingContext instanceof AbstractPojoMappingContextImplementor ) {
-				AbstractPojoMappingContextImplementor pojoMappingContext = (AbstractPojoMappingContextImplementor) mappingContext;
+				BackendMappingContext mappingContext) {
+			if ( mappingContext instanceof AbstractPojoBackendMappingContext ) {
+				AbstractPojoBackendMappingContext pojoMappingContext = (AbstractPojoBackendMappingContext) mappingContext;
 				return Optional.of( pojoMappingContext.getIdentifierBridgeToDocumentIdentifierContext() );
 			}
 			else {

@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 import com.google.gson.JsonObject;
 
@@ -32,7 +32,7 @@ public class ElasticsearchIndexDocumentWorkExecutor implements IndexDocumentWork
 	public ElasticsearchIndexDocumentWorkExecutor(ElasticsearchWorkBuilderFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,
-			SessionContextImplementor sessionContext) {
+			BackendSessionContext sessionContext) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;

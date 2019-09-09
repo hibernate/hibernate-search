@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFie
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 
 import com.google.gson.Gson;
 
@@ -33,7 +33,7 @@ public final class ElasticsearchSearchContext {
 	// Targeted indexes
 	private final ElasticsearchScopeModel scopeModel;
 
-	public ElasticsearchSearchContext(MappingContextImplementor mappingContext,
+	public ElasticsearchSearchContext(BackendMappingContext mappingContext,
 			Gson userFacingGson, ElasticsearchJsonSyntaxHelper jsonSyntaxHelper,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchScopeModel scopeModel) {

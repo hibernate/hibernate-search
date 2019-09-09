@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjecti
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import org.apache.lucene.search.Collector;
@@ -36,7 +36,7 @@ class LuceneSearchQueryExtractContext {
 	private final Query luceneQuery;
 	private final LuceneCollectors luceneCollectors;
 
-	LuceneSearchQueryExtractContext(SessionContextImplementor sessionContext,
+	LuceneSearchQueryExtractContext(BackendSessionContext sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			IndexSearcher indexSearcher, Query luceneQuery,
 			LuceneCollectors luceneCollectors) {

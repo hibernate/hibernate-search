@@ -13,17 +13,17 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributo
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 
 public class StubIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<StubDocumentElement> {
 	private final StubIndexManager indexManager;
-	private final SessionContextImplementor sessionContext;
+	private final BackendSessionContext sessionContext;
 	private final DocumentCommitStrategy commitStrategy;
 
-	public StubIndexDocumentWorkExecutor(StubIndexManager indexManager, SessionContextImplementor sessionContext,
+	public StubIndexDocumentWorkExecutor(StubIndexManager indexManager, BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		this.indexManager = indexManager;
 		this.sessionContext = sessionContext;

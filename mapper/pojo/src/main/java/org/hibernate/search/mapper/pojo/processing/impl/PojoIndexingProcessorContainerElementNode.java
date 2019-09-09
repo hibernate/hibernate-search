@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -53,13 +53,13 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 	}
 
 	@Override
-	public final void process(DocumentElement target, C source, AbstractPojoSessionContextImplementor sessionContext) {
+	public final void process(DocumentElement target, C source, AbstractPojoBackendSessionContext sessionContext) {
 		try ( Stream<V> stream = extractorHolder.get().extract( source ) ) {
 			stream.forEach( sourceItem -> processItem( target, sourceItem, sessionContext ) );
 		}
 	}
 
-	private void processItem(DocumentElement target, V sourceItem, AbstractPojoSessionContextImplementor sessionContext) {
+	private void processItem(DocumentElement target, V sourceItem, AbstractPojoBackendSessionContext sessionContext) {
 		for ( PojoIndexingProcessor<? super V> nestedNode : nestedNodes ) {
 			nestedNode.process( target, sourceItem, sessionContext );
 		}

@@ -11,7 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
@@ -69,11 +69,11 @@ class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 		private final StubBackend backend;
 		// In a real mapper, this should be used for some features; keeping this here in case we need to stub such feature
 		@SuppressWarnings("unused")
-		private final MappingContextImplementor mappingContext;
+		private final BackendMappingContext mappingContext;
 		private final Set<String> indexNames = new LinkedHashSet<>();
 		private final Set<StubIndexSchemaNode> rootSchemaNodes = new LinkedHashSet<>();
 
-		Builder(StubBackend backend, MappingContextImplementor mappingContext, String indexName, StubIndexSchemaNode rootSchemaNode) {
+		Builder(StubBackend backend, BackendMappingContext mappingContext, String indexName, StubIndexSchemaNode rootSchemaNode) {
 			this.backend = backend;
 			this.mappingContext = mappingContext;
 			this.indexNames.add( indexName );

@@ -17,8 +17,8 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 /**
  * An interface with knowledge of the backend internals,
@@ -35,7 +35,7 @@ public interface WorkExecutionBackendContext {
 	IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, Optional<String> shardId,
@@ -44,9 +44,9 @@ public interface WorkExecutionBackendContext {
 	IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
 	IndexWorkExecutor createWorkExecutor(WorkExecutionIndexManagerContext indexManagerContext,
-			DetachedSessionContextImplementor sessionContext);
+			DetachedBackendSessionContext sessionContext);
 }

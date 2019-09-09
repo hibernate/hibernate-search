@@ -43,9 +43,9 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuild
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -93,7 +93,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
@@ -125,7 +125,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
@@ -140,14 +140,14 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	@Override
 	public IndexWorkExecutor createWorkExecutor(WorkExecutionIndexManagerContext indexManagerContext,
-			DetachedSessionContextImplementor sessionContext) {
+			DetachedBackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new LuceneIndexWorkExecutor( workFactory, indexManagerContext, sessionContext );
 	}
 
 	@Override
-	public LuceneSearchContext createSearchContext(MappingContextImplementor mappingContext,
+	public LuceneSearchContext createSearchContext(BackendMappingContext mappingContext,
 			LuceneScopeModel scopeModel) {
 		return new LuceneSearchContext(
 				mappingContext, analysisDefinitionRegistry, multiTenancyStrategy, scopeModel
@@ -157,7 +157,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	@Override
 	public <H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
 			LuceneSearchContext searchContext,
-			SessionContextImplementor sessionContext,
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );

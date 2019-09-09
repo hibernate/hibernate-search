@@ -28,9 +28,9 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuild
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
@@ -87,7 +87,7 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext,
+	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return backendContext.createWorkPlan(
 				shardHolder, indexEntryFactory,
@@ -97,7 +97,7 @@ public class LuceneIndexManagerImpl
 
 	@Override
 	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
-			SessionContextImplementor sessionContext, DocumentCommitStrategy commitStrategy) {
+			BackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
 		return backendContext.createDocumentWorkExecutor(
 				shardHolder, indexEntryFactory,
 				sessionContext, commitStrategy
@@ -105,12 +105,12 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor(DetachedSessionContextImplementor sessionContext) {
+	public IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext) {
 		return backendContext.createWorkExecutor( shardHolder, sessionContext );
 	}
 
 	@Override
-	public IndexScopeBuilder createScopeBuilder(MappingContextImplementor mappingContext) {
+	public IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext) {
 		return new LuceneIndexScopeBuilder(
 				backendContext, mappingContext, this
 		);

@@ -26,7 +26,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -62,8 +62,8 @@ public class MultiTenancyBaseIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private final StubSessionContext tenant1SessionContext = new StubSessionContext( TENANT_1 );
-	private final StubSessionContext tenant2SessionContext = new StubSessionContext( TENANT_2 );
+	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( TENANT_1 );
+	private final StubBackendSessionContext tenant2SessionContext = new StubBackendSessionContext( TENANT_2 );
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -336,7 +336,7 @@ public class MultiTenancyBaseIT {
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
 		StubMappingScope scope = indexManager.createScope();
-		SearchQuery<DocumentReference> query = scope.query( new StubSessionContext() )
+		SearchQuery<DocumentReference> query = scope.query( new StubBackendSessionContext() )
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 	}
@@ -347,7 +347,7 @@ public class MultiTenancyBaseIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubSessionContext() );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubBackendSessionContext() );
 
 		workPlan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
 			document.addValue( indexMapping.string, STRING_VALUE_3 );
@@ -367,7 +367,7 @@ public class MultiTenancyBaseIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubSessionContext() );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubBackendSessionContext() );
 
 		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( indexMapping.string, UPDATED_STRING );
@@ -387,7 +387,7 @@ public class MultiTenancyBaseIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubSessionContext() );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubBackendSessionContext() );
 		workPlan.delete( referenceProvider( DOCUMENT_ID_1 ) );
 		workPlan.execute().join();
 	}

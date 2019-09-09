@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 public class StubSearchProjectionContext {
 
@@ -16,7 +16,7 @@ public class StubSearchProjectionContext {
 
 	private boolean hasFailedLoad = false;
 
-	public StubSearchProjectionContext(SessionContextImplementor sessionContext) {
+	public StubSearchProjectionContext(BackendSessionContext sessionContext) {
 		this.fromDocumentFieldValueConvertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
 	}
 
