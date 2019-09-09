@@ -235,6 +235,27 @@ public class CompositeSearchSortIT {
 	}
 
 	@Test
+	public void then_flattened_nested_limit2() {
+		SearchQuery<DocumentReference> query;
+
+		String normalField = indexMapping.identicalForFirstTwo.relativeFieldName;
+		String flattenedField = "flattened." + indexMapping.flattenedField.relativeFieldName;
+		String nestedField = "nested." + indexMapping.flattenedField.relativeFieldName;
+
+		query = simpleQuery( f -> f.byField( flattenedField ).asc().then().byField( normalField ).asc() );
+		// [a b a][a a b] => {[1 3] 2}
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+
+		query = simpleQuery( f -> f.byField( nestedField ).asc().then().byField( flattenedField ).asc() );
+		// [b a a][a b a] => {[3 2] 1}
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2 );
+
+		query = simpleQuery( f -> f.byField( normalField ).asc().then().byField( nestedField ).asc() );
+		// [a a b][b a a] => {[2 1] 3}
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
+	}
+
+	@Test
 	public void then_flattened_nested_filterByPredicate() {
 		SearchQuery<DocumentReference> query;
 
