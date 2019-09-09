@@ -494,7 +494,7 @@ stage('Non-default environments') {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
-							-pl org.hibernate.search:hibernate-search-integrationtest-orm,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+							-pl org.hibernate.search:hibernate-search-integrationtest-orm,org.hibernate.search:hibernate-search-integrationtest-mapper-orm-envers,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 							-P$buildEnv.mavenProfile \
 					"""
 				}
