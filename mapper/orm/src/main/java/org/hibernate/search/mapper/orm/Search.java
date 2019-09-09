@@ -8,13 +8,17 @@ package org.hibernate.search.mapper.orm;
 
 import java.lang.invoke.MethodHandles;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -27,6 +31,44 @@ public final class Search {
 
 	private Search() {
 		// Private constructor
+	}
+
+	/**
+	 * Retrieve the {@link SearchMapping} from a Hibernate ORM {@link SessionFactory}.
+	 *
+	 * @param sessionFactory A Hibernate ORM session factory.
+	 * @return The corresponding {@link SearchSession}.
+	 * @throws org.hibernate.search.util.common.SearchException if the session NOT {@link Session#isOpen()}.
+	 */
+	public static SearchMapping mapping(SessionFactory sessionFactory) {
+		SessionFactoryImplementor sessionFactoryImpl;
+		try {
+			sessionFactoryImpl = sessionFactory.unwrap( SessionFactoryImplementor.class );
+		}
+		catch (IllegalStateException e) {
+			throw log.hibernateSessionFactoryAccessError( e );
+		}
+
+		return getSearchMapping( sessionFactoryImpl );
+	}
+
+	/**
+	 * Retrieve the {@link SearchMapping} from a JPA {@link EntityManagerFactory}.
+	 *
+	 * @param entityManagerFactory A JPA entity manager factory.
+	 * @return The corresponding {@link SearchSession}.
+	 * @throws org.hibernate.search.util.common.SearchException if the session NOT {@link Session#isOpen()}.
+	 */
+	public static SearchMapping mapping(EntityManagerFactory entityManagerFactory) {
+		SessionFactoryImplementor sessionFactoryImpl;
+		try {
+			sessionFactoryImpl = entityManagerFactory.unwrap( SessionFactoryImplementor.class );
+		}
+		catch (IllegalStateException e) {
+			throw log.hibernateSessionFactoryAccessError( e );
+		}
+
+		return getSearchMapping( sessionFactoryImpl );
 	}
 
 	/**
@@ -133,10 +175,15 @@ public final class Search {
 		return HibernateOrmSearchQueryAdapter.create( searchQuery );
 	}
 
+	private static SearchMapping getSearchMapping(SessionFactoryImplementor sessionFactoryImplementor) {
+		HibernateSearchContextProviderService mappingContextProvider =
+				HibernateSearchContextProviderService.get( sessionFactoryImplementor );
+		return mappingContextProvider.get();
+	}
+
 	private static SearchSession createSearchSession(SessionImplementor sessionImplementor) {
 		HibernateSearchContextProviderService mappingContextProvider =
-				sessionImplementor.getSessionFactory().getServiceRegistry()
-						.getService( HibernateSearchContextProviderService.class );
+				HibernateSearchContextProviderService.get( sessionImplementor.getSessionFactory() );
 		return new LazyInitSearchSession( mappingContextProvider, sessionImplementor );
 	}
 

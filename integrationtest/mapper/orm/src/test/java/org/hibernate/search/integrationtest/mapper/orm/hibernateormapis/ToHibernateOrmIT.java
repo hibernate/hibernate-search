@@ -20,6 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -76,6 +77,12 @@ public class ToHibernateOrmIT {
 					.preparedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void toHibernateOrmSessionFactory() {
+		SearchMapping searchMapping = Search.mapping( sessionFactory );
+		assertThat( searchMapping.toOrmSessionFactory() ).isSameAs( sessionFactory );
 	}
 
 	@Test
