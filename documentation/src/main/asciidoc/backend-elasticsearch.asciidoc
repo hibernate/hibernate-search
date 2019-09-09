@@ -200,7 +200,7 @@ You will need to add this dependency:
 ----
 <dependency>
    <groupId>org.hibernate</groupId>
-   <artifactId>hibernate-search-elasticsearch-aws</artifactId>
+   <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 ----
