@@ -37,7 +37,7 @@ class LuceneNumericRangePredicateBuilder<F, E extends Number>
 		);
 	}
 
-	private static <E> E getLowerValue(LuceneNumericDomain<E> domain, E lowerLimit, boolean excludeLowerLimit) {
+	private static <E extends Number> E getLowerValue(LuceneNumericDomain<E> domain, E lowerLimit, boolean excludeLowerLimit) {
 		if ( lowerLimit == null ) {
 			return domain.getMinValue();
 		}
@@ -46,7 +46,7 @@ class LuceneNumericRangePredicateBuilder<F, E extends Number>
 		}
 	}
 
-	private static <E> E getUpperValue(LuceneNumericDomain<E> domain, E upperLimit, boolean excludeUpperLimit) {
+	private static <E extends Number> E getUpperValue(LuceneNumericDomain<E> domain, E upperLimit, boolean excludeUpperLimit) {
 		if ( upperLimit == null ) {
 			return domain.getMaxValue();
 		}

@@ -6,15 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import org.apache.lucene.search.SortField;
-
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl.NestedNumericFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedNumericFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+
+import org.apache.lucene.search.SortField;
 
 public class LuceneNumericFieldSortBuilder<F, E extends Number>
 		extends AbstractLuceneStandardFieldSortBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
@@ -37,15 +38,15 @@ public class LuceneNumericFieldSortBuilder<F, E extends Number>
 	}
 
 	private SortField createSortField() {
-		SortField.Type sortFieldType = codec.getDomain().getSortFieldType();
+		LuceneNumericDomain<E> numericDomain = codec.getDomain();
 		if ( nestedDocumentPath != null ) {
-			nestedFieldSort = new NestedNumericFieldComparatorSource( nestedDocumentPath, sortFieldType, getEffectiveMissingValue( missingValue, order ) );
+			nestedFieldSort = new NestedNumericFieldComparatorSource( nestedDocumentPath, numericDomain, (E) getEffectiveMissingValue( missingValue, order ) );
 			return new SortField( absoluteFieldPath, nestedFieldSort, order == SortOrder.DESC );
 		}
 
 		SortField sortField = new SortField(
 				absoluteFieldPath,
-				sortFieldType,
+				numericDomain.getSortFieldType(),
 				order == SortOrder.DESC
 		);
 		setEffectiveMissingValue( sortField, missingValue, order );

@@ -11,7 +11,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.types.sort.missing.impl.LuceneMissingValueComparatorSource;
-import org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl.NestedTextFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedTextFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 

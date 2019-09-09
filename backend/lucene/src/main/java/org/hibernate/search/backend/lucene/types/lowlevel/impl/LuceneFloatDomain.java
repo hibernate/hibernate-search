@@ -18,10 +18,15 @@ import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.DoubleValuesSource;
+import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.util.BitSet;
 
 public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	private static final LuceneNumericDomain<Float> INSTANCE = new LuceneFloatDomain();
@@ -102,5 +107,42 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public IndexableField createDocValuesField(String absoluteFieldPath, Float numericValue) {
 		return new FloatDocValuesField( absoluteFieldPath, numericValue );
+	}
+
+	@Override
+	public NumericNestedFieldComparator<Float> createNestedFieldComparator(String fieldname, int numHits, Float missingValue) {
+		return new FloatFieldComparator( numHits, fieldname, missingValue );
+	}
+
+	public static class FloatFieldComparator extends FieldComparator.FloatComparator implements NumericNestedFieldComparator<Float> {
+		private NestedDocsProvider nestedDocsProvider;
+
+		public FloatFieldComparator(int numHits, String field, Float missingValue) {
+			super( numHits, field, missingValue );
+		}
+
+		@Override
+		public NumericComparator<Float> getComparator() {
+			return this;
+		}
+
+		@Override
+		public void setNestedDocsProvider(NestedDocsProvider nestedDocsProvider) {
+			this.nestedDocsProvider = nestedDocsProvider;
+		}
+
+		@Override
+		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
+			NumericDocValues numericDocValues = super.getNumericDocValues( context, field );
+			SortedNumericDoubleValues sortedNumericDoubleValues = SortedNumericDoubleValues.createFloat( numericDocValues );
+
+			BitSet parentDocs = nestedDocsProvider.parentDocs( context );
+			DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
+			if ( parentDocs != null && childDocs != null ) {
+				numericDocValues = OnTheFlyNestedSorter.sort( sortedNumericDoubleValues, missingValue, parentDocs, childDocs ).getRawFloatValues();
+			}
+
+			return numericDocValues;
+		}
 	}
 }

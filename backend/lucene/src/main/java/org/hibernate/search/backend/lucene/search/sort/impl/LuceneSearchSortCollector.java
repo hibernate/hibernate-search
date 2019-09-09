@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl.NestedFieldComparatorSource;
+import org.hibernate.search.backend.lucene.types.sort.nested.impl.NestedFieldComparatorSource;
 
 import org.apache.lucene.search.SortField;
 

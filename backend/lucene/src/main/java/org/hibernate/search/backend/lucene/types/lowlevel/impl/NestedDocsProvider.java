@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl;
+package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -31,12 +31,12 @@ import org.apache.lucene.util.BitSet;
  * Copied and adapted from {@code org.elasticsearch.index.fielddata.IndexFieldData.Nested} class
  * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
  */
-public class ParentChildDocsProvider {
+public class NestedDocsProvider {
 
 	private final BitSetProducer parentFiler;
 	private final Query childQuery;
 
-	public ParentChildDocsProvider(String nestedDocumentPath, Query originalParentQuery) {
+	public NestedDocsProvider(String nestedDocumentPath, Query originalParentQuery) {
 		this.parentFiler = new QueryBitSetProducer( originalParentQuery );
 		this.childQuery = LuceneNestedQueries.findChildQuery( Collections.singleton( nestedDocumentPath ), originalParentQuery );
 	}

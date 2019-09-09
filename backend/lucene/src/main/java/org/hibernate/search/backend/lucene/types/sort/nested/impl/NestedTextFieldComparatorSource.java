@@ -4,10 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.sort.nested.onthefly.impl;
+package org.hibernate.search.backend.lucene.types.sort.nested.impl;
 
 import java.io.IOException;
 
+import org.hibernate.search.backend.lucene.types.lowlevel.impl.OnTheFlyNestedSorter;
 import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
 import org.hibernate.search.backend.lucene.types.sort.missing.impl.LuceneReplaceMissingSortedDocValues;
 
@@ -36,8 +37,8 @@ public class NestedTextFieldComparatorSource extends NestedFieldComparatorSource
 			protected SortedDocValues getSortedDocValues(LeafReaderContext context, String field) throws IOException {
 				SortedDocValues sortedDocValues = super.getSortedDocValues( context, field );
 
-				BitSet parentDocs = docsProvider.parentDocs( context );
-				DocIdSetIterator childDocs = docsProvider.childDocs( context );
+				BitSet parentDocs = nestedDocsProvider.parentDocs( context );
+				DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
 				if ( parentDocs != null && childDocs != null ) {
 					sortedDocValues = OnTheFlyNestedSorter.sort( sortedDocValues, parentDocs, childDocs );
 				}
