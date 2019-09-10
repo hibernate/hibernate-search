@@ -11,7 +11,7 @@ package org.hibernate.search.mapper.pojo.model.path.spi;
  * so that they can be detected at runtime when given a set of paths.
  * <p>
  * Used in particular in dirty checking,
- * see {@link org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver}.
+ * see {@link org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver}.
  *
  * @param <S> The expected type of the object representing a set of paths.
  */
