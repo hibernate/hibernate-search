@@ -127,20 +127,20 @@ public class SearchSortIT {
 	@Test
 	public void byField_flattened() {
 		SearchQuery<DocumentReference> query;
-		query = simpleQuery( b -> b.byField( "flattenedObject.string" )
-				.asc().onMissingValue().sortLast() );
+		query = simpleQuery( b -> b.field( "flattenedObject.string" )
+				.asc().missing().last() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		query = simpleQuery( b -> b.byField( "flattenedObject.string" )
-				.desc().onMissingValue().sortLast() );
+		query = simpleQuery( b -> b.field( "flattenedObject.string" )
+				.desc().missing().last() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
-		query = simpleQuery( b -> b.byField( "flattenedObject.integer" )
-				.asc().onMissingValue().sortLast() );
+		query = simpleQuery( b -> b.field( "flattenedObject.integer" )
+				.asc().missing().last() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		query = simpleQuery( b -> b.byField( "flattenedObject.integer" )
-				.desc().onMissingValue().sortLast() );
+		query = simpleQuery( b -> b.field( "flattenedObject.integer" )
+				.desc().missing().last() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 
@@ -148,36 +148,36 @@ public class SearchSortIT {
 	@TestForIssue( jiraKey = "HSEARCH-2254" )
 	public void byField_nested() {
 		SearchQuery<DocumentReference> query;
-		query = simpleQuery( b -> b.byField( "nestedObject.string" )
-				.asc().onMissingValue().sortLast() );
+		query = simpleQuery( b -> b.field( "nestedObject.string" )
+				.asc().missing().last() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		query = simpleQuery( b -> b.byField( "nestedObject.string" )
-				.desc().onMissingValue().sortLast() );
+		query = simpleQuery( b -> b.field( "nestedObject.string" )
+				.desc().missing().last() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
-		query = simpleQuery( b -> b.byField( "nestedObject.string" )
-				.asc().onMissingValue().sortFirst() );
+		query = simpleQuery( b -> b.field( "nestedObject.string" )
+				.asc().missing().first() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
 
-		query = simpleQuery( b -> b.byField( "nestedObject.string" )
-				.desc().onMissingValue().sortFirst() );
+		query = simpleQuery( b -> b.field( "nestedObject.string" )
+				.desc().missing().first() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
 
-		query = simpleQuery( b -> b.byField( "nestedObject.integer" )
-				.asc().onMissingValue().sortLast() );
+		query = simpleQuery( b -> b.field( "nestedObject.integer" )
+				.asc().missing().last() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		query = simpleQuery( b -> b.byField( "nestedObject.integer" )
-				.desc().onMissingValue().sortLast() );
+		query = simpleQuery( b -> b.field( "nestedObject.integer" )
+				.desc().missing().last() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
-		query = simpleQuery( b -> b.byField( "nestedObject.integer" )
-				.asc().onMissingValue().sortFirst() );
+		query = simpleQuery( b -> b.field( "nestedObject.integer" )
+				.asc().missing().first() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
 
-		query = simpleQuery( b -> b.byField( "nestedObject.integer" )
-				.desc().onMissingValue().sortFirst() );
+		query = simpleQuery( b -> b.field( "nestedObject.integer" )
+				.desc().missing().first() );
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
 	}
 

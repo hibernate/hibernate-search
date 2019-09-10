@@ -349,37 +349,37 @@ public class FieldSearchSortIT {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
-			query = simpleQuery( b -> b.byField( fieldPath ).onMissingValue().sortLast() );
+			query = simpleQuery( b -> b.field( fieldPath ).missing().last() );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 
-			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortLast() );
+			query = simpleQuery( b -> b.field( fieldPath ).asc().missing().last() );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 
-			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortLast() );
+			query = simpleQuery( b -> b.field( fieldPath ).desc().missing().last() );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY );
 
-			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortFirst() );
+			query = simpleQuery( b -> b.field( fieldPath ).asc().missing().first() );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
-			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortFirst() );
+			query = simpleQuery( b -> b.field( fieldPath ).desc().missing().first() );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 			// Explicit order with onMissingValue().use( ... )
-			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.before1Value ) );
+			query = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.before1Value ) );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between1And2Value ) );
+			query = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.between1And2Value ) );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
-			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between2And3Value ) );
+			query = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.between2And3Value ) );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
-			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.after3Value ) );
+			query = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.after3Value ) );
 			assertThat( query )
 					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 		}
