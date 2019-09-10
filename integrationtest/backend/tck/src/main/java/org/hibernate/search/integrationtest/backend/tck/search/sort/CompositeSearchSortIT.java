@@ -198,15 +198,15 @@ public class CompositeSearchSortIT {
 		String flattenedField = "flattened." + indexMapping.flattenedField.relativeFieldName;
 		String nestedField = "nested." + indexMapping.flattenedField.relativeFieldName;
 
-		query = simpleQuery( f -> f.byField( flattenedField ).asc().then().byField( normalField ).asc() );
+		query = simpleQuery( f -> f.field( flattenedField ).asc().then().field( normalField ).asc() );
 		// [a b a][a a b] => {1 3 2}
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3, DOCUMENT_2 );
 
-		query = simpleQuery( f -> f.byField( nestedField ).asc().then().byField( flattenedField ).asc() );
+		query = simpleQuery( f -> f.field( nestedField ).asc().then().field( flattenedField ).asc() );
 		// [b a a][a b a] => {3 2 1}
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
-		query = simpleQuery( f -> f.byField( normalField ).asc().then().byField( nestedField ).asc() );
+		query = simpleQuery( f -> f.field( normalField ).asc().then().field( nestedField ).asc() );
 		// [a a b][b a a] => {2 1 3}
 		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
 	}
@@ -227,8 +227,8 @@ public class CompositeSearchSortIT {
 		 * The test below would fail if, by chance, the top N documents of the first pass did not include
 		 * the expected top document overall (i.e. document 2 or 3).
 		 */
-		query = simpleQuery( f -> f.byField( nestedField ).asc().onMissingValue().sortLast()
-				.then().byField( normalField ).asc() );
+		query = simpleQuery( f -> f.field( nestedField ).asc().missing().last()
+				.then().field( normalField ).asc() );
 		// [b a a][a b b] => {[2 or 3] (3 or 2) 1}
 		assertThat( query.fetch( 1 ) ).hits().ordinal( 0 )
 				.isDocRefHit( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
@@ -242,15 +242,15 @@ public class CompositeSearchSortIT {
 		String flattenedField = "flattened." + indexMapping.flattenedField.relativeFieldName;
 		String nestedField = "nested." + indexMapping.flattenedField.relativeFieldName;
 
-		query = simpleQuery( f -> f.byField( flattenedField ).asc().then().byField( normalField ).asc() );
+		query = simpleQuery( f -> f.field( flattenedField ).asc().then().field( normalField ).asc() );
 		// [a b a][a a b] => {[1 3] 2}
 		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
-		query = simpleQuery( f -> f.byField( nestedField ).asc().then().byField( flattenedField ).asc() );
+		query = simpleQuery( f -> f.field( nestedField ).asc().then().field( flattenedField ).asc() );
 		// [b a a][a b a] => {[3 2] 1}
 		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2 );
 
-		query = simpleQuery( f -> f.byField( normalField ).asc().then().byField( nestedField ).asc() );
+		query = simpleQuery( f -> f.field( normalField ).asc().then().field( nestedField ).asc() );
 		// [a a b][b a a] => {[2 1] 3}
 		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
 	}
@@ -264,24 +264,24 @@ public class CompositeSearchSortIT {
 		String nestedField = "nested." + indexMapping.flattenedField.relativeFieldName;
 
 		query = indexManager.createScope().query()
-				.predicate( b -> b.match().onField( normalField ).matching( "aaa" ) )
-				.sort( f -> f.byField( flattenedField ).asc().then().byField( normalField ).asc() )
+				.predicate( b -> b.match().field( normalField ).matching( "aaa" ) )
+				.sort( f -> f.field( flattenedField ).asc().then().field( normalField ).asc() )
 				.toQuery();
 
 		// [a b a][a a b] => {1+ 3 2+}
 		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		query = indexManager.createScope().query()
-				.predicate( b -> b.match().onField( normalField ).matching( "aaa" ) )
-				.sort( f -> f.byField( nestedField ).asc().then().byField( flattenedField ).asc() )
+				.predicate( b -> b.match().field( normalField ).matching( "aaa" ) )
+				.sort( f -> f.field( nestedField ).asc().then().field( flattenedField ).asc() )
 				.toQuery();
 
 		// [b a a][a b a] => {3 2+ 1+}
 		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
 
 		query = indexManager.createScope().query()
-				.predicate( b -> b.match().onField( normalField ).matching( "aaa" ) )
-				.sort( f -> f.byField( normalField ).asc().then().byField( nestedField ).asc() )
+				.predicate( b -> b.match().field( normalField ).matching( "aaa" ) )
+				.sort( f -> f.field( normalField ).asc().then().field( nestedField ).asc() )
 				.toQuery();
 		// [a a b][b a a] => {2+ 1+ 3}
 		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
