@@ -6,9 +6,17 @@
  */
 package org.hibernate.search.mapper.orm.session.impl;
 
+import java.util.Collection;
+
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
+import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 
 public interface HibernateOrmSearchSessionMappingContext {
+
+	HibernateOrmMappingContextImpl getBackendMappingContext();
+
+	<T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types);
 
 	HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder createSessionBuilder(
 			SessionImplementor sessionImplementor);

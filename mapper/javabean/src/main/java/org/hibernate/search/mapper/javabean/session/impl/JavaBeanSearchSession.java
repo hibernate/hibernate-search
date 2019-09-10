@@ -15,7 +15,6 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
-import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanBackendMappingContext;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
@@ -33,6 +32,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, ReferenceHitMapper<EntityReference> {
 
+	private final JavaBeanSearchSessionMappingContext mappingContext;
 	private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
 
 	private final DocumentCommitStrategy commitStrategy;
@@ -41,6 +41,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 
 	private JavaBeanSearchSession(JavaBeanSearchSessionBuilder builder) {
 		super( builder, builder.buildSessionContext() );
+		this.mappingContext = builder.mappingContext;
 		this.typeContextProvider = builder.typeContextProvider;
 		this.commitStrategy = builder.commitStrategy;
 		this.refreshStrategy = builder.refreshStrategy;
@@ -56,19 +57,12 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(Collection<? extends Class<?>> types) {
-		return scope( types ).search();
+		return search( createScope( types ) );
 	}
 
 	@Override
-	public SearchScope scope(Collection<? extends Class<?>> targetedTypes) {
-		return new SearchScopeImpl(
-				this,
-				getDelegate().createPojoScope(
-						targetedTypes,
-						// We don't load anything, so we don't need any additional type context
-						ignored -> null
-				)
-		);
+	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(SearchScope scope) {
+		return search( (SearchScopeImpl) scope );
 	}
 
 	@Override
@@ -93,15 +87,27 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		return new EntityReferenceImpl( typeContext.getJavaClass(), id );
 	}
 
+	private SearchScopeImpl createScope(Collection<? extends Class<?>> types) {
+		return mappingContext.createScope( types );
+	}
+
+	private SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(SearchScopeImpl scope) {
+		return ( (SearchScopeImpl) scope ).search(
+				getDelegate().getBackendSessionContext(),
+				this
+		);
+	}
+
 	public static class JavaBeanSearchSessionBuilder extends AbstractBuilder<JavaBeanSearchSession>
 			implements SearchSessionBuilder {
-		private final JavaBeanBackendMappingContext mappingContext;
+		private final JavaBeanSearchSessionMappingContext mappingContext;
 		private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
 		private String tenantId;
 		private DocumentCommitStrategy commitStrategy = DocumentCommitStrategy.FORCE;
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
-		public JavaBeanSearchSessionBuilder(PojoMappingDelegate mappingDelegate, JavaBeanBackendMappingContext mappingContext,
+		public JavaBeanSearchSessionBuilder(PojoMappingDelegate mappingDelegate,
+				JavaBeanSearchSessionMappingContext mappingContext,
 				JavaBeanSearchSessionTypeContextProvider typeContextProvider) {
 			super( mappingDelegate );
 			this.mappingContext = mappingContext;
@@ -127,7 +133,11 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		}
 
 		protected AbstractPojoBackendSessionContext buildSessionContext() {
-			return new JavaBeanBackendSessionContext( mappingContext, tenantId, PojoRuntimeIntrospector.noProxy() );
+			return new JavaBeanBackendSessionContext(
+					mappingContext.getBackendMappingContext(),
+					tenantId,
+					PojoRuntimeIntrospector.noProxy()
+			);
 		}
 
 		@Override

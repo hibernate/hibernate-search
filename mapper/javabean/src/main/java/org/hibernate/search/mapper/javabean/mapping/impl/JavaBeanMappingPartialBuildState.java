@@ -28,7 +28,7 @@ public class JavaBeanMappingPartialBuildState implements MappingPartialBuildStat
 	}
 
 	public MappingImplementor<SearchMapping> finalizeMapping() {
-		return new JavaBeanMappingImpl( mappingDelegate, typeContextContainer );
+		return new JavaBeanMapping( mappingDelegate, typeContextContainer );
 	}
 
 }

@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.pojo.scope.spi;
 
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -31,6 +33,7 @@ public interface PojoScopeDelegate<R, E, C> {
 	Set<C> getIncludedIndexedTypes();
 
 	SearchQueryHitTypeStep<?, R, E, SearchProjectionFactory<R, E>, ?> search(
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder);
 
 	SearchPredicateFactory predicate();
@@ -41,6 +44,6 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	SearchAggregationFactory aggregation();
 
-	PojoScopeWorkExecutor executor();
+	PojoScopeWorkExecutor executor(DetachedBackendSessionContext sessionContext);
 
 }

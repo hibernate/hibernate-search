@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.scope.impl;
 
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -19,18 +20,10 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl implements SearchScope {
 
-	private final ReferenceHitMapper<EntityReference> referenceHitMapper;
 	private final PojoScopeDelegate<EntityReference, Void, Void> delegate;
 
-	public SearchScopeImpl(ReferenceHitMapper<EntityReference> referenceHitMapper,
-			PojoScopeDelegate<EntityReference, Void, Void> delegate) {
-		this.referenceHitMapper = referenceHitMapper;
+	public SearchScopeImpl(PojoScopeDelegate<EntityReference, Void, Void> delegate) {
 		this.delegate = delegate;
-	}
-
-	@Override
-	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search() {
-		return delegate.search( new JavaBeanLoadingContext.Builder( referenceHitMapper ) );
 	}
 
 	@Override
@@ -51,5 +44,10 @@ public class SearchScopeImpl implements SearchScope {
 	@Override
 	public SearchAggregationFactory aggregation() {
 		return delegate.aggregation();
+	}
+
+	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(BackendSessionContext sessionContext,
+			ReferenceHitMapper<EntityReference> referenceHitMapper) {
+		return delegate.search( sessionContext, new JavaBeanLoadingContext.Builder( referenceHitMapper ) );
 	}
 }

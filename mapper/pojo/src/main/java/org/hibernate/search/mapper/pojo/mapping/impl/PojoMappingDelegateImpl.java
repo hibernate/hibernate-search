@@ -6,7 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.util.Collection;
+
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
 import org.hibernate.search.mapper.pojo.session.impl.PojoSearchSessionDelegateImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
@@ -30,6 +36,20 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 			closer.pushAll( PojoIndexedTypeManager::close, indexedTypeManagers.getAll() );
 			closer.pushAll( PojoContainedTypeManager::close, containedTypeManagers.getAll() );
 		}
+	}
+
+	@Override
+	public <R, E, E2, C> PojoScopeDelegate<R, E2, C> createPojoScope(
+			AbstractPojoBackendMappingContext mappingContext,
+			Collection<? extends Class<? extends E>> targetedTypes,
+			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
+		return PojoScopeDelegateImpl.create(
+				mappingContext,
+				indexedTypeManagers,
+				containedTypeManagers,
+				targetedTypes,
+				indexedTypeExtendedContextProvider
+		);
 	}
 
 	@Override

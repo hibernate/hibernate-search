@@ -7,7 +7,9 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.SessionFactory;
@@ -19,17 +21,24 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
+import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
+import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -115,6 +124,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
+	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
+		return createScope( types );
+	}
+
+	@Override
 	public EntityManagerFactory toEntityManagerFactory() {
 		return backendMappingContext.getSessionFactory();
 	}
@@ -156,6 +170,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
+	public HibernateOrmScopeSessionContext getSessionContext(EntityManager entityManager) {
+		return HibernateOrmSearchSession.get( this, HibernateOrmUtils.toSessionImplementor( entityManager ) );
+	}
+
+	@Override
 	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor session, boolean createIfDoesNotExist) {
 		return HibernateOrmSearchSession.get( this, session ).getCurrentWorkPlan( createIfDoesNotExist );
 	}
@@ -163,6 +182,22 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public <E> AbstractHibernateOrmTypeContext<E> getTypeContext(Class<E> type) {
 		return typeContextContainer.getByExactClass( type );
+	}
+
+	@Override
+	public HibernateOrmMappingContextImpl getBackendMappingContext() {
+		return backendMappingContext;
+	}
+
+	@Override
+	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types) {
+		PojoScopeDelegate<EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
+				getDelegate().createPojoScope(
+						backendMappingContext,
+						types,
+						typeContextContainer::getIndexedByExactClass
+				);
+		return new SearchScopeImpl<>( this, scopeDelegate );
 	}
 
 	@Override
@@ -176,7 +211,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		}
 
 		return new HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder(
-				getDelegate(), backendMappingContext, this, typeContextContainer,
+				getDelegate(), this, typeContextContainer,
 				sessionImplementor,
 				synchronizationStrategy
 		);
