@@ -433,12 +433,12 @@ public class AnnotationMappingSmokeIT {
 
 	@Test
 	public void search_multipleElementsProjection() {
-		try ( SearchSession session = mapping.createSession() ) {
-			SearchScope scope = session.scope(
-					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
-			);
+		SearchScope scope = mapping.scope(
+				Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+		);
 
-			SearchQuery<List<?>> query = scope.search()
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchQuery<List<?>> query = session.search( scope )
 					.asProjections(
 							scope.projection().field( "myTextField", String.class ).toProjection(),
 							scope.projection().entityReference().toProjection(),

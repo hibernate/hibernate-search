@@ -14,9 +14,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
@@ -24,7 +25,6 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
@@ -37,11 +37,11 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static <R, E, E2, C> PojoScopeDelegate<R, E2, C> create(
+			AbstractPojoBackendMappingContext mappingContext,
 			PojoScopeIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoScopeContainedTypeContextProvider containedTypeContextProvider,
 			Collection<? extends Class<? extends E>> targetedTypes,
-			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider,
-			AbstractPojoBackendSessionContext sessionContext) {
+			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		if ( targetedTypes.isEmpty() ) {
 			throw log.invalidEmptyTargetForScope();
 		}
@@ -75,23 +75,22 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 						.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
 		return new PojoScopeDelegateImpl<>(
-				targetedTypeContexts, targetedTypeExtendedContexts,
-				sessionContext
+				mappingContext,
+				targetedTypeContexts, targetedTypeExtendedContexts
 		);
 	}
 
+	private final AbstractPojoBackendMappingContext mappingContext;
 	private final Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>> targetedTypeContexts;
 	private final Set<C> targetedTypeExtendedContexts;
-	private final AbstractPojoBackendSessionContext sessionContext;
 	private MappedIndexScope<R, E2> delegate;
-	private PojoScopeWorkExecutor executor;
 
-	private PojoScopeDelegateImpl(Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>> targetedTypeContexts,
-			Set<C> targetedTypeExtendedContexts,
-			AbstractPojoBackendSessionContext sessionContext) {
+	private PojoScopeDelegateImpl(AbstractPojoBackendMappingContext mappingContext,
+			Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>> targetedTypeContexts,
+			Set<C> targetedTypeExtendedContexts) {
+		this.mappingContext = mappingContext;
 		this.targetedTypeContexts = targetedTypeContexts;
 		this.targetedTypeExtendedContexts = targetedTypeExtendedContexts;
-		this.sessionContext = sessionContext;
 	}
 
 	@Override
@@ -101,6 +100,7 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 
 	@Override
 	public SearchQueryHitTypeStep<?, R, E2, SearchProjectionFactory<R, E2>, ?> search(
+			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E2> loadingContextBuilder) {
 		return getIndexScope().search( sessionContext, loadingContextBuilder );
 	}
@@ -126,17 +126,13 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 	}
 
 	@Override
-	public PojoScopeWorkExecutor executor() {
-		if ( executor == null ) {
-			executor = new PojoScopeWorkExecutorImpl(
-					targetedTypeContexts, DetachedBackendSessionContext.of( sessionContext )
-			);
-		}
-		return executor;
+	public PojoScopeWorkExecutor executor(DetachedBackendSessionContext sessionContext) {
+		return new PojoScopeWorkExecutorImpl(
+				targetedTypeContexts, sessionContext
+		);
 	}
 
 	private MappedIndexScope<R, E2> getIndexScope() {
-		AbstractPojoBackendMappingContext mappingContext = sessionContext.getMappingContext();
 		if ( delegate == null ) {
 			Iterator<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>> iterator = targetedTypeContexts.iterator();
 			MappedIndexScopeBuilder<R, E2> builder = iterator.next().createScopeBuilder(

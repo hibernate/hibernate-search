@@ -16,6 +16,7 @@ import javax.persistence.Persistence;
 
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -100,11 +101,11 @@ public class GettingStartedWithoutAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching-objects[]
 			// Not shown: get the entity manager and open a transaction
-			SearchSession searchSession = Search.session( entityManager ); // <1>
+			SearchMapping searchMapping = Search.mapping( entityManager.getEntityManagerFactory() ); // <1>
 
-			SearchScope<Book> scope = searchSession.scope( Book.class ); // <2>
+			SearchScope<Book> scope = searchMapping.scope( Book.class ); // <2>
 
-			SearchResult<Book> result = scope.search() // <3>
+			SearchResult<Book> result = scope.search( entityManager ) // <3>
 					.predicate( scope.predicate().match() // <4>
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
@@ -118,7 +119,7 @@ public class GettingStartedWithoutAnalysisIT {
 			List<Book> hits2 =
 					/* ... same DSL calls as above... */
 			// end::searching-objects[]
-					scope.search()
+					scope.search( entityManager )
 					.predicate( scope.predicate().match()
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )

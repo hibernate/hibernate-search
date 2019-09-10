@@ -18,7 +18,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiator;
-import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingImpl;
+import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
@@ -136,7 +136,7 @@ public final class SearchMappingBuilder {
 			 * Since the user doesn't have access to the integration, but only to the (closeable) mapping,
 			 * make sure to close the integration whenever the mapping is closed by the user.
 			 */
-			JavaBeanMappingImpl mappingImpl = (JavaBeanMappingImpl) mapping;
+			JavaBeanMapping mappingImpl = (JavaBeanMapping) mapping;
 			mappingImpl.onClose( integration::close );
 			return mappingImpl;
 		}

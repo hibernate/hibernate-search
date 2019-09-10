@@ -48,24 +48,15 @@ public interface SearchSession extends AutoCloseable {
 	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(Collection<? extends Class<?>> types);
 
 	/**
-	 * Create a {@link SearchScope} limited to the given type.
+	 * Initiate the building of a search query.
+	 * <p>
+	 * The query will target the indexes in the given scope.
 	 *
-	 * @param type A type to include in the scope.
-	 * @return The created scope.
-	 * @see SearchScope
+	 * @param scope A scope representing all indexed types that will be targeted by the search query.
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see SearchQueryHitTypeStep
 	 */
-	default SearchScope scope(Class<?> type) {
-		return scope( Collections.singleton( type ) );
-	}
-
-	/**
-	 * Create a {@link SearchScope} limited to the given types.
-	 *
-	 * @param types A collection of types to include in the scope.
-	 * @return The created scope.
-	 * @see SearchScope
-	 */
-	SearchScope scope(Collection<? extends Class<?>> types);
+	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(SearchScope scope);
 
 	/**
 	 * @return The main work plan for this session. It will be executed upon closing this session.

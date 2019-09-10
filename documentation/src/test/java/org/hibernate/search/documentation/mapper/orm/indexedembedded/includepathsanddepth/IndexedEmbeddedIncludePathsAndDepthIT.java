@@ -15,6 +15,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
@@ -107,30 +108,29 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 			assertThat( result ).hasSize( 1 );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			SubTest.expectException(
-					() -> {
-						searchSession.scope( Human.class ).predicate()
-								.match().onField( "parents.parents.parents.nickname" );
-					}
-			)
-					.assertThrown()
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" );
-			// TODO HSEARCH-3684: an exception should be thrown here, but isn't.
-			/*
-			SubTest.expectException(
-					() -> {
-						searchSession.scope( Human.class ).predicate()
-								.match().onField( "parents.parents.parents.parents.name" );
-					}
-			)
-					.assertThrown()
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Unknown field" );
-			 */
-		} );
+		SearchMapping searchMapping = Search.mapping( entityManagerFactory );
+
+		SubTest.expectException(
+				() -> {
+					searchMapping.scope( Human.class ).predicate()
+							.match().onField( "parents.parents.parents.nickname" );
+				}
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" );
+		// TODO HSEARCH-3684: an exception should be thrown here, but isn't.
+		/*
+		SubTest.expectException(
+				() -> {
+					searchMapping.scope( Human.class ).predicate()
+							.match().onField( "parents.parents.parents.parents.name" );
+				}
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field" );
+		 */
 
 	}
 

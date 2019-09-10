@@ -7,11 +7,34 @@
 package org.hibernate.search.mapper.javabean.mapping;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
+import java.util.Collections;
 
+import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 
 public interface SearchMapping {
+
+	/**
+	 * Create a {@link SearchScope} limited to the given type.
+	 *
+	 * @param type A type to include in the scope.
+	 * @return The created scope.
+	 * @see SearchScope
+	 */
+	default SearchScope scope(Class<?> type) {
+		return scope( Collections.singleton( type ) );
+	}
+
+	/**
+	 * Create a {@link SearchScope} limited to the given types.
+	 *
+	 * @param types A collection of types to include in the scope.
+	 * @return The created scope.
+	 * @see SearchScope
+	 */
+	SearchScope scope(Collection<? extends Class<?>> types);
 
 	/**
 	 * @return A new session allowing to {@link SearchSession#getMainWorkPlan() index} or

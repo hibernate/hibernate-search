@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.persistence.EntityManager;
 import javax.transaction.Synchronization;
 
@@ -21,33 +20,29 @@ import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
-import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
-import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
-import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.TransientReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -92,7 +87,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final HibernateOrmScopeMappingContext scopeMappingContext;
+	private final HibernateOrmSearchSessionMappingContext mappingContext;
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 	private final HibernateOrmSessionContextImpl sessionContext;
 	private AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
@@ -112,7 +107,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder,
 			HibernateOrmSessionContextImpl backendSessionContext) {
 		super( builder, backendSessionContext );
-		this.scopeMappingContext = builder.scopeMappingContext;
+		this.mappingContext = builder.mappingContext;
 		this.typeContextProvider = builder.typeContextProvider;
 		this.sessionContext = backendSessionContext;
 		this.synchronizationStrategy = builder.synchronizationStrategy;
@@ -124,17 +119,17 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public <T> HibernateOrmSearchQueryHitTypeStep<T> search(Collection<? extends Class<? extends T>> types) {
-		return scope( types ).search();
+		return createScope( types ).search( this );
 	}
 
 	@Override
 	public SearchWriter writer(Collection<? extends Class<?>> types) {
-		return scope( types ).writer();
+		return createScope( types ).writer( this );
 	}
 
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
-		return scope( types ).massIndexer();
+		return createScope( types ).massIndexer( this );
 	}
 
 	@Override
@@ -145,18 +140,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public Session toOrmSession() {
 		return sessionContext.getSession();
-	}
-
-	@Override
-	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
-		checkOrmSessionIsOpen();
-
-		PojoScopeDelegate<EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
-				getDelegate().createPojoScope(
-						types,
-						typeContextProvider::getIndexedByExactClass
-				);
-		return new SearchScopeImpl<>( scopeMappingContext, this, scopeDelegate );
 	}
 
 	@Override
@@ -176,6 +159,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public SessionImplementor getSession() {
 		return sessionContext.getSession();
+	}
+
+	@Override
+	public BackendSessionContext getBackendSessionContext() {
+		return sessionContext;
 	}
 
 	@Override
@@ -254,6 +242,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return synchronizationStrategy;
 	}
 
+	private <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types) {
+		checkOrmSessionIsOpen();
+		return mappingContext.createScope( types );
+	}
+
 	private PojoWorkPlan createWorkPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return getDelegate().createWorkPlan( commitStrategy, refreshStrategy );
 	}
@@ -327,28 +320,25 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	public static class HibernateOrmSearchSessionBuilder extends AbstractBuilder<HibernateOrmSearchSession> {
-		private final HibernateOrmMappingContextImpl mappingContext;
-		private final HibernateOrmScopeMappingContext scopeMappingContext;
+		private final HibernateOrmSearchSessionMappingContext mappingContext;
 		private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 		private final SessionImplementor sessionImplementor;
 		private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
 		public HibernateOrmSearchSessionBuilder(PojoMappingDelegate mappingDelegate,
-				HibernateOrmMappingContextImpl mappingContext,
-				HibernateOrmScopeMappingContext scopeMappingContext,
+				HibernateOrmSearchSessionMappingContext mappingContext,
 				HibernateOrmSessionTypeContextProvider typeContextProvider,
 				SessionImplementor sessionImplementor,
 				AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 			super( mappingDelegate );
 			this.mappingContext = mappingContext;
-			this.scopeMappingContext = scopeMappingContext;
 			this.typeContextProvider = typeContextProvider;
 			this.sessionImplementor = sessionImplementor;
 			this.synchronizationStrategy = synchronizationStrategy;
 		}
 
 		private HibernateOrmSessionContextImpl buildBackendSessionContext() {
-			return new HibernateOrmSessionContextImpl( mappingContext, sessionImplementor );
+			return new HibernateOrmSessionContextImpl( mappingContext.getBackendMappingContext(), sessionImplementor );
 		}
 
 		@Override

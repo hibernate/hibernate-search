@@ -6,25 +6,35 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
+import java.util.Collection;
+
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.scope.SearchScope;
+import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanBackendMappingContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSession;
+import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 
-public class JavaBeanMappingImpl extends AbstractPojoMappingImplementor<SearchMapping> implements
-		CloseableSearchMapping {
+public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMapping>
+		implements CloseableSearchMapping, JavaBeanSearchSessionMappingContext {
 
 	private final JavaBeanBackendMappingContext backendMappingContext;
 	private final JavaBeanTypeContextContainer typeContextContainer;
 
-	JavaBeanMappingImpl(PojoMappingDelegate mappingDelegate, JavaBeanTypeContextContainer typeContextContainer) {
+	JavaBeanMapping(PojoMappingDelegate mappingDelegate, JavaBeanTypeContextContainer typeContextContainer) {
 		super( mappingDelegate );
 		this.backendMappingContext = new JavaBeanBackendMappingContext();
 		this.typeContextContainer = typeContextContainer;
+	}
+
+	@Override
+	public SearchScope scope(Collection<? extends Class<?>> targetedTypes) {
+		return createScope( targetedTypes );
 	}
 
 	@Override
@@ -42,9 +52,26 @@ public class JavaBeanMappingImpl extends AbstractPojoMappingImplementor<SearchMa
 		return createSearchManagerBuilder();
 	}
 
+	@Override
+	public JavaBeanBackendMappingContext getBackendMappingContext() {
+		return backendMappingContext;
+	}
+
+	@Override
+	public SearchScopeImpl createScope(Collection<? extends Class<?>> types) {
+		return new SearchScopeImpl(
+				getDelegate().createPojoScope(
+						backendMappingContext,
+						types,
+						// We don't load anything, so we don't need any additional type context
+						ignored -> null
+				)
+		);
+	}
+
 	private SearchSessionBuilder createSearchManagerBuilder() {
 		return new JavaBeanSearchSession.JavaBeanSearchSessionBuilder(
-				getDelegate(), backendMappingContext, typeContextContainer
+				getDelegate(), this, typeContextContainer
 		);
 	}
 }

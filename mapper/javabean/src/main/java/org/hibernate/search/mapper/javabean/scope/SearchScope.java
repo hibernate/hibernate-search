@@ -27,20 +27,10 @@ import org.hibernate.search.mapper.javabean.common.EntityReference;
 public interface SearchScope {
 
 	/**
-	 * Initiate the building of a search query.
-	 * <p>
-	 * The query will target the indexes mapped to types in this scope, or to any of their sub-types.
-	 *
-	 * @return The initial step of a DSL where the search query can be defined.
-	 * @see SearchQueryHitTypeStep
-	 */
-	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search();
-
-	/**
 	 * Initiate the building of a search predicate.
 	 * <p>
-	 * The predicate will only be valid for {@link #search() search queries} created using this scope
-	 * or a wider scope.
+	 * The predicate will only be valid for {@link org.hibernate.search.mapper.javabean.session.SearchSession#search(SearchScope) search queries}
+	 * created using this scope or a wider scope.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
 	 * since you can {@link SearchQueryPredicateStep#predicate(Function) define predicates with lambdas}
@@ -55,8 +45,8 @@ public interface SearchScope {
 	/**
 	 * Initiate the building of a search sort.
 	 * <p>
-	 * The sort will only be valid for {@link #search() search queries} created using this scope
-	 * or a wider scope.
+	 * The sort will only be valid for {@link org.hibernate.search.mapper.javabean.session.SearchSession#search(SearchScope) search queries}
+	 * created using this scope or a wider scope.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
 	 * since you can {@link SearchQueryOptionsStep#sort(Function) define sorts with lambdas}
@@ -71,8 +61,8 @@ public interface SearchScope {
 	/**
 	 * Initiate the building of a search projection that will be valid for the indexes in this scope.
 	 * <p>
-	 * The projection will only be valid for {@link #search() search queries} created using this scope
-	 * or a wider scope.
+	 * The projection will only be valid for {@link org.hibernate.search.mapper.javabean.session.SearchSession#search(SearchScope) search queries}
+	 * created using this scope or a wider scope.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
 	 * since you can {@link SearchQueryHitTypeStep#asProjection(Function)} define projections with lambdas}
@@ -87,7 +77,8 @@ public interface SearchScope {
 	/**
 	 * Initiate the building of a search aggregation that will be valid for the indexes in this scope.
 	 * <p>
-	 * The aggregation will only be usable in {@link #search() search queries} created using this scope.
+	 * The aggregation will only be usable in {@link org.hibernate.search.mapper.javabean.session.SearchSession#search(SearchScope) search queries}
+	 * created using this scope or a wider scope.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
 	 * since you can {@link SearchQueryOptionsStep#aggregation(AggregationKey, SearchAggregation)} define aggregations with lambdas}

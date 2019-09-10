@@ -21,6 +21,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -103,12 +104,11 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void asProjection_searchProjectionObject_single() {
+		SearchMapping searchMapping = Search.mapping( sessionFactory );
+		SearchScope<Book> scope = searchMapping.scope( Book.class );
+
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.session( session );
-
-			SearchScope<Book> scope = searchSession.scope( Book.class );
-
-			SearchQuery<String> query = scope.search()
+			SearchQuery<String> query = scope.search( session )
 					.asProjection(
 							scope.projection().field( "title", String.class ).toProjection()
 					)
@@ -136,12 +136,11 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void asProjection_searchProjectionObject_multiple() {
+		SearchMapping searchMapping = Search.mapping( sessionFactory );
+		SearchScope<Book> scope = searchMapping.scope( Book.class );
+
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.session( session );
-
-			SearchScope<Book> scope = searchSession.scope( Book.class );
-
-			SearchQuery<List<?>> query = scope.search()
+			SearchQuery<List<?>> query = scope.search( session )
 					.asProjections(
 							scope.projection().field( "title", String.class ).toProjection(),
 							scope.projection().entityReference().toProjection(),

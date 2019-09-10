@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
+import javax.persistence.EntityManager;
+
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -24,24 +27,26 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	private final HibernateOrmScopeMappingContext mappingContext;
-	private final HibernateOrmScopeSessionContext sessionContext;
 	private final PojoScopeDelegate<EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
 
 	public SearchScopeImpl(HibernateOrmScopeMappingContext mappingContext,
-			HibernateOrmScopeSessionContext sessionContext,
 			PojoScopeDelegate<EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
-		this.sessionContext = sessionContext;
 		this.delegate = delegate;
 	}
 
 	@Override
-	public HibernateOrmSearchQueryHitTypeStep<E> search() {
+	public HibernateOrmSearchQueryHitTypeStep<E> search(EntityManager entityManager) {
+		HibernateOrmScopeSessionContext sessionContext = mappingContext.getSessionContext( entityManager );
+		return search( sessionContext );
+	}
+
+	public HibernateOrmSearchQueryHitTypeStep<E> search(HibernateOrmScopeSessionContext sessionContext) {
 		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
 				mappingContext, sessionContext, delegate.getIncludedIndexedTypes()
 		);
 		return new HibernateOrmSearchQueryHitTypeStepImpl<>(
-				delegate.search( loadingContextBuilder ),
+				delegate.search( sessionContext.getBackendSessionContext(), loadingContextBuilder ),
 				loadingContextBuilder
 		);
 	}
@@ -67,17 +72,28 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	}
 
 	@Override
-	public SearchWriter writer() {
-		return new SearchWriterImpl( delegate.executor() );
+	public SearchWriter writer(EntityManager entityManager) {
+		HibernateOrmScopeSessionContext sessionContext = mappingContext.getSessionContext( entityManager );
+		return writer( sessionContext );
+	}
+
+	public SearchWriter writer(HibernateOrmScopeSessionContext sessionContext) {
+		return new SearchWriterImpl( delegate.executor( sessionContext.getDetachedBackendSessionContext() ) );
 	}
 
 	@Override
-	public MassIndexer massIndexer() {
+	public MassIndexer massIndexer(EntityManager entityManager) {
+		HibernateOrmScopeSessionContext sessionContext = mappingContext.getSessionContext( entityManager );
+		return massIndexer( sessionContext );
+	}
+
+	public MassIndexer massIndexer(HibernateOrmScopeSessionContext sessionContext) {
+		DetachedBackendSessionContext detachedSessionContext = sessionContext.getDetachedBackendSessionContext();
 		return new MassIndexerImpl(
 				mappingContext,
 				delegate.getIncludedIndexedTypes(),
-				sessionContext.getDetachedBackendSessionContext(),
-				delegate.executor()
+				detachedSessionContext,
+				delegate.executor( detachedSessionContext )
 		);
 	}
 }
