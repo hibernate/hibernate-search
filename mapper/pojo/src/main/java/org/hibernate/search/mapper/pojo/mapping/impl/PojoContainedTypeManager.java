@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext;
