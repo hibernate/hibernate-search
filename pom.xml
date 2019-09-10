@@ -2433,7 +2433,7 @@
         <profile>
             <id>elasticsearch-5.0</id>
             <properties>
-                <version.elasticsearch.plugin>5.7</version.elasticsearch.plugin>
+                <version.elasticsearch.plugin>6.14</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>5.1.2</test.elasticsearch.host.version>
             </properties>
             <build>
@@ -2484,7 +2484,7 @@
                 </property>
             </activation>
             <properties>
-                <version.elasticsearch.plugin>5.7</version.elasticsearch.plugin>
+                <version.elasticsearch.plugin>6.14</version.elasticsearch.plugin>
                 <test.elasticsearch.host.version>5.6.8</test.elasticsearch.host.version>
             </properties>
             <build>
