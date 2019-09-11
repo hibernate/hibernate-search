@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
 public class NormalizedDocRefHit {

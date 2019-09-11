@@ -27,7 +27,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;

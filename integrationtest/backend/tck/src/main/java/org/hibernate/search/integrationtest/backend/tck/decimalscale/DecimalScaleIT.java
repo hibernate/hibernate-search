@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;

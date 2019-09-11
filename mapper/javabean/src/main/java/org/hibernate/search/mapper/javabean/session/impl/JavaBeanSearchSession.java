@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;

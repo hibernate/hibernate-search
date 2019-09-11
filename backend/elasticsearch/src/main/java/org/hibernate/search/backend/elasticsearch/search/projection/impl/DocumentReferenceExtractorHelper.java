@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;

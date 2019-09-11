@@ -20,7 +20,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;

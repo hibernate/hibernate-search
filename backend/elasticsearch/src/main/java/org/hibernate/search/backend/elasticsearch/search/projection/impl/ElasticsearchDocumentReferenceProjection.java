@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 

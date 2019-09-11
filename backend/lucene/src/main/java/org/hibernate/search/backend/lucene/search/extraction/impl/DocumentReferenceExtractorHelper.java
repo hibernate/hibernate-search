@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 
 public final class DocumentReferenceExtractorHelper {
 

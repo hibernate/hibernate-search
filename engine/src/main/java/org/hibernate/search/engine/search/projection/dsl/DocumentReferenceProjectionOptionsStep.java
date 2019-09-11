@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 
 /**
  * The initial and final step in a "document reference" projection definition, where optional parameters can be set.

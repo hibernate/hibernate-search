@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.assertion;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
 import org.assertj.core.api.Assertions;

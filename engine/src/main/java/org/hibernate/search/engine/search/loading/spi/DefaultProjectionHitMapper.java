@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.loading.spi;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapper<R, E> {

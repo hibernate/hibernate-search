@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.javabean.search.loading.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;

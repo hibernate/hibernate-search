@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.loading.spi;
 
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 
 /**
  * The result of the loading of the entities by the {@link ProjectionHitMapper}.

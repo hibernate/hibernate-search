@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;

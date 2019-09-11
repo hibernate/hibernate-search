@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.mapper.session.context.spi.DetachedSessionContextImplementor;
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubMappingContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 

@@ -7,7 +7,7 @@
 
 package org.hibernate.search.mapper.javabean.log.impl;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.SearchException;

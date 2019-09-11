@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.stub;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 
 public class StubLoadedObject {
 	private final DocumentReference documentReference;
