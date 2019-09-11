@@ -11,4 +11,9 @@ public class Elasticsearch56JsonSyntaxHelper extends Elasticsearch7JsonSyntaxHel
 	public String getTermAggregationOrderByTermToken() {
 		return "_term"; // _key in ES6.0+
 	}
+
+	@Override
+	public boolean useOldSortNestedApi() {
+		return true;
+	}
 }

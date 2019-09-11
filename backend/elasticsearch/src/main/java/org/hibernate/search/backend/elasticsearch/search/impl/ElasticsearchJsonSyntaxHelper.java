@@ -10,4 +10,6 @@ public interface ElasticsearchJsonSyntaxHelper {
 
 	String getTermAggregationOrderByTermToken();
 
+	boolean useOldSortNestedApi();
+
 }
