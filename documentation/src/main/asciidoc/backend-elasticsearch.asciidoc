@@ -421,21 +421,72 @@ The Elasticsearch `date` type does not support the whole range of years that can
 // Search 5 anchors backward compatibility
 [[elasticsearch-mapping-analyzer]]
 
-[IMPORTANT]
+<<concepts-analysis,Analysis>> is the text processing performed by analyzers,
+both when indexing (document processing)
+and when searching (query processing).
+
+All built-in Elasticsearch analyzers can be used transparently,
+without any configuration in Hibernate Search:
+just use their name wherever Hibernate Search expects an analyzer name.
+However, in order to define custom analyzers,
+analysis must be configured explicitly.
+
+[CAUTION]
 ====
-This section is currently incomplete.
-A decent introduction is included in the getting started guide: see <<getting-started-analysis>>.
+Elasticsearch analysis configuration is not applied immediately on startup:
+it needs to be pushed to the Elasticsearch cluster.
+Hibernate Search will only push the configuration to the cluster if specific conditions are met,
+and only if instructed to do so
+through the <<backend-elasticsearch-index-lifecycle,lifecycle configuration>>.
 ====
 
 To configure analysis in an Elasticsearch backend, you will need to:
 
-* Implement a bean that implements the `org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer` interface.
-* Configure your backend to use that bean by setting the configuration property
+* Define a class that implements the `org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer` interface.
+* Configure the backend to use that implementation by setting the configuration property
 `hibernate.search.backends.<backend name>.analysis.configurer`
-to a <<configuration-property-types,bean reference>> pointing to your bean.
+to a <<configuration-property-types,bean reference>> pointing to the implementation.
 
-// TODO add a simple example: configurer implementation + settings
+Hibernate Search will call the `configure` method of this implementation on startup,
+and the configurer will be able to take advantage of a DSL to define analyzers:
 
+.Implementing and using an analysis configurer with the Elasticsearch backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
+----
+<1> Define a custom analyzer named "english", because it will be used to analyze English text such as book titles.
+<2> Set the tokenizer to a standard tokenizer.
+<3> Set the char filters. Char filters are applied in the order they are given, before the tokenizer.
+<4> Set the token filters. Token filters are applied in the order they are given, after the tokenizer.
+<5> Note that, for Elasticsearch, any parameterized char filter, tokenizer or token filter
+must be defined separately and assigned a name.
+<6> Set the value of a parameter for the char filter/tokenizer/token filter being defined.
+<7> Normalizers are defined in a similar way, the only difference being that they cannot use a tokenizer.
+<8> Multiple analyzers/normalizers can be defined in the same configurer.
+
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/analysis/elasticsearch-simple.properties[]
+----
+<1> Assign the configurer to the backend `myBackend` using a Hibernate Search configuration property.
+====
+
+It is also possible to assign a name to a parameterized built-in analyzer:
+
+.Naming a parameterized built-in analyzer in the Elasticsearch backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedElasticsearchAnalysisConfigurer.java[tags=type]
+----
+<1> Define an analyzer with the given name and type.
+<2> Set the value of a parameter for the analyzer being defined.
+====
+
+[TIP]
+====
 To know which character filters, tokenizers and token filters are available,
 refer to the documentation:
 
@@ -445,9 +496,7 @@ refer to the documentation:
 {elasticsearchDocUrl}/analysis-charfilters.html[character filters],
 {elasticsearchDocUrl}/analysis-tokenizers.html[tokenizers],
 {elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
-
-
-// TODO add detailed description of each use case: normalizer, analyzer, custom, builtin type, ...
+====
 
 [[backend-elasticsearch-multi-tenancy]]
 == Multi-tenancy
