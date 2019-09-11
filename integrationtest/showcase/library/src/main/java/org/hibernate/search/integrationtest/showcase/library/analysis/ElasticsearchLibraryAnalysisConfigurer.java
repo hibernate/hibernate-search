@@ -17,7 +17,7 @@ public class ElasticsearchLibraryAnalysisConfigurer implements ElasticsearchAnal
 	@Override
 	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.normalizer( LibraryAnalyzers.NORMALIZER_SORT ).custom()
-				.tokenFilters( "asciifolding", "lowercase" );
+				.tokenFilters( "lowercase", "asciifolding" );
 		context.normalizer( LibraryAnalyzers.NORMALIZER_ISBN ).custom()
 				.charFilters( "removeHyphens" );
 		context.charFilter( "removeHyphens" ).type( "pattern_replace" )

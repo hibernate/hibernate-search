@@ -20,22 +20,22 @@ class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConfigurer 
 	public void configure(LuceneAnalysisConfigurationContext context) {
 		context.analyzer( "english" ).custom()
 				.tokenizer( StandardTokenizerFactory.class )
-				.tokenFilter( ASCIIFoldingFilterFactory.class )
-				.tokenFilter( LowerCaseFilterFactory.class )
-				.tokenFilter( SnowballPorterFilterFactory.class )
-						.param( "language", "English" );
-
-		context.analyzer( "name" ).custom()
-				.tokenizer( StandardTokenizerFactory.class )
-				.tokenFilter( ASCIIFoldingFilterFactory.class )
-				.tokenFilter( LowerCaseFilterFactory.class );
-
-		context.analyzer( "autocomplete_indexing" ).custom()
-				.tokenizer( StandardTokenizerFactory.class )
-				.tokenFilter( ASCIIFoldingFilterFactory.class )
 				.tokenFilter( LowerCaseFilterFactory.class )
 				.tokenFilter( SnowballPorterFilterFactory.class )
 						.param( "language", "English" )
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
+
+		context.analyzer( "name" ).custom()
+				.tokenizer( StandardTokenizerFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
+
+		context.analyzer( "autocomplete_indexing" ).custom()
+				.tokenizer( StandardTokenizerFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( SnowballPorterFilterFactory.class )
+						.param( "language", "English" )
+				.tokenFilter( ASCIIFoldingFilterFactory.class )
 				.tokenFilter( EdgeNGramFilterFactory.class )
 						.param( "minGramSize", "3" )
 						.param( "maxGramSize", "7" );
@@ -43,19 +43,19 @@ class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConfigurer 
 		// Same as "autocomplete-indexing", but without the edge-ngram filter
 		context.analyzer( "autocomplete_query" ).custom()
 				.tokenizer( StandardTokenizerFactory.class )
-				.tokenFilter( ASCIIFoldingFilterFactory.class )
 				.tokenFilter( LowerCaseFilterFactory.class )
 				.tokenFilter( SnowballPorterFilterFactory.class )
-						.param( "language", "English" );
+						.param( "language", "English" )
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
 
 		// Normalizers
 
 		context.normalizer( "english" ).custom()
-				.tokenFilter( ASCIIFoldingFilterFactory.class )
-				.tokenFilter( LowerCaseFilterFactory.class );
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
 
 		context.normalizer( "name" ).custom()
-				.tokenFilter( ASCIIFoldingFilterFactory.class )
-				.tokenFilter( LowerCaseFilterFactory.class );
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
 	}
 }
