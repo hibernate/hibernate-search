@@ -13,8 +13,8 @@ import org.hibernate.search.engine.search.aggregation.dsl.impl.DefaultSearchAggr
 import org.hibernate.search.engine.search.aggregation.dsl.impl.SearchAggregationDslContextImpl;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
-import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.impl.DefaultSearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.query.impl.DefaultSearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;

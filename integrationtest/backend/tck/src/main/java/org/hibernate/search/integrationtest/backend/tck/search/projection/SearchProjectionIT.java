@@ -26,13 +26,13 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
-import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;

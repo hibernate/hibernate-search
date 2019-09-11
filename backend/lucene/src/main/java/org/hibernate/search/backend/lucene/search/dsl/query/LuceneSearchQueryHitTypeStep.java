@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
-import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
+import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 
 public interface LuceneSearchQueryHitTypeStep<R, E>

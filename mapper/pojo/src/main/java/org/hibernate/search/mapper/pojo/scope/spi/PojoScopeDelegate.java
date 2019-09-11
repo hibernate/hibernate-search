@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
