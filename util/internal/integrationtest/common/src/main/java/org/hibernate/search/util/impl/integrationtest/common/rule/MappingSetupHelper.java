@@ -83,6 +83,15 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 
 		public abstract C withProperty(String keyRadical, Object value);
 
+		public final C withProperties(Map<String, Object> properties) {
+			properties.forEach( this::withProperty );
+			return thisAsC();
+		}
+
+		public final C withProperties(String propertyFilePath) {
+			return withProperties( configurationProvider.getPropertiesFromFile( propertyFilePath ) );
+		}
+
 		public final C withBackendProperty(String backendName, String keyRadical, Object value) {
 			return withPropertyRadical( "backends." + backendName + "." + keyRadical, value );
 		}
