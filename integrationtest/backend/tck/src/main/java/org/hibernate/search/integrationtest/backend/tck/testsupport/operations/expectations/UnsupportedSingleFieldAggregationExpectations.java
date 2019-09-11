@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations;
 
-import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 
 public interface UnsupportedSingleFieldAggregationExpectations {
 

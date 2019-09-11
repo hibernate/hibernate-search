@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.dsl.query;
 
-import org.hibernate.search.backend.lucene.search.dsl.aggregation.LuceneSearchAggregationFactory;
+import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchFetchable;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;

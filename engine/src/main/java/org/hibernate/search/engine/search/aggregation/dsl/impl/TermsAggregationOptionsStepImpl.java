@@ -4,13 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.dsl.aggregation.impl;
+package org.hibernate.search.engine.search.aggregation.dsl.impl;
 
 import java.util.Map;
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
-import org.hibernate.search.engine.search.dsl.aggregation.TermsAggregationOptionsStep;
+import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
 import org.hibernate.search.util.common.impl.Contracts;
 
 class TermsAggregationOptionsStepImpl<F> implements TermsAggregationOptionsStep<F, Map<F, Long>> {

@@ -8,9 +8,9 @@ package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
-import org.hibernate.search.engine.search.dsl.aggregation.impl.DefaultSearchAggregationFactory;
-import org.hibernate.search.engine.search.dsl.aggregation.impl.SearchAggregationDslContextImpl;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.DefaultSearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.impl.SearchAggregationDslContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
