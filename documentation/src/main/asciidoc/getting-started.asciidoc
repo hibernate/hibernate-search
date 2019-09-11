@@ -338,33 +338,29 @@ See <<search-dsl-query>> for more information.
 
 Exact matches are well and good, but obviously not what you would expect from a full-text search engine.
 
-For non-exact matches, you will need to configure *analysis*.
+For non-exact matches, you will need to configure *analysis*,
+i.e. how text is supposed to be processed when indexing and searching.
+This involves _analyzers_,
+which are made up of three types of components, applied one after the other:
 
-=== Concept
+* (rarely) zero or more character filters, to clean up the input text:
+`A <strong>GREAT</strong> résume` => `A GREAT résume`.
+* a tokenizer, to split the input text into words, called "tokens":
+`A GREAT résume` => `[A, GREAT, résume]`.
+* zero or more token filters, to normalize the tokens and remove meaningless tokens.
+`[A, GREAT, résume]` => `[great, resume]`.
 
-In the Lucene world (Lucene, Elasticsearch, Solr, ...),
-non-exact matches can be achieved by applying what is called an "analyzer"
-to *both* documents (when indexing) and search terms (when querying).
+There are built-in analyzers,
+but it is generally better to build your own
+by picking the filters and tokenizer most suited to your specific needs.
 
-The analyzer will perform three steps, delegated to the following components, in the following order:
+The following paragraphs will explain how to configure and use
+a simple yet reasonably useful analyzer.
+For more information about analysis and how to configure it,
+refer to the <<concepts-analysis>> section.
 
-. Character filter: transforms the input text: replaces, adds or removes characters.
-This step is rarely used, generally text is transformed in the third step.
-. Tokenizer: splits the text into several words, called "tokens".
-. Token filter: transforms the tokens: replaces, add or removes characters in a token,
-derives new tokens from the existing ones, removes tokens based on some condition, ...
-
-In order to perform non-exact matches, you will need to either pick a pre-defined analyzer,
-or define your own by combining character filters, a tokenizer, and token filters.
-
-The following section will give a reasonable example of a general-purpose analyzer.
-For more advanced use cases, refer to the <<concepts-analysis>> section.
-
-=== Configuration
-
-Once you know what analysis is and which analyzer you want to apply,
-you will need to define it, or at least give it a name in Hibernate Search.
-This is done though analysis configurers, which are defined per backend:
+Each custom analyzer needs to be given a name in Hibernate Search.
+This is done through analysis configurers, which are defined per backend:
 
 . First, you need to implement an analysis configurer, a Java class that implements a backend-specific interface:
 `LuceneAnalysisConfigurer` or `ElasticsearchAnalysisConfigurer`.
