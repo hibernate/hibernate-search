@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 /**
  * The initial and final step in "match all" predicate definition, where optional parameters can be set.

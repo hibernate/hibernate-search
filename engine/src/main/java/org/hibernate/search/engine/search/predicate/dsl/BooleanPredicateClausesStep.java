@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 /**
  * The initial and final step in a boolean predicate definition, where clauses can be added.
