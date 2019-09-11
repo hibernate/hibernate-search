@@ -22,8 +22,8 @@ public class LuceneLibraryAnalysisConfigurer implements LuceneAnalysisConfigurer
 	public void configure(LuceneAnalysisConfigurationContext context) {
 		context.analyzer( LibraryAnalyzers.ANALYZER_DEFAULT ).instance( new StandardAnalyzer() );
 		context.normalizer( LibraryAnalyzers.NORMALIZER_SORT ).custom()
-				.tokenFilter( ASCIIFoldingFilterFactory.class )
-				.tokenFilter( LowerCaseFilterFactory.class );
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
 		context.normalizer( LibraryAnalyzers.NORMALIZER_ISBN ).custom()
 				.charFilter( PatternReplaceCharFilterFactory.class )
 				.param( "pattern", "-+" )

@@ -20,15 +20,15 @@ public class MyLuceneAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	public void configure(LuceneAnalysisConfigurationContext context) {
 		context.analyzer( "english" ).custom() // <1>
 				.tokenizer( StandardTokenizerFactory.class ) // <2>
-				.tokenFilter( ASCIIFoldingFilterFactory.class ) // <3>
 				.tokenFilter( LowerCaseFilterFactory.class ) // <3>
 				.tokenFilter( SnowballPorterFilterFactory.class ) // <3>
-						.param( "language", "English" ); // <4>
+						.param( "language", "English" ) // <4>
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
 
 		context.analyzer( "name" ).custom() // <5>
 				.tokenizer( StandardTokenizerFactory.class )
-				.tokenFilter( ASCIIFoldingFilterFactory.class )
-				.tokenFilter( LowerCaseFilterFactory.class );
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
 	}
 }
 // end::include[]

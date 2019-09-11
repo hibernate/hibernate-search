@@ -15,7 +15,7 @@ public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisC
 	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.analyzer( "english" ).custom() // <1>
 				.tokenizer( "standard" ) // <2>
-				.tokenFilters( "asciifolding", "lowercase", "snowball_english" ); // <3>
+				.tokenFilters( "lowercase", "snowball_english", "asciifolding" ); // <3>
 
 		context.tokenFilter( "snowball_english" ) // <4>
 				.type( "snowball" )
@@ -23,7 +23,7 @@ public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisC
 
 		context.analyzer( "name" ).custom() // <6>
 				.tokenizer( "standard" )
-				.tokenFilters( "asciifolding", "lowercase" );
+				.tokenFilters( "lowercase", "asciifolding" );
 	}
 }
 // end::include[]
