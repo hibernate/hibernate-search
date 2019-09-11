@@ -7,8 +7,14 @@
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
 public class Elasticsearch7JsonSyntaxHelper implements ElasticsearchJsonSyntaxHelper {
+
 	@Override
 	public String getTermAggregationOrderByTermToken() {
 		return "_key";
+	}
+
+	@Override
+	public boolean useOldSortNestedApi() {
+		return false;
 	}
 }
