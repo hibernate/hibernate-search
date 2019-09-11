@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
+import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.AbstractTypeMapping;
 
 
 public interface ElasticsearchIndexSchemaNodeContributor {

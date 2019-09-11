@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.util.common.SearchException;

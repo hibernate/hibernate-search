@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletionException;
 
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
-import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
