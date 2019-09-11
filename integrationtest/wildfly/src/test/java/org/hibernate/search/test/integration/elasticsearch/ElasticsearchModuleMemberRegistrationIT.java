@@ -38,7 +38,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -49,7 +48,6 @@ import org.junit.runner.RunWith;
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
-@Ignore // TODO HSEARCH-3426 re-enable when upgrading to WF15 because https://issues.jboss.org/browse/WFCORE-4083 will be fixed
 public class ElasticsearchModuleMemberRegistrationIT {
 
 	private static final String EXPECTED_SEARCH_VERSION_RESOURCE = "expectedHibernateSearchVersion";
