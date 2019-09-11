@@ -182,6 +182,43 @@ public class SearchSortIT {
 	}
 
 	@Test
+	@TestForIssue( jiraKey = "HSEARCH-2254" )
+	public void byField_nested_x2() {
+		SearchQuery<DocumentReference> query;
+		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
+				.asc().missing().last() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
+				.desc().missing().last() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
+				.asc().missing().first() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
+
+		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
+				.desc().missing().first() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
+
+		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
+				.asc().missing().last() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
+				.desc().missing().last() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
+				.asc().missing().first() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
+
+		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
+				.desc().missing().first() );
+		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
+	}
+
+	@Test
 	public void byScore() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query;
@@ -494,6 +531,11 @@ public class SearchSortIT {
 			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			nestedObject.addValue( indexMapping.nestedObject.string, "george" );
 			nestedObject.addValue( indexMapping.nestedObject.integer, 2 );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedX2Object = nestedObject.addObject( indexMapping.nestedX2Object.self );
+			nestedX2Object.addValue( indexMapping.nestedX2Object.string, "george" );
+			nestedX2Object.addValue( indexMapping.nestedX2Object.integer, 2 );
 		} );
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
 			document.addValue( indexMapping.string, "aaron" );
@@ -511,6 +553,11 @@ public class SearchSortIT {
 			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			nestedObject.addValue( indexMapping.nestedObject.string, "aaron" );
 			nestedObject.addValue( indexMapping.nestedObject.integer, 1 );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedX2Object = nestedObject.addObject( indexMapping.nestedX2Object.self );
+			nestedX2Object.addValue( indexMapping.nestedX2Object.string, "aaron" );
+			nestedX2Object.addValue( indexMapping.nestedX2Object.integer, 1 );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
 			document.addValue( indexMapping.string, "zach" );
@@ -528,6 +575,11 @@ public class SearchSortIT {
 			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			nestedObject.addValue( indexMapping.nestedObject.string, "zach" );
 			nestedObject.addValue( indexMapping.nestedObject.integer, 3 );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedX2Object = nestedObject.addObject( indexMapping.nestedX2Object.self );
+			nestedX2Object.addValue( indexMapping.nestedX2Object.string, "zach" );
+			nestedX2Object.addValue( indexMapping.nestedX2Object.integer, 3 );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -549,6 +601,7 @@ public class SearchSortIT {
 
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
+		final ObjectMapping nestedX2Object;
 
 		IndexMapping(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ) )
@@ -564,12 +617,14 @@ public class SearchSortIT {
 			unsortable = root.field( "unsortable", f -> f.asString().sortable( Sortable.NO ) )
 					.toReference();
 
-			IndexSchemaObjectField flattenedObjectField =
-					root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
 			flattenedObject = new ObjectMapping( flattenedObjectField );
-			IndexSchemaObjectField nestedObjectField =
-					root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+
+			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
 			nestedObject = new ObjectMapping( nestedObjectField );
+
+			IndexSchemaObjectField nestedX2ObjectField = nestedObjectField.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+			nestedX2Object = new ObjectMapping( nestedX2ObjectField );
 		}
 	}
 
