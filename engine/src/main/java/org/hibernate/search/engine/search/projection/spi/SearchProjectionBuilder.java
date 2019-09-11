@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 
 /**
  * A search projection builder, i.e. an object responsible for collecting parameters
