@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;

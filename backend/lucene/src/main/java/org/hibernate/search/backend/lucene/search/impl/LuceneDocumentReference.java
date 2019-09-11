@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 
 
 
