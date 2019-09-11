@@ -10,11 +10,11 @@ package org.hibernate.search.engine.search.dsl.query;
 import java.util.Collection;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.dsl.aggregation.AggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchFetchable;

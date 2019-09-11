@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
-import org.hibernate.search.backend.lucene.search.dsl.aggregation.LuceneSearchAggregationFactory;
-import org.hibernate.search.backend.lucene.search.dsl.aggregation.impl.LuceneSearchAggregationFactoryImpl;
+import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
+import org.hibernate.search.backend.lucene.search.aggregation.dsl.impl.LuceneSearchAggregationFactoryImpl;
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearchPredicateFactoryImpl;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
@@ -31,9 +31,9 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
-import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactoryExtension;
-import org.hibernate.search.engine.search.dsl.aggregation.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
+import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;

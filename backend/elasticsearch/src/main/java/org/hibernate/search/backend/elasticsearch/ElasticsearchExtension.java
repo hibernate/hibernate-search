@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.search.dsl.aggregation.ElasticsearchSearchAggregationFactory;
-import org.hibernate.search.backend.elasticsearch.search.dsl.aggregation.impl.ElasticsearchSearchAggregationFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.impl.ElasticsearchSearchAggregationFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.ElasticsearchSearchProjectionFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryHitTypeStep;
@@ -31,9 +31,9 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
-import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactoryExtension;
-import org.hibernate.search.engine.search.dsl.aggregation.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
+import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;

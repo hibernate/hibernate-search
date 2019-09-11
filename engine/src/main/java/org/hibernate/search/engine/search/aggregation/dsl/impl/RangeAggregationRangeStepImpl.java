@@ -4,15 +4,15 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.dsl.aggregation.impl;
+package org.hibernate.search.engine.search.aggregation.dsl.impl;
 
 import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
-import org.hibernate.search.engine.search.dsl.aggregation.RangeAggregationRangeMoreStep;
-import org.hibernate.search.engine.search.dsl.aggregation.RangeAggregationRangeStep;
+import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeMoreStep;
+import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeStep;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.impl.Contracts;
 

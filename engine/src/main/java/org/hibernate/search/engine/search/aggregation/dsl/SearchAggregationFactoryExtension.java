@@ -4,13 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.dsl.aggregation;
+package org.hibernate.search.engine.search.aggregation.dsl;
 
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.search.dsl.aggregation.spi.DelegatingSearchAggregationFactory;
-import org.hibernate.search.engine.search.dsl.aggregation.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.aggregation.dsl.spi.DelegatingSearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 
 /**
  * An extension to the search aggregation DSL, allowing the use of non-standard aggregations in a query.

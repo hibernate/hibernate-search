@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.dsl.aggregation.AggregationFinalStep;
-import org.hibernate.search.engine.search.dsl.aggregation.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
