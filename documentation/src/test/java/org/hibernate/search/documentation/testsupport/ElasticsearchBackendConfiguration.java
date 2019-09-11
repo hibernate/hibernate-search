@@ -17,7 +17,6 @@ import org.junit.rules.TestRule;
 
 public class ElasticsearchBackendConfiguration extends AbstractDocumentationBackendConfiguration {
 
-	// This will be used in a later commit
 	protected final TestElasticsearchClient testElasticsearchClient = new TestElasticsearchClient();
 
 	@Override
