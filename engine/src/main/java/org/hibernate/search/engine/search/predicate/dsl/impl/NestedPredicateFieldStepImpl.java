@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;

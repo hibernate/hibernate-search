@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import com.google.gson.JsonObject;
 

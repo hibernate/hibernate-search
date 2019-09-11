@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 
-import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 /**
  * The final step in a predicate definition, where the predicate can be retrieved.

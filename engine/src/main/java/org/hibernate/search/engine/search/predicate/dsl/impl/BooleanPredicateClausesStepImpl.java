@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.MinimumShouldMatchConditionStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
