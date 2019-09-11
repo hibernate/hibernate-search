@@ -17,9 +17,9 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.projection.dsl.impl.DefaultSearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.query.impl.DefaultSearchQueryHitTypeStep;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
-import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortFactory;
-import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.impl.DefaultSearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.impl.SearchSortDslContextImpl;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 

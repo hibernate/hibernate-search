@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 
 /**

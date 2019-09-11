@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortColl
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneNumericFieldComparatorSource;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 import org.apache.lucene.search.SortField;
 

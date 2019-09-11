@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuil
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

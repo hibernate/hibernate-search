@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 
 import com.google.gson.JsonElement;

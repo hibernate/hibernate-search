@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearch
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

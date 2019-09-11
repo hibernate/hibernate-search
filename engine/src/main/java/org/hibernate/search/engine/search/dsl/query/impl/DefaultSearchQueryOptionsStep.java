@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryOptionsStep;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 

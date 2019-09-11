@@ -11,7 +11,7 @@ import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAg
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryOptionsStep;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryPredicateStep;
-import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactory;
+import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
@@ -20,7 +20,7 @@ import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBu
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryOptionsStep;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
 class LuceneSearchQueryOptionsStepImpl<H>
 		extends AbstractExtendedSearchQueryOptionsStep<

@@ -15,8 +15,8 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
-import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchFetchable;
 import org.hibernate.search.engine.search.query.SearchResult;
 
