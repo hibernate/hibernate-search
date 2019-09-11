@@ -2058,8 +2058,6 @@
             </activation>
             <!-- Skip the OSGi and WildFly integration tests with JDK >= 12 -->
             <properties>
-                <!-- see https://github.com/jbossas/jboss-classfilewriter/issues/18 -->
-                <failsafe.wildfly.skip>true</failsafe.wildfly.skip>
                 <!-- no specific issue was reported yet -->
                 <failsafe.osgi.skip>true</failsafe.osgi.skip>
             </properties>
