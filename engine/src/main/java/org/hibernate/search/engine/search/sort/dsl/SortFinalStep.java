@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.sort.dsl;
 
 
-import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.sort.SearchSort;
 
 /**
  * The final step in a sort definition, where the sort can be retrieved.

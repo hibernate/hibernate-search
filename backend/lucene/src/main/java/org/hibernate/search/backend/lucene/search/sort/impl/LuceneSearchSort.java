@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.sort.SearchSort;
 
 class LuceneSearchSort implements SearchSort, LuceneSearchSortBuilder {
 

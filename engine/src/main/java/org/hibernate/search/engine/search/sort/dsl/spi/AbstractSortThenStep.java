@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.dsl.spi;
 
-import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.impl.DefaultSearchSortFactory;

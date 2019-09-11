@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.dsl;
 
-import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.sort.SearchSort;
 
 /**
  * The initial and final step in a composite sort definition, where sort elements can be added.
