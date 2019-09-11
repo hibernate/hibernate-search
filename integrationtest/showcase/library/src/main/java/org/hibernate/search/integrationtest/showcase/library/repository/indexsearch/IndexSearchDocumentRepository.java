@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.showcase.library.repository.indexse
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;

@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl;
 
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactory;
+import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 
 

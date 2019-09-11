@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.spi;
 
-import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 /**
  * A search sort builder, i.e. an object responsible for collecting parameters

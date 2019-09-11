@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
-import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
 class LuceneScoreSortBuilder extends AbstractLuceneSearchSortBuilder
