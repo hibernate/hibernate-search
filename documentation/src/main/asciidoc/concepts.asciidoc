@@ -20,20 +20,80 @@ include::todo-placeholder.asciidoc[]
 // Search 5 anchors backward compatibility
 [[analyzer]]
 
-[IMPORTANT]
+Roughly speaking, performing a search query in a full-text search engine involves:
+
+. extracting tokens (words) from the query;
+. looking up these words in the index,
+which (still roughly speaking) maps each token to the list of documents that contain this token;
+. aggregating the results of the lookups to produce a list of matching documents.
+
+This need for "tokens" means that text has to be processed,
+both when indexing (document processing, to build the token -> document map)
+and when searching (query processing, to generate a list of tokens to look up).
+
+However, the processing is not *just* about "tokenizing".
+Index lookups are *exact* lookups,
+which means that looking up `Great` (capitalized) will not return documents containing only `great` (all lowercase).
+An extra step is performed when processing text to address this caveat:
+token filtering, which normalizes tokens.
+Thanks to that "normalization",
+`Great` will be indexed as `great`,
+so that an index lookup for the query `great` will match as expected.
+
+In the Lucene world (Lucene, Elasticsearch, Solr, ...),
+text processing during both the indexing and searching phases
+is called "analysis" and is performed by an "analyzer".
+
+The analyzer is made up of three types of components,
+which will each process the text successively in the following order:
+
+. Character filter: transforms the input characters. Replaces, adds or removes characters.
+. Tokenizer: splits the text into several words, called "tokens".
+. Token filter: transforms the tokens. Replaces, add or removes characters in a token,
+derives new tokens from the existing ones, removes tokens based on some condition, ...
+
+The tokenizer usually splits on whitespaces (though there are other options).
+Token filters are usually where customization takes place.
+They can remove accented characters,
+remove meaningless suffixes (`-ing`, `-s`, ...)
+or tokens (`a`, `the`, ...),
+replace tokens with a chosen spelling (`wi-fi` => `wifi`),
+etc.
+
+[TIP]
 ====
-This section is currently incomplete.
-A decent introduction is included in the getting started guide: see <<getting-started-analysis>>.
+Character filters, though useful, are rarely used,
+because they have no knowledge of token boundaries.
+
+Unless you know what you are doing,
+you should generally favor token filters.
 ====
 
-////
-TODO The getting started section has a link pointing here and expects the section to
-include a detailed explanation of analysis, how it works and how to configure it in HSearch.
-We also need to explain the difference between analyzer and normalizer.
-////
+In some cases, it is necessary to index text in one block,
+without any tokenization:
 
-For more information about how to configure analysis,
-see the documentation of each backend:
+* For some types of text, such as SKUs or other business codes,
+tokenization simply does not make sense: the text is a single "keyword".
+* For sorts by field value, tokenization is not necessary.
+It is also forbidden in Hibernate Search due to performance issues;
+only non-tokenized fields can be sorted on.
+
+To address these use cases,
+a special type of analyzer, called "normalizer", is available.
+Normalizers are simply analyzers that are guaranteed not to use a tokenizer:
+they can only use character filters and token filters.
+
+In Hibernate Search, analyzers and normalizers are referenced by their name,
+for example <<mapper-orm-directfieldmapping-analyzer,when defining a full-text field>>.
+Analyzers and normalizers have two separate namespaces.
+
+Some names are already assigned to built-in analyzers (in Elasticsearch in particular),
+but it is possible (and recommended) to assign names to custom analyzers and normalizers,
+assembled using built-in components (tokenizers, filters) to address your specific needs.
+
+Each backend exposes its own APIs to define analyzers and normalizers,
+and generally to configure analysis.
+See the documentation of each backend for more information:
 
 * <<backend-lucene-analysis,Analysis for the Lucene backend>>
 * <<backend-elasticsearch-analysis,Analysis for the Elasticsearch backend>>
