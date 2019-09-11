@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 

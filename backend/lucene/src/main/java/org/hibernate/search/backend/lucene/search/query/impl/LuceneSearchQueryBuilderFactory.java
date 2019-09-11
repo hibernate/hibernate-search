@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneEntityProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneReferenceProjection;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 

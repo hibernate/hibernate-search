@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl;
 
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 
 /**
  * The final step in a projection definition, where the projection can be retrieved.

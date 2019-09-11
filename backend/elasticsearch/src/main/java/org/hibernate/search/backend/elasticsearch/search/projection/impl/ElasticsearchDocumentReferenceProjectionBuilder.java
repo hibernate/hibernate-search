@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import java.util.Set;
 
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 
 

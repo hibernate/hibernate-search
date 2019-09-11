@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.EntityReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;

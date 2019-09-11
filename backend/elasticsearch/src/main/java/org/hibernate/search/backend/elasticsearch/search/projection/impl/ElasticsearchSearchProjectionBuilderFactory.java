@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.scope.model.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;

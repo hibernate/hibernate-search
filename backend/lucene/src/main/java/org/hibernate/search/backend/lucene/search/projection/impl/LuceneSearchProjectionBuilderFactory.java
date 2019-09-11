@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNode
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;

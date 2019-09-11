@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.query.spi;
 import java.util.List;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 /**

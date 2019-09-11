@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
 import org.apache.lucene.document.Document;

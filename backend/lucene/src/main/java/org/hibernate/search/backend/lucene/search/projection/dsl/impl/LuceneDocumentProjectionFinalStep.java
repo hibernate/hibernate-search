@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.projection.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
-import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
