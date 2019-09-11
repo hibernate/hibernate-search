@@ -1408,7 +1408,7 @@ configuration.
 Hibernate Search is included in the WildFly application server, and since WildFly 10 the module
 is automatically activated (added to the classpath of your deployment) if you are using Hibernate ORM and have any indexed entities.
 
-WildFly 14 includes an older version of Hibernate Search; if you want to use that then you won't need to download anything else and you can stop reading this chapter; however you might miss out on several new features and improvements.
+WildFly 17 includes an older version of Hibernate Search; if you want to use that then you won't need to download anything else and you can stop reading this chapter; however you might miss out on several new features and improvements.
 When deciding to use the older version make sure to read the version of this guide matching the version of Hibernate Search included in your application server: this guide applies to `{hibernateSearchVersion}` exclusively.
 
 We strongly suggest using the latest version. Doing so is not much harder: provision a WildFly server using the dedicated tool,
