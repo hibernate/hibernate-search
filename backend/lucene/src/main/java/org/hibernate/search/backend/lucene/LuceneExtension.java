@@ -14,8 +14,8 @@ import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAg
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.impl.LuceneSearchAggregationFactoryImpl;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.impl.LuceneSearchPredicateFactoryImpl;
-import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
-import org.hibernate.search.backend.lucene.search.dsl.projection.impl.LuceneSearchProjectionFactoryImpl;
+import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
+import org.hibernate.search.backend.lucene.search.projection.dsl.impl.LuceneSearchProjectionFactoryImpl;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryHitTypeStep;
 import org.hibernate.search.backend.lucene.search.dsl.query.impl.LuceneSearchQueryHitTypeStepImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
@@ -36,8 +36,8 @@ import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFacto
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
