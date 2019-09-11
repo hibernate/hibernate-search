@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.javabean.session;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;

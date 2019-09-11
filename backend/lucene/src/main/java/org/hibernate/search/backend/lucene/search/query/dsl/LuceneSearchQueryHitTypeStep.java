@@ -1,0 +1,44 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.backend.lucene.search.query.dsl;
+
+import java.util.List;
+import java.util.function.Function;
+
+import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
+import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
+import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+
+public interface LuceneSearchQueryHitTypeStep<R, E>
+		extends SearchQueryHitTypeStep<
+		LuceneSearchQueryOptionsStep<E>,
+				R,
+				E,
+				LuceneSearchProjectionFactory<R, E>,
+				LuceneSearchPredicateFactory
+		>,
+		LuceneSearchQueryPredicateStep<E> {
+
+	@Override
+	LuceneSearchQueryPredicateStep<E> asEntity();
+
+	@Override
+	LuceneSearchQueryPredicateStep<R> asEntityReference();
+
+	@Override
+	<P> LuceneSearchQueryPredicateStep<P> asProjection(
+			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
+
+	@Override
+	<P> LuceneSearchQueryPredicateStep<P> asProjection(SearchProjection<P> projection);
+
+	@Override
+	LuceneSearchQueryPredicateStep<List<?>> asProjections(SearchProjection<?>... projections);
+
+}

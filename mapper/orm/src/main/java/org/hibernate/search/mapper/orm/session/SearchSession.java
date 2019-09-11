@@ -16,7 +16,7 @@ import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
-import org.hibernate.search.mapper.orm.search.dsl.query.HibernateOrmSearchQueryHitTypeStep;
+import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 
 public interface SearchSession {
 

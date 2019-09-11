@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 /**

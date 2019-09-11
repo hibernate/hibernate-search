@@ -33,9 +33,9 @@ import org.assertj.core.api.Assertions;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
-import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryOptionsStep;
-import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryPredicateStep;
-import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryHitTypeStep;
+import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
+import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryPredicateStep;
+import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryHitTypeStep;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;

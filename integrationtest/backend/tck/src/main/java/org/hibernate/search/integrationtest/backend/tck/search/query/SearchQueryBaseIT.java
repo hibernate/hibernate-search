@@ -22,9 +22,9 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkE
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryDslExtension;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryPredicateStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
