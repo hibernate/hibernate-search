@@ -557,6 +557,24 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="my-rules:ImplPackagesMustNotHaveSubPackages">
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <description>
+            ".impl" packages must be leaves: they must not have any sub-package.
+            Exceptions are only allowed for:
+            - org.hibernate.search.util.impl
+        </description>
+        <cypher><![CDATA[
+            MATCH (artifact:Maven:Artifact:HibernateSearch)
+                    -[:CONTAINS]->(package:Package)
+            WHERE
+                package.fqn =~ ".*\\.impl\\..*"
+                AND NOT package.fqn STARTS WITH "org.hibernate.search.util.impl"
+            RETURN DISTINCT
+                artifact.name AS Artifact, package.fqn AS Package
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
         <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
@@ -571,6 +589,7 @@
         <includeConstraint refId="my-rules:TypeNamesShouldBeUniqueInInterdependentModules" />
         <includeConstraint refId="my-rules:UnitTestsMustHaveProperSuffix" />
         <includeConstraint refId="my-rules:IntegrationTestsMustHaveProperSuffix" />
+        <includeConstraint refId="my-rules:ImplPackagesMustNotHaveSubPackages" />
     </group>
 
     <group id="cycles">
