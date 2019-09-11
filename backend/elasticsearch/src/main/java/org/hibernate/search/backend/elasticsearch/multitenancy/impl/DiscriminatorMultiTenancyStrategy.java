@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.regex.Pattern;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataTypes;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;

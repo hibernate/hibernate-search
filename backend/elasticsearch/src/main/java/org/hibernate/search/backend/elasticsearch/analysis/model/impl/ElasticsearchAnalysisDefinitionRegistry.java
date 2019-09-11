@@ -11,11 +11,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.AnalyzerDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.CharFilterDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.NormalizerDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.TokenFilterDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.TokenizerDefinition;
+import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.AnalyzerDefinition;
+import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.CharFilterDefinition;
+import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.NormalizerDefinition;
+import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.TokenFilterDefinition;
+import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.TokenizerDefinition;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 

@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObj
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
+import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
