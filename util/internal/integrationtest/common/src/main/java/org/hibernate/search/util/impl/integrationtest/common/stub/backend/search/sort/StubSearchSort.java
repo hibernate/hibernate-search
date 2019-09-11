@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.List;
 
-import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.sort.SearchSort;
 
 class StubSearchSort extends StubSortBuilder implements SearchSort {
 	private final List<StubSortBuilder> builders;

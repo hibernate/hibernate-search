@@ -26,7 +26,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.util.common.reporting.EventContext;
