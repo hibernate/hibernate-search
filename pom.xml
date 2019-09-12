@@ -372,7 +372,7 @@
         <maven.compiler.argument.source>${maven.compiler.source}</maven.compiler.argument.source>
         <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
-        
+
         <!--
                 Options to compile with the Eclipse compiler when building with maven (not with the IDE).
                 See profile "compiler-eclipse".
@@ -2071,20 +2071,6 @@
             </modules>
         </profile>
 
-        <profile>
-            <id>jdk12+</id>
-            <activation>
-                <jdk>[12,)</jdk>
-            </activation>
-            <!-- Skip the OSGi and WildFly integration tests with JDK >= 12 -->
-            <properties>
-                <!-- no specific issue was reported yet -->
-                <failsafe.osgi.skip>true</failsafe.osgi.skip>
-                <!-- https://bugs.openjdk.java.net/browse/JDK-8212233?focusedCommentId=14245762 -->
-                <javadoc.additionalOptions.java-version>-html5 -source 8</javadoc.additionalOptions.java-version>
-            </properties>
-        </profile>
-        
         <profile>
             <id>compiler-eclipse</id>
             <build>
