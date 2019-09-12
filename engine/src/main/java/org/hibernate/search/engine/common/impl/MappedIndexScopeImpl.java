@@ -11,8 +11,8 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.DefaultSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.SearchAggregationDslContextImpl;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryHitTypeStep;

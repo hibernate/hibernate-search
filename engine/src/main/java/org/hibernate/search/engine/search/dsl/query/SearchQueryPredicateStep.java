@@ -9,8 +9,8 @@ package org.hibernate.search.engine.search.dsl.query;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 /**
  * The step in a query definition where the predicate can be set.

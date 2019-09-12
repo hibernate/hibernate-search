@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl;
 
-import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
+import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;

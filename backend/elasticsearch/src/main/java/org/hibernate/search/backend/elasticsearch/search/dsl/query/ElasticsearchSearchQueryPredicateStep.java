@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.query;
 
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
+import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
 
 public interface ElasticsearchSearchQueryPredicateStep<H>

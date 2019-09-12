@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.query.impl;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
+import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryPredicateStep;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactory;
@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractExtendedSearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 

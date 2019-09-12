@@ -20,10 +20,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.sort.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangeSearchPredicateIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;

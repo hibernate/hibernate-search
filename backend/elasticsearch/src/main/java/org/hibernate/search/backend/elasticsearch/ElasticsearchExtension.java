@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.impl.El
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.ElasticsearchSearchProjectionFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.ElasticsearchSearchQueryHitTypeStep;
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactory;
+import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.query.impl.ElasticsearchSearchQueryHitTypeStepImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
@@ -24,7 +24,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtension;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.impl.ElasticsearchSearchPredicateFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortFactory;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.impl.ElasticsearchSearchSortFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
@@ -34,8 +34,8 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtension;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryDslExtension;

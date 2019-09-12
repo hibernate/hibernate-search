@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-import org.hibernate.search.engine.search.dsl.predicate.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 
 public interface BooleanPredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
