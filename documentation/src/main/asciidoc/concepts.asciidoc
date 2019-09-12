@@ -3,9 +3,38 @@
 [[concepts-full-text]]
 == Full-text search
 
-include::todo-placeholder.asciidoc[]
+Full-text search is a set of techniques for searching,
+in a corpus of text documents,
+the documents that best match a given query.
 
-// TODO maybe give a short introduction to full-text search and full-text indexes?
+The main difference with traditional search -- for example in an SQL database --
+is that the stored text is not considered as a single block of text,
+but as a collection of tokens (words).
+
+Hibernate Search relies on either http://lucene.apache.org/[Apache Lucene]
+or https://www.elastic.co/products/elasticsearch[Elasticsearch]
+to implement full-text search.
+Since Elasticsearch uses Lucene internally,
+they share a lot of characteristics and their general approach to full-text search.
+
+To simplify, these search engines are based on the concept of inverted indexes:
+a dictionary where the key is a token (word) found in a document,
+and the value is the list of identifiers of every document containing this token.
+
+Still simplifying, once all documents are indexed,
+searching for documents involves three steps:
+
+. extracting tokens (words) from the query;
+. looking up these tokens in the index to find matching documents;
+. aggregating the results of the lookups to produce a list of matching documents.
+
+[NOTE]
+====
+Lucene and Elasticsearch are not limited to just text search: numeric data is also supported,
+enabling support for integers, doubles, longs, dates, etc.
+These types are indexed and queried using a slightly different approach,
+which obviously does not involve text processing.
+====
 
 [[concepts-mapping]]
 == Mapping
@@ -20,15 +49,10 @@ include::todo-placeholder.asciidoc[]
 // Search 5 anchors backward compatibility
 [[analyzer]]
 
-Roughly speaking, performing a search query in a full-text search engine involves:
-
-. extracting tokens (words) from the query;
-. looking up these words in the index,
-which (still roughly speaking) maps each token to the list of documents that contain this token;
-. aggregating the results of the lookups to produce a list of matching documents.
-
-This need for "tokens" means that text has to be processed,
-both when indexing (document processing, to build the token -> document map)
+As mentioned in <<concepts-full-text>>,
+the full-text engine works on tokens,
+which means text has to be processed
+both when indexing (document processing, to build the token -> document index)
 and when searching (query processing, to generate a list of tokens to look up).
 
 However, the processing is not *just* about "tokenizing".
