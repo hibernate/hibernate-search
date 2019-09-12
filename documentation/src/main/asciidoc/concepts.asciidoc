@@ -39,10 +39,45 @@ which obviously does not involve text processing.
 [[concepts-mapping]]
 == Mapping
 
-include::todo-placeholder.asciidoc[]
+Applications targeted by Hibernate search generally use an entity-based model to represent data.
+In this model, each entity is a single object with a few properties of atomic type
+(`String`, `Integer`, `LocalDate`, ...).
+Each entity can have multiple associations to one or even many other entities.
 
-// TODO maybe explain what we mean by "mapping"?
-// TODO explain what an "entity" is and what it implies
+Entities are thus organized as a graph,
+where each node is an entity and each association is an edge.
+
+By contrast, Lucene and Elasticsearch work with documents.
+Each document is a collection of "fields",
+each field being assigned a name -- a unique string --
+and a value -- which can be text, but also numeric data such as an integer or a date.
+Fields also have a type, which not only determines the type of values (text/numeric),
+but more importantly the way this value will be stored: indexed, stored, with doc values, etc.
+It is possible to introduce nested documents, but not real associations.
+
+Documents are thus organized, at best, as a collection of trees,
+where each tree is a document, optionally with nested documents.
+
+There are multiple mismatches between the entity model and the document model:
+properties vs. fields, associations vs. nested documents, graph vs. collection of trees.
+
+The goal of _mapping_, in Hibernate search, is to resolve these mismatches
+by defining how to transform one or more entities into a document,
+and how to resolve a search hit back into the original entity.
+This is the main added value of Hibernate Search,
+the basis for everything else from automatic indexing to the various search DSLs.
+
+Mapping is usually configured using annotations in the entity model,
+but this can also be achieved using a programmatic API.
+To learn more about how to configure mapping, see <<mapper-orm-mapping>>.
+
+To learn how to index the resulting documents, see <<mapper-orm-indexing>>
+(hint: it's automatic).
+
+To learn how to search with an API
+that takes advantage of the mapping to be closer to the entity model,
+in particular by returning hits as entities instead of just document identifiers,
+see <<search-dsl>>.
 
 [[concepts-analysis]]
 == Analysis
