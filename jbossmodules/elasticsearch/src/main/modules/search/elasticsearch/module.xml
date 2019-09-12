@@ -14,7 +14,6 @@
         <module name="org.elasticsearch.client.elasticsearch-rest-client" slot="${module-slot.org.elasticsearch.client}"/>
         <module name="com.google.code.gson" slot="${module-slot.com.google.code.gson}"/>
         <module name="org.elasticsearch.client.elasticsearch-rest-client-sniffer" slot="${module-slot.org.elasticsearch.client}"/>
-        <module name="javax.xml.bind.api"/>
         <module name="org.hibernate.commons-annotations"/>
         <module name="org.jboss.logging"/>
         <module name="org.apache.httpcomponents"/>
