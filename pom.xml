@@ -2042,25 +2042,12 @@
                     -Djdk.attach.allowAttachSelf=true
                     --add-modules=java.se
                 </arquillian.wildfly.jvm.args.java-version>
-                <!-- Skip the OSGi and WildFly integration tests with JDK 11 -->
-                <failsafe.wildfly.skip>true</failsafe.wildfly.skip>
+                <!-- Skip the OSGi integration tests with JDK 11+ -->
                 <failsafe.osgi.skip>true</failsafe.osgi.skip>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
             </modules>
-        </profile>
-
-        <profile>
-            <id>jdk12+</id>
-            <activation>
-                <jdk>[12,)</jdk>
-            </activation>
-            <!-- Skip the OSGi and WildFly integration tests with JDK >= 12 -->
-            <properties>
-                <!-- no specific issue was reported yet -->
-                <failsafe.osgi.skip>true</failsafe.osgi.skip>
-            </properties>
         </profile>
 
         <profile>
