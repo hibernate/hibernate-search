@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.dsl.query;
 
-import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
+import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
 
 public interface LuceneSearchQueryPredicateStep<H>

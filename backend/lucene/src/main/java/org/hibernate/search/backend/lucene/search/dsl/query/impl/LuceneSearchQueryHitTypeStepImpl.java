@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
-import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactory;
+import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryOptionsStep;
 import org.hibernate.search.backend.lucene.search.dsl.query.LuceneSearchQueryPredicateStep;
@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBu
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.predicate.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.dsl.projection.ProjectionFinalStep;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;

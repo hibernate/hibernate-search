@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 /**
  * Defines the storage strategy for an object field.

@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.dsl.query.spi;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.projection.impl.DefaultSearchProjectionFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;

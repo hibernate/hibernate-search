@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.dsl.query.impl;
 
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryPredicateStep;
 import org.hibernate.search.engine.search.dsl.query.spi.AbstractSearchQueryOptionsStep;
