@@ -1,6 +1,22 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.7.Final (12-09-2019)
+-------------------------
+
+** Task
+    * HSEARCH-3703 Remove the dependency to javax.xml.bind.api in JBoss modules
+    * HSEARCH-3702 Upgrade to JBoss logging 3.4.0.Final
+    * HSEARCH-3701 Upgrade to WildFly 17.0.1.Final
+    * HSEARCH-3700 Upgrade to Hibernate ORM 5.3.12.Final
+    * HSEARCH-3699 Backport to 5.10: Rely on ORM to declare the dependency to JAXB in Java 9+ instead of declaring it ourselves
+    * HSEARCH-3698 Backport to 5.10 : Remove the dependency to javax.xml.bind from the Elasticsearch module
+    * HSEARCH-3697 Test Hibernate Search on JDK13 regularly on the CI
+    * HSEARCH-3696 Test compatibility with JDK13 in Search 5.10
+    * HSEARCH-3695 Update 5.10 Jenkinsfile to match that of 5.11 and master
+    * HSEARCH-3663 Upgrade to Hibernate ORM Hibernate ORM 5.3.11.Final
+    * HSEARCH-3652 Refresh Jenkinsfiles to match the new CI environment
+
 5.10.6.Final (17-06-2019)
 -------------------------
 
