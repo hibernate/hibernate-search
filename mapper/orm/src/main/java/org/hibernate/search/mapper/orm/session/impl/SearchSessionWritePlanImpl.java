@@ -11,41 +11,44 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 final class SearchSessionWritePlanImpl implements SearchSessionWritePlan {
 
-	private final HibernateOrmSearchSession searchSession;
+	private final SearchSessionWritePlanContext context;
 
-	SearchSessionWritePlanImpl(HibernateOrmSearchSession searchSession) {
-		this.searchSession = searchSession;
+	SearchSessionWritePlanImpl(SearchSessionWritePlanContext context) {
+		this.context = context;
 	}
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		getCurrentWorkPlan().update( entity );
+		context.getCurrentWorkPlan( true ).update( entity );
 	}
 
 	@Override
 	public void delete(Object entity) {
-		getCurrentWorkPlan().delete( entity );
+		context.getCurrentWorkPlan( true ).delete( entity );
 	}
 
 	@Override
 	public void purge(Class<?> entityClass, Object providedId) {
-		getCurrentWorkPlan().purge( entityClass, providedId );
+		context.getCurrentWorkPlan( true ).purge( entityClass, providedId );
 	}
 
 	@Override
 	public void process() {
-		getCurrentWorkPlan().prepare();
+		PojoWorkPlan plan = context.getCurrentWorkPlan( false );
+		if ( plan == null ) {
+			return;
+		}
+		plan.prepare();
 	}
 
 	@Override
 	public void execute() {
-		searchSession.getAutomaticIndexingSynchronizationStrategy().handleFuture(
-				getCurrentWorkPlan().execute()
+		PojoWorkPlan plan = context.getCurrentWorkPlan( false );
+		if ( plan == null ) {
+			return;
+		}
+		context.getAutomaticIndexingSynchronizationStrategy().handleFuture(
+				plan.execute()
 		);
-	}
-
-	private PojoWorkPlan getCurrentWorkPlan() {
-		searchSession.checkOrmSessionIsOpen();
-		return searchSession.getCurrentWorkPlan( true );
 	}
 }

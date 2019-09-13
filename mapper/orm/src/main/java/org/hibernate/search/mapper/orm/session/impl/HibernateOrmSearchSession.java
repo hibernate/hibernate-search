@@ -52,7 +52,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * The actual implementation of {@link SearchSession}.
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
-		implements SearchSession, HibernateOrmScopeSessionContext, ReferenceHitMapper<EntityReference> {
+		implements SearchSession, HibernateOrmScopeSessionContext, SearchSessionWritePlanContext,
+				ReferenceHitMapper<EntityReference> {
 
 	/**
 	 * @param sessionImplementor A Hibernate session
@@ -205,9 +206,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return getDelegate().createSessionWorkExecutor( commitStrategy );
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public PojoWorkPlan getCurrentWorkPlan(boolean createIfDoesNotExist) {
 		SessionImplementor sessionImplementor = sessionContext.getSession();
+		checkOrmSessionIsOpen( sessionImplementor );
 		Transaction transactionIdentifier = null;
 
 		TransientReference<Map<Transaction, PojoWorkPlan>> reference = (TransientReference<Map<Transaction, PojoWorkPlan>>) sessionImplementor.getProperties()
@@ -249,7 +252,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return workPlan;
 	}
 
-	AutomaticIndexingSynchronizationStrategy getAutomaticIndexingSynchronizationStrategy() {
+	@Override
+	public AutomaticIndexingSynchronizationStrategy getAutomaticIndexingSynchronizationStrategy() {
 		return synchronizationStrategy;
 	}
 
@@ -312,11 +316,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 				.isJta();
 	}
 
-	void checkOrmSessionIsOpen() {
+	private void checkOrmSessionIsOpen() {
 		checkOrmSessionIsOpen( sessionContext.getSession() );
 	}
 
-	static void checkOrmSessionIsOpen(SessionImplementor session) {
+	private static void checkOrmSessionIsOpen(SessionImplementor session) {
 		try {
 			session.checkOpen();
 		}
