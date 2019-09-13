@@ -29,7 +29,7 @@ import org.junit.Test;
 
 /**
  * Tests the behaviour of different kinds of {@link Session#flush()}.
- * Each of ones has to trigger a {@link PojoIndexingPlan#prepare()} exactly when the flush is expected.
+ * Each of ones has to trigger a {@link PojoIndexingPlan#process()} exactly when the flush is expected.
  */
 @TestForIssue( jiraKey = "HSEARCH-3360" )
 public class SearchSessionFlushIT {

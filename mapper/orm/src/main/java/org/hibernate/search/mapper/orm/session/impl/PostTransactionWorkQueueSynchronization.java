@@ -43,7 +43,7 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 	@Override
 	public void beforeCompletion() {
 		log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this );
-		indexingPlan.prepare();
+		indexingPlan.process();
 	}
 
 	@Override

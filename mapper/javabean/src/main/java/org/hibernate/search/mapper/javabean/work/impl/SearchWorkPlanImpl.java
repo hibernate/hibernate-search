@@ -31,22 +31,22 @@ public class SearchWorkPlanImpl implements SearchWorkPlan {
 
 	@Override
 	public void update(Object entity) {
-		delegate.update( entity );
+		delegate.addOrUpdate( entity );
 	}
 
 	@Override
 	public void update(Object providedId, Object entity) {
-		delegate.update( providedId, entity );
+		delegate.addOrUpdate( providedId, entity );
 	}
 
 	@Override
 	public void update(Object entity, String... dirtyPaths) {
-		delegate.update( entity, dirtyPaths );
+		delegate.addOrUpdate( entity, dirtyPaths );
 	}
 
 	@Override
 	public void update(Object providedId, Object entity, String... dirtyPaths) {
-		delegate.update( providedId, entity, dirtyPaths );
+		delegate.addOrUpdate( providedId, entity, dirtyPaths );
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class SearchWorkPlanImpl implements SearchWorkPlan {
 	}
 
 	public void prepare() {
-		delegate.prepare();
+		delegate.process();
 	}
 
 	public CompletableFuture<?> execute() {

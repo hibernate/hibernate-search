@@ -89,7 +89,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 		}
 	}
 
-	void prepare() {
+	void process() {
 		sendCommandsToDelegate();
 		getDelegate().prepare();
 	}
@@ -107,7 +107,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 		delegate.discard();
 	}
 
-	void clearNotPrepared() {
+	void discardNotProcessed() {
 		this.indexingPlansPerId.clear();
 	}
 

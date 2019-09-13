@@ -104,10 +104,10 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			if ( dirtyCheckingEnabled ) {
-				plan.update( providedId, entity, getDirtyPropertyNames( event ) );
+				plan.addOrUpdate( providedId, entity, getDirtyPropertyNames( event ) );
 			}
 			else {
-				plan.update( providedId, entity );
+				plan.addOrUpdate( providedId, entity );
 			}
 		}
 	}
@@ -136,7 +136,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		EventSource session = event.getSession();
 		PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, session );
-		plan.prepare();
+		plan.process();
 
 		// flush within a transaction should trigger only the prepare phase,
 		// since the execute phase is supposed to be triggered by the transaction commit
@@ -159,7 +159,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 //			 */
 //			return;
 //		}
-		getCurrentIndexingPlan( state.getContextProvider(), event.getSession() ).prepare();
+		getCurrentIndexingPlan( state.getContextProvider(), event.getSession() ).process();
 	}
 
 	@Override
@@ -169,7 +169,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 		// skip the clearNotPrepared operation in case there has been no one to clear
 		if ( plan != null ) {
-			plan.clearNotPrepared();
+			plan.discardNotProcessed();
 		}
 	}
 
@@ -224,18 +224,18 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 					 * which can then decide whether to reindex based on whether the collection
 					 * has any impact on indexing.
 					 */
-					plan.update( providedId, entity, collectionRole );
+					plan.addOrUpdate( providedId, entity, collectionRole );
 				}
 				else {
 					/*
 					 * We don't know which collection is being changed,
 					 * so we have to default to reindexing, just in case.
 					 */
-					plan.update( providedId, entity );
+					plan.addOrUpdate( providedId, entity );
 				}
 			}
 			else {
-				plan.update( providedId, entity );
+				plan.addOrUpdate( providedId, entity );
 			}
 		}
 	}

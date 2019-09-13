@@ -19,7 +19,7 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		context.getCurrentIndexingPlan( true ).update( entity );
+		context.getCurrentIndexingPlan( true ).addOrUpdate( entity );
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 		if ( plan == null ) {
 			return;
 		}
-		plan.prepare();
+		plan.process();
 	}
 
 	@Override

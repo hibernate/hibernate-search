@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
  * <p>
  * This class is stateful: it queues operations internally to apply them at a later time.
  * <p>
- * When {@link #prepare()} is called,
+ * When {@link #process()} is called,
  * the entities will be processed and index documents will be built
  * and stored in an internal buffer.
  * <p>
@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
  * the operations will be actually sent to the index.
  * <p>
  * Note that {@link #execute()} will implicitly trigger processing of documents that weren't processed yet,
- * if any, so calling {@link #prepare()} is not necessary if you call {@link #execute()} just next.
+ * if any, so calling {@link #process()} is not necessary if you call {@link #execute()} just next.
  * <p>
  * Implementations may not be thread-safe.
  */
@@ -41,7 +41,7 @@ public interface PojoIndexingPlan {
 	 * <p>
 	 * <strong>Note:</strong> depending on the backend, this may lead to errors or duplicate entries in the index
 	 * if the entity was actually already present in the index before this call.
-	 * When in doubt, you should rather use {@link #update(Object, Object)} or {@link #update(Object)}.
+	 * When in doubt, you should rather use {@link #addOrUpdate(Object, Object)} or {@link #addOrUpdate(Object)}.
 	 *
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
@@ -53,11 +53,11 @@ public interface PojoIndexingPlan {
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
 	 * <p>
-	 * Shorthand for {@code update(null, entity)}; see {@link #update(Object, Object)}.
+	 * Shorthand for {@code update(null, entity)}; see {@link #addOrUpdate(Object, Object)}.
 	 *
 	 * @param entity The entity to update in the index.
 	 */
-	void update(Object entity);
+	void addOrUpdate(Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
@@ -67,7 +67,7 @@ public interface PojoIndexingPlan {
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to update in the index.
 	 */
-	void update(Object providedId, Object entity);
+	void addOrUpdate(Object providedId, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index,
@@ -76,13 +76,13 @@ public interface PojoIndexingPlan {
 	 * <p>
 	 * Assumes that the entity may already be present in the index.
 	 * <p>
-	 * Shorthand for {@code update(null, entity, dirtyPaths)}; see {@link #update(Object, Object)}.
+	 * Shorthand for {@code update(null, entity, dirtyPaths)}; see {@link #addOrUpdate(Object, Object)}.
 	 *
 	 * @param entity The entity to update in the index.
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
 	 * ("directEntityProperty.nestedPropery").
 	 */
-	void update(Object entity, String... dirtyPaths);
+	void addOrUpdate(Object entity, String... dirtyPaths);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index,
@@ -96,7 +96,7 @@ public interface PojoIndexingPlan {
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
 	 * ("directEntityProperty.nestedPropery").
 	 */
-	void update(Object providedId, Object entity, String... dirtyPaths);
+	void addOrUpdate(Object providedId, Object entity, String... dirtyPaths);
 
 	/**
 	 * Delete an entity from the index.
@@ -133,31 +133,35 @@ public interface PojoIndexingPlan {
 	void purge(Class<?> clazz, Object providedId);
 
 	/**
-	 * Prepare the execution of the indexing plan, i.e. execute as much as possible without writing to the index.
+	 * Extract all data from objects passed to the indexing plan so far,
+	 * create documents to be indexed and put them into an internal buffer,
+	 * without writing them to the indexes.
 	 * <p>
 	 * In particular, ensure that all data is extracted from the POJOs
 	 * and converted to the backend-specific format.
 	 * <p>
 	 * Calling this method is optional: the {@link #execute()} method
-	 * will perform the preparation if necessary.
+	 * will perform the processing if necessary.
 	 */
-	void prepare();
+	void process();
 
 	/**
-	 * Start executing all the works in this plan, and clear the plan so that it can be re-used.
+	 * Write all pending changes to the index now,
+	 * without waiting for a Hibernate ORM flush event or transaction commit,
+	 * and clear the plan so that it can be re-used.
 	 *
 	 * @return A {@link CompletableFuture} that will be completed when all the works are complete.
 	 */
 	CompletableFuture<?> execute();
 
 	/**
-	 * Discard all works that are prepared but not yet executed.
+	 * Discard all plans of indexing.
 	 */
 	void discard();
 
 	/**
-	 * Discard all works that are not prepared yet.
+	 * Discard all plans of indexing, except for parts that were already {@link #process() processed}.
 	 */
-	void clearNotPrepared();
+	void discardNotProcessed();
 
 }

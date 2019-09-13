@@ -409,7 +409,7 @@ public interface Log extends BasicLogger {
 					+ " Make sure you do not change entities within an entity getter or a custom bridge used for indexing,"
 					+ " and avoid any event that could trigger entity processing."
 					+ " Hibernate ORM flushes, in particular, must be avoided in entity getters and bridges.")
-	SearchException recursiveIndexingPlanPrepare();
+	SearchException recursiveIndexingPlanProcess();
 
 	@Message(id = ID_OFFSET_2 + 61, value = "Type '%1$s' cannot be indexed-embedded, because no index mapping (@GenericField, @FullTextField, ...) is defined for that type.")
 	SearchException invalidIndexedEmbedded(@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel);

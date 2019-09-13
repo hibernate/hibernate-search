@@ -39,7 +39,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	private final Map<Class<?>, PojoIndexedTypeIndexingPlan<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
 	private final Map<Class<?>, PojoContainedTypeIndexingPlan<?>> containedTypeDelegates = new HashMap<>();
 
-	private boolean isPreparing = false;
+	private boolean isProcessing = false;
 
 	public PojoIndexingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
@@ -67,24 +67,24 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	}
 
 	@Override
-	public void update(Object entity) {
-		update( null, entity );
+	public void addOrUpdate(Object entity) {
+		addOrUpdate( null, entity );
 	}
 
 	@Override
-	public void update(Object providedId, Object entity) {
+	public void addOrUpdate(Object providedId, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
 		delegate.update( providedId, entity );
 	}
 
 	@Override
-	public void update(Object entity, String... dirtyPaths) {
-		update( null, entity, dirtyPaths );
+	public void addOrUpdate(Object entity, String... dirtyPaths) {
+		addOrUpdate( null, entity, dirtyPaths );
 	}
 
 	@Override
-	public void update(Object providedId, Object entity, String... dirtyPaths) {
+	public void addOrUpdate(Object providedId, Object entity, String... dirtyPaths) {
 		Class<?> clazz = getIntrospector().getClass( entity );
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
 		delegate.update( providedId, entity, dirtyPaths );
@@ -109,12 +109,12 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	}
 
 	@Override
-	public void prepare() {
-		if ( isPreparing ) {
-			throw log.recursiveIndexingPlanPrepare();
+	public void process() {
+		if ( isProcessing ) {
+			throw log.recursiveIndexingPlanProcess();
 		}
 
-		isPreparing = true;
+		isProcessing = true;
 		try {
 			for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
 				delegate.resolveDirty( this::updateBecauseOfContained );
@@ -123,18 +123,18 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 				delegate.resolveDirty( this::updateBecauseOfContained );
 			}
 			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
-				delegate.prepare();
+				delegate.process();
 			}
 		}
 		finally {
-			isPreparing = false;
+			isProcessing = false;
 		}
 	}
 
 	@Override
 	public CompletableFuture<?> execute() {
 		try {
-			prepare();
+			process();
 			List<CompletableFuture<?>> futures = new ArrayList<>();
 			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				futures.add( delegate.execute() );
@@ -159,9 +159,9 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	}
 
 	@Override
-	public void clearNotPrepared() {
+	public void discardNotProcessed() {
 		for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
-			delegate.clearNotPrepared();
+			delegate.discardNotProcessed();
 		}
 	}
 
