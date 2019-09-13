@@ -64,8 +64,8 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetch_noArg() {
-		assertThat( matchAllQuery().fetch() )
+	public void fetchAll() {
+		assertThat( matchAllQuery().fetchAll() )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -73,7 +73,7 @@ public class SearchQueryFetchIT {
 					}
 				} );
 
-		assertThat( matchFirstHalfQuery().fetch() )
+		assertThat( matchFirstHalfQuery().fetchAll() )
 				.hasTotalHitCount( DOCUMENT_COUNT / 2 )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT / 2; i++ ) {
@@ -134,15 +134,15 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchHits_noArg() {
-		assertThat( matchAllQuery().fetchHits() )
+	public void fetchAllHits() {
+		assertThat( matchAllQuery().fetchAllHits() )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
 						builder.doc( INDEX_NAME, docId( i ) );
 					}
 				} );
 
-		assertThat( matchFirstHalfQuery().fetchHits() )
+		assertThat( matchFirstHalfQuery().fetchAllHits() )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT / 2; i++ ) {
 						builder.doc( INDEX_NAME, docId( i ) );
@@ -244,7 +244,7 @@ public class SearchQueryFetchIT {
 					}
 				} );
 
-		assertThat( query.fetch() ).fromQuery( query )
+		assertThat( query.fetchAll() ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {

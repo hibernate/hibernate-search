@@ -21,7 +21,7 @@ import org.assertj.core.api.ObjectAssert;
 public class SearchResultAssert<H> {
 
 	public static <H> SearchResultAssert<H> assertThat(SearchQuery<? extends H> searchQuery) {
-		return SearchResultAssert.<H>assertThat( searchQuery.fetch() ).fromQuery( searchQuery );
+		return SearchResultAssert.<H>assertThat( searchQuery.fetchAll() ).fromQuery( searchQuery );
 	}
 
 	public static <H> SearchResultAssert<H> assertThat(SearchResult<? extends H> actual) {

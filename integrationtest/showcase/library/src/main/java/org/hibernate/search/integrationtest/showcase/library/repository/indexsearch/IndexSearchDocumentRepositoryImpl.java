@@ -43,7 +43,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		return Search.session( entityManager )
 				.search( DOCUMENT_CLASS )
 				.predicate( p -> p.matchAll() )
-				.fetchHits();
+				.fetchAllHits();
 	}
 
 	@Override
@@ -148,6 +148,6 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 						.matching( terms )
 				)
 				.sort( b -> b.field( "author" ).order( order ) )
-				.fetchHits();
+				.fetchAllHits();
 	}
 }

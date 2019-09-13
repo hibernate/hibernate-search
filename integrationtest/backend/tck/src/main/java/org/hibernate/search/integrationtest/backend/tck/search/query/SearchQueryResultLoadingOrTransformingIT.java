@@ -494,7 +494,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		expect( loadingContextMock.getProjectionHitMapper() )
 				.andReturn( new DefaultProjectionHitMapper<>( reference -> reference, EntityLoader.identity() ) );
 		replayAll();
-		query.fetch();
+		query.fetchAll();
 		verifyAll();
 
 		// Second query execution to make sure the backend doesn't try to cache the projection hit mapper...
@@ -502,7 +502,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		expect( loadingContextMock.getProjectionHitMapper() )
 				.andReturn( new DefaultProjectionHitMapper<>( reference -> reference, EntityLoader.identity() ) );
 		replayAll();
-		query.fetch();
+		query.fetchAll();
 		verifyAll();
 	}
 

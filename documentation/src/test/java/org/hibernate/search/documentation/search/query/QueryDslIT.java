@@ -167,7 +167,7 @@ public class QueryDslIT {
 			// tag::fetching-all-searchResult[]
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.predicate( f -> f.id().matchingAny( Arrays.asList( 1, 2 ) ) )
-					.fetch();
+					.fetchAll();
 
 			long totalHitCount = result.getTotalHitCount();
 			List<Book> hits = result.getHits();
@@ -183,7 +183,7 @@ public class QueryDslIT {
 			// tag::fetching-all-hits[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.id().matchingAny( Arrays.asList( 1, 2 ) ) )
-					.fetchHits();
+					.fetchAllHits();
 			// end::fetching-all-hits[]
 
 			assertThat( hits ).extracting( Book::getId )

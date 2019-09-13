@@ -125,8 +125,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public SearchResult<H> fetch() {
-		return toQuery().fetch();
+	public SearchResult<H> fetchAll() {
+		return toQuery().fetchAll();
 	}
 
 	@Override
@@ -140,8 +140,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public List<H> fetchHits() {
-		return toQuery().fetchHits();
+	public List<H> fetchAllHits() {
+		return toQuery().fetchAllHits();
 	}
 
 	@Override

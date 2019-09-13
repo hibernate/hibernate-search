@@ -21,16 +21,6 @@ public interface SearchFetchable<H> {
 	/**
 	 * Execute the query and return the {@link SearchResult}.
 	 *
-	 * @return The {@link SearchResult}.
-	 * @throws SearchException If something goes wrong while executing the query.
-	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
-	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
-	 */
-	SearchResult<H> fetch();
-
-	/**
-	 * Execute the query and return the {@link SearchResult}.
-	 *
 	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
 	 * @return The {@link SearchResult}.
 	 * @throws SearchException If something goes wrong while executing the query.
@@ -50,16 +40,6 @@ public interface SearchFetchable<H> {
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
 	SearchResult<H> fetch(Integer limit, Integer offset);
-
-	/**
-	 * Execute the query and return the hits as a {@link List}.
-	 *
-	 * @return The query hits.
-	 * @throws SearchException If something goes wrong while executing the query.
-	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
-	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
-	 */
-	List<H> fetchHits();
 
 	/**
 	 * Execute the query and return the hits as a {@link List}.
@@ -102,5 +82,50 @@ public interface SearchFetchable<H> {
 	 * @throws SearchException If something goes wrong while executing the query.
 	 */
 	long fetchTotalHitCount();
+
+	/**
+	 * Execute the query and return the {@link SearchResult},
+	 * including <strong>all</strong> hits, without any sort of limit.
+	 * <p>
+	 * {@link #fetch(Integer)} or {@link #fetch(Integer, Integer)} should generally be preferred, for performance reasons.
+	 *
+	 * @return The {@link SearchResult}.
+	 * @throws SearchException If something goes wrong while executing the query.
+	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
+	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
+	 */
+	SearchResult<H> fetchAll();
+
+	/**
+	 * @deprecated Use {@link #fetchAll()} instead, or (preferably) {@link #fetch(Integer)}.
+	 * @return The {@link SearchResult}.
+	 */
+	@Deprecated
+	default SearchResult<H> fetch() {
+		return fetchAll();
+	}
+
+	/**
+	 * Execute the query and return <strong>all</strong> hits as a {@link List},
+	 * without any sort of limit.
+	 * <p>
+	 * {@link #fetchHits(Integer)} or {@link #fetchHits(Integer, Integer)} should generally be preferred,
+	 * for performance reasons.
+	 *
+	 * @return The query hits.
+	 * @throws SearchException If something goes wrong while executing the query.
+	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
+	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
+	 */
+	List<H> fetchAllHits();
+
+	/**
+	 * @deprecated Use {@link #fetchAllHits()} instead, or (preferably) {@link #fetchHits(Integer)}.
+	 * @return The {@link SearchResult}.
+	 */
+	@Deprecated
+	default List<H> fetchHits() {
+		return fetchAllHits();
+	}
 
 }

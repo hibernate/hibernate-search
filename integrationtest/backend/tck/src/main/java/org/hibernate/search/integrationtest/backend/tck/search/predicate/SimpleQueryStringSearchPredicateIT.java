@@ -328,7 +328,7 @@ public class SimpleQueryStringSearchPredicateIT {
 				.predicate( f -> f.simpleQueryString().field( whitespaceAnalyzedField ).matching( "HERE | PANDA" )
 						// we don't have any analyzer with that name
 						.analyzer( "this_name_does_actually_not_exist" ) )
-				.toQuery().fetch()
+				.toQuery().fetchAll()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

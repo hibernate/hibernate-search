@@ -41,7 +41,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.field( "string" ).missing().last().asc() )
 				.toQuery();
-		SearchResult<Double> results = query.fetch();
+		SearchResult<Double> results = query.fetchAll();
 
 		checkResult( results.getHits().get( 0 ), 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), 1300d, Offset.offset( 10d ) );
@@ -61,7 +61,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.field( "string" ).missing().last().asc() )
 				.toQuery();
-		SearchResult<Double> results = query.fetch();
+		SearchResult<Double> results = query.fetchAll();
 
 		checkResult( results.getHits().get( 0 ), 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), 1300d, Offset.offset( 10d ) );
@@ -81,7 +81,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.field( "string" ).missing().last().asc() )
 				.toQuery();
-		SearchResult<Double> results = query.fetch();
+		SearchResult<Double> results = query.fetchAll();
 
 		checkResult( results.getHits().get( 0 ), 0.430d, Offset.offset( 0.010d ) );
 		checkResult( results.getHits().get( 1 ), 1.300d, Offset.offset( 0.010d ) );
@@ -105,7 +105,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.field( "string" ).missing().last().asc() )
 				.toQuery();
-		SearchResult<List<?>> results = query.fetch();
+		SearchResult<List<?>> results = query.fetchAll();
 
 		checkResult( (Double) results.getHits().get( 0 ).get( 0 ), 430d, Offset.offset( 10d ) );
 		checkResult( (Double) results.getHits().get( 1 ).get( 0 ), 1300d, Offset.offset( 10d ) );
@@ -139,7 +139,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						.distance( "geoPoint", center )
 				)
 				.toQuery();
-		SearchResult<Double> results = query.fetch();
+		SearchResult<Double> results = query.fetchAll();
 
 		checkResult( results.getHits().get( 0 ), 1300d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), 430d, Offset.offset( 10d ) );
@@ -161,7 +161,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.field( "string" ).missing().last().asc() )
 				.toQuery();
-		SearchResult<Double> results = query.fetch();
+		SearchResult<Double> results = query.fetchAll();
 
 		checkResult( results.getHits().get( 0 ), 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), 1300d, Offset.offset( 10d ) );

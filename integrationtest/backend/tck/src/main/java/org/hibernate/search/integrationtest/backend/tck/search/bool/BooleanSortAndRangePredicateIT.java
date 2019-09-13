@@ -140,7 +140,7 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private void assertHasHitsWithBooleanProperties(SearchQuery<DocumentReference> query, Boolean... expectedPropertyValues) {
-		List<DocumentReference> hits = query.fetch().getHits();
+		List<DocumentReference> hits = query.fetchAll().getHits();
 		assertEquals( expectedPropertyValues.length, hits.size() );
 
 		for ( int i = 0; i < expectedPropertyValues.length; i++ ) {

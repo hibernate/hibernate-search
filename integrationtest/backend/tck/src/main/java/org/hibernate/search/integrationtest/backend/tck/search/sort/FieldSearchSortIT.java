@@ -202,28 +202,28 @@ public class FieldSearchSortIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			// using before 1 value
-			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.before1Value ), scope ).fetchHits();
+			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.before1Value ), scope ).fetchAllHits();
 			assertThat( docRefHits ).ordinals( 0, 1, 2, 3 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 			assertThat( docRefHits ).ordinal( 4 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
 			assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
 			assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
 
 			// using between 1 and 2 value
-			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.between1And2Value ), scope ).fetchHits();
+			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.between1And2Value ), scope ).fetchAllHits();
 			assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
 			assertThat( docRefHits ).ordinals( 1, 2, 3, 4 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 			assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
 			assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
 
 			// using between 2 and 3 value
-			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.between2And3Value ), scope ).fetchHits();
+			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.between2And3Value ), scope ).fetchAllHits();
 			assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
 			assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
 			assertThat( docRefHits ).ordinals( 2, 3, 4, 5 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 			assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
 
 			// using after 3 value
-			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.after3Value ), scope ).fetchHits();
+			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( fieldModel.after3Value ), scope ).fetchAllHits();
 			assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
 			assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
 			assertThat( docRefHits ).ordinal( 2 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
@@ -245,19 +245,19 @@ public class FieldSearchSortIT {
 			Object docValue3 = normalizeIfNecessary( fieldModel.document3Value.indexedValue );
 
 			// using doc 1 value
-			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( docValue1 ), scope ).fetchHits();
+			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( docValue1 ), scope ).fetchAllHits();
 			assertThat( docRefHits ).ordinals( 0, 1, 2, 3, 4 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 			assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
 			assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
 
 			// using doc 2 value
-			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( docValue2 ), scope ).fetchHits();
+			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( docValue2 ), scope ).fetchAllHits();
 			assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
 			assertThat( docRefHits ).ordinals( 1, 2, 3, 4, 5 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 			assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
 
 			// using doc 3 value
-			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( docValue3 ), scope ).fetchHits();
+			docRefHits = simpleQuery( b -> b.field( fieldPath ).asc().missing().use( docValue3 ), scope ).fetchAllHits();
 			assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
 			assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
 			assertThat( docRefHits ).ordinals( 2, 3, 4, 5, 6 ).hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );

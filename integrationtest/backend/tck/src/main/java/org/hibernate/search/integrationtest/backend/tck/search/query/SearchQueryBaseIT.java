@@ -162,7 +162,7 @@ public class SearchQueryBaseIT {
 		}
 
 		public SearchResult<H> extendedFetch() {
-			return query.fetch();
+			return query.fetchAll();
 		}
 	}
 

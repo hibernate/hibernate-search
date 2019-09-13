@@ -284,7 +284,7 @@ public class ToHibernateOrmIT {
 		);
 
 		SubTest.expectException( () -> {
-			query.fetchHits();
+			query.fetchAllHits();
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

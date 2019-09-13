@@ -79,7 +79,7 @@ public class ElasticsearchSearchQueryIT {
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 
-		query.fetch();
+		query.fetchAll();
 	}
 
 	@Test
@@ -103,7 +103,7 @@ public class ElasticsearchSearchQueryIT {
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 
-		query.fetch();
+		query.fetchAll();
 	}
 
 	@SuppressWarnings("unused")

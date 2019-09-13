@@ -76,7 +76,7 @@ public class ProvidedIdIT {
 					.predicate( f -> f.matchAll() )
 					.toQuery();
 
-			assertThat( query.fetch().getHits() )
+			assertThat( query.fetchAll().getHits() )
 					.containsExactly( new EntityReferenceImpl( IndexedEntity.class, "42" ) );
 		}
 		backendMock.verifyExpectationsMet();

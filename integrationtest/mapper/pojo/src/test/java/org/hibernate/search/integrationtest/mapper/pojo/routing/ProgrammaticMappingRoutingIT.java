@@ -128,7 +128,7 @@ public class ProgrammaticMappingRoutingIT {
 					StubSearchWorkBehavior.empty()
 			);
 
-			query.fetch();
+			query.fetchAll();
 			backendMock.verifyExpectationsMet();
 		}
 	}
