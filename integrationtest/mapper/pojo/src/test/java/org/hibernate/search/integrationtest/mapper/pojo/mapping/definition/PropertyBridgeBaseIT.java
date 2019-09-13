@@ -125,7 +125,7 @@ public class PropertyBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			entity.stringProperty = "some string 2";
-			session.indexingPlan().update( entity, new String[] { "stringProperty" } );
+			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
@@ -206,7 +206,7 @@ public class PropertyBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			contained.stringProperty = "some string 2";
-			session.indexingPlan().update( entity, new String[] { "contained.stringProperty" } );
+			session.indexingPlan().addOrUpdate( entity, new String[] { "contained.stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", contained.stringProperty ) )
@@ -384,7 +384,7 @@ public class PropertyBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			containedLevel2Entity.stringProperty = "some string";
-			session.indexingPlan().update( containedLevel2Entity, new String[] { "stringProperty" } );
+			session.indexingPlan().addOrUpdate( containedLevel2Entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", "constant" ) )
@@ -810,7 +810,7 @@ public class PropertyBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			entity.stringProperty.add( "value2" );
-			session.indexingPlan().update( entity, new String[] { "stringProperty" } );
+			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", "value1", "value2" ) )

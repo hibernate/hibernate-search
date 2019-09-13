@@ -119,7 +119,7 @@ public class TypeBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			entity.stringProperty = "some string 2";
-			session.indexingPlan().update( entity, new String[] { "stringProperty" } );
+			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
@@ -192,7 +192,7 @@ public class TypeBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			entity.stringProperty = "some string 2";
-			session.indexingPlan().update( entity, new String[] { "stringProperty" } );
+			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
@@ -318,7 +318,7 @@ public class TypeBridgeBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			containedEntity.stringProperty = "some string";
 
-			session.indexingPlan().update( containedEntity, new String[] { "stringProperty" } );
+			session.indexingPlan().addOrUpdate( containedEntity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", "constant" ) )
@@ -713,7 +713,7 @@ public class TypeBridgeBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			entity.enumProperty = CustomEnum.VALUE2;
 
-			session.indexingPlan().update( entity, new String[] { "enumProperty" } );
+			session.indexingPlan().addOrUpdate( entity, new String[] { "enumProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b

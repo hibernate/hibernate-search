@@ -30,22 +30,22 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
-	public void update(Object entity) {
+	public void addOrUpdate(Object entity) {
 		delegate.addOrUpdate( entity );
 	}
 
 	@Override
-	public void update(Object providedId, Object entity) {
+	public void addOrUpdate(Object providedId, Object entity) {
 		delegate.addOrUpdate( providedId, entity );
 	}
 
 	@Override
-	public void update(Object entity, String... dirtyPaths) {
+	public void addOrUpdate(Object entity, String... dirtyPaths) {
 		delegate.addOrUpdate( entity, dirtyPaths );
 	}
 
 	@Override
-	public void update(Object providedId, Object entity, String... dirtyPaths) {
+	public void addOrUpdate(Object providedId, Object entity, String... dirtyPaths) {
 		delegate.addOrUpdate( providedId, entity, dirtyPaths );
 	}
 
@@ -57,10 +57,6 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	@Override
 	public void delete(Object providedId, Object entity) {
 		delegate.delete( providedId, entity );
-	}
-
-	public void prepare() {
-		delegate.process();
 	}
 
 	public CompletableFuture<?> execute() {

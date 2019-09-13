@@ -29,7 +29,7 @@ public interface SearchIndexingPlan {
 	 * <p>
 	 * <strong>Note:</strong> depending on the backend, this may lead to errors or duplicate entries in the index
 	 * if the entity was actually already present in the index before this call.
-	 * When in doubt, you should rather use {@link #update(Object, Object)} or {@link #update(Object)}.
+	 * When in doubt, you should rather use {@link #addOrUpdate(Object, Object)} or {@link #addOrUpdate(Object)}.
 	 *
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
@@ -41,11 +41,11 @@ public interface SearchIndexingPlan {
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
 	 * <p>
-	 * Shorthand for {@code update(null, entity)}; see {@link #update(Object, Object)}.
+	 * Shorthand for {@code update(null, entity)}; see {@link #addOrUpdate(Object, Object)}.
 	 *
 	 * @param entity The entity to update in the index.
 	 */
-	void update(Object entity);
+	void addOrUpdate(Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
@@ -55,7 +55,7 @@ public interface SearchIndexingPlan {
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to update in the index.
 	 */
-	void update(Object providedId, Object entity);
+	void addOrUpdate(Object providedId, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index,
@@ -64,13 +64,13 @@ public interface SearchIndexingPlan {
 	 * <p>
 	 * Assumes that the entity may already be present in the index.
 	 * <p>
-	 * Shorthand for {@code update(null, entity, dirtyPaths)}; see {@link #update(Object, Object)}.
+	 * Shorthand for {@code update(null, entity, dirtyPaths)}; see {@link #addOrUpdate(Object, Object)}.
 	 *
 	 * @param entity The entity to update in the index.
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
 	 * ("directEntityProperty.nestedPropery").
 	 */
-	void update(Object entity, String... dirtyPaths);
+	void addOrUpdate(Object entity, String... dirtyPaths);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index,
@@ -84,7 +84,7 @@ public interface SearchIndexingPlan {
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
 	 * ("directEntityProperty.nestedPropery").
 	 */
-	void update(Object providedId, Object entity, String... dirtyPaths);
+	void addOrUpdate(Object providedId, Object entity, String... dirtyPaths);
 
 	/**
 	 * Delete an entity from the index.
