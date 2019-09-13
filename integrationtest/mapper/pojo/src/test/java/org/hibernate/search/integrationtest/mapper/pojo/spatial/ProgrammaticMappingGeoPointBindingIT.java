@@ -138,9 +138,9 @@ public class ProgrammaticMappingGeoPointBindingIT {
 			entity3.setId( 3 );
 			entity3.setCoord( new CustomCoordinates( 3.1d, 3.2d ) );
 
-			session.getMainWorkPlan().add( entity1 );
-			session.getMainWorkPlan().add( entity2 );
-			session.getMainWorkPlan().add( entity3 );
+			session.indexingPlan().add( entity1 );
+			session.indexingPlan().add( entity2 );
+			session.indexingPlan().add( entity3 );
 
 			backendMock.expectWorks( GeoPointOnTypeEntity.INDEX )
 					.add( "1", b -> b

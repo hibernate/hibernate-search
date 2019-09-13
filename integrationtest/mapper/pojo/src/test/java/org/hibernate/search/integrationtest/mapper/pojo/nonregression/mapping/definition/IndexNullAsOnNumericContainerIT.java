@@ -56,7 +56,7 @@ public class IndexNullAsOnNumericContainerIT {
 			entity1.getIntegerList().add( null );
 			entity1.getIntegerList().add( 2 );
 
-			session.getMainWorkPlan().add( entity1 );
+			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b

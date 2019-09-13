@@ -98,7 +98,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 		try ( SearchSession session = mapping.createSession() ) {
 			for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
 				Object entity = expectations.instantiateTypeWithIdentifierBridge1( entityIdentifierValue );
-				session.getMainWorkPlan().add( entity );
+				session.indexingPlan().add( entity );
 			}
 
 			BackendMock.DocumentWorkCallListContext expectationSetter = backendMock.expectWorks(

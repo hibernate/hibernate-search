@@ -12,12 +12,12 @@ import java.util.Collections;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
-import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
+import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 
 public interface SearchSession extends AutoCloseable {
 
 	/**
-	 * Execute any pending work in the {@link #getMainWorkPlan() main work plan}
+	 * Execute any pending work in the {@link #indexingPlan() indexing plan}
 	 * and release any resource held by this session.
 	 */
 	@Override
@@ -79,8 +79,8 @@ public interface SearchSession extends AutoCloseable {
 	SearchScope scope(Collection<? extends Class<?>> types);
 
 	/**
-	 * @return The main work plan for this session. It will be executed upon closing this session.
+	 * @return The indexing plan for this session. It will be executed upon closing this session.
 	 */
-	SearchWorkPlan getMainWorkPlan();
+	SearchIndexingPlan indexingPlan();
 
 }

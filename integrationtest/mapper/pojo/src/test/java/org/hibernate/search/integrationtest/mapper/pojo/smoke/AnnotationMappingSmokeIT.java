@@ -216,13 +216,13 @@ public class AnnotationMappingSmokeIT {
 			entity2.getEmbeddingAsMap().add( entity5 );
 			entity3.getEmbeddingAsMap().add( entity5 );
 
-			session.getMainWorkPlan().add( entity1 );
-			session.getMainWorkPlan().add( entity2 );
-			session.getMainWorkPlan().add( entity4 );
-			session.getMainWorkPlan().delete( entity1 );
-			session.getMainWorkPlan().add( entity3 );
-			session.getMainWorkPlan().add( entity5 );
-			session.getMainWorkPlan().add( entity6 );
+			session.indexingPlan().add( entity1 );
+			session.indexingPlan().add( entity2 );
+			session.indexingPlan().add( entity4 );
+			session.indexingPlan().delete( entity1 );
+			session.indexingPlan().add( entity3 );
+			session.indexingPlan().add( entity5 );
+			session.indexingPlan().add( entity6 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "2", b -> b

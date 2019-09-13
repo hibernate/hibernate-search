@@ -37,7 +37,7 @@ public interface SearchMapping {
 	SearchScope scope(Collection<? extends Class<?>> types);
 
 	/**
-	 * @return A new session allowing to {@link SearchSession#getMainWorkPlan() index} or
+	 * @return A new session allowing to {@link SearchSession#indexingPlan() index} or
 	 * {@link SearchSession#search(Class) search for} entities.
 	 * @see #createSessionWithOptions()
 	 */

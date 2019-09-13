@@ -7,16 +7,13 @@
 package org.hibernate.search.mapper.javabean.work;
 
 /**
- * A set of works to be executed on mapped indexes.
+ * An interface for indexing entities in the context of a session.
  * <p>
- * Works are accumulated when methods such as {@link #add(Object)} or {@link #update(Object, Object)} are called,
- * and executed only when the search manager is closed.
- * <p>
- * Relative ordering of works within a work plan will be preserved.
+ * This class is stateful: it queues operations internally to apply them when the session is closed.
  * <p>
  * This contract is not thread-safe.
  */
-public interface SearchWorkPlan {
+public interface SearchIndexingPlan {
 
 	/**
 	 * Add an entity to the index, assuming that the entity is absent from the index.

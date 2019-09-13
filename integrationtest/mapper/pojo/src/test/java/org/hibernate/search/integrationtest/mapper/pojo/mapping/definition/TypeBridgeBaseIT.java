@@ -109,7 +109,7 @@ public class TypeBridgeBaseIT {
 		entity.stringProperty = "some string";
 
 		try ( SearchSession session = mapping.createSession() ) {
-			session.getMainWorkPlan().add( entity );
+			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
@@ -119,7 +119,7 @@ public class TypeBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			entity.stringProperty = "some string 2";
-			session.getMainWorkPlan().update( entity, new String[] { "stringProperty" } );
+			session.indexingPlan().update( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
@@ -182,7 +182,7 @@ public class TypeBridgeBaseIT {
 		entity.stringProperty = "some string";
 
 		try ( SearchSession session = mapping.createSession() ) {
-			session.getMainWorkPlan().add( entity );
+			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
@@ -192,7 +192,7 @@ public class TypeBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			entity.stringProperty = "some string 2";
-			session.getMainWorkPlan().update( entity, new String[] { "stringProperty" } );
+			session.indexingPlan().update( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
@@ -306,8 +306,8 @@ public class TypeBridgeBaseIT {
 		containedEntity.stringProperty = "some string";
 
 		try ( SearchSession session = mapping.createSession() ) {
-			session.getMainWorkPlan().add( entity );
-			session.getMainWorkPlan().add( containedEntity );
+			session.indexingPlan().add( entity );
+			session.indexingPlan().add( containedEntity );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", "constant" ) )
@@ -318,7 +318,7 @@ public class TypeBridgeBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			containedEntity.stringProperty = "some string";
 
-			session.getMainWorkPlan().update( containedEntity, new String[] { "stringProperty" } );
+			session.indexingPlan().update( containedEntity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", "constant" ) )
@@ -698,7 +698,7 @@ public class TypeBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 
-			session.getMainWorkPlan().add( entity );
+			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b
@@ -713,7 +713,7 @@ public class TypeBridgeBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			entity.enumProperty = CustomEnum.VALUE2;
 
-			session.getMainWorkPlan().update( entity, new String[] { "enumProperty" } );
+			session.indexingPlan().update( entity, new String[] { "enumProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b

@@ -19,13 +19,13 @@ public interface SearchSessionBuilder {
 	SearchSessionBuilder tenantId(String tenantId);
 
 	/**
-	 * @param commitStrategy The commit strategy for indexing works added to the {@link SearchSession#getMainWorkPlan() main work plan}.
+	 * @param commitStrategy The commit strategy for indexing works added to the {@link SearchSession#indexingPlan() indexing plan}.
 	 * @return {@code this} for method chaining.
 	 */
 	SearchSessionBuilder commitStrategy(DocumentCommitStrategy commitStrategy);
 
 	/**
-	 * @param refreshStrategy The refresh strategy for indexing works added to the {@link SearchSession#getMainWorkPlan() main work plan}.
+	 * @param refreshStrategy The refresh strategy for indexing works added to the {@link SearchSession#indexingPlan() indexing plan}.
 	 * @return {@code this} for method chaining.
 	 */
 	SearchSessionBuilder refreshStrategy(DocumentRefreshStrategy refreshStrategy);

@@ -115,7 +115,7 @@ public class FieldDefaultBridgeIT<V, F> {
 			int id = 0;
 			for ( V propertyValue : getPropertyValues() ) {
 				Object entity = expectations.instantiateTypeWithValueBridge1( id, propertyValue );
-				session.getMainWorkPlan().add( entity );
+				session.indexingPlan().add( entity );
 				++id;
 			}
 

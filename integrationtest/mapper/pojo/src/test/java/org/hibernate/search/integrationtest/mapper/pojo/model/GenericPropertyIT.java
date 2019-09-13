@@ -70,7 +70,7 @@ public class GenericPropertyIT {
 			entity1.setGenericProperty( genericEntity );
 			genericEntity.setParent( entity1 );
 
-			session.getMainWorkPlan().add( entity1 );
+			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b

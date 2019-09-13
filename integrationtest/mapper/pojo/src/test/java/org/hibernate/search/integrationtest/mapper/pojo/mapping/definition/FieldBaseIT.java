@@ -299,7 +299,7 @@ public class FieldBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity = new IndexedEntity();
 			entity.id = 1;
-			session.getMainWorkPlan().add( entity );
+			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
 					// Stub backend is not supposed to use 'indexNullAs' option

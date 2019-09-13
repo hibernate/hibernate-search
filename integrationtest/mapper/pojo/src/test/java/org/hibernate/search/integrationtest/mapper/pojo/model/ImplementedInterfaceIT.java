@@ -46,7 +46,7 @@ public class ImplementedInterfaceIT {
 	public void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedPojo indexedPojo = new IndexedPojo( 1, "Using some other text here" );
-			session.getMainWorkPlan().add( indexedPojo );
+			session.indexingPlan().add( indexedPojo );
 
 			backendMock.expectWorks( IndexedPojo.class.getName() ).add( "1", b -> b
 					.field( "text", "Using some other text here" )

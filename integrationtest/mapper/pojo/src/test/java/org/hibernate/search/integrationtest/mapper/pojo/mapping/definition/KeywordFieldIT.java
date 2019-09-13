@@ -420,7 +420,7 @@ public class KeywordFieldIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			E entity1 = newEntityFunction.apply( 1, propertyValue );
 
-			session.getMainWorkPlan().add( entity1 );
+			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b

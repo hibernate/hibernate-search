@@ -79,7 +79,7 @@ public class FieldContainerExtractorBaseIT {
 			IndexedEntity entity = new IndexedEntity();
 			entity.id = 1;
 			entity.text = new MyContainer<>( "value1", "value2" );
-			session.getMainWorkPlan().add( entity );
+			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
 					// Stub backend is not supposed to use 'indexNullAs' option

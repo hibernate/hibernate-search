@@ -67,7 +67,7 @@ public class AnnotationMappingRoutingIT {
 			entity1.setCategory( EntityCategory.CATEGORY_2 );
 			entity1.setValue( "val1" );
 
-			session.getMainWorkPlan().add( entity1 );
+			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( b -> b
@@ -92,7 +92,7 @@ public class AnnotationMappingRoutingIT {
 			entity1.setCategory( EntityCategory.CATEGORY_2 );
 			entity1.setValue( "val1" );
 
-			session.getMainWorkPlan().add( entity1 );
+			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( b -> b

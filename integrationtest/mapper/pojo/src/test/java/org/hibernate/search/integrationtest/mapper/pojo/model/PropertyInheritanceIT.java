@@ -72,7 +72,7 @@ public class PropertyInheritanceIT {
 			entity1.setEmbedded( entity2 );
 			entity2.setEmbedding( entity1 );
 
-			session.getMainWorkPlan().add( entity1 );
+			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b

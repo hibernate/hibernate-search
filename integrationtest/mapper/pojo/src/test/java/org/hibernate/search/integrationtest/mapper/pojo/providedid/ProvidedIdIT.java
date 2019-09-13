@@ -52,7 +52,7 @@ public class ProvidedIdIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 
-			session.getMainWorkPlan().add( "42", entity1 );
+			session.indexingPlan().add( "42", entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "42", b -> { } )
@@ -96,7 +96,7 @@ public class ProvidedIdIT {
 			IndexedEntity entity1 = new IndexedEntity();
 
 			SubTest.expectException(
-					() -> session.getMainWorkPlan().add( entity1 )
+					() -> session.indexingPlan().add( entity1 )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )

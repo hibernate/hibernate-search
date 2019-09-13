@@ -67,7 +67,7 @@ public final class SearchMappingBuilder {
 
 	/**
 	 * @param type The type to be considered as an entity type, i.e. a type that may be indexed
-	 * and whose instances be added/updated/deleted through the {@link SearchSession#getMainWorkPlan() work plan}.
+	 * and whose instances be added/updated/deleted through the {@link SearchSession#indexingPlan() indexing plan}.
 	 * @return {@code this}, for call chaining.
 	 */
 	public SearchMappingBuilder addEntityType(Class<?> type) {
@@ -77,7 +77,7 @@ public final class SearchMappingBuilder {
 
 	/**
 	 * @param types The types to be considered as entity types, i.e. types that may be indexed
-	 * and whose instances be added/updated/deleted through the {@link SearchSession#getMainWorkPlan() work plan}.
+	 * and whose instances be added/updated/deleted through the {@link SearchSession#indexingPlan() indexing plan}.
 	 * @return {@code this}, for call chaining.
 	 */
 	public SearchMappingBuilder addEntityTypes(Set<Class<?>> types) {

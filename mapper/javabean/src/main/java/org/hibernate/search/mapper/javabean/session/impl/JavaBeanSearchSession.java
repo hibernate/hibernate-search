@@ -20,8 +20,8 @@ import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanBackendSessionContext;
-import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
-import org.hibernate.search.mapper.javabean.work.impl.SearchWorkPlanImpl;
+import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -37,7 +37,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
-	private SearchWorkPlanImpl workPlan;
+	private SearchIndexingPlanImpl indexingPlan;
 
 	private JavaBeanSearchSession(JavaBeanSearchSessionBuilder builder) {
 		super( builder, builder.buildSessionContext() );
@@ -49,8 +49,8 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public void close() {
-		if ( workPlan != null ) {
-			CompletableFuture<?> future = workPlan.execute();
+		if ( indexingPlan != null ) {
+			CompletableFuture<?> future = indexingPlan.execute();
 			future.join();
 		}
 	}
@@ -71,11 +71,11 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public SearchWorkPlan getMainWorkPlan() {
-		if ( workPlan == null ) {
-			workPlan = new SearchWorkPlanImpl( getDelegate().createIndexingPlan( commitStrategy, refreshStrategy ) );
+	public SearchIndexingPlan indexingPlan() {
+		if ( indexingPlan == null ) {
+			indexingPlan = new SearchIndexingPlanImpl( getDelegate().createIndexingPlan( commitStrategy, refreshStrategy ) );
 		}
-		return workPlan;
+		return indexingPlan;
 	}
 
 	@Override
