@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrate
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
-import org.hibernate.search.mapper.orm.writing.SearchWriter;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -205,29 +205,29 @@ public class HibernateOrmManualIndexingIT {
 	}
 
 	@Test
-	public void writer() {
+	public void workspace() {
 		int numberOfBooks = 10;
 		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyName.SESSION );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			// tag::writer-retrieval[]
+			// tag::workspace-retrieval[]
 			SearchSession searchSession = Search.session( entityManager ); // <1>
-			SearchWriter writer1 = searchSession.writer(); // <2>
-			SearchWriter writer2 = searchSession.writer( Book.class ); // <3>
-			SearchWriter writer3 = searchSession.writer( Book.class, Author.class ); // <4>
-			// end::writer-retrieval[]
+			SearchWorkspace workspace1 = searchSession.workspace(); // <2>
+			SearchWorkspace workspace2 = searchSession.workspace( Book.class ); // <3>
+			SearchWorkspace workspace3 = searchSession.workspace( Book.class, Author.class ); // <4>
+			// end::workspace-retrieval[]
 		} );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			assertBookCount( entityManager, numberOfBooks );
 			assertAuthorCount( entityManager, numberOfBooks );
 
-			// tag::writer-purge[]
+			// tag::workspace-purge[]
 			SearchSession searchSession = Search.session( entityManager ); // <1>
-			SearchWriter writer = searchSession.writer( Book.class, Author.class ); // <2>
-			writer.purge(); // <3>
-			// end::writer-purge[]
+			SearchWorkspace workspace = searchSession.workspace( Book.class, Author.class ); // <2>
+			workspace.purge(); // <3>
+			// end::workspace-purge[]
 
 			assertBookCount( entityManager, 0 );
 			assertAuthorCount( entityManager, 0 );
@@ -279,7 +279,7 @@ public class HibernateOrmManualIndexingIT {
 	private void assertBookCount(EntityManager entityManager, int expectedCount) {
 		SearchSession searchSession = Search.session( entityManager );
 		// Ensure every committed work is searchable: flush also executes a refresh on Elasticsearch
-		searchSession.writer().flush();
+		searchSession.workspace().flush();
 		assertThat(
 				searchSession.search( Book.class )
 						.predicate( f -> f.matchAll() )
@@ -291,7 +291,7 @@ public class HibernateOrmManualIndexingIT {
 	private void assertAuthorCount(EntityManager entityManager, int expectedCount) {
 		SearchSession searchSession = Search.session( entityManager );
 		// Ensure every committed work is searchable: flush also executes a refresh on Elasticsearch
-		searchSession.writer().flush();
+		searchSession.workspace().flush();
 		assertThat(
 				searchSession.search( Author.class )
 						.predicate( f -> f.matchAll() )

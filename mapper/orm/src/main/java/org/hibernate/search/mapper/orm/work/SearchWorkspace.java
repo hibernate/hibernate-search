@@ -4,26 +4,29 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.writing;
+package org.hibernate.search.mapper.orm.work;
 
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The entry point for explicit index write operations.
+ * The entry point for explicit index operations.
+ * <p>
+ * A {@link SearchWorkspace} targets a pre-defined set of indexed types (and their indexes),
+ * filtered to only affect a single tenant, if relevant.
  * <p>
  * While {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY automatic indexing}
  * generally takes care of indexing entities as they are persisted/deleted in the database,
  * there are cases where massive operations must be applied to the index,
  * such as completely purging the index.
- * This is where the {@link SearchWriter} comes in.
+ * This is where the {@link SearchWorkspace} comes in.
  */
-public interface SearchWriter {
+public interface SearchWorkspace {
 
 	/**
-	 * Purge the indexes targeted by this writer, removing all documents.
+	 * Purge the data targeted by this workspaces, removing all documents.
 	 * <p>
 	 * When using multi-tenancy, only documents of one tenant will be removed:
-	 * the tenant that was targeted by the session from where this writer originated.
+	 * the tenant that was targeted by the session from where this workspace originated.
 	 */
 	void purge();
 
@@ -60,7 +63,7 @@ public interface SearchWriter {
 	CompletableFuture<?> flushAsync();
 
 	/**
-	 * Merge all segments of the indexes targeted by this writer into a single one.
+	 * Merge all segments of the indexes targeted by this workspace into a single one.
 	 * <p>
 	 * Note this operation may affect performance positively as well as negatively.
 	 * As a rule of thumb, if indexes are read-only for extended periods of time,

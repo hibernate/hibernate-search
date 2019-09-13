@@ -39,7 +39,7 @@ import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationS
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
-import org.hibernate.search.mapper.orm.writing.SearchWriter;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
@@ -133,8 +133,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public SearchWriter writer(Collection<? extends Class<?>> types) {
-		return scope( types ).writer( DetachedBackendSessionContext.of( sessionContext ) );
+	public SearchWorkspace workspace(Collection<? extends Class<?>> types) {
+		return scope( types ).workspace( DetachedBackendSessionContext.of( sessionContext ) );
 	}
 
 	@Override

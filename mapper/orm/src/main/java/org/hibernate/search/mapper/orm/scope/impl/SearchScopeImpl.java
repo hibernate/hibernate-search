@@ -17,8 +17,8 @@ import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.search.query.dsl.impl.HibernateOrmSearchQueryHitTypeStepImpl;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
-import org.hibernate.search.mapper.orm.writing.SearchWriter;
-import org.hibernate.search.mapper.orm.writing.impl.SearchWriterImpl;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
+import org.hibernate.search.mapper.orm.work.impl.SearchWorkspaceImpl;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
@@ -64,17 +64,17 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	}
 
 	@Override
-	public SearchWriter writer() {
-		return writer( (String) null );
+	public SearchWorkspace workspace() {
+		return workspace( (String) null );
 	}
 
 	@Override
-	public SearchWriter writer(String tenantId) {
-		return writer( mappingContext.getDetachedBackendSessionContext( tenantId ) );
+	public SearchWorkspace workspace(String tenantId) {
+		return workspace( mappingContext.getDetachedBackendSessionContext( tenantId ) );
 	}
 
-	public SearchWriter writer(DetachedBackendSessionContext detachedSessionContext) {
-		return new SearchWriterImpl( delegate.executor( detachedSessionContext ) );
+	public SearchWorkspace workspace(DetachedBackendSessionContext detachedSessionContext) {
+		return new SearchWorkspaceImpl( delegate.executor( detachedSessionContext ) );
 	}
 
 	@Override

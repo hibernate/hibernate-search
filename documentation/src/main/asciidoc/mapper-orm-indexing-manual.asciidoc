@@ -248,7 +248,7 @@ but rather about a large number of documents, possibly all of them.
 This includes, for example, purging the index to remove all of its content.
 
 The operations are performed *outside* of the context of an ORM session,
-using the `SearchWriter` interface.
+using the `SearchWorkspace` interface.
 This interface exposes various large-scale operations
 that can be applied to an index or a set of indexes.
 These operations are triggered as soon as they are requested,
@@ -257,10 +257,10 @@ without waiting for the transaction commit.
 This interface offers the following methods:
 
 `purge()`::
-Purge the indexes targeted by this writer, removing all documents.
+Purge the indexes targeted by this workspace, removing all documents.
 +
 When using multi-tenancy, only documents of one tenant will be removed:
-the tenant of the session from which this writer originated.
+the tenant of the session from which this workspace originated.
 `purgeAsync()`::
 Asynchronous version of `purge()` returning a `CompletableFuture`.
 `flush()`::
@@ -273,7 +273,7 @@ Only to be used by experts fully aware of the implications.
 `flushAsync()`::
 Asynchronous version of `flush()` returning a `CompletableFuture`.
 `optimize()`::
-Merge all segments of the indexes targeted by this writer into a single one.
+Merge all segments of the indexes targeted by this workspace into a single one.
 +
 Note this operation may affect performance positively as well as negatively.
 As a rule of thumb, if indexes are read-only for extended periods of time,
@@ -283,31 +283,31 @@ is likely to degrade read/write performance overall.
 `optimizeAsync()`::
 Asynchronous version of `optimize()` returning a `CompletableFuture`.
 
-Below is an example using a `SearchWriter` to purge several indexes.
+Below is an example using a `SearchWorkspace` to purge several indexes.
 
-.Purging indexes using a `SearchWriter`
+.Purging indexes using a `SearchWorkspace`
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=writer-purge]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-purge]
 ----
 <1> Get a `SearchSession`.
-<2> Get a writer targeting the indexes mapped to the `Book` and `Author` entity types.
+<2> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
 <3> Trigger a purge.
 This method is synchronous and will only return after the purge is complete,
 but an asynchronous method, `purgeAsync`, is also available.
 ====
 
-There are multiple ways to retrieve the `SearchWriter` to target one, several or all indexes:
+There are multiple ways to retrieve a `SearchWorkspace` to target one, several or all indexes:
 
-.Retrieving a `SearchWriter`
+.Retrieving a `SearchWorkspace`
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=writer-retrieval]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval]
 ----
 <1> Get a `SearchSession`.
-<2> Get a writer targeting all indexes.
-<3> Get a writer targeting the index mapped to the `Book` entity type.
-<4> Get a writer targeting the indexes mapped to the `Book` and `Author` entity types.
+<2> Get a workspace targeting all indexes.
+<3> Get a workspace targeting the index mapped to the `Book` entity type.
+<4> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
 ====

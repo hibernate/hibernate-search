@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryH
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
-import org.hibernate.search.mapper.orm.writing.SearchWriter;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 
 /**
  * A lazily initializing {@link SearchSession}.
@@ -50,8 +50,8 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
-	public SearchWriter writer(Collection<? extends Class<?>> types) {
-		return getDelegate().writer( types );
+	public SearchWorkspace workspace(Collection<? extends Class<?>> types) {
+		return getDelegate().workspace( types );
 	}
 
 	@Override

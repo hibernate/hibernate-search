@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryPredicateStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.writing.SearchWriter;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
@@ -96,25 +96,25 @@ public interface SearchScope<E> {
 	SearchAggregationFactory aggregation();
 
 	/**
-	 * Create a {@link SearchWriter} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 * Create a {@link SearchWorkspace} for the indexes mapped to types in this scope, or to any of their sub-types.
 	 * <p>
 	 * This method only works for single-tenant applications.
-	 * If multi-tenancy is enabled, use {@link #writer(String)} instead.
+	 * If multi-tenancy is enabled, use {@link #workspace(String)} instead.
 	 *
-	 * @return A {@link SearchWriter}.
+	 * @return A {@link SearchWorkspace}.
 	 */
-	SearchWriter writer();
+	SearchWorkspace workspace();
 
 	/**
-	 * Create a {@link SearchWriter} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 * Create a {@link SearchWorkspace} for the indexes mapped to types in this scope, or to any of their sub-types.
 	 * <p>
 	 * This method only works for multi-tenant applications.
-	 * If multi-tenancy is disabled, use {@link #writer()} instead.
+	 * If multi-tenancy is disabled, use {@link #workspace()} instead.
 	 *
 	 * @param tenantId The identifier of the tenant whose index content should be targeted.
-	 * @return A {@link SearchWriter}.
+	 * @return A {@link SearchWorkspace}.
 	 */
-	SearchWriter writer(String tenantId);
+	SearchWorkspace workspace(String tenantId);
 
 	/**
 	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.writing;
+package org.hibernate.search.integrationtest.mapper.orm.workspace;
 
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
@@ -15,7 +15,7 @@ import javax.persistence.Id;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.writing.SearchWriter;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -25,7 +25,7 @@ import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Rule;
 import org.junit.Test;
 
-public abstract class AbstractSearchWriterSimpleOperationIT {
+public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	private static final String BACKEND1_NAME = "stubBackend1";
 	private static final String BACKEND2_NAME = "stubBackend2";
@@ -44,17 +44,17 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		SessionFactory sessionFactory = setup();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchWriter writer = Search.session( session ).writer( IndexedEntity1.class );
+			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
-			CompletableFuture<?> futureFromWriter = executeAsync( writer );
+			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
 			backend1Mock.verifyExpectationsMet();
-			assertThat( futureFromWriter ).isPending();
+			assertThat( futureFromWorkspace ).isPending();
 
 			futureFromBackend.complete( new Object() );
-			assertThat( futureFromWriter ).isSuccessful();
+			assertThat( futureFromWorkspace ).isSuccessful();
 		} );
 	}
 
@@ -63,18 +63,18 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		SessionFactory sessionFactory = setup();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchWriter writer = Search.session( session ).writer( IndexedEntity1.class );
+			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
-			CompletableFuture<?> futureFromWriter = executeAsync( writer );
+			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
 			backend1Mock.verifyExpectationsMet();
-			assertThat( futureFromWriter ).isPending();
+			assertThat( futureFromWorkspace ).isPending();
 
 			RuntimeException exception = new RuntimeException();
 			futureFromBackend.completeExceptionally( exception );
-			assertThat( futureFromWriter ).isFailed( exception );
+			assertThat( futureFromWorkspace ).isFailed( exception );
 		} );
 	}
 
@@ -83,13 +83,13 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		SessionFactory sessionFactory = setup();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchWriter writer = Search.session( session ).writer( IndexedEntity1.class );
+			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
 			futureFromBackend.complete( new Object() );
-			executeSync( writer );
+			executeSync( workspace );
 			backend1Mock.verifyExpectationsMet();
 		} );
 	}
@@ -99,7 +99,7 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		SessionFactory sessionFactory = setup();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchWriter writer = Search.session( session ).writer( IndexedEntity1.class );
+			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
@@ -108,7 +108,7 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 			futureFromBackend.completeExceptionally( exception );
 
 			SubTest.expectException(
-					() -> executeSync( writer )
+					() -> executeSync( workspace )
 			)
 					.assertThrown()
 					.isSameAs( exception );
@@ -120,23 +120,23 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		SessionFactory sessionFactory = setup();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchWriter writer = Search.session( session ).writer();
+			SearchWorkspace workspace = Search.session( session ).workspace();
 
 			CompletableFuture<Object> future1FromBackend = new CompletableFuture<>();
 			CompletableFuture<Object> future2FromBackend = new CompletableFuture<>();
 			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, future1FromBackend );
 			expectWork( backend2Mock, IndexedEntity2.INDEX_NAME, future2FromBackend );
 
-			CompletableFuture<?> futureFromWriter = executeAsync( writer );
+			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
 			backend1Mock.verifyExpectationsMet();
 			backend2Mock.verifyExpectationsMet();
-			assertThat( futureFromWriter ).isPending();
+			assertThat( futureFromWorkspace ).isPending();
 
 			future1FromBackend.complete( new Object() );
-			assertThat( futureFromWriter ).isPending();
+			assertThat( futureFromWorkspace ).isPending();
 
 			future2FromBackend.complete( new Object() );
-			assertThat( futureFromWriter ).isSuccessful();
+			assertThat( futureFromWorkspace ).isSuccessful();
 		} );
 	}
 
@@ -144,32 +144,32 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 	public void outOfSession() {
 		SessionFactory sessionFactory = setup();
 
-		SearchWriter writer;
+		SearchWorkspace workspace;
 		try ( Session session = sessionFactory.openSession() ) {
-			writer = Search.session( session ).writer( IndexedEntity1.class );
+			workspace = Search.session( session ).workspace( IndexedEntity1.class );
 		}
 
 		CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 		expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
-		CompletableFuture<?> futureFromWriter = executeAsync( writer );
+		CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
 		backend1Mock.verifyExpectationsMet();
-		assertThat( futureFromWriter ).isPending();
+		assertThat( futureFromWorkspace ).isPending();
 
 		futureFromBackend.complete( new Object() );
-		assertThat( futureFromWriter ).isSuccessful();
+		assertThat( futureFromWorkspace ).isSuccessful();
 	}
 
 	@Test
 	public void fromMappingWithoutSession() {
 		SessionFactory sessionFactory = setup();
 
-		SearchWriter writer = Search.mapping( sessionFactory ).scope( IndexedEntity1.class ).writer();
+		SearchWorkspace workspace = Search.mapping( sessionFactory ).scope( IndexedEntity1.class ).workspace();
 
 		CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 		expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
-		CompletableFuture<?> futureFromWriter = executeAsync( writer );
+		CompletableFuture<?> futureFromWriter = executeAsync( workspace );
 		backend1Mock.verifyExpectationsMet();
 		assertThat( futureFromWriter ).isPending();
 
@@ -179,9 +179,9 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 
 	protected abstract void expectWork(BackendMock backendMock, String indexName, CompletableFuture<?> future);
 
-	protected abstract void executeSync(SearchWriter writer);
+	protected abstract void executeSync(SearchWorkspace workspace);
 
-	protected abstract CompletableFuture<?> executeAsync(SearchWriter writer);
+	protected abstract CompletableFuture<?> executeAsync(SearchWorkspace workspace);
 
 	private SessionFactory setup() {
 		backend1Mock.expectAnySchema( IndexedEntity1.INDEX_NAME );

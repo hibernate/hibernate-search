@@ -14,7 +14,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
-import org.hibernate.search.mapper.orm.writing.SearchWriter;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 
@@ -59,31 +59,31 @@ public interface SearchSession {
 	<T> HibernateOrmSearchQueryHitTypeStep<T> search(SearchScope<T> scope);
 
 	/**
-	 * Create a {@link SearchWriter} for the indexes mapped to all indexed types.
+	 * Create a {@link SearchWorkspace} for the indexes mapped to all indexed types.
 	 *
-	 * @return A {@link SearchWriter}.
+	 * @return A {@link SearchWorkspace}.
 	 */
-	default SearchWriter writer() {
-		return writer( Collections.singleton( Object.class ) );
+	default SearchWorkspace workspace() {
+		return workspace( Collections.singleton( Object.class ) );
 	}
 
 	/**
-	 * Create a {@link SearchWriter} for the indexes mapped to the given type, or to any of its sub-types.
+	 * Create a {@link SearchWorkspace} for the indexes mapped to the given type, or to any of its sub-types.
 	 *
-	 * @param types One or more indexed types, or supertypes of all indexed types that will be targeted by the writer.
-	 * @return A {@link SearchWriter}.
+	 * @param types One or more indexed types, or supertypes of all indexed types that will be targeted by the workspace.
+	 * @return A {@link SearchWorkspace}.
 	 */
-	default SearchWriter writer(Class<?> ... types) {
-		return writer( Arrays.asList( types ) );
+	default SearchWorkspace workspace(Class<?> ... types) {
+		return workspace( Arrays.asList( types ) );
 	}
 
 	/**
-	 * Create a {@link SearchWriter} for the indexes mapped to the given types, or to any of their sub-types.
+	 * Create a {@link SearchWorkspace} for the indexes mapped to the given types, or to any of their sub-types.
 	 *
-	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the writer.
-	 * @return A {@link SearchWriter}.
+	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the workspace.
+	 * @return A {@link SearchWorkspace}.
 	 */
-	SearchWriter writer(Collection<? extends Class<?>> types);
+	SearchWorkspace workspace(Collection<? extends Class<?>> types);
 
 	/**
 	 * Creates a {@link MassIndexer} to rebuild the indexes of all indexed entity types.
@@ -101,7 +101,7 @@ public interface SearchSession {
 	 * <p>
 	 * {@link MassIndexer} instances cannot be reused.
 	 *
-	 * @param types An array of indexed types, or supertypes of all indexed types that will be targeted by the writer.
+	 * @param types An array of indexed types, or supertypes of all indexed types that will be targeted by the workspace.
 	 * @return The created mass indexer.
 	 */
 	default MassIndexer massIndexer(Class<?>... types) {
@@ -111,8 +111,8 @@ public interface SearchSession {
 	/**
 	 * Creates a {@link MassIndexer} to rebuild the indexes mapped to the given types, or to any of their sub-types.
 	 *
-	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the writer.
-	 * @return A {@link SearchWriter}.
+	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the workspace.
+	 * @return A {@link SearchWorkspace}.
 	 */
 	MassIndexer massIndexer(Collection<? extends Class<?>> types);
 

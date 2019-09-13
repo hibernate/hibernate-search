@@ -4,18 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.writing.impl;
+package org.hibernate.search.mapper.orm.work.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.orm.writing.SearchWriter;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
 import org.hibernate.search.util.common.impl.Futures;
 
-public class SearchWriterImpl implements SearchWriter {
+public class SearchWorkspaceImpl implements SearchWorkspace {
 	private final PojoScopeWorkExecutor scopeWorkExecutor;
 
-	public SearchWriterImpl(PojoScopeWorkExecutor scopeWorkExecutor) {
+	public SearchWorkspaceImpl(PojoScopeWorkExecutor scopeWorkExecutor) {
 		this.scopeWorkExecutor = scopeWorkExecutor;
 	}
 
