@@ -4,16 +4,16 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.session.impl;
+package org.hibernate.search.mapper.orm.work.impl;
 
-import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
-final class SearchSessionWritePlanImpl implements SearchSessionWritePlan {
+public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
-	private final SearchSessionWritePlanContext context;
+	private final SearchIndexingPlanContext context;
 
-	SearchSessionWritePlanImpl(SearchSessionWritePlanContext context) {
+	public SearchIndexingPlanImpl(SearchIndexingPlanContext context) {
 		this.context = context;
 	}
 

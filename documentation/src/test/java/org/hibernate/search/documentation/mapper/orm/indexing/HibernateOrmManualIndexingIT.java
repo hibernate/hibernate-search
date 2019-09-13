@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -86,7 +86,7 @@ public class HibernateOrmManualIndexingIT {
 
 			// tag::persist-automatic-indexing-periodic-flush-execute-clear[]
 			SearchSession searchSession = Search.session( entityManager ); // <1>
-			SearchSessionWritePlan searchWritePlan = searchSession.writePlan(); // <2>
+			SearchIndexingPlan indexingPlan = searchSession.indexingPlan(); // <2>
 
 			entityManager.getTransaction().begin();
 			try {
@@ -97,7 +97,7 @@ public class HibernateOrmManualIndexingIT {
 					if ( ( i + 1 ) % BATCH_SIZE == 0 ) {
 						entityManager.flush();
 						entityManager.clear();
-						searchWritePlan.execute(); // <4>
+						indexingPlan.execute(); // <4>
 					}
 				}
 				entityManager.getTransaction().commit(); // <5>
@@ -151,15 +151,15 @@ public class HibernateOrmManualIndexingIT {
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			assertBookCount( entityManager, 0 );
 
-			// tag::write-plan-addOrUpdate[]
+			// tag::indexing-plan-addOrUpdate[]
 			SearchSession searchSession = Search.session( entityManager ); // <1>
-			SearchSessionWritePlan searchWritePlan = searchSession.writePlan(); // <2>
+			SearchIndexingPlan indexingPlan = searchSession.indexingPlan(); // <2>
 
 			entityManager.getTransaction().begin();
 			try {
 				Book book = entityManager.getReference( Book.class, 5 ); // <3>
 
-				searchWritePlan.addOrUpdate( book ); // <4>
+				indexingPlan.addOrUpdate( book ); // <4>
 
 				entityManager.getTransaction().commit(); // <5>
 			}
@@ -167,7 +167,7 @@ public class HibernateOrmManualIndexingIT {
 				entityManager.getTransaction().rollback();
 				throw e;
 			}
-			// end::write-plan-addOrUpdate[]
+			// end::indexing-plan-addOrUpdate[]
 
 			assertBookCount( entityManager, 1 );
 		} );
@@ -182,15 +182,15 @@ public class HibernateOrmManualIndexingIT {
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			assertBookCount( entityManager, numberOfBooks );
 
-			// tag::write-plan-delete[]
+			// tag::indexing-plan-delete[]
 			SearchSession searchSession = Search.session( entityManager ); // <1>
-			SearchSessionWritePlan searchWritePlan = searchSession.writePlan(); // <2>
+			SearchIndexingPlan indexingPlan = searchSession.indexingPlan(); // <2>
 
 			entityManager.getTransaction().begin();
 			try {
 				Book book = entityManager.getReference( Book.class, 5 ); // <3>
 
-				searchWritePlan.delete( book ); // <4>
+				indexingPlan.delete( book ); // <4>
 
 				entityManager.getTransaction().commit(); // <5>
 			}
@@ -198,7 +198,7 @@ public class HibernateOrmManualIndexingIT {
 				entityManager.getTransaction().rollback();
 				throw e;
 			}
-			// end::write-plan-delete[]
+			// end::indexing-plan-delete[]
 
 			assertBookCount( entityManager, numberOfBooks - 1 );
 		} );

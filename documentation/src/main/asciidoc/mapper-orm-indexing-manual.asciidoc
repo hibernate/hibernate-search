@@ -24,8 +24,8 @@ As with everything in Hibernate Search,
 these APIs only affect the Hibernate Search indexes:
 they do not write anything to the database.
 
-[[mapper-orm-indexing-manual-writeplan-process-execute]]
-== Controlling entity reads and index writes with `SearchSessionWritePlan`
+[[mapper-orm-indexing-manual-indexingplan-process-execute]]
+== Controlling entity reads and index writes with `SearchIndexingPlan`
 // Search 5 anchors backward compatibility
 [[search-batchindex-flushtoindexes]]
 
@@ -91,7 +91,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 Note we're relying on automatic indexing to index the entity,
 but this would work just as well if automatic indexing was disabled,
 only requiring an extra call to index the entity.
-See <<mapper-orm-indexing-manual-writeplan-writes>>.
+See <<mapper-orm-indexing-manual-indexingplan-writes>>.
 <5> Commit the transaction at the end of each iteration of the outer loop.
 The entities will be flushed and indexed automatically.
 ====
@@ -113,7 +113,7 @@ after the call to `session.flush()`/`session.clear()`,
 without waiting for the database transaction to be committed:
 the internal document buffer will be cleared after each write to indexes.
 
-This is done by calling the `execute()` method on the write plan,
+This is done by calling the `execute()` method on the indexing plan,
 as shown in the example below.
 
 [IMPORTANT]
@@ -126,7 +126,7 @@ The index will thus be inconsistent with the database.
 To recover from that situation, you will have to either
 execute the exact same database changes that failed manually
 (to get the database back in sync with the index),
-or <<mapper-orm-indexing-manual-writeplan-writes,reindex the entities>> affected by the transaction manually
+or <<mapper-orm-indexing-manual-indexingplan-writes,reindex the entities>> affected by the transaction manually
 (to get the index back in sync with the database).
 
 Of course, if you can afford to take the indexes offline for a longer period of time,
@@ -141,13 +141,13 @@ and <<mapper-orm-indexing-massindexer,reindex everything>>.
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-execute-clear]
 ----
 <1> Get the `SearchSession`.
-<2> Get the search session's write plan.
+<2> Get the search session's indexing plan.
 <3> For every iteration of the loop, instantiate a new entity and persist it.
 Note we're relying on automatic indexing to index the entity,
 but this would work just as well if automatic indexing was disabled,
 only requiring an extra call to index the entity.
-See <<mapper-orm-indexing-manual-writeplan-writes>>.
-<4> After after a `flush()`/`clear()`, call `writePlan.execute()`.
+See <<mapper-orm-indexing-manual-indexingplan-writes>>.
+<4> After after a `flush()`/`clear()`, call `indexingPlan.execute()`.
 The entities will be processed and *the changes will be sent to the indexes immediately*.
 Hibernate Search will wait for index changes to be "completed"
 as required by the configured <<mapper-orm-indexing-automatic-synchronization,synchronization strategy>>.
@@ -156,7 +156,7 @@ The remaining entities that were not flushed/cleared will be flushed and indexed
 ====
 
 
-[[mapper-orm-indexing-manual-writeplan-writes]]
+[[mapper-orm-indexing-manual-indexingplan-writes]]
 == Explicitly indexing and deleting specific documents
 // Search 5 anchors backward compatibility
 [[_adding_instances_to_the_index]]
@@ -167,7 +167,7 @@ the indexes will start empty and stay that way
 until explicit indexing commands are sent to Hibernate Search.
 
 Indexing is done in the context of an ORM session
-using the `SearchSessionWritePlan` interface.
+using the `SearchIndexingPlan` interface.
 This interface represents the (mutable) set of changes
 that are planned in the context of a session,
 and will be applied to indexes upon transaction commit.
@@ -193,35 +193,35 @@ Respectively, process the changes and apply them to indexes.
 +
 These methods will be executed automatically on commit,
 so they are only useful when processing large number of items,
-as explained in <<mapper-orm-indexing-manual-writeplan-process-execute>>.
+as explained in <<mapper-orm-indexing-manual-indexingplan-process-execute>>.
 
 Below are examples of using `addOrUpdate` and `delete`.
 
-.Explicitly adding or updating an entity in the index using `SearchSessionWritePlan`
+.Explicitly adding or updating an entity in the index using `SearchIndexingPlan`
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=write-plan-addOrUpdate]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-addOrUpdate]
 ----
 <1> Get the `SearchSession`.
-<2> Get the search session's write plan.
+<2> Get the search session's indexing plan.
 <3> Fetch from the database the `Book` we want to index.
-<4> Submit the `Book` to the write plan for an add-or-update operation.
+<4> Submit the `Book` to the indexing plan for an add-or-update operation.
 The operation won't be executed immediately,
 but will be delayed until the transaction is committed.
 <5> Commit the transaction, allowing Hibernate Search to actually write the document to the index.
 ====
 
-.Explicitly deleting an entity from the index using `SearchSessionWritePlan`
+.Explicitly deleting an entity from the index using `SearchIndexingPlan`
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=write-plan-delete]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-delete]
 ----
 <1> Get the `SearchSession`.
-<2> Get the search session's write plan.
+<2> Get the search session's indexing plan.
 <3> Fetch from the database the `Book` we want to un-index.
-<4> Submit the `Book` to the write plan for a delete operation.
+<4> Submit the `Book` to the indexing plan for a delete operation.
 The operation won't be executed immediately,
 but will be delayed until the transaction is committed.
 <5> Commit the transaction, allowing Hibernate Search to actually delete the document from the index.
@@ -229,7 +229,7 @@ but will be delayed until the transaction is committed.
 
 [TIP]
 ====
-Multiple operations can be performed in a single write plan.
+Multiple operations can be performed in a single indexing plan.
 The same entity can even be changed multiple times,
 for example added and then removed:
 Hibernate Search will simplify the operation as expected.
@@ -238,7 +238,7 @@ This will work fine for any reasonable number of entities,
 but changing or simply loading large numbers of entities in a single session
 requires special care with Hibernate ORM,
 and then some extra care with Hibernate Search.
-See <<mapper-orm-indexing-manual-writeplan-process-execute>> for more information.
+See <<mapper-orm-indexing-manual-indexingplan-process-execute>> for more information.
 ====
 
 == Explicitly altering a whole index

@@ -14,7 +14,7 @@ import javax.persistence.Id;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -67,17 +67,17 @@ public class AutomaticIndexingOutOfTransactionIT {
 	@Test
 	public void clear() {
 		withinSession( sessionFactory, session -> {
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 
 			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );
-			// working directly on the work plan to add works immediately (not at flush time!)
-			writePlan.addOrUpdate( entity1 );
+			// working directly on the indexing plan to add works immediately (not at flush time!)
+			indexingPlan.addOrUpdate( entity1 );
 
 			// clearing the update of entity 1
 			session.clear();
 
 			IndexedEntity entity2 = new IndexedEntity( 2, "number2" );
-			writePlan.addOrUpdate( entity2 );
+			indexingPlan.addOrUpdate( entity2 );
 
 			// only entity 2 is supposed to be flushed here
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )

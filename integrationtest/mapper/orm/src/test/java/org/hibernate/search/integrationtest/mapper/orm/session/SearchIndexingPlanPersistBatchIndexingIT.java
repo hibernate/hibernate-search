@@ -13,7 +13,7 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -25,13 +25,13 @@ import org.junit.Test;
 
 /**
  * Test batch indexing relying not on the {@link org.hibernate.search.mapper.orm.massindexing.MassIndexer},
- * but on automatic indexing and on the {@link SearchSessionWritePlan},
+ * but on automatic indexing and on the {@link SearchIndexingPlan},
  * flushing and clearing the session periodically.
  * <p>
  * This is mostly useful when inserting lots of data into the database using JPA.
  */
 @TestForIssue(jiraKey = "HSEARCH-3049")
-public class SearchSessionWritePlanPersistBatchIndexingIT {
+public class SearchIndexingPlanPersistBatchIndexingIT {
 
 	private static final String BACKEND_NAME = "stubBackend";
 
@@ -55,7 +55,7 @@ public class SearchSessionWritePlanPersistBatchIndexingIT {
 		SessionFactory sessionFactory = setup();
 
 		withinTransaction( sessionFactory, session -> {
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 
 			// This is for test only and wouldn't be present in real code
 			int firstIdOfThisBatch = 0;
@@ -98,7 +98,7 @@ public class SearchSessionWritePlanPersistBatchIndexingIT {
 		SessionFactory sessionFactory = setup();
 
 		withinTransaction( sessionFactory, session -> {
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 
 			// This is for test only and wouldn't be present in real code
 			int firstIdOfThisBatch = 0;
@@ -113,7 +113,7 @@ public class SearchSessionWritePlanPersistBatchIndexingIT {
 					expectAddWorks( firstIdOfThisBatch, i ).executed();
 					firstIdOfThisBatch = i;
 
-					writePlan.execute();
+					indexingPlan.execute();
 
 					// For test only: check execution happens before the clear()
 					backendMock.verifyExpectationsMet();

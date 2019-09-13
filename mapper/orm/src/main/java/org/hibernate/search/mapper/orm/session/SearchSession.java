@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
@@ -156,10 +157,10 @@ public interface SearchSession {
 	}
 
 	/**
-	 * @return The write plan for this session, allowing to explicitly index or delete entities,
+	 * @return The indexing plan for this session, allowing to explicitly index entities or delete them from the index,
 	 * or to process entity changes or even write to the indexes before the transaction is committed.
 	 */
-	SearchSessionWritePlan writePlan();
+	SearchIndexingPlan indexingPlan();
 
 	/**
 	 * @return The underlying {@link EntityManager} used by this {@link SearchSession}.

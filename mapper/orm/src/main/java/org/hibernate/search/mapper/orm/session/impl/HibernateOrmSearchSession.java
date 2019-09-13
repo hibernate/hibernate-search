@@ -37,9 +37,11 @@ import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
+import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanContext;
+import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
@@ -52,7 +54,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * The actual implementation of {@link SearchSession}.
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
-		implements SearchSession, HibernateOrmScopeSessionContext, SearchSessionWritePlanContext,
+		implements SearchSession, HibernateOrmScopeSessionContext, SearchIndexingPlanContext,
 				ReferenceHitMapper<EntityReference> {
 
 	/**
@@ -100,7 +102,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	 */
 	private boolean enlistInTransaction = false;
 
-	private SearchSessionWritePlanImpl writePlan;
+	private SearchIndexingPlanImpl indexingPlan;
 
 	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder) {
 		this( builder, builder.buildBackendSessionContext() );
@@ -160,11 +162,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public SearchSessionWritePlan writePlan() {
-		if ( writePlan == null ) {
-			writePlan = new SearchSessionWritePlanImpl( this );
+	public SearchIndexingPlan indexingPlan() {
+		if ( indexingPlan == null ) {
+			indexingPlan = new SearchIndexingPlanImpl( this );
 		}
-		return writePlan;
+		return indexingPlan;
 	}
 
 	@Override

@@ -22,7 +22,7 @@ public enum AutomaticIndexingStrategyName {
 	/**
 	 * No automatic indexing is performed:
 	 * indexing will only happen when explicitly requested through APIs
-	 * such as {@link SearchSession#writePlan()}.
+	 * such as {@link SearchSession#indexingPlan()}.
 	 */
 	NONE("none"),
 

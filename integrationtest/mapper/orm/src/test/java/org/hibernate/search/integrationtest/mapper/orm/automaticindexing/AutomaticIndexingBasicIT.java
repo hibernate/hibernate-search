@@ -20,7 +20,7 @@ import javax.persistence.Id;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -595,12 +595,12 @@ public class AutomaticIndexingBasicIT {
 			session.persist( entity7 );
 			session.persist( entity8 );
 
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
-			writePlan.addOrUpdate( entity9 );
-			writePlan.addOrUpdate( entity10 );
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
+			indexingPlan.addOrUpdate( entity9 );
+			indexingPlan.addOrUpdate( entity10 );
 
 			// the clear will revert the changes that haven't been flushed yet,
-			// including the ones that have been inserted directly in the write plan (bypassing the ORM session)
+			// including the ones that have been inserted directly in the indexing plan (bypassing the ORM session)
 			session.clear();
 
 			backendMock.expectWorks( IndexedEntity.INDEX )

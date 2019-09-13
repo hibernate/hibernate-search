@@ -15,7 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -27,9 +27,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test usage of the session write plan with an entity type whose document ID is not the entity ID.
+ * Test usage of the session indexing plan with an entity type whose document ID is not the entity ID.
  */
-public class SearchSessionWritePlanNonEntityIdDocumentIdIT {
+public class SearchIndexingPlanNonEntityIdDocumentIdIT {
 
 	private static final String BACKEND_NAME = "stubBackend";
 
@@ -53,11 +53,11 @@ public class SearchSessionWritePlanNonEntityIdDocumentIdIT {
 			session.persist( entity2 );
 			session.persist( entity3 );
 
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
-			writePlan.addOrUpdate( entity1 );
-			writePlan.addOrUpdate( entity2 );
-			writePlan.delete( entity3 );
-			writePlan.purge( IndexedEntity.class, 47 ); // Does not exist in database, but may exist in the index
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
+			indexingPlan.addOrUpdate( entity1 );
+			indexingPlan.addOrUpdate( entity2 );
+			indexingPlan.delete( entity3 );
+			indexingPlan.purge( IndexedEntity.class, 47 ); // Does not exist in database, but may exist in the index
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
 					.update( "41", b -> b.field( "text", "number1" ) )

@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 
 /**
@@ -75,8 +75,8 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
-	public SearchSessionWritePlan writePlan() {
-		return getDelegate().writePlan();
+	public SearchIndexingPlan indexingPlan() {
+		return getDelegate().indexingPlan();
 	}
 
 	@Override

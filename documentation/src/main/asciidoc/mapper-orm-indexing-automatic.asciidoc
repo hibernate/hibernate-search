@@ -55,7 +55,7 @@ entity changes performed up to the flush will be indexed correctly.
 If you come from Hibernate Search 5 or earlier,
 you may see this as a significant improvement:
 there is no need to call `flushToIndexes()` and update indexes in the middle of a transaction anymore,
-except for larger volumes of data (see <<mapper-orm-indexing-manual-writeplan-process-execute>>).
+except for larger volumes of data (see <<mapper-orm-indexing-manual-indexingplan-process-execute>>).
 ====
 Inside transactions, indexing happens after transactions are committed::
 When entity changes happen inside a transaction,
@@ -68,7 +68,7 @@ and perform flush/clear, regularly to save memory,
 be aware that Hibernate Search's internal buffer holding documents to index
 will grow on each flush, and will not be cleared until the transaction is committed or rolled back.
 If you encounter memory issues because of that,
-see <<mapper-orm-indexing-manual-writeplan-process-execute>> for a few solutions.
+see <<mapper-orm-indexing-manual-indexingplan-process-execute>> for a few solutions.
 Outside of transactions, indexing happens on session flush::
 When entity changes happen outside of any transaction (not recommended),
 indexes are updated immediately upon session `flush()`.

@@ -19,7 +19,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.session.SearchSessionWritePlan;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -33,7 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-3049")
-public class SearchSessionWritePlanBaseIT {
+public class SearchIndexingPlanBaseIT {
 
 	private static final String BACKEND1_NAME = "stubBackend1";
 	private static final String BACKEND2_NAME = "stubBackend2";
@@ -60,11 +60,11 @@ public class SearchSessionWritePlanBaseIT {
 			session.persist( entity2 );
 			session.persist( entity3 );
 
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
-			writePlan.addOrUpdate( entity1 );
-			writePlan.addOrUpdate( entity2 );
-			writePlan.delete( entity3 );
-			writePlan.purge( IndexedEntity1.class, 42 ); // Does not exist in database, but may exist in the index
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
+			indexingPlan.addOrUpdate( entity1 );
+			indexingPlan.addOrUpdate( entity2 );
+			indexingPlan.delete( entity3 );
+			indexingPlan.purge( IndexedEntity1.class, 42 ); // Does not exist in database, but may exist in the index
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.update( "1", b -> b.field( "text", "number1" ) )
@@ -99,34 +99,34 @@ public class SearchSessionWritePlanBaseIT {
 			session.persist( entity7 );
 			session.persist( entity8 );
 
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 
-			writePlan.addOrUpdate( entity1 );
-			writePlan.addOrUpdate( entity1 );
+			indexingPlan.addOrUpdate( entity1 );
+			indexingPlan.addOrUpdate( entity1 );
 
-			writePlan.delete( entity2 );
-			writePlan.delete( entity2 );
+			indexingPlan.delete( entity2 );
+			indexingPlan.delete( entity2 );
 
-			writePlan.addOrUpdate( entity3 );
-			writePlan.delete( entity3 );
+			indexingPlan.addOrUpdate( entity3 );
+			indexingPlan.delete( entity3 );
 
-			writePlan.delete( entity4 );
-			writePlan.addOrUpdate( entity4 );
+			indexingPlan.delete( entity4 );
+			indexingPlan.addOrUpdate( entity4 );
 
-			writePlan.purge( IndexedEntity1.class, 42 );
-			writePlan.purge( IndexedEntity1.class, 42 );
+			indexingPlan.purge( IndexedEntity1.class, 42 );
+			indexingPlan.purge( IndexedEntity1.class, 42 );
 
-			writePlan.delete( entity5 );
-			writePlan.purge( IndexedEntity1.class, 5 );
+			indexingPlan.delete( entity5 );
+			indexingPlan.purge( IndexedEntity1.class, 5 );
 
-			writePlan.purge( IndexedEntity1.class, 6 );
-			writePlan.delete( entity6 );
+			indexingPlan.purge( IndexedEntity1.class, 6 );
+			indexingPlan.delete( entity6 );
 
-			writePlan.addOrUpdate( entity7 );
-			writePlan.purge( IndexedEntity1.class, 7 );
+			indexingPlan.addOrUpdate( entity7 );
+			indexingPlan.purge( IndexedEntity1.class, 7 );
 
-			writePlan.purge( IndexedEntity1.class, 8 );
-			writePlan.addOrUpdate( entity8 );
+			indexingPlan.purge( IndexedEntity1.class, 8 );
+			indexingPlan.addOrUpdate( entity8 );
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					// multiple addOrUpdate => single update
@@ -157,9 +157,9 @@ public class SearchSessionWritePlanBaseIT {
 		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
 
 		withinTransaction( sessionFactory, session -> {
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 			SubTest.expectException(
-					() -> writePlan.purge( ContainedEntity.class, 42 )
+					() -> indexingPlan.purge( ContainedEntity.class, 42 )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -229,14 +229,14 @@ public class SearchSessionWritePlanBaseIT {
 			session.flush();
 			backend1Mock.verifyExpectationsMet();
 
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
 					.executed();
 
-			writePlan.execute();
+			indexingPlan.execute();
 
 			// Works should be executed immediately
 			backend1Mock.verifyExpectationsMet();
@@ -270,9 +270,9 @@ public class SearchSessionWritePlanBaseIT {
 
 			session.persist( entity3 );
 
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
-			writePlan.addOrUpdate( entity1 );
-			writePlan.delete( entity2 );
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
+			indexingPlan.addOrUpdate( entity1 );
+			indexingPlan.delete( entity2 );
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					// Requested explicitly
@@ -298,10 +298,10 @@ public class SearchSessionWritePlanBaseIT {
 			session.persist( entity2 );
 			session.persist( entity3 );
 
-			SearchSessionWritePlan writePlan = Search.session( session ).writePlan();
-			writePlan.addOrUpdate( entity1 );
-			writePlan.addOrUpdate( entity2 );
-			writePlan.delete( entity3 );
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
+			indexingPlan.addOrUpdate( entity1 );
+			indexingPlan.addOrUpdate( entity2 );
+			indexingPlan.delete( entity3 );
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.update( "1", b -> b.field( "text", "number1" ) )
@@ -319,37 +319,37 @@ public class SearchSessionWritePlanBaseIT {
 	public void outOfSession() {
 		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
 
-		SearchSessionWritePlan writePlan;
+		SearchIndexingPlan indexingPlan;
 		IndexedEntity1 entity;
 		try ( Session session = sessionFactory.openSession() ) {
 			entity = new IndexedEntity1( 1, "number1" );
 			session.persist( entity );
-			writePlan = Search.session( session ).writePlan();
+			indexingPlan = Search.session( session ).indexingPlan();
 		}
 
 		SubTest.expectException(
-				() -> writePlan.addOrUpdate( entity )
+				() -> indexingPlan.addOrUpdate( entity )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 
 		SubTest.expectException(
-				() -> writePlan.delete( entity )
+				() -> indexingPlan.delete( entity )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 
 		SubTest.expectException(
-				() -> writePlan.process()
+				() -> indexingPlan.process()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 
 		SubTest.expectException(
-				() -> writePlan.execute()
+				() -> indexingPlan.execute()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

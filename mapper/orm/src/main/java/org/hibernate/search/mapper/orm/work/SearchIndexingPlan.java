@@ -4,10 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.session;
+package org.hibernate.search.mapper.orm.work;
 
 /**
- * An interface for writing to indexes in the context of an ORM Session.
+ * An interface for indexing entities in the context of an ORM Session.
  * <p>
  * This class is stateful: it queues operations internally to apply them at a later time.
  * <p>
@@ -28,7 +28,7 @@ package org.hibernate.search.mapper.orm.session;
  * {@link #process()} and {@link #execute()} are mostly useful when automatic indexing is disabled,
  * to control the indexing process explicitly.
  */
-public interface SearchSessionWritePlan {
+public interface SearchIndexingPlan {
 
 	/**
 	 * Add or update a document in the index if the entity type is mapped to an index
@@ -75,7 +75,7 @@ public interface SearchSessionWritePlan {
 	void purge(Class<?> entityClass, Object providedId);
 
 	/**
-	 * Extract all data from objects passed to the write plan so far,
+	 * Extract all data from objects passed to the indexing plan so far,
 	 * creates documents to be indexed and put them into an internal buffer,
 	 * without writing them to the indexes.
 	 * <p>
